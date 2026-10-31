@@ -371,6 +371,68 @@ guest environment. `--modes sync export --cpus 1 12` tests scheduling without
 unnecessary repeated CPU readback. Browser playback, GPU composition, audio and
 end-to-end latency are outside this benchmark; Firefox is not relaunched here.
 
+## End-to-end Firefox playback (2026-11-01)
+
+Headless decoder/export throughput does not measure browser presentation. In a
+foreground 720p H.264 test, Firefox supplied video at source rate but lost frames
+in the compositor. A marker-only capture showed a 31 ms median vsync-notification
+gap and a 104 ms 95th percentile. Full all-thread stack sampling disturbed one
+run enough to end on software decoding; that run is excluded from the playback
+comparison.
+
+Two shared-runtime mechanisms were corrected:
+
+- Seccomp no longer excludes every shared dup/close operation from the worker
+  path. Allowed descriptor operations use the existing files_struct membership;
+  an owner-only resource or denial carries its exact entry decision back to the
+  owner without re-evaluating the filter. Four-worker and denial/deferral tests
+  cover the change. This removes avoidable checkpoints but did not by itself
+  improve this fixture's FPS.
+- Requested Wayland frame callbacks follow the advertised 60 Hz clock even if
+  the requesting surface has not replaced its own pixels. The old 100 ms
+  callback-only interval restricted browser synchronization surfaces, including
+  clients rendering new content into a child surface. Producer-dependent extra
+  cooldown is also removed. Callback-only commits still do not publish/repaint
+  an unchanged scene; unpresented commits still cannot be acknowledged, and
+  clients without requests schedule no callbacks.
+
+The same original 720p video track was repeated ten times through AVFoundation
+passthrough, without re-encoding, with audio omitted. Each sequential run used a
+fresh profile, metadata readiness plus ten seconds of startup settling, five
+seconds of playback warmup, and a 20-second unprofiled interval. Guest execution
+used 12 slots and host-managed memory. The build VM was stopped.
+
+| Path | Accepted video FPS | Dropped / total frames in interval |
+| --- | ---: | ---: |
+| Trames before | 18.16 | 235 / 599 |
+| Trames with both fixes | 29.61 | 4 / 597 |
+| Native macOS Firefox | 29.83 | 0 / 597 |
+
+These are individual source-paced samples, not maximum-throughput scores or
+statistical medians. Guest Firefox is 142.0; native Firefox is 159.0, so this is
+an application-path reference, not an isolated runtime-overhead measurement.
+Playback-quality counters measure accepted/dropped frames, not physical scanout.
+The final guest sample retained hardware decoding and reported no buffering.
+Removing only the adaptive cooldown gave 15.28 FPS; removing callback-only
+downclocking produced the substantial gain.
+
+Cold autoplay remains a separate limitation: the original 12-second AAC fixture
+still enters Firefox's 15-second BUFFERING state during startup. A 25-second
+window straddling that pause accepted 10.58 FPS (272 total, 7 dropped), then
+resumed normal playback and looping. The steady-state result above does not
+claim to fix that cold-start stall. A WebDriver click and text-input check after
+that window completed correctly in 403 ms for the combined controller roundtrip.
+Audio output/A-V synchronization, higher-resolution playback and physical iPad
+presentation are not established by this pass; the shared iPad compile passes.
+
+Use the Mac product's `scripts/benchmark-firefox-video.py --port PORT --output
+result.json --seconds 20 --check-input` with a separate visible Marionette test
+profile already displaying the video. It reads playback-quality counters and
+frame-callback notifications without changing decoder, graphics or sandbox
+preferences. The input check runs after timing. [Machine-readable samples and
+fixture hashes](../validation/firefox-video-playback.json) retain intermediate
+controls as well as the native comparison.
+
 ## Primary sources
 
 - [Apple VideoToolbox hardware decoder query](https://developer.apple.com/documentation/videotoolbox/vtishardwaredecodesupported(_:)) and [actual hardware decoder property](https://developer.apple.com/documentation/videotoolbox/kvtdecompressionpropertykey_usinghardwareacceleratedvideodecoder).

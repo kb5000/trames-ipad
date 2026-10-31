@@ -1,0 +1,481 @@
+{
+  "date": "2026-11-01",
+  "guest_firefox": "142.0",
+  "native_firefox": "159.0",
+  "mac_source": "7f97c96",
+  "runtime_base": "059118df7d584b26a2115d9574a1aeccc05c784b",
+  "method": {
+    "execution_slots": 12,
+    "memory": "host-managed",
+    "network": "loopback",
+    "visible_window": true,
+    "fresh_profile_per_run": true,
+    "warmup": "10 s after metadata readiness, then play and wait 5 s",
+    "measurement_seconds": 20,
+    "logging": "no per-frame logs or profiler in these samples",
+    "frame_rate_formula": "delta(totalVideoFrames - droppedVideoFrames) / elapsed host seconds",
+    "native_control": "separate native profile, explicit navigation, 1920x960 window; different Firefox version",
+    "limits": [
+      "single sequential runs, not statistical medians",
+      "source-paced 720p H.264 playback, not maximum decoder throughput",
+      "playback-quality accepted frames are not physical scanout measurements",
+      "audio output and A/V synchronization not validated"
+    ]
+  },
+  "fixture": {
+    "codec": "progressive H.264 High, 1280x720, 8-bit 4:2:0",
+    "construction": "AVFoundation passthrough: original video track repeated 10 times, audio omitted; no re-encoding",
+    "original_sha256": "1e7d09d9d31447f6907d00b90fd9962170184b9225224028c7988efa161a0766",
+    "sha256": "c35553321ff5dd8eeeca84e3422855574b60b389ea310921d4ce96a0cb3cc1e4",
+    "bytes": 46209162
+  },
+  "runs": {
+    "before": {
+      "mode": "controlled",
+      "elapsed": 20.047331165999992,
+      "before": {
+        "time": 4.840121,
+        "duration": 120.666666,
+        "size": [
+          1280,
+          720
+        ],
+        "buffered": [
+          [
+            0,
+            120.666666
+          ]
+        ],
+        "seekable": [
+          [
+            0,
+            120.666666
+          ]
+        ],
+        "rate": 1,
+        "ready": 4,
+        "paused": false,
+        "total": 146,
+        "dropped": 43,
+        "error": null,
+        "visibility": "visible",
+        "focus": true,
+        "heartbeat": null,
+        "wall": 39421,
+        "callbacks": 71,
+        "processing": 0
+      },
+      "after": {
+        "time": 24.940455,
+        "duration": 120.666666,
+        "size": [
+          1280,
+          720
+        ],
+        "buffered": [
+          [
+            0,
+            120.666666
+          ]
+        ],
+        "seekable": [
+          [
+            0,
+            120.666666
+          ]
+        ],
+        "rate": 1,
+        "ready": 4,
+        "paused": false,
+        "total": 745,
+        "dropped": 278,
+        "error": null,
+        "visibility": "visible",
+        "focus": true,
+        "heartbeat": null,
+        "wall": 59498,
+        "callbacks": 361,
+        "processing": 0
+      },
+      "displayed_fps": 18.157030329171157,
+      "callback_fps": 14.465765921592403,
+      "stderr_bytes": 2268,
+      "total_delta": 599,
+      "dropped_delta": 235,
+      "hardware_decoding": true,
+      "drop_stages": {
+        "droppedCompositorFrames": 239,
+        "droppedDecodedFrames": 0,
+        "droppedSinkFrames": 39
+      },
+      "buffering_ms": 0
+    },
+    "fd_only": {
+      "mode": "controlled",
+      "elapsed": 20.024467709000007,
+      "before": {
+        "time": 4.90652,
+        "duration": 120.666666,
+        "size": [
+          1280,
+          720
+        ],
+        "buffered": [
+          [
+            0,
+            120.666666
+          ]
+        ],
+        "seekable": [
+          [
+            0,
+            120.666666
+          ]
+        ],
+        "rate": 1,
+        "ready": 4,
+        "paused": false,
+        "total": 149,
+        "dropped": 75,
+        "error": null,
+        "visibility": "visible",
+        "focus": true,
+        "heartbeat": null,
+        "wall": 39695,
+        "callbacks": 82,
+        "processing": 0
+      },
+      "after": {
+        "time": 24.914402,
+        "duration": 120.666666,
+        "size": [
+          1280,
+          720
+        ],
+        "buffered": [
+          [
+            0,
+            120.666666
+          ]
+        ],
+        "seekable": [
+          [
+            0,
+            120.666666
+          ]
+        ],
+        "rate": 1,
+        "ready": 4,
+        "paused": false,
+        "total": 744,
+        "dropped": 362,
+        "error": null,
+        "visibility": "visible",
+        "focus": true,
+        "heartbeat": null,
+        "wall": 59717,
+        "callbacks": 407,
+        "processing": 0
+      },
+      "displayed_fps": 15.381182884655118,
+      "callback_fps": 16.23014427763933,
+      "stderr_bytes": 2268,
+      "total_delta": 595,
+      "dropped_delta": 287,
+      "hardware_decoding": true,
+      "drop_stages": {
+        "droppedCompositorFrames": 362,
+        "droppedDecodedFrames": 0,
+        "droppedSinkFrames": 0
+      },
+      "buffering_ms": 0
+    },
+    "no_adaptive_cooldown": {
+      "mode": "controlled",
+      "elapsed": 20.022985500000004,
+      "before": {
+        "time": 4.860086,
+        "duration": 120.666666,
+        "size": [
+          1280,
+          720
+        ],
+        "buffered": [
+          [
+            0,
+            120.666666
+          ]
+        ],
+        "seekable": [
+          [
+            0,
+            120.666666
+          ]
+        ],
+        "rate": 1,
+        "ready": 4,
+        "paused": false,
+        "total": 146,
+        "dropped": 68,
+        "error": null,
+        "visibility": "visible",
+        "focus": true,
+        "heartbeat": null,
+        "wall": 39892,
+        "callbacks": 81,
+        "processing": 0
+      },
+      "after": {
+        "time": 24.89242,
+        "duration": 120.666666,
+        "size": [
+          1280,
+          720
+        ],
+        "buffered": [
+          [
+            0,
+            120.666666
+          ]
+        ],
+        "seekable": [
+          [
+            0,
+            120.666666
+          ]
+        ],
+        "rate": 1,
+        "ready": 4,
+        "paused": false,
+        "total": 743,
+        "dropped": 359,
+        "error": null,
+        "visibility": "visible",
+        "focus": true,
+        "heartbeat": null,
+        "wall": 59920,
+        "callbacks": 409,
+        "processing": 0
+      },
+      "displayed_fps": 15.282436278046545,
+      "callback_fps": 16.38117352679499,
+      "stderr_bytes": 2268,
+      "total_delta": 597,
+      "dropped_delta": 291,
+      "hardware_decoding": true,
+      "drop_stages": {
+        "droppedCompositorFrames": 359,
+        "droppedDecodedFrames": 0,
+        "droppedSinkFrames": 0
+      },
+      "buffering_ms": 0
+    },
+    "fixed": {
+      "mode": "controlled",
+      "elapsed": 20.024722499999996,
+      "before": {
+        "time": 4.938502,
+        "duration": 120.666666,
+        "size": [
+          1280,
+          720
+        ],
+        "buffered": [
+          [
+            0,
+            120.666666
+          ]
+        ],
+        "seekable": [
+          [
+            0,
+            120.666666
+          ]
+        ],
+        "rate": 1,
+        "ready": 4,
+        "paused": false,
+        "total": 148,
+        "dropped": 1,
+        "error": null,
+        "visibility": "visible",
+        "focus": true,
+        "heartbeat": null,
+        "wall": 38838,
+        "callbacks": 124,
+        "processing": 0
+      },
+      "after": {
+        "time": 24.956675,
+        "duration": 120.666666,
+        "size": [
+          1280,
+          720
+        ],
+        "buffered": [
+          [
+            0,
+            120.666666
+          ]
+        ],
+        "seekable": [
+          [
+            0,
+            120.666666
+          ]
+        ],
+        "rate": 1,
+        "ready": 4,
+        "paused": false,
+        "total": 745,
+        "dropped": 5,
+        "error": null,
+        "visibility": "visible",
+        "focus": true,
+        "heartbeat": null,
+        "wall": 58857,
+        "callbacks": 605,
+        "processing": 0
+      },
+      "displayed_fps": 29.613394143164786,
+      "callback_fps": 24.02030789690095,
+      "stderr_bytes": 2268,
+      "total_delta": 597,
+      "dropped_delta": 4,
+      "hardware_decoding": true,
+      "drop_stages": {
+        "droppedCompositorFrames": 4,
+        "droppedDecodedFrames": 0,
+        "droppedSinkFrames": 1
+      },
+      "buffering_ms": 0
+    },
+    "native": {
+      "mode": "controlled",
+      "elapsed": 20.01376025,
+      "before": {
+        "time": 4.969249,
+        "duration": 12,
+        "size": [
+          1280,
+          720
+        ],
+        "buffered": [
+          [
+            0,
+            120.666666
+          ]
+        ],
+        "seekable": [
+          [
+            0,
+            12
+          ]
+        ],
+        "rate": 1,
+        "ready": 4,
+        "paused": false,
+        "total": 149,
+        "dropped": 0,
+        "error": null,
+        "visibility": "visible",
+        "focus": true,
+        "heartbeat": null,
+        "wall": 15542,
+        "callbacks": 126,
+        "processing": 0
+      },
+      "after": {
+        "time": 25.00486,
+        "duration": 25.00486,
+        "size": [
+          1280,
+          720
+        ],
+        "buffered": [
+          [
+            0,
+            120.666666
+          ]
+        ],
+        "seekable": [
+          [
+            0,
+            25.00486
+          ]
+        ],
+        "rate": 1,
+        "ready": 4,
+        "paused": false,
+        "total": 746,
+        "dropped": 0,
+        "error": null,
+        "visibility": "visible",
+        "focus": true,
+        "heartbeat": null,
+        "wall": 35553,
+        "callbacks": 623,
+        "processing": 0
+      },
+      "displayed_fps": 29.829476946992006,
+      "callback_fps": 24.832914644313277,
+      "stderr_bytes": 0,
+      "total_delta": 597,
+      "dropped_delta": 0,
+      "hardware_decoding": true,
+      "drop_stages": {
+        "droppedCompositorFrames": 0,
+        "droppedDecodedFrames": 0,
+        "droppedSinkFrames": 0
+      },
+      "buffering_ms": 0
+    }
+  },
+  "cold_autoplay_short_clip": {
+    "elapsed_browser": 25.036,
+    "elapsed_host": 25.024755374999998,
+    "before": {
+      "wall": 32314,
+      "time": 8.216902,
+      "size": [
+        1280,
+        720
+      ],
+      "rate": 1,
+      "ready": 2,
+      "total": 244,
+      "dropped": 168,
+      "callbacks": 0,
+      "paused": false,
+      "error": null,
+      "visibility": "visible"
+    },
+    "after": {
+      "wall": 57350,
+      "time": 5.157337,
+      "size": [
+        1280,
+        720
+      ],
+      "rate": 1,
+      "ready": 4,
+      "total": 516,
+      "dropped": 175,
+      "callbacks": 216,
+      "paused": false,
+      "error": null,
+      "visibility": "visible"
+    },
+    "accepted_fps": 10.584757948554081,
+    "callback_fps": 8.627576290142194,
+    "dropped_frames": 7,
+    "total_frames": 272,
+    "interaction_ms": 402.6990840000053,
+    "interaction": {
+      "clicked": "yes",
+      "text": "Trames video"
+    },
+    "interpretation": "Window includes the remaining startup BUFFERING pause; subsequent playback/looping and post-window click/text input succeed."
+  },
+  "runtime_revision": "330e60d2ed8edbaa37038a5a08fa7202b40559fa"
+}
