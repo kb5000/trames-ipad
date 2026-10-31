@@ -412,7 +412,9 @@ These are individual source-paced samples, not maximum-throughput scores or
 statistical medians. Guest Firefox is 142.0; native Firefox is 159.0, so this is
 an application-path reference, not an isolated runtime-overhead measurement.
 Playback-quality counters measure accepted/dropped frames, not physical scanout.
-The final guest sample retained hardware decoding and reported no buffering.
+The final guest sample retained hardware decoding and reported no buffering. An additional
+installed Trames Dev smoke test accepted 29.26 FPS (9/745 dropped) over
+25.151 seconds, with click and typing succeeding after timing.
 Removing only the adaptive cooldown gave 15.28 FPS; removing callback-only
 downclocking produced the substantial gain.
 

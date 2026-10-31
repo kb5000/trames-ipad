@@ -477,5 +477,61 @@
     },
     "interpretation": "Window includes the remaining startup BUFFERING pause; subsequent playback/looping and post-window click/text input succeed."
   },
-  "runtime_revision": "330e60d2ed8edbaa37038a5a08fa7202b40559fa"
+  "runtime_revision": "330e60d2ed8edbaa37038a5a08fa7202b40559fa",
+  "installed_dev_smoke": {
+    "elapsed_browser": 25.151,
+    "elapsed_host": 25.173185499999995,
+    "before": {
+      "wall": 31123,
+      "time": 22.627246,
+      "size": [
+        1280,
+        720
+      ],
+      "rate": 1,
+      "ready": 4,
+      "total": 680,
+      "dropped": 499,
+      "callbacks": 76,
+      "paused": false,
+      "error": null,
+      "visibility": "visible"
+    },
+    "after": {
+      "wall": 56274,
+      "time": 47.786985,
+      "size": [
+        1280,
+        720
+      ],
+      "rate": 1,
+      "ready": 4,
+      "total": 1425,
+      "dropped": 508,
+      "callbacks": 685,
+      "paused": false,
+      "error": null,
+      "visibility": "visible"
+    },
+    "accepted_fps": 29.263249970180112,
+    "callback_fps": 24.213748956303924,
+    "dropped_frames": 9,
+    "total_frames": 745,
+    "interaction_ms": 628.8642089999996,
+    "interaction": {
+      "clicked": "yes",
+      "text": "Trames video"
+    },
+    "product_revision": "cf3bf026fa61cb1ae093f965ce9449c984b166c4",
+    "runtime_revision": "330e60d2ed8edbaa37038a5a08fa7202b40559fa",
+    "method": "Installed Trames Dev, long video, cold autoplay launch, 5 s warmup, 25 s unprofiled interval; post-window WebDriver input check."
+  },
+  "validation": {
+    "runtime_macos_workflow": "7/7 shell steps passed",
+    "runtime_linux_arm64_workflow": "7/7 shell steps passed",
+    "macos_product_workflow": "11/11 shell steps passed, including both channel builds and package verification",
+    "interpreter_kernel_conformance": "234 passed, 3 ignored",
+    "ipad_ffi": "aarch64-apple-ios check passed",
+    "unchanged_gpu_pixel_oracles": "reused; video and Vulkan adapter sources unchanged"
+  }
 }
