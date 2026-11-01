@@ -952,5 +952,67 @@
       "Initial callback gaps still exceeded two seconds; early-playback accepted FPS was mixed between pairs, not a stable improvement.",
       "No new ordinary byte lock, memory barrier, coordinator or service thread."
     ]
+  },
+  "wayland_pool_crash_followup": {
+    "date": "2026-11-01",
+    "runtime_revision": "1309faf688cd20780f4fa36d93e4f9d9ace8385f",
+    "observed": {
+      "browser": "Original Alpine Firefox 151.0.3, Linux AArch64, 12 CPUs, native GPU/video/audio and host profile.",
+      "sequence": "Local video followed by Bilibili homepage and https://www.bilibili.com/video/BV1xixi6yELU/. Browser exited with status 139 after about 128 seconds.",
+      "protocol_error": "wl_shm_pool#60: error 1: shared memory mapping failed",
+      "parent_fault": "pid=34, PC 0x39eaa890, null guest address. libxul base 0x335de000; relative PC 0x68cc890.",
+      "symbol_resolution": "Official matching firefox-dbg 151.0.3-r0; libxul build ID 1abd4383a12cf9c53d6cada400b4d0c48a191df4. WlLogHandler deliberately writes to null after MOZ_CrashPrintf on the fatal Wayland error.",
+      "original_map_errno": "Not captured: the old compositor discarded the I/O error. The exact quota cause for this particular browser exit remains an inference."
+    },
+    "change": "Host-managed sessions lift the existing root memfd shared budget instead of retaining its independent 128 MiB ceiling. Retained files/FD transfers/native maps keep their accounting and ownership. Explicit bounded/common/iPad defaults remain unchanged. Error-only logging now includes the map I/O error and pool dimensions.",
+    "regressions": {
+      "session_policy": "An already-created memfd fails beyond 128 MiB under default policy; switching the same budget to host-managed accepts the next 64 KiB.",
+      "wayland_fd_protocol": "Nine 16 MiB pools through native SCM_RIGHTS: bounded mode returns StorageFull and the same fatal mapping protocol error on pool nine; host-managed mode accepts 144 MiB and a display.sync round-trip.",
+      "cleanup": "Dropping the compositor releases all shared budget charges in both modes.",
+      "allocation": "No image contents touched or eagerly populated by the protocol regression; sparse extents remain demand-backed."
+    },
+    "verification": {
+      "runtime_macos_ci": "7/7 passed",
+      "runtime_arm64_linux_ci": "7/7 passed",
+      "mac_product_ci": "11/11 passed",
+      "ipad_product_clippy": "passed",
+      "ipad_device_compile": "passed",
+      "installed_dev": "codesign --deep --strict passed; installed executable equals locally tested Dev bundle; org.trames.Trames.mac.dev.",
+      "stable_unchanged_sha256": "1f0cf5b4408477b0e2decaad4cd29bd943460189f0a2b8e4fbd87db078cfdf6b"
+    },
+    "limitations": [
+      "The original Bilibili log did not preserve the map errno. Matching protocol error/intentional crash, deterministic wire regression, old-browser reproduction and same-binary bounded control establish the quota failure path. They do not prove that every intermittent tab or browser exit had this cause.",
+      "No new ordinary-byte checks, visibility barriers, global lock or coordinator/service thread.",
+      "Per-file extents, invalid mappings and actual host memory exhaustion retain their independent error behavior."
+    ],
+    "installed_dev_sha256": "674896cc094ca0f12c0bce1cb7b50eac96a58812902615e861040ac4d3aacd18",
+    "browser_negative_control": {
+      "runner": "Original installed Dev before runtime 1309faf, automatic host memory.",
+      "setup": "Separate profile, original Firefox 151.0.3, 12 CPUs; 2048x980 windows containing a 1920x1080 animated Canvas. No sampling or per-frame trace. Prior static-window create/close test in the same process passed.",
+      "result": "After five animated windows, opening the next window disconnected Marionette. wl_shm_pool#121: shared memory mapping failed; same parent PC 0x39eaa890; process exited 139.",
+      "limits": "Functional stress control, not a performance measurement. The old runner cannot expose the original map errno.",
+      "runtime_revision": "9e793db8693fbbca5e888b5537d0b6ececff6614",
+      "runner_sha256": "b6fa40fe17a60b075d593ebc322ff434c4a5b95b5be6afb1e80e89e229902764"
+    },
+    "browser_fixed_control": {
+      "runner": "Installed Dev built at runtime 1309faf, automatic host memory.",
+      "setup": "New dedicated profile with matching preferences, same original Firefox, 12 CPUs and the same animated Canvas window sequence. No sampling or per-frame trace.",
+      "result": "All 20 animated windows opened and responded, with 21 total browser windows including the initial blank one. Held all windows for 15 seconds, then closed the 20 test windows and returned to the initial one. Controller passed; browser quit normally with status 0. No shared mapping protocol error or parent CPU fault was logged.",
+      "viewport_scope": "First four content viewports were 1024x683 to 1920x843; subsequent 16 were 1996x843. Window configuration settled differently during initial opens, so this is functional stress evidence, not a precisely size-matched performance comparison."
+    },
+    "same_binary_bounded_control": {
+      "runner": "Same installed fixed Dev; --memory-mib 8192 keeps the old bounded 128 MiB memfd budget. Dedicated new profile with matching preferences.",
+      "result": "Creating/resizing the sixth animated window failed after about 77 seconds. The new error-path log directly reported StorageFull, then wl_shm_pool#112 fatal mapping error and browser shutdown.",
+      "failed_mapping": {
+        "offset": 0,
+        "bytes": 8028160,
+        "pool": 8028160,
+        "length": 8028160,
+        "capacity": 8028160,
+        "already_allocated_in_file": 3997696
+      },
+      "interpretation": "Confirms the independent shared-budget ceiling as the deterministic browser failure mechanism. Restoring the old policy reproduces the exit with the same executable that passed 20 windows in host-managed mode; changing the total guest-memory mode can affect other browser heuristics, so this is a functional control, not a performance comparison.",
+      "exit_status": 139
+    }
   }
 }
