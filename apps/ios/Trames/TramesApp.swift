@@ -47,13 +47,13 @@ struct WorkspaceView: View {
                                             .onChanged { value in draggedTab=item;dragLocation=value.location }
                                             .onEnded { value in finishTabDrag(item,at:value.location) })
                                         .contextMenu {
-                                            Button("移到浮动窗口",systemImage:"rectangle.on.rectangle") { workspace.detach(item) }
-                                            Button("关闭",role:.destructive) { workspace.closeItem(item) }
+                                            Button(L10n.text("移到浮动窗口"),systemImage:"rectangle.on.rectangle") { workspace.detach(item) }
+                                            Button(L10n.text("关闭"),role:.destructive) { workspace.closeItem(item) }
                                         }
                                     Button { workspace.closeItem(item) } label: {
                                         Image(systemName:"xmark").font(.system(size:12))
                                             .frame(width:44,height:44).contentShape(Rectangle())
-                                    }.buttonStyle(.plain).accessibilityLabel("关闭标签页")
+                                    }.buttonStyle(.plain).accessibilityLabel(L10n.text("关闭标签页"))
                                         .accessibilityIdentifier("close-tab-\(item.token)")
                                 }
                                 .background(workspace.layout.selected == item ? Color.white.opacity(0.12) : .clear)
@@ -64,13 +64,13 @@ struct WorkspaceView: View {
                     }
                 }.workspaceFrame("tabs")
                 Button { sessionActions = true } label: {
-                    Label("新建或管理会话", systemImage: "plus")
+                    Label(L10n.text("新建或管理会话"), systemImage: "plus")
                         .labelStyle(.iconOnly).frame(minWidth: 44, minHeight: 44)
-                }.confirmationDialog("新建或管理会话", isPresented: $sessionActions, titleVisibility: .visible) {
-                    Button("新建终端",systemImage:"terminal") {workspace.openLocal()}
-                    Button("Linux 环境",systemImage:"square.stack.3d.up") {environmentsSheet=true}
+                }.accessibilityIdentifier("session-actions").confirmationDialog(L10n.text("新建或管理会话"), isPresented: $sessionActions, titleVisibility: .visible) {
+                    Button(L10n.text("新建终端"),systemImage:"terminal") {workspace.openLocal()}
+                    Button(L10n.text("Linux 环境"),systemImage:"square.stack.3d.up") {environmentsSheet=true}
                     Button("Files", systemImage: "folder") { filesSheet = true }
-                    Button("设置", systemImage: "gear") { settingsSheet = true }
+                    Button(L10n.text("设置"), systemImage: "gear") { settingsSheet = true }
                 }
 
             }.padding(.horizontal,12).padding(.vertical,6).workspaceFrame("header")
@@ -87,7 +87,7 @@ struct WorkspaceView: View {
                 }.frame(width:proxy.size.width,height:proxy.size.height,alignment:.topLeading)
                 .overlay {
                     if workspace.layout.selected == nil && workspace.layout.floating.isEmpty {
-                        ContentUnavailableView("打开一个终端",systemImage:"terminal",description:Text("从顶部标签栏恢复窗口，或选择 Linux 环境。"))
+                        ContentUnavailableView(L10n.text("打开一个终端"),systemImage:"terminal",description:Text(L10n.text("从顶部标签栏恢复窗口，或选择 Linux 环境。")))
                     }
                 }
             .onAppear { workspace.updateViewport(proxy.size) }
@@ -108,7 +108,7 @@ struct WorkspaceView: View {
         .sheet(isPresented:$environmentsSheet) {EnvironmentManagerView(workspace:workspace)}
         .sheet(isPresented: $settingsSheet) { SettingsView(workspace: workspace) }
         .alert("Trames", isPresented: Binding(get: { workspace.error != nil }, set: { if !$0 { workspace.error = nil } })) {
-            Button("好") { workspace.error = nil }
+            Button(L10n.text("好")) { workspace.error = nil }
         } message: { Text(workspace.error ?? "") }
     }
     private func finishTabDrag(_ item: WorkspaceItemID, at point: CGPoint) {
@@ -139,7 +139,7 @@ struct SessionView: View {
                 Spacer()
                 if let cpu = session.cpuPercent {
                     Text("CPU \(cpu)%").monospacedDigit().accessibilityIdentifier("cpu-usage")
-                        .accessibilityHint("App CPU 用量，一个核心满载为百分之百")
+                        .accessibilityHint(L10n.text("App CPU 用量，一个核心满载为百分之百"))
                 }
                 if let capacity = session.capacity {
                     Text("\(ByteCountFormatter.string(fromByteCount: Int64(capacity.used_bytes), countStyle: .binary)) / \(ByteCountFormatter.string(fromByteCount: Int64(capacity.budget_bytes), countStyle: .binary))")
@@ -167,42 +167,42 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("本地内存") {
-                    Picker("Linux 总预算", selection: $memoryTotal) {
+                Section(L10n.text("本地内存")) {
+                    Picker(L10n.text("Linux 总预算"), selection: $memoryTotal) {
                         ForEach(memoryChoices, id: \.self) { value in
                             Text(ByteCountFormatter.string(fromByteCount: Int64(value) << 20, countStyle: .binary)).tag(value)
                         }
                     }
                     .onChange(of: memoryTotal) { _, value in memoryProcess = min(memoryProcess, value) }
-                    Picker("单进程预算", selection: $memoryProcess) {
+                    Picker(L10n.text("单进程预算"), selection: $memoryProcess) {
                         ForEach(memoryChoices.filter { $0 <= memoryTotal }, id: \.self) { value in
                             Text(ByteCountFormatter.string(fromByteCount: Int64(value) << 20, countStyle: .binary)).tag(value)
                         }
                     }
-                    Text("默认总预算 1 GiB、单进程 512 MiB。内存按需使用，不会预先分配；请为 iPadOS 和其他应用留出空间。下次打开本地终端生效。").font(.caption)
+                    Text(L10n.text("默认总预算 1 GiB、单进程 512 MiB。内存按需使用，不会预先分配；请为 iPadOS 和其他应用留出空间。下次打开本地终端生效。")).font(.caption)
                 }
-                Section("本地磁盘") {
-                    Toggle("使用设备卷容量作为存储预算", isOn: $volume)
-                    Text("默认预算 16 GiB；启用后按应用所在卷的总容量计算。实际可用空间仍受系统剩余容量限制，下次打开本地终端生效。").font(.caption)
-                    Button("重置 Linux 环境",role:.destructive) {resetConfirmation=true}.disabled(workspace.resetting)
+                Section(L10n.text("本地磁盘")) {
+                    Toggle(L10n.text("使用设备卷容量作为存储预算"), isOn: $volume)
+                    Text(L10n.text("默认预算 16 GiB；启用后按应用所在卷的总容量计算。实际可用空间仍受系统剩余容量限制，下次打开本地终端生效。")).font(.caption)
+                    Button(L10n.text("重置 Linux 环境"),role:.destructive) {resetConfirmation=true}.disabled(workspace.resetting)
                 }
-                Section("Linux 与 iPad") {
-                    Toggle("允许 Linux 发起原生访问请求", isOn: $bridge)
-                    Text("文本剪贴板自动与 iPad 互通，读取由 iPadOS 请求权限。其他原生请求仍需逐次允许；关闭后所有新请求都会被拒绝。").font(.caption)
+                Section(L10n.text("Linux 与 iPad")) {
+                    Toggle(L10n.text("允许 Linux 发起原生访问请求"), isOn: $bridge)
+                    Text(L10n.text("文本剪贴板自动与 iPad 互通，读取由 iPadOS 请求权限。其他原生请求仍需逐次允许；关闭后所有新请求都会被拒绝。")).font(.caption)
                     if let directories = workspace.directories {
-                        NavigationLink("Files 目录授权") { FolderGrantsView(store: directories) }
+                        NavigationLink(L10n.text("Files 目录授权")) { FolderGrantsView(store: directories) }
                     }
                 }
-                Section("后台行为") { Text("进入后台后暂停本地 Linux；返回前台后继续。Files 采用独立副本导入和导出。").font(.caption) }
+                Section(L10n.text("后台行为")) { Text(L10n.text("进入后台后暂停本地 Linux；返回前台后继续。Files 采用独立副本导入和导出。")).font(.caption) }
                 Section("GPU") {
-                    Toggle("Vulkan 计算与图形（实验）", isOn: $vulkan)
-                    Text("下次打开本地终端生效。需在 Linux 安装 vulkan-loader；支持选定计算、图形和 Wayland 接口。Wayland 应用各自显示为 App 内窗口，调整窗口大小会请求应用改变分辨率。窗口也可停靠到顶部标签栏。").font(.caption)
+                    Toggle(L10n.text("Vulkan 计算与图形（实验）"), isOn: $vulkan)
+                    Text(L10n.text("下次打开本地终端生效。需在 Linux 安装 vulkan-loader；支持选定计算、图形和 Wayland 接口。Wayland 应用各自显示为 App 内窗口，调整窗口大小会请求应用改变分辨率。窗口也可停靠到顶部标签栏。")).font(.caption)
                 }
-            }.navigationTitle("设置").toolbar { Button("完成") { dismiss() } }
-                .alert("重置 Linux 环境？",isPresented:$resetConfirmation) {
-                    Button("删除并重新初始化",role:.destructive) {dismiss(); workspace.resetLocal()}
-                    Button("取消",role:.cancel) {}
-                } message: {Text("将重置当前环境中的软件、文件和配置。其他 Linux 环境和 Files 目录授权会保留。")}
+            }.navigationTitle(L10n.text("设置")).toolbar { Button(L10n.text("完成")) { dismiss() } }
+                .alert(L10n.text("重置 Linux 环境？"),isPresented:$resetConfirmation) {
+                    Button(L10n.text("删除并重新初始化"),role:.destructive) {dismiss(); workspace.resetLocal()}
+                    Button(L10n.text("取消"),role:.cancel) {}
+                } message: {Text(L10n.text("将重置当前环境中的软件、文件和配置。其他 Linux 环境和 Files 目录授权会保留。"))}
         }
     }
 }

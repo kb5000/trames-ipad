@@ -10,7 +10,7 @@ struct WorkspaceTabLabel: View {
         case .wayland(_,let id):
             let window=session.waylandWindows.first { $0.id == id }
             let title=window?.title ?? ""
-            Label(title.isEmpty ? (window?.app_id.isEmpty == false ? window!.app_id : "图形应用") : title,systemImage:"window.ceiling")
+            Label(title.isEmpty ? (window?.app_id.isEmpty == false ? window!.app_id : L10n.text("图形应用")) : title,systemImage:"window.ceiling")
         }
     }
 }
@@ -54,11 +54,11 @@ struct WorkspaceWindow: View {
                         .accessibilityIdentifier("window-title-\(item.token)")
                 }
                 Spacer()
-                windowButton("minus",label:"最小化到标签栏") { workspace.minimize(item) }
+                windowButton("minus",label:L10n.text("最小化到标签栏")) { workspace.minimize(item) }
                     .accessibilityIdentifier("minimize-\(item.token)")
-                windowButton("arrow.up.left.and.arrow.down.right",label:"停靠为标签页") { workspace.dock(item) }
+                windowButton("arrow.up.left.and.arrow.down.right",label:L10n.text("停靠为标签页")) { workspace.dock(item) }
                     .accessibilityIdentifier("dock-\(item.token)")
-                windowButton("xmark",label:"关闭窗口") { workspace.closeItem(item) }
+                windowButton("xmark",label:L10n.text("关闭窗口")) { workspace.closeItem(item) }
                     .accessibilityIdentifier("close-window-\(item.token)")
             }.font(.callout).padding(.leading,12).frame(height:44)
                 .background(Color(white:0.16))
@@ -85,7 +85,7 @@ struct WorkspaceWindow: View {
                 Color.clear.frame(width:48,height:48).contentShape(Rectangle())
                     .accessibilityElement(children:.ignore)
                     .accessibilityIdentifier("window-resize-\(item.token)")
-                    .accessibilityLabel("调整窗口大小")
+                    .accessibilityLabel(L10n.text("调整窗口大小"))
                     .gesture(DragGesture(coordinateSpace:.named("workspace")).onChanged { value in
                         if resizeOrigin == nil { geometry=displayedGeometry;resizeOrigin=geometry.size;workspace.focus(item) }
                         geometry.size=CGSize(width:resizeOrigin!.width+value.translation.width,height:resizeOrigin!.height+value.translation.height)

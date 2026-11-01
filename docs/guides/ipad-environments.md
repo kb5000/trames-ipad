@@ -48,3 +48,18 @@ Implementation and container policy live in the shared runtime's
 
 See the [validation record](../validation/ipad-environments-20261102.json) for
 physical iPad checks, production FFI coverage and the systemd idle-CPU comparison.
+
+## Application language and guest locale
+
+The app supports English and Simplified Chinese, including environment setup,
+settings, file transfer, native access consent, accessibility labels, Files
+pending-edit folders and the local-network permission explanation. It follows
+iPadOS's language preference for Trames; choose the app's language in system
+Settings when an override is needed. Other languages fall back to English.
+Environment names, guest terminal output and Linux window titles remain their
+original content. Low-level runtime/package diagnostics retain their source text.
+
+Application language does not configure Linux locale. The existing `C.UTF-8`
+default remains available for UTF-8 terminal text; no locale packages or
+`locale-gen` setup is needed for the app's interface. Configure a locale inside
+a guest only when that Linux application's own behavior requires it.

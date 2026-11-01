@@ -83,22 +83,22 @@ struct BridgeConsentPresenter: View {
         Color.clear.sheet(item: $controller.challenge) { host in
             NavigationStack {
                 Form {
-                    Section("本地 Linux 请求") {
+                    Section(L10n.text("本地 Linux 请求")) {
                         Text(title(host.request.method)).font(.headline)
                         if let value = host.request.params["url"]?.text { Text(String(value.prefix(4096))).textSelection(.enabled) }
                         if let value = host.request.params["text"]?.text { Text(String(value.prefix(1024))).textSelection(.enabled) }
-                        if let value = host.request.params["path"]?.text { LabeledContent("Files 路径", value: value) }
-                        if let value = host.request.params["guest"]?.text { LabeledContent("Linux 路径", value: value) }
-                        if let value = host.request.params["grant"]?.text { LabeledContent("目录授权", value: value) }
+                        if let value = host.request.params["path"]?.text { LabeledContent(L10n.text("Files 路径"), value: value) }
+                        if let value = host.request.params["guest"]?.text { LabeledContent(L10n.text("Linux 路径"), value: value) }
+                        if let value = host.request.params["grant"]?.text { LabeledContent(L10n.text("目录授权"), value: value) }
                     }
-                    Section { Text("只允许这一次请求。任何 Linux 程序都可以发起请求，请核对操作内容。").font(.caption) }
-                    Button("允许这一次") { controller.allow() }.accessibilityIdentifier("bridge-allow")
-                    Button("拒绝", role: .cancel) { controller.deny() }.accessibilityIdentifier("bridge-deny")
-                }.navigationTitle("允许 Linux 访问 iPad？").accessibilityIdentifier("bridge-consent")
+                    Section { Text(L10n.text("只允许这一次请求。任何 Linux 程序都可以发起请求，请核对操作内容。")).font(.caption) }
+                    Button(L10n.text("允许这一次")) { controller.allow() }.accessibilityIdentifier("bridge-allow")
+                    Button(L10n.text("拒绝"), role: .cancel) { controller.deny() }.accessibilityIdentifier("bridge-deny")
+                }.navigationTitle(L10n.text("允许 Linux 访问 iPad？")).accessibilityIdentifier("bridge-consent")
             }.interactiveDismissDisabled()
         }
     }
     private func title(_ method: String) -> String {
-        ["clipboard.read":"读取 iPad 剪贴板文本", "clipboard.write":"写入 iPad 剪贴板文本", "url.open":"在浏览器中打开链接", "device.info":"读取设备型号及系统版本", "files.list":"查看已授权的 Files 目录", "files.import":"从 Files 复制文件到 Linux", "files.export":"从 Linux 复制文件到 Files"][method] ?? method
+        ["clipboard.read":L10n.text("读取 iPad 剪贴板文本"), "clipboard.write":L10n.text("写入 iPad 剪贴板文本"), "url.open":L10n.text("在浏览器中打开链接"), "device.info":L10n.text("读取设备型号及系统版本"), "files.list":L10n.text("查看已授权的 Files 目录"), "files.import":L10n.text("从 Files 复制文件到 Linux"), "files.export":L10n.text("从 Linux 复制文件到 Files")][method] ?? method
     }
 }

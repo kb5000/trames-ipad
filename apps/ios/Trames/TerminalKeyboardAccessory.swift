@@ -61,7 +61,7 @@ final class TerminalKeyboardAccessory:UIInputView {
             let actions=button.actions(forTarget:accessory,forControlEvent:.touchDown) ?? []
             if actions.contains("toggleInputKeyboard:") {
                 button.accessibilityIdentifier="terminal-extended-keyboard-toggle"
-                button.accessibilityLabel="扩展键盘"
+                button.accessibilityLabel=L10n.text("扩展键盘")
             }
             if actions.contains("ctrl:") {
                 // Upstream ctrl: only toggles controlModifier. Forward that

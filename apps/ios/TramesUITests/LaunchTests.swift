@@ -8,9 +8,29 @@ final class LaunchTests: XCTestCase {
     // window gestures and UIKit animations remain enabled.
     private func launchApp(_ arguments: [String] = []) -> XCUIApplication {
         let app = XCUIApplication()
-        app.launchArguments = ["--ui-acceptance"] + arguments
+        // Keep existing Chinese assertions independent of the CI machine's language.
+        let language = arguments.contains("-AppleLanguages") ? [] : ["-AppleLanguages", "(zh-Hans)", "-AppleLocale", "zh_CN"]
+        app.launchArguments = ["--ui-acceptance"] + language + arguments
         app.launch()
         return app
+    }
+    private func checkLanguage(_ language:String, actions:String, settings:String, memory:String, done:String) {
+        let app=launchApp(["--workspace-ui-acceptance", "-AppleLanguages", "(\(language))", "-AppleLocale", language == "en" ? "en_US" : "zh_CN"])
+        defer {app.terminate()}
+        let menu=app.buttons["session-actions"]
+        XCTAssertTrue(menu.waitForExistence(timeout:20),app.debugDescription)
+        XCTAssertEqual(menu.label,actions)
+        menu.tap()
+        app.buttons[settings].firstMatch.tap()
+        XCTAssertTrue(app.staticTexts[memory].waitForExistence(timeout:5),app.debugDescription)
+        XCTAssertTrue(app.buttons[done].exists)
+        XCTAssertFalse(app.staticTexts[language == "en" ? "本地内存" : "Local Memory"].exists)
+    }
+    func testEnglishApplicationLanguage() {
+        checkLanguage("en",actions:"New or manage sessions",settings:"Settings",memory:"Local Memory",done:"Done")
+    }
+    func testChineseApplicationLanguage() {
+        checkLanguage("zh-Hans",actions:"新建或管理会话",settings:"设置",memory:"本地内存",done:"完成")
     }
     func testWorkspaceTabsDetachDockAndTerminalTitleRemainsVisible() {
         let app=launchApp(["--workspace-ui-acceptance"])
@@ -160,8 +180,9 @@ final class LaunchTests: XCTestCase {
         let app=launchApp(["--workspace-ui-acceptance"])
         XCTAssertTrue(app.buttons["新建或管理会话"].waitForExistence(timeout:20))
         app.buttons["新建或管理会话"].tap()
-        XCTAssertTrue(app.buttons["本地 Alpine 终端"].waitForExistence(timeout:5))
-        XCTAssertTrue(app.buttons["Files"].exists);XCTAssertTrue(app.buttons["设置"].exists)
+        XCTAssertTrue(app.buttons["新建终端"].firstMatch.waitForExistence(timeout:5))
+        XCTAssertTrue(app.buttons["Linux 环境"].firstMatch.exists)
+        XCTAssertTrue(app.buttons["Files"].firstMatch.exists);XCTAssertTrue(app.buttons["设置"].firstMatch.exists)
         XCTAssertFalse(app.buttons["原生 CoreMark"].exists)
         XCTAssertFalse(app.buttons["SSH 连接"].exists);XCTAssertFalse(app.buttons["Files / SFTP"].exists)
     }
@@ -212,7 +233,7 @@ final class LaunchTests: XCTestCase {
         app.buttons.matching(NSPredicate(format:"identifier BEGINSWITH %@","close-tab-terminal-")).firstMatch.tap()
         app.buttons["新建或管理会话"].tap()
         // iPadOS 27 can expose the SwiftUI label as a nested button as well.
-        app.buttons["本地 Alpine 终端"].firstMatch.tap()
+        app.buttons["新建终端"].firstMatch.tap()
         let reopened = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label == %@", "Alpine · 本地"), object: app.staticTexts["session-state"])
         XCTAssertEqual(XCTWaiter.wait(for: [reopened], timeout: 30), .completed)
     }

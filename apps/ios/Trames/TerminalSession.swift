@@ -14,7 +14,7 @@ final class TerminalSession: NSObject, ObservableObject, Identifiable, TerminalV
     var onWaylandChanged: (([LocalWaylandWindow]) -> Void)?
     var onFileProviderError: ((String) -> Void)?
     @Published var title: String
-    @Published var state = "连接中…"
+    @Published var state = L10n.text("连接中…")
     @Published var capacity: LocalStatus?
     @Published var waylandWindows: [LocalWaylandWindow] = []
     @Published var waylandText: LocalWaylandText?
@@ -47,7 +47,7 @@ final class TerminalSession: NSObject, ObservableObject, Identifiable, TerminalV
     private var clipboardObserver: NSObjectProtocol?
     private var terminalSize:(columns:Int,rows:Int)?
     init(title: String, isLocal: Bool = false) {
-        self.fallbackTitle = title.isEmpty ? "终端" : title
+        self.fallbackTitle = title.isEmpty ? L10n.text("终端") : title
         self.isLocal = isLocal
         self.title = self.fallbackTitle; super.init()
         terminal.terminalDelegate = self
@@ -69,7 +69,7 @@ final class TerminalSession: NSObject, ObservableObject, Identifiable, TerminalV
     }
     func startLocal(_ environment: EnvironmentStore, useVolumeBudget: Bool, profile:RootfsEnvironment? = nil, maintenance:Bool = false, after previous:TerminalSession? = nil) {
         environmentID=profile?.id ?? "alpine";environmentName=profile?.name ?? "Alpine"
-        state="正在准备 \(environmentName)…"
+        state=L10n.text("正在准备 %@…", String(describing: environmentName))
         task = Task { [weak self] in
             do {
                 await previous?.waitUntilClosed()
@@ -101,7 +101,7 @@ final class TerminalSession: NSObject, ObservableObject, Identifiable, TerminalV
                 while owner.local == nil {
                     try Task.checkCancellation()
                     if let error=owner.startupError {throw error}
-                    if owner.closed {throw TramesError.message("Linux 环境已关闭")}
+                    if owner.closed {throw TramesError.message(L10n.text("Linux 环境已关闭"))}
                     try await Task.sleep(for:.milliseconds(20))
                 }
                 try Task.checkCancellation()
@@ -126,9 +126,9 @@ final class TerminalSession: NSObject, ObservableObject, Identifiable, TerminalV
                 let status=try local.terminalStatus(terminalID)
                 if status.phase != lastPhase {
                     lastPhase=status.phase
-                    state=status.phase == "running" ? "\(environmentName) · 本地" : status.phase
+                    state=status.phase == "running" ? L10n.text("%@ · 本地", String(describing: environmentName)) : status.phase
                     terminalExited=["exited","failed","cancelled"].contains(status.phase)
-                    if terminalExited {pendingInput.removeAll();state=status.error ?? "已退出"}
+                    if terminalExited {pendingInput.removeAll();state=status.error ?? L10n.text("已退出")}
                 }
                 let output = try local.receive(terminal:terminalID)
                 #if DEBUG
@@ -195,7 +195,7 @@ final class TerminalSession: NSObject, ObservableObject, Identifiable, TerminalV
     }
     func send(_ data: Data) {
         guard !closed,!terminalClosed,!terminalExited else {return}
-        guard pendingInput.count + data.count <= 65536 else { state = "输入队列已满，请稍后重试"; return }
+        guard pendingInput.count + data.count <= 65536 else { state = L10n.text("输入队列已满，请稍后重试"); return }
         pendingInput.append(data)
 
     }
@@ -221,7 +221,7 @@ final class TerminalSession: NSObject, ObservableObject, Identifiable, TerminalV
     }
     private func applyFileProviderEdits(_ local:LocalSession) async {
         let errors=await FileProviderService.applyPending(to:local,environmentID:environmentID)
-        if !errors.isEmpty {onFileProviderError?("部分 Files 编辑未写回，修改副本已保留。\n"+errors.prefix(4).joined(separator:"\n"))}
+        if !errors.isEmpty {onFileProviderError?(L10n.text("部分 Files 编辑未写回，修改副本已保留。\n")+errors.prefix(4).joined(separator:"\n"))}
     }
     private func synchronizeClipboard() {
         guard environmentOwner == nil,!paused,local != nil,UserDefaults.standard.object(forKey:"bridgeEnabled") as? Bool != false else { return }
@@ -253,7 +253,7 @@ final class TerminalSession: NSObject, ObservableObject, Identifiable, TerminalV
         onTerminalOutput=nil;onWaylandCommand=nil
         #endif
         pendingInput.removeAll()
-        state = "已关闭"
+        state = L10n.text("已关闭")
     }
     /// Removing the first terminal view must retain its Linux/Wayland owner.
     /// Extra windows own only their PTY and can be disposed immediately.
@@ -261,7 +261,7 @@ final class TerminalSession: NSObject, ObservableObject, Identifiable, TerminalV
         if environmentOwner != nil {close();return}
         guard !terminalClosed else {return};terminalClosed=true
         if let local,let terminalID {try? local.closeTerminal(terminalID);self.terminalID=nil}
-        pendingInput.removeAll();state="已关闭"
+        pendingInput.removeAll();state=L10n.text("已关闭")
     }
     func fail(_ error: Error) {
         guard !closed else { return }

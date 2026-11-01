@@ -82,7 +82,7 @@ final class RootfsFileProvider:NSFileProviderExtension {
     }
     override func item(for identifier:NSFileProviderItemIdentifier) throws -> NSFileProviderItem {
         if identifier == .rootContainer {return RootfsItem(id:identifier.rawValue,parent:identifier.rawValue,name:"Trames",directory:true)}
-        if identifier.rawValue=="pending-edits" {return RootfsItem(id:"pending-edits",parent:NSFileProviderItemIdentifier.rootContainer.rawValue,name:"待写回的编辑",directory:true)}
+        if identifier.rawValue=="pending-edits" {return RootfsItem(id:"pending-edits",parent:NSFileProviderItemIdentifier.rootContainer.rawValue,name:L10n.text("待写回的编辑"),directory:true)}
         if identifier.rawValue.hasPrefix("pending/") {
             guard let request=try edits().requests().first(where:{"pending/"+$0.token==identifier.rawValue}) else {throw NSFileProviderError(.noSuchItem)}
             return recoveryItem(request)

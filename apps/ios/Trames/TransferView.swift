@@ -17,20 +17,20 @@ struct TransferView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("本地 Linux 文件") {
-                    Text(UserDefaults.standard.bool(forKey:"rootfsFileProviderAvailable") ? "可在文件 App 中浏览 Trames › \(session.environmentName)。编辑现有普通文件后，回到 Trames 时写回；待写回副本可在「待写回的编辑」中另存。" : "当前签名未提供文件共享容器，可继续使用这里的导入和导出。")
+                Section(L10n.text("本地 Linux 文件")) {
+                    Text(UserDefaults.standard.bool(forKey:"rootfsFileProviderAvailable") ? L10n.text("可在文件 App 中浏览 Trames › %@。编辑现有普通文件后，回到 Trames 时写回；待写回副本可在「待写回的编辑」中另存。", String(describing: session.environmentName)) : L10n.text("当前签名未提供文件共享容器，可继续使用这里的导入和导出。"))
                         .font(.caption).foregroundStyle(.secondary)
-                    TextField("文件路径", text: $path).textInputAutocapitalization(.never).autocorrectionDisabled()
+                    TextField(L10n.text("文件路径"), text: $path).textInputAutocapitalization(.never).autocorrectionDisabled()
                     if let selected { Text(selected.lastPathComponent) }
-                    Button("选择 Files 文件") { chooser = true }.disabled(busy)
-                    Toggle("替换 Linux 中的同名文件",isOn:$replace).disabled(busy)
-                    Button("导入到 Linux") { transfer(upload: true) }.disabled(busy || selected == nil)
-                    Button("导出到 Files") { transfer(upload: false) }.disabled(busy)
+                    Button(L10n.text("选择 Files 文件")) { chooser = true }.disabled(busy)
+                    Toggle(L10n.text("替换 Linux 中的同名文件"),isOn:$replace).disabled(busy)
+                    Button(L10n.text("导入到 Linux")) { transfer(upload: true) }.disabled(busy || selected == nil)
+                    Button(L10n.text("导出到 Files")) { transfer(upload: false) }.disabled(busy)
                 }
-                Section { Text(message.isEmpty ? "导入使用文件副本；开启替换后，同名文件在传输完整成功后替换，取消或失败时保留原文件。" : message).font(.caption) }
-                if busy { Button("取消传输", role: .destructive) { task?.cancel(); message = "取消中…" } }
+                Section { Text(message.isEmpty ? L10n.text("导入使用文件副本；开启替换后，同名文件在传输完整成功后替换，取消或失败时保留原文件。") : message).font(.caption) }
+                if busy { Button(L10n.text("取消传输"), role: .destructive) { task?.cancel(); message = L10n.text("取消中…") } }
             }.navigationTitle("Files")
-                .toolbar { Button("完成") { task?.cancel(); dismiss() } }
+                .toolbar { Button(L10n.text("完成")) { task?.cancel(); dismiss() } }
                 .fileImporter(isPresented: $chooser, allowedContentTypes: [.data, .item]) { result in
                     switch result {
                     case .success(let url): selected = url
@@ -45,8 +45,8 @@ struct TransferView: View {
         }
     }
     private func transfer(upload: Bool) {
-        guard !path.isEmpty else { message = "请输入文件路径"; return }
-        busy = true; message = "传输中…"
+        guard !path.isEmpty else { message = L10n.text("请输入文件路径"); return }
+        busy = true; message = L10n.text("传输中…")
         task = Task {
             let stage = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
             var keep = false
@@ -56,10 +56,10 @@ struct TransferView: View {
                 try Task.checkCancellation()
                 if let local = session.local {
                     try await local.transferAsync(guest: path, host: stage, export: !upload, replace:upload && replace)
-                } else { throw TramesError.message("会话已关闭") }
+                } else { throw TramesError.message(L10n.text("会话已关闭")) }
                 try Task.checkCancellation()
-                if upload { message = "传输完成" }
-                else { keep = true; exportFile = ExportFile(url: stage); message = "请选择导出位置" }
+                if upload { message = L10n.text("传输完成") }
+                else { keep = true; exportFile = ExportFile(url: stage); message = L10n.text("请选择导出位置") }
             } catch { message = error.localizedDescription }
         }
     }

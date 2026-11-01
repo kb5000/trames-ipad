@@ -1,5 +1,7 @@
 name: Trames
 options:
+  developmentLanguage: en
+  knownRegions: [en, zh-Hans]
   bundleIdPrefix: org.trames
   deploymentTarget:
     iOS: '17.0'

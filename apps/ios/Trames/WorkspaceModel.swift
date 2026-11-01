@@ -224,7 +224,7 @@ final class WorkspaceModel: ObservableObject {
         session.startLocal(environment,useVolumeBudget:UserDefaults.standard.bool(forKey:"useVolumeBudget"),profile:profile,maintenance:maintenance,after:previous)
     }
     func createEnvironment(name:String,distribution:String,initMode:String,packages:String,archive:URL?,sha256:String?) async throws {
-        guard let environment else {throw TramesError.message("环境存储不可用")}
+        guard let environment else {throw TramesError.message(L10n.text("环境存储不可用"))}
         let profile=try await environment.create(name:name,distribution:distribution,initMode:initMode,packages:packages,archive:archive,sha256:sha256)
         try await refreshEnvironments();openEnvironment(profile)
     }

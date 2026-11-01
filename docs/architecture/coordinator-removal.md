@@ -1,4 +1,136 @@
-# 协调器拆分进度
+# Coordinator dependency audit
+
+## Current assessment — 2026-11-02
+
+The shared kernel still has an owner event loop. It is no longer a mandatory
+per-call hop for all CPU workers. Ordinary shared-resource I/O, futex waits and
+wakes, retained task scheduling, and supported native operations already execute
+on the existing workers. Remaining ownership is substantial, especially pathname
+metadata and resource creation. This audit does not claim complete removal.
+
+The audited shared runtime is `a45bbe3b07a2faa22a3e3a9332bd397809005e57`.
+Mac uses the hardware executor; iPad uses the interpreter with the same process,
+VFS, signal and memory semantics. No execution-path code changed for this audit.
+The Mac `--metrics` output now exports existing execution-path counters as JSON;
+normal execution acquires no new profiling counters, checks or barriers.
+
+### Boundaries that must be counted separately
+
+- **Worker completion:** guest CPU, syscall or native operation runs on the same
+  existing execution thread, with shared resource ownership. A blocked task gives
+  up its execution slot; notifications requeue the retained task.
+- **Owner service:** only the caller is parked. Its CPU and memory View survive,
+  and peer workers continue. The owner still processes requests, so this is a
+  remaining central hop even when it causes no cohort stop.
+- **VM checkpoint:** the affected address-space/backing domains quiesce, commit
+  and rebuild their Views. Unrelated domains retain their jobs. A new eligible
+  private anonymous interval can instead be published through an owner service.
+- **Whole-cohort join:** workers return their Views and process state is updated
+  by the owner. A control check alone is not a join. The persistent epoch checks
+  host control at bounded intervals without automatically recreating the cohort.
+- **Serial execution:** a lone eligible runnable task may execute on the owner
+  without any worker RPC. Zero worker counters in this mode do not establish a
+  parallel bottleneck.
+
+### Source audit and remaining work
+
+| Scenario | Current authority and remaining dependency | Can centralized execution be removed? |
+| --- | --- | --- |
+| Basic CPU execution, libc native functions, identity/clock queries | Worker snapshots / native registry; Mac monotonic vDSO calls avoid a syscall altogether. | Already off the owner for admitted parallel calls. iPad retains its own clock capability profile. |
+| Futex WAIT/WAKE/REQUEUE, sleep, ordinary retained I/O waits | Shared wait queues and execution queue. Legacy owner-only futex targets still request a scheduling join. | Normal worker handoff is already direct. Move remaining owner-only task state into the same queue before removing its fallback. |
+| Pipe/PTY byte I/O, TCP/UDP and Unix socket byte operations, unmasked poll/epoll, supported io_uring | Retained OFDs, shared endpoint state and host readiness notifications. Creating endpoints, accept/connect policy changes, SCM_RIGHTS imports and unsupported resource kinds still use owner authority. | Steady-state I/O is largely direct; resource creation and publication can migrate with shared Files/network authority. |
+| Open regular file reads/writes, seek and fd metadata | Captured `FileEpoch`/`DirectFiles` handles cover eligible files. Uncaptured files, bulk disk service and sync requests may use owner services; mapped backing and SIGXFSZ cases retain structural/signal boundaries. | Yes, by sharing complete inode/backing and pending-I/O authority. Do not substitute one global VFS mutex or another resource-service thread. |
+| Pathname metadata and namespace changes | `newfstatat` (79), path lookup/open, readlink and namespace mutations still enter owner Linux/VFS paths. The benchmark below identifies repeated path metadata as a major remaining join source. | **First priority:** shared pathname/inode query authority; then open/create/directory changes. Directory/inode invariants require object-level synchronization. |
+| FD membership | dup/dup3/close, selected fcntl and CLOEXEC operations have worker implementations. New descriptor kinds and side effects outside the retained authority can fall back. | Extend shared Files/OFD registration rather than rebuild snapshots for every new FD. Preserve accepted OFDs across close/reuse. |
+| brk/mmap/munmap/mprotect/mremap/mincore/madvise | Additive anonymous mmap can use a service; structural changes use scoped VM checkpoints. Filtered entries preserve the exact seccomp decision on the mm owner. | The executing owner can migrate into a per-mm transaction. Unmap/protection/replacement still need affected users and backend translations to synchronize. Hardware-backed guest addresses do not eliminate these lifetime rules. |
+| clone/fork/exec/exit/wait, process groups, credentials, signal delivery and rlimits | Owner-held process registry, run-state transitions and kernel-wide relationships. Signal action queries have a worker path; delivery and mutable task authority still join. | Incrementally: shared task registry, targeted run-queue notifications and per-task/group state transitions. Fork/exec must coordinate the participating mm/Files/task domains; no Linux semantic requirement to stop unrelated processes. |
+| Masked ppoll/epoll, temporary signal masks, seccomp installation/TSYNC, tracing | Unsupported/owner-retained cases keep kernel entry/restart/mask authority. `a45bbe3` prevents dormant masked epoll from repeatedly stopping unrelated workers. | Share per-task mask/restart state, filter generations and targeted wakeups before migrating. Dropping the mask/filter semantics is not an optimization. |
+| Vulkan/video/audio and Wayland/native resources | Supported calls and GPU waits already use workers and notifications. Audio OPEN, video CREATE_SURFACE and non-worker Vulkan/resource operations retain owner paths. Native service pumping and FD/rights publication remain owner-side. AppKit presentation has a separate platform UI-thread requirement. | Migrate device/resource registration using shared authority. Keep platform UI dispatch isolated in the Mac/iPad adapter; it need not suspend guest CPUs. GPU context/queue synchronization remains local to the real resource. |
+| Host control, PTY resize/hangup/signals, systemd/session lifecycle and memory pressure | `cohort_control` and the product adapter poll/dispatch actual changes. Real signals, timer expiry, foreground group changes or stop requests can request a join. | Keep a small session control loop; publish targeted task/domain events so unrelated workers continue. Eliminating this loop's existence is less useful than eliminating its data-path responsibility. |
+
+Source anchors in the shared runtime:
+[worker admission](https://github.com/kb5000/trames-runtime/blob/main/crates/trames-session/src/worker_syscalls.rs),
+[worker execution](https://github.com/kb5000/trames-runtime/blob/main/crates/trames-session/src/workers.rs),
+[process owner and dispatch](https://github.com/kb5000/trames-runtime/blob/main/crates/trames-session/src/process.rs),
+[VM/control boundaries](https://github.com/kb5000/trames-runtime/blob/main/crates/trames-session/src/process_vm.rs),
+[remaining services](https://github.com/kb5000/trames-runtime/blob/main/crates/trames-session/src/process_service.rs),
+[shared direct I/O](https://github.com/kb5000/trames-runtime/blob/main/crates/trames-linux/src/direct.rs),
+[file captures](https://github.com/kb5000/trames-runtime/blob/main/crates/trames-vfs/src/file_io.rs).
+
+### Current measurements
+
+Real Apple Silicon HVF execution, 12 configured CPU slots, disposable storage and
+loopback-only HTTP. Counts include program startup/teardown. These are single
+instrumented diagnostic samples, not throughput or cross-platform score claims.
+The iPad scheduler/source assessment shares this kernel; the numeric samples
+below are Mac measurements. GUI/Vulkan workloads were source-audited, not freshly
+profiled in this matrix.
+
+| Workload | Total syscalls | Worker syscalls | Owner service requests | Cohort rounds | Summed peer-drain time |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 200,000 libc monotonic clock queries | 4 | 0 (serial/vDSO) | 0 | 0 | 0 ms |
+| 12-thread futex ring, 2,000 rounds | 48,149 | 48,036 | 0 | 66 | 0.491 ms |
+| Four-thread paging/atomics + fork COW | 89 | 16 | 0 | 21 | 2.184 ms |
+| Four processes, 40,000 private pread calls | 40,689 | 40,011 | 520 | 50 | 24.884 ms |
+| Four processes, 40,000 shared pread calls | 40,694 | 39,892 | 515 | 59 | 1.485 ms |
+| Four processes, 40,000 private path-stat calls | 40,688 | 11 | 509 | 28,097 | 87.229 ms |
+| Four processes, 40,000 shared path-stat calls | 40,688 | 11 | 514 | 27,923 | 39.985 ms |
+| Four concurrent 1 MiB HTTP downloads | 411 | 81 | 7 | 117 | 2.121 ms |
+
+The file fixtures initialize four 8 MiB files before their counted loops. Many
+~512 owner services are initialization writes/syncs; the read-loop counters show
+40,000 and 39,881 direct file calls respectively. Do not classify all of these
+service requests as costs of the read loop. Private/shared wall times also have
+different cold import/cache histories and are deliberately not compared here.
+
+The shared metadata sample returned syscall 79 at joins 31,159 times. This
+histogram counts pending returns, not unique first-stop causes; remaining calls
+can execute in serial tails. It cannot be summed into a unique pause count.
+The futex sample's return histogram contains mask changes (135), exits (93),
+clones (220) and unmap (215), rather than the 48,000 steady-state wait/wake calls.
+
+Peer-drain time excludes dispatch, mapping rebuild, actual syscalls and caller
+service waits. Service wait is summed over callers and can overlap. Neither is
+an end-to-end CPU percentage. Raw counters and commands are recorded in the
+[validation record](../validation/coordinator-audit-20261102.json).
+
+The already-validated masked epoll fix is relevant to systemd: multi-terminal
+idle host CPU fell from about 107% to 2.2% in the production FFI check, and from
+about 150% to 6% on the physical iPad HUD. These are reused earlier checks of the
+same runtime source, not rerun measurements; see
+[iPad environment validation](../validation/ipad-environments-20261102.json).
+
+### Recommended migration order
+
+1. Path metadata (`newfstatat`/statx/access/readlink) over shared namespace/inode
+   authority. Test rename/unlink, symlinks, mount boundaries, host mutations and
+   concurrent metadata changes. Preserve normal Linux races; no stronger
+   ordering, guest-race error or whole-function global lock.
+2. Open/create/accept/pipe/event/timer descriptor publication using shared Files
+   and resource objects. Let existing workers observe the real membership rather
+   than stopping every job to capture newly registered resources.
+3. Temporary signal-mask waits, signal delivery and task creation/exit using a
+   shared task registry and targeted execution-queue events. Preserve seccomp
+   decisions, EINTR/restart, process-group semantics and OFD lifetimes.
+4. Complete per-mm structural ownership and native-device registration. Reduce
+   synchronization to the actual mm/backing/device domains. Keep required HVF
+   translation invalidation and iPad interpreter memory lifetime semantics in
+   their existing backend boundary.
+
+A final owner loop for session lifecycle is compatible with this design. The
+objective is that normal CPU, filesystem, network and device operations run on
+existing execution threads, while real shared-state changes synchronize their
+own objects. This audit adds no new coordinator, reactor thread or polling bus.
+
+---
+
+## Historical migration record (through 2026-10-24)
+
+The dated record below predates later worker FD operations, scoped VM checkpoints
+and the current product builds. Use the audit above for present ownership; its
+old release notes and migration batch counts are historical.
+
+### Earlier progress notes
 
 2026-10-24 的性能优先级审计见 [整组停顿测量](../validation/cohort-cost.md)：
 先让实际 Files/OFD 结构调用在 worker 完成，再缩小 VM 修改的暂停域；
