@@ -64,6 +64,7 @@ pub struct Cpu {
     native_calls: bool,
     vulkan_calls: bool,
     video_calls: bool,
+    audio_calls: bool,
     registers: [u64; 31],
     pub sp: u64,
     pub pc: u64,
@@ -154,7 +155,7 @@ impl Cpu {
         self.vulkan_calls = enabled;
     }
     pub fn native_calls_enabled(&self) -> bool {
-        self.native_calls || self.vulkan_calls || self.video_calls
+        self.native_calls || self.vulkan_calls || self.video_calls || self.audio_calls
     }
     pub fn decode_stats(&self) -> DecodeStats {
         self.decoded.stats
@@ -242,7 +243,8 @@ impl Cpu {
         let mut event = Event::Continue;
         if (self.native_calls
             || self.vulkan_calls && self.x(16) == 0x0001_0006
-            || self.video_calls && self.x(16) == 0x0001_0007)
+            || self.video_calls && self.x(16) == 0x0001_0007
+            || self.audio_calls && self.x(16) == 0x0001_0008)
             && ins == 0xd44a8a40
         {
             next = pc;
@@ -808,6 +810,29 @@ mod native_tests {
         }
     }
     #[test]
+    fn audio_opt_in_cannot_enable_other_native_profiles() {
+        let mut memory = Memory::default();
+        memory.map(0x1000, PAGE_SIZE, Permissions::RW).unwrap();
+        memory.write(0x1000, &0xd44a8a40u32.to_le_bytes()).unwrap();
+        memory.protect(0x1000, PAGE_SIZE, Permissions::RX).unwrap();
+        for module in [0x10001, 0x10006, 0x10007, 0x10008] {
+            let mut cpu = Cpu::new(0x1000, 0);
+            <Cpu as trames_engine::Cpu>::set_audio_calls(&mut cpu, true);
+            cpu.set_x(16, module);
+            cpu.set_x(17, 1);
+            assert_eq!(
+                matches!(
+                    cpu.run_slice(&mut memory, 1),
+                    SliceOutcome::NativeCall {
+                        module: 0x10008,
+                        ..
+                    }
+                ),
+                module == 0x10008
+            );
+        }
+    }
+    #[test]
     fn vulkan_opt_in_does_not_activate_the_pure_memory_profile() {
         let mut m = Memory::default();
         m.map(0x1000, PAGE_SIZE, Permissions::RW).unwrap();
@@ -925,6 +950,9 @@ impl trames_engine::Cpu for Cpu {
     }
     fn set_vulkan_calls(&mut self, enabled: bool) {
         self.set_vulkan_calls(enabled);
+    }
+    fn set_audio_calls(&mut self, enabled: bool) {
+        self.audio_calls = enabled;
     }
     fn set_video_calls(&mut self, enabled: bool) {
         self.video_calls = enabled;

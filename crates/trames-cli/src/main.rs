@@ -527,6 +527,7 @@ fn run() -> Result<u8, Box<dyn std::error::Error>> {
             native_allocator,
             vulkan_accelerator,
             video_accelerator,
+            ..Default::default()
         },
     )?;
     runtime.linux.trace = trace;

@@ -24,6 +24,7 @@ trames-linux = { workspace = true }
 trames-vfs = { workspace = true }
 trames-net = { workspace = true }
 trames-vulkan = { workspace = true }
+trames-audio = { path = "../../runtime/crates/trames-audio" }
 trames-video = { workspace = true }
 trames-graphics = { workspace = true }
 trames-wayland = { workspace = true }

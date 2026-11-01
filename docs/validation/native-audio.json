@@ -1,0 +1,426 @@
+{
+  "date": "2026-11-01",
+  "scope": "Mac native audio; input accepted with existing system virtual microphone only",
+  "backend": {
+    "output": "AVAudioEngine AVAudioSourceNode device pull",
+    "capture": "AudioQueue input",
+    "guest": "standard ALSA ioplug; unchanged FFmpeg and Firefox"
+  },
+  "acceptance": {
+    "output": {
+      "passed": true,
+      "returncode": 0,
+      "mode": "output",
+      "samples": [
+        {
+          "playback_frames": 144000,
+          "rate": 48000,
+          "channels": 2,
+          "elapsed": 3.067442,
+          "drain": 0
+        }
+      ],
+      "sha256": {
+        "audio-native": "c24fcb698d80d5f17e90e02099e75f6653f074d093262f05736370e7a739e51c",
+        "libasound_module_pcm_trames.so": "0fec04537271ea3a458b51bf7b691787906064ad0b950c06f9db5153dd3293f2",
+        "asound.conf": "3dd2775eecc8bc05a399ba9761fbfc8f8fd2c2852ea2f97b9466773f2f158722"
+      }
+    },
+    "clock": {
+      "passed": true,
+      "returncode": 0,
+      "mode": "clock",
+      "samples": [
+        {
+          "clock_max_step_frames": 550,
+          "clock_max_poll_gap": 0.011448,
+          "continuous_clock": true
+        },
+        {
+          "playback_frames": 144000,
+          "rate": 48000,
+          "channels": 2,
+          "elapsed": 3.067045,
+          "drain": 0
+        }
+      ],
+      "sha256": {
+        "audio-native": "c24fcb698d80d5f17e90e02099e75f6653f074d093262f05736370e7a739e51c",
+        "libasound_module_pcm_trames.so": "0fec04537271ea3a458b51bf7b691787906064ad0b950c06f9db5153dd3293f2",
+        "asound.conf": "3dd2775eecc8bc05a399ba9761fbfc8f8fd2c2852ea2f97b9466773f2f158722"
+      }
+    },
+    "duplex": {
+      "passed": true,
+      "returncode": 0,
+      "mode": "duplex",
+      "samples": [
+        {
+          "capture_frames": 48000,
+          "elapsed": 1.054223,
+          "rms": 0.0,
+          "peak": 0.0
+        },
+        {
+          "playback_frames": 144000,
+          "rate": 48000,
+          "channels": 2,
+          "elapsed": 3.067035,
+          "drain": 0
+        }
+      ],
+      "sha256": {
+        "audio-native": "c24fcb698d80d5f17e90e02099e75f6653f074d093262f05736370e7a739e51c",
+        "libasound_module_pcm_trames.so": "0fec04537271ea3a458b51bf7b691787906064ad0b950c06f9db5153dd3293f2",
+        "asound.conf": "3dd2775eecc8bc05a399ba9761fbfc8f8fd2c2852ea2f97b9466773f2f158722"
+      }
+    },
+    "ffmpeg_s16le_44100": {
+      "mode": "ffmpeg",
+      "returncode": 0,
+      "seconds": 6.850000417,
+      "stdout": "",
+      "stderr": "trames: session ready\n"
+    }
+  },
+  "firefox": {
+    "version": "151.0.3",
+    "fixture": "45-second 1920x1080 60 Hz H.264/AAC",
+    "measurement": "Foreground, after five seconds warmup; no build VM or CI running",
+    "remaining_stutter": true,
+    "audible_result": "Owner confirmed continuous crackle is gone after switching to device pull",
+    "physical_av_offset_measured": false,
+    "device_pull_run": {
+      "page": "file:///opt/trames-video-perf-controlled-402b01c5/index.html",
+      "elapsed_browser": 25.03,
+      "elapsed_host": 25.045770542,
+      "accepted_fps": 53.61566120655213,
+      "callback_fps": 21.174590491410306,
+      "dropped_frames": 97,
+      "total_frames": 1439,
+      "playback_events": [],
+      "frame_gaps": {
+        "count": 530,
+        "p50_ms": 42.57999999999993,
+        "p95_ms": 50,
+        "p99_ms": 97.30000000000109,
+        "max_ms": 1564.5400000000009,
+        "over_50_ms": 22,
+        "over_100_ms": 5
+      },
+      "media_speed": 0.9583133439872152,
+      "volume_changes": [
+        {
+          "volume": 0.05,
+          "setter_roundtrip_ms": 12.737040999994065
+        },
+        {
+          "volume": 0.12,
+          "setter_roundtrip_ms": 40.59504200000674
+        },
+        {
+          "volume": 0.03,
+          "setter_roundtrip_ms": 16.24579199999232
+        },
+        {
+          "volume": 0.08,
+          "setter_roundtrip_ms": 12.856582999987154
+        }
+      ],
+      "volume_frame_gaps": {
+        "count": 50,
+        "p50_ms": 43.220000000001164,
+        "p95_ms": 53.81999999999971,
+        "p99_ms": 67,
+        "max_ms": 67,
+        "over_50_ms": 5,
+        "over_100_ms": 0
+      },
+      "interaction_ms": 287.4165000000062,
+      "interaction": {
+        "clicked": "yes",
+        "text": "Trames video"
+      },
+      "before": {
+        "wall": 5889,
+        "time": 4.634645,
+        "size": [
+          1920,
+          1080
+        ],
+        "rate": 1,
+        "ready": 4,
+        "total": 279,
+        "dropped": 60,
+        "callbacks": 87,
+        "paused": false,
+        "error": null,
+        "visibility": "visible",
+        "focus": true,
+        "duration": 45,
+        "buffered": [
+          [
+            0,
+            45
+          ]
+        ]
+      },
+      "after": {
+        "wall": 30919,
+        "time": 28.621228,
+        "size": [
+          1920,
+          1080
+        ],
+        "rate": 1,
+        "ready": 4,
+        "total": 1718,
+        "dropped": 157,
+        "callbacks": 617,
+        "paused": false,
+        "error": null,
+        "visibility": "visible",
+        "focus": true,
+        "duration": 45,
+        "buffered": [
+          [
+            0,
+            45
+          ]
+        ]
+      }
+    }
+  },
+  "limitations": [
+    "Virtual microphone provides silence; physical microphone quality not accepted",
+    "Residual browser/rendering stalls remain under investigation",
+    "iPad device compile only; UI audio activation not enabled"
+  ],
+  "elapsed_stall_investigation": {
+    "date": "2026-11-01",
+    "fixture": "1080p60 H.264 High/AAC, 45 seconds, loop enabled",
+    "fixture_sha256": "4537c2ef54701574d04bfe15b10278fc923eb27ff46398f806ffaa9d4c865afb",
+    "runner_sha256": "773f5e4b41acbaa90a99eaaccad81716f953d84a78c723287a151d3ef6276d87",
+    "method": "Same final device-pull binary, 12 CPUs, no host sampler, Firefox profiler, metrics or concurrent CI; isolated new profiles; two host-directory runs then one private-store run, 35 seconds each. Early volume change at 0.5 seconds; later volume/click/typing checks after timing. Window visible. Short ordered observations; not randomized or physical scanout.",
+    "attribution": "Separate opt-in slow-call records aligned a later multi-second frame-callback gap with repeated Glean local database replacements at datareporting/glean/db/data.safe.tmp. Observed private-store creates took about 30-40 ms each. A start-at-18s test crossed media position 22s without the severe gap.",
+    "cases": [
+      {
+        "elapsed_browser": 35.037,
+        "accepted_fps": 57.453549105231616,
+        "callback_fps": 22.604675057796044,
+        "media_speed": 0.9840906184890259,
+        "frame_gaps": {
+          "count": 792,
+          "p50_ms": 42.81999999999971,
+          "p95_ms": 47.23999999999796,
+          "p99_ms": 82.39999999999964,
+          "max_ms": 432.7000000000007,
+          "over_50_ms": 22,
+          "over_100_ms": 4
+        },
+        "volume_changes": [
+          {
+            "volume": 0.05,
+            "setter_roundtrip_ms": 9.24024999999773
+          },
+          {
+            "volume": 0.12,
+            "setter_roundtrip_ms": 6.613708999999801
+          },
+          {
+            "volume": 0.03,
+            "setter_roundtrip_ms": 10.633916999999826
+          },
+          {
+            "volume": 0.08,
+            "setter_roundtrip_ms": 24.403875000004405
+          }
+        ],
+        "volume_frame_gaps": {
+          "count": 49,
+          "p50_ms": 42.25999999999476,
+          "p95_ms": 49.95999999999913,
+          "p99_ms": 50,
+          "max_ms": 50,
+          "over_50_ms": 0,
+          "over_100_ms": 0
+        },
+        "interaction": {
+          "clicked": "yes",
+          "text": "Trames video"
+        },
+        "interaction_ms": 279.0423340000032,
+        "case": "controlled-583f9a87",
+        "profile_storage": "host directory",
+        "steady_after_first_3s_max_gap_ms": 102.22000000000116,
+        "main_jitter": [],
+        "early_volume": [
+          {
+            "wall": 14972,
+            "elapsed": 0
+          }
+        ]
+      },
+      {
+        "elapsed_browser": 35.035,
+        "accepted_fps": 58.08477237048666,
+        "callback_fps": 22.66305123447981,
+        "media_speed": 0.9860930498073356,
+        "frame_gaps": {
+          "count": 794,
+          "p50_ms": 42.88000000000102,
+          "p95_ms": 47.42000000000189,
+          "p99_ms": 77.19999999999891,
+          "max_ms": 404.72000000000116,
+          "over_50_ms": 18,
+          "over_100_ms": 5
+        },
+        "volume_changes": [
+          {
+            "volume": 0.05,
+            "setter_roundtrip_ms": 10.324709000002485
+          },
+          {
+            "volume": 0.12,
+            "setter_roundtrip_ms": 10.572000000003356
+          },
+          {
+            "volume": 0.03,
+            "setter_roundtrip_ms": 13.47412500000189
+          },
+          {
+            "volume": 0.08,
+            "setter_roundtrip_ms": 22.728209000000277
+          }
+        ],
+        "volume_frame_gaps": {
+          "count": 50,
+          "p50_ms": 42.599999999998545,
+          "p95_ms": 49.83999999999651,
+          "p99_ms": 50,
+          "max_ms": 50,
+          "over_50_ms": 0,
+          "over_100_ms": 0
+        },
+        "interaction": {
+          "clicked": "yes",
+          "text": "Trames video"
+        },
+        "interaction_ms": 260.3179589999982,
+        "case": "controlled-463d1a67",
+        "profile_storage": "host directory",
+        "steady_after_first_3s_max_gap_ms": 146.91999999999825,
+        "main_jitter": [],
+        "early_volume": [
+          {
+            "wall": 14927,
+            "elapsed": 1
+          }
+        ]
+      },
+      {
+        "elapsed_browser": 35.068,
+        "accepted_fps": 52.355423748146464,
+        "callback_fps": 21.358503478955175,
+        "media_speed": 0.9523265370138018,
+        "frame_gaps": {
+          "count": 749,
+          "p50_ms": 42.919999999998254,
+          "p95_ms": 47.04000000000087,
+          "p99_ms": 113.77999999999884,
+          "max_ms": 1276.4599999999991,
+          "over_50_ms": 17,
+          "over_100_ms": 9
+        },
+        "volume_changes": [
+          {
+            "volume": 0.05,
+            "setter_roundtrip_ms": 10.514459000006582
+          },
+          {
+            "volume": 0.12,
+            "setter_roundtrip_ms": 7.939707999994994
+          },
+          {
+            "volume": 0.03,
+            "setter_roundtrip_ms": 15.244042000006175
+          },
+          {
+            "volume": 0.08,
+            "setter_roundtrip_ms": 18.794624999998177
+          }
+        ],
+        "volume_frame_gaps": {
+          "count": 50,
+          "p50_ms": 42.44000000000233,
+          "p95_ms": 50,
+          "p99_ms": 63.26000000000204,
+          "max_ms": 63.26000000000204,
+          "over_50_ms": 1,
+          "over_100_ms": 0
+        },
+        "interaction": {
+          "clicked": "yes",
+          "text": "Trames video"
+        },
+        "interaction_ms": 526.528875000011,
+        "case": "controlled-fab73ef7",
+        "profile_storage": "private store",
+        "steady_after_first_3s_max_gap_ms": 1276.4599999999991,
+        "main_jitter": [
+          {
+            "wall": 52746,
+            "gap": 102
+          },
+          {
+            "wall": 53097,
+            "gap": 273
+          },
+          {
+            "wall": 53215,
+            "gap": 118
+          },
+          {
+            "wall": 53517,
+            "gap": 129
+          },
+          {
+            "wall": 66906,
+            "gap": 203
+          }
+        ],
+        "early_volume": [
+          {
+            "wall": 29481,
+            "elapsed": 0
+          }
+        ]
+      }
+    ],
+    "discarded_experiments": [
+      "GPU-ready/consumed frame callback changes: no established benefit; reverted.",
+      "Broader in-epoch namespace service path: no stable benefit; reverted.",
+      "Host and Firefox sampling: strongly perturbed playback; excluded from normal performance scores."
+    ],
+    "remaining": [
+      "Private-store full-manifest persistence remains a general bottleneck; host-profile is opt-in storage placement.",
+      "Cold startup still has a shorter frame gap.",
+      "Callbacks remain about 23 Hz; playback-quality counters are accepted frames, not physical scanout.",
+      "Physical A/V offset and long-term drift are unmeasured."
+    ]
+  },
+  "runtime_revision": "dd35e7fa6a142b687648e8d5ecef5ce9fc1eff65",
+  "verification": {
+    "runtime_macos_ci": "7/7 passed; first four successful steps reused after local network permission retry",
+    "runtime_arm64_linux_ci": "7/7 passed",
+    "ipad_product_clippy": "all targets/features passed",
+    "kernel_conformance": "239 passed, 3 ignored",
+    "ipad_device_compile": "passed; audio remains disabled in product defaults",
+    "cpu_adapter_tests": "previous same-source pass reused",
+    "guest_plugin": "same verified ARM64 musl artifacts reused",
+    "mac_product_ci": "11/11 passed cumulatively: build/test steps 1-9 plus packaging steps 10-11 retried after preserving conflicting old archives",
+    "local_ci_cache": "Native .m/.mm sources now participate in input fingerprints; verified audio.mm inclusion, no source change requiring repeated runtime tests"
+  },
+  "mac_revision": "6bd3dfe",
+  "installed_dev_sha256": "5d66085af5a1a204d178e6703fdcbfd0be6998dbe67c4ffa4e15a17470b15750"
+}

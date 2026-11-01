@@ -93,7 +93,7 @@ def rust_inputs(root):
     paths = {root / p for p in ('Cargo.toml', 'Cargo.lock', 'rust-toolchain.toml', '.gitmodules', 'runtime-version.json', 'runtime/Cargo.toml', 'runtime/Cargo.lock')}
     for folder in ('crates', 'runtime/crates', 'runtime/vendor', '.cargo'):
         paths.update(p for p in (root / folder).rglob('*') if p.suffix in
-                     ('.rs', '.toml', '.lock', '.c', '.h', '.py', '.json', '.S'))
+                     ('.rs', '.toml', '.lock', '.c', '.h', '.m', '.mm', '.py', '.json', '.S'))
     return file_map(root, paths)
 
 

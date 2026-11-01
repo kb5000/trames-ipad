@@ -617,6 +617,7 @@ fn run(
             native_allocator: options.native_allocator,
             vulkan_accelerator: options.vulkan_accelerator,
             video_accelerator: options.vulkan_accelerator,
+            ..Default::default()
         },
     )
     .map_err(|e| e.to_string())?;

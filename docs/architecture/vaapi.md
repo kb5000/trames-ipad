@@ -6,8 +6,8 @@ adapter are implemented. Stock Firefox 142 selects VA-API in its RDD process
 with its normal sandbox. Foreground 720p30 and near-source-rate 1080p60 playback
 are validated below. The recommended Firefox 151/native-video profile passes cold short-clip
 autoplay/looping without the old 15-second buffer pause; Firefox 142 retains that
-limitation. HEVC, AV1, encoding, video processing, audio
-output/A-V synchronization and physical iPad playback are not validated.
+limitation. HEVC, AV1, encoding, video processing, physical A/V synchronization and physical iPad playback are not validated.
+Mac audio output and virtual input are covered in the native-audio follow-up below.
 
 ## Architecture
 
@@ -528,3 +528,42 @@ acceptance. Audio was muted; output/A-V synchronization remains outside scope.
 - [FFmpeg 7.1 VA H.264 input](https://github.com/FFmpeg/FFmpeg/blob/n7.1/libavcodec/vaapi_h264.c) and [VideoToolbox input](https://github.com/FFmpeg/FFmpeg/blob/n7.1/libavcodec/videotoolbox.c).
 - [Firefox 142 VA export/sync](https://github.com/mozilla-firefox/firefox/blob/FIREFOX_142_0_RELEASE/dom/media/platforms/ffmpeg/FFmpegVideoDecoder.cpp), [display initialization](https://github.com/mozilla-firefox/firefox/blob/FIREFOX_142_0_RELEASE/dom/media/platforms/ffmpeg/VALibWrapper.cpp), and [plane import](https://github.com/mozilla-firefox/firefox/blob/FIREFOX_142_0_RELEASE/widget/gtk/DMABufSurface.cpp).
 - [Khronos native Metal texture import](https://docs.vulkan.org/refpages/latest/refpages/source/VkImportMetalTextureInfoEXT.html) and [Metal external-memory import](https://docs.vulkan.org/refpages/latest/refpages/source/VkImportMemoryMetalHandleInfoEXT.html).
+
+## Native audio follow-up (2026-11-01)
+
+Standard ALSA output and capture now connect to the shared native audio backend.
+The final Mac output path uses AVAudioSourceNode device pull, rather than
+prefilling Audio Queue buffers with silence. This removes the persistent
+discontinuities heard in the first integration. Capture is accepted with the
+system virtual microphone, as requested; physical USB microphone quality is not
+part of this acceptance.
+
+The ALSA fixture plays 144,000 stereo/48 kHz frames in 3.067 s. Its continuous
+clock check observes at most 517 frames of progress over a maximum 10.767 ms
+poll gap; simultaneous capture reads 48,000 mono frames in 1.053 s. Original
+FFmpeg S16/44.1 kHz output also completes. Firefox 151 plays with the normal
+sandbox and native audio; the owner confirmed the persistent crackle is gone.
+
+This does not close browser smoothness acceptance. A 25-second foreground
+1080p60 audio/video interval accepts 53.62 FPS, but video callbacks have a
+97.3 ms p99 gap and a 1.565 s maximum gap. The media clock advances at 0.958
+of wall time. Four webpage volume changes complete in 12.7–40.6 ms controller
+roundtrips; their observed two-second window has no callback gap over 100 ms.
+Long stalls elsewhere still need correlation with scheduling/rendering data.
+
+[Shared architecture and setup](https://github.com/kb5000/trames-runtime/blob/main/docs/architecture/audio.md)
+and [machine-readable acceptance](../validation/native-audio.json) describe the
+capability opt-ins, callback ownership, artifacts and limitations.
+
+### Elapsed-time stall attribution
+
+Starting the clip at 18 seconds crossed the original 22-second media position
+without the severe stall. Later isolated runs aligned frame gaps with Firefox's
+Glean local database replacement burst, rather than with a particular video
+sample. The private namespace manifest cost remains a separate runtime storage
+limitation. The Mac launcher now accepts a dedicated `--host-profile` directory,
+using the existing persistent host-directory backend without disabling Glean or
+profile saving. Paired counters and methodology are in
+[the audio validation record](../validation/native-audio.json). Early playback
+still has a shorter cold-start gap; this does not claim sustained zero-drop 60 FPS
+or physical A/V synchronization acceptance.
