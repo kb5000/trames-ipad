@@ -1,6 +1,55 @@
 # Coordinator dependency audit
 
-## Current assessment — 2026-11-02
+## First migration implemented — 2026-11-02
+
+Runtime `0a3a99ca676f0008a524658529e8c5dde0bc0b95` moves ordinary
+`newfstatat`, `fstat`, `statx`, `faccessat`, `faccessat2` and `readlinkat` queries
+onto the existing execution workers. Mac and iPad pin the same implementation.
+The original resolver, credentials and live inode/host metadata are reused; the
+namespace tree and stat results are not copied or cached. `statx` resolves metadata
+and mount identity once. Directory/O_PATH metadata leases do not migrate directory
+cursors or retain last-close ownership. Seccomp decisions survive a deferred call
+without being evaluated twice. No extra execution/resource thread is added.
+
+The ownership proof and remaining epoch boundary for root/cwd/mount/credential
+changes are documented in the shared runtime's
+[execution design](https://github.com/kb5000/trames-runtime/blob/main/docs/architecture/execution-backends.md#worker-pathname-metadata-2026-11-02).
+Dynamic proc/sys/dev endpoints and unsupported control descriptors still defer.
+Open/create, directory mutations, full FD publication, signal/task state and
+structural VM ownership are subsequent stages; this is not complete coordinator
+removal.
+
+Final fixed-work comparison on Apple M6 (12 CPUs, 24 GiB), using four processes
+and 40,000 total pathname stat calls. Timings are medians of three unprofiled
+runs; counters come from separate diagnostic samples.
+
+| Case | Longest child query loop, before → after | Whole workload, before → after | Cohort rounds, before → after |
+| --- | ---: | ---: | ---: |
+| Private store | 608.7 → 121.6 ms | 777.3 → 295.2 ms | 27,225 → 53 |
+| Shared host directory | 751.0 → 176.1 ms | 832.4 → 261.3 ms | 27,843 → 58 |
+
+Native macOS performs the same query-loop work in **10.7 ms**,
+with **17.2 ms** for the full workload. Guest query-loop
+speedups are approximately 5.0× private and 4.3× shared; whole-workload gains are
+approximately 2.6× and 3.2×. A substantial native gap remains. These values are
+not Firefox page/video or end-to-end application measurements.
+
+The remaining ~500 services are largely file initialization writes/syncs outside
+the query loops. Cohort drain alone excludes dispatch, mapping rebuild and actual
+resource work. A different scheduling interleaving changes these counters; no
+deterministic race outcome or exact count is imposed.
+
+[Raw results and validation](../validation/path-queries-20261102.json) and
+[reproducible comparison](../../tests/performance/path-metadata.py) record source
+identities, fixture/binary hashes, all repetitions and remaining limitations.
+Affected shared-module and interpreter regressions, production FFI environments,
+Mac product checks and the iPad device cross-build passed locally. Physical iPad
+testing was skipped at the owner's request.
+
+---
+
+
+## Baseline assessment — before the first migration
 
 The shared kernel still has an owner event loop. It is no longer a mandatory
 per-call hop for all CPU workers. Ordinary shared-resource I/O, futex waits and

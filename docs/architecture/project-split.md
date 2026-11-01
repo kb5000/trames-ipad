@@ -9,14 +9,14 @@ The source projects are now independently maintained:
 | [trames-mac](https://github.com/kb5000/trames-mac) | Hypervisor transport and Apple Silicon product entry points. |
 
 Each product has its own workspace and lockfile. Its `runtime/` Git submodule
-pins an exact runtime commit; `runtime-version.json` records that commit and the
-extracted content digest. Product Cargo dependencies resolve to this in-tree
-checkout. No absolute peer-checkout path, interpreter dependency in common code,
-or private signing credential is required to build the common runtime.
+pins an exact runtime commit; `runtime-version.json` records that live pin. Its
+`extracted_content_sha256` retains the original repository-extraction provenance.
+Product Cargo dependencies resolve to this in-tree checkout. No absolute
+peer-checkout path, interpreter dependency in common code, or private signing
+credential is required to build the common runtime.
 
-The complete kernel/executor migration is reviewed on `codex/shared-process-kernel`
-until it is merged. Add `--branch codex/shared-process-kernel` when cloning a
-product for this checkpoint.
+All three repositories now develop on `main`. Historical migration checkpoint
+branches are not needed when cloning or building current products.
 
 ```sh
 git clone --recurse-submodules https://github.com/kb5000/trames-ipad.git

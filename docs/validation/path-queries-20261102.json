@@ -1,0 +1,1129 @@
+{
+  "passed": true,
+  "processes": 4,
+  "operations_each": 10000,
+  "cpus": 12,
+  "repeats": 3,
+  "records": [
+    {
+      "kind": "private",
+      "variant": "before",
+      "repeat": 0,
+      "wall_seconds": 0.931973459,
+      "exit": 0,
+      "children": [
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.2744935,
+          "mib_per_second": 0.0,
+          "ops_per_second": 36430.735,
+          "sync_seconds": 0.014078583,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.4442835,
+          "mib_per_second": 0.0,
+          "ops_per_second": 22508.151,
+          "sync_seconds": 0.015062,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.601515459,
+          "mib_per_second": 0.0,
+          "ops_per_second": 16624.677,
+          "sync_seconds": 0.013901625,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.655398167,
+          "mib_per_second": 0.0,
+          "ops_per_second": 15257.9,
+          "sync_seconds": 0.014999208,
+          "checksum": 83886080000
+        }
+      ],
+      "paths": {
+        "cohort_rounds": 27225,
+        "cohort_stop_us": 92415,
+        "service_caller_wait_us": 205695,
+        "service_requests": 513,
+        "serviced_syscalls": 513,
+        "syscalls": 40688,
+        "vm_local_syscalls": 7,
+        "worker_direct_syscalls": 0,
+        "worker_fd_syscalls": 3,
+        "worker_file_syscalls": 0,
+        "worker_futex_waits": 0,
+        "worker_futex_wakes": 0,
+        "worker_gpu_calls": 0,
+        "worker_gpu_waits": 0,
+        "worker_poll_syscalls": 0,
+        "worker_socket_syscalls": 0,
+        "worker_syscalls": 11,
+        "worker_task_resumes": 513
+      }
+    },
+    {
+      "kind": "private",
+      "variant": "after",
+      "repeat": 0,
+      "wall_seconds": 0.302858375,
+      "exit": 0,
+      "children": [
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.098093834,
+          "mib_per_second": 0.0,
+          "ops_per_second": 101943.207,
+          "sync_seconds": 0.015033416,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.096117,
+          "mib_per_second": 0.0,
+          "ops_per_second": 104039.868,
+          "sync_seconds": 0.035340208,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.121159375,
+          "mib_per_second": 0.0,
+          "ops_per_second": 82535.916,
+          "sync_seconds": 0.036241458,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.122038834,
+          "mib_per_second": 0.0,
+          "ops_per_second": 81941.13,
+          "sync_seconds": 0.015087167,
+          "checksum": 83886080000
+        }
+      ],
+      "paths": {
+        "cohort_rounds": 53,
+        "cohort_stop_us": 32136,
+        "service_caller_wait_us": 227241,
+        "service_requests": 522,
+        "serviced_syscalls": 522,
+        "syscalls": 40685,
+        "vm_local_syscalls": 6,
+        "worker_direct_syscalls": 39897,
+        "worker_fd_syscalls": 3,
+        "worker_file_syscalls": 39897,
+        "worker_futex_waits": 0,
+        "worker_futex_wakes": 0,
+        "worker_gpu_calls": 0,
+        "worker_gpu_waits": 0,
+        "worker_poll_syscalls": 0,
+        "worker_socket_syscalls": 0,
+        "worker_syscalls": 39908,
+        "worker_task_resumes": 522
+      }
+    },
+    {
+      "kind": "private",
+      "variant": "before",
+      "repeat": 1,
+      "wall_seconds": 0.763997292,
+      "exit": 0,
+      "children": [
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.216555875,
+          "mib_per_second": 0.0,
+          "ops_per_second": 46177.459,
+          "sync_seconds": 0.014958333,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.396822167,
+          "mib_per_second": 0.0,
+          "ops_per_second": 25200.205,
+          "sync_seconds": 0.013052833,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.550191791,
+          "mib_per_second": 0.0,
+          "ops_per_second": 18175.48,
+          "sync_seconds": 0.01409125,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.629915042,
+          "mib_per_second": 0.0,
+          "ops_per_second": 15875.157,
+          "sync_seconds": 0.012461834,
+          "checksum": 83886080000
+        }
+      ]
+    },
+    {
+      "kind": "private",
+      "variant": "after",
+      "repeat": 1,
+      "wall_seconds": 0.2949258750000001,
+      "exit": 0,
+      "children": [
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.10358325,
+          "mib_per_second": 0.0,
+          "ops_per_second": 96540.705,
+          "sync_seconds": 0.014946291,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.117259834,
+          "mib_per_second": 0.0,
+          "ops_per_second": 85280.694,
+          "sync_seconds": 0.01164875,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.114306292,
+          "mib_per_second": 0.0,
+          "ops_per_second": 87484.248,
+          "sync_seconds": 0.013549333,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.119577917,
+          "mib_per_second": 0.0,
+          "ops_per_second": 83627.481,
+          "sync_seconds": 0.013318167,
+          "checksum": 83886080000
+        }
+      ]
+    },
+    {
+      "kind": "private",
+      "variant": "after",
+      "repeat": 2,
+      "wall_seconds": 0.29516937499999996,
+      "exit": 0,
+      "children": [
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.098287208,
+          "mib_per_second": 0.0,
+          "ops_per_second": 101742.64,
+          "sync_seconds": 0.013989417,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.09520025,
+          "mib_per_second": 0.0,
+          "ops_per_second": 105041.741,
+          "sync_seconds": 0.030323375,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.121580042,
+          "mib_per_second": 0.0,
+          "ops_per_second": 82250.342,
+          "sync_seconds": 0.030827667,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.117625542,
+          "mib_per_second": 0.0,
+          "ops_per_second": 85015.549,
+          "sync_seconds": 0.012748334,
+          "checksum": 83886080000
+        }
+      ]
+    },
+    {
+      "kind": "private",
+      "variant": "before",
+      "repeat": 2,
+      "wall_seconds": 0.7773229170000002,
+      "exit": 0,
+      "children": [
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.218281541,
+          "mib_per_second": 0.0,
+          "ops_per_second": 45812.394,
+          "sync_seconds": 0.014104666,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.441109041,
+          "mib_per_second": 0.0,
+          "ops_per_second": 22670.132,
+          "sync_seconds": 0.014080084,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.554827875,
+          "mib_per_second": 0.0,
+          "ops_per_second": 18023.608,
+          "sync_seconds": 0.014175875,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.5969835,
+          "mib_per_second": 0.0,
+          "ops_per_second": 16750.882,
+          "sync_seconds": 0.013063625,
+          "checksum": 83886080000
+        }
+      ]
+    },
+    {
+      "kind": "private",
+      "variant": "before",
+      "repeat": 3,
+      "wall_seconds": 0.7940970420000006,
+      "exit": 0,
+      "children": [
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.254493375,
+          "mib_per_second": 0.0,
+          "ops_per_second": 39293.754,
+          "sync_seconds": 0.013061292,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.400668792,
+          "mib_per_second": 0.0,
+          "ops_per_second": 24958.27,
+          "sync_seconds": 0.013127333,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.5662885,
+          "mib_per_second": 0.0,
+          "ops_per_second": 17658.844,
+          "sync_seconds": 0.014266958,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.608673584,
+          "mib_per_second": 0.0,
+          "ops_per_second": 16429.167,
+          "sync_seconds": 0.0140615,
+          "checksum": 83886080000
+        }
+      ]
+    },
+    {
+      "kind": "private",
+      "variant": "after",
+      "repeat": 3,
+      "wall_seconds": 0.31662783400000016,
+      "exit": 0,
+      "children": [
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.102186167,
+          "mib_per_second": 0.0,
+          "ops_per_second": 97860.604,
+          "sync_seconds": 0.013963333,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.117928792,
+          "mib_per_second": 0.0,
+          "ops_per_second": 84796.934,
+          "sync_seconds": 0.015297458,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.11151675,
+          "mib_per_second": 0.0,
+          "ops_per_second": 89672.628,
+          "sync_seconds": 0.036020666,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.134802042,
+          "mib_per_second": 0.0,
+          "ops_per_second": 74182.853,
+          "sync_seconds": 0.034882542,
+          "checksum": 83886080000
+        }
+      ]
+    },
+    {
+      "kind": "shared",
+      "variant": "before",
+      "repeat": 0,
+      "wall_seconds": 0.8357322499999995,
+      "exit": 0,
+      "children": [
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.272834667,
+          "mib_per_second": 0.0,
+          "ops_per_second": 36652.234,
+          "sync_seconds": 0.003977083,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.493313208,
+          "mib_per_second": 0.0,
+          "ops_per_second": 20271.097,
+          "sync_seconds": 4.4583e-05,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.684608542,
+          "mib_per_second": 0.0,
+          "ops_per_second": 14606.888,
+          "sync_seconds": 2.5916e-05,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.750989,
+          "mib_per_second": 0.0,
+          "ops_per_second": 13315.774,
+          "sync_seconds": 5.875e-06,
+          "checksum": 83886080000
+        }
+      ],
+      "paths": {
+        "cohort_rounds": 27843,
+        "cohort_stop_us": 38072,
+        "service_caller_wait_us": 45806,
+        "service_requests": 511,
+        "serviced_syscalls": 511,
+        "syscalls": 40688,
+        "vm_local_syscalls": 6,
+        "worker_direct_syscalls": 0,
+        "worker_fd_syscalls": 3,
+        "worker_file_syscalls": 0,
+        "worker_futex_waits": 0,
+        "worker_futex_wakes": 0,
+        "worker_gpu_calls": 0,
+        "worker_gpu_waits": 0,
+        "worker_poll_syscalls": 0,
+        "worker_socket_syscalls": 0,
+        "worker_syscalls": 11,
+        "worker_task_resumes": 511
+      }
+    },
+    {
+      "kind": "shared",
+      "variant": "after",
+      "repeat": 0,
+      "wall_seconds": 0.250953,
+      "exit": 0,
+      "children": [
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.152805167,
+          "mib_per_second": 0.0,
+          "ops_per_second": 65442.813,
+          "sync_seconds": 6.1333e-05,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.159267209,
+          "mib_per_second": 0.0,
+          "ops_per_second": 62787.564,
+          "sync_seconds": 3.7334e-05,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.16141875,
+          "mib_per_second": 0.0,
+          "ops_per_second": 61950.672,
+          "sync_seconds": 1.3791e-05,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.174300583,
+          "mib_per_second": 0.0,
+          "ops_per_second": 57372.155,
+          "sync_seconds": 3.541e-06,
+          "checksum": 83886080000
+        }
+      ],
+      "paths": {
+        "cohort_rounds": 58,
+        "cohort_stop_us": 1394,
+        "service_caller_wait_us": 51740,
+        "service_requests": 520,
+        "serviced_syscalls": 520,
+        "syscalls": 40688,
+        "vm_local_syscalls": 7,
+        "worker_direct_syscalls": 39184,
+        "worker_fd_syscalls": 3,
+        "worker_file_syscalls": 39184,
+        "worker_futex_waits": 0,
+        "worker_futex_wakes": 0,
+        "worker_gpu_calls": 0,
+        "worker_gpu_waits": 0,
+        "worker_poll_syscalls": 0,
+        "worker_socket_syscalls": 0,
+        "worker_syscalls": 39195,
+        "worker_task_resumes": 520
+      }
+    },
+    {
+      "kind": "shared",
+      "variant": "before",
+      "repeat": 1,
+      "wall_seconds": 0.8324112500000007,
+      "exit": 0,
+      "children": [
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.278631875,
+          "mib_per_second": 0.0,
+          "ops_per_second": 35889.648,
+          "sync_seconds": 4.3583e-05,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.503913125,
+          "mib_per_second": 0.0,
+          "ops_per_second": 19844.69,
+          "sync_seconds": 2.9167e-05,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.677084875,
+          "mib_per_second": 0.0,
+          "ops_per_second": 14769.197,
+          "sync_seconds": 2.8917e-05,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.737438209,
+          "mib_per_second": 0.0,
+          "ops_per_second": 13560.458,
+          "sync_seconds": 1.2292e-05,
+          "checksum": 83886080000
+        }
+      ]
+    },
+    {
+      "kind": "shared",
+      "variant": "after",
+      "repeat": 1,
+      "wall_seconds": 0.2613178750000005,
+      "exit": 0,
+      "children": [
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.159378,
+          "mib_per_second": 0.0,
+          "ops_per_second": 62743.917,
+          "sync_seconds": 5.4208e-05,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.161865041,
+          "mib_per_second": 0.0,
+          "ops_per_second": 61779.863,
+          "sync_seconds": 1.5041e-05,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.163036166,
+          "mib_per_second": 0.0,
+          "ops_per_second": 61336.084,
+          "sync_seconds": 1.1125e-05,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.173111583,
+          "mib_per_second": 0.0,
+          "ops_per_second": 57766.21,
+          "sync_seconds": 4.166e-06,
+          "checksum": 83886080000
+        }
+      ]
+    },
+    {
+      "kind": "shared",
+      "variant": "after",
+      "repeat": 2,
+      "wall_seconds": 0.27114545800000034,
+      "exit": 0,
+      "children": [
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.174901208,
+          "mib_per_second": 0.0,
+          "ops_per_second": 57175.134,
+          "sync_seconds": 4.4542e-05,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.1769355,
+          "mib_per_second": 0.0,
+          "ops_per_second": 56517.771,
+          "sync_seconds": 2.4209e-05,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.176294,
+          "mib_per_second": 0.0,
+          "ops_per_second": 56723.428,
+          "sync_seconds": 1.2875e-05,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.177369333,
+          "mib_per_second": 0.0,
+          "ops_per_second": 56379.532,
+          "sync_seconds": 4.541e-06,
+          "checksum": 83886080000
+        }
+      ]
+    },
+    {
+      "kind": "shared",
+      "variant": "before",
+      "repeat": 2,
+      "wall_seconds": 0.8355625829999997,
+      "exit": 0,
+      "children": [
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.273591209,
+          "mib_per_second": 0.0,
+          "ops_per_second": 36550.882,
+          "sync_seconds": 5.3708e-05,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.489520208,
+          "mib_per_second": 0.0,
+          "ops_per_second": 20428.166,
+          "sync_seconds": 3.0833e-05,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.687445083,
+          "mib_per_second": 0.0,
+          "ops_per_second": 14546.617,
+          "sync_seconds": 2.1542e-05,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.751037709,
+          "mib_per_second": 0.0,
+          "ops_per_second": 13314.911,
+          "sync_seconds": 4e-06,
+          "checksum": 83886080000
+        }
+      ]
+    },
+    {
+      "kind": "shared",
+      "variant": "before",
+      "repeat": 3,
+      "wall_seconds": 0.8286028329999997,
+      "exit": 0,
+      "children": [
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.275216291,
+          "mib_per_second": 0.0,
+          "ops_per_second": 36335.058,
+          "sync_seconds": 4.25e-05,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.492066334,
+          "mib_per_second": 0.0,
+          "ops_per_second": 20322.463,
+          "sync_seconds": 0.004262334,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.678845958,
+          "mib_per_second": 0.0,
+          "ops_per_second": 14730.882,
+          "sync_seconds": 0.004151584,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.752044167,
+          "mib_per_second": 0.0,
+          "ops_per_second": 13297.091,
+          "sync_seconds": 1.1125e-05,
+          "checksum": 83886080000
+        }
+      ]
+    },
+    {
+      "kind": "shared",
+      "variant": "after",
+      "repeat": 3,
+      "wall_seconds": 0.2608246249999997,
+      "exit": 0,
+      "children": [
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.153787291,
+          "mib_per_second": 0.0,
+          "ops_per_second": 65024.879,
+          "sync_seconds": 0.003055834,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.16275375,
+          "mib_per_second": 0.0,
+          "ops_per_second": 61442.517,
+          "sync_seconds": 1.8125e-05,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.163817,
+          "mib_per_second": 0.0,
+          "ops_per_second": 61043.726,
+          "sync_seconds": 1.1166e-05,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.176058667,
+          "mib_per_second": 0.0,
+          "ops_per_second": 56799.249,
+          "sync_seconds": 5.208e-06,
+          "checksum": 83886080000
+        }
+      ]
+    },
+    {
+      "kind": "native",
+      "variant": "native",
+      "repeat": 1,
+      "wall_seconds": 0.01780587499999875,
+      "children": [
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.010748,
+          "mib_per_second": 0.0,
+          "ops_per_second": 930405.657,
+          "sync_seconds": 2e-06,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.010116,
+          "mib_per_second": 0.0,
+          "ops_per_second": 988533.021,
+          "sync_seconds": 0.0,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.010502,
+          "mib_per_second": 0.0,
+          "ops_per_second": 952199.582,
+          "sync_seconds": 1e-06,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.009999,
+          "mib_per_second": 0.0,
+          "ops_per_second": 1000100.01,
+          "sync_seconds": 1e-06,
+          "checksum": 83886080000
+        }
+      ],
+      "exit": 0
+    },
+    {
+      "kind": "native",
+      "variant": "native",
+      "repeat": 2,
+      "wall_seconds": 0.017208415999999005,
+      "children": [
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.009724,
+          "mib_per_second": 0.0,
+          "ops_per_second": 1028383.381,
+          "sync_seconds": 1e-06,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.01055,
+          "mib_per_second": 0.0,
+          "ops_per_second": 947867.298,
+          "sync_seconds": 1e-06,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.010653,
+          "mib_per_second": 0.0,
+          "ops_per_second": 938702.705,
+          "sync_seconds": 1e-06,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.010119,
+          "mib_per_second": 0.0,
+          "ops_per_second": 988239.946,
+          "sync_seconds": 1e-06,
+          "checksum": 83886080000
+        }
+      ],
+      "exit": 0
+    },
+    {
+      "kind": "native",
+      "variant": "native",
+      "repeat": 3,
+      "wall_seconds": 0.016841582999999716,
+      "children": [
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.009939,
+          "mib_per_second": 0.0,
+          "ops_per_second": 1006137.437,
+          "sync_seconds": 2e-06,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.009955,
+          "mib_per_second": 0.0,
+          "ops_per_second": 1004520.352,
+          "sync_seconds": 1e-06,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.010326,
+          "mib_per_second": 0.0,
+          "ops_per_second": 968429.214,
+          "sync_seconds": 0.0,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "stat",
+          "operations": 10000,
+          "seconds": 0.009705,
+          "mib_per_second": 0.0,
+          "ops_per_second": 1030396.705,
+          "sync_seconds": 0.0,
+          "checksum": 83886080000
+        }
+      ],
+      "exit": 0
+    }
+  ],
+  "sha256": {
+    "baseline": "02b482866f390a2f0b072f135b1e9c8f80144ac474bdd8a35ff2249636129bd5",
+    "candidate": "b28f6ff9eb93236423ed6785c903ede6ad5d08f10e0e6c46a07afa258c120a7a",
+    "native": "6992056cd261787f1b0a258f1928c3b5a56f438e44baaaf360f0521659f2f254",
+    "fixture": "f1296a8d6786e02d595cfc46056e5139560a1a78cbc184d125a59379f08c7dc3",
+    "rootfs": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe"
+  },
+  "summary": {
+    "private": {
+      "before": {
+        "loop_max_median_seconds": 0.608673584,
+        "process_wall_median_seconds": 0.7773229170000002,
+        "profile": {
+          "cohort_rounds": 27225,
+          "cohort_stop_us": 92415,
+          "service_caller_wait_us": 205695,
+          "service_requests": 513,
+          "serviced_syscalls": 513,
+          "syscalls": 40688,
+          "vm_local_syscalls": 7,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 3,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 11,
+          "worker_task_resumes": 513
+        }
+      },
+      "after": {
+        "loop_max_median_seconds": 0.121580042,
+        "process_wall_median_seconds": 0.29516937499999996,
+        "profile": {
+          "cohort_rounds": 53,
+          "cohort_stop_us": 32136,
+          "service_caller_wait_us": 227241,
+          "service_requests": 522,
+          "serviced_syscalls": 522,
+          "syscalls": 40685,
+          "vm_local_syscalls": 6,
+          "worker_direct_syscalls": 39897,
+          "worker_fd_syscalls": 3,
+          "worker_file_syscalls": 39897,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 39908,
+          "worker_task_resumes": 522
+        }
+      }
+    },
+    "shared": {
+      "before": {
+        "loop_max_median_seconds": 0.751037709,
+        "process_wall_median_seconds": 0.8324112500000007,
+        "profile": {
+          "cohort_rounds": 27843,
+          "cohort_stop_us": 38072,
+          "service_caller_wait_us": 45806,
+          "service_requests": 511,
+          "serviced_syscalls": 511,
+          "syscalls": 40688,
+          "vm_local_syscalls": 6,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 3,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 11,
+          "worker_task_resumes": 511
+        }
+      },
+      "after": {
+        "loop_max_median_seconds": 0.176058667,
+        "process_wall_median_seconds": 0.2613178750000005,
+        "profile": {
+          "cohort_rounds": 58,
+          "cohort_stop_us": 1394,
+          "service_caller_wait_us": 51740,
+          "service_requests": 520,
+          "serviced_syscalls": 520,
+          "syscalls": 40688,
+          "vm_local_syscalls": 7,
+          "worker_direct_syscalls": 39184,
+          "worker_fd_syscalls": 3,
+          "worker_file_syscalls": 39184,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 39195,
+          "worker_task_resumes": 520
+        }
+      }
+    },
+    "native": {
+      "native": {
+        "loop_max_median_seconds": 0.010653,
+        "process_wall_median_seconds": 0.017208415999999005
+      }
+    }
+  },
+  "date": "2026-11-02",
+  "hardware": {
+    "cpu": "Apple M6",
+    "logical_cpus": 12,
+    "memory_bytes": 25769803776
+  },
+  "runtime_revision": "0a3a99ca676f0008a524658529e8c5dde0bc0b95",
+  "baseline_mac_revision": "14b5278",
+  "baseline_runtime_revision": "a45bbe3b07a2faa22a3e3a9332bd397809005e57",
+  "scope": {
+    "execution": "Real Apple Silicon HVF, 12 configured slots; no Linux kernel VM",
+    "work": "Four processes, 10000 cached pathname stat calls each, 8 MiB files",
+    "timing": "Three unprofiled repetitions, longest child query-loop duration and whole-process wall-time medians; diagnostic runs separate",
+    "native": "Same hostfs-bench.c fixed work as native macOS in a host temporary directory",
+    "setup": "One freshly imported disposable pinned Alpine store shared by both versions; import outside timing",
+    "limitations": [
+      "A microbenchmark, not Firefox latency or a general speedup claim.",
+      "Whole-process time includes four 8 MiB file initializations, sync, fork/exec and teardown.",
+      "Owner services during initialization and joins for lifecycle/namespace changes remain.",
+      "Serial tails may complete on the owner, so worker-call counts need not equal all query calls.",
+      "Only simulated/host iPad execution and cross-build validation; physical device testing skipped at user request."
+    ]
+  },
+  "validation": {
+    "kernel_conformance": {
+      "passed": 243,
+      "ignored": 3
+    },
+    "vfs_hostfs": {
+      "passed": 392,
+      "ignored": 1
+    },
+    "linux": {
+      "passed": 148,
+      "ignored": 1
+    },
+    "memory": {
+      "unit_passed": 156,
+      "ignored": 1,
+      "integration_passed": 6
+    },
+    "mac_product": {
+      "passed": 13,
+      "ignored": 1
+    },
+    "production_ffi": {
+      "passed": 13,
+      "ffi_sha256": "1f2dbc083c618c6ad8be2181e8e1c58ce7656aa5cbc0bb45237fd92c54905881",
+      "prepared_imports_reused": true,
+      "environments": [
+        "Alpine",
+        "Debian",
+        "custom rootfs",
+        "original systemd with two PTYs"
+      ]
+    },
+    "strict_clippy": [
+      "shared affected crates",
+      "interpreter kernel conformance",
+      "Mac product"
+    ],
+    "ios_device_static_library": "built successfully, existing guest binaries reused",
+    "ios_device_static_library_sha256": "9437ca82c4ec7ee1e80b7bb2bd0608b965aa7df7ddadde77e50686dc656593d2",
+    "execution_boundaries": [
+      "iPad passed",
+      "Mac passed"
+    ],
+    "physical_ipad": "skipped per user request"
+  },
+  "reproduce": "python3 tests/performance/path-metadata.py --baseline OLD_MAC_RUNNER --candidate NEW_MAC_RUNNER --native NATIVE_HOSTFS_BENCH --fixture STATIC_ARM64_LINUX_HOSTFS_BENCH --rootfs PINNED_ALPINE_ARCHIVE --output NEW_DISPOSABLE_OUTPUT"
+}
