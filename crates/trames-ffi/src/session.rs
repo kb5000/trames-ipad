@@ -24,6 +24,13 @@ static WORKERS: AtomicUsize = AtomicUsize::new(0);
 pub struct Options {
     pub store: PathBuf,
     pub rootfs: Option<PathBuf>,
+    #[serde(default = "default_distro")]
+    pub distro: String,
+    pub rootfs_sha256: Option<String>,
+    #[serde(default = "default_init")]
+    pub init: String,
+    pub command: Option<Vec<String>>,
+    pub debian_setup: Option<DebianSetup>,
     pub musl_libc: Option<PathBuf>,
     pub volume_total: u64,
     pub volume_available: u64,
@@ -57,6 +64,13 @@ pub struct Options {
 }
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
+pub struct DebianSetup {
+    pub packages: String,
+    #[serde(default)]
+    pub systemd: bool,
+}
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct HostTimezone {
     pub identifier: String,
     pub data: Vec<u8>,
@@ -71,16 +85,42 @@ pub fn install(options: Options) -> Result<(), String> {
     }
     let archive = options.rootfs.as_ref().ok_or("rootfs archive required")?;
     let mut vfs = open_store(&options)?;
-    trames_distro::install_alpine(
-        &mut File::open(archive).map_err(|e| e.to_string())?,
-        &mut vfs,
-    )
-    .map_err(|e| e.to_string())?;
-    if let Some(libc) = options.musl_libc {
-        trames_distro::install_musl(&mut File::open(libc).map_err(|e| e.to_string())?, &mut vfs)
-            .map_err(|e| e.to_string())?;
+    install_image(&options, archive, &mut vfs)?;
+    Ok(())
+}
+fn default_distro() -> String {
+    "alpine".into()
+}
+fn default_init() -> String {
+    "shell".into()
+}
+fn install_image(
+    options: &Options,
+    archive: &std::path::Path,
+    vfs: &mut Vfs,
+) -> Result<(), String> {
+    let mut reader = File::open(archive).map_err(|e| e.to_string())?;
+    match options.distro.as_str() {
+        "alpine" => {
+            trames_distro::install_alpine(&mut reader, vfs).map_err(|e| e.to_string())?;
+        }
+        "debian" => {
+            trames_distro::install_debian(&mut reader, vfs).map_err(|e| e.to_string())?;
+        }
+        "custom" => {
+            trames_distro::rootfs::install(archive, vfs, options.rootfs_sha256.as_deref())
+                .map_err(|e| e.to_string())?;
+        }
+        _ => return Err("unsupported distribution".into()),
     }
-    vfs.executable(b"/bin/ash").map_err(|e| e.to_string())?;
+    trames_distro::rootfs::validate_command(vfs, &["/bin/sh".into()]).map_err(|e| e.to_string())?;
+    trames_distro::systemd::renew_identity(vfs).map_err(|e| e.to_string())?;
+    if let Some(libc) = &options.musl_libc {
+        if options.distro == "alpine" {
+            trames_distro::install_musl(&mut File::open(libc).map_err(|e| e.to_string())?, vfs)
+                .map_err(|e| e.to_string())?;
+        }
+    }
     Ok(())
 }
 fn memory_limits(options: &Options) -> Result<trames_core::MemoryLimits, String> {
@@ -402,7 +442,7 @@ fn prepare_runtime_mounts(vfs: &mut Vfs) -> Result<(), String> {
     };
     prepare(vfs).map_err(|error| format!("prepare runtime tmpfs: {error}"))
 }
-fn prepare_guest_defaults(vfs: &mut Vfs, network: &str) -> Result<(), String> {
+fn prepare_guest_defaults(vfs: &mut Vfs, network: &str, distro: &str) -> Result<(), String> {
     let resolver = if network == "loopback" {
         b"nameserver 127.0.0.53\n".as_slice()
     } else {
@@ -419,13 +459,14 @@ fn prepare_guest_defaults(vfs: &mut Vfs, network: &str) -> Result<(), String> {
                     let data = vfs.read(fd, 256).unwrap_or_default();
                     let _ = vfs.close(fd);
                     data != bytes
-                        && matches!(
+                        && (matches!(
                             data.as_slice(),
                             b"nameserver 10.0.0.1\nnameserver fd00::1\n"
                                 | b"nameserver 10.0.0.1\n"
                                 | b"nameserver 127.0.0.53\n"
                                 | b"nameserver 169.254.0.53\n"
-                        )
+                        ) || (distro == "debian"
+                            && data == b"# https://1.1.1.1 (privacy-focused, highly-available DNS service)\nnameserver 1.1.1.1\nnameserver 1.0.0.1\n"))
                 });
         if old_managed_dns {
             let fd = vfs
@@ -469,6 +510,15 @@ fn run(
     commands: mpsc::Receiver<Command>,
 ) -> Result<u8, String> {
     let guest_memory_limits = memory_limits(&options)?;
+    if !matches!(options.init.as_str(), "shell" | "systemd") {
+        return Err("init must be shell or systemd".into());
+    }
+    if options.init == "systemd" && (options.command.is_some() || options.debian_setup.is_some()) {
+        return Err("use shell mode for maintenance commands".into());
+    }
+    if (options.command.is_some() || options.debian_setup.is_some()) && options.multiple_terminals {
+        return Err("maintenance commands require a single terminal".into());
+    }
     let mut vfs = open_store(&options)?;
     if let Some(budget) = options.budget_bytes {
         let mut limits = trames_vfs::StorageLimits::disk();
@@ -488,30 +538,45 @@ fn run(
     }
     // First installation uses a new store chosen by the native adapter. A partial
     // failed installation is never promoted to the active environment directory.
-    if vfs.executable(b"/bin/ash").is_err() {
+    if vfs.executable(b"/bin/sh").is_err() {
         let archive = options
             .rootfs
-            .ok_or("Alpine rootfs archive is required for first installation")?;
-        trames_distro::install_alpine(
-            &mut File::open(archive).map_err(|e| e.to_string())?,
-            &mut vfs,
-        )
-        .map_err(|e| e.to_string())?;
+            .as_ref()
+            .ok_or("rootfs archive is required for first installation")?;
+        install_image(&options, archive, &mut vfs)?;
     }
     if session.cancelled.load(Ordering::Acquire) {
         return Err("session cancelled".into());
     }
-    if let Some(libc) = options.musl_libc {
-        trames_distro::install_musl(&mut File::open(libc).map_err(|e| e.to_string())?, &mut vfs)
+    if options.distro == "alpine" {
+        if let Some(libc) = &options.musl_libc {
+            trames_distro::install_musl(
+                &mut File::open(libc).map_err(|e| e.to_string())?,
+                &mut vfs,
+            )
             .map_err(|e| e.to_string())?;
+        }
     }
+    let init_monitor = if options.init == "systemd" {
+        Some(trames_distro::systemd::prepare(&mut vfs).map_err(|e| e.to_string())?)
+    } else {
+        None
+    };
+    let native_terminals = if options.multiple_terminals && init_monitor.is_some() {
+        Some(crate::terminals::NativeTerminals::for_systemd(&mut vfs)?)
+    } else {
+        None
+    };
     // Before Wayland publishes its socket or any terminal/service can run.
     // Mounts belong to this kernel session, shared by all its local terminals.
     prepare_runtime_mounts(&mut vfs)?;
-    prepare_guest_defaults(&mut vfs, &options.network)?;
+    prepare_guest_defaults(&mut vfs, &options.network, &options.distro)?;
     vfs.chdir(b"/root").map_err(|e| e.to_string())?;
+    // Bundled Mesa/Xwayland adapters target musl. Keep glibc rootfs loaders
+    // and libraries intact; their own Wayland clients still use this server.
+    let bundled_musl = vfs.executable(trames_distro::MUSL_LOADER).is_ok();
     let mut zink_egl = false;
-    if options.vulkan_accelerator {
+    if options.vulkan_accelerator && bundled_musl {
         if let Some(path) = &options.vulkan_icd {
             trames_distro::install_vulkan_icd(
                 &mut File::open(path).map_err(|e| e.to_string())?,
@@ -529,7 +594,7 @@ fn run(
             }
         }
     }
-    if let Some(timezone) = options.timezone {
+    if let Some(timezone) = &options.timezone {
         trames_distro::synchronize_timezone(&mut vfs, &timezone.identifier, &timezone.data)
             .map_err(|e| e.to_string())?;
     }
@@ -559,7 +624,7 @@ fn run(
         ]);
     }
     if options.wayland {
-        if let Some(ref path) = options.xwayland_launcher {
+        if let Some(ref path) = options.xwayland_launcher.as_ref().filter(|_| bundled_musl) {
             trames_distro::install_xwayland_launcher(
                 &mut File::open(path).map_err(|e| e.to_string())?,
                 &mut vfs,
@@ -595,16 +660,39 @@ fn run(
             "XMODIFIERS=@im=trames".into(),
         ]);
     }
-    let bytes = vfs.executable(b"/bin/ash").map_err(|e| e.to_string())?;
-    let argv = if options.multiple_terminals {
+    let argv = if init_monitor.is_some() {
+        environment.extend([
+            "container=trames".into(),
+            "NOTIFY_SOCKET=/run/host/notify".into(),
+        ]);
+        if options.wayland {
+            trames_distro::systemd::file(&mut vfs, b"/run/systemd/system/console-getty.service.d/70-wayland.conf", b"[Service]\nEnvironment=XDG_RUNTIME_DIR=/run/user/0 WAYLAND_DISPLAY=wayland-0 DISPLAY=:0\n").map_err(|e|e.to_string())?;
+        }
         vec![
-            "/bin/ash".into(),
-            "-c".into(),
-            crate::terminals::INIT.into(),
+            "/usr/lib/systemd/systemd".into(),
+            "--system".into(),
+            "--unit=multi-user.target".into(),
         ]
+    } else if let Some(setup) = options.debian_setup {
+        if options.distro != "debian" {
+            return Err("Debian setup requires a Debian environment".into());
+        }
+        vec![
+            "/bin/sh".into(),
+            "-ec".into(),
+            trames_distro::packages::debian_script(&setup.packages, setup.systemd)?,
+        ]
+    } else if let Some(command) = options.command {
+        command
+    } else if options.multiple_terminals {
+        vec!["/bin/sh".into(), "-c".into(), crate::terminals::INIT.into()]
     } else {
-        vec!["/bin/ash".into(), "-i".into()]
+        vec!["/bin/sh".into(), "-il".into()]
     };
+    trames_distro::rootfs::validate_command(&mut vfs, &argv).map_err(|e| e.to_string())?;
+    let bytes = vfs
+        .executable(argv.first().ok_or("empty Linux command")?.as_bytes())
+        .map_err(|e| e.to_string())?;
     let mut runtime = Runtime::load_with_options(
         &bytes,
         &argv,
@@ -631,7 +719,8 @@ fn run(
         session: session.clone(),
         commands,
         snapshot_at: Instant::now(),
-        terminals: None,
+        terminals: native_terminals,
+        init_monitor,
         pending: None,
     };
     io.snapshot(&runtime.linux.vfs);
@@ -656,6 +745,7 @@ struct Adapter {
     snapshot_at: Instant,
     terminals: Option<crate::terminals::NativeTerminals>,
     pending: Option<Command>,
+    init_monitor: Option<trames_distro::systemd::Monitor>,
 }
 impl Adapter {
     fn command(&mut self, vfs: &mut Vfs, command: Command) {
@@ -885,6 +975,9 @@ impl GuestOutput for Adapter {
         {
             return Ok(true);
         }
+        if self.init_monitor.as_ref().is_some_and(|i| i.pending(false)) {
+            return Ok(true);
+        }
         if self.pending.is_none() {
             self.pending = self.commands.try_recv().ok();
         }
@@ -920,6 +1013,10 @@ impl GuestOutput for Adapter {
     fn control(&mut self, vfs: &mut Vfs) -> io::Result<bool> {
         if self.session.cancelled.load(Ordering::Acquire) {
             return Ok(false);
+        }
+        if let Some(init) = &mut self.init_monitor {
+            init.control(false)
+                .map_err(|e| io::Error::other(e.to_string()))?;
         }
         if self.session.multiple_terminals {
             if self.terminals.is_none() {
@@ -1159,11 +1256,11 @@ mod memory_tests {
             vfs.close(fd).unwrap();
             bytes
         };
-        prepare_guest_defaults(&mut vfs, "full").unwrap();
+        prepare_guest_defaults(&mut vfs, "full", "alpine").unwrap();
         assert_eq!(read(&mut vfs), b"nameserver 169.254.0.53\n");
-        prepare_guest_defaults(&mut vfs, "loopback").unwrap();
+        prepare_guest_defaults(&mut vfs, "loopback", "alpine").unwrap();
         assert_eq!(read(&mut vfs), b"nameserver 127.0.0.53\n");
-        prepare_guest_defaults(&mut vfs, "full").unwrap();
+        prepare_guest_defaults(&mut vfs, "full", "alpine").unwrap();
         assert_eq!(read(&mut vfs), b"nameserver 169.254.0.53\n");
         let fd = vfs
             .open_at(trames_vfs::AT_FDCWD, b"/etc/resolv.conf", 1 | 0x200, 0)
@@ -1171,8 +1268,18 @@ mod memory_tests {
         vfs.write(fd, b"nameserver 1.1.1.1\n# user override\n")
             .unwrap();
         vfs.close(fd).unwrap();
-        prepare_guest_defaults(&mut vfs, "full").unwrap();
+        prepare_guest_defaults(&mut vfs, "full", "debian").unwrap();
         assert_eq!(read(&mut vfs), b"nameserver 1.1.1.1\n# user override\n");
+        let shipped=b"# https://1.1.1.1 (privacy-focused, highly-available DNS service)\nnameserver 1.1.1.1\nnameserver 1.0.0.1\n";
+        let fd = vfs
+            .open_at(trames_vfs::AT_FDCWD, b"/etc/resolv.conf", 1 | 0x200, 0)
+            .unwrap();
+        vfs.write(fd, shipped).unwrap();
+        vfs.close(fd).unwrap();
+        prepare_guest_defaults(&mut vfs, "full", "custom").unwrap();
+        assert_eq!(read(&mut vfs), shipped);
+        prepare_guest_defaults(&mut vfs, "full", "debian").unwrap();
+        assert_eq!(read(&mut vfs), b"nameserver 169.254.0.53\n");
     }
     #[test]
     fn optional_json_budgets_preserve_defaults_and_validate_before_start() {

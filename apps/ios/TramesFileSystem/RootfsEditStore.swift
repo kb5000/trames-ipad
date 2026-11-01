@@ -128,7 +128,7 @@ struct RootfsEditStore {
     }
     /// Called once before initial guest execution and on foreground resumption.
     /// The callback performs conditional VFS replacement and returns its version.
-    func replay(_ apply:(RootfsEditRequest,URL) throws -> RootfsFileVersion) -> [String] {
+    func replay(environment: String? = nil, _ apply:(RootfsEditRequest,URL) throws -> RootfsFileVersion) -> [String] {
         guard let directories=try? FileManager.default.contentsOfDirectory(at:pending,includingPropertiesForKeys:nil) else {return []}
         var errors:[String]=[]
         for directory in directories {
@@ -137,6 +137,7 @@ struct RootfsEditStore {
                 // request.json is published. The stable baseline supplies the
                 // document lock, so replay waits for that save to finish.
                 let seed=try decode(RootfsEditBase.self,states.appendingPathComponent(directory.lastPathComponent+".json"))
+                if let environment,seed.environment != environment {continue}
                 guard directory.lastPathComponent==key(seed.identifier) else {throw RootfsCatalogError.invalidStore}
                 try locked(seed.identifier) {
                     guard var value=request(seed.identifier) else {return}

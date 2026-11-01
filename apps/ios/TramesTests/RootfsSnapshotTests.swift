@@ -15,6 +15,42 @@ final class RootfsSnapshotTests:XCTestCase {
         try Data("rootfs fixture".utf8).write(to:snapshot.object(entry))
         return (directory,snapshot)
     }
+    func testNewNestedEnvironmentResolvesTheExistingRootBeforeMissingChildren() throws {
+        let parent=FileManager.default.temporaryDirectory.appendingPathComponent("environment-path-\(UUID().uuidString)",isDirectory:true)
+        let actual=parent.appendingPathComponent("actual",isDirectory:true),alias=parent.appendingPathComponent("alias",isDirectory:true)
+        try FileManager.default.createDirectory(at:actual,withIntermediateDirectories:true)
+        defer {try? FileManager.default.removeItem(at:parent)}
+        try FileManager.default.createSymbolicLink(at:alias,withDestinationURL:actual)
+        let profile=RootfsEnvironment(id:"new-id",name:"Debian",store:"environments/new-id",distribution:"debian")
+        let resolved=try profile.storeURL(in:alias)
+        XCTAssertEqual(resolved.path,actual.resolvingSymlinksInPath().appendingPathComponent("environments/new-id").path)
+        let catalog=RootfsCatalog(version:1,environments:[profile]);try catalog.save(alias)
+        XCTAssertEqual(try RootfsCatalog.load(alias).environments,[profile])
+    }
+    func testLegacyCatalogAndNewEnvironmentMetadataRoundTrip() throws {
+        let legacy=try JSONDecoder().decode(RootfsCatalog.self,from:Data("{\"version\":1,\"environments\":[{\"id\":\"alpine\",\"name\":\"Alpine\",\"store\":\"environment\"}]}".utf8))
+        XCTAssertEqual(legacy.environments[0].distro,"alpine")
+        XCTAssertEqual(legacy.environments[0].boot,"shell")
+        let debian=RootfsEnvironment(id:"debian",name:"Debian",store:"environments/debian",distribution:"debian",initMode:"systemd",packages:"standard",needsSetup:true)
+        let roundTrip=try JSONDecoder().decode(RootfsCatalog.self,from:JSONEncoder().encode(RootfsCatalog(version:1,environments:legacy.environments+[debian])))
+        XCTAssertEqual(roundTrip.environments[1],debian)
+        XCTAssertEqual(roundTrip.environments[0],legacy.environments[0])
+    }
+    func testPendingImportDoesNotHideInstalledEnvironmentsFromFiles() throws {
+        let root=FileManager.default.temporaryDirectory.appendingPathComponent("pending-rootfs-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at:root,withIntermediateDirectories:true)
+        defer {try? FileManager.default.removeItem(at:root)}
+        let (installed,_)=try fixture()
+        try FileManager.default.moveItem(at:installed,to:root.appendingPathComponent("environment"))
+        let pending=RootfsEnvironment(id:"debian",name:"Debian",store:"environments/debian",distribution:"debian")
+        let catalog=RootfsCatalog(version:1,environments:RootfsCatalog.alpine.environments+[pending])
+        XCTAssertEqual(try catalog.installedEnvironments(in:root),RootfsCatalog.alpine.environments)
+        let next=try pending.storeURL(in:root)
+        try FileManager.default.createDirectory(at:next,withIntermediateDirectories:true)
+        XCTAssertEqual(try catalog.installedEnvironments(in:root),RootfsCatalog.alpine.environments)
+        try FileManager.default.copyItem(at:root.appendingPathComponent("environment/manifest"),to:next.appendingPathComponent("manifest"))
+        XCTAssertEqual(try catalog.installedEnvironments(in:root),catalog.environments)
+    }
     func testProductionManifestReadOnlyBrowsingAndExportPreserveHardlinks() throws {
         let (directory,snapshot)=try fixture();defer {try? FileManager.default.removeItem(at:directory)}
         let original=try Data(contentsOf:directory.appendingPathComponent("manifest"))

@@ -28,7 +28,7 @@ enum FileProviderService {
         let directory=root.appendingPathComponent("file-provider-pending",isDirectory:true)
         return !((try? FileManager.default.contentsOfDirectory(atPath:directory.path)) ?? []).isEmpty
     }
-    static func applyPending(to local:LocalSession) async -> [String] {
+    static func applyPending(to local:LocalSession, environmentID:String = "alpine") async -> [String] {
         if let replay {return await replay.task.value}
         guard UIApplication.shared.applicationState == .active,UserDefaults.standard.bool(forKey:"rootfsFileProviderAvailable"),let root=RootfsLocations.sharedRoot else {return []}
         let id=UUID()
@@ -38,9 +38,9 @@ enum FileProviderService {
             repeat {
                 let generation=saveGeneration
                 let failures=await Task.detached(priority:.userInitiated) {
-                    RootfsEditStore(root:root).replay { request,payload in
+                    RootfsEditStore(root:root).replay(environment:environmentID) { request,payload in
                         let catalog=try RootfsCatalog.load(root)
-                        guard let environment=catalog.environments.first(where:{$0.id==request.base.environment}),environment.id=="alpine" else {throw RootfsCatalogError.noSuchItem}
+                        guard let environment=catalog.environments.first(where:{$0.id==request.base.environment}),environment.id==environmentID else {throw RootfsCatalogError.noSuchItem}
                         let inode=try local.commitFileEdit(guest:request.base.path,host:payload,expectedInode:request.base.version.inode,expectedSHA256:request.base.version.sha256,replacementSHA256:request.sha256)
                         return RootfsFileVersion(inode:inode,sha256:request.sha256)
                     }

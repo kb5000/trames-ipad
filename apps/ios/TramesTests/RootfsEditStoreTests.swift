@@ -15,6 +15,19 @@ final class RootfsEditStoreTests:XCTestCase {
         let store=RootfsEditStore(root:root);try store.record(base)
         return (root,store,base,source)
     }
+    func testReplayOnlyCommitsTheSelectedEnvironmentAndPreservesOtherEdits() throws {
+        let (root,store,alpine,source)=try fixture();defer {try? FileManager.default.removeItem(at:root)}
+        let debian=RootfsEditBase(identifier:"node/debian/p/1234",environment:"debian",path:alpine.path,version:alpine.version)
+        try store.record(debian)
+        try Data("edited".utf8).write(to:source)
+        try store.stage(alpine.identifier,from:source);try store.stage(debian.identifier,from:source)
+        var applied:[String]=[]
+        XCTAssertTrue(store.replay(environment:"debian") {request,_ in applied.append(request.base.environment);return request.base.version}.isEmpty)
+        XCTAssertEqual(applied,["debian"])
+        XCTAssertNotNil(store.request(alpine.identifier))
+        XCTAssertNil(store.request(debian.identifier))
+        XCTAssertNil(store.request(alpine.identifier)?.error)
+    }
     func testRepeatedSavesCoalesceAndPersistUntilExplicitReplay() throws {
         let (root,store,base,source)=try fixture();defer {try? FileManager.default.removeItem(at:root)}
         try Data("draft".utf8).write(to:source);try store.stage(base.identifier,from:source)

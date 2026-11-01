@@ -1,0 +1,179 @@
+{
+  "date": "2026-11-02",
+  "runtime": "a45bbe3b07a2faa22a3e3a9332bd397809005e57",
+  "mac": "a3b53f48067a280066e798fd9db0514bd72c699a",
+  "scope": "Shared cold rootfs import, Debian package preparation, optional systemd, iPad environment UI and per-environment Files edits; unchanged CPU/network/graphics acceptance reused.",
+  "sources": {
+    "alpine": "3.22.6",
+    "debian": "13 (trixie), 20261027",
+    "debian_sha256": "2b70e040f7d132c8d366ee0223462552686510fb372ea5a83822973c30f19e36"
+  },
+  "local": {
+    "distro_tests": {
+      "passed": 9
+    },
+    "ffi_tests": {
+      "passed": 7,
+      "includes": "Managed DNS migrates only the exact built-in Debian template and preserves custom configurations."
+    },
+    "vfs_tests": {
+      "passed": 358,
+      "ignored": 1
+    },
+    "kernel_limits_tests": {
+      "passed": 6
+    },
+    "swift_files_and_catalog": {
+      "passed": 14,
+      "skipped": 1,
+      "skip_reason": "Existing opt-in 256 MiB large-save probe; not enabled for this metadata change."
+    },
+    "production_ffi": {
+      "passed": true,
+      "checks": [
+        {
+          "case": "alpine-install",
+          "passed": true,
+          "reused": true
+        },
+        {
+          "case": "alpine",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "alpine",
+          "terminal": 2,
+          "passed": true
+        },
+        {
+          "case": "debian-install",
+          "passed": true,
+          "reused": true
+        },
+        {
+          "case": "debian",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "debian",
+          "terminal": 2,
+          "passed": true
+        },
+        {
+          "case": "debian-setup",
+          "passed": true
+        },
+        {
+          "case": "custom-install",
+          "passed": true,
+          "reused": true
+        },
+        {
+          "case": "custom",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "custom",
+          "terminal": 2,
+          "passed": true
+        },
+        {
+          "case": "custom-sha256-rejection",
+          "passed": true
+        },
+        {
+          "case": "systemd",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "systemd",
+          "terminal": 2,
+          "passed": true
+        }
+      ],
+      "systemd_after_idle_fix": "Both terminals, original PID 1 and D-Bus passed again.",
+      "scope_note": "Cold imports and unchanged Alpine/Debian/custom checks reused; systemd dual-PTY acceptance repeated after the scheduler change."
+    },
+    "mac": {
+      "unit_passed": 13,
+      "ignored": 1,
+      "original_systemd": {
+        "cpus": [
+          1,
+          4
+        ],
+        "graceful_stop": true,
+        "persistent_unit": true,
+        "shell_maintenance": true,
+        "backup_restore_identity": true
+      },
+      "runner_reexec_disabled": true,
+      "after_idle_fix": "Original systemd services, journal/notify, persistent unit, graceful stop, mode switch and backup passed again at 1 and 4 CPUs."
+    },
+    "strict_clippy": "passed",
+    "rustfmt": "passed",
+    "ios_release_build": "passed",
+    "signed_bundle_verification": "passed",
+    "kernel_conformance": {
+      "passed": 242,
+      "ignored": 3,
+      "native_permission_retry": "All six permission-denied tests passed with native access; other passed results reused."
+    },
+    "idle_cpu_percent": {
+      "before": {
+        "systemd_single": 4.410038291340529,
+        "systemd_multi": 107.26914602257615
+      },
+      "after": {
+        "systemd_single": 4.01776996428754,
+        "systemd_multi": 2.2051756550332606
+      },
+      "sample_seconds": 8,
+      "method": "Process getrusage CPU time divided by elapsed monotonic time while pumping production FFI every 20 ms; 100% is one host core."
+    }
+  },
+  "ipad": {
+    "version": "1.4.0",
+    "build": "45",
+    "device": "iPad Air 11-inch (M3)",
+    "os": "27.0.1",
+    "memory_budget_mib": 4096,
+    "process_memory_budget_mib": 4096,
+    "wireless_update": "passed",
+    "debian_rootfs_import": "passed",
+    "maintenance_shell": "passed",
+    "debian_release_observed": "13.7",
+    "automatic_package_retry": "passed",
+    "apt_index_download": "passed",
+    "standard_packages": "passed",
+    "original_systemd_pid_1": "passed",
+    "dbus": "active",
+    "idle_app_cpu_observed_percent": {
+      "before": 125,
+      "after": 5,
+      "after_two_terminals": 6
+    },
+    "second_terminal": "passed",
+    "switch_to_existing_alpine": "passed",
+    "existing_alpine_node_version": "22.23.4",
+    "existing_alpine_store_observed": "1.34 GB",
+    "active_environment_after_checks": "Alpine",
+    "custom_import_device_ui": "Not exercised; archive import, digest rejection and custom-image PTYs passed through the production FFI on Apple Silicon macOS."
+  },
+  "fixes": [
+    "Real per-process RLIMIT_NOFILE for original systemd service setup; inherited/shared according to Linux process/thread rules, enforced at descriptor allocation.",
+    "Canonicalize existing iOS container root before appending missing environment directories.",
+    "Replace only the exact shipped built-in Debian public resolver template with the existing Trames host resolver; preserve user overrides and custom-image configurations.",
+    "Masked owner epoll continuations only join worker contexts when actual events, unmasked signals or timeout are ready; readiness observation preserves one-shot/edge delivery and temporary signal masks."
+  ],
+  "limitations": [
+    "One active local environment on iPad.",
+    "Bundled Mesa/Xwayland/Vulkan adapters target musl; no new Debian glibc graphics bundle.",
+    "Systemd does not keep running while iPadOS suspends the app.",
+    "Custom images require ARM64 /bin/sh, setsid and their loaders/libraries; systemd images also require systemd and D-Bus."
+  ]
+}

@@ -5,6 +5,9 @@ import TramesKit
 final class WorkspaceModel: ObservableObject {
     @Published var sessions: [TerminalSession] = []
     @Published private(set) var localOwner: TerminalSession?
+    @Published private(set) var profiles = RootfsCatalog.alpine.environments
+    @Published private(set) var selectedEnvironmentID = "alpine"
+    var selectedEnvironment:RootfsEnvironment {profiles.first(where:{$0.id==selectedEnvironmentID}) ?? RootfsCatalog.alpine.environments[0]}
     private var terminalSequence = 0
     @Published private(set) var layout = WorkspaceTabs()
     private var observedModes: [WorkspaceItemID:String] = [:]
@@ -45,7 +48,14 @@ final class WorkspaceModel: ObservableObject {
         do {
             let environment = try EnvironmentStore(); self.environment = environment
             directories = try ScopedDirectories(file: environment.authorizationRoot.appendingPathComponent("folder-grants.json"))
-            openLocal()
+            Task {
+                do {
+                    profiles=try await environment.profiles()
+                    let saved=UserDefaults.standard.string(forKey:"activeEnvironmentID") ?? "alpine"
+                    selectedEnvironmentID=profiles.contains(where:{$0.id==saved}) ? saved : "alpine"
+                    openLocal()
+                } catch {self.error=error.localizedDescription}
+            }
         } catch { self.error = error.localizedDescription }
     }
     var current: TerminalSession? { layout.selected.flatMap { session(for: $0) } ?? local }
@@ -177,31 +187,58 @@ final class WorkspaceModel: ObservableObject {
         guard !resetting else { return }
         if let owner=localOwner {
             terminalSequence+=1
-            let session=TerminalSession(title:"Alpine \(terminalSequence)",isLocal:true)
+            let session=TerminalSession(title:"\(owner.environmentName) \(terminalSequence)",isLocal:true)
             session.attachTerminal(to:owner)
             session.pause(!appActive)
             add(session)
             return
         }
         guard let environment else { return }
-        let session = TerminalSession(title: "Alpine", isLocal:true)
+        let session = TerminalSession(title:selectedEnvironment.name,isLocal:true)
         session.pause(!appActive)
         session.bridge.directories = directories
         add(session)
-        session.startLocal(environment, useVolumeBudget: UserDefaults.standard.bool(forKey: "useVolumeBudget"))
+        session.startLocal(environment,useVolumeBudget:UserDefaults.standard.bool(forKey:"useVolumeBudget"),profile:selectedEnvironment)
+    }
+    private func stopLocal() {
+        let localSessions=sessions.filter(\.isLocal)
+        for session in localSessions {session.close()}
+        localOwner?.close()
+        let ids=Set(localSessions.map(\.id)+[localOwner?.id].compactMap{$0})
+        sessions.removeAll(where: { $0.isLocal });change {next in for id in ids {next.closeSession(id)}}
+        localOwner=nil;terminalSequence=0
+        observedModes=observedModes.filter{!ids.contains($0.key.session)}
+        pendingModes=pendingModes.filter{!ids.contains($0.key.session)}
+        dialogSizes=dialogSizes.filter{!ids.contains($0.key.session)}
+    }
+    func refreshEnvironments() async throws {
+        if let environment {profiles=try await environment.profiles()}
+    }
+    func openEnvironment(_ profile:RootfsEnvironment,maintenance:Bool=false) {
+        guard let environment,!resetting else {return}
+        let previous=localOwner
+        stopLocal();selectedEnvironmentID=profile.id
+        UserDefaults.standard.set(profile.id,forKey:"activeEnvironmentID")
+        let session=TerminalSession(title:profile.name,isLocal:true)
+        session.pause(!appActive);session.bridge.directories=directories;add(session)
+        session.startLocal(environment,useVolumeBudget:UserDefaults.standard.bool(forKey:"useVolumeBudget"),profile:profile,maintenance:maintenance,after:previous)
+    }
+    func createEnvironment(name:String,distribution:String,initMode:String,packages:String,archive:URL?,sha256:String?) async throws {
+        guard let environment else {throw TramesError.message("环境存储不可用")}
+        let profile=try await environment.create(name:name,distribution:distribution,initMode:initMode,packages:packages,archive:archive,sha256:sha256)
+        try await refreshEnvironments();openEnvironment(profile)
+    }
+    func configureBoot(_ profile:RootfsEnvironment,mode:String) async throws {
+        guard let environment else {return}
+        _=try await environment.setBoot(profile,mode:mode);try await refreshEnvironments()
     }
     func resetLocal() {
-        guard let environment, !resetting else {return}
-        resetting=true
-        for session in sessions {session.close()}
-        localOwner?.close()
-        let ids=Set(sessions.map(\.id)+[localOwner?.id].compactMap{$0})
-        sessions=[];change { next in for id in ids {next.closeSession(id)} }
-        localOwner=nil;terminalSequence=0
-        observedModes=[:];pendingModes=[:];dialogSizes=[:]
+        guard let environment,!resetting else {return}
+        let profile=selectedEnvironment,previous=localOwner
+        resetting=true;stopLocal()
         Task {
-            do { try await environment.reset(); resetting=false; openLocal() }
-            catch {resetting=false; self.error=error.localizedDescription}
+            do {await previous?.waitUntilClosed();try await environment.reset(profile:profile);try await refreshEnvironments();resetting=false;openLocal()}
+            catch {resetting=false;self.error=error.localizedDescription}
         }
     }
     func close(_ session: TerminalSession) {
@@ -210,12 +247,14 @@ final class WorkspaceModel: ObservableObject {
     }
     func background() {
         appActive = false
+        Task {await environment?.pausePreparation(true)}
         for session in environmentOwners {
             session.pause(true)
         }
     }
     func foreground() {
         appActive = true
+        Task {await environment?.pausePreparation(false)}
         for session in environmentOwners { session.pause(false) }
     }
 }

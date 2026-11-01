@@ -5,16 +5,24 @@ import Darwin
 #endif
 
 enum RootfsCatalogError: Error { case invalidStore, noSuchItem, unavailable }
-struct RootfsEnvironment: Codable, Equatable {
+struct RootfsEnvironment: Codable, Equatable, Identifiable, Sendable {
     let id: String
     let name: String
     let store: String
+    var distribution: String? = nil
+    var initMode: String? = nil
+    var packages: String? = nil
+    var needsSetup: Bool? = nil
+    var sourceSHA256: String? = nil
+    var distro: String { distribution ?? "alpine" }
+    var boot: String { initMode ?? "shell" }
     func storeURL(in root:URL) throws -> URL {
         guard !id.isEmpty,id.utf8.count<=64,id.allSatisfy({$0.isASCII && ($0.isLetter || $0.isNumber || $0=="-")}),
               !name.isEmpty,name.utf8.count<=255,!name.contains("/"),!name.utf8.contains(0),
               !store.hasPrefix("/"),!store.split(separator:"/",omittingEmptySubsequences:false).contains(where:{$0.isEmpty || $0=="." || $0==".."}) else { throw RootfsCatalogError.invalidStore }
-        let url=root.appendingPathComponent(store,isDirectory:true).resolvingSymlinksInPath()
-        guard url.path.hasPrefix(root.resolvingSymlinksInPath().path+"/") else { throw RootfsCatalogError.invalidStore }
+        let canonicalRoot=root.resolvingSymlinksInPath()
+        let url=canonicalRoot.appendingPathComponent(store,isDirectory:true).resolvingSymlinksInPath()
+        guard url.path.hasPrefix(canonicalRoot.path+"/") else { throw RootfsCatalogError.invalidStore }
         return url
     }
 }
@@ -22,11 +30,14 @@ struct RootfsCatalog: Codable {
     let version: Int
     let environments: [RootfsEnvironment]
     static let alpine=RootfsCatalog(version:1,environments:[RootfsEnvironment(id:"alpine",name:"Alpine",store:"environment")])
+    func installedEnvironments(in root:URL) throws -> [RootfsEnvironment] {
+        try environments.filter {FileManager.default.fileExists(atPath:try $0.storeURL(in:root).appendingPathComponent("manifest").path)}
+    }
     static func load(_ root:URL) throws -> RootfsCatalog {
         let data=try Data(contentsOf:root.appendingPathComponent("roots.json"))
         guard data.count<=65536 else { throw RootfsCatalogError.invalidStore }
         let result=try JSONDecoder().decode(Self.self,from:data)
-        guard result.version==1,result.environments.count<=64,Set(result.environments.map(\.id)).count==result.environments.count else { throw RootfsCatalogError.invalidStore }
+        guard result.version==1,result.environments.count<=64,Set(result.environments.map(\.id)).count==result.environments.count,Set(result.environments.map(\.store)).count==result.environments.count else { throw RootfsCatalogError.invalidStore }
         for environment in result.environments { _=try environment.storeURL(in:root) }
         return result
     }

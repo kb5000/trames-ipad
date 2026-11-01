@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-//! Host PTY masters on the coordinator. Shells run unchanged guest BusyBox.
+//! Host PTY masters on the coordinator. Shells run the image's unchanged /bin/sh.
 //! The init pipe is private: children inherit only their slave, never a master.
 use crate::session::{Buffers, QUEUE_LIMIT};
 use std::{
@@ -11,7 +11,7 @@ use trames_vfs::{Vfs, AT_FDCWD, O_CLOEXEC, O_NONBLOCK};
 // Monitor mode prevents ash's asynchronous children inheriting ignored SIGINT.
 // The private console enables normal job control. setsid then opens the slave
 // in its own session. Retry interrupted reads when a launcher child exits.
-pub(crate) const INIT: &str = "set -m; trap '' CHLD; while :; do if IFS= read -r tty <&3; then /bin/busybox setsid /bin/ash -c 'exec /bin/ash -i <\"$1\" >\"$1\" 2>&1' sh \"$tty\" 3<&- & fi; done";
+pub(crate) const INIT: &str = "set -m; trap '' CHLD; while :; do if IFS= read -r tty <&3; then setsid /bin/sh -c 'exec /bin/sh -il <\"$1\" >\"$1\" 2>&1' sh \"$tty\" 3<&- & fi; done";
 pub(crate) const LIMIT: usize = 32;
 pub(crate) struct Channel {
     pub input: VecDeque<u8>,
@@ -61,6 +61,35 @@ impl NativeTerminals {
         Ok(Self {
             vfs,
             control: writer,
+            masters: BTreeMap::new(),
+        })
+    }
+    pub fn for_systemd(root: &mut Vfs) -> Result<Self, String> {
+        const FIFO: &[u8] = b"/run/trames-terminal-control";
+        root.mknod_at(AT_FDCWD, FIFO, 0o10600, 0)
+            .map_err(|e| e.to_string())?;
+        let mut vfs = root.clone();
+        let control = vfs
+            .open_at(AT_FDCWD, FIFO, 2 | O_NONBLOCK | O_CLOEXEC, 0)
+            .map_err(|e| e.to_string())?;
+        // PID 1 closes inherited FDs. Its ordinary getty service opens this
+        // per-boot FIFO instead, then runs the same multi-terminal launcher.
+        let script = format!("exec 3</run/trames-terminal-control; {INIT}");
+        let escaped = script
+            .replace('\\', "\\\\")
+            .replace('"', "\\\"")
+            .replace('$', "$$")
+            .replace('%', "%%");
+        let unit = format!("[Service]\nExecStart=\nExecStart=/bin/sh -c \"{escaped}\"\n");
+        trames_distro::systemd::file(
+            root,
+            b"/run/systemd/system/console-getty.service.d/60-terminals.conf",
+            unit.as_bytes(),
+        )
+        .map_err(|e| e.to_string())?;
+        Ok(Self {
+            vfs,
+            control,
             masters: BTreeMap::new(),
         })
     }

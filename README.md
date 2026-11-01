@@ -110,6 +110,8 @@ target/debug/trames-run --storage target/my-system --install-busybox --export /n
 
 默认最多执行 10,000,000 条指令，可使用 `trames-run --max-instructions 1000 ELF [ARG ...]` 调整。运行器传递 guest 退出码；加载失败、CPU 故障或超出预算时返回 125，诊断写入 stderr。guest 也能主动返回 125，调用方应同时查看诊断。
 
+iPad 开发版现支持独立的 Alpine、Debian、可选 systemd 和自定义 ARM64 rootfs，可从 **+ → Linux 环境** 管理；原有 Alpine 数据保留。[配置与使用](docs/guides/ipad-environments.md)。
+
 ## Alpine 和 apk
 
 ~~~sh
@@ -355,7 +357,7 @@ memfd 与 classic seals、文件复制/批量 I/O，以及单 CPU 的调度/亲�
 | `trames-net` | 有界非阻塞 TCP/UDP、网络能力、宿主错误翻译和就绪等待 |
 | `trames-vfs` | 共享虚拟命名空间、磁盘/内存文件、配额与容量、打开描述与管道 |
 | `trames-core` | ELF/初始栈、进程调度、exec/wait、信号帧、虚拟 PTY |
-| `trames-distro` | 固定 SHA-256 Alpine rootfs、受限归档解析与 VFS 导入 |
+| `trames-distro` | 固定 SHA-256 Alpine/Debian、共享 rootfs 导入和 systemd 准备 |
 | `trames-cli` | `trames-run`，宿主字节流输出和退出码 |
 
 尚不支持重叠 PT_LOAD 页面、完整 AArch64、SVE、备用信号栈、多个 PTY、非零 VTIME、完整需求分页/回收与所有映射扩展。线程、vfork 和 futex 已有选定实现；其余 Linux 缺口见[当前清单](docs/roadmap/compatibility-current.md)。未实现的指令明确报告故障，未知系统调用返回 `-ENOSYS`。安全限制及其兼容性影响见 [security](docs/security/README.md)。

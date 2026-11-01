@@ -24,6 +24,7 @@ struct WorkspaceView: View {
     @ObservedObject var workspace: WorkspaceModel
     @State private var filesSheet = false
     @State private var settingsSheet = false
+    @State private var environmentsSheet = false
     @State private var sessionActions = false
     @State private var frames: [String:CGRect] = [:]
     @State private var draggedTab: WorkspaceItemID?
@@ -66,7 +67,8 @@ struct WorkspaceView: View {
                     Label("新建或管理会话", systemImage: "plus")
                         .labelStyle(.iconOnly).frame(minWidth: 44, minHeight: 44)
                 }.confirmationDialog("新建或管理会话", isPresented: $sessionActions, titleVisibility: .visible) {
-                    Button("本地 Alpine 终端", systemImage: "terminal") { workspace.openLocal() }
+                    Button("新建终端",systemImage:"terminal") {workspace.openLocal()}
+                    Button("Linux 环境",systemImage:"square.stack.3d.up") {environmentsSheet=true}
                     Button("Files", systemImage: "folder") { filesSheet = true }
                     Button("设置", systemImage: "gear") { settingsSheet = true }
                 }
@@ -85,7 +87,7 @@ struct WorkspaceView: View {
                 }.frame(width:proxy.size.width,height:proxy.size.height,alignment:.topLeading)
                 .overlay {
                     if workspace.layout.selected == nil && workspace.layout.floating.isEmpty {
-                        ContentUnavailableView("打开一个终端",systemImage:"terminal",description:Text("从顶部标签栏恢复窗口，或打开本地 Alpine。"))
+                        ContentUnavailableView("打开一个终端",systemImage:"terminal",description:Text("从顶部标签栏恢复窗口，或选择 Linux 环境。"))
                     }
                 }
             .onAppear { workspace.updateViewport(proxy.size) }
@@ -103,6 +105,7 @@ struct WorkspaceView: View {
         .background(.black)
         .background { if let owner=workspace.localOwner {BridgeConsentPresenter(controller:owner.bridge)} }
         .sheet(isPresented: $filesSheet) { if let session = workspace.current { TransferView(session: session) } }
+        .sheet(isPresented:$environmentsSheet) {EnvironmentManagerView(workspace:workspace)}
         .sheet(isPresented: $settingsSheet) { SettingsView(workspace: workspace) }
         .alert("Trames", isPresented: Binding(get: { workspace.error != nil }, set: { if !$0 { workspace.error = nil } })) {
             Button("好") { workspace.error = nil }
@@ -199,7 +202,7 @@ struct SettingsView: View {
                 .alert("重置 Linux 环境？",isPresented:$resetConfirmation) {
                     Button("删除并重新初始化",role:.destructive) {dismiss(); workspace.resetLocal()}
                     Button("取消",role:.cancel) {}
-                } message: {Text("将删除 Linux 中所有软件、文件和配置，并重新下载 Alpine。Files 目录授权会保留。")}
+                } message: {Text("将重置当前环境中的软件、文件和配置。其他 Linux 环境和 Files 目录授权会保留。")}
         }
     }
 }

@@ -9,6 +9,8 @@ final class TerminalSession: NSObject, ObservableObject, Identifiable, TerminalV
     let terminal = TerminalViewport(frame: .zero, font: .monospacedSystemFont(ofSize: 14, weight: .regular))
     let fallbackTitle: String
     let isLocal: Bool
+    private(set) var environmentID = "alpine"
+    private(set) var environmentName = "Alpine"
     var onWaylandChanged: (([LocalWaylandWindow]) -> Void)?
     var onFileProviderError: ((String) -> Void)?
     @Published var title: String
@@ -65,14 +67,19 @@ final class TerminalSession: NSObject, ObservableObject, Identifiable, TerminalV
         }
         #endif
     }
-    func startLocal(_ environment: EnvironmentStore, useVolumeBudget: Bool) {
-        state="正在准备 Alpine…"
+    func startLocal(_ environment: EnvironmentStore, useVolumeBudget: Bool, profile:RootfsEnvironment? = nil, maintenance:Bool = false, after previous:TerminalSession? = nil) {
+        environmentID=profile?.id ?? "alpine";environmentName=profile?.name ?? "Alpine"
+        state="正在准备 \(environmentName)…"
         task = Task { [weak self] in
             do {
+                await previous?.waitUntilClosed()
+                try Task.checkCancellation()
                 let gpu = UserDefaults.standard.object(forKey: "vulkanCompute") as? Bool ?? true
                 let memory = UserDefaults.standard.object(forKey: "guestMemoryMiB") as? Int ?? 1024
                 let processMemory = UserDefaults.standard.object(forKey: "guestProcessMemoryMiB") as? Int ?? 512
-                let local = try await environment.start(useVolumeBudget: useVolumeBudget, vulkan: gpu, memoryBudgetMiB: memory, processMemoryBudgetMiB: min(processMemory, memory))
+                let local = try await environment.start(profile:profile,useVolumeBudget:useVolumeBudget,vulkan:gpu,memoryBudgetMiB:memory,processMemoryBudgetMiB:min(processMemory,memory),maintenance:maintenance) { [weak self] bytes in
+                    Task { @MainActor in self?.terminal.feed(byteArray:Array(bytes)[...]) }
+                }
                 guard let self, !self.closed else { local.close(); return }
                 self.local = local
                 bridge.attach(local)
@@ -88,7 +95,7 @@ final class TerminalSession: NSObject, ObservableObject, Identifiable, TerminalV
         }
     }
     func attachTerminal(to owner: TerminalSession) {
-        environmentOwner=owner;terminalID=nil
+        environmentOwner=owner;environmentID=owner.environmentID;environmentName=owner.environmentName;terminalID=nil
         task=Task { [weak self] in
             do {
                 while owner.local == nil {
@@ -119,7 +126,7 @@ final class TerminalSession: NSObject, ObservableObject, Identifiable, TerminalV
                 let status=try local.terminalStatus(terminalID)
                 if status.phase != lastPhase {
                     lastPhase=status.phase
-                    state=status.phase == "running" ? "Alpine · 本地" : status.phase
+                    state=status.phase == "running" ? "\(environmentName) · 本地" : status.phase
                     terminalExited=["exited","failed","cancelled"].contains(status.phase)
                     if terminalExited {pendingInput.removeAll();state=status.error ?? "已退出"}
                 }
@@ -213,7 +220,7 @@ final class TerminalSession: NSObject, ObservableObject, Identifiable, TerminalV
         }
     }
     private func applyFileProviderEdits(_ local:LocalSession) async {
-        let errors=await FileProviderService.applyPending(to:local)
+        let errors=await FileProviderService.applyPending(to:local,environmentID:environmentID)
         if !errors.isEmpty {onFileProviderError?("部分 Files 编辑未写回，修改副本已保留。\n"+errors.prefix(4).joined(separator:"\n"))}
     }
     private func synchronizeClipboard() {
@@ -231,6 +238,7 @@ final class TerminalSession: NSObject, ObservableObject, Identifiable, TerminalV
             }
         }
     }
+    func waitUntilClosed() async {await task?.value}
     func close() {
         guard !closed else { return }; closed = true
         if let timezoneObserver { NotificationCenter.default.removeObserver(timezoneObserver) }

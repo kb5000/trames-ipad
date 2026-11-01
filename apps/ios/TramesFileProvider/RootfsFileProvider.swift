@@ -78,7 +78,7 @@ final class RootfsFileProvider:NSFileProviderExtension {
         let id=entry.identifier(environment:index.environment.id),journal=try edits(),pending=journal.request(id)
         let problem=pending?.error ?? journal.base(id)?.error
         let error=problem.map {NSError(domain:NSFileProviderErrorDomain,code:NSFileProviderError.cannotSynchronize.rawValue,userInfo:[NSLocalizedDescriptionKey:$0])}
-        return RootfsItem(id:id,parent:parent,name:entry.filename,directory:entry.kind==0,readable:entry.kind==0 || entry.kind==1,writable:index.environment.id=="alpine" && entry.kind==1 && String(data:entry.path,encoding:.utf8) != nil,pending:pending != nil,error:error,size:pending?.size ?? size,modified:entry.modified,version:pending?.token ?? "\(index.snapshot.revision)/\(modified.timeIntervalSince1970)/\(size ?? 0)")
+        return RootfsItem(id:id,parent:parent,name:entry.filename,directory:entry.kind==0,readable:entry.kind==0 || entry.kind==1,writable:entry.kind==1 && String(data:entry.path,encoding:.utf8) != nil,pending:pending != nil,error:error,size:pending?.size ?? size,modified:entry.modified,version:pending?.token ?? "\(index.snapshot.revision)/\(modified.timeIntervalSince1970)/\(size ?? 0)")
     }
     override func item(for identifier:NSFileProviderItemIdentifier) throws -> NSFileProviderItem {
         if identifier == .rootContainer {return RootfsItem(id:identifier.rawValue,parent:identifier.rawValue,name:"Trames",directory:true)}
@@ -103,7 +103,7 @@ final class RootfsFileProvider:NSFileProviderExtension {
     fileprivate func listing(_ identifier:NSFileProviderItemIdentifier) throws -> [NSFileProviderItem] {
         if identifier == .workingSet || identifier.rawValue=="pending-edits" {return try edits().requests().map {recoveryItem($0)}}
         if identifier == .rootContainer {
-            var items=try catalog().environments.map {try item(for:NSFileProviderItemIdentifier(rawValue:"environment/"+$0.id))}
+            var items=try catalog().installedEnvironments(in:root()).map {try item(for:NSFileProviderItemIdentifier(rawValue:"environment/"+$0.id))}
             if try !edits().requests().isEmpty {items.append(try item(for:NSFileProviderItemIdentifier(rawValue:"pending-edits")))}
             return items
         }
@@ -117,7 +117,7 @@ final class RootfsFileProvider:NSFileProviderExtension {
         return try (index.children[path] ?? []).sorted { $0.path.lexicographicallyPrecedes($1.path) }.map {try item(index,$0)}
     }
     fileprivate func anchor() throws -> NSFileProviderSyncAnchor {
-        let version=try catalog().environments.map {try "\($0.id):\(index($0).snapshot.revision)"}.joined(separator:";")
+        let version=try catalog().installedEnvironments(in:root()).map {try "\($0.id):\(index($0).snapshot.revision)"}.joined(separator:";")
         return NSFileProviderSyncAnchor(rawValue:Data(("editable-v1:"+version+":"+(try edits().revision())).utf8))
     }
     override func enumerator(for containerItemIdentifier:NSFileProviderItemIdentifier) throws -> NSFileProviderEnumerator {
