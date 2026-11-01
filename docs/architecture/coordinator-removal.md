@@ -1,5 +1,65 @@
 # Coordinator dependency audit
 
+## Third migration implemented — 2026-11-02
+
+Runtime `eef3631c6f1dccdcf863d3765379be93cdcc6e4b` moves `pipe2`, `eventfd2`,
+`timerfd_create` and `inotify_init1` creation/publication onto existing CPU workers.
+The common `DescriptorFactory` contains only actual Files membership, the shared
+OFD ID allocator and captured filesystem UID/GID. Mac and iPad use the same
+constructors, resources, FD limits and byte/control/wait mechanisms. No VFS/Rc control crosses
+this boundary and no new coordinator/resource thread is introduced.
+
+Pipe creation reserves two numbers in one Files transaction, copies output
+without holding the table lock, then publishes both complete OFDs together.
+Failed output or unwinding releases both slots and endpoints. The owner uses the
+same ABI/rollback transport. Existing worker views immediately accept all four
+new resource types; blocked I/O retains the original object across close/reuse.
+Timer notifications/deadlines, pipe EOF and inotify delivery reuse existing
+signals. Seccomp evaluates each entry once, preserving normal denied-entry effects.
+Non-I/O calls also skip the byte dispatcher's unused FD lookup for argument zero.
+
+Four processes each run 10,000 complete lifecycles. Each pipe cycle sends/reads a
+byte and checks EOF; eventfd checks its counter; timerfd sets/gets a disarmed timer;
+inotify checks nonblocking empty read. Timings below are longest-child loop
+medians from three unprofiled repetitions; separate diagnostic samples supply
+cohort counts. The identical static ELF runs in both Trames versions and the
+Linux-kernel reference. The macOS fixture measures the pipe lifecycle only.
+
+| Resource | Previous loop | Current loop | Gain | Native Linux loop | Native macOS loop | Cohort rounds, previous → current |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Pipe | 976.1 ms | 97.3 ms | 10.0× | 20.3 ms | 25.7 ms | 25,336 → 48 |
+| eventfd | 885.3 ms | 58.5 ms | 15.1× | 14.4 ms | — | 25,012 → 43 |
+| timerfd | 889.1 ms | 59.6 ms | 14.9× | 14.5 ms | — | 25,298 → 44 |
+| inotify | 838.5 ms | 46.7 ms | 18.0× | 15.0 ms | — | 24,776 → 38 |
+
+Full-workload wall medians, including startup/fork/exec/output/teardown, improve
+from **1013.2 → 134.9 ms**, **926.0 → 95.0 ms**, **923.9 → 94.5 ms** and
+**874.2 → 84.3 ms** respectively. These are lifecycle microbenchmarks, not general
+application or Firefox scores. Current loops remain approximately **3.1–4.8×**
+slower than the native Linux reference. Its existing ARM64 Lima/VZ environment
+uses six vCPUs and four benchmark processes; it ran after the Mac measurements
+and was stopped afterward. Native inotify here measures empty initialization/
+read/close, not watched-directory throughput. Diagnostic counts include startup,
+teardown and serial tails; drain time alone is not a CPU percentage.
+
+Validation passed: 404 VFS tests, 150 Linux tests, 245 interpreter-kernel tests,
+Mac product checks and strict Clippy, 13 production FFI environment checks
+(including original systemd with two PTYs), product boundaries and the iPad
+device static-library cross-build. Tests cover concurrent unique live FD/OFD
+allocation, real pipe ownership/flags, copyout rollback, existing-view visibility,
+waits after close/reuse, live timer deadlines and allowed/denied seccomp paths.
+Physical iPad testing remains skipped at the owner's request. Mac's installed
+development app contains the measured binary.
+
+[Samples, hashes, native references and validation](../validation/descriptor-create-20261102.json),
+the [fixed-work fixture](../../tests/fixtures/fd-create-bench.c) and
+[comparison harness](../../tests/performance/fd-create.py) record reproduction.
+The shared [execution design](https://github.com/kb5000/trames-runtime/blob/main/docs/architecture/execution-backends.md#worker-anonymous-resource-creation-2026-11-02)
+documents ownership and publication. Epoll/watch state, sockets/connect/accept/
+SCM_RIGHTS, inotify add-watch control, signalfd/task masks and signal-producing
+pipe operations retain their existing owner boundaries, alongside structural VM
+and native-device registration work.
+
 ## Second migration implemented — 2026-11-02
 
 Runtime `721e50aa7b377d03abfc7696120dda299c71f16d` moves ordinary regular-file
@@ -48,9 +108,9 @@ measured binary. [Raw samples, hashes and validation](../validation/worker-open-
 and the [comparison harness](../../tests/performance/path-metadata.py) are retained.
 The harness also runs a Linux/macOS native-only reference.
 
-`O_TRUNC` opens, directory cursors and mutations, lower-overlay
+At this second checkpoint, `O_TRUNC` opens, directory cursors and mutations, lower-overlay
 files, special endpoints, pipe/socket/accept/event/timer creation, signal/task
-state, structural VM changes and native-device registration still have owner
+state, structural VM changes and native-device registration still had owner
 boundaries. The shared [execution design](https://github.com/kb5000/trames-runtime/blob/main/docs/architecture/execution-backends.md#worker-regular-file-opens-and-publication-2026-11-02)
 records the publication and ownership rules. No coordinator/resource thread or
 polling bus was added.
@@ -209,10 +269,10 @@ same runtime source, not rerun measurements; see
    authority. Test rename/unlink, symlinks, mount boundaries, host mutations and
    concurrent metadata changes. Preserve normal Linux races; no stronger
    ordering, guest-race error or whole-function global lock.
-2. Ordinary regular-file open/create/publication is implemented above. Next are
-   accept/pipe/socket/event/timer creation and remaining descriptor kinds using
-   shared Files and resource objects. Existing workers should observe real
-   membership without stopping every job to recapture registered resources.
+2. Regular-file open/create and pipe/eventfd/timerfd/inotify creation/publication
+   are implemented above. Next are socket/connect/accept/SCM_RIGHTS and epoll
+   interest ownership using shared Files and resource objects. Existing workers
+   should observe real membership without stopping every job to recapture it.
 3. Temporary signal-mask waits, signal delivery and task creation/exit using a
    shared task registry and targeted execution-queue events. Preserve seccomp
    decisions, EINTR/restart, process-group semantics and OFD lifetimes.

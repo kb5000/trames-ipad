@@ -1,0 +1,2211 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-02",
+  "passed": true,
+  "runtime_revision": "eef3631c6f1dccdcf863d3765379be93cdcc6e4b",
+  "baseline_runtime_revision": "721e50aa7b377d03abfc7696120dda299c71f16d",
+  "baseline_mac_revision": "9fdd82323fc884176e2ae45421c459d60b552622",
+  "candidate_mac_revision": "b76348802951a73def2fae3669c7deceabf77672",
+  "hardware": {
+    "cpu": "Apple M6",
+    "logical_cpus": 12,
+    "memory_bytes": 25769803776
+  },
+  "scope": {
+    "execution": "Real Apple Silicon HVF with shared userspace Linux kernel; 12 configured CPU slots",
+    "work": "Four processes, 10000 resource lifecycles each; no pathname/data-file loop",
+    "timing": "Medians of three unprofiled repetitions; longest child loop and full workload wall time; separate profiling samples and counterbalanced version order",
+    "setup": "One fresh disposable pinned Alpine store per resource kind, shared by both Trames versions; import outside timed runs",
+    "operations": {
+      "pipe": "pipe2, write byte, read/check byte, close writer, read/check EOF, close reader",
+      "eventfd": "create, write/check counter, read/check counter, close",
+      "timerfd": "create monotonic timer, set/get disarmed state, close",
+      "inotify": "create nonblocking instance, read/check EAGAIN, close"
+    },
+    "native": "Same static ELF on existing native ARM64 Linux-kernel Lima/VZ reference, six vCPUs, 8 GiB configured; four processes. macOS fixture measures the same pipe lifecycle only.",
+    "limitations": [
+      "Lifecycle microbenchmarks, not Firefox or whole-application scores.",
+      "Whole-workload times include startup/fork/exec/output/teardown.",
+      "Diagnostic samples include startup/teardown and scheduling-dependent serial tails. Counts are not deterministic admission targets.",
+      "Cohort drain time excludes dispatch/resource work and is not CPU utilization.",
+      "Native inotify reference covers empty initialization/read/close, not watch creation or directory-event throughput.",
+      "Native Linux reference was initially stopped, started after Mac timing and stopped afterward.",
+      "Unchanged interpreter/HVF CPU engines, guest-memory module and graphics code reuse prior validation; affected worker/kernel regressions were rerun.",
+      "Physical iPad testing skipped per user request; host production FFI and device cross-build passed."
+    ]
+  },
+  "summary": {
+    "pipe": {
+      "loop_before_ms": 976.103666,
+      "loop_after_ms": 97.279375,
+      "speedup": 10.034024848535468,
+      "linux_native_loop_ms": 20.275045,
+      "linux_native_ratio": 4.797985651819762,
+      "wall_before_ms": 1013.1661670000005,
+      "wall_after_ms": 134.85733399999944,
+      "cohort_rounds_before": 25336,
+      "cohort_rounds_after": 48,
+      "mac_native_loop_ms": 25.687
+    },
+    "eventfd": {
+      "loop_before_ms": 885.3045000000001,
+      "loop_after_ms": 58.536083000000005,
+      "speedup": 15.124081671129241,
+      "linux_native_loop_ms": 14.377848,
+      "linux_native_ratio": 4.071268732288726,
+      "wall_before_ms": 925.9925829999997,
+      "wall_after_ms": 94.98104200000057,
+      "cohort_rounds_before": 25012,
+      "cohort_rounds_after": 43
+    },
+    "timerfd": {
+      "loop_before_ms": 889.105541,
+      "loop_after_ms": 59.58275,
+      "speedup": 14.922197129202665,
+      "linux_native_loop_ms": 14.524806,
+      "linux_native_ratio": 4.1021374054841075,
+      "wall_before_ms": 923.9235830000001,
+      "wall_after_ms": 94.53229100000016,
+      "cohort_rounds_before": 25298,
+      "cohort_rounds_after": 44
+    },
+    "inotify": {
+      "loop_before_ms": 838.494917,
+      "loop_after_ms": 46.697541,
+      "speedup": 17.955868746921812,
+      "linux_native_loop_ms": 15.00918,
+      "linux_native_ratio": 3.1112653056329527,
+      "wall_before_ms": 874.2096660000003,
+      "wall_after_ms": 84.31366699999998,
+      "cohort_rounds_before": 24776,
+      "cohort_rounds_after": 38
+    }
+  },
+  "cases": {
+    "pipe": {
+      "passed": true,
+      "kind": "pipe",
+      "processes": 4,
+      "operations_each": 10000,
+      "repeats": 3,
+      "cpus": 12,
+      "records": [
+        {
+          "variant": "before",
+          "repeat": 0,
+          "wall_seconds": 1.400748083,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.505678042,
+              "checksum": 50005000
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.705417417,
+              "checksum": 50005000
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.945226333,
+              "checksum": 50005000
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 1.014359667,
+              "checksum": 50005000
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 25336,
+            "cohort_stop_us": 96244,
+            "service_caller_wait_us": 48,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 240112,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 100208,
+            "worker_fd_syscalls": 66806,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 167014,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "after",
+          "repeat": 0,
+          "wall_seconds": 0.13684012499999998,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.096952875,
+              "checksum": 50005000
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.096413667,
+              "checksum": 50005000
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.098155459,
+              "checksum": 50005000
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.098049375,
+              "checksum": 50005000
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 48,
+            "cohort_stop_us": 1142,
+            "service_caller_wait_us": 35,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 240113,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 119905,
+            "worker_fd_syscalls": 119905,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 239810,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "before",
+          "repeat": 1,
+          "wall_seconds": 1.019620292,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.467836584,
+              "checksum": 50005000
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.673402583,
+              "checksum": 50005000
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.919667667,
+              "checksum": 50005000
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.984921291,
+              "checksum": 50005000
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 1,
+          "wall_seconds": 0.1360994169999996,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.095031625,
+              "checksum": 50005000
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.096679959,
+              "checksum": 50005000
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.097439542,
+              "checksum": 50005000
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.09631925,
+              "checksum": 50005000
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 2,
+          "wall_seconds": 0.13485733399999944,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.093816875,
+              "checksum": 50005000
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.09594875,
+              "checksum": 50005000
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.097007292,
+              "checksum": 50005000
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.097279375,
+              "checksum": 50005000
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 2,
+          "wall_seconds": 1.0099205829999995,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.463221208,
+              "checksum": 50005000
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.657089459,
+              "checksum": 50005000
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.909654708,
+              "checksum": 50005000
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.976103666,
+              "checksum": 50005000
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 3,
+          "wall_seconds": 1.0131661670000005,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.472296792,
+              "checksum": 50005000
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.674588625,
+              "checksum": 50005000
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.908066541,
+              "checksum": 50005000
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.974898375,
+              "checksum": 50005000
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 3,
+          "wall_seconds": 0.1347296250000003,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.093765292,
+              "checksum": 50005000
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.095366375,
+              "checksum": 50005000
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.096372834,
+              "checksum": 50005000
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.09510975,
+              "checksum": 50005000
+            }
+          ]
+        },
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.26527395799999987,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.03353,
+              "checksum": 50005000
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.033177,
+              "checksum": 50005000
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.033279,
+              "checksum": 50005000
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.033315,
+              "checksum": 50005000
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.029942249999999504,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.025015,
+              "checksum": 50005000
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.025497,
+              "checksum": 50005000
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.025687,
+              "checksum": 50005000
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.025199,
+              "checksum": 50005000
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.029093207999999926,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.024448,
+              "checksum": 50005000
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.025225,
+              "checksum": 50005000
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.025267,
+              "checksum": 50005000
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.024947,
+              "checksum": 50005000
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "baseline": "9274c33835f8fcf4f4bd25245d7ee6afed83dfcf8cb76ff8541ac446e31ca4d4",
+        "candidate": "ca1439cc1986728714da224b9c02d35c291f0edbcfe3d4e79559b3198cbfe616",
+        "native": "7f5a380c2dd0001fbb6756b523adb109e7f9eee4f248b240b98ecacf95bf42d1",
+        "fixture": "1a85a2b57164dfd7d55ee2ddf0a32b8cf187e1b6417f0277e4140c06258c2f55",
+        "rootfs": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe"
+      },
+      "native_environment": {
+        "system": "Darwin",
+        "release": "27.0.0",
+        "architecture": "arm64",
+        "logical_cpus": 12
+      },
+      "summary": {
+        "before": {
+          "loop_max_median_seconds": 0.976103666,
+          "process_wall_median_seconds": 1.0131661670000005,
+          "profile": {
+            "cohort_rounds": 25336,
+            "cohort_stop_us": 96244,
+            "service_caller_wait_us": 48,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 240112,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 100208,
+            "worker_fd_syscalls": 66806,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 167014,
+            "worker_task_resumes": 3
+          }
+        },
+        "after": {
+          "loop_max_median_seconds": 0.097279375,
+          "process_wall_median_seconds": 0.13485733399999944,
+          "profile": {
+            "cohort_rounds": 48,
+            "cohort_stop_us": 1142,
+            "service_caller_wait_us": 35,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 240113,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 119905,
+            "worker_fd_syscalls": 119905,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 239810,
+            "worker_task_resumes": 3
+          }
+        },
+        "native": {
+          "loop_max_median_seconds": 0.025687,
+          "process_wall_median_seconds": 0.029942249999999504
+        }
+      }
+    },
+    "eventfd": {
+      "passed": true,
+      "kind": "eventfd",
+      "processes": 4,
+      "operations_each": 10000,
+      "repeats": 3,
+      "cpus": 12,
+      "records": [
+        {
+          "variant": "before",
+          "repeat": 0,
+          "wall_seconds": 0.943998542,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.415585209,
+              "checksum": 50005000
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.642745166,
+              "checksum": 50005000
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.851944083,
+              "checksum": 50005000
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.898481792,
+              "checksum": 50005000
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 25012,
+            "cohort_stop_us": 114287,
+            "service_caller_wait_us": 60,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 160112,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 65919,
+            "worker_fd_syscalls": 32960,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 98879,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "after",
+          "repeat": 0,
+          "wall_seconds": 0.1006591670000001,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.059356375,
+              "checksum": 50005000
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.060009542,
+              "checksum": 50005000
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.058764208,
+              "checksum": 50005000
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.059569,
+              "checksum": 50005000
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 43,
+            "cohort_stop_us": 801,
+            "service_caller_wait_us": 28,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 160109,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 79991,
+            "worker_fd_syscalls": 79990,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 159981,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "before",
+          "repeat": 1,
+          "wall_seconds": 0.9342853339999999,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.404214667,
+              "checksum": 50005000
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.637747667,
+              "checksum": 50005000
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.85090925,
+              "checksum": 50005000
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.895366,
+              "checksum": 50005000
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 1,
+          "wall_seconds": 0.09963537500000008,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.056926375,
+              "checksum": 50005000
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.056630166,
+              "checksum": 50005000
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.057032083,
+              "checksum": 50005000
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.058821625,
+              "checksum": 50005000
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 2,
+          "wall_seconds": 0.09434116700000006,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.057262625,
+              "checksum": 50005000
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.057790417,
+              "checksum": 50005000
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.057691375,
+              "checksum": 50005000
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.057736459,
+              "checksum": 50005000
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 2,
+          "wall_seconds": 0.9201759169999999,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.404182958,
+              "checksum": 50005000
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.627232917,
+              "checksum": 50005000
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.841415541,
+              "checksum": 50005000
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.8853045,
+              "checksum": 50005000
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 3,
+          "wall_seconds": 0.9259925829999998,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.405294417,
+              "checksum": 50005000
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.63132625,
+              "checksum": 50005000
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.835286291,
+              "checksum": 50005000
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.882532625,
+              "checksum": 50005000
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 3,
+          "wall_seconds": 0.09498104200000057,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.056840584,
+              "checksum": 50005000
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.057815834,
+              "checksum": 50005000
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.058536083,
+              "checksum": 50005000
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.058070458,
+              "checksum": 50005000
+            }
+          ]
+        }
+      ],
+      "sha256": {
+        "baseline": "9274c33835f8fcf4f4bd25245d7ee6afed83dfcf8cb76ff8541ac446e31ca4d4",
+        "candidate": "ca1439cc1986728714da224b9c02d35c291f0edbcfe3d4e79559b3198cbfe616",
+        "fixture": "1a85a2b57164dfd7d55ee2ddf0a32b8cf187e1b6417f0277e4140c06258c2f55",
+        "rootfs": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe"
+      },
+      "native_environment": {
+        "system": "Darwin",
+        "release": "27.0.0",
+        "architecture": "arm64",
+        "logical_cpus": 12
+      },
+      "summary": {
+        "before": {
+          "loop_max_median_seconds": 0.8853045,
+          "process_wall_median_seconds": 0.9259925829999998,
+          "profile": {
+            "cohort_rounds": 25012,
+            "cohort_stop_us": 114287,
+            "service_caller_wait_us": 60,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 160112,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 65919,
+            "worker_fd_syscalls": 32960,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 98879,
+            "worker_task_resumes": 3
+          }
+        },
+        "after": {
+          "loop_max_median_seconds": 0.058536083,
+          "process_wall_median_seconds": 0.09498104200000057,
+          "profile": {
+            "cohort_rounds": 43,
+            "cohort_stop_us": 801,
+            "service_caller_wait_us": 28,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 160109,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 79991,
+            "worker_fd_syscalls": 79990,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 159981,
+            "worker_task_resumes": 3
+          }
+        }
+      }
+    },
+    "timerfd": {
+      "passed": true,
+      "kind": "timerfd",
+      "processes": 4,
+      "operations_each": 10000,
+      "repeats": 3,
+      "cpus": 12,
+      "records": [
+        {
+          "variant": "before",
+          "repeat": 0,
+          "wall_seconds": 0.9742646250000001,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "timerfd",
+              "operations": 10000,
+              "seconds": 0.4255465,
+              "checksum": 50005000
+            },
+            {
+              "kind": "timerfd",
+              "operations": 10000,
+              "seconds": 0.6552355,
+              "checksum": 50005000
+            },
+            {
+              "kind": "timerfd",
+              "operations": 10000,
+              "seconds": 0.867711458,
+              "checksum": 50005000
+            },
+            {
+              "kind": "timerfd",
+              "operations": 10000,
+              "seconds": 0.913457917,
+              "checksum": 50005000
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 25298,
+            "cohort_stop_us": 117736,
+            "service_caller_wait_us": 32,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 160112,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 66122,
+            "worker_fd_syscalls": 33061,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 99183,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "after",
+          "repeat": 0,
+          "wall_seconds": 0.102192917,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "timerfd",
+              "operations": 10000,
+              "seconds": 0.059701333,
+              "checksum": 50005000
+            },
+            {
+              "kind": "timerfd",
+              "operations": 10000,
+              "seconds": 0.059430042,
+              "checksum": 50005000
+            },
+            {
+              "kind": "timerfd",
+              "operations": 10000,
+              "seconds": 0.060296916,
+              "checksum": 50005000
+            },
+            {
+              "kind": "timerfd",
+              "operations": 10000,
+              "seconds": 0.060130916,
+              "checksum": 50005000
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 44,
+            "cohort_stop_us": 957,
+            "service_caller_wait_us": 32,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 160109,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 79811,
+            "worker_fd_syscalls": 79811,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 159622,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "before",
+          "repeat": 1,
+          "wall_seconds": 0.9330805419999999,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "timerfd",
+              "operations": 10000,
+              "seconds": 0.411237833,
+              "checksum": 50005000
+            },
+            {
+              "kind": "timerfd",
+              "operations": 10000,
+              "seconds": 0.6408405,
+              "checksum": 50005000
+            },
+            {
+              "kind": "timerfd",
+              "operations": 10000,
+              "seconds": 0.852662209,
+              "checksum": 50005000
+            },
+            {
+              "kind": "timerfd",
+              "operations": 10000,
+              "seconds": 0.897124708,
+              "checksum": 50005000
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 1,
+          "wall_seconds": 0.09332425000000022,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "timerfd",
+              "operations": 10000,
+              "seconds": 0.058657042,
+              "checksum": 50005000
+            },
+            {
+              "kind": "timerfd",
+              "operations": 10000,
+              "seconds": 0.05852325,
+              "checksum": 50005000
+            },
+            {
+              "kind": "timerfd",
+              "operations": 10000,
+              "seconds": 0.059982459,
+              "checksum": 50005000
+            },
+            {
+              "kind": "timerfd",
+              "operations": 10000,
+              "seconds": 0.059213583,
+              "checksum": 50005000
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 2,
+          "wall_seconds": 0.09741637500000033,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "timerfd",
+              "operations": 10000,
+              "seconds": 0.058325292,
+              "checksum": 50005000
+            },
+            {
+              "kind": "timerfd",
+              "operations": 10000,
+              "seconds": 0.058190666,
+              "checksum": 50005000
+            },
+            {
+              "kind": "timerfd",
+              "operations": 10000,
+              "seconds": 0.05958275,
+              "checksum": 50005000
+            },
+            {
+              "kind": "timerfd",
+              "operations": 10000,
+              "seconds": 0.058569875,
+              "checksum": 50005000
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 2,
+          "wall_seconds": 0.9239235830000001,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "timerfd",
+              "operations": 10000,
+              "seconds": 0.408129584,
+              "checksum": 50005000
+            },
+            {
+              "kind": "timerfd",
+              "operations": 10000,
+              "seconds": 0.634175459,
+              "checksum": 50005000
+            },
+            {
+              "kind": "timerfd",
+              "operations": 10000,
+              "seconds": 0.844765541,
+              "checksum": 50005000
+            },
+            {
+              "kind": "timerfd",
+              "operations": 10000,
+              "seconds": 0.889105541,
+              "checksum": 50005000
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 3,
+          "wall_seconds": 0.9191979999999997,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "timerfd",
+              "operations": 10000,
+              "seconds": 0.409754083,
+              "checksum": 50005000
+            },
+            {
+              "kind": "timerfd",
+              "operations": 10000,
+              "seconds": 0.623080833,
+              "checksum": 50005000
+            },
+            {
+              "kind": "timerfd",
+              "operations": 10000,
+              "seconds": 0.835497709,
+              "checksum": 50005000
+            },
+            {
+              "kind": "timerfd",
+              "operations": 10000,
+              "seconds": 0.880095667,
+              "checksum": 50005000
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 3,
+          "wall_seconds": 0.09453229100000016,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "timerfd",
+              "operations": 10000,
+              "seconds": 0.056138667,
+              "checksum": 50005000
+            },
+            {
+              "kind": "timerfd",
+              "operations": 10000,
+              "seconds": 0.058966708,
+              "checksum": 50005000
+            },
+            {
+              "kind": "timerfd",
+              "operations": 10000,
+              "seconds": 0.059163792,
+              "checksum": 50005000
+            },
+            {
+              "kind": "timerfd",
+              "operations": 10000,
+              "seconds": 0.058368625,
+              "checksum": 50005000
+            }
+          ]
+        }
+      ],
+      "sha256": {
+        "baseline": "9274c33835f8fcf4f4bd25245d7ee6afed83dfcf8cb76ff8541ac446e31ca4d4",
+        "candidate": "ca1439cc1986728714da224b9c02d35c291f0edbcfe3d4e79559b3198cbfe616",
+        "fixture": "1a85a2b57164dfd7d55ee2ddf0a32b8cf187e1b6417f0277e4140c06258c2f55",
+        "rootfs": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe"
+      },
+      "native_environment": {
+        "system": "Darwin",
+        "release": "27.0.0",
+        "architecture": "arm64",
+        "logical_cpus": 12
+      },
+      "summary": {
+        "before": {
+          "loop_max_median_seconds": 0.889105541,
+          "process_wall_median_seconds": 0.9239235830000001,
+          "profile": {
+            "cohort_rounds": 25298,
+            "cohort_stop_us": 117736,
+            "service_caller_wait_us": 32,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 160112,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 66122,
+            "worker_fd_syscalls": 33061,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 99183,
+            "worker_task_resumes": 3
+          }
+        },
+        "after": {
+          "loop_max_median_seconds": 0.05958275,
+          "process_wall_median_seconds": 0.09453229100000016,
+          "profile": {
+            "cohort_rounds": 44,
+            "cohort_stop_us": 957,
+            "service_caller_wait_us": 32,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 160109,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 79811,
+            "worker_fd_syscalls": 79811,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 159622,
+            "worker_task_resumes": 3
+          }
+        }
+      }
+    },
+    "inotify": {
+      "passed": true,
+      "kind": "inotify",
+      "processes": 4,
+      "operations_each": 10000,
+      "repeats": 3,
+      "cpus": 12,
+      "records": [
+        {
+          "variant": "before",
+          "repeat": 0,
+          "wall_seconds": 0.884429792,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "inotify",
+              "operations": 10000,
+              "seconds": 0.391724708,
+              "checksum": 50005000
+            },
+            {
+              "kind": "inotify",
+              "operations": 10000,
+              "seconds": 0.615417791,
+              "checksum": 50005000
+            },
+            {
+              "kind": "inotify",
+              "operations": 10000,
+              "seconds": 0.810820542,
+              "checksum": 50005000
+            },
+            {
+              "kind": "inotify",
+              "operations": 10000,
+              "seconds": 0.843749084,
+              "checksum": 50005000
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 24776,
+            "cohort_stop_us": 131289,
+            "service_caller_wait_us": 31,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 120112,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 33294,
+            "worker_fd_syscalls": 33295,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 66589,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "after",
+          "repeat": 0,
+          "wall_seconds": 0.08366045900000008,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "inotify",
+              "operations": 10000,
+              "seconds": 0.048275667,
+              "checksum": 50005000
+            },
+            {
+              "kind": "inotify",
+              "operations": 10000,
+              "seconds": 0.047111958,
+              "checksum": 50005000
+            },
+            {
+              "kind": "inotify",
+              "operations": 10000,
+              "seconds": 0.048405458,
+              "checksum": 50005000
+            },
+            {
+              "kind": "inotify",
+              "operations": 10000,
+              "seconds": 0.047380042,
+              "checksum": 50005000
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 38,
+            "cohort_stop_us": 903,
+            "service_caller_wait_us": 34,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 120104,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 39998,
+            "worker_fd_syscalls": 79995,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 119993,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "before",
+          "repeat": 1,
+          "wall_seconds": 0.8742096660000003,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "inotify",
+              "operations": 10000,
+              "seconds": 0.388615084,
+              "checksum": 50005000
+            },
+            {
+              "kind": "inotify",
+              "operations": 10000,
+              "seconds": 0.611227209,
+              "checksum": 50005000
+            },
+            {
+              "kind": "inotify",
+              "operations": 10000,
+              "seconds": 0.805779333,
+              "checksum": 50005000
+            },
+            {
+              "kind": "inotify",
+              "operations": 10000,
+              "seconds": 0.839086,
+              "checksum": 50005000
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 1,
+          "wall_seconds": 0.08056050000000026,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "inotify",
+              "operations": 10000,
+              "seconds": 0.046439958,
+              "checksum": 50005000
+            },
+            {
+              "kind": "inotify",
+              "operations": 10000,
+              "seconds": 0.046494125,
+              "checksum": 50005000
+            },
+            {
+              "kind": "inotify",
+              "operations": 10000,
+              "seconds": 0.045184041,
+              "checksum": 50005000
+            },
+            {
+              "kind": "inotify",
+              "operations": 10000,
+              "seconds": 0.045703958,
+              "checksum": 50005000
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 2,
+          "wall_seconds": 0.0844450000000001,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "inotify",
+              "operations": 10000,
+              "seconds": 0.046872708,
+              "checksum": 50005000
+            },
+            {
+              "kind": "inotify",
+              "operations": 10000,
+              "seconds": 0.046133666,
+              "checksum": 50005000
+            },
+            {
+              "kind": "inotify",
+              "operations": 10000,
+              "seconds": 0.047407,
+              "checksum": 50005000
+            },
+            {
+              "kind": "inotify",
+              "operations": 10000,
+              "seconds": 0.0468985,
+              "checksum": 50005000
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 2,
+          "wall_seconds": 0.8665543749999998,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "inotify",
+              "operations": 10000,
+              "seconds": 0.386988542,
+              "checksum": 50005000
+            },
+            {
+              "kind": "inotify",
+              "operations": 10000,
+              "seconds": 0.604959208,
+              "checksum": 50005000
+            },
+            {
+              "kind": "inotify",
+              "operations": 10000,
+              "seconds": 0.796992709,
+              "checksum": 50005000
+            },
+            {
+              "kind": "inotify",
+              "operations": 10000,
+              "seconds": 0.83032775,
+              "checksum": 50005000
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 3,
+          "wall_seconds": 0.8765146249999995,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "inotify",
+              "operations": 10000,
+              "seconds": 0.39194475,
+              "checksum": 50005000
+            },
+            {
+              "kind": "inotify",
+              "operations": 10000,
+              "seconds": 0.611402042,
+              "checksum": 50005000
+            },
+            {
+              "kind": "inotify",
+              "operations": 10000,
+              "seconds": 0.80481925,
+              "checksum": 50005000
+            },
+            {
+              "kind": "inotify",
+              "operations": 10000,
+              "seconds": 0.838494917,
+              "checksum": 50005000
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 3,
+          "wall_seconds": 0.08431366699999998,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "inotify",
+              "operations": 10000,
+              "seconds": 0.046679209,
+              "checksum": 50005000
+            },
+            {
+              "kind": "inotify",
+              "operations": 10000,
+              "seconds": 0.046618292,
+              "checksum": 50005000
+            },
+            {
+              "kind": "inotify",
+              "operations": 10000,
+              "seconds": 0.046177,
+              "checksum": 50005000
+            },
+            {
+              "kind": "inotify",
+              "operations": 10000,
+              "seconds": 0.046697541,
+              "checksum": 50005000
+            }
+          ]
+        }
+      ],
+      "sha256": {
+        "baseline": "9274c33835f8fcf4f4bd25245d7ee6afed83dfcf8cb76ff8541ac446e31ca4d4",
+        "candidate": "ca1439cc1986728714da224b9c02d35c291f0edbcfe3d4e79559b3198cbfe616",
+        "fixture": "1a85a2b57164dfd7d55ee2ddf0a32b8cf187e1b6417f0277e4140c06258c2f55",
+        "rootfs": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe"
+      },
+      "native_environment": {
+        "system": "Darwin",
+        "release": "27.0.0",
+        "architecture": "arm64",
+        "logical_cpus": 12
+      },
+      "summary": {
+        "before": {
+          "loop_max_median_seconds": 0.838494917,
+          "process_wall_median_seconds": 0.8742096660000003,
+          "profile": {
+            "cohort_rounds": 24776,
+            "cohort_stop_us": 131289,
+            "service_caller_wait_us": 31,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 120112,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 33294,
+            "worker_fd_syscalls": 33295,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 66589,
+            "worker_task_resumes": 3
+          }
+        },
+        "after": {
+          "loop_max_median_seconds": 0.046697541,
+          "process_wall_median_seconds": 0.08431366699999998,
+          "profile": {
+            "cohort_rounds": 38,
+            "cohort_stop_us": 903,
+            "service_caller_wait_us": 34,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 120104,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 39998,
+            "worker_fd_syscalls": 79995,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 119993,
+            "worker_task_resumes": 3
+          }
+        }
+      }
+    }
+  },
+  "linux_native_reference": {
+    "passed": true,
+    "cases": {
+      "pipe": {
+        "passed": true,
+        "kind": "pipe",
+        "processes": 4,
+        "operations_each": 10000,
+        "repeats": 3,
+        "cpus": 6,
+        "records": [
+          {
+            "variant": "native",
+            "repeat": 1,
+            "wall_seconds": 0.02187875000001327,
+            "children": [
+              {
+                "kind": "pipe",
+                "operations": 10000,
+                "seconds": 0.019217088,
+                "checksum": 50005000
+              },
+              {
+                "kind": "pipe",
+                "operations": 10000,
+                "seconds": 0.020226753,
+                "checksum": 50005000
+              },
+              {
+                "kind": "pipe",
+                "operations": 10000,
+                "seconds": 0.020608836,
+                "checksum": 50005000
+              },
+              {
+                "kind": "pipe",
+                "operations": 10000,
+                "seconds": 0.019861879,
+                "checksum": 50005000
+              }
+            ],
+            "exit": 0
+          },
+          {
+            "variant": "native",
+            "repeat": 2,
+            "wall_seconds": 0.02094279399997845,
+            "children": [
+              {
+                "kind": "pipe",
+                "operations": 10000,
+                "seconds": 0.020020837,
+                "checksum": 50005000
+              },
+              {
+                "kind": "pipe",
+                "operations": 10000,
+                "seconds": 0.019251964,
+                "checksum": 50005000
+              },
+              {
+                "kind": "pipe",
+                "operations": 10000,
+                "seconds": 0.019831754,
+                "checksum": 50005000
+              },
+              {
+                "kind": "pipe",
+                "operations": 10000,
+                "seconds": 0.020275045,
+                "checksum": 50005000
+              }
+            ],
+            "exit": 0
+          },
+          {
+            "variant": "native",
+            "repeat": 3,
+            "wall_seconds": 0.020543878000012228,
+            "children": [
+              {
+                "kind": "pipe",
+                "operations": 10000,
+                "seconds": 0.019142797,
+                "checksum": 50005000
+              },
+              {
+                "kind": "pipe",
+                "operations": 10000,
+                "seconds": 0.018299173,
+                "checksum": 50005000
+              },
+              {
+                "kind": "pipe",
+                "operations": 10000,
+                "seconds": 0.02001092,
+                "checksum": 50005000
+              },
+              {
+                "kind": "pipe",
+                "operations": 10000,
+                "seconds": 0.019924587,
+                "checksum": 50005000
+              }
+            ],
+            "exit": 0
+          }
+        ],
+        "sha256": {
+          "native": "1a85a2b57164dfd7d55ee2ddf0a32b8cf187e1b6417f0277e4140c06258c2f55"
+        },
+        "native_environment": {
+          "system": "Linux",
+          "release": "7.0.0-38-generic",
+          "architecture": "aarch64",
+          "logical_cpus": 6
+        },
+        "summary": {
+          "native": {
+            "loop_max_median_seconds": 0.020275045,
+            "process_wall_median_seconds": 0.02094279399997845
+          }
+        },
+        "reference": "Existing Lima VZ ARM64 native Linux kernel; six vCPUs, 8 GiB configured; four benchmark processes"
+      },
+      "eventfd": {
+        "passed": true,
+        "kind": "eventfd",
+        "processes": 4,
+        "operations_each": 10000,
+        "repeats": 3,
+        "cpus": 6,
+        "records": [
+          {
+            "variant": "native",
+            "repeat": 1,
+            "wall_seconds": 0.01488568000002033,
+            "children": [
+              {
+                "kind": "eventfd",
+                "operations": 10000,
+                "seconds": 0.014313681,
+                "checksum": 50005000
+              },
+              {
+                "kind": "eventfd",
+                "operations": 10000,
+                "seconds": 0.01431389,
+                "checksum": 50005000
+              },
+              {
+                "kind": "eventfd",
+                "operations": 10000,
+                "seconds": 0.014414889,
+                "checksum": 50005000
+              },
+              {
+                "kind": "eventfd",
+                "operations": 10000,
+                "seconds": 0.014352598,
+                "checksum": 50005000
+              }
+            ],
+            "exit": 0
+          },
+          {
+            "variant": "native",
+            "repeat": 2,
+            "wall_seconds": 0.014689263000008168,
+            "children": [
+              {
+                "kind": "eventfd",
+                "operations": 10000,
+                "seconds": 0.014217431,
+                "checksum": 50005000
+              },
+              {
+                "kind": "eventfd",
+                "operations": 10000,
+                "seconds": 0.014377848,
+                "checksum": 50005000
+              },
+              {
+                "kind": "eventfd",
+                "operations": 10000,
+                "seconds": 0.014216764,
+                "checksum": 50005000
+              },
+              {
+                "kind": "eventfd",
+                "operations": 10000,
+                "seconds": 0.014195181,
+                "checksum": 50005000
+              }
+            ],
+            "exit": 0
+          },
+          {
+            "variant": "native",
+            "repeat": 3,
+            "wall_seconds": 0.014739138999999568,
+            "children": [
+              {
+                "kind": "eventfd",
+                "operations": 10000,
+                "seconds": 0.01421214,
+                "checksum": 50005000
+              },
+              {
+                "kind": "eventfd",
+                "operations": 10000,
+                "seconds": 0.014338556,
+                "checksum": 50005000
+              },
+              {
+                "kind": "eventfd",
+                "operations": 10000,
+                "seconds": 0.014294473,
+                "checksum": 50005000
+              },
+              {
+                "kind": "eventfd",
+                "operations": 10000,
+                "seconds": 0.014293639,
+                "checksum": 50005000
+              }
+            ],
+            "exit": 0
+          }
+        ],
+        "sha256": {
+          "native": "1a85a2b57164dfd7d55ee2ddf0a32b8cf187e1b6417f0277e4140c06258c2f55"
+        },
+        "native_environment": {
+          "system": "Linux",
+          "release": "7.0.0-38-generic",
+          "architecture": "aarch64",
+          "logical_cpus": 6
+        },
+        "summary": {
+          "native": {
+            "loop_max_median_seconds": 0.014377848,
+            "process_wall_median_seconds": 0.014739138999999568
+          }
+        },
+        "reference": "Existing Lima VZ ARM64 native Linux kernel; six vCPUs, 8 GiB configured; four benchmark processes"
+      },
+      "timerfd": {
+        "passed": true,
+        "kind": "timerfd",
+        "processes": 4,
+        "operations_each": 10000,
+        "repeats": 3,
+        "cpus": 6,
+        "records": [
+          {
+            "variant": "native",
+            "repeat": 1,
+            "wall_seconds": 0.014966139000023304,
+            "children": [
+              {
+                "kind": "timerfd",
+                "operations": 10000,
+                "seconds": 0.01405289,
+                "checksum": 50005000
+              },
+              {
+                "kind": "timerfd",
+                "operations": 10000,
+                "seconds": 0.014415099,
+                "checksum": 50005000
+              },
+              {
+                "kind": "timerfd",
+                "operations": 10000,
+                "seconds": 0.014524806,
+                "checksum": 50005000
+              },
+              {
+                "kind": "timerfd",
+                "operations": 10000,
+                "seconds": 0.014400349,
+                "checksum": 50005000
+              }
+            ],
+            "exit": 0
+          },
+          {
+            "variant": "native",
+            "repeat": 2,
+            "wall_seconds": 0.015463471000003892,
+            "children": [
+              {
+                "kind": "timerfd",
+                "operations": 10000,
+                "seconds": 0.014674139,
+                "checksum": 50005000
+              },
+              {
+                "kind": "timerfd",
+                "operations": 10000,
+                "seconds": 0.014653348,
+                "checksum": 50005000
+              },
+              {
+                "kind": "timerfd",
+                "operations": 10000,
+                "seconds": 0.01503168,
+                "checksum": 50005000
+              },
+              {
+                "kind": "timerfd",
+                "operations": 10000,
+                "seconds": 0.014884639,
+                "checksum": 50005000
+              }
+            ],
+            "exit": 0
+          },
+          {
+            "variant": "native",
+            "repeat": 3,
+            "wall_seconds": 0.014562389000019493,
+            "children": [
+              {
+                "kind": "timerfd",
+                "operations": 10000,
+                "seconds": 0.014022724,
+                "checksum": 50005000
+              },
+              {
+                "kind": "timerfd",
+                "operations": 10000,
+                "seconds": 0.013950641,
+                "checksum": 50005000
+              },
+              {
+                "kind": "timerfd",
+                "operations": 10000,
+                "seconds": 0.014055724,
+                "checksum": 50005000
+              },
+              {
+                "kind": "timerfd",
+                "operations": 10000,
+                "seconds": 0.014055432,
+                "checksum": 50005000
+              }
+            ],
+            "exit": 0
+          }
+        ],
+        "sha256": {
+          "native": "1a85a2b57164dfd7d55ee2ddf0a32b8cf187e1b6417f0277e4140c06258c2f55"
+        },
+        "native_environment": {
+          "system": "Linux",
+          "release": "7.0.0-38-generic",
+          "architecture": "aarch64",
+          "logical_cpus": 6
+        },
+        "summary": {
+          "native": {
+            "loop_max_median_seconds": 0.014524806,
+            "process_wall_median_seconds": 0.014966139000023304
+          }
+        },
+        "reference": "Existing Lima VZ ARM64 native Linux kernel; six vCPUs, 8 GiB configured; four benchmark processes"
+      },
+      "inotify": {
+        "passed": true,
+        "kind": "inotify",
+        "processes": 4,
+        "operations_each": 10000,
+        "repeats": 3,
+        "cpus": 6,
+        "records": [
+          {
+            "variant": "native",
+            "repeat": 1,
+            "wall_seconds": 0.01565972100002,
+            "children": [
+              {
+                "kind": "inotify",
+                "operations": 10000,
+                "seconds": 0.015164013,
+                "checksum": 50005000
+              },
+              {
+                "kind": "inotify",
+                "operations": 10000,
+                "seconds": 0.015073555,
+                "checksum": 50005000
+              },
+              {
+                "kind": "inotify",
+                "operations": 10000,
+                "seconds": 0.01514568,
+                "checksum": 50005000
+              },
+              {
+                "kind": "inotify",
+                "operations": 10000,
+                "seconds": 0.015156888,
+                "checksum": 50005000
+              }
+            ],
+            "exit": 0
+          },
+          {
+            "variant": "native",
+            "repeat": 2,
+            "wall_seconds": 0.015418596000017715,
+            "children": [
+              {
+                "kind": "inotify",
+                "operations": 10000,
+                "seconds": 0.014911306,
+                "checksum": 50005000
+              },
+              {
+                "kind": "inotify",
+                "operations": 10000,
+                "seconds": 0.015004597,
+                "checksum": 50005000
+              },
+              {
+                "kind": "inotify",
+                "operations": 10000,
+                "seconds": 0.01500918,
+                "checksum": 50005000
+              },
+              {
+                "kind": "inotify",
+                "operations": 10000,
+                "seconds": 0.014983305,
+                "checksum": 50005000
+              }
+            ],
+            "exit": 0
+          },
+          {
+            "variant": "native",
+            "repeat": 3,
+            "wall_seconds": 0.0154216379999923,
+            "children": [
+              {
+                "kind": "inotify",
+                "operations": 10000,
+                "seconds": 0.014964181,
+                "checksum": 50005000
+              },
+              {
+                "kind": "inotify",
+                "operations": 10000,
+                "seconds": 0.01491139,
+                "checksum": 50005000
+              },
+              {
+                "kind": "inotify",
+                "operations": 10000,
+                "seconds": 0.014989972,
+                "checksum": 50005000
+              },
+              {
+                "kind": "inotify",
+                "operations": 10000,
+                "seconds": 0.014977347,
+                "checksum": 50005000
+              }
+            ],
+            "exit": 0
+          }
+        ],
+        "sha256": {
+          "native": "1a85a2b57164dfd7d55ee2ddf0a32b8cf187e1b6417f0277e4140c06258c2f55"
+        },
+        "native_environment": {
+          "system": "Linux",
+          "release": "7.0.0-38-generic",
+          "architecture": "aarch64",
+          "logical_cpus": 6
+        },
+        "summary": {
+          "native": {
+            "loop_max_median_seconds": 0.01500918,
+            "process_wall_median_seconds": 0.0154216379999923
+          }
+        },
+        "reference": "Existing Lima VZ ARM64 native Linux kernel; six vCPUs, 8 GiB configured; four benchmark processes"
+      }
+    }
+  },
+  "validation": {
+    "vfs_hostfs": {
+      "passed": 404,
+      "ignored": 1,
+      "final_affected_test_recheck": 4
+    },
+    "linux": {
+      "passed": 150,
+      "ignored": 1
+    },
+    "kernel_conformance": {
+      "passed": 245,
+      "ignored": 3
+    },
+    "mac_product": {
+      "passed": 13,
+      "ignored": 1
+    },
+    "production_ffi": {
+      "passed": 13,
+      "prepared_imports_reused": true,
+      "environments": [
+        "Alpine",
+        "Debian",
+        "custom rootfs",
+        "original systemd with two PTYs"
+      ],
+      "ffi_sha256": "d79bcc3c9ec46a558bcd87f3e75313ffc47756e4907bc677e418ec40061d3006"
+    },
+    "strict_clippy": [
+      "shared affected modules",
+      "interpreter kernel conformance",
+      "Mac product"
+    ],
+    "ios_device_static_library": {
+      "built": true,
+      "sha256": "6602a73e6e06f0a949d7fdbc1214949d15bb7ade291430f5482db39e9b850f3e",
+      "guest_artifacts": "unchanged validated binaries reused"
+    },
+    "execution_boundaries": [
+      "iPad passed",
+      "Mac passed"
+    ],
+    "physical_ipad": "skipped per user request",
+    "installed_mac_development_runner_sha256": "ca1439cc1986728714da224b9c02d35c291f0edbcfe3d4e79559b3198cbfe616"
+  },
+  "source_hashes": {
+    "fixture": "158a7c34448e59a1c52ab5edaf6cc623f745b802b1b50ec2f5759b6907f1c626",
+    "harness": "7179215e6bbe8083e61600b0c9805dfe853b01c1479c283ee7011d7ec4a167cc"
+  },
+  "reproduce": {
+    "trames": "python3 tests/performance/fd-create.py --baseline OLD_MAC_RUNNER --candidate NEW_MAC_RUNNER --fixture STATIC_ARM64_LINUX_FD_BENCH --rootfs PINNED_ALPINE_ARCHIVE --kind RESOURCE --output NEW_DISPOSABLE_OUTPUT; add --native NATIVE_MAC_FD_BENCH for pipe",
+    "linux": "python3 tests/performance/fd-create.py --native-only --native SAME_STATIC_ARM64_LINUX_FD_BENCH --kind RESOURCE --cpus 6 --output NEW_DISPOSABLE_LINUX_OUTPUT"
+  },
+  "fixture_build": {
+    "mac": "clang -O2 -Wall -Wextra -Werror tests/fixtures/fd-create-bench.c -o native-mac",
+    "linux": "clang --target=aarch64-linux-musl -O2 -Wall -Wextra -Werror -fno-stack-protector -nostdlib -static -isystem MUSL/include --ld-path=LLD MUSL/lib/crt1.o MUSL/lib/crti.o tests/fixtures/fd-create-bench.c -LMUSL/lib -lc -lgcc MUSL/lib/crtn.o -o linux",
+    "note": "The same resulting static Linux binary, verified by SHA-256, was used for both Trames versions and the native Linux-kernel reference."
+  }
+}
