@@ -1,0 +1,85 @@
+{
+  "date": "2026-11-01",
+  "channel": "physical-device development build",
+  "version": "1.4.0",
+  "version_overrides": "MARKETING_VERSION=1.4.0 and CURRENT_PROJECT_VERSION=39 in the ignored local development spec; not a public release tag.",
+  "scope": "Current shared Linux runtime and iPad interpreter, plus iOS framework linkage and terminal viewport fixes.",
+  "runtime_commit": "ed54e48800998824a4361944464386acd8274a41",
+  "mac_1_4_runtime_base": "1309faf688cd20780f4fa36d93e4f9d9ace8385f",
+  "runtime_delta": "Only the audio build recipe changes: AudioUnit is linked on macOS; iOS uses AudioToolbox. Runtime execution code is identical to the Mac 1.4.0 base.",
+  "source_sha256": {
+    "apps/ios/Trames/TerminalSession.swift": "ed2cadb24336f6fac584cccbbc4fa9a29b3dd3e9b5f98eecb6d9cd0450fb071b",
+    "apps/ios/Trames/WorkspaceKeyboardContainer.swift": "c8ce06b5ad66aad8ce304786f32fcfb088e029d568f165825ef76e9eb8605bb6",
+    "apps/ios/TramesTests/TerminalViewportTests.swift": "584841092b4b6e11965d4ff2864c731b24ecc347af71f4e1d7cdc275e28b98ae",
+    "apps/ios/project.yml": "14aa1054f555341525912bdea03297f8ee2a342a429826fde18ac833531a0aa0",
+    "runtime/crates/trames-audio/build.rs": "5d024081403a43562bf4ab3d40c14a18e4aa0172f0954a430d63a0141dd9bbee"
+  },
+  "fixes": [
+    "Link the Apple audio and video frameworks from the Xcode app target; iOS has no separate AudioUnit framework.",
+    "Anchor the workspace to UIKeyboardLayoutGuide instead of reconstructing keyboard height from notifications. The status row remains above the hardware-keyboard accessory and extended keyboard.",
+    "Fit the terminal scroll view height to complete native text rows. Leave the fractional remainder outside the scroll view so bottom clamping cannot reveal a partial history line at the top."
+  ],
+  "physical_device": {
+    "model": "iPad Air 11-inch (M3)",
+    "os": "iPadOS 27.0.1",
+    "transport": "localNetwork",
+    "existing_app_updated": true,
+    "uninstall_or_reset": false,
+    "installed_version_verified": true,
+    "same_app_group_verified": true,
+    "user_completed_developer_trust": true
+  },
+  "physical_observations": [
+    "App opens the Alpine shell. A real terminal command reports aarch64.",
+    "In build 38, seq 1 60 reaches the last prompt and clear reveals a partial history line at the top.",
+    "In build 39, seq 1 60 and clear show complete top/bottom rows without that partial history line.",
+    "The status row remains visible above the accessory; expanding and closing the original extended keyboard preserves the layout.",
+    "The app is left open at an idle terminal; Device Hub keyboard capture is restored to off."
+  ],
+  "validation": {
+    "device_rust_link": "passed",
+    "simulator_rust_link": "passed",
+    "signed_device_build": "passed",
+    "codesign_deep_strict": "passed",
+    "packaged_ipa_codesign_deep_strict": "passed",
+    "macos_audio_unit_tests": {
+      "passed": 1,
+      "failed": 0
+    },
+    "viewport_and_keyboard_tests": {
+      "passed": 7,
+      "failed": 0
+    },
+    "guest_pty_resize_test": {
+      "passed": 1,
+      "failed": 0
+    }
+  },
+  "guest_payload_sha256": {
+    "libc.so": "885b308b75e36bb402b311fba1d3f1284e6dd8d3a0bfbf88686bff1b629f9b23",
+    "libtrames_vulkan_icd.so": "d3a4025c664f17ab34245a9bf653ae6ecf372be925034498640b73983ca60682",
+    "libEGL.so.1": "7aab7ec87b8faaee13915d7727b641419475ec1a49241d8c2fd3e9bf407bfa92",
+    "Xwayland-native": "08257be95ca38b39559e90f8b0af19bf841153d9d31f2a9d493a641b8f64be34",
+    "trames-xwayland": "cc53ae46c81c314d7deea280d2d72cd1711d67403612433510fd12adf0deda11"
+  },
+  "ipa": {
+    "bytes": 128870811,
+    "sha256": "e81c08ef168d62e14ff59f8079c1365851c5de6a09858c2bdeb883bfdc899c3f",
+    "verified_files": 181,
+    "signed_bundle_preserved": true
+  },
+  "limits": [
+    "This is a developer-signed device package; signing profiles and device identifiers remain local.",
+    "iPad executes guest CPU instructions with the interpreter, while the Mac benchmark uses HVF. No iPad Geekbench score or speed comparison is claimed.",
+    "These are targeted build/layout checks, not new full Firefox, GPU, audio/video, File Provider editing or distribution acceptance. Unchanged runtime suites are reused."
+  ],
+  "build_settings": {
+    "xcode": "27.2 (27B52)",
+    "metal_toolchain": "27B47",
+    "device_rust": "aarch64-apple-ios, release, debug symbols",
+    "app_configuration": "Release",
+    "jit": false,
+    "file_provider_embedded": true
+  },
+  "build": "39"
+}

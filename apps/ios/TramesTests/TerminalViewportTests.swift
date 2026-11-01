@@ -82,6 +82,29 @@ final class TerminalViewportTests: XCTestCase {
         XCTAssertEqual(view.getTerminal().cols, portraitColumns)
     }
 
+    func testHostKeepsWholeRowsAndAlignedScrollbackAfterResizeAndClear() {
+        let terminal=makeViewport()
+        let host=TerminalViewportHost(terminal:terminal)
+        // Use the hosted viewport: UIKit must retain the spare space outside
+        // the scroll view even as keyboard/window geometry changes.
+        defer {terminal.updateUiClosed()}
+        for size in [CGSize(width:320,height:160),CGSize(width:640,height:321.5),
+                     CGSize(width:319.75,height:83.25),CGSize(width:320,height:160)] {
+            host.frame.size=size;host.setNeedsLayout();host.layoutIfNeeded()
+            terminal.feed(text:(0..<60).map {"row-\($0)\r\n"}.joined())
+            terminal.layoutIfNeeded()
+            let rowHeight=terminal.getOptimalFrameSize().height/CGFloat(terminal.getTerminal().rows)
+            XCTAssertEqual(terminal.bounds.height,terminal.getOptimalFrameSize().height,accuracy:0.001)
+            XCTAssertLessThanOrEqual(terminal.frame.maxY,host.bounds.height)
+            XCTAssertLessThan(host.bounds.height-terminal.frame.maxY,rowHeight)
+            XCTAssertEqual(terminal.bounds.minY/rowHeight,(terminal.bounds.minY/rowHeight).rounded(),accuracy:0.001)
+            terminal.feed(text:"\u{1b}[H\u{1b}[2J")
+            terminal.layoutIfNeeded()
+            XCTAssertEqual(terminal.bounds.minY/rowHeight,(terminal.bounds.minY/rowHeight).rounded(),accuracy:0.001)
+            XCTAssertEqual(terminal.bounds.width,size.width)
+        }
+    }
+
     func testWideOutputAndContentSizeChangesCannotEnableHorizontalScrolling() {
         let view = makeViewport()
         defer { view.updateUiClosed() }

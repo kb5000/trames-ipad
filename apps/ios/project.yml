@@ -57,6 +57,10 @@ targets:
       - sdk: IOSurface.framework
       - sdk: CoreGraphics.framework
       - sdk: CoreVideo.framework
+      - sdk: CoreMedia.framework
+      - sdk: VideoToolbox.framework
+      - sdk: AudioToolbox.framework
+      - sdk: AVFoundation.framework
       - sdk: MetalPerformanceShaders.framework
       - sdk: UIKit.framework
     settings:

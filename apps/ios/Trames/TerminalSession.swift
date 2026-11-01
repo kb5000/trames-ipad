@@ -311,15 +311,21 @@ final class TerminalViewportHost:UIView {
     init(terminal:TerminalViewport) {
         self.terminal=terminal
         super.init(frame:.zero)
+        backgroundColor=terminal.backgroundColor
         clipsToBounds=true
         terminal.frame=bounds
-        terminal.autoresizingMask=[.flexibleWidth,.flexibleHeight]
         addSubview(terminal)
     }
     required init?(coder:NSCoder) {fatalError("init(coder:) has not been implemented")}
     override func layoutSubviews() {
         super.layoutSubviews()
-        if terminal.frame != bounds {terminal.frame=bounds;terminal.setNeedsLayout()}
+        let rowHeight=terminal.getOptimalFrameSize().height/CGFloat(terminal.getTerminal().rows)
+        // A taller fractional-row viewport makes UIScrollView clamp its bottom
+        // offset between rows, exposing a clipped history line at the top.
+        // Keep the remainder outside the scroll view, below the last full row.
+        let height=floor(bounds.height/rowHeight)*rowHeight
+        let frame=CGRect(x:0,y:0,width:bounds.width,height:height)
+        if terminal.frame != frame {terminal.frame=frame;terminal.setNeedsLayout()}
         terminal.layoutIfNeeded()
     }
 }
