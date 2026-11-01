@@ -409,7 +409,7 @@
       "Physical A/V offset and long-term drift are unmeasured."
     ]
   },
-  "runtime_revision": "e812f7f3f464cb9dcfd6a002351410b1f1c0b58e",
+  "runtime_revision": "9e793db8693fbbca5e888b5537d0b6ececff6614",
   "verification": {
     "runtime_macos_ci": "7/7 passed; first four successful steps reused after local network permission retry",
     "runtime_arm64_linux_ci": "7/7 passed",
@@ -421,8 +421,8 @@
     "mac_product_ci": "11/11 passed cumulatively: build/test steps 1-9 plus packaging steps 10-11 retried after preserving conflicting old archives",
     "local_ci_cache": "Native .m/.mm sources now participate in input fingerprints; verified audio.mm inclusion, no source change requiring repeated runtime tests"
   },
-  "mac_revision": "385fa64b27a049c7b568d90238e1bcb7129819d9",
-  "installed_dev_sha256": "ebaa16f41c795b59ae676354eaec27065ff69453a44f9a46f2be3cb67b00d7a6",
+  "mac_revision": "9c48498d0910d907f49868337b5a1664f4d1d4de",
+  "installed_dev_sha256": "b6fa40fe17a60b075d593ebc322ff434c4a5b95b5be6afb1e80e89e229902764",
   "descriptor_followup": {
     "failure": {
       "requested_rights": 3,
@@ -686,5 +686,271 @@
         "next_candidate": "Joined memory-view preparation and repeated backing-domain validation. Per-page change identities in host MAP_PRIVATE mappings are a code-inspection candidate, not a measured attribution of all domain checks."
       }
     }
+  },
+  "private_page_in_and_stream_followup": {
+    "date": "2026-11-01",
+    "runtime_revision": "9e793db8693fbbca5e888b5537d0b6ececff6614",
+    "changes": [
+      "Host MAP_PRIVATE page-in metadata grouped by mapping; physical identities, COW, EOF and source retention unchanged.",
+      "Large AF_UNIX stream sendmsg returns bounded short writes instead of EMSGSIZE at the 1 MiB staging boundary.",
+      "Previously pending Unix msghdr/iovec batching and cross-page/fault regression integrated with owner authorization."
+    ],
+    "method": "Same cloned Alpine/Firefox 151.0.3 stores and copied profiles, 12 CPUs, same 1080p60 H.264/AAC fixture. Instrumented before/after followed by uninstrumented reverse order. Short ordered observations, not a randomized universal speedup or physical display capture. ABI batching was added after these measurements.",
+    "observations": {
+      "before": {
+        "startup": {
+          "port_ready_s": 4.249361334,
+          "video_width_ready_s": 23.700474625
+        },
+        "stages": {
+          "0-5": {
+            "callbacks": 28,
+            "max_ms": 2168.119999999999,
+            "over100": 3
+          },
+          "5-10": {
+            "callbacks": 114,
+            "max_ms": 55.52000000000044,
+            "over100": 0
+          },
+          "10-15": {
+            "callbacks": 116,
+            "max_ms": 49.89999999999782,
+            "over100": 0
+          }
+        },
+        "accepted_fps": 44.099090124194724,
+        "callback_fps": 17.20130172013017,
+        "frame_gaps": {
+          "count": 259,
+          "p50_ms": 43.11999999999898,
+          "p95_ms": 48.02000000000044,
+          "p99_ms": 558.6000000000022,
+          "max_ms": 2168.119999999999,
+          "over_50_ms": 5,
+          "over_100_ms": 3
+        },
+        "volume_changes": [
+          {
+            "volume": 0.05,
+            "setter_roundtrip_ms": 22.301583999997376
+          },
+          {
+            "volume": 0.12,
+            "setter_roundtrip_ms": 19.23045800000267
+          },
+          {
+            "volume": 0.03,
+            "setter_roundtrip_ms": 23.979375000003245
+          },
+          {
+            "volume": 0.08,
+            "setter_roundtrip_ms": 83.82079100000084
+          }
+        ],
+        "runtime_metrics": {
+          "syscalls": 1659772,
+          "context_switches": 516094,
+          "hardware_mapped_bytes": 56786944,
+          "guest_resident_bytes": 234762240,
+          "vm_checkpoint_groups": 20817,
+          "vm_checkpoint_spaces": 20817,
+          "backing_domain_checks": 242966126,
+          "backing_page_checks": 2077906,
+          "parallel_memory_us": 11360097,
+          "instruction_count": null
+        }
+      },
+      "after": {
+        "startup": {
+          "port_ready_s": 3.805037333999998,
+          "video_width_ready_s": 20.074332125000005
+        },
+        "stages": {
+          "0-5": {
+            "callbacks": 76,
+            "max_ms": 1647.1599999999999,
+            "over100": 2
+          },
+          "5-10": {
+            "callbacks": 116,
+            "max_ms": 66.23999999999796,
+            "over100": 0
+          },
+          "10-15": {
+            "callbacks": 118,
+            "max_ms": 46.61999999999898,
+            "over100": 0
+          }
+        },
+        "accepted_fps": 52.088877062267166,
+        "callback_fps": 20.75572112825971,
+        "frame_gaps": {
+          "count": 311,
+          "p50_ms": 42.5,
+          "p95_ms": 45.97999999999956,
+          "p99_ms": 79.06000000000131,
+          "max_ms": 1647.1599999999999,
+          "over_50_ms": 6,
+          "over_100_ms": 2
+        },
+        "volume_changes": [
+          {
+            "volume": 0.05,
+            "setter_roundtrip_ms": 12.411416999995595
+          },
+          {
+            "volume": 0.12,
+            "setter_roundtrip_ms": 20.72858299999325
+          },
+          {
+            "volume": 0.03,
+            "setter_roundtrip_ms": 14.663583000000813
+          },
+          {
+            "volume": 0.08,
+            "setter_roundtrip_ms": 29.322415999999407
+          }
+        ],
+        "runtime_metrics": {
+          "syscalls": 1760321,
+          "context_switches": 543442,
+          "hardware_mapped_bytes": 58146816,
+          "guest_resident_bytes": 235786240,
+          "vm_checkpoint_groups": 21452,
+          "vm_checkpoint_spaces": 21452,
+          "backing_domain_checks": 37439747,
+          "backing_page_checks": 1777465,
+          "parallel_memory_us": 5912219,
+          "instruction_count": null
+        }
+      },
+      "after-plain": {
+        "startup": {
+          "port_ready_s": 3.8286504999999997,
+          "video_width_ready_s": 20.590270792000002
+        },
+        "stages": {
+          "0-5": {
+            "callbacks": 25,
+            "max_ms": 2035.6200000000026,
+            "over100": 6
+          },
+          "5-10": {
+            "callbacks": 115,
+            "max_ms": 258.1200000000026,
+            "over100": 1
+          },
+          "10-15": {
+            "callbacks": 117,
+            "max_ms": 48.38000000000102,
+            "over100": 0
+          }
+        },
+        "accepted_fps": 43.17168895097453,
+        "callback_fps": 17.09572274329808,
+        "frame_gaps": {
+          "count": 257,
+          "p50_ms": 42.63999999999942,
+          "p95_ms": 48.07999999999811,
+          "p99_ms": 321,
+          "max_ms": 2035.6200000000026,
+          "over_50_ms": 7,
+          "over_100_ms": 7
+        },
+        "volume_changes": [
+          {
+            "volume": 0.05,
+            "setter_roundtrip_ms": 13.686415999998758
+          },
+          {
+            "volume": 0.12,
+            "setter_roundtrip_ms": 13.60237500000494
+          },
+          {
+            "volume": 0.03,
+            "setter_roundtrip_ms": 15.33524999999969
+          },
+          {
+            "volume": 0.08,
+            "setter_roundtrip_ms": 20.30749999999415
+          }
+        ]
+      },
+      "before-plain": {
+        "startup": {
+          "port_ready_s": 4.106254749999998,
+          "video_width_ready_s": 24.221715957999997
+        },
+        "stages": {
+          "0-5": {
+            "callbacks": 61,
+            "max_ms": 2337.6800000000003,
+            "over100": 2
+          },
+          "5-10": {
+            "callbacks": 112,
+            "max_ms": 125.73999999999796,
+            "over100": 1
+          },
+          "10-15": {
+            "callbacks": 116,
+            "max_ms": 49.460000000002765,
+            "over100": 0
+          }
+        },
+        "accepted_fps": 48.91555145362252,
+        "callback_fps": 19.31570967103962,
+        "frame_gaps": {
+          "count": 293,
+          "p50_ms": 43.18000000000029,
+          "p95_ms": 48.81999999999971,
+          "p99_ms": 116.28000000000247,
+          "max_ms": 2337.6800000000003,
+          "over_50_ms": 10,
+          "over_100_ms": 3
+        },
+        "volume_changes": [
+          {
+            "volume": 0.05,
+            "setter_roundtrip_ms": 24.837874999988685
+          },
+          {
+            "volume": 0.12,
+            "setter_roundtrip_ms": 29.192584000000465
+          },
+          {
+            "volume": 0.03,
+            "setter_roundtrip_ms": 26.841042000000925
+          },
+          {
+            "volume": 0.08,
+            "setter_roundtrip_ms": 38.65316700000676
+          }
+        ]
+      }
+    },
+    "ipc": {
+      "observed_log": "Child 136 main/ImageBridge threads: pipe error: Message too large; Exiting due to channel error on the original local video page.",
+      "regression": "Owner/worker >2 MiB transfer through short writes; complete payload, SCM_RIGHTS exactly once, datagram/SEQPACKET atomic-message errors retained.",
+      "browser_control": "65,536 / 614,400 / 2,097,152-character document-title trials survived on both before/after binaries. This did not reproduce the original failure and is not a negative control.",
+      "remaining": "A deterministic transport defect consistent with the exit log is fixed. No proof that all occasional tab crashes share this cause; longer playback acceptance remains necessary."
+    },
+    "verification": {
+      "runtime_macos_ci": "7/7 passed after final ABI integration",
+      "runtime_arm64_linux_ci": "7/7 passed after final ABI integration",
+      "vfs_mapping_regressions": "Concurrent page-ins, aliases/COW, ELF permissions/EOF, truncation/regrowth, expired range history; one domain and five changed pages for 512-page test plus alias.",
+      "linux_stream_regression": "passed on both platforms",
+      "kernel_conformance": "239 passed, 3 ignored cumulatively; 6 loopback cases retried with network permission before ABI-only follow-up; final runtime CI covers same session implementation",
+      "ipad_product_clippy": "passed after final ABI integration",
+      "ipad_device_compile": "passed after final ABI integration",
+      "multiple_terminals": "PASS: 3 PTYs, shared files/processes, isolated cwd/env, resize, Ctrl+C, backpressure, close/exit/reopen/cancellation, rebuilt final-source FFI",
+      "mac_product_ci": "11/11 passed cumulatively: full pre-ABI product run plus affected ABI steps 4-5 and 8-11; unchanged checks reused"
+    },
+    "remaining": [
+      "Video-dimension readiness improved by about 3.6 seconds in both paired orders.",
+      "Initial callback gaps still exceeded two seconds; early-playback accepted FPS was mixed between pairs, not a stable improvement.",
+      "No new ordinary byte lock, memory barrier, coordinator or service thread."
+    ]
   }
 }

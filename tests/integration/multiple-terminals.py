@@ -50,7 +50,8 @@ with tempfile.TemporaryDirectory(prefix='trames-terminals-') as d:
     try:
         terminals=[1,api.trames_session_terminal_open(handle),api.trames_session_terminal_open(handle)]
         assert terminals==[1,2,3],terminals
-        wait(lambda: all(status(t)['phase']=='running' for t in terminals))
+        wait(lambda: all(status(t)['phase']=='running' for t in terminals),
+             seconds=float(os.environ.get('TRAMES_TEST_STARTUP_TIMEOUT', '20')))
         # Match an actual complete output frame, never the command's TTY echo.
         for t in terminals:run(t,f"stty -echo; printf '\\nREADY_{t}\\n'",f'\r\nREADY_{t}\r\n')
         run(1,"cd /tmp; export PRIVATE_VAR=one; printf shared-content >/tmp/shared; echo ONE_READY",'ONE_READY')
