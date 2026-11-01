@@ -409,7 +409,7 @@
       "Physical A/V offset and long-term drift are unmeasured."
     ]
   },
-  "runtime_revision": "dd35e7fa6a142b687648e8d5ecef5ce9fc1eff65",
+  "runtime_revision": "e812f7f3f464cb9dcfd6a002351410b1f1c0b58e",
   "verification": {
     "runtime_macos_ci": "7/7 passed; first four successful steps reused after local network permission retry",
     "runtime_arm64_linux_ci": "7/7 passed",
@@ -421,6 +421,121 @@
     "mac_product_ci": "11/11 passed cumulatively: build/test steps 1-9 plus packaging steps 10-11 retried after preserving conflicting old archives",
     "local_ci_cache": "Native .m/.mm sources now participate in input fingerprints; verified audio.mm inclusion, no source change requiring repeated runtime tests"
   },
-  "mac_revision": "6bd3dfe",
-  "installed_dev_sha256": "5d66085af5a1a204d178e6703fdcbfd0be6998dbe67c4ffa4e15a17470b15750"
+  "mac_revision": "385fa64b27a049c7b568d90238e1bcb7129819d9",
+  "installed_dev_sha256": "ebaa16f41c795b59ae676354eaec27065ff69453a44f9a46f2be3cb67b00d7a6",
+  "descriptor_followup": {
+    "failure": {
+      "requested_rights": 3,
+      "control_buffer_fd_capacity": 204,
+      "installed_rights": 2,
+      "occupied_slots": 254,
+      "old_ceiling": 256,
+      "effect": "SCM_RIGHTS truncation, invalid FD and abnormal video-bridge shutdown"
+    },
+    "new_ceiling": 1048576,
+    "allocation": "Sparse membership, shared masks sized to populated words, free intervals under existing table lock, actual-only io_uring capture",
+    "steady_parent_fds": 165,
+    "hardware_decode_confirmed": true,
+    "post_fix": {
+      "accepted_fps": 59.22968139089926,
+      "callback_fps": 23.20938357873721,
+      "frame_gaps": {
+        "count": 279,
+        "p50_ms": 42.9199999999837,
+        "p95_ms": 47.27999999996973,
+        "p99_ms": 50.35999999998603,
+        "max_ms": 61.820000000006985,
+        "over_50_ms": 3,
+        "over_100_ms": 0
+      },
+      "media_speed": 1.0019826137592547,
+      "hover_accepted_fps": 58.07168657960544,
+      "hover_callbacks_fps": 22.506251736593498,
+      "hover_max_frame_gap_ms": 208.14000000001397,
+      "hover_moves": 356
+    },
+    "discarded_async_presentation": {
+      "accepted_fps": 59.3424885559717,
+      "callback_fps": 22.971285892634207,
+      "frame_gaps": {
+        "count": 276,
+        "p50_ms": 42.95999999999185,
+        "p95_ms": 47.66000000000349,
+        "p99_ms": 62.04000000000087,
+        "max_ms": 97.13999999999942,
+        "over_50_ms": 3,
+        "over_100_ms": 0
+      },
+      "media_speed": 1.0029355805243445,
+      "hover_accepted_fps": 57.197330791229746,
+      "hover_callbacks_fps": 22.1980117118344,
+      "hover_max_frame_gap_ms": 204.52000000000407,
+      "hover_moves": 355
+    },
+    "limits": "Guest pointer actions exercise Gecko hover; native mouse-post permission was unavailable. User native-input feedback and physical scanout cadence remain separate acceptance. Async presentation showed no stable benefit and was reverted.",
+    "verification": {
+      "vfs": "357 passed, 1 ignored",
+      "runtime_macos_ci": "7/7 passed; loopback tests rerun with local network access",
+      "runtime_arm64_linux_ci": "7/7 passed",
+      "kernel_conformance": "239 passed, 3 ignored",
+      "ipad_device_compile": "passed",
+      "mac_product_ci": "11/11 passed"
+    },
+    "native_presented_callback_followup": {
+      "steady": {
+        "elapsed_host": 12.192755416,
+        "successful_drawable_callbacks": 674,
+        "callback_rate": 55.27872716248702,
+        "presented_gap_max_ms": 74.92358300000035,
+        "presented_gap_p95_ms": 33.28520800000234,
+        "gpu_completions": 674,
+        "hidden": 0
+      },
+      "guest_hover": {
+        "elapsed_host": 7.608073542000001,
+        "successful_drawable_callbacks": 420,
+        "callback_rate": 55.204513689491876,
+        "presented_gap_max_ms": 241.674500000002,
+        "presented_gap_p95_ms": 25.066666000000737,
+        "gpu_completions": 427,
+        "hidden": 0
+      },
+      "volume": {
+        "elapsed_host": 7.167870499999999,
+        "successful_drawable_callbacks": 426,
+        "callback_rate": 59.431877291867934,
+        "presented_gap_max_ms": 66.64520799999707,
+        "presented_gap_p95_ms": 25.054916999991406,
+        "gpu_completions": 426,
+        "hidden": 0
+      }
+    },
+    "native_pointer_followup": {
+      "method": "Private AppKit timer delivered NSEvent mouseMoved through the canvas at 120 Hz; no OS event-post permission or shipping test hook",
+      "events_sent": 2400,
+      "native_callback_total_ms": 7.804,
+      "native_callback_max_ms": 0.015,
+      "page_moves_observed": 854,
+      "accepted_fps": 57.30519944036775,
+      "callback_fps": 22.014105016703308,
+      "frame_gaps": {
+        "count": 770,
+        "p50_ms": 43.799999999995634,
+        "p95_ms": 51,
+        "p99_ms": 69.45999999999913,
+        "max_ms": 500,
+        "over_50_ms": 42,
+        "over_100_ms": 6
+      },
+      "page_heartbeat_delays_over_100_ms": [
+        {
+          "wall": 40351,
+          "gap": 323
+        }
+      ],
+      "warm_native_pointer_presented_callbacks_hz": 59.1,
+      "warm_native_pointer_max_presented_gap_ms": 91.654583,
+      "limits": "Ordered short runs; cold startup is slow and occasional gaps remain. Native callbacks measure drawable presentation notifications, not independent display capture. Trace logging may perturb timing; no claim that all user-visible stutters are fixed."
+    }
+  }
 }
