@@ -536,6 +536,155 @@
       "warm_native_pointer_presented_callbacks_hz": 59.1,
       "warm_native_pointer_max_presented_gap_ms": 91.654583,
       "limits": "Ordered short runs; cold startup is slow and occasional gaps remain. Native callbacks measure drawable presentation notifications, not independent display capture. Trace logging may perturb timing; no claim that all user-visible stutters are fixed."
+    },
+    "final_normal_playback": {
+      "elapsed_browser": 35.03,
+      "accepted_fps": 56.83699685983443,
+      "callback_fps": 22.352269483300027,
+      "frame_gaps": {
+        "count": 783,
+        "p50_ms": 43.39999999999418,
+        "p95_ms": 51,
+        "p99_ms": 77.81999999999243,
+        "max_ms": 306.3199999999997,
+        "over_50_ms": 47,
+        "over_100_ms": 5
+      },
+      "volume_changes": [
+        {
+          "volume": 0.05,
+          "setter_roundtrip_ms": 45.73570800000226
+        },
+        {
+          "volume": 0.12,
+          "setter_roundtrip_ms": 15.95400000000069
+        },
+        {
+          "volume": 0.03,
+          "setter_roundtrip_ms": 20.28045899999853
+        },
+        {
+          "volume": 0.08,
+          "setter_roundtrip_ms": 35.91787500000265
+        }
+      ],
+      "volume_frame_gaps": {
+        "count": 48,
+        "p50_ms": 50,
+        "p95_ms": 51,
+        "p99_ms": 125,
+        "max_ms": 125,
+        "over_50_ms": 9,
+        "over_100_ms": 1
+      }
+    },
+    "owner_feedback": "Initially stutters after load; substantially better afterwards (2026-11-01).",
+    "cold_start_followup": {
+      "cache_pair_method": "Sequential private/host Mesa shader-cache placement; APFS-cloned stores and copied profiles from the same snapshot, identical initial 102-file/2061080-byte cache, installed Dev binary. No cache relocation shipped. Ordered short observations, not a randomized speedup claim.",
+      "cache_pair": {
+        "private": {
+          "startup": {
+            "port_ready_s": 4.059435125,
+            "video_width_ready_s": 23.61185175
+          },
+          "stages": {
+            "0-5": {
+              "callbacks": 57,
+              "max_ms": 637.1599999999999,
+              "over100": 9
+            },
+            "5-10": {
+              "callbacks": 114,
+              "max_ms": 114.08000000000175,
+              "over100": 1
+            },
+            "10-20": {
+              "callbacks": 229,
+              "max_ms": 132.6999999999971,
+              "over100": 1
+            },
+            "20-30": {
+              "callbacks": 227,
+              "max_ms": 198.5,
+              "over100": 1
+            }
+          },
+          "accepted_fps": 52.971533211253536,
+          "frame_gaps": {
+            "count": 627,
+            "p50_ms": 43.13999999999942,
+            "p95_ms": 48.47999999999956,
+            "p99_ms": 142.5,
+            "max_ms": 637.1599999999999,
+            "over_50_ms": 21,
+            "over_100_ms": 12
+          }
+        },
+        "host": {
+          "startup": {
+            "port_ready_s": 4.002641374999996,
+            "video_width_ready_s": 22.809247291000005
+          },
+          "stages": {
+            "0-5": {
+              "callbacks": 14,
+              "max_ms": 1185.800000000003,
+              "over100": 7
+            },
+            "5-10": {
+              "callbacks": 111,
+              "max_ms": 193.3199999999997,
+              "over100": 1
+            },
+            "10-20": {
+              "callbacks": 231,
+              "max_ms": 73.92000000000189,
+              "over100": 0
+            },
+            "20-30": {
+              "callbacks": 230,
+              "max_ms": 67.12000000000262,
+              "over100": 0
+            }
+          },
+          "accepted_fps": 49.72026108964966,
+          "frame_gaps": {
+            "count": 586,
+            "p50_ms": 43.13999999999942,
+            "p95_ms": 48.18000000000029,
+            "p99_ms": 201.91999999999825,
+            "max_ms": 1185.800000000003,
+            "over_50_ms": 15,
+            "over_100_ms": 8
+          }
+        }
+      },
+      "driver_native_compile_summary": {
+        "method": "MoltenVK lifecycle performance tracking; includes startup and later playback, therefore not a startup-only wall-time breakdown",
+        "spirv_to_msl_count": 10,
+        "spirv_to_msl_average_ms": 0.694,
+        "msl_library_count": 75,
+        "msl_library_average_ms": 0.025,
+        "metal_pipeline_count": 86,
+        "metal_pipeline_average_ms": 0.081,
+        "conclusion": "Recorded native conversions/compiles are milliseconds, insufficient to explain the observed multi-second startup stall."
+      },
+      "runtime_diagnostic": {
+        "method": "Existing --metrics; 39.1-second session includes startup and 15-second playback interval. Instrumentation perturbs timing; diagnostic totals are not a normal-performance score or an additive wall-time partition.",
+        "parallel_memory_us": 10122527,
+        "parallel_dispatch_us": 3782802,
+        "parallel_stop_us": 2765831,
+        "backing_domain_checks": 229365905,
+        "backing_page_checks": 2019648,
+        "vm_checkpoint_groups": 21709,
+        "syscalls": 1510740,
+        "context_switches": 445976,
+        "gpu_wait_us": 322929,
+        "gpu_compiles": 68,
+        "hardware_page_ins": 0,
+        "hardware_page_out_bytes": 0,
+        "next_candidate": "Joined memory-view preparation and repeated backing-domain validation. Per-page change identities in host MAP_PRIVATE mappings are a code-inspection candidate, not a measured attribution of all domain checks."
+      }
     }
   }
 }
