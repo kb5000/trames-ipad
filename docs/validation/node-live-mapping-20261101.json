@@ -1,0 +1,131 @@
+{
+  "date": "2026-11-01",
+  "runtime_before": "ed54e48800998824a4361944464386acd8274a41",
+  "runtime_after": "2d937623c641c2be8fe70ecdeb3f571df8b62745",
+  "node_version": "22.23.4-r0",
+  "node_apk_sha256": "5abb3b0c666309289ef610b4d8a0d2a395ec32040acdc3940258b196920634bc",
+  "hybrid_musl_sha256": "885b308b75e36bb402b311fba1d3f1284e6dd8d3a0bfbf88686bff1b629f9b23",
+  "host_arch": "aarch64",
+  "host_page_bytes": 16384,
+  "memory_budget_mib": 4096,
+  "process_memory_budget_mib": 4096,
+  "diagnosis": {
+    "guest_fault_pc": "0x7002667c",
+    "instruction": "str x20, [x0]",
+    "function": "musl mallocng alloc_slot",
+    "cause": "A reservation-only munmap rotated the live anonymous publication owner without marking cached anonymous snapshots dirty; later mmap succeeded but the caller View missed its mapping.",
+    "temporary_instrumentation_removed": true
+  },
+  "matrix_before": [
+    {
+      "case": "direct-8cpu",
+      "exit": 139,
+      "seconds": 0.273210625,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "case": "shell-8cpu",
+      "exit": 139,
+      "seconds": 0.26050587499999994,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "case": "direct-1cpu",
+      "exit": 0,
+      "seconds": 0.890920125,
+      "stdout": "1\n",
+      "stderr": ""
+    },
+    {
+      "case": "shell-1cpu",
+      "exit": 0,
+      "seconds": 0.872228792,
+      "stdout": "1\n",
+      "stderr": ""
+    }
+  ],
+  "matrix_after": [
+    {
+      "case": "direct-8cpu",
+      "exit": 0,
+      "seconds": 1.9940605,
+      "stdout": "1\n",
+      "stderr": ""
+    },
+    {
+      "case": "shell-8cpu",
+      "exit": 0,
+      "seconds": 1.7137551659999999,
+      "stdout": "1\n",
+      "stderr": ""
+    },
+    {
+      "case": "direct-1cpu",
+      "exit": 0,
+      "seconds": 1.2427552919999996,
+      "stdout": "1\n",
+      "stderr": ""
+    },
+    {
+      "case": "shell-1cpu",
+      "exit": 0,
+      "seconds": 1.1751885000000009,
+      "stdout": "1\n",
+      "stderr": ""
+    }
+  ],
+  "regression_before": "failed: Unmapped(2097152)",
+  "regression_after": "passed",
+  "memory_tests": {
+    "passed": 156,
+    "ignored": 1,
+    "strict_clippy": "passed"
+  },
+  "live_mmap_clone_vm_peer": "passed",
+  "production_ffi_repl": {
+    "passed": true,
+    "checks": 8,
+    "terminals": 2,
+    "delayed_eager_preview": true
+  },
+  "node_compatibility": [
+    {
+      "case": "node-compat",
+      "exit": 0,
+      "seconds": 9.632704166
+    },
+    {
+      "case": "node-inotify",
+      "exit": 0,
+      "seconds": 1.1266172090000008
+    },
+    {
+      "case": "node-socket-handoff",
+      "exit": 0,
+      "seconds": 3.4450202920000006
+    }
+  ],
+  "mac_hvf": {
+    "cpus": 8,
+    "command": "node -p 1",
+    "stdout": "1\n",
+    "exit": 0
+  },
+  "ipad": {
+    "product_version": "1.4.0",
+    "product_build": "40",
+    "device_class": "iPad Air 11-inch (M3)",
+    "os_version": "27.0.1",
+    "signed_bundle_verified": true,
+    "wireless_install": "passed",
+    "default_node_p_1": "passed",
+    "repl_numeric_evaluation": "passed",
+    "repl_arithmetic_observed": "293 * 73634 = 21574762"
+  },
+  "jit_disabled": false,
+  "worker_count_reduced": false,
+  "additional_per_access_checks": false,
+  "scope": "Targeted shared-memory and Node regression; unchanged CPU/Linux/network/graphics acceptance reused."
+}

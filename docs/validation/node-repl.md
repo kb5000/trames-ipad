@@ -70,3 +70,39 @@ Owner report tracked and code fix completed in [Issue #34](https://github.com/kb
 The subsequent private-file atomic COW source also passes the Apple REPL checks:
 [run 39437406520](https://github.com/kb5000/trames/actions/runs/39437406520).
 This still does not install or validate a new package on the owner's iPad.
+
+
+## Node 22.23.4 live-mapping regression (2026-11-01)
+
+Physical iPad build 39 segfaulted in the ordinary Node startup path, while
+`node --version`, Python and `node --jitless -p 1` worked. The same signed Alpine
+Node 22.23.4 package reproduces on Apple ARM64/16 KiB with the cached interpreter:
+8 CPUs fail with exit 139; 1 CPU or syscall tracing passes. Diagnostic-only
+instrumentation confirms a successful anonymous mmap whose returned address is
+already unmapped in the caller View. Its next mallocng store faults at
+`0x7002667c` (`alloc_slot`, `str x20, [x0]`).
+
+V8 trims inaccessible address reservations. A reservation-only munmap rotates the
+append-only anonymous publication owner, but previously left the cached anonymous
+snapshot clean when no anonymous pages overlapped the removed range. A subsequent
+live mmap then published into an owner the resumed caller no longer consulted.
+Runtime [`2d93762`](https://github.com/kb5000/trames-runtime/commit/2d937623c641c2be8fe70ecdeb3f571df8b62745)
+marks that owner rotation dirty at the existing structural boundary. This retains
+JIT, multi-CPU execution and live additive mmap; ordinary accesses gain no check,
+barrier or lock.
+
+The small reservation-unmap/live-mmap regression fails before the fix and passes
+afterward. All 156 default memory tests, strict memory Clippy, the running CLONE_VM
+peer live-mmap regression, both direct/shell Node starts at 1 and 8 CPUs, and all
+eight production-FFI two-terminal REPL checks pass locally. Default V8 arithmetic,
+SharedArrayBuffer/Atomics, async files/crypto, workers, child processes, HTTP,
+inotify and socket handoff pass with 8 CPUs. Mac HVF also passes `node -p 1` with
+8 CPUs. Temporary instrumentation is removed from the shipped sources.
+
+Trames Dev 1.4.0/build 40 was signed, wirelessly installed and launched on the
+physical iPad Air M3 with existing Linux data retained. Default `node -p 1` and
+interactive numeric evaluation pass there; interactive arithmetic also returns
+`21574762` for `293 * 73634`. No `--jitless` or CPU-count workaround is configured.
+[Structured validation](node-live-mapping-20261101.json) records source identities
+and the local before/after matrix. Unchanged acceptance suites are reused; this
+is a targeted compatibility check rather than a new full-release certification.
