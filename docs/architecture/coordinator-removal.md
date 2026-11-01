@@ -1,5 +1,60 @@
 # Coordinator dependency audit
 
+## Second migration implemented — 2026-11-02
+
+Runtime `721e50aa7b377d03abfc7696120dda299c71f16d` moves ordinary regular-file
+`openat`/`openat2`, including creation, onto execution workers. A free FD is
+reserved before resource creation and the complete shared OFD is published to
+the real Files membership. Existing workers can immediately perform eligible
+reads/in-place writes without an owner RPC or a table recapture. Prepared authority lives
+on the OFD and is bound to its original execution epoch; no global publication
+cache is consulted on each I/O. Close/reuse retains the accepted original OFD.
+
+The shared umask, record-lock registry and OFD ID allocator preserve the original
+Linux ownership. Concurrent exclusive creation has one winner; ordinary creators
+reopen that inode. A reservation rolls back on failure. Cross-worker file-size
+limits remain caller-specific. New-file growth and other existing I/O deferrals
+can still use a single-caller owner service while peer CPUs continue.
+
+The change also fixes recursive inode read locking during file preparation and
+removes unused inode write locks from ordinary open/notification delivery. A
+production systemd check exposed a refresh of an unreached lazy page; refresh
+now materializes it through the original fallible source/private-COW contract.
+Shared physical identity, private isolation and backing errors have a regression.
+
+Four processes perform **40,000 open → pread → fstat → close cycles**. Values
+are medians of three unprofiled repetitions; counters use separate samples.
+The same static ELF runs in both Trames versions and the Linux reference.
+
+| Case | Longest child loop, before → after | Whole workload, before → after | Cohort rounds, before → after |
+| --- | ---: | ---: | ---: |
+| Private store | 1673.0 → 240.7 ms | 1851.3 → 419.4 ms | 33,404 → 45 |
+| Shared host directory | 1976.6 → 437.8 ms | 2052.8 → 522.2 ms | 28,983 → 44 |
+
+Loop gains are **7.0× private** and **4.5× shared**; whole-workload gains
+are approximately **4.4×** and **3.9×**. Native macOS/APFS completes the same C
+work in **142.3 ms** for the loop and **148.2 ms** overall. The separate native
+Linux-kernel reference completes it in **13.6 ms** and **23.3 ms**: the existing
+ARM64 Lima/VZ reference has six vCPUs, uses ext4 and runs four benchmark processes.
+It was started after the Mac measurements and stopped again afterward. The
+filesystem/kernel paths differ, so both references remain explicit. A substantial
+Linux-native gap remains; these are not Firefox or general application scores.
+
+All affected shared tests, 244 interpreter kernel regressions, Mac checks and
+13 production FFI environment checks passed, including original systemd with
+two PTYs. The device static library cross-build passed; physical iPad testing
+remains skipped at the owner's request. Mac's installed development app has the
+measured binary. [Raw samples, hashes and validation](../validation/worker-open-20261102.json)
+and the [comparison harness](../../tests/performance/path-metadata.py) are retained.
+The harness also runs a Linux/macOS native-only reference.
+
+`O_TRUNC` opens, directory cursors and mutations, lower-overlay
+files, special endpoints, pipe/socket/accept/event/timer creation, signal/task
+state, structural VM changes and native-device registration still have owner
+boundaries. The shared [execution design](https://github.com/kb5000/trames-runtime/blob/main/docs/architecture/execution-backends.md#worker-regular-file-opens-and-publication-2026-11-02)
+records the publication and ownership rules. No coordinator/resource thread or
+polling bus was added.
+
 ## First migration implemented — 2026-11-02
 
 Runtime `0a3a99ca676f0008a524658529e8c5dde0bc0b95` moves ordinary
@@ -15,9 +70,8 @@ The ownership proof and remaining epoch boundary for root/cwd/mount/credential
 changes are documented in the shared runtime's
 [execution design](https://github.com/kb5000/trames-runtime/blob/main/docs/architecture/execution-backends.md#worker-pathname-metadata-2026-11-02).
 Dynamic proc/sys/dev endpoints and unsupported control descriptors still defer.
-Open/create, directory mutations, full FD publication, signal/task state and
-structural VM ownership are subsequent stages; this is not complete coordinator
-removal.
+At this first checkpoint, open/create, directory mutations, full FD publication,
+signal/task state and structural VM ownership remained subsequent stages.
 
 Final fixed-work comparison on Apple M6 (12 CPUs, 24 GiB), using four processes
 and 40,000 total pathname stat calls. Timings are medians of three unprofiled
@@ -155,9 +209,10 @@ same runtime source, not rerun measurements; see
    authority. Test rename/unlink, symlinks, mount boundaries, host mutations and
    concurrent metadata changes. Preserve normal Linux races; no stronger
    ordering, guest-race error or whole-function global lock.
-2. Open/create/accept/pipe/event/timer descriptor publication using shared Files
-   and resource objects. Let existing workers observe the real membership rather
-   than stopping every job to capture newly registered resources.
+2. Ordinary regular-file open/create/publication is implemented above. Next are
+   accept/pipe/socket/event/timer creation and remaining descriptor kinds using
+   shared Files and resource objects. Existing workers should observe real
+   membership without stopping every job to recapture registered resources.
 3. Temporary signal-mask waits, signal delivery and task creation/exit using a
    shared task registry and targeted execution-queue events. Preserve seccomp
    decisions, EINTR/restart, process-group semantics and OFD lifetimes.

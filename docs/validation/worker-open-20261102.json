@@ -1,0 +1,1318 @@
+{
+  "passed": true,
+  "processes": 4,
+  "operations_each": 10000,
+  "cpus": 12,
+  "mode": "openclose",
+  "repeats": 3,
+  "records": [
+    {
+      "kind": "private",
+      "variant": "before",
+      "repeat": 0,
+      "wall_seconds": 2.340096666,
+      "exit": 0,
+      "children": [
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.932449416,
+          "mib_per_second": 0.0,
+          "ops_per_second": 10724.442,
+          "sync_seconds": 0.02112675,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 1.225539167,
+          "mib_per_second": 0.0,
+          "ops_per_second": 8159.674,
+          "sync_seconds": 0.01493675,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 1.642367167,
+          "mib_per_second": 0.0,
+          "ops_per_second": 6088.772,
+          "sync_seconds": 0.013095583,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 1.724921375,
+          "mib_per_second": 0.0,
+          "ops_per_second": 5797.366,
+          "sync_seconds": 0.015158625,
+          "checksum": 83886080000
+        }
+      ],
+      "paths": {
+        "cohort_rounds": 33404,
+        "cohort_stop_us": 295591,
+        "service_caller_wait_us": 196886,
+        "service_requests": 510,
+        "serviced_syscalls": 510,
+        "syscalls": 200648,
+        "vm_local_syscalls": 2,
+        "worker_direct_syscalls": 69676,
+        "worker_fd_syscalls": 69680,
+        "worker_file_syscalls": 69676,
+        "worker_futex_waits": 0,
+        "worker_futex_wakes": 0,
+        "worker_gpu_calls": 0,
+        "worker_gpu_waits": 0,
+        "worker_poll_syscalls": 0,
+        "worker_socket_syscalls": 0,
+        "worker_syscalls": 139356,
+        "worker_task_resumes": 510
+      }
+    },
+    {
+      "kind": "private",
+      "variant": "after",
+      "repeat": 0,
+      "wall_seconds": 0.35827841699999974,
+      "exit": 0,
+      "children": [
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.165425083,
+          "mib_per_second": 0.0,
+          "ops_per_second": 60450.325,
+          "sync_seconds": 0.01389275,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.18048725,
+          "mib_per_second": 0.0,
+          "ops_per_second": 55405.576,
+          "sync_seconds": 0.022162667,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.162753916,
+          "mib_per_second": 0.0,
+          "ops_per_second": 61442.454,
+          "sync_seconds": 0.014898834,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.186623833,
+          "mib_per_second": 0.0,
+          "ops_per_second": 53583.724,
+          "sync_seconds": 0.01410525,
+          "checksum": 83886080000
+        }
+      ],
+      "paths": {
+        "cohort_rounds": 45,
+        "cohort_stop_us": 15056,
+        "service_caller_wait_us": 193292,
+        "service_requests": 517,
+        "serviced_syscalls": 517,
+        "syscalls": 200644,
+        "vm_local_syscalls": 1,
+        "worker_direct_syscalls": 119371,
+        "worker_fd_syscalls": 79584,
+        "worker_file_syscalls": 119371,
+        "worker_futex_waits": 0,
+        "worker_futex_wakes": 0,
+        "worker_gpu_calls": 0,
+        "worker_gpu_waits": 0,
+        "worker_poll_syscalls": 0,
+        "worker_socket_syscalls": 0,
+        "worker_syscalls": 198955,
+        "worker_task_resumes": 517
+      }
+    },
+    {
+      "kind": "private",
+      "variant": "before",
+      "repeat": 1,
+      "wall_seconds": 1.8558470420000006,
+      "exit": 0,
+      "children": [
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.955420083,
+          "mib_per_second": 0.0,
+          "ops_per_second": 10466.6,
+          "sync_seconds": 0.014391417,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 1.086709917,
+          "mib_per_second": 0.0,
+          "ops_per_second": 9202.088,
+          "sync_seconds": 0.014217292,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 1.603028709,
+          "mib_per_second": 0.0,
+          "ops_per_second": 6238.191,
+          "sync_seconds": 0.014705667,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 1.673023375,
+          "mib_per_second": 0.0,
+          "ops_per_second": 5977.203,
+          "sync_seconds": 0.014325208,
+          "checksum": 83886080000
+        }
+      ]
+    },
+    {
+      "kind": "private",
+      "variant": "after",
+      "repeat": 1,
+      "wall_seconds": 0.41943833299999955,
+      "exit": 0,
+      "children": [
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.193925292,
+          "mib_per_second": 0.0,
+          "ops_per_second": 51566.25,
+          "sync_seconds": 0.01292,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.198658167,
+          "mib_per_second": 0.0,
+          "ops_per_second": 50337.724,
+          "sync_seconds": 0.013318708,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.240653375,
+          "mib_per_second": 0.0,
+          "ops_per_second": 41553.541,
+          "sync_seconds": 0.013522625,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.23276575,
+          "mib_per_second": 0.0,
+          "ops_per_second": 42961.647,
+          "sync_seconds": 0.027486834,
+          "checksum": 83886080000
+        }
+      ]
+    },
+    {
+      "kind": "private",
+      "variant": "after",
+      "repeat": 2,
+      "wall_seconds": 0.3784719999999995,
+      "exit": 0,
+      "children": [
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.176992833,
+          "mib_per_second": 0.0,
+          "ops_per_second": 56499.463,
+          "sync_seconds": 0.015067666,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.178615,
+          "mib_per_second": 0.0,
+          "ops_per_second": 55986.339,
+          "sync_seconds": 0.017526542,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.219784042,
+          "mib_per_second": 0.0,
+          "ops_per_second": 45499.209,
+          "sync_seconds": 0.011296167,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.238484792,
+          "mib_per_second": 0.0,
+          "ops_per_second": 41931.395,
+          "sync_seconds": 0.01459225,
+          "checksum": 83886080000
+        }
+      ]
+    },
+    {
+      "kind": "private",
+      "variant": "before",
+      "repeat": 2,
+      "wall_seconds": 1.8513422079999993,
+      "exit": 0,
+      "children": [
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.810491375,
+          "mib_per_second": 0.0,
+          "ops_per_second": 12338.194,
+          "sync_seconds": 0.014190125,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 1.165055042,
+          "mib_per_second": 0.0,
+          "ops_per_second": 8583.285,
+          "sync_seconds": 0.013626416,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 1.585874833,
+          "mib_per_second": 0.0,
+          "ops_per_second": 6305.668,
+          "sync_seconds": 0.015934542,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 1.70328625,
+          "mib_per_second": 0.0,
+          "ops_per_second": 5871.004,
+          "sync_seconds": 0.015008084,
+          "checksum": 83886080000
+        }
+      ]
+    },
+    {
+      "kind": "private",
+      "variant": "before",
+      "repeat": 3,
+      "wall_seconds": 1.8432869590000003,
+      "exit": 0,
+      "children": [
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.96334975,
+          "mib_per_second": 0.0,
+          "ops_per_second": 10380.446,
+          "sync_seconds": 0.01614475,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 1.076197083,
+          "mib_per_second": 0.0,
+          "ops_per_second": 9291.978,
+          "sync_seconds": 0.014915708,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 1.589212625,
+          "mib_per_second": 0.0,
+          "ops_per_second": 6292.424,
+          "sync_seconds": 0.014950041,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 1.666183542,
+          "mib_per_second": 0.0,
+          "ops_per_second": 6001.74,
+          "sync_seconds": 0.014853,
+          "checksum": 83886080000
+        }
+      ]
+    },
+    {
+      "kind": "private",
+      "variant": "after",
+      "repeat": 3,
+      "wall_seconds": 0.4601357090000011,
+      "exit": 0,
+      "children": [
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.208609417,
+          "mib_per_second": 0.0,
+          "ops_per_second": 47936.475,
+          "sync_seconds": 0.012009625,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.210480125,
+          "mib_per_second": 0.0,
+          "ops_per_second": 47510.424,
+          "sync_seconds": 0.01408175,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.240533333,
+          "mib_per_second": 0.0,
+          "ops_per_second": 41574.279,
+          "sync_seconds": 0.012015875,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.280046791,
+          "mib_per_second": 0.0,
+          "ops_per_second": 35708.318,
+          "sync_seconds": 0.014684584,
+          "checksum": 83886080000
+        }
+      ]
+    },
+    {
+      "kind": "shared",
+      "variant": "before",
+      "repeat": 0,
+      "wall_seconds": 2.093769667,
+      "exit": 0,
+      "children": [
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.957915167,
+          "mib_per_second": 0.0,
+          "ops_per_second": 10439.338,
+          "sync_seconds": 0.003385667,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 1.516301,
+          "mib_per_second": 0.0,
+          "ops_per_second": 6594.997,
+          "sync_seconds": 5.0625e-05,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 1.835637541,
+          "mib_per_second": 0.0,
+          "ops_per_second": 5447.699,
+          "sync_seconds": 0.002599542,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 2.008131209,
+          "mib_per_second": 0.0,
+          "ops_per_second": 4979.754,
+          "sync_seconds": 0.0030075,
+          "checksum": 83886080000
+        }
+      ],
+      "paths": {
+        "cohort_rounds": 28983,
+        "cohort_stop_us": 149739,
+        "service_caller_wait_us": 56759,
+        "service_requests": 517,
+        "serviced_syscalls": 517,
+        "syscalls": 200648,
+        "vm_local_syscalls": 3,
+        "worker_direct_syscalls": 67843,
+        "worker_fd_syscalls": 67847,
+        "worker_file_syscalls": 67843,
+        "worker_futex_waits": 0,
+        "worker_futex_wakes": 0,
+        "worker_gpu_calls": 0,
+        "worker_gpu_waits": 0,
+        "worker_poll_syscalls": 0,
+        "worker_socket_syscalls": 0,
+        "worker_syscalls": 135690,
+        "worker_task_resumes": 517
+      }
+    },
+    {
+      "kind": "shared",
+      "variant": "after",
+      "repeat": 0,
+      "wall_seconds": 0.5269684580000007,
+      "exit": 0,
+      "children": [
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.415633375,
+          "mib_per_second": 0.0,
+          "ops_per_second": 24059.666,
+          "sync_seconds": 0.000993417,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.418333583,
+          "mib_per_second": 0.0,
+          "ops_per_second": 23904.368,
+          "sync_seconds": 0.003088375,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.436696,
+          "mib_per_second": 0.0,
+          "ops_per_second": 22899.225,
+          "sync_seconds": 1.5e-05,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.446441041,
+          "mib_per_second": 0.0,
+          "ops_per_second": 22399.374,
+          "sync_seconds": 3.833e-06,
+          "checksum": 83886080000
+        }
+      ],
+      "paths": {
+        "cohort_rounds": 44,
+        "cohort_stop_us": 1133,
+        "service_caller_wait_us": 52210,
+        "service_requests": 516,
+        "serviced_syscalls": 516,
+        "syscalls": 200645,
+        "vm_local_syscalls": 4,
+        "worker_direct_syscalls": 119557,
+        "worker_fd_syscalls": 79708,
+        "worker_file_syscalls": 119557,
+        "worker_futex_waits": 0,
+        "worker_futex_wakes": 0,
+        "worker_gpu_calls": 0,
+        "worker_gpu_waits": 0,
+        "worker_poll_syscalls": 0,
+        "worker_socket_syscalls": 0,
+        "worker_syscalls": 199265,
+        "worker_task_resumes": 516
+      }
+    },
+    {
+      "kind": "shared",
+      "variant": "before",
+      "repeat": 1,
+      "wall_seconds": 2.073502125000001,
+      "exit": 0,
+      "children": [
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 1.112912958,
+          "mib_per_second": 0.0,
+          "ops_per_second": 8985.429,
+          "sync_seconds": 0.002898333,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 1.425113458,
+          "mib_per_second": 0.0,
+          "ops_per_second": 7016.985,
+          "sync_seconds": 4.7083e-05,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 1.816087916,
+          "mib_per_second": 0.0,
+          "ops_per_second": 5506.341,
+          "sync_seconds": 0.006433834,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 1.98655775,
+          "mib_per_second": 0.0,
+          "ops_per_second": 5033.833,
+          "sync_seconds": 8e-06,
+          "checksum": 83886080000
+        }
+      ]
+    },
+    {
+      "kind": "shared",
+      "variant": "after",
+      "repeat": 1,
+      "wall_seconds": 0.5222434999999983,
+      "exit": 0,
+      "children": [
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.415475959,
+          "mib_per_second": 0.0,
+          "ops_per_second": 24068.781,
+          "sync_seconds": 1.525e-05,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.425443375,
+          "mib_per_second": 0.0,
+          "ops_per_second": 23504.891,
+          "sync_seconds": 6.9667e-05,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.424880208,
+          "mib_per_second": 0.0,
+          "ops_per_second": 23536.046,
+          "sync_seconds": 1.2375e-05,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.43402625,
+          "mib_per_second": 0.0,
+          "ops_per_second": 23040.081,
+          "sync_seconds": 3.25e-06,
+          "checksum": 83886080000
+        }
+      ]
+    },
+    {
+      "kind": "shared",
+      "variant": "after",
+      "repeat": 2,
+      "wall_seconds": 0.5352304589999974,
+      "exit": 0,
+      "children": [
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.417898959,
+          "mib_per_second": 0.0,
+          "ops_per_second": 23929.229,
+          "sync_seconds": 4.0583e-05,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.428069875,
+          "mib_per_second": 0.0,
+          "ops_per_second": 23360.672,
+          "sync_seconds": 1.2083e-05,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.441407333,
+          "mib_per_second": 0.0,
+          "ops_per_second": 22654.812,
+          "sync_seconds": 0.003477542,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.45796925,
+          "mib_per_second": 0.0,
+          "ops_per_second": 21835.527,
+          "sync_seconds": 4.333e-06,
+          "checksum": 83886080000
+        }
+      ]
+    },
+    {
+      "kind": "shared",
+      "variant": "before",
+      "repeat": 2,
+      "wall_seconds": 2.0528416249999992,
+      "exit": 0,
+      "children": [
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.973512417,
+          "mib_per_second": 0.0,
+          "ops_per_second": 10272.083,
+          "sync_seconds": 0.003632875,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 1.373065667,
+          "mib_per_second": 0.0,
+          "ops_per_second": 7282.973,
+          "sync_seconds": 0.004251291,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 1.821636459,
+          "mib_per_second": 0.0,
+          "ops_per_second": 5489.57,
+          "sync_seconds": 5.0292e-05,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 1.976611584,
+          "mib_per_second": 0.0,
+          "ops_per_second": 5059.163,
+          "sync_seconds": 4.334e-06,
+          "checksum": 83886080000
+        }
+      ]
+    },
+    {
+      "kind": "shared",
+      "variant": "before",
+      "repeat": 3,
+      "wall_seconds": 2.028399957999998,
+      "exit": 0,
+      "children": [
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 1.047283209,
+          "mib_per_second": 0.0,
+          "ops_per_second": 9548.516,
+          "sync_seconds": 0.003492083,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 1.395494667,
+          "mib_per_second": 0.0,
+          "ops_per_second": 7165.918,
+          "sync_seconds": 4.5625e-05,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 1.757214917,
+          "mib_per_second": 0.0,
+          "ops_per_second": 5690.824,
+          "sync_seconds": 0.00412325,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 1.952790958,
+          "mib_per_second": 0.0,
+          "ops_per_second": 5120.876,
+          "sync_seconds": 8.125e-06,
+          "checksum": 83886080000
+        }
+      ]
+    },
+    {
+      "kind": "shared",
+      "variant": "after",
+      "repeat": 3,
+      "wall_seconds": 0.5219254169999985,
+      "exit": 0,
+      "children": [
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.399761791,
+          "mib_per_second": 0.0,
+          "ops_per_second": 25014.897,
+          "sync_seconds": 0.003937,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.415952333,
+          "mib_per_second": 0.0,
+          "ops_per_second": 24041.216,
+          "sync_seconds": 2.525e-05,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.413581792,
+          "mib_per_second": 0.0,
+          "ops_per_second": 24179.014,
+          "sync_seconds": 2.1e-05,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.437771917,
+          "mib_per_second": 0.0,
+          "ops_per_second": 22842.945,
+          "sync_seconds": 3.334e-06,
+          "checksum": 83886080000
+        }
+      ]
+    },
+    {
+      "kind": "native",
+      "variant": "native",
+      "repeat": 1,
+      "wall_seconds": 0.4206233750000017,
+      "children": [
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.171529,
+          "mib_per_second": 0.0,
+          "ops_per_second": 58299.18,
+          "sync_seconds": 1e-06,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.170324,
+          "mib_per_second": 0.0,
+          "ops_per_second": 58711.632,
+          "sync_seconds": 1e-06,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.166456,
+          "mib_per_second": 0.0,
+          "ops_per_second": 60075.936,
+          "sync_seconds": 1e-06,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.167976,
+          "mib_per_second": 0.0,
+          "ops_per_second": 59532.314,
+          "sync_seconds": 1e-06,
+          "checksum": 83886080000
+        }
+      ],
+      "exit": 0
+    },
+    {
+      "kind": "native",
+      "variant": "native",
+      "repeat": 2,
+      "wall_seconds": 0.1477091659999985,
+      "children": [
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.13731,
+          "mib_per_second": 0.0,
+          "ops_per_second": 72827.908,
+          "sync_seconds": 2e-06,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.140001,
+          "mib_per_second": 0.0,
+          "ops_per_second": 71428.061,
+          "sync_seconds": 1e-06,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.139081,
+          "mib_per_second": 0.0,
+          "ops_per_second": 71900.547,
+          "sync_seconds": 1e-06,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.140304,
+          "mib_per_second": 0.0,
+          "ops_per_second": 71273.805,
+          "sync_seconds": 0.0,
+          "checksum": 83886080000
+        }
+      ],
+      "exit": 0
+    },
+    {
+      "kind": "native",
+      "variant": "native",
+      "repeat": 3,
+      "wall_seconds": 0.14818179199999904,
+      "children": [
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.137241,
+          "mib_per_second": 0.0,
+          "ops_per_second": 72864.523,
+          "sync_seconds": 0.0,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.14029,
+          "mib_per_second": 0.0,
+          "ops_per_second": 71280.918,
+          "sync_seconds": 1e-06,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.142295,
+          "mib_per_second": 0.0,
+          "ops_per_second": 70276.538,
+          "sync_seconds": 1e-06,
+          "checksum": 83886080000
+        },
+        {
+          "mode": "openclose",
+          "operations": 10000,
+          "seconds": 0.139616,
+          "mib_per_second": 0.0,
+          "ops_per_second": 71625.029,
+          "sync_seconds": 0.0,
+          "checksum": 83886080000
+        }
+      ],
+      "exit": 0
+    }
+  ],
+  "sha256": {
+    "baseline": "b28f6ff9eb93236423ed6785c903ede6ad5d08f10e0e6c46a07afa258c120a7a",
+    "candidate": "9274c33835f8fcf4f4bd25245d7ee6afed83dfcf8cb76ff8541ac446e31ca4d4",
+    "native": "110189929b7ebd34aa421c2d2b05251d3dda83fcc9d937b926b9a202fb7bb9ab",
+    "fixture": "0f1aa5e52d5c8339196dcda7e5296cd1ae11d01d0aebe08be3cc02bed0eb9e2b",
+    "rootfs": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe"
+  },
+  "summary": {
+    "private": {
+      "before": {
+        "loop_max_median_seconds": 1.673023375,
+        "process_wall_median_seconds": 1.8513422079999993,
+        "profile": {
+          "cohort_rounds": 33404,
+          "cohort_stop_us": 295591,
+          "service_caller_wait_us": 196886,
+          "service_requests": 510,
+          "serviced_syscalls": 510,
+          "syscalls": 200648,
+          "vm_local_syscalls": 2,
+          "worker_direct_syscalls": 69676,
+          "worker_fd_syscalls": 69680,
+          "worker_file_syscalls": 69676,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 139356,
+          "worker_task_resumes": 510
+        }
+      },
+      "after": {
+        "loop_max_median_seconds": 0.240653375,
+        "process_wall_median_seconds": 0.41943833299999955,
+        "profile": {
+          "cohort_rounds": 45,
+          "cohort_stop_us": 15056,
+          "service_caller_wait_us": 193292,
+          "service_requests": 517,
+          "serviced_syscalls": 517,
+          "syscalls": 200644,
+          "vm_local_syscalls": 1,
+          "worker_direct_syscalls": 119371,
+          "worker_fd_syscalls": 79584,
+          "worker_file_syscalls": 119371,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 198955,
+          "worker_task_resumes": 517
+        }
+      }
+    },
+    "shared": {
+      "before": {
+        "loop_max_median_seconds": 1.976611584,
+        "process_wall_median_seconds": 2.0528416249999992,
+        "profile": {
+          "cohort_rounds": 28983,
+          "cohort_stop_us": 149739,
+          "service_caller_wait_us": 56759,
+          "service_requests": 517,
+          "serviced_syscalls": 517,
+          "syscalls": 200648,
+          "vm_local_syscalls": 3,
+          "worker_direct_syscalls": 67843,
+          "worker_fd_syscalls": 67847,
+          "worker_file_syscalls": 67843,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 135690,
+          "worker_task_resumes": 517
+        }
+      },
+      "after": {
+        "loop_max_median_seconds": 0.437771917,
+        "process_wall_median_seconds": 0.5222434999999983,
+        "profile": {
+          "cohort_rounds": 44,
+          "cohort_stop_us": 1133,
+          "service_caller_wait_us": 52210,
+          "service_requests": 516,
+          "serviced_syscalls": 516,
+          "syscalls": 200645,
+          "vm_local_syscalls": 4,
+          "worker_direct_syscalls": 119557,
+          "worker_fd_syscalls": 79708,
+          "worker_file_syscalls": 119557,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 199265,
+          "worker_task_resumes": 516
+        }
+      }
+    },
+    "native": {
+      "native": {
+        "loop_max_median_seconds": 0.142295,
+        "process_wall_median_seconds": 0.14818179199999904
+      }
+    }
+  },
+  "date": "2026-11-02",
+  "hardware": {
+    "cpu": "Apple M6",
+    "logical_cpus": 12,
+    "memory_bytes": 25769803776,
+    "host_filesystem": "APFS"
+  },
+  "runtime_revision": "721e50aa7b377d03abfc7696120dda299c71f16d",
+  "baseline_mac_revision": "cc4e0458da78ace22dd3643d71794c4f2f699e8c",
+  "baseline_runtime_revision": "0a3a99ca676f0008a524658529e8c5dde0bc0b95",
+  "candidate_mac_revision": "9fdd82323fc884176e2ae45421c459d60b552622",
+  "linux_native_reference": {
+    "passed": true,
+    "processes": 4,
+    "operations_each": 10000,
+    "cpus": 6,
+    "mode": "openclose",
+    "repeats": 3,
+    "records": [
+      {
+        "kind": "native",
+        "variant": "native",
+        "repeat": 1,
+        "wall_seconds": 0.02334114800000009,
+        "children": [
+          {
+            "mode": "openclose",
+            "operations": 10000,
+            "seconds": 0.012844323,
+            "mib_per_second": 0.0,
+            "ops_per_second": 778554.074,
+            "sync_seconds": 0.000284292,
+            "checksum": 83886080000
+          },
+          {
+            "mode": "openclose",
+            "operations": 10000,
+            "seconds": 0.013614739,
+            "mib_per_second": 0.0,
+            "ops_per_second": 734498.105,
+            "sync_seconds": 2.8e-05,
+            "checksum": 83886080000
+          },
+          {
+            "mode": "openclose",
+            "operations": 10000,
+            "seconds": 0.013298406,
+            "mib_per_second": 0.0,
+            "ops_per_second": 751969.823,
+            "sync_seconds": 3.4125e-05,
+            "checksum": 83886080000
+          },
+          {
+            "mode": "openclose",
+            "operations": 10000,
+            "seconds": 0.013472073,
+            "mib_per_second": 0.0,
+            "ops_per_second": 742276.263,
+            "sync_seconds": 3.875e-05,
+            "checksum": 83886080000
+          }
+        ],
+        "exit": 0
+      },
+      {
+        "kind": "native",
+        "variant": "native",
+        "repeat": 2,
+        "wall_seconds": 0.021505857999997602,
+        "children": [
+          {
+            "mode": "openclose",
+            "operations": 10000,
+            "seconds": 0.012885282,
+            "mib_per_second": 0.0,
+            "ops_per_second": 776079.251,
+            "sync_seconds": 0.000311708,
+            "checksum": 83886080000
+          },
+          {
+            "mode": "openclose",
+            "operations": 10000,
+            "seconds": 0.012877573,
+            "mib_per_second": 0.0,
+            "ops_per_second": 776543.841,
+            "sync_seconds": 3.15e-05,
+            "checksum": 83886080000
+          },
+          {
+            "mode": "openclose",
+            "operations": 10000,
+            "seconds": 0.013214823,
+            "mib_per_second": 0.0,
+            "ops_per_second": 756725.989,
+            "sync_seconds": 2.4041e-05,
+            "checksum": 83886080000
+          },
+          {
+            "mode": "openclose",
+            "operations": 10000,
+            "seconds": 0.012772115,
+            "mib_per_second": 0.0,
+            "ops_per_second": 782955.681,
+            "sync_seconds": 4.0041e-05,
+            "checksum": 83886080000
+          }
+        ],
+        "exit": 0
+      },
+      {
+        "kind": "native",
+        "variant": "native",
+        "repeat": 3,
+        "wall_seconds": 0.026485437999994588,
+        "children": [
+          {
+            "mode": "openclose",
+            "operations": 10000,
+            "seconds": 0.012950198,
+            "mib_per_second": 0.0,
+            "ops_per_second": 772188.966,
+            "sync_seconds": 0.000204541,
+            "checksum": 83886080000
+          },
+          {
+            "mode": "openclose",
+            "operations": 10000,
+            "seconds": 0.013118407,
+            "mib_per_second": 0.0,
+            "ops_per_second": 762287.677,
+            "sync_seconds": 3.5208e-05,
+            "checksum": 83886080000
+          },
+          {
+            "mode": "openclose",
+            "operations": 10000,
+            "seconds": 0.013575698,
+            "mib_per_second": 0.0,
+            "ops_per_second": 736610.375,
+            "sync_seconds": 3.1083e-05,
+            "checksum": 83886080000
+          },
+          {
+            "mode": "openclose",
+            "operations": 10000,
+            "seconds": 0.01288324,
+            "mib_per_second": 0.0,
+            "ops_per_second": 776202.26,
+            "sync_seconds": 4.3125e-05,
+            "checksum": 83886080000
+          }
+        ],
+        "exit": 0
+      }
+    ],
+    "sha256": {
+      "native": "0f1aa5e52d5c8339196dcda7e5296cd1ae11d01d0aebe08be3cc02bed0eb9e2b"
+    },
+    "native_environment": {
+      "system": "Linux",
+      "release": "7.0.0-38-generic",
+      "architecture": "aarch64",
+      "logical_cpus": 6
+    },
+    "summary": {
+      "native": {
+        "native": {
+          "loop_max_median_seconds": 0.013575698,
+          "process_wall_median_seconds": 0.02334114800000009
+        }
+      }
+    },
+    "filesystem": "ext4",
+    "reference": "Existing Lima VZ ARM64 native Linux kernel; six vCPUs, 8 GiB configured; four benchmark processes"
+  },
+  "scope": {
+    "work": "Four processes, 10000 open(O_RDONLY|O_CLOEXEC), pread(1), fstat and close cycles each; 8 MiB files",
+    "execution": "Real Apple Silicon HVF with shared userspace Linux kernel, 12 configured slots",
+    "timing": "Three unprofiled repetitions; longest child loop and full workload wall medians; diagnostic runs separate and counterbalanced version order",
+    "setup": "One freshly imported disposable Alpine store shared by both Trames versions; import excluded from timing",
+    "native": "macOS native C build on APFS; separate native Linux-kernel reference uses the identical static ELF on ext4 with six vCPUs and four benchmark processes",
+    "limitations": [
+      "A microbenchmark, not Firefox latency or a general application score.",
+      "Full workload includes four file initializations, sync, fork/exec and teardown.",
+      "Initialization writes/sync still account for approximately 500 owner services; these are outside the measured loops.",
+      "Linux reference has a different kernel/filesystem path; it is reported separately from the macOS APFS reference.",
+      "The reference Linux machine was initially stopped, started only after Mac measurements, and stopped again afterward.",
+      "Worker counts may omit serial tails and diagnostic interleavings are not deterministic.",
+      "iPad device cross-build and host FFI validated; physical device testing skipped at user request."
+    ]
+  },
+  "validation": {
+    "vfs_hostfs": {
+      "passed": 400,
+      "ignored": 1
+    },
+    "linux": {
+      "passed": 148,
+      "ignored": 1
+    },
+    "memory": {
+      "unit_passed": 157,
+      "ignored": 1,
+      "integration_passed": 6
+    },
+    "kernel_conformance": {
+      "passed": 244,
+      "ignored": 3
+    },
+    "mac_product": {
+      "passed": 13,
+      "ignored": 1
+    },
+    "production_ffi": {
+      "passed": 13,
+      "prepared_imports_reused": true,
+      "environments": [
+        "Alpine",
+        "Debian",
+        "custom rootfs",
+        "original systemd with two PTYs"
+      ],
+      "ffi_sha256": "1bca9d2a6d8371a3517278df03c2f45c141d52290fe60a06cefaca5fe9106bc1"
+    },
+    "ios_device_static_library": {
+      "built": true,
+      "sha256": "6c8407fae69fce5f23356ecd3a8013829dd6ce6080aaa0e8d2340e6905972b7e",
+      "guest_artifacts": "unchanged validated binaries reused"
+    },
+    "strict_clippy": [
+      "shared affected modules",
+      "Mac product",
+      "interpreter kernel conformance"
+    ],
+    "execution_boundaries": [
+      "iPad passed",
+      "Mac passed"
+    ],
+    "physical_ipad": "skipped per user request",
+    "mac_development_app_runner_sha256": "9274c33835f8fcf4f4bd25245d7ee6afed83dfcf8cb76ff8541ac446e31ca4d4"
+  },
+  "regressions": [
+    "Live new-FD visibility across existing worker captures without recapture.",
+    "Real accepted OFD survives close/reuse; pending reservation invisible and rollback restores number.",
+    "Concurrent private and host O_CREAT, exclusive winner, distinct FD numbers.",
+    "Live shared umask and caller-specific file-size-limit policy.",
+    "Concurrent creation, directory metadata and close without recursive inode or namespace lock inversion.",
+    "Distinct cross-worker OFD IDs and flock conflict ownership.",
+    "Once-only seccomp entry decisions for allowed, denied and deferred open/close.",
+    "Published file capability cannot bypass a later epoch admission.",
+    "Unreached deferred page refresh preserves shared identity, private COW and fallible I/O semantics."
+  ],
+  "fixture_source_sha256": "6723cdf5417c044be42ac6f97ae6149485cc643e7283d15529be27e3aabb6bac",
+  "harness_source_sha256": "3ccd08a14725a94ab19a0125e698e259b924b0988338cdfdee04549cb3636fb2",
+  "reproduce": {
+    "mac": "python3 tests/performance/path-metadata.py --baseline OLD_MAC_RUNNER --candidate NEW_MAC_RUNNER --native NATIVE_MAC_HOSTFS_BENCH --fixture STATIC_ARM64_LINUX_HOSTFS_BENCH --rootfs PINNED_ALPINE_ARCHIVE --mode openclose --output NEW_DISPOSABLE_OUTPUT",
+    "linux": "python3 tests/performance/path-metadata.py --native-only --native SAME_STATIC_ARM64_LINUX_HOSTFS_BENCH --mode openclose --cpus 6 --output NEW_DISPOSABLE_LINUX_EXT4_OUTPUT"
+  }
+}

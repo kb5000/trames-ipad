@@ -6,6 +6,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import platform
 import shlex
 import statistics
 import subprocess
@@ -13,11 +14,17 @@ import time
 
 p = argparse.ArgumentParser(description=__doc__)
 for name in ('baseline', 'candidate', 'native', 'fixture', 'rootfs', 'output'):
-    p.add_argument('--' + name, type=Path, required=True)
+    p.add_argument('--' + name, type=Path)
+p.add_argument('--native-only', action='store_true', help='run the same native reference on Linux or macOS')
 p.add_argument('--repeats', type=int, default=3)
 p.add_argument('--cpus', type=int, default=12)
 p.add_argument('--operations', type=int, default=10000)
+p.add_argument('--mode', choices=('stat', 'openclose'), default='stat')
 a = p.parse_args()
+for name in (('native', 'output') if a.native_only else
+             ('baseline', 'candidate', 'native', 'fixture', 'rootfs', 'output')):
+    if getattr(a, name) is None:
+        p.error('--' + name + ' is required')
 assert a.repeats > 0 and 0 < a.operations <= 1000000
 a.output = a.output.resolve()
 a.output.mkdir(parents=True, exist_ok=False)
@@ -28,9 +35,12 @@ native = a.output / 'native'
 native.mkdir()
 env = dict(os.environ, TRAMES_MAC_BUNDLED='1')
 report = dict(passed=False, processes=4, operations_each=a.operations,
-              cpus=a.cpus, repeats=a.repeats, records=[], sha256={
+              cpus=a.cpus, mode=a.mode, repeats=a.repeats, records=[], sha256={
                   key: hashlib.sha256(getattr(a, key).read_bytes()).hexdigest()
-                  for key in ('baseline', 'candidate', 'native', 'fixture', 'rootfs')})
+                  for key in ('baseline', 'candidate', 'native', 'fixture', 'rootfs')
+                  if getattr(a, key) is not None}, native_environment=dict(
+                      system=platform.system(), release=platform.release(),
+                      architecture=platform.machine(), logical_cpus=os.cpu_count()))
 
 
 def save():
@@ -45,7 +55,7 @@ def options(runner):
 
 def guest(kind, variant, repeat):
     directory = '/tmp' if kind == 'private' else '/work'
-    jobs = [f'/bench {shlex.quote(directory + "/metadata-" + str(i))} stat {a.operations} & p{i}=$!'
+    jobs = [f'/bench {shlex.quote(directory + "/metadata-" + str(i))} {a.mode} {a.operations} & p{i}=$!'
             for i in range(4)]
     command = '; '.join(jobs + [f'wait $p{i} || exit $?' for i in range(4)])
     runner = a.baseline if variant == 'before' else a.candidate
@@ -75,22 +85,23 @@ def guest(kind, variant, repeat):
 try:
     # Prepare one disposable store once. Both versions then use the same image,
     # fixture, file contents and mount; import time is outside every timed sample.
-    setup = subprocess.run(options(a.candidate) + [
-        '--rootfs', str(a.rootfs.resolve()), '--exec-file', '/bench=' + str(a.fixture.resolve()),
-        '/bin/true'], capture_output=True, env=env, timeout=120)
-    (a.output / 'setup.stderr').write_bytes(setup.stderr)
-    assert setup.returncode == 0, setup.stderr
-    for kind in ('private', 'shared'):
-        # Profile separately; no clock/counter instrumentation in timed samples.
-        for variant in ('before', 'after'):
-            guest(kind, variant, 0)
-        for repeat in range(1, a.repeats + 1):
-            for variant in (('before', 'after') if repeat % 2 else ('after', 'before')):
-                guest(kind, variant, repeat)
+    if not a.native_only:
+        setup = subprocess.run(options(a.candidate) + [
+            '--rootfs', str(a.rootfs.resolve()), '--exec-file', '/bench=' + str(a.fixture.resolve()),
+            '/bin/true'], capture_output=True, env=env, timeout=120)
+        (a.output / 'setup.stderr').write_bytes(setup.stderr)
+        assert setup.returncode == 0, setup.stderr
+        for kind in ('private', 'shared'):
+            # Profile separately; no clock/counter instrumentation in timed samples.
+            for variant in ('before', 'after'):
+                guest(kind, variant, 0)
+            for repeat in range(1, a.repeats + 1):
+                for variant in (('before', 'after') if repeat % 2 else ('after', 'before')):
+                    guest(kind, variant, repeat)
     for repeat in range(1, a.repeats + 1):
         began = time.monotonic()
         children = [subprocess.Popen([str(a.native.resolve()), str(native / f'metadata-{i}'),
-                                      'stat', str(a.operations)], stdout=subprocess.PIPE,
+                                      a.mode, str(a.operations)], stdout=subprocess.PIPE,
                                      stderr=subprocess.PIPE) for i in range(4)]
         rows = []
         for child in children:
@@ -100,7 +111,7 @@ try:
         report['records'].append(dict(kind='native', variant='native', repeat=repeat,
                                       wall_seconds=time.monotonic() - began, children=rows, exit=0))
     summary = {}
-    for kind in ('private', 'shared', 'native'):
+    for kind in (('native',) if a.native_only else ('private', 'shared', 'native')):
         summary[kind] = {}
         for variant in (('native',) if kind == 'native' else ('before', 'after')):
             rows = [r for r in report['records'] if r['kind'] == kind

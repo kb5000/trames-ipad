@@ -53,7 +53,8 @@ int main(int argc, char **argv) {
     size_t block = !strcmp(mode, "read4k") ? 4096 : sizeof(buffer);
     int reading = !strcmp(mode, "read64k") || !strcmp(mode, "read4k");
     int writing = !strcmp(mode, "write64k");
-    assert(reading || writing || !strcmp(mode, "stat"));
+    int opening = !strcmp(mode, "openclose");
+    assert(reading || writing || opening || !strcmp(mode, "stat"));
     uint64_t checksum = 0;
     double began = now();
     for (unsigned i = 0; i < iterations; i++) {
@@ -66,6 +67,14 @@ int main(int argc, char **argv) {
             }
         } else if (writing) {
             assert(pwrite(fd, buffer, block, offset) == (ssize_t)block);
+        } else if (opening) {
+            int opened = open(path, O_RDONLY | O_CLOEXEC); assert(opened >= 0);
+            struct stat stat;
+            assert(pread(opened, buffer, 1, 0) == 1 && buffer[0] == 7);
+            assert(!fstat(opened, &stat));
+            assert(stat.st_size == (off_t)length && S_ISREG(stat.st_mode));
+            assert(!close(opened));
+            checksum += stat.st_size;
         } else {
             struct stat stat;
             assert(!fstatat(AT_FDCWD, path, &stat, 0));
