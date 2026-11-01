@@ -22,6 +22,16 @@ vkmark --winsys wayland
 首次安装会下载客户端的原始运行依赖。上述示例使用原版包，无需替换 libwayland
 或修改应用源码。Vulkan 使用标准 loader 与 App 自动安装的实验性 ICD。
 
+For `vkmark`, select `--winsys wayland` explicitly. On the current iPad
+Vulkan profile, vkmark 2025.01's automatic detection can probe `display.so`
+first and abort with `vk::createInstance: ErrorExtensionNotPresent` before
+trying Wayland. This does not mean the Wayland plugin or Vulkan loader is
+missing. The explicit command above bypasses direct-display probing, as
+supported by [vkmark's window-system selection](https://github.com/vkmark/vkmark#window-system-selection).
+On 2026-11-01, the physical M3 iPad running Trames Dev 1.4.0 build 39 completed
+the original `clear` and `cube` scenes through Wayland without installing any
+additional packages; the native app window displayed the rotating cube.
+
 终端和图形应用共用顶部标签栏。浮动窗口标题栏的停靠按钮会把窗口放到与 Alpine
 平行的标签页；拖到顶部不会自动最大化。拖动标签到内容区可重新变成浮动窗口，
 在顶部左右拖动可调整顺序；终端标签同样支持这些操作。
