@@ -533,5 +533,679 @@
     "interpreter_kernel_conformance": "234 passed, 3 ignored",
     "ipad_ffi": "aarch64-apple-ios check passed",
     "unchanged_gpu_pixel_oracles": "reused; video and Vulkan adapter sources unchanged"
+  },
+  "followup_1080p60": {
+    "runtime_before": "330e60d2ed8edbaa37038a5a08fa7202b40559fa",
+    "runtime_after": "952952b96772b6faf0e62953f5a84aa4bdf3d440",
+    "method": "Fresh profiles; 10 seconds after metadata, then play; 30 seconds sampled once per second; common five-second warmup excluded; sequential visible windows; no profiler; build VM stopped. Accepted frames are not physical scanout. Muted audio track is included; audio output and A/V sync are not validated.",
+    "fixture": {
+      "width": 1920,
+      "height": 1080,
+      "fps": 60,
+      "seconds": 45,
+      "video": "H.264 High, libx264 veryfast CRF 23, GOP 120, three B frames",
+      "audio": "AAC 48 kHz mono, 128 kbps",
+      "sha256": "4537c2ef54701574d04bfe15b10278fc923eb27ff46398f806ffaa9d4c865afb",
+      "bytes": 41511979
+    },
+    "runs": {
+      "before": {
+        "elapsed_browser_seconds": 24.408,
+        "total_frames": 1465,
+        "dropped_frames": 127,
+        "accepted_fps": 54.81809242871189,
+        "before": {
+          "wall": 40156,
+          "time": 4.91969,
+          "duration": 45.021333,
+          "size": [
+            1920,
+            1080
+          ],
+          "ready": 4,
+          "paused": false,
+          "total": 295,
+          "dropped": 22,
+          "cb": 123,
+          "visibility": "visible",
+          "buffered": [
+            [
+              0,
+              45
+            ]
+          ],
+          "events": [
+            [
+              34916,
+              "playing",
+              0,
+              4
+            ]
+          ]
+        },
+        "after": {
+          "wall": 64564,
+          "time": 29.325385,
+          "duration": 45.021333,
+          "size": [
+            1920,
+            1080
+          ],
+          "ready": 4,
+          "paused": false,
+          "total": 1760,
+          "dropped": 149,
+          "cb": 716,
+          "visibility": "visible",
+          "buffered": [
+            [
+              0,
+              45
+            ]
+          ],
+          "events": [
+            [
+              34916,
+              "playing",
+              0,
+              4
+            ]
+          ]
+        }
+      },
+      "phase_only": {
+        "elapsed_browser_seconds": 24.44,
+        "total_frames": 1466,
+        "dropped_frames": 140,
+        "accepted_fps": 54.25531914893617,
+        "before": {
+          "wall": 40258,
+          "time": 4.935804,
+          "duration": 45.021333,
+          "size": [
+            1920,
+            1080
+          ],
+          "ready": 4,
+          "paused": false,
+          "total": 297,
+          "dropped": 28,
+          "cb": 124,
+          "visibility": "visible",
+          "buffered": [
+            [
+              0,
+              45
+            ]
+          ],
+          "events": [
+            [
+              35001,
+              "playing",
+              0,
+              4
+            ]
+          ]
+        },
+        "after": {
+          "wall": 64698,
+          "time": 29.38288,
+          "duration": 45.021333,
+          "size": [
+            1920,
+            1080
+          ],
+          "ready": 4,
+          "paused": false,
+          "total": 1763,
+          "dropped": 168,
+          "cb": 718,
+          "visibility": "visible",
+          "buffered": [
+            [
+              0,
+              45
+            ]
+          ],
+          "events": [
+            [
+              35001,
+              "playing",
+              0,
+              4
+            ]
+          ]
+        }
+      },
+      "worker_sleeps_and_phase": {
+        "elapsed_browser_seconds": 24.452,
+        "total_frames": 1467,
+        "dropped_frames": 27,
+        "accepted_fps": 58.89088827089808,
+        "before": {
+          "wall": 40923,
+          "time": 4.820806,
+          "duration": 45.021333,
+          "size": [
+            1920,
+            1080
+          ],
+          "ready": 4,
+          "paused": false,
+          "total": 291,
+          "dropped": 0,
+          "cb": 121,
+          "visibility": "visible",
+          "buffered": [
+            [
+              0,
+              45
+            ]
+          ],
+          "events": [
+            [
+              35663,
+              "playing",
+              0,
+              4
+            ]
+          ]
+        },
+        "after": {
+          "wall": 65375,
+          "time": 29.280824,
+          "duration": 45.021333,
+          "size": [
+            1920,
+            1080
+          ],
+          "ready": 4,
+          "paused": false,
+          "total": 1758,
+          "dropped": 27,
+          "cb": 713,
+          "visibility": "visible",
+          "buffered": [
+            [
+              0,
+              45
+            ]
+          ],
+          "events": [
+            [
+              35663,
+              "playing",
+              0,
+              4
+            ]
+          ]
+        }
+      },
+      "native_firefox_159": {
+        "elapsed_browser_seconds": 24.278,
+        "total_frames": 1456,
+        "dropped_frames": 0,
+        "accepted_fps": 59.97199110305627,
+        "before": {
+          "wall": 15350,
+          "time": 5.011694,
+          "duration": 45,
+          "size": [
+            1920,
+            1080
+          ],
+          "ready": 4,
+          "paused": false,
+          "total": 302,
+          "dropped": 0,
+          "cb": 128,
+          "visibility": "visible",
+          "buffered": [
+            [
+              0,
+              45
+            ]
+          ],
+          "events": [
+            [
+              10284,
+              "playing",
+              0,
+              4
+            ]
+          ]
+        },
+        "after": {
+          "wall": 39628,
+          "time": 29.292038,
+          "duration": 45,
+          "size": [
+            1920,
+            1080
+          ],
+          "ready": 4,
+          "paused": false,
+          "total": 1758,
+          "dropped": 0,
+          "cb": 734,
+          "visibility": "visible",
+          "buffered": [
+            [
+              0,
+              45
+            ]
+          ],
+          "events": [
+            [
+              10284,
+              "playing",
+              0,
+              4
+            ]
+          ]
+        }
+      }
+    },
+    "remaining_limitations": [
+      "Firefox 142 retains its 21.333 ms duration/buffered-end mismatch; runtime scheduling alone does not fix it.",
+      "Firefox 151 can switch to software during cold startup using its slow-decode heuristic; the native-video profile defaults disable that heuristic only when no user preference already exists. Actual decoder/import errors retain their normal error path.",
+      "1080p60 long playback is supported but not sustained zero-drop 60 FPS. Muted audio output/A-V synchronization and 4K browser playback remain unvalidated."
+    ],
+    "new_client_acceptance": {
+      "firefox": "151.0.3-r0, official Alpine v3.23 signed APK",
+      "firefox_apk_sha256": "13e0747ca344abe1eaaca74a40d00bca033f90a798cc5d96325f296eee98a1d4",
+      "mesa": {
+        "mesa": "25.1.9",
+        "source_sha256": "412df33a1bb3c785ed698555a3972118a37c458e7accf6ae53f4bb87b3db454a",
+        "method": "Incremental native ARM64 musl Ninja build with existing verified options; private zink_screen layout dependents rebuilt. Patches re-applied to original source separately.",
+        "patches": {
+          "0004-native-video-render-node-discovery.patch": "2e543c3258334b9d55df10fb9d9d5c6d46814c03b5cccc0e5c7b5cd046f1e210",
+          "0003-honor-import-only-external-memory.patch": "d99609f09058ffcdc7e539cd5ab1985be871114bba3d36c8b45212cc20d81d8b",
+          "0002-preserve-pbo-upload-output-type.patch": "421b12c83a353f04175848883a2f2aa853b4d4fc3bbec9dfc346e755836682fe",
+          "0005-drop-unused-host-memory-probe.patch": "05d524f1128ca6e2d3227f148654f9a16f544cb2553b7f926f64aedce71795f4",
+          "0001-wayland-kopper-native-wsi.patch": "c3b359d856aa2eaf7ea4120215b948e7c20c10f777d3d852e0df991e3c7bab36"
+        },
+        "libraries": {
+          "libgallium-25.1.9.so": "2fbbe081e0924fd6ddeadc9af686d45fcc0ebd91a867d8642d93833510a6abaa",
+          "libEGL.so.1": "9ebb409430a0d35381f8ccef08590c7dcdeb08702909e0cd42c4dad9217abc60"
+        }
+      },
+      "long_video": {
+        "page": "file:///opt/trames-video-perf-controlled-b817b987/index.html",
+        "elapsed_browser": 55.018,
+        "elapsed_host": 55.016289209,
+        "before": {
+          "wall": 6090,
+          "time": 5.029943,
+          "size": [
+            1920,
+            1080
+          ],
+          "rate": 1,
+          "ready": 4,
+          "total": 302,
+          "dropped": 20,
+          "callbacks": 122,
+          "paused": false,
+          "error": null,
+          "visibility": "visible",
+          "focus": true,
+          "duration": 45,
+          "events": [
+            {
+              "event": "playing",
+              "wall": 1056,
+              "time": 0,
+              "ready": 4
+            }
+          ],
+          "buffered": [
+            [
+              0,
+              45
+            ]
+          ]
+        },
+        "after": {
+          "wall": 61108,
+          "time": 15.060464,
+          "size": [
+            1920,
+            1080
+          ],
+          "rate": 1,
+          "ready": 4,
+          "total": 3604,
+          "dropped": 238,
+          "callbacks": 1385,
+          "paused": false,
+          "error": null,
+          "visibility": "visible",
+          "focus": true,
+          "duration": 45,
+          "events": [
+            {
+              "event": "playing",
+              "wall": 1056,
+              "time": 0,
+              "ready": 4
+            },
+            {
+              "event": "seeking",
+              "wall": 46071,
+              "time": 0.026345,
+              "ready": 4
+            },
+            {
+              "event": "seeked",
+              "wall": 46073,
+              "time": 0.026345,
+              "ready": 4
+            }
+          ],
+          "buffered": [
+            [
+              0,
+              45
+            ]
+          ]
+        },
+        "accepted_fps": 56.05438220218837,
+        "callback_fps": 22.956123450507107,
+        "dropped_frames": 218,
+        "total_frames": 3302,
+        "playback_events": [
+          {
+            "event": "seeking",
+            "wall": 46071,
+            "time": 0.026345,
+            "ready": 4
+          },
+          {
+            "event": "seeked",
+            "wall": 46073,
+            "time": 0.026345,
+            "ready": 4
+          }
+        ],
+        "interaction_ms": 576.4673749999929,
+        "interaction": {
+          "clicked": "yes",
+          "text": "Trames video"
+        }
+      },
+      "long_video_hardware": true,
+      "long_video_buffering_ms": 0,
+      "cold_short_with_native_policy": {
+        "functional_only": true,
+        "seconds_after_controller_connected": 20,
+        "duration": 12,
+        "events": [
+          [
+            33526,
+            "seeking",
+            0.017771,
+            4
+          ],
+          [
+            33528,
+            "seeked",
+            0.017771,
+            4
+          ],
+          [
+            45531,
+            "seeking",
+            0.026026,
+            4
+          ],
+          [
+            45531,
+            "seeked",
+            0.026026,
+            4
+          ]
+        ],
+        "hardware": true,
+        "buffering_ms": 0,
+        "preferences": {
+          "media.ffmpeg.vaapi.enabled": true,
+          "media.ffmpeg.disable-software-fallback": true
+        },
+        "notes": "No per-frame logs. Build VM active during this functional case; FPS excluded from native comparison. Initial startup still drops frames."
+      }
+    },
+    "mesa_query_regression": {
+      "old": {
+        "passed": false,
+        "returncode": 134,
+        "sha256": {
+          "check": "ca35b10c45f5c20f2aac97fcd4542e8ecabbfb4b8509f15dd123262f5ee3fbd5",
+          "ld-musl-aarch64.so.1": "42fb025bc758b76e60e7b3b0fcdcfab93b6ba1694b363244c2e8e6f51847e28c",
+          "libEGL.so.1": "9ebb409430a0d35381f8ccef08590c7dcdeb08702909e0cd42c4dad9217abc60",
+          "libGLESv2.so.2": "1be4cbcf9ccb483a0135f5af76644f6fd7aa894ca4b39dac09857176b1d4dce7",
+          "libLLVM.so.20.1": "1a80aa18733cd9579b43a61a5848c6d05a0c84fa6cfeffb464cb9aa1a817971a",
+          "libSPIRV-Tools.so": "9978afd1907cdcf857ad6e875547921eef9dba63582cf2b5b7361a374b6e6cbd",
+          "libSvtAv1Enc.so.2": "332b429da9ef607f2a73f4f7feb450f38f700db22d74e37c910f8f16a9cccc29",
+          "libX11-xcb.so.1": "ebdb66a7bd5e2eba10663b395cfea22b656f5ca86dcef605b1142c9ed0aa8ec4",
+          "libX11.so.6": "adba92fc1c990fddba0fceaa249c6d0c7a24908ab8ac9e5cba7daede9c6a6dd1",
+          "libXau.so.6": "541039f77baf79bff82c859dbecb41d046fe1c13b172392160312cc2d39f5a52",
+          "libXdmcp.so.6": "f79259348abadc0b32ae61fef7032ac7afcd3c1319b0095c190bdc1394c483ad",
+          "libXext.so.6": "9ebd0896513279794d5ba6f86566581a0683c1e49e79d74e2efc2fa958457c88",
+          "libXfixes.so.3": "2da0ee289779003ce4381806d47f207398b3cd04996b7d8d5ed60c833f8296a4",
+          "libaom.so.3": "3229f3e3478583fab36252376569534605e2d75efd0c2236426dd4f8c3a96ab5",
+          "libavcodec.so.60": "f2df65ffb1d8a9a3d4656d89cdbe7bf112abea442844cb07effd32b003b9671b",
+          "libavformat.so.60": "79ed2ccaaac785cd4fd7c12a5ca42fc2fbad1a670d26074d1d9b698aeb323fae",
+          "libavutil.so.58": "fddc6b53fa004fabc701c99ae6208bf7da7e12e4bf4ad525583f5143c3d91e6a",
+          "libbluray.so.2": "c0487392906e183f9f004582fee0b0448586d92512e16c534db4fbc830d14f81",
+          "libbrotlicommon.so.1": "abdf1f7c44fabb16ca538c8650290f4cdc0727884f12c3bd713d8a16dc5a805f",
+          "libbrotlidec.so.1": "ea9b5fe7e7ec9943a4331bee7d5b41fdface6a8e2398101821dc51e98a1c1c9c",
+          "libbrotlienc.so.1": "d927d06c4a9a49f32cf7765f9b56526e24fa2361152fe2754d49075a77d40872",
+          "libbsd.so.0": "6304e54559e94174d59cd30f3f2876f6269f329bf7034952f94573ac49038d02",
+          "libbz2.so.1": "c1360c1241bc5dff6ad1d62b1b39f848afefb202e9f439504db8cda684789a10",
+          "libcjson.so.1": "911fdbdec7222a1e9e094720c08383110ff8496c5a9115ced76e935988db11de",
+          "libcrypto.so.3": "911da5b5135cec3a520d294e56aefae5d753c9e1ed45aeabe8093d3ba986c284",
+          "libdav1d.so.7": "df05a1a20eba22e1286268df46a1c57b46b9a9dc725da42ef6f309871f2dc85e",
+          "libdrm.so.2": "a6f7b31feec2b1a28b0e88827c215bd7828db0fe7b86e44ae1a9558fff1b3ebd",
+          "libdrm_amdgpu.so.1": "32e262eaae832f29deebce8aee6bf563fc901f1a337d280300c2637f137dc2cd",
+          "libelf.so.1": "ba5fcfee734c258c3ba5b666e6967bca47ba2ca63c6373cf439a617794c089bb",
+          "libexpat.so.1": "51237d47a0a25c1a938398d26a21ba9e708ac647aebc5d38ddf5366a9a20f6f2",
+          "libffi.so.8": "9e9631cbbd1e9f1de646dccbfe6357dabb085c07bf4eb0b870dba887a1f11053",
+          "libgallium-25.1.9.so": "9577fbe1e2929e46c3d9308a982005120a744e7d4c55311151432a189f1d0c20",
+          "libgbm.so.1": "b2016afc92ff8681136e06f96d6b976d6a93f968299c5e4746786eb79aacbbf6",
+          "libgcc_s.so.1": "2d945d6ce360769b41fbffc652c2440014bbd69416f13fe206fbac19d32c9431",
+          "libgomp.so.1": "1ede7ee7f575f2f7cd32768930769d993d0283d7a87ca7b7d19d791570a14320",
+          "libhwy.so.1": "53e2c5498884009e08c0a9e88ce42b18a88448000cf152812dc23e7310735a7b",
+          "libjxl.so.0.10": "dd33445d24d6f86f382b21b993cb110545e475c9335258677cc5422cc20a96b6",
+          "libjxl_cms.so.0.10": "49710a3fe4e2bb5888f14b78d3056d18ae356575797d602817b2525262248b30",
+          "libjxl_threads.so.0.10": "ba65831dc3d61c73d0f769863cff43f2d494b41c9d021ef42e0a3a1bb82d950d",
+          "liblcms2.so.2": "11b958c675995a6c938f16c59fc7e0f66d87bbcc8fe68ddae1e6e203ca533341",
+          "liblzma.so.5": "684bf2cbc78ba9e8956818b02a07cc0c1f6ef1738bb0d6b2bf59a72d5aff0b94",
+          "libmbedcrypto.so.16": "fd5166802ef82dd9d8ff4b52f2de980eecec5180c3df7fbfb8a705015dc85423",
+          "libmd.so.0": "e6555b271864e03a0229410b971d4e62541775fef7b846ff64f162450043bc85",
+          "libmp3lame.so.0": "c959e807473ea8089b56c59553f6ca5e2bde773c8d17cf5f76b6fc7d648e2833",
+          "libmpg123.so.0": "ed51ff9212b8100d17ba865dcb102b1b39faeefae356c16c4152973bb285026d",
+          "libnuma.so.1": "7e31fa618ef75a625aaf0a8edc2edca6c3e3241186077c04798558295f68e185",
+          "libogg.so.0": "808f73b5a3d25f3f272a19056bdcb807e9d03c6afbc14bbb28e36ead2327141f",
+          "libopenmpt.so.0": "d6ace66b0ca780ab8a1abedd15fb43d854f08c69d3d094e0ee5750ce535cd39d",
+          "libopus.so.0": "0ba25c946e712e546b0cf7ab01ada3cd3bade90a77af06234bd37eea623efaa8",
+          "librav1e.so.0.7": "2c26f3731641f15119b431d7efe8550ebeb244422f32757963bc24ffc01688fe",
+          "librist.so.4": "ff2ff5744df4b147d9daeb8ec5994b6d3e445b03f87280967de9220b0484c4ce",
+          "libsharpyuv.so.0": "babcef2376deb66dadcb31bc153e52972089c2251b421f3ced4bd4058d12e35c",
+          "libsodium.so.26": "61cc35a08a847227e3848ecd6d4bf03af08e6a7c5930022e3bf8fa996caa361c",
+          "libsoxr.so.0": "ac339f92c877d6974c804abb2b3f3bee31bc6b73c5fe8b66460b1a7ef377ee1e",
+          "libsrt.so.1.5": "71554b9b3c375b0d203f4e7e07eefde9b5d58fb0fd35a302bfe4386f4bebeb42",
+          "libssh.so.4": "56e3d672a7024a7db54b6cfb532302b0d75eaafaa2977a920433a3fa4cc87681",
+          "libssl.so.3": "c2c68f2588b1c919d716d6bd998da35541e5f8ff415ad657f52ac4e8f61c929d",
+          "libstdc++.so.6": "85f2cd6db79578ab58be4d12b7df7482ebc003a37496c7544956d9157f8a2b3f",
+          "libswresample.so.4": "8ce4ed0f13f88610b18232b71d17589acbb2cecf66bc35ed1dc1d62d17a11911",
+          "libtheoradec.so.1": "beb0cc60bc5872b0a4a7b5b25f023f4fd8640a5a44b0d49789b6838a263c551b",
+          "libtheoraenc.so.1": "ccb7c4ef7fdcf1b71538d32e254d9d1f85328b47d3c852c09912b22dab534d74",
+          "libtrames_vulkan_icd.so": "ab472cf4f8ade5d0bab47a9242c13e7e50f67d087df0a9db05a15c0715552ebd",
+          "libva-drm.so.2": "69e5c0eb63e86480724652b0d65030d83b8aae96b146f860e167a84df0228d6d",
+          "libva-x11.so.2": "93a8502e9c3ef6c175bee89ad1d54c1e88b5797860b2848a967381d6c581605b",
+          "libva.so.2": "20cbb8bc83c93c72bdacdfcc183e4a3c4893956ae030e2026c3046af5cafb00f",
+          "libvdpau.so.1": "9867fb1be0b64c4fff51134be3575728fa2a1224b0da987c7f0b20e4e974afd2",
+          "libvorbis.so.0": "d2242b199a96ddb9c5541691d4b9d1048fefedf8a5754a7767eae4a0b545814c",
+          "libvorbisenc.so.2": "4999017c8b1093ff111fda21c9b97a69c4d7bf4e4eee521d09fc38d2ec42cd41",
+          "libvorbisfile.so.3": "3cd96432a3c0351230c65bfba5d50bedf210342a336a6157efb3bb51a148a6c8",
+          "libvpx.so.9": "46a42e812232b67e0118f82fde41938331eb473c03fb536c16fe42233d1dcc83",
+          "libvulkan.so.1": "382419ec9f138dd2a980fc988482a72b643c32901599b568a27fe7742946c752",
+          "libwayland-client.so.0": "b1a0f560b02802dcdac26811fcd726638590ae3af369d1367c1c3a1c1dc3c596",
+          "libwayland-server.so.0": "95e137b859ed8d98d76c38f6c7c90fbc899b43777bcee7f983ac0170051f9d65",
+          "libwebp.so.7": "adb7048aa7f7a63d7bf0ba2806a1d905a5a3d0aaa84790b36e515cd7ad8efdde",
+          "libwebpmux.so.3": "c8ea34468c5c5c2746b31cb671ea4a7fa419a0b461e9123d94ac112b855ce474",
+          "libx264.so.164": "87e40f7e90e125d4b7bc09a466679b8aa77f525606728a2e6609d26b3f0e7b14",
+          "libx265.so.209": "a59214787bbda5fd8caa96e34b98b3deced9d9ddf121a1b2b12ba6a7c883a0a6",
+          "libxcb-dri3.so.0": "719d3b552d4fa9a449e304792c2105bfb3dc9b06af834dbdc015f8295d904529",
+          "libxcb-present.so.0": "dbb4e4bc054f4d8c76829fb3e26fd28b0837e00a959782d0b85c21612a0e4c65",
+          "libxcb-randr.so.0": "9e8ea50bf477819df945d4320be1d90640840c582727b083ca7d9e308d50641c",
+          "libxcb-shm.so.0": "c81ab82b5c307c8b8e584b111d692c8e33297b29e493f2f6e26aa56c61d5f86d",
+          "libxcb-sync.so.1": "5e4c699c715e42c7f782f4e60886457e8fae0b238ffe5fadbe0405ca0a5eea98",
+          "libxcb-xfixes.so.0": "e4da99d415cc7b633b09083b1c8440c547e0940ee45694319c0da7677727beff",
+          "libxcb.so.1": "37b5950b0a216608ed5f9eb3e3c8244c6839aa7920901ee4ee2c663bc9ddfe4a",
+          "libxml2.so.2": "8f0ef3b255a82fa577bd59b102c8742accf4ee4847655c11297797d8b2295b7c",
+          "libxshmfence.so.1": "8d7b7132936a3c09ff1a3a84426bb7b2577e70cc43b694d4a63e41eacd1b69fd",
+          "libxvidcore.so.4": "3e690dd98fe8c2dfd6e38aa99560b32aa173d4d66f718d8b0259aa115566c1b1",
+          "libz.so.1": "1dfd2166dd6124fbd4cbba54ea3d5b2de60e308c252de39d1369e71d301ddea4",
+          "libzmq.so.5": "6d23680f3d55707b9eee7fcd98398d70e1ae84931c899a6416fb7b03b8820d41",
+          "libzstd.so.1": "0261e625d796007a4688f12b5bea20ca8af9d6767d645286501245a0f0187699",
+          "sample.h264": "9d0ac0fb2a9f3f51ac4d42b4d5980bf478e416ef1000a5dfd7fb6616eaaafb52",
+          "trames_drv_video.so": "406c3c1b304fbafb6cb9a325af22642641f5481d9e8e459d6d5c872dc0fbdc10"
+        },
+        "scope": "hardware H.264; export before sync; fork/SCM_RIGHTS; native GPU plane pixels",
+        "frontend": "EGL/GLES/Zink",
+        "denied_sysinfo": true
+      },
+      "patched": {
+        "passed": true,
+        "returncode": 0,
+        "sha256": {
+          "check": "ca35b10c45f5c20f2aac97fcd4542e8ecabbfb4b8509f15dd123262f5ee3fbd5",
+          "ld-musl-aarch64.so.1": "42fb025bc758b76e60e7b3b0fcdcfab93b6ba1694b363244c2e8e6f51847e28c",
+          "libEGL.so.1": "9ebb409430a0d35381f8ccef08590c7dcdeb08702909e0cd42c4dad9217abc60",
+          "libGLESv2.so.2": "1be4cbcf9ccb483a0135f5af76644f6fd7aa894ca4b39dac09857176b1d4dce7",
+          "libLLVM.so.20.1": "1a80aa18733cd9579b43a61a5848c6d05a0c84fa6cfeffb464cb9aa1a817971a",
+          "libSPIRV-Tools.so": "9978afd1907cdcf857ad6e875547921eef9dba63582cf2b5b7361a374b6e6cbd",
+          "libSvtAv1Enc.so.2": "332b429da9ef607f2a73f4f7feb450f38f700db22d74e37c910f8f16a9cccc29",
+          "libX11-xcb.so.1": "ebdb66a7bd5e2eba10663b395cfea22b656f5ca86dcef605b1142c9ed0aa8ec4",
+          "libX11.so.6": "adba92fc1c990fddba0fceaa249c6d0c7a24908ab8ac9e5cba7daede9c6a6dd1",
+          "libXau.so.6": "541039f77baf79bff82c859dbecb41d046fe1c13b172392160312cc2d39f5a52",
+          "libXdmcp.so.6": "f79259348abadc0b32ae61fef7032ac7afcd3c1319b0095c190bdc1394c483ad",
+          "libXext.so.6": "9ebd0896513279794d5ba6f86566581a0683c1e49e79d74e2efc2fa958457c88",
+          "libXfixes.so.3": "2da0ee289779003ce4381806d47f207398b3cd04996b7d8d5ed60c833f8296a4",
+          "libaom.so.3": "3229f3e3478583fab36252376569534605e2d75efd0c2236426dd4f8c3a96ab5",
+          "libavcodec.so.60": "f2df65ffb1d8a9a3d4656d89cdbe7bf112abea442844cb07effd32b003b9671b",
+          "libavformat.so.60": "79ed2ccaaac785cd4fd7c12a5ca42fc2fbad1a670d26074d1d9b698aeb323fae",
+          "libavutil.so.58": "fddc6b53fa004fabc701c99ae6208bf7da7e12e4bf4ad525583f5143c3d91e6a",
+          "libbluray.so.2": "c0487392906e183f9f004582fee0b0448586d92512e16c534db4fbc830d14f81",
+          "libbrotlicommon.so.1": "abdf1f7c44fabb16ca538c8650290f4cdc0727884f12c3bd713d8a16dc5a805f",
+          "libbrotlidec.so.1": "ea9b5fe7e7ec9943a4331bee7d5b41fdface6a8e2398101821dc51e98a1c1c9c",
+          "libbrotlienc.so.1": "d927d06c4a9a49f32cf7765f9b56526e24fa2361152fe2754d49075a77d40872",
+          "libbsd.so.0": "6304e54559e94174d59cd30f3f2876f6269f329bf7034952f94573ac49038d02",
+          "libbz2.so.1": "c1360c1241bc5dff6ad1d62b1b39f848afefb202e9f439504db8cda684789a10",
+          "libcjson.so.1": "911fdbdec7222a1e9e094720c08383110ff8496c5a9115ced76e935988db11de",
+          "libcrypto.so.3": "911da5b5135cec3a520d294e56aefae5d753c9e1ed45aeabe8093d3ba986c284",
+          "libdav1d.so.7": "df05a1a20eba22e1286268df46a1c57b46b9a9dc725da42ef6f309871f2dc85e",
+          "libdrm.so.2": "a6f7b31feec2b1a28b0e88827c215bd7828db0fe7b86e44ae1a9558fff1b3ebd",
+          "libdrm_amdgpu.so.1": "32e262eaae832f29deebce8aee6bf563fc901f1a337d280300c2637f137dc2cd",
+          "libelf.so.1": "ba5fcfee734c258c3ba5b666e6967bca47ba2ca63c6373cf439a617794c089bb",
+          "libexpat.so.1": "51237d47a0a25c1a938398d26a21ba9e708ac647aebc5d38ddf5366a9a20f6f2",
+          "libffi.so.8": "9e9631cbbd1e9f1de646dccbfe6357dabb085c07bf4eb0b870dba887a1f11053",
+          "libgallium-25.1.9.so": "2fbbe081e0924fd6ddeadc9af686d45fcc0ebd91a867d8642d93833510a6abaa",
+          "libgbm.so.1": "b2016afc92ff8681136e06f96d6b976d6a93f968299c5e4746786eb79aacbbf6",
+          "libgcc_s.so.1": "2d945d6ce360769b41fbffc652c2440014bbd69416f13fe206fbac19d32c9431",
+          "libgomp.so.1": "1ede7ee7f575f2f7cd32768930769d993d0283d7a87ca7b7d19d791570a14320",
+          "libhwy.so.1": "53e2c5498884009e08c0a9e88ce42b18a88448000cf152812dc23e7310735a7b",
+          "libjxl.so.0.10": "dd33445d24d6f86f382b21b993cb110545e475c9335258677cc5422cc20a96b6",
+          "libjxl_cms.so.0.10": "49710a3fe4e2bb5888f14b78d3056d18ae356575797d602817b2525262248b30",
+          "libjxl_threads.so.0.10": "ba65831dc3d61c73d0f769863cff43f2d494b41c9d021ef42e0a3a1bb82d950d",
+          "liblcms2.so.2": "11b958c675995a6c938f16c59fc7e0f66d87bbcc8fe68ddae1e6e203ca533341",
+          "liblzma.so.5": "684bf2cbc78ba9e8956818b02a07cc0c1f6ef1738bb0d6b2bf59a72d5aff0b94",
+          "libmbedcrypto.so.16": "fd5166802ef82dd9d8ff4b52f2de980eecec5180c3df7fbfb8a705015dc85423",
+          "libmd.so.0": "e6555b271864e03a0229410b971d4e62541775fef7b846ff64f162450043bc85",
+          "libmp3lame.so.0": "c959e807473ea8089b56c59553f6ca5e2bde773c8d17cf5f76b6fc7d648e2833",
+          "libmpg123.so.0": "ed51ff9212b8100d17ba865dcb102b1b39faeefae356c16c4152973bb285026d",
+          "libnuma.so.1": "7e31fa618ef75a625aaf0a8edc2edca6c3e3241186077c04798558295f68e185",
+          "libogg.so.0": "808f73b5a3d25f3f272a19056bdcb807e9d03c6afbc14bbb28e36ead2327141f",
+          "libopenmpt.so.0": "d6ace66b0ca780ab8a1abedd15fb43d854f08c69d3d094e0ee5750ce535cd39d",
+          "libopus.so.0": "0ba25c946e712e546b0cf7ab01ada3cd3bade90a77af06234bd37eea623efaa8",
+          "librav1e.so.0.7": "2c26f3731641f15119b431d7efe8550ebeb244422f32757963bc24ffc01688fe",
+          "librist.so.4": "ff2ff5744df4b147d9daeb8ec5994b6d3e445b03f87280967de9220b0484c4ce",
+          "libsharpyuv.so.0": "babcef2376deb66dadcb31bc153e52972089c2251b421f3ced4bd4058d12e35c",
+          "libsodium.so.26": "61cc35a08a847227e3848ecd6d4bf03af08e6a7c5930022e3bf8fa996caa361c",
+          "libsoxr.so.0": "ac339f92c877d6974c804abb2b3f3bee31bc6b73c5fe8b66460b1a7ef377ee1e",
+          "libsrt.so.1.5": "71554b9b3c375b0d203f4e7e07eefde9b5d58fb0fd35a302bfe4386f4bebeb42",
+          "libssh.so.4": "56e3d672a7024a7db54b6cfb532302b0d75eaafaa2977a920433a3fa4cc87681",
+          "libssl.so.3": "c2c68f2588b1c919d716d6bd998da35541e5f8ff415ad657f52ac4e8f61c929d",
+          "libstdc++.so.6": "85f2cd6db79578ab58be4d12b7df7482ebc003a37496c7544956d9157f8a2b3f",
+          "libswresample.so.4": "8ce4ed0f13f88610b18232b71d17589acbb2cecf66bc35ed1dc1d62d17a11911",
+          "libtheoradec.so.1": "beb0cc60bc5872b0a4a7b5b25f023f4fd8640a5a44b0d49789b6838a263c551b",
+          "libtheoraenc.so.1": "ccb7c4ef7fdcf1b71538d32e254d9d1f85328b47d3c852c09912b22dab534d74",
+          "libtrames_vulkan_icd.so": "ab472cf4f8ade5d0bab47a9242c13e7e50f67d087df0a9db05a15c0715552ebd",
+          "libva-drm.so.2": "69e5c0eb63e86480724652b0d65030d83b8aae96b146f860e167a84df0228d6d",
+          "libva-x11.so.2": "93a8502e9c3ef6c175bee89ad1d54c1e88b5797860b2848a967381d6c581605b",
+          "libva.so.2": "20cbb8bc83c93c72bdacdfcc183e4a3c4893956ae030e2026c3046af5cafb00f",
+          "libvdpau.so.1": "9867fb1be0b64c4fff51134be3575728fa2a1224b0da987c7f0b20e4e974afd2",
+          "libvorbis.so.0": "d2242b199a96ddb9c5541691d4b9d1048fefedf8a5754a7767eae4a0b545814c",
+          "libvorbisenc.so.2": "4999017c8b1093ff111fda21c9b97a69c4d7bf4e4eee521d09fc38d2ec42cd41",
+          "libvorbisfile.so.3": "3cd96432a3c0351230c65bfba5d50bedf210342a336a6157efb3bb51a148a6c8",
+          "libvpx.so.9": "46a42e812232b67e0118f82fde41938331eb473c03fb536c16fe42233d1dcc83",
+          "libvulkan.so.1": "382419ec9f138dd2a980fc988482a72b643c32901599b568a27fe7742946c752",
+          "libwayland-client.so.0": "b1a0f560b02802dcdac26811fcd726638590ae3af369d1367c1c3a1c1dc3c596",
+          "libwayland-server.so.0": "95e137b859ed8d98d76c38f6c7c90fbc899b43777bcee7f983ac0170051f9d65",
+          "libwebp.so.7": "adb7048aa7f7a63d7bf0ba2806a1d905a5a3d0aaa84790b36e515cd7ad8efdde",
+          "libwebpmux.so.3": "c8ea34468c5c5c2746b31cb671ea4a7fa419a0b461e9123d94ac112b855ce474",
+          "libx264.so.164": "87e40f7e90e125d4b7bc09a466679b8aa77f525606728a2e6609d26b3f0e7b14",
+          "libx265.so.209": "a59214787bbda5fd8caa96e34b98b3deced9d9ddf121a1b2b12ba6a7c883a0a6",
+          "libxcb-dri3.so.0": "719d3b552d4fa9a449e304792c2105bfb3dc9b06af834dbdc015f8295d904529",
+          "libxcb-present.so.0": "dbb4e4bc054f4d8c76829fb3e26fd28b0837e00a959782d0b85c21612a0e4c65",
+          "libxcb-randr.so.0": "9e8ea50bf477819df945d4320be1d90640840c582727b083ca7d9e308d50641c",
+          "libxcb-shm.so.0": "c81ab82b5c307c8b8e584b111d692c8e33297b29e493f2f6e26aa56c61d5f86d",
+          "libxcb-sync.so.1": "5e4c699c715e42c7f782f4e60886457e8fae0b238ffe5fadbe0405ca0a5eea98",
+          "libxcb-xfixes.so.0": "e4da99d415cc7b633b09083b1c8440c547e0940ee45694319c0da7677727beff",
+          "libxcb.so.1": "37b5950b0a216608ed5f9eb3e3c8244c6839aa7920901ee4ee2c663bc9ddfe4a",
+          "libxml2.so.2": "8f0ef3b255a82fa577bd59b102c8742accf4ee4847655c11297797d8b2295b7c",
+          "libxshmfence.so.1": "8d7b7132936a3c09ff1a3a84426bb7b2577e70cc43b694d4a63e41eacd1b69fd",
+          "libxvidcore.so.4": "3e690dd98fe8c2dfd6e38aa99560b32aa173d4d66f718d8b0259aa115566c1b1",
+          "libz.so.1": "1dfd2166dd6124fbd4cbba54ea3d5b2de60e308c252de39d1369e71d301ddea4",
+          "libzmq.so.5": "6d23680f3d55707b9eee7fcd98398d70e1ae84931c899a6416fb7b03b8820d41",
+          "libzstd.so.1": "0261e625d796007a4688f12b5bea20ca8af9d6767d645286501245a0f0187699",
+          "sample.h264": "9d0ac0fb2a9f3f51ac4d42b4d5980bf478e416ef1000a5dfd7fb6616eaaafb52",
+          "trames_drv_video.so": "406c3c1b304fbafb6cb9a325af22642641f5481d9e8e459d6d5c872dc0fbdc10"
+        },
+        "scope": "hardware H.264; export before sync; fork/SCM_RIGHTS; native GPU plane pixels",
+        "frontend": "EGL/GLES/Zink",
+        "denied_sysinfo": true
+      },
+      "method": "Exact same previously verified multislice stream. TEST_EGL executable exported sysconf unavailability and denied sysinfo with seccomp; patched GPU Y/UV pixels match the explicit VA readback oracle."
+    },
+    "validation": {
+      "runtime_macos_ci": {
+        "passed": 7,
+        "total": 7
+      },
+      "runtime_arm64_linux_ci": {
+        "passed": 7,
+        "total": 7
+      },
+      "mac_product_ci": {
+        "passed": 11,
+        "total": 11
+      },
+      "kernel_conformance": {
+        "passed": 238,
+        "ignored": 3,
+        "failed": 0
+      },
+      "ipad_device_compile": "aarch64-apple-ios trames-ffi: passed",
+      "mesa_patches": "all five applied to pristine pinned source; rebuilt all affected Zink objects",
+      "profile_policy": "explicit preference wins; repeated setup is idempotent",
+      "dev_install": {
+        "identifier": "org.trames.Trames.mac.dev",
+        "binary_sha256": "7a5dc592e16525e6d7dc9932a85bba07bfbae7337da5f329c3a8c707f902aba4",
+        "stable_unchanged": true
+      }
+    }
   }
 }

@@ -1,0 +1,31 @@
+# SPDX-License-Identifier: MIT
+Subject: Zink: remove the unused host physical-memory probe
+
+In Mesa 25.1.9 this field is written once and never read. Resource/cache
+budgets already use Vulkan memory heaps. Do not reject a working device when
+a sandbox denies the unrelated OS query. No budget or sandbox policy changes.
+
+--- a/src/gallium/drivers/zink/zink_screen.c
++++ b/src/gallium/drivers/zink/zink_screen.c
+@@ -3566,11 +3566,6 @@
+    screen->total_video_mem = get_video_mem(screen);
+    screen->clamp_video_mem = screen->total_video_mem * 0.8;
+-   if (!os_get_total_physical_memory(&screen->total_mem)) {
+-      if (!screen->driver_name_is_inferred)
+-         mesa_loge("ZINK: failed to get total physical memory");
+-      goto fail;
+-   }
+ 
+    zink_init_shader_caps(screen);
+    zink_init_compute_caps(screen);
+    zink_init_screen_caps(screen);
+--- a/src/gallium/drivers/zink/zink_types.h
++++ b/src/gallium/drivers/zink/zink_types.h
+@@ -1469,7 +1469,6 @@
+    uint64_t total_video_mem;
+    uint64_t clamp_video_mem;
+-   uint64_t total_mem;
+    uint64_t mapped_vram;
+ 
+    VkInstance instance;
+    const struct zink_instance_info *instance_info;

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Stock FFmpeg/libva -> immutable native FDs -> fork/SCM_RIGHTS -> native Vulkan.
 // The explicit CPU readback is a test oracle, never part of the rendering path.
+#define _GNU_SOURCE
 #include <assert.h>
 #include <fcntl.h>
 #include <stdint.h>
@@ -19,6 +20,13 @@
 #include <va/va_drmcommon.h>
 #include <vulkan/vulkan.h>
 #ifdef TEST_EGL
+#include <dlfcn.h>
+#include <errno.h>
+#include <stddef.h>
+#include <linux/filter.h>
+#include <linux/seccomp.h>
+#include <sys/prctl.h>
+#include <sys/syscall.h>
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
 #include <GLES3/gl3.h>
@@ -94,6 +102,32 @@ static void sample_vulkan(const VADRMPRIMESurfaceDescriptor *desc,int fds[2],con
 }
 #endif
 #ifdef TEST_EGL
+// Export from the test executable (-Wl,--export-dynamic). libc may cache or
+// accelerate sysconf independently of sysinfo, so inject unavailability at the
+// same public API Mesa calls, as well as checking the real seccomp denial.
+static int deny_physical_memory;
+long sysconf(int name) {
+    if(deny_physical_memory && name==_SC_PHYS_PAGES){errno=EACCES;return -1;}
+    long (*original)(int)=dlsym(RTLD_NEXT,"sysconf");assert(original);
+    return original(name);
+}
+static void restrict_os_memory_query(void) {
+    if(!getenv("TRAMES_TEST_DENY_SYSINFO"))return;
+    struct sock_filter filter[]={
+        BPF_STMT(BPF_LD|BPF_W|BPF_ABS,offsetof(struct seccomp_data,nr)),
+        BPF_JUMP(BPF_JMP|BPF_JEQ|BPF_K,SYS_sysinfo,0,1),
+        BPF_STMT(BPF_RET|BPF_K,SECCOMP_RET_ERRNO|EACCES),
+        BPF_STMT(BPF_RET|BPF_K,SECCOMP_RET_ALLOW),
+    };
+    struct sock_fprog program={.len=sizeof(filter)/sizeof(filter[0]),.filter=filter};
+    assert(!prctl(PR_SET_NO_NEW_PRIVS,1,0,0,0));
+    assert(!prctl(PR_SET_SECCOMP,SECCOMP_MODE_FILTER,&program));
+    char info[256];errno=0;
+    assert(syscall(SYS_sysinfo,info)==-1 && errno==EACCES);
+    deny_physical_memory=1;errno=0;
+    assert(sysconf(_SC_PHYS_PAGES)==-1 && errno==EACCES);
+    fprintf(stderr,"OS sysconf memory query unavailable; EGL image import must still work\n");
+}
 static void sample_egl(const VADRMPRIMESurfaceDescriptor *desc,int fds[2],const uint8_t *expected) {
     PFNEGLGETPLATFORMDISPLAYEXTPROC platform=(void*)eglGetProcAddress("eglGetPlatformDisplayEXT");assert(platform);
     EGLDisplay display=platform(EGL_PLATFORM_SURFACELESS_MESA,EGL_DEFAULT_DISPLAY,NULL);assert(display!=EGL_NO_DISPLAY);assert(eglInitialize(display,NULL,NULL));
@@ -131,6 +165,7 @@ int main(int argc,char **argv) {
     int sockets[2],fds[2]={desc.objects[0].fd,desc.objects[1].fd};assert(!socketpair(AF_UNIX,SOCK_SEQPACKET,0,sockets));pid_t child=fork();assert(child>=0);
     if(!child) {close(sockets[0]);close(fds[0]);close(fds[1]);receive_fds(sockets[1],fds);
 #ifdef TEST_EGL
+    restrict_os_memory_query();
     sample_egl(&desc,fds,expected);
 #else
     sample_vulkan(&desc,fds,expected);

@@ -3,7 +3,7 @@
 """Check stock FFmpeg/libva frame export and two-process native Vulkan/EGL import.
 
 Build vaapi-native-import.c on ARM64 Linux with pkg-config media libraries.
-Use -DTEST_EGL and link egl/glesv2 for the original Mesa EGL/GLES variant.
+Use -DTEST_EGL -Wl,--export-dynamic and link egl/glesv2 for the original Mesa EGL/GLES variant.
 A separately signed Mac runner and an isolated guest store are required.
 """
 import argparse
@@ -24,7 +24,10 @@ def main():
     parser.add_argument('--libraries', type=Path, help='Flat directory of exact Linux runtime .so dependencies')
     parser.add_argument('--egl', type=Path, help='Paired Mesa EGL library; requires --gallium and an EGL fixture')
     parser.add_argument('--gallium', type=Path)
+    parser.add_argument('--deny-sysinfo', action='store_true', help='deny the unused OS memory query before EGL initialization')
     args = parser.parse_args()
+    if args.deny_sysinfo and not args.egl:
+        parser.error('--deny-sysinfo requires the EGL fixture')
     if bool(args.egl) != bool(args.gallium):
         parser.error('--egl and --gallium must be paired')
     files = {'check': args.program, 'trames_drv_video.so': args.driver,
@@ -54,6 +57,8 @@ def main():
            'VK_DRIVER_FILES': guest + '/trames.json', 'LD_LIBRARY_PATH': guest,
            'GALLIUM_DRIVER': 'zink', 'MESA_LOADER_DRIVER_OVERRIDE': 'zink',
            'EGL_PLATFORM': 'surfaceless'}
+    if args.deny_sysinfo:
+        env['TRAMES_TEST_DENY_SYSINFO'] = '1'
     script = 'export ' + ' '.join(k + '=' + shlex.quote(v) for k, v in env.items())
     script += '; exec ' + shlex.join([guest + '/check', guest + '/sample.h264'])
     result = subprocess.run(command + ['/bin/sh', '-ec', script], capture_output=True,
@@ -65,7 +70,8 @@ def main():
         passed &= b'EGL renderer: zink Vulkan' in result.stderr and b'MOLTENVK' in result.stderr
     report = {'passed': bool(passed), 'returncode': result.returncode, 'sha256': checksums,
               'scope': 'hardware H.264; export before sync; fork/SCM_RIGHTS; native GPU plane pixels',
-              'frontend': 'EGL/GLES/Zink' if args.egl else 'Vulkan'}
+              'frontend': 'EGL/GLES/Zink' if args.egl else 'Vulkan',
+              'denied_sysinfo': args.deny_sysinfo}
     (out / 'result.json').write_text(json.dumps(report, indent=2) + '\n')
     print(json.dumps({'passed': bool(passed), 'frontend': report['frontend'], 'output': str(out)}))
     if not passed:

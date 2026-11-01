@@ -1,12 +1,13 @@
 # VA-API over VideoToolbox
 
-Status: experimental H.264 implementation, 2026-10-31. The shared runtime,
+Status: experimental H.264 implementation, 2026-11-01. The shared runtime,
 standard libva driver, retained image FDs, native Vulkan import and Mesa EGL
 adapter are implemented. Stock Firefox 142 selects VA-API in its RDD process
-with its normal sandbox and default hardware-decoding policy. Playback works,
-including backward seek and looping, but end-to-end performance is not yet ready
-for a stable release: one foreground 720p30 interval displayed 17.7 FPS.
-HEVC, AV1, encoding, video processing and physical iPad playback are not validated.
+with its normal sandbox. Foreground 720p30 and near-source-rate 1080p60 playback
+are validated below. The recommended Firefox 151/native-video profile passes cold short-clip
+autoplay/looping without the old 15-second buffer pause; Firefox 142 retains that
+limitation. HEVC, AV1, encoding, video processing, audio
+output/A-V synchronization and physical iPad playback are not validated.
 
 ## Architecture
 
@@ -424,7 +425,7 @@ window straddling that pause accepted 10.58 FPS (272 total, 7 dropped), then
 resumed normal playback and looping. The steady-state result above does not
 claim to fix that cold-start stall. A WebDriver click and text-input check after
 that window completed correctly in 403 ms for the combined controller roundtrip.
-Audio output/A-V synchronization, higher-resolution playback and physical iPad
+Audio output/A-V synchronization, 4K browser playback and physical iPad
 presentation are not established by this pass; the shared iPad compile passes.
 
 Use the Mac product's `scripts/benchmark-firefox-video.py --port PORT --output
@@ -434,6 +435,90 @@ frame-callback notifications without changing decoder, graphics or sandbox
 preferences. The input check runs after timing. [Machine-readable samples and
 fixture hashes](../validation/firefox-video-playback.json) retain intermediate
 controls as well as the native comparison.
+
+## 1080p60 and worker sleep deadlines (2026-11-01)
+
+A new 45-second 1920×1080/60 Hz H.264 High/AAC fixture uses a continuous encode,
+not repeated remuxed segments. A foreground marker capture identified 21,396
+whole-cohort returns for `nanosleep`, in addition to Unix message transfers.
+Such short graphics-library backoffs must release the caller's execution slot
+without pausing its peers. The shared runtime now parks nanosleep/clock_nanosleep
+on the existing deadline queue. Original deadlines and remaining pointers survive
+checkpoints; normal expiry returns zero, and the existing owner handles signal
+interruption. Seccomp still evaluates each accepted/denied entry once. No extra
+service thread, polling loop or guest preference is introduced.
+
+Wayland callback deadlines also retain their fixed phase rather than accumulating
+one dispatch delay per tick. The phase-only change did not improve this sample
+by itself. Requested callbacks still require presented content, and missed ticks
+are skipped without replaying a backlog.
+
+| Path | Accepted video FPS | Dropped / total |
+| --- | ---: | ---: |
+| Previous runtime | 54.82 | 127 / 1465 |
+| Fixed phase only | 54.26 | 140 / 1466 |
+| Worker sleeps + fixed phase | 58.89 | 27 / 1467 |
+| Native Firefox 159 | 59.97 | 0 / 1456 |
+
+These sequential individual samples exclude five seconds of playback warmup
+following metadata readiness and ten seconds of settling. The measured windows
+are about 24 seconds (30 seconds sampled once per second). No profiler/build VM
+ran during timing. The final guest retained hardware decoding, with zero decoder
+drops and no buffering during this interval. Firefox versions differ (142 vs
+159); window geometry is not pixel-identical. This is not a maximum-throughput
+or physical-scanout score. See the paired counters and fixture SHA-256 in
+[the machine-readable record](../validation/firefox-video-playback.json).
+
+The original short AAC cold-autoplay case still stalls; neither a larger decoded
+queue nor the scheduling fix removes it. Its buffered range ends at 12.000 s,
+while Firefox 142 reports 12.021333 s duration. At the last five-second threshold,
+a transient decoded-queue shortage enters BUFFERING even though the entire file
+is local. The queue can refill with already late frames and wait for the fixed
+15-second timeout repeatedly. JavaScript remains responsive. A similar duration/
+buffered-end failure mode is described in [Mozilla bug 2083351](https://bugzilla.mozilla.org/show_bug.cgi?id=2083351),
+but that later warm-seek regression is not identified as the exact Firefox 142
+cause. This limitation requires a media-state-machine/client fix; changing guest
+clocks or suppressing frame counters would not repair it. The 1080p interval above
+does not cover its final five seconds or looping, and does not claim to fix it.
+
+### Newer client and cold-autoplay acceptance
+
+The isolated test environment was upgraded using official Alpine v3.23 signed
+packages to Firefox 151.0.3. It reports 12.000 s for the original short clip,
+matching the buffered end, and no longer triggers the old 15-second buffer wait.
+The previous Firefox 142 environment was preserved for the paired timing above.
+
+Two independent startup issues were then addressed:
+
+- Mesa 25.1.9 wrote `zink_screen.total_mem` once and never read it. Its failed
+  physical-memory query nevertheless rejected a working Vulkan device inside
+  the RDD sandbox. [Patch 0005](../../patches/mesa/0005-drop-unused-host-memory-probe.patch)
+  removes the dead query and field; existing resource/cache budgets continue to
+  use Vulkan heaps. The new pixel fixture makes sysconf unavailable and denies
+  sysinfo with seccomp: the old library fails EGL initialization, and the patched
+  library matched the hardware frame's Y/UV pixels. No browser sandbox change
+  is required.
+- Firefox 151 counts wall-clock decode delays and may switch to software after
+  cold graphics initialization/scheduling stalls. On this verified-fast
+  VideoToolbox backend that switch is counterproductive. The Mac launcher seeds
+  `media.ffmpeg.vaapi.enabled=true` and
+  `media.ffmpeg.disable-software-fallback=true` for native-video profiles only
+  when no explicit preference exists. `--video-policy browser` preserves browser
+  defaults. The [upstream slow-decode branch](https://github.com/mozilla-firefox/firefox/blob/FIREFOX_151_0_3_RELEASE/dom/media/platforms/ffmpeg/FFmpegVideoDecoder.cpp#L1334)
+  is separate from actual VA decode/image-import failures, which still use the
+  ordinary error/recovery path. This keeps the hardware choice; it does not
+  suppress frame-drop counters or reduce video quality.
+
+A fresh cold short-clip run with that policy retained hardware decoding, crossed
+two loop transitions and reported zero buffering time. Initial startup still
+lost frames; this functional check is not a zero-latency or zero-drop claim.
+
+A separate 55.018-second 1080p60 run, including the clip end and looping, accepted
+56.05 FPS (218/3302 dropped), retained hardware decoding and reported zero
+buffering time. Click and typing passed after timing (576 ms combined controller
+roundtrip). This longer/newer-client result has a different scope from the
+58.89 FPS paired steady interval above. Neither is a sustained zero-drop 60 FPS
+acceptance. Audio was muted; output/A-V synchronization remains outside scope.
 
 ## Primary sources
 
