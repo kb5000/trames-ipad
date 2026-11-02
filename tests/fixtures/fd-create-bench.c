@@ -290,6 +290,28 @@ int main(int argc, char **argv) {
             assert(!getsockname(fd, (struct sockaddr *)&address, &size));
             assert(address.sin_family == AF_INET && size == sizeof(address));
             assert(!close(fd));
+        } else if (!strcmp(kind, "unix-create") || !strcmp(kind, "unix-pair")) {
+            int endpoints[2] = {-1, -1};
+            if (!strcmp(kind, "unix-pair")) {
+                assert(!socketpair(AF_UNIX, SOCK_STREAM, 0, endpoints));
+            } else {
+                endpoints[0] = socket(AF_UNIX, SOCK_STREAM, 0); assert(endpoints[0] >= 0);
+            }
+            int alias = dup(endpoints[0]); assert(alias >= 0);
+            assert(!fcntl(alias, F_SETFL, O_NONBLOCK));
+            assert(fcntl(endpoints[0], F_GETFL) & O_NONBLOCK);
+            int bytes = 8192, value = 0; socklen_t size = sizeof(value);
+            assert(!setsockopt(alias, SOL_SOCKET, SO_RCVBUF, &bytes, sizeof(bytes)));
+            assert(!getsockopt(alias, SOL_SOCKET, SO_TYPE, &value, &size) && value == SOCK_STREAM);
+            if (endpoints[1] >= 0) {
+                unsigned char sent = (unsigned char)i, received = 0;
+                assert(write(alias, &sent, 1) == 1);
+                assert(read(endpoints[1], &received, 1) == 1 && received == sent);
+                assert(!shutdown(alias, SHUT_WR));
+                assert(read(endpoints[1], &received, 1) == 0);
+                assert(!close(endpoints[1]));
+            }
+            assert(!close(alias)); assert(!close(endpoints[0]));
         } else if (!strcmp(kind, "pipe")) {
             int p[2];
 #ifdef __linux__

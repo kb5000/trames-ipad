@@ -1,5 +1,78 @@
 # Coordinator dependency audit
 
+## Twenty-first migration implemented — complete Unix socket resources and worker lifecycle — 2026-11-03
+
+Runtime `2b2194fee02e63b0ac6d0dcac11e9829206758ff` moves the actual Unix socket
+control graph and full open descriptions to shared ownership, common to Mac and
+iPad. This removes the ownership boundary that previously forced ordinary socket
+creation, aliases, option controls and final close through joined execution.
+
+| Resource / operation | Shared original authority and worker behavior | Remaining joined boundary |
+| --- | --- | --- |
+| Unix socket graph | Actual network identity, abstract namespace, pathname routes, names/credentials, connection, listener queue and options; derived Send/Sync | Bind/connect/accept and addressed datagram entry/wait admission |
+| Creation and membership | socket/socketpair, actual Files reservations, full OFDs, dup/flags/close | Excluded legacy ancillary owning graphs |
+| Short controls | Listen, address/peer queries, original Unix options and shutdown share one owner/worker ABI | Structural namespace and task transitions |
+| Network namespace OFDs | Actual shared identity, IP/Unix resources and quota; aliases and portable rights retain original setns authority | unshare/setns, proc controls and mount/nsfs topology |
+
+Connected byte/message I/O reads one canonical immutable binding; it does not lock
+the connection graph or consult a second connection cache. A connection inherits
+its original options before publication and keeps the client's preconnect readiness
+source, preserving existing subscriptions without a forwarding thread. Locks leave
+before notifications. Fresh socketpairs use normal Files publication rather than
+invalidating every existing descriptor snapshot. There is no new global lock,
+resource thread, bus, ordinary guest memory fence or native permission policy.
+
+Accepted operations retain complete original OFDs across close/reuse; prepared maps
+and epoll watches stay weak. Transport admission accepts once before choosing Unix
+or IP. Owner message handoff receives that accepted lease directly instead of looking
+up a number after another worker may have closed/reused it. Legacy Unix-bearing rights
+remain excluded from portable sets: original owner graph/cycle checks stay in place,
+and closed destinations reap their owner payloads on the existing joined boundary.
+Actual endpoint close/notification still occurs immediately on its final worker drop.
+
+Production FFI systemd boot exposed an old assumption that all shared raw byte reads
+could finish without owner ancillary handling. Retained Unix byte handoff now covers
+immediate and parked read/readv, using the same original socket and original ABI.
+Tests close/reuse the FD, deliver legacy rights, verify original bytes and final peer
+hangup, and confirm that replacement eventfds remain untouched. Final systemd/DBus
+startup and both real FFI terminals pass.
+
+| Four processes × 1,000 checked operations, longest-child median | Previous | Current | Native macOS | Native Linux, exact ELF | Improvement |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Unix create / alias / flags / options / close | 394.28 ms | 13.21 ms | 5.01 ms | 4.07 ms | 29.85x |
+| Socketpair / alias / flags / options / bytes / shutdown / EOF / close | 536.50 ms | 21.92 ms | 4.77 ms | 6.46 ms | 24.47x |
+| Existing pipe-rights transfer / bytes / close | 10.48 ms | 10.21 ms | 1.51 ms | 1.97 ms | No significant change claimed |
+
+Process-wall medians fall **432.49 → 51.49 ms**, **572.95 → 60.48 ms**, and
+**48.67 → 45.46 ms**. Separate diagnostic cohort counts are **11,788 → 45**,
+**16,327 → 50**, and **57 → 44**. Service requests are **6,038 → 3**,
+**5,060 → 3**, and **3 → 2**, including process startup/teardown. These residual
+counts are recorded, not presented as zero joins for a whole application.
+
+Three unprofiled counterbalanced samples run after compilation, with local Linux CI
+stopped and four Trames vCPUs. Creation is inside the first two loops; existing
+rights transports are outside that timer. Native macOS uses its native Unix APIs;
+native ARM64 Linux runs the identical static musl ELF on the existing six-vCPU CI
+machine. Different kernels/API semantics are contextual references. This is neither
+a Firefox/whole-app/physical-iPad measurement nor a claim of generally native speed.
+
+Validation covers Apple/Linux VFS **441/440**, ABI **179 each**, kernel **267
+unique cases each**, strict checks, Mac product **13**, both product boundaries,
+all **13** production FFI environment checks, and the iPad static build. Physical
+iPad testing remains skipped per owner. Eight creators exercise all three Unix
+kinds, original credentials/network after unshare, rollback and last-close lifetime.
+The filtered two-task regression executes 176 lifecycle/control/byte calls plus two
+final futex waits with zero services and one filter decision per entry on one/two
+slots. Linux exposed old signalfd/directory tests whose completed task could spin
+away the shared instruction allowance. Those tasks and the equivalent PTY test now
+park; only affected cases are rerun, reusing unchanged passes and guest artifacts.
+
+The goal remains active. Next are worker Unix bind/connect/accept/addressed datagram
+controls, portable Unix-bearing ancillary ownership and cycle reclamation, task/job
+control and legacy PTY paths, io_uring controls, mount topology, proc controls and
+structural VM/task transitions. See the [validation record](../validation/worker-unix-graph-20261103.json)
+and [shared contract](../../runtime/docs/architecture/execution-backends.md#shared-unix-control-ownership-and-worker-creation-2026-11-03).
+
 ## Twentieth migration implemented — worker PTY creation and live device policy — 2026-11-03
 
 Runtime `8bb98ca0706c2192ce01064c11b6e0d92035063e` shares the actual per-cgroup
