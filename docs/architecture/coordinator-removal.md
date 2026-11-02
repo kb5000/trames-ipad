@@ -1,5 +1,62 @@
 # Coordinator dependency audit
 
+## Twelfth migration implemented — shared live routing resources — 2026-11-02
+
+Runtime `4021141d5064d5f554f7bf94e0efa80ac34f4619` shares the actual topology/View, ruleset, conntrack
+and loopback resources by composition. These resources contain no owner Rc graph;
+complete namespace/fabric/socket projection lifetime and production socket factory
+routing still need migration. No new worker opcode is claimed in this stage.
+
+Topology queries use concurrent readers; structural changes alone need a writer.
+Connection/NAT invariants synchronize per namespace, and a route releases that
+state before the next namespace/bridge. Configuration handlers capture resources
+and leave topology before taking their transaction lock. Nested read reacquisition
+was removed to avoid deadlock when a writer is pending.
+
+Packet accounting no longer takes a topology writer. Stored links hold the actual
+relaxed atomic counters; public Device remains a reporting snapshot, and moving
+a link preserves its counter resource. Unchanged native metadata refresh likewise
+needs only a reader, allocates no address vector, and never performs host interface
+queries under topology. Changed metadata retains the original writer transaction.
+
+Rule batches and ctnetlink changes hold their actual object lock from cloning
+through validation, output-capacity preflight and publication. Concurrent batches
+cannot overwrite a successful generation; deletes cannot restore deleted flows
+or erase newly inserted packet state. Rule counters use relaxed atomic updates,
+and publication preserves packet increments. The original protocol, permissions,
+rollback, limits and private redirect previews are retained. No global network
+mutex, new resource-service thread, message bus or polling loop is introduced.
+
+Concurrency coverage proves another namespace progresses while one is locked,
+topology readers coexist, exact packet/drop totals need no writer, link moves
+preserve counters, unchanged native refresh progresses under a held reader, all
+concurrent rule batches publish, live publication preserves packet counts, and
+concurrent deletes/inserts retain every intended flow. Apple and ARM64 Linux pass
+75 network unit tests, 11 integration tests, affected VFS/ABI tests and strict
+checks. Mac product checks, 13 production FFI checks and the iPad static build
+passed; physical iPad checks remain skipped per owner.
+
+TCP regression results are approximately flat, as expected for this ownership
+stage. Four processes each perform the stated fixed work; results are medians of
+three unprofiled counterbalanced runs, with separate profiling samples:
+
+| Longest-child loop median | Previous | Current | Native macOS | Reused native Linux |
+| --- | ---: | ---: | ---: | ---: |
+| TCP epoll, 2,000 cycles each | 29.24 ms | 29.26 ms | 19.39 ms | 5.54 ms |
+| Complete TCP sessions, 256 each | 45.70 ms | 45.08 ms | 15.63 ms | 3.78 ms |
+
+Native Linux references are reused with exact ELF identity verified per case;
+macOS equivalents are measured afresh. Their APIs, kernels and CPU allocation
+differ. Startup/teardown is excluded from child loops and included in wall time.
+Diagnostic counts include nonblocking retries and are not a performance claim.
+No application speedup is inferred. Unchanged CPU/memory/graphics/interpreter
+scheduling acceptance is reused rather than rerun for documentation or pins.
+
+Next work is complete namespace/virtual-fabric ownership and shared socket OFDs,
+then actual factory/control/accept dispatch, alongside Unix/task/VM dependencies.
+See [the validation record](../validation/shared-routing-20261102.json) and the
+[shared routing contract](../../runtime/docs/architecture/execution-backends.md#shared-routing-filtering-and-connection-tracking-2026-11-02).
+
 ## Eleventh migration implemented — shared native network lifetime — 2026-11-02
 
 Runtime `4d69b7e016ed83e5783d4c5b668c31c9084d440a` removes native namespace/DNS Rc ownership and the

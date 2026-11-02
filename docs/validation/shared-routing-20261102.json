@@ -1,0 +1,1453 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-02",
+  "passed": true,
+  "runtime_revision": "4021141d5064d5f554f7bf94e0efa80ac34f4619",
+  "baseline_runtime_revision": "4d69b7e016ed83e5783d4c5b668c31c9084d440a",
+  "baseline_mac_revision": "973fa57a467db154ca5a1f6e35ef2e6771bdce46",
+  "candidate_mac_revision": "9b92981d5828d0149afcfdda932ffb6c03ea35be",
+  "scope": {
+    "migrated": [
+      "Actual topology/View, loopback state, ruleset and conntrack resources are Send+Sync by composition.",
+      "Packet accounting uses per-link relaxed atomics and topology readers; unchanged native metadata refresh never requests a writer or allocates an address vector.",
+      "nf_tables and ctnetlink share original protocol transaction helpers; publication holds its object lock from snapshot through validation/copyout preflight and commit."
+    ],
+    "production_new_worker_syscalls": [],
+    "production_socket_factory_migrated": false,
+    "still_owner": [
+      "Complete Linux namespace and virtual fabric/socket lifetime",
+      "Full socket OFD publication and production creation/bind/connect/listen/accept dispatch",
+      "Unix/SCM_RIGHTS, task/signal, structural VM/device ownership"
+    ],
+    "concurrency": "Topology read -> per-namespace conntrack -> ruleset read. Configuration captures its resource and releases topology before object transactions. One route releases its conntrack guard before the next namespace. Metadata counters/loopback use relaxed atomics, with no new guest-memory barrier.",
+    "timing": "Four processes; 2000 checked TCP epoll one-shot byte cycles or 256 complete TCP sessions each. Median of three unprofiled counterbalanced samples, plus separate profiling. Setup/teardown outside child loops, inside wall time.",
+    "limitations": [
+      "Resource-sharing tests establish concurrency and identity properties, not whole-product speedups. Production socket dispatch is unchanged in this stage.",
+      "Mac equivalents use corresponding kqueue APIs; native Linux and macOS have different kernels/CPU allocation. Unchanged Linux references are reused only after exact fixture ELF hash verification.",
+      "Cohort/service metrics include startup, teardown and nonblocking retries; variation is not a claimed optimization or CPU utilization.",
+      "Physical iPad testing skipped per owner; the shared static build passed. Unchanged CPU/memory/graphics and interpreter scheduling acceptance is reused.",
+      "No new unsafe, guest quota, race errno, service thread, message bus or polling loop. Ordinary native TCP bytes retain their existing path."
+    ]
+  },
+  "summary": {
+    "epoll": {
+      "loop_before_ms": 29.238708,
+      "loop_after_ms": 29.262792,
+      "loop_change_percent": 0.08237026068320663,
+      "wall_before_ms": 62.59041700000001,
+      "wall_after_ms": 63.58862500000018,
+      "mac_native_equivalent_ms": 19.39,
+      "linux_native_ms": 5.535902,
+      "cohort_before": 53,
+      "cohort_after": 54,
+      "interpretation": "Approximately flat. No new production socket worker opcode in this stage."
+    },
+    "session": {
+      "loop_before_ms": 45.698333,
+      "loop_after_ms": 45.081417,
+      "loop_change_percent": -1.3499748448154603,
+      "wall_before_ms": 78.75795900000004,
+      "wall_after_ms": 78.42570799999993,
+      "mac_native_equivalent_ms": 15.630999999999998,
+      "linux_native_ms": 3.776884,
+      "cohort_before": 41,
+      "cohort_after": 49,
+      "interpretation": "Approximately flat. No new production socket worker opcode in this stage."
+    }
+  },
+  "cases": {
+    "epoll": {
+      "passed": true,
+      "kind": "tcp-epoll",
+      "processes": 4,
+      "operations_each": 2000,
+      "repeats": 3,
+      "cpus": 12,
+      "records": [
+        {
+          "variant": "before",
+          "repeat": 0,
+          "wall_seconds": 0.4443323749999999,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.053031375,
+              "checksum": 2001000
+            },
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.052199875,
+              "checksum": 2001000
+            },
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.053694875,
+              "checksum": 2001000
+            },
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.055088667,
+              "checksum": 2001000
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 53,
+            "cohort_stop_us": 2402,
+            "service_caller_wait_us": 749,
+            "service_requests": 35,
+            "serviced_syscalls": 31,
+            "syscalls": 32175,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 24008,
+            "worker_fd_syscalls": 8006,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 8000,
+            "worker_socket_syscalls": 16008,
+            "worker_syscalls": 32014,
+            "worker_task_resumes": 31
+          }
+        },
+        {
+          "variant": "after",
+          "repeat": 0,
+          "wall_seconds": 0.06612250000000008,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.027567541,
+              "checksum": 2001000
+            },
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.027810583,
+              "checksum": 2001000
+            },
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.028082291,
+              "checksum": 2001000
+            },
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.029563625,
+              "checksum": 2001000
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 54,
+            "cohort_stop_us": 1035,
+            "service_caller_wait_us": 580,
+            "service_requests": 33,
+            "serviced_syscalls": 31,
+            "syscalls": 32178,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 23935,
+            "worker_fd_syscalls": 7984,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 7976,
+            "worker_socket_syscalls": 15959,
+            "worker_syscalls": 31919,
+            "worker_task_resumes": 31
+          }
+        },
+        {
+          "variant": "before",
+          "repeat": 1,
+          "wall_seconds": 0.06279275000000006,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.027538334,
+              "checksum": 2001000
+            },
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.028302959,
+              "checksum": 2001000
+            },
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.027709584,
+              "checksum": 2001000
+            },
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.029238708,
+              "checksum": 2001000
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 1,
+          "wall_seconds": 0.063623333,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.026704042,
+              "checksum": 2001000
+            },
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.027701666,
+              "checksum": 2001000
+            },
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.02878075,
+              "checksum": 2001000
+            },
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.028902334,
+              "checksum": 2001000
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 2,
+          "wall_seconds": 0.06237295899999995,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.028090708,
+              "checksum": 2001000
+            },
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.028368,
+              "checksum": 2001000
+            },
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.028415125,
+              "checksum": 2001000
+            },
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.029974083,
+              "checksum": 2001000
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 2,
+          "wall_seconds": 0.06259041700000001,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.02784625,
+              "checksum": 2001000
+            },
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.027338375,
+              "checksum": 2001000
+            },
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.028700916,
+              "checksum": 2001000
+            },
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.029306792,
+              "checksum": 2001000
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 3,
+          "wall_seconds": 0.06158754200000005,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.027419709,
+              "checksum": 2001000
+            },
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.027141416,
+              "checksum": 2001000
+            },
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.027490958,
+              "checksum": 2001000
+            },
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.028928333,
+              "checksum": 2001000
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 3,
+          "wall_seconds": 0.06358862500000018,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.028159625,
+              "checksum": 2001000
+            },
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.027573292,
+              "checksum": 2001000
+            },
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.02856625,
+              "checksum": 2001000
+            },
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.029262792,
+              "checksum": 2001000
+            }
+          ]
+        },
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.02700283300000006,
+          "children": [
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.019105,
+              "checksum": 2001000
+            },
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.019276,
+              "checksum": 2001000
+            },
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.019341,
+              "checksum": 2001000
+            },
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.019256,
+              "checksum": 2001000
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.023009125000000186,
+          "children": [
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.018648,
+              "checksum": 2001000
+            },
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.019602,
+              "checksum": 2001000
+            },
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.019428,
+              "checksum": 2001000
+            },
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.019152,
+              "checksum": 2001000
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.022873832999999788,
+          "children": [
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.018298,
+              "checksum": 2001000
+            },
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.01939,
+              "checksum": 2001000
+            },
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.019217,
+              "checksum": 2001000
+            },
+            {
+              "kind": "tcp-epoll",
+              "operations": 2000,
+              "seconds": 0.018941,
+              "checksum": 2001000
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "baseline": "493d2b592fae3736ec91125438c4f6c3e73b535c819691456c8493fc56af0440",
+        "candidate": "e38536e7d5546b4d0e9afeceaff6e616828caa1f45dd7f29d822f79a4edc7126",
+        "native": "867ca4627f0c0679a1be23d054c7372177aa274d8636ae97077205cf8d5ccc09",
+        "fixture": "21941385050d94b081ecd90d2b797cd8ab52b70be243749a5710f20fe40da00f",
+        "rootfs": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe"
+      },
+      "native_environment": {
+        "system": "Darwin",
+        "release": "27.0.0",
+        "architecture": "arm64",
+        "logical_cpus": 12
+      },
+      "summary": {
+        "before": {
+          "loop_max_median_seconds": 0.029238708,
+          "process_wall_median_seconds": 0.06259041700000001,
+          "profile": {
+            "cohort_rounds": 53,
+            "cohort_stop_us": 2402,
+            "service_caller_wait_us": 749,
+            "service_requests": 35,
+            "serviced_syscalls": 31,
+            "syscalls": 32175,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 24008,
+            "worker_fd_syscalls": 8006,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 8000,
+            "worker_socket_syscalls": 16008,
+            "worker_syscalls": 32014,
+            "worker_task_resumes": 31
+          }
+        },
+        "after": {
+          "loop_max_median_seconds": 0.029262792,
+          "process_wall_median_seconds": 0.06358862500000018,
+          "profile": {
+            "cohort_rounds": 54,
+            "cohort_stop_us": 1035,
+            "service_caller_wait_us": 580,
+            "service_requests": 33,
+            "serviced_syscalls": 31,
+            "syscalls": 32178,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 23935,
+            "worker_fd_syscalls": 7984,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 7976,
+            "worker_socket_syscalls": 15959,
+            "worker_syscalls": 31919,
+            "worker_task_resumes": 31
+          }
+        },
+        "native": {
+          "loop_max_median_seconds": 0.01939,
+          "process_wall_median_seconds": 0.023009125000000186
+        }
+      }
+    },
+    "session": {
+      "passed": true,
+      "kind": "tcp-session",
+      "processes": 4,
+      "operations_each": 256,
+      "repeats": 3,
+      "cpus": 12,
+      "records": [
+        {
+          "variant": "before",
+          "repeat": 0,
+          "wall_seconds": 0.11970237500000003,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.062711167,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.063683417,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.060968708,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.06234825,
+              "checksum": 32896
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 41,
+            "cohort_stop_us": 1806,
+            "service_caller_wait_us": 130952,
+            "service_requests": 5608,
+            "serviced_syscalls": 5604,
+            "syscalls": 14463,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 5152,
+            "worker_fd_syscalls": 2052,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 5152,
+            "worker_syscalls": 8737,
+            "worker_task_resumes": 5604
+          }
+        },
+        {
+          "variant": "after",
+          "repeat": 0,
+          "wall_seconds": 0.07754908300000007,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.042828459,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.042968917,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.044992583,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.045387292,
+              "checksum": 32896
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 49,
+            "cohort_stop_us": 865,
+            "service_caller_wait_us": 93683,
+            "service_requests": 5251,
+            "serviced_syscalls": 5248,
+            "syscalls": 12734,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 4638,
+            "worker_fd_syscalls": 2050,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 4638,
+            "worker_syscalls": 7355,
+            "worker_task_resumes": 5248
+          }
+        },
+        {
+          "variant": "before",
+          "repeat": 1,
+          "wall_seconds": 0.07979970900000011,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.043376708,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.042934875,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.043979583,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.043599167,
+              "checksum": 32896
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 1,
+          "wall_seconds": 0.07842570799999993,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.044240542,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.045081417,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.044290583,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.04408775,
+              "checksum": 32896
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 2,
+          "wall_seconds": 0.07642270800000017,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.042245125,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.04355125,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.042314667,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.044115833,
+              "checksum": 32896
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 2,
+          "wall_seconds": 0.078702834,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.044023875,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.043367583,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.043959542,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.045698333,
+              "checksum": 32896
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 3,
+          "wall_seconds": 0.07875795900000004,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.044562834,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.044227666,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.04489225,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.045897416,
+              "checksum": 32896
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 3,
+          "wall_seconds": 0.0844405829999999,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.044414041,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.045253916,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.04473625,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.045079458,
+              "checksum": 32896
+            }
+          ]
+        },
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.01985112499999997,
+          "children": [
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.015501,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.015559,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.01539,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.01528,
+              "checksum": 32896
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.019423750000000073,
+          "children": [
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.015636,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.015683,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.015617,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.015294,
+              "checksum": 32896
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.019461583000000005,
+          "children": [
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.015587,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.015631,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.015521,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.015323,
+              "checksum": 32896
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "baseline": "493d2b592fae3736ec91125438c4f6c3e73b535c819691456c8493fc56af0440",
+        "candidate": "e38536e7d5546b4d0e9afeceaff6e616828caa1f45dd7f29d822f79a4edc7126",
+        "native": "b1b5cce65f2bfc89be0342f635752aace93308396f9ac29105aa06bc8d010e40",
+        "fixture": "4028b2573165dffceb6c0e08d84d0de6ab6197c3f5c1d825c0ca9deb92238c10",
+        "rootfs": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe"
+      },
+      "native_environment": {
+        "system": "Darwin",
+        "release": "27.0.0",
+        "architecture": "arm64",
+        "logical_cpus": 12
+      },
+      "summary": {
+        "before": {
+          "loop_max_median_seconds": 0.045698333,
+          "process_wall_median_seconds": 0.07875795900000004,
+          "profile": {
+            "cohort_rounds": 41,
+            "cohort_stop_us": 1806,
+            "service_caller_wait_us": 130952,
+            "service_requests": 5608,
+            "serviced_syscalls": 5604,
+            "syscalls": 14463,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 5152,
+            "worker_fd_syscalls": 2052,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 5152,
+            "worker_syscalls": 8737,
+            "worker_task_resumes": 5604
+          }
+        },
+        "after": {
+          "loop_max_median_seconds": 0.045081417,
+          "process_wall_median_seconds": 0.07842570799999993,
+          "profile": {
+            "cohort_rounds": 49,
+            "cohort_stop_us": 865,
+            "service_caller_wait_us": 93683,
+            "service_requests": 5251,
+            "serviced_syscalls": 5248,
+            "syscalls": 12734,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 4638,
+            "worker_fd_syscalls": 2050,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 4638,
+            "worker_syscalls": 7355,
+            "worker_task_resumes": 5248
+          }
+        },
+        "native": {
+          "loop_max_median_seconds": 0.015631,
+          "process_wall_median_seconds": 0.019461583000000005
+        }
+      }
+    }
+  },
+  "reused_linux_references": {
+    "epoll": {
+      "source_record": "docs/validation/tcp-poll-20261102.json",
+      "case": {
+        "passed": true,
+        "kind": "tcp-epoll",
+        "processes": 4,
+        "operations_each": 2000,
+        "repeats": 3,
+        "cpus": 6,
+        "records": [
+          {
+            "variant": "native",
+            "repeat": 1,
+            "wall_seconds": 0.010398100000003296,
+            "children": [
+              {
+                "kind": "tcp-epoll",
+                "operations": 2000,
+                "seconds": 0.00518551,
+                "checksum": 2001000
+              },
+              {
+                "kind": "tcp-epoll",
+                "operations": 2000,
+                "seconds": 0.005535902,
+                "checksum": 2001000
+              },
+              {
+                "kind": "tcp-epoll",
+                "operations": 2000,
+                "seconds": 0.004398773,
+                "checksum": 2001000
+              },
+              {
+                "kind": "tcp-epoll",
+                "operations": 2000,
+                "seconds": 0.004282782,
+                "checksum": 2001000
+              }
+            ],
+            "exit": 0
+          },
+          {
+            "variant": "native",
+            "repeat": 2,
+            "wall_seconds": 0.006631033000005004,
+            "children": [
+              {
+                "kind": "tcp-epoll",
+                "operations": 2000,
+                "seconds": 0.004834825,
+                "checksum": 2001000
+              },
+              {
+                "kind": "tcp-epoll",
+                "operations": 2000,
+                "seconds": 0.004960692,
+                "checksum": 2001000
+              },
+              {
+                "kind": "tcp-epoll",
+                "operations": 2000,
+                "seconds": 0.005417951,
+                "checksum": 2001000
+              },
+              {
+                "kind": "tcp-epoll",
+                "operations": 2000,
+                "seconds": 0.005216007,
+                "checksum": 2001000
+              }
+            ],
+            "exit": 0
+          },
+          {
+            "variant": "native",
+            "repeat": 3,
+            "wall_seconds": 0.008428280000003951,
+            "children": [
+              {
+                "kind": "tcp-epoll",
+                "operations": 2000,
+                "seconds": 0.005812132,
+                "checksum": 2001000
+              },
+              {
+                "kind": "tcp-epoll",
+                "operations": 2000,
+                "seconds": 0.004910654,
+                "checksum": 2001000
+              },
+              {
+                "kind": "tcp-epoll",
+                "operations": 2000,
+                "seconds": 0.005136722,
+                "checksum": 2001000
+              },
+              {
+                "kind": "tcp-epoll",
+                "operations": 2000,
+                "seconds": 0.005265128,
+                "checksum": 2001000
+              }
+            ],
+            "exit": 0
+          }
+        ],
+        "sha256": {
+          "native": "21941385050d94b081ecd90d2b797cd8ab52b70be243749a5710f20fe40da00f"
+        },
+        "native_environment": {
+          "system": "Linux",
+          "release": "7.0.0-38-generic",
+          "architecture": "aarch64",
+          "logical_cpus": 6
+        },
+        "summary": {
+          "native": {
+            "loop_max_median_seconds": 0.005535902,
+            "process_wall_median_seconds": 0.008428280000003951
+          }
+        }
+      }
+    },
+    "session": {
+      "source_record": "docs/validation/epoll-live-20261102.json",
+      "case": {
+        "passed": true,
+        "kind": "tcp-session",
+        "processes": 4,
+        "operations_each": 256,
+        "repeats": 3,
+        "cpus": 6,
+        "records": [
+          {
+            "variant": "native",
+            "repeat": 1,
+            "wall_seconds": 0.00592630599999211,
+            "children": [
+              {
+                "kind": "tcp-session",
+                "operations": 256,
+                "seconds": 0.004208052,
+                "checksum": 32896
+              },
+              {
+                "kind": "tcp-session",
+                "operations": 256,
+                "seconds": 0.004111759,
+                "checksum": 32896
+              },
+              {
+                "kind": "tcp-session",
+                "operations": 256,
+                "seconds": 0.003894051,
+                "checksum": 32896
+              },
+              {
+                "kind": "tcp-session",
+                "operations": 256,
+                "seconds": 0.002665798,
+                "checksum": 32896
+              }
+            ],
+            "exit": 0
+          },
+          {
+            "variant": "native",
+            "repeat": 2,
+            "wall_seconds": 0.005370471000048838,
+            "children": [
+              {
+                "kind": "tcp-session",
+                "operations": 256,
+                "seconds": 0.003776884,
+                "checksum": 32896
+              },
+              {
+                "kind": "tcp-session",
+                "operations": 256,
+                "seconds": 0.003612091,
+                "checksum": 32896
+              },
+              {
+                "kind": "tcp-session",
+                "operations": 256,
+                "seconds": 0.00269284,
+                "checksum": 32896
+              },
+              {
+                "kind": "tcp-session",
+                "operations": 256,
+                "seconds": 0.002594964,
+                "checksum": 32896
+              }
+            ],
+            "exit": 0
+          },
+          {
+            "variant": "native",
+            "repeat": 3,
+            "wall_seconds": 0.005041262000020197,
+            "children": [
+              {
+                "kind": "tcp-session",
+                "operations": 256,
+                "seconds": 0.0035858,
+                "checksum": 32896
+              },
+              {
+                "kind": "tcp-session",
+                "operations": 256,
+                "seconds": 0.003663009,
+                "checksum": 32896
+              },
+              {
+                "kind": "tcp-session",
+                "operations": 256,
+                "seconds": 0.002696548,
+                "checksum": 32896
+              },
+              {
+                "kind": "tcp-session",
+                "operations": 256,
+                "seconds": 0.002499798,
+                "checksum": 32896
+              }
+            ],
+            "exit": 0
+          }
+        ],
+        "sha256": {
+          "native": "4028b2573165dffceb6c0e08d84d0de6ab6197c3f5c1d825c0ca9deb92238c10"
+        },
+        "native_environment": {
+          "system": "Linux",
+          "release": "7.0.0-38-generic",
+          "architecture": "aarch64",
+          "logical_cpus": 6
+        },
+        "summary": {
+          "native": {
+            "loop_max_median_seconds": 0.003776884,
+            "process_wall_median_seconds": 0.005370471000048838
+          }
+        }
+      }
+    }
+  },
+  "linux_ci": {
+    "passed": true,
+    "checks": [
+      {
+        "check": "tests",
+        "exit": 0
+      },
+      {
+        "check": "clippy",
+        "exit": 0
+      }
+    ]
+  },
+  "reviewed_sources": [
+    {
+      "path": "crates/trames-net/src/hybrid.rs",
+      "sha256": "2ccb43e1462f1ddb81fdeaf5b71f190923e2598706c04a04382d9b5f7acfcf47"
+    },
+    {
+      "path": "crates/trames-net/src/lib.rs",
+      "sha256": "83fe1ae1331ef4901353e02b237c0763f7e8c415fe88d26c18aba3d89f4f3632"
+    },
+    {
+      "path": "crates/trames-net/src/native.rs",
+      "sha256": "f955334050ede7ee042ad200ed55b4406a11a8e8292e323c9b166eb04eb6d1b1"
+    },
+    {
+      "path": "crates/trames-net/src/native/control.rs",
+      "sha256": "6e0143cd397797a340a3aaa67f657581f826c8e81b5c70aa37fd4641456a50d6"
+    },
+    {
+      "path": "crates/trames-net/src/native/direct.rs",
+      "sha256": "7a95649b2e0bb661219d008b3142773b0ad69e8f333a3540a30852940a690e4b"
+    },
+    {
+      "path": "crates/trames-net/src/netdev.rs",
+      "sha256": "c06c7d037fa5b39b4ca2d8ced0eb0001e23430e172cd5f6c26c30bb538deaccc"
+    },
+    {
+      "path": "crates/trames-net/src/netdev_router.rs",
+      "sha256": "1b59ff11cb1b6f86324aa115766786175538ef7b5443935f65b75f6dedb0bc2f"
+    },
+    {
+      "path": "crates/trames-net/src/netlink.rs",
+      "sha256": "c7bc30d19fa4907e174b139d50ed7136e8da66f35d5644c2899a7eba6943ec3c"
+    },
+    {
+      "path": "crates/trames-net/src/nft_conntrack.rs",
+      "sha256": "25625af8843ee960047a78449b93b12517a2f82fd80cc7a2049ae12264f2449c"
+    },
+    {
+      "path": "crates/trames-net/src/nftables.rs",
+      "sha256": "5cd836926f911447dde754713c93bdb3404e94a58a60b4fee1c448a7d3e4fa35"
+    },
+    {
+      "path": "crates/trames-net/src/nftables_tests.rs",
+      "sha256": "a93ad0675d00cb5878346526a2a44e6b52b72e32695e44c29f180a54dd4a90de"
+    },
+    {
+      "path": "crates/trames-net/src/root_routing_tests.rs",
+      "sha256": "1de92bbffada6762a8486bbd3abc931cbaeb6d56c4845ddc3548895a626b0c1a"
+    },
+    {
+      "path": "crates/trames-net/src/routing_tests.rs",
+      "sha256": "8e87c1331e6fa4f4eea078293ff6b2ad9dbd0a0652e68a0a4ccc800fd8f94fdb"
+    },
+    {
+      "path": "crates/trames-net/src/rtnetlink.rs",
+      "sha256": "2387e47e04153d46e36ca4d7ccaeb44122f6f6e430a884ebbfdb786ad7891c99"
+    },
+    {
+      "path": "crates/trames-net/src/virtualnet/mod.rs",
+      "sha256": "a84b0b4b4dfe8c980a61d5f49ddfe7f9dfbeaa7663c39dc02bef6f5d8cf31f66"
+    },
+    {
+      "path": "crates/trames-net/src/virtualnet/sockets.rs",
+      "sha256": "a7f238cc1653d39956f37352bde3649e5a456e233271d6fc7e4676142041eb92"
+    },
+    {
+      "path": "crates/trames-net/src/netdev_shared_tests.rs",
+      "sha256": "a619e0b27b1d626559500c1cfb36064fca237ce7bec2c2f62f021b140314a92e"
+    },
+    {
+      "path": "docs/architecture/execution-backends.md",
+      "sha256": "95c84bcace42ca1107064d3b15913258987b23e089a006bcd7cf3d55e2db816e"
+    }
+  ],
+  "validation": {
+    "mac_host": {
+      "net_unit_passed": 75,
+      "net_integration_passed": 11,
+      "linux_abi_passed": 161,
+      "linux_abi_ignored": 1,
+      "vfs_passed": 418,
+      "vfs_ignored": 1
+    },
+    "linux_host": {
+      "net_unit_passed": 75,
+      "net_integration_passed": 11,
+      "linux_abi_passed": 161,
+      "linux_abi_ignored": 1,
+      "vfs_passed": 417,
+      "vfs_ignored": 1
+    },
+    "mac_product": {
+      "passed": 13,
+      "ignored": 1
+    },
+    "strict_checks": [
+      "Apple and native ARM64 Linux affected crates/all targets/hostfs",
+      "Mac product/all targets"
+    ],
+    "production_ffi": {
+      "passed": true,
+      "checks": [
+        {
+          "case": "alpine-install",
+          "passed": true,
+          "reused": true
+        },
+        {
+          "case": "alpine",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "alpine",
+          "terminal": 2,
+          "passed": true
+        },
+        {
+          "case": "debian-install",
+          "passed": true,
+          "reused": true
+        },
+        {
+          "case": "debian",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "debian",
+          "terminal": 2,
+          "passed": true
+        },
+        {
+          "case": "debian-setup",
+          "passed": true
+        },
+        {
+          "case": "custom-install",
+          "passed": true,
+          "reused": true
+        },
+        {
+          "case": "custom",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "custom",
+          "terminal": 2,
+          "passed": true
+        },
+        {
+          "case": "custom-sha256-rejection",
+          "passed": true
+        },
+        {
+          "case": "systemd",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "systemd",
+          "terminal": 2,
+          "passed": true
+        }
+      ]
+    },
+    "ios_static_build": true,
+    "product_boundaries": true
+  },
+  "log_hashes": {
+    "target/shared-routing-final-net-tests.log": "2c4985d6885487a53af18c42f4aea949e2c16729a65960277a760b1b7528c29a",
+    "target/shared-routing-vfs-linux-tests.log": "84f932b0a691668c149ed72b3a6395d30123bc9622eefffd535e6262ecc6e7cf",
+    "target/shared-routing-all-clippy.log": "ef6f1e72288e10118d025e0f8b8d8311d110fcd177d9d95e670cd9748c573cdd",
+    "target/shared-routing-mac-tests.log": "4aab813702b839bd695c5fa8befa0c59382cc2e8c5e3570218e490a817996b90",
+    "target/shared-routing-mac-clippy.log": "ca77e749687cec4c6ba49a684189bad8a697794c94b3ea809c738ea05565c735",
+    "target/shared-routing-ffi-build.log": "9cba7b22a80cf1905408beb155514c011fa8458f54168a1c678f1fd55ff2e3f8",
+    "target/shared-routing-ios-build.log": "a507d8f0ab99bd3ea41407f6bb53ea8f2e27eb65fa9e30ff5b29e190e7b1ff57",
+    "target/shared-routing-ffi.log": "a0ed12eb6aa6fe034466b76f310acfdbcd27794a78dbf9cf6cf2b6e08298cc0d",
+    "target/shared-routing-ipad-boundaries.log": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651",
+    "target/shared-routing-mac-boundaries.log": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651",
+    "target/local-ci/io/shared-routing-linux-tests.log": "91f19d15076d71b5469fdc7ebd98c9e23dbb0a3933fde186f456404c693fa072",
+    "target/local-ci/io/shared-routing-linux-clippy.log": "8a608bca0f515873d965dcee729bffc6d9116ac81306cbab89e6a573f788933e"
+  },
+  "artifact_hashes": {
+    "target/shared-routing-baseline/trames-mac-run": "493d2b592fae3736ec91125438c4f6c3e73b535c819691456c8493fc56af0440",
+    "target/local-ci/io/tcp-poll-linux-bench": "21941385050d94b081ecd90d2b797cd8ab52b70be243749a5710f20fe40da00f",
+    "target/epoll-live-fixture/linux": "4028b2573165dffceb6c0e08d84d0de6ab6197c3f5c1d825c0ca9deb92238c10",
+    "target/release/libtrames_ffi.dylib": "aff74273851c248e7c366f2cd7e12fb69277a3a18dcff36244071ea3b979dbc5",
+    "target/aarch64-apple-ios/release/libtrames_ffi.a": "7186fb5218c37f49ded9d16e72f5d168073a3fbdf2a4d8c5c2973e596accc5fe"
+  },
+  "installed_dev_runner_sha256": "e38536e7d5546b4d0e9afeceaff6e616828caa1f45dd7f29d822f79a4edc7126"
+}
