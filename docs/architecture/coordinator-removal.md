@@ -1,5 +1,67 @@
 # Coordinator dependency audit
 
+## Fifth migration implemented — 2026-11-02
+
+Runtime `36c64a8109a9b53496a3f0cfd662a4ae302f63ce` moves eligible idle TCP
+close into the existing single-caller owner service. Admission remains owner-only:
+the native socket must be Idle; hybrid sockets additionally have no peer,
+listener or guest-stack branch. The original VFS close preserves alias and FD
+lifetimes. Connecting, connected, failed, listening, virtual/non-TCP and filtered
+closes keep their prior boundary. Actual socket membership gates the worker
+candidate, so unrelated owner resources retain their original checkpoints.
+No new cross-thread TCP control projection, resource thread or policy route is
+introduced in this stage.
+
+Two live-publication correctness issues were fixed before measurement:
+
+- Forks can share a descriptor-content version while owning distinct mutable
+  FD tables. `NetworkEpoch` previously reused a capture by that content version,
+  which could attach a child's live socket lookup to its parent's table. Captures
+  now bind to actual Files membership; its retained allocation prevents identity
+  reuse. CLONE_FILES siblings still share their correct capture.
+- FD flags now resolve newly created socket OFDs through their existing weak
+  membership projection. Existing workers see nonblocking/cloexec updates and
+  independent aliases/reused numbers. Only existing atomic bits are exposed;
+  endpoint and namespace controls remain on the owner. The ordinary shared-file
+  flags branch keeps its original borrowed access without an added Arc increment.
+
+The unchanged four-process, 5,000-cycles-each TCP control fixture measures this
+stage against the preceding measured binary. Each cycle creates a TCP socket,
+sets/gets TCP_NODELAY, queries its local address and closes it. Loop and wall
+values are medians of three unprofiled counterbalanced runs; a separate profile
+supplies counts. macOS native was freshly measured. The native Linux reference is
+reused from the preceding stage: the exact fixture ELF SHA and native workload
+are unchanged, and the reference VM was not started again.
+
+| Measurement | Previous | Current | Native macOS | Native Linux, reused |
+| --- | ---: | ---: | ---: | ---: |
+| Longest-child loop | 1,021.2 ms | 466.0 ms | 42.9 ms | 9.54 ms |
+| Full workload wall | 1,058.7 ms | 504.3 ms | 48.3 ms | 10.1 ms |
+| Cohort rounds, diagnostic sample | 17,597 | 49 | — | — |
+
+The loop improves **2.19×** and diagnostic cohort rounds decrease **99.7%**.
+Remaining rounds include process startup/teardown and unrelated control. This
+workload still issues **99,978 owner service requests**, so eliminating drains
+has not eliminated per-call central dispatch. Current loops remain **10.9× native
+macOS** and **48.9× the reused native Linux reference**. Actual direct socket
+controls and broader close ownership remain the next performance target. These
+are control-lifecycle results, not connected TCP throughput or Firefox scores;
+service/drain counters are not CPU percentages.
+
+Affected checks passed: 408 VFS tests, 152 Linux ABI tests, 67 network tests,
+248 interpreter-kernel tests, Mac product checks/strict Clippy, 13 production FFI
+environment checks and the iPad static cross-build. Passing unaffected results
+were reused. New coverage checks independent fork tables with equal versions,
+existing captures seeing new socket flags, alias status versus descriptor flags,
+FD reuse, idle-versus-active close admission, and two CPUs creating/closing
+sockets without per-call cohort checkpoints. Physical iPad testing remains
+skipped. Mac's installed development app contains the measured binary; existing
+sessions keep their old executable until restarted.
+
+[Raw samples, hashes and validation](../validation/socket-idle-close-20261102.json)
+and the shared [Files/close design](https://github.com/kb5000/trames-runtime/blob/main/docs/architecture/execution-backends.md#idle-tcp-close-and-live-files-identity-2026-11-02)
+record reproduction and the remaining boundary.
+
 ## Fourth migration implemented — 2026-11-02
 
 Runtime `860005dff5f914a28fa88c4f1bce561a1b089d17` moves unfiltered Internet

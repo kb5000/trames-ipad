@@ -1,0 +1,758 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-02",
+  "passed": true,
+  "runtime_revision": "36c64a8109a9b53496a3f0cfd662a4ae302f63ce",
+  "baseline_runtime_revision": "860005dff5f914a28fa88c4f1bce561a1b089d17",
+  "baseline_mac_revision": "f3616b9f3ab6e7e1bb7d53a88f7b1dbcb4a81d1a",
+  "candidate_mac_revision": "9b9171f81352309fd84020ba952aaf14a5ad7b0b",
+  "hardware": {
+    "cpu": "Apple M6",
+    "logical_cpus": 12,
+    "memory_bytes": 25769803776
+  },
+  "scope": {
+    "work": "Unchanged four-process 5000-cycle socket/TCP_NODELAY set/get/getsockname/close workload; no payload traffic",
+    "timing": "Three unprofiled counterbalanced repetitions, separate diagnostic samples, Mac-native reference freshly measured",
+    "linux_reference": "Reused preceding 2026-11-02 ARM64 Linux native run: fixture SHA identical, workload and native implementation unchanged, six vCPUs/8 GiB; no reference VM started this stage.",
+    "limitations": [
+      "Native TCP control operations still run on owner; only eligible idle TCP closes no longer join.",
+      "Cross-thread TCP-control proposal has not been applied; it remains subject to explicit authorization.",
+      "Connecting/connected/listening/failed/guest-stack sockets and filtered closes preserve prior joined boundaries.",
+      "No TCP throughput or Firefox performance claim.",
+      "Unchanged CPU, memory and graphics validation reused; physical iPad skipped per owner."
+    ]
+  },
+  "summary": {
+    "loop_before_ms": 1021.245875,
+    "loop_after_ms": 465.96245899999997,
+    "speedup": 2.191691316059434,
+    "mac_native_loop_ms": 42.939,
+    "linux_native_loop_ms": 9.538708999999999,
+    "mac_native_ratio": 10.851730571275532,
+    "linux_native_ratio": 48.849635626791844,
+    "wall_before_ms": 1058.7244579999995,
+    "wall_after_ms": 504.3292920000004,
+    "cohort_rounds_before": 17597,
+    "cohort_rounds_after": 49,
+    "service_requests_after": 99978
+  },
+  "mac_comparison": {
+    "passed": true,
+    "kind": "tcp",
+    "processes": 4,
+    "operations_each": 5000,
+    "repeats": 3,
+    "cpus": 12,
+    "records": [
+      {
+        "variant": "before",
+        "repeat": 0,
+        "wall_seconds": 1.415058583,
+        "exit": 0,
+        "children": [
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.823063333,
+            "checksum": 12502500
+          },
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.944252542,
+            "checksum": 12502500
+          },
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 1.015064958,
+            "checksum": 12502500
+          },
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 1.031990083,
+            "checksum": 12502500
+          }
+        ],
+        "paths": {
+          "cohort_rounds": 17597,
+          "cohort_stop_us": 39628,
+          "service_caller_wait_us": 787914,
+          "service_requests": 73734,
+          "serviced_syscalls": 73734,
+          "syscalls": 100112,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 73734
+        }
+      },
+      {
+        "variant": "after",
+        "repeat": 0,
+        "wall_seconds": 0.4898843749999999,
+        "exit": 0,
+        "children": [
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.449255625,
+            "checksum": 12502500
+          },
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.450774541,
+            "checksum": 12502500
+          },
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.4498255,
+            "checksum": 12502500
+          },
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.451750708,
+            "checksum": 12502500
+          }
+        ],
+        "paths": {
+          "cohort_rounds": 49,
+          "cohort_stop_us": 1240,
+          "service_caller_wait_us": 1032207,
+          "service_requests": 99978,
+          "serviced_syscalls": 99978,
+          "syscalls": 100113,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 99978
+        }
+      },
+      {
+        "variant": "before",
+        "repeat": 1,
+        "wall_seconds": 1.0587244579999995,
+        "exit": 0,
+        "children": [
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.8307485,
+            "checksum": 12502500
+          },
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.938802792,
+            "checksum": 12502500
+          },
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 1.007156791,
+            "checksum": 12502500
+          },
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 1.021910709,
+            "checksum": 12502500
+          }
+        ]
+      },
+      {
+        "variant": "after",
+        "repeat": 1,
+        "wall_seconds": 0.5043292920000004,
+        "exit": 0,
+        "children": [
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.463738083,
+            "checksum": 12502500
+          },
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.464785833,
+            "checksum": 12502500
+          },
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.464131875,
+            "checksum": 12502500
+          },
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.465962459,
+            "checksum": 12502500
+          }
+        ]
+      },
+      {
+        "variant": "after",
+        "repeat": 2,
+        "wall_seconds": 0.4863393340000002,
+        "exit": 0,
+        "children": [
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.443498625,
+            "checksum": 12502500
+          },
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.444556667,
+            "checksum": 12502500
+          },
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.445582916,
+            "checksum": 12502500
+          },
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.444549292,
+            "checksum": 12502500
+          }
+        ]
+      },
+      {
+        "variant": "before",
+        "repeat": 2,
+        "wall_seconds": 1.060800833,
+        "exit": 0,
+        "children": [
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.830574,
+            "checksum": 12502500
+          },
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.936217167,
+            "checksum": 12502500
+          },
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 1.007632666,
+            "checksum": 12502500
+          },
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 1.021245875,
+            "checksum": 12502500
+          }
+        ]
+      },
+      {
+        "variant": "before",
+        "repeat": 3,
+        "wall_seconds": 1.0355500829999995,
+        "exit": 0,
+        "children": [
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.806605708,
+            "checksum": 12502500
+          },
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.912936583,
+            "checksum": 12502500
+          },
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.982116125,
+            "checksum": 12502500
+          },
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.996832042,
+            "checksum": 12502500
+          }
+        ]
+      },
+      {
+        "variant": "after",
+        "repeat": 3,
+        "wall_seconds": 0.5124266669999997,
+        "exit": 0,
+        "children": [
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.469973,
+            "checksum": 12502500
+          },
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.470950958,
+            "checksum": 12502500
+          },
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.471838084,
+            "checksum": 12502500
+          },
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.470663208,
+            "checksum": 12502500
+          }
+        ]
+      },
+      {
+        "variant": "native",
+        "repeat": 1,
+        "wall_seconds": 0.036085416999999786,
+        "children": [
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.027052,
+            "checksum": 12502500
+          },
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.027872,
+            "checksum": 12502500
+          },
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.027812,
+            "checksum": 12502500
+          },
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.027066,
+            "checksum": 12502500
+          }
+        ],
+        "exit": 0
+      },
+      {
+        "variant": "native",
+        "repeat": 2,
+        "wall_seconds": 0.04833149999999975,
+        "children": [
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.041134,
+            "checksum": 12502500
+          },
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.041692,
+            "checksum": 12502500
+          },
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.042678,
+            "checksum": 12502500
+          },
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.042939,
+            "checksum": 12502500
+          }
+        ],
+        "exit": 0
+      },
+      {
+        "variant": "native",
+        "repeat": 3,
+        "wall_seconds": 0.06614641700000057,
+        "children": [
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.060601,
+            "checksum": 12502500
+          },
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.059399,
+            "checksum": 12502500
+          },
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.059432,
+            "checksum": 12502500
+          },
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.058796,
+            "checksum": 12502500
+          }
+        ],
+        "exit": 0
+      }
+    ],
+    "sha256": {
+      "baseline": "c684b699bef627fa0c3365c1507092c8ac26b339759532a3c84a0a8181ab86ee",
+      "candidate": "57e0db232e0583ff7614f6e968e51355782268b4aab7d07e9f315ecd2e7e07d4",
+      "native": "89c1a2351a7d06263bf9876cacc145316a32621b44d8b6348b814192fcbc235a",
+      "fixture": "c9faa94949b28addd8cd798e289f37c974fb19def044b9305332d750e404d6f7",
+      "rootfs": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe"
+    },
+    "native_environment": {
+      "system": "Darwin",
+      "release": "27.0.0",
+      "architecture": "arm64",
+      "logical_cpus": 12
+    },
+    "summary": {
+      "before": {
+        "loop_max_median_seconds": 1.021245875,
+        "process_wall_median_seconds": 1.0587244579999995,
+        "profile": {
+          "cohort_rounds": 17597,
+          "cohort_stop_us": 39628,
+          "service_caller_wait_us": 787914,
+          "service_requests": 73734,
+          "serviced_syscalls": 73734,
+          "syscalls": 100112,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 73734
+        }
+      },
+      "after": {
+        "loop_max_median_seconds": 0.465962459,
+        "process_wall_median_seconds": 0.5043292920000004,
+        "profile": {
+          "cohort_rounds": 49,
+          "cohort_stop_us": 1240,
+          "service_caller_wait_us": 1032207,
+          "service_requests": 99978,
+          "serviced_syscalls": 99978,
+          "syscalls": 100113,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 99978
+        }
+      },
+      "native": {
+        "loop_max_median_seconds": 0.042939,
+        "process_wall_median_seconds": 0.04833149999999975
+      }
+    }
+  },
+  "linux_reference_reused": {
+    "passed": true,
+    "kind": "tcp",
+    "processes": 4,
+    "operations_each": 5000,
+    "repeats": 3,
+    "cpus": 6,
+    "records": [
+      {
+        "variant": "native",
+        "repeat": 1,
+        "wall_seconds": 0.010565499999998451,
+        "children": [
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.00942325,
+            "checksum": 12502500
+          },
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.009179166,
+            "checksum": 12502500
+          },
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.008590416,
+            "checksum": 12502500
+          },
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.009922541,
+            "checksum": 12502500
+          }
+        ],
+        "exit": 0
+      },
+      {
+        "variant": "native",
+        "repeat": 2,
+        "wall_seconds": 0.010031415999996796,
+        "children": [
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.009538709,
+            "checksum": 12502500
+          },
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.00835025,
+            "checksum": 12502500
+          },
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.009537667,
+            "checksum": 12502500
+          },
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.008534833,
+            "checksum": 12502500
+          }
+        ],
+        "exit": 0
+      },
+      {
+        "variant": "native",
+        "repeat": 3,
+        "wall_seconds": 0.010064979999995671,
+        "children": [
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.008227452,
+            "checksum": 12502500
+          },
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.008343185,
+            "checksum": 12502500
+          },
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.009534716,
+            "checksum": 12502500
+          },
+          {
+            "kind": "tcp",
+            "operations": 5000,
+            "seconds": 0.009357341,
+            "checksum": 12502500
+          }
+        ],
+        "exit": 0
+      }
+    ],
+    "sha256": {
+      "native": "c9faa94949b28addd8cd798e289f37c974fb19def044b9305332d750e404d6f7"
+    },
+    "native_environment": {
+      "system": "Linux",
+      "release": "7.0.0-38-generic",
+      "architecture": "aarch64",
+      "logical_cpus": 6
+    },
+    "summary": {
+      "native": {
+        "loop_max_median_seconds": 0.009538709,
+        "process_wall_median_seconds": 0.010064979999995671
+      }
+    },
+    "reference": "Existing Lima VZ ARM64 native Linux kernel; six vCPUs, 8 GiB configured; four benchmark processes"
+  },
+  "validation": {
+    "vfs": {
+      "passed": 408,
+      "ignored": 1,
+      "note": "406 full-run passes reused; corrected access-bit expectation in one new flags test; six flags and five networking tests passed including the new fork isolation case."
+    },
+    "linux": {
+      "passed": 152,
+      "ignored": 1,
+      "note": "151 unaffected full-run passes plus new idle close regression."
+    },
+    "network": {
+      "unit_passed": 56,
+      "integration_passed": 11
+    },
+    "kernel": {
+      "passed": 248,
+      "ignored": 3,
+      "note": "247 final full-run passes reused; the new socket loop exposed equal-version fork capture binding, fixed and passed targeted rerun."
+    },
+    "mac": {
+      "passed": 13,
+      "ignored": 1
+    },
+    "strict_clippy": [
+      "shared affected targets",
+      "interpreter kernel conformance",
+      "Mac product"
+    ],
+    "production_ffi": {
+      "passed": true,
+      "checks": [
+        {
+          "case": "alpine-install",
+          "passed": true,
+          "reused": true
+        },
+        {
+          "case": "alpine",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "alpine",
+          "terminal": 2,
+          "passed": true
+        },
+        {
+          "case": "debian-install",
+          "passed": true,
+          "reused": true
+        },
+        {
+          "case": "debian",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "debian",
+          "terminal": 2,
+          "passed": true
+        },
+        {
+          "case": "debian-setup",
+          "passed": true
+        },
+        {
+          "case": "custom-install",
+          "passed": true,
+          "reused": true
+        },
+        {
+          "case": "custom",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "custom",
+          "terminal": 2,
+          "passed": true
+        },
+        {
+          "case": "custom-sha256-rejection",
+          "passed": true
+        },
+        {
+          "case": "systemd",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "systemd",
+          "terminal": 2,
+          "passed": true
+        }
+      ]
+    },
+    "ios_static_cross_build": true,
+    "product_boundaries": true
+  },
+  "source_hashes": {
+    "tests/fixtures/fd-create-bench.c": "e595927b91a02fd84e52bfc0f0cf512b72b09f93468765f1df3e21e2a49fe298",
+    "tests/performance/fd-create.py": "8c64cf2b774091df31270817f66de7cf66ceb7968db18e2648ddaa65bafc0c88",
+    "target/socket-direct-baseline/trames-mac-run": "c684b699bef627fa0c3365c1507092c8ac26b339759532a3c84a0a8181ab86ee",
+    "target/socket-control-fixture/linux": "c9faa94949b28addd8cd798e289f37c974fb19def044b9305332d750e404d6f7",
+    "target/socket-control-fixture/native-mac": "89c1a2351a7d06263bf9876cacc145316a32621b44d8b6348b814192fcbc235a",
+    "target/release/libtrames_ffi.dylib": "33629acd845f703ed2cec786addb1c874eac2024d4266eb0cc8e1588d019ba5c",
+    "target/aarch64-apple-ios/release/libtrames_ffi.a": "df30036b83d5da8b2628674a5c8f625fb9536ef23b4856bac3c4ae25613fc91b"
+  },
+  "log_hashes": {
+    "socket-idle-close-tests.log": "ea6a9749423c6fb51498efcd6d48c07d6364d68c70715ce35ef3b0f6b6e103f4",
+    "socket-idle-close-linux.log": "3c934d3f438718390c6fd210e8835a1060f20c3abee81b48b005ed805c908c29",
+    "socket-idle-close-vfs.log": "9b9904ae6c7a305c1d81fa6c7cbca1ae2ac83b8a2e66d7a65ba5ecf2372d6b75",
+    "socket-idle-close-flags-final.log": "d7a49b97f3df198000975f7ad806da95172169fb580154b2582c6ffffc850e2f",
+    "socket-idle-close-network-final.log": "93d65abbdd99ed6f7f7885819fabc6557020e5dec4eb02d80f9bb2bb7c77ea46",
+    "socket-idle-close-kernel-full-final.log": "c6384344b9c01fb6e478ffb58ab217bb743989606b661689b2fb6378b244e80a",
+    "socket-idle-close-kernel-final.log": "5c0bbe5f91cecf241dceacb3219a6db0ce16d494162da64ae4931e778306a8ff",
+    "socket-idle-close-kernel-clippy-final.log": "057ce10d574c07c4f97c459c6f644d3d5dfbeddfd2c2b1129205c38fefdfb335",
+    "socket-idle-close-clippy-final.log": "f5d33461fe091c284ffcf86086f4943557a6f0b87fe6478c38ac6f450ed5bb75",
+    "socket-idle-close-mac-tests.log": "9c5968fa72b0b8757d15ed8ce32dd3a792254e887c2a3118d7ae464572e6802c",
+    "socket-idle-close-mac-clippy-final.log": "a85945101b3a5fc130078ae74294ad2a7f76a8bbe284b36cfa5661747fe47972",
+    "socket-idle-close-ffi.log": "a0ed12eb6aa6fe034466b76f310acfdbcd27794a78dbf9cf6cf2b6e08298cc0d",
+    "socket-idle-close-ios-final.log": "c9ac6a787e755efa9318687cfe48476c091826162944f7bcaf7a2149407147df",
+    "socket-idle-close-boundaries-ipad.log": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651",
+    "socket-idle-close-boundaries-mac.log": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651"
+  },
+  "installed_dev_runner_sha256": "57e0db232e0583ff7614f6e968e51355782268b4aab7d07e9f315ecd2e7e07d4"
+}
