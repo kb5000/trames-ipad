@@ -22,6 +22,7 @@
 #include <poll.h>
 #ifdef __linux__
 #include <sys/eventfd.h>
+#include <sys/syscall.h>
 #include <sys/signalfd.h>
 #include <signal.h>
 #include <sys/epoll.h>
@@ -107,6 +108,25 @@ int main(int argc, char **argv) {
     unsigned operations = (unsigned)strtoul(argv[2], NULL, 10);
     assert(operations && operations <= 1000000);
     uint64_t checksum = 0;
+    int ip_messages = !strcmp(kind, "udp-message") || !strcmp(kind, "tcp-message") || !strcmp(kind, "udp-batch") || !strcmp(kind, "tcp-batch");
+    int ip_batch = !strcmp(kind, "udp-batch") || !strcmp(kind, "tcp-batch");
+    int ip_udp = !strncmp(kind, "udp-", 4);
+    int ip_pair[2] = {-1,-1};
+    if (ip_messages) {
+        struct sockaddr_in endpoint = {.sin_family = AF_INET, .sin_addr.s_addr = htonl(INADDR_LOOPBACK)};
+        socklen_t size = sizeof(endpoint);
+        ip_pair[0] = socket(AF_INET, ip_udp ? SOCK_DGRAM : SOCK_STREAM, 0); assert(ip_pair[0] >= 0);
+        int bound = socket(AF_INET, ip_udp ? SOCK_DGRAM : SOCK_STREAM, 0); assert(bound >= 0);
+        assert(!bind(bound, (struct sockaddr *)&endpoint, sizeof(endpoint)));
+        assert(!getsockname(bound, (struct sockaddr *)&endpoint, &size));
+        if (!ip_udp) assert(!listen(bound, 1));
+        assert(!connect(ip_pair[0], (struct sockaddr *)&endpoint, size));
+        if (ip_udp) ip_pair[1] = bound;
+        else {
+            ip_pair[1] = accept(bound, NULL, NULL); assert(ip_pair[1] >= 0); assert(!close(bound));
+            int enabled = 1; assert(!setsockopt(ip_pair[0], IPPROTO_TCP, TCP_NODELAY, &enabled, sizeof(enabled)));
+        }
+    }
     int unix_listener = -1;
     int unix_session = !strcmp(kind, "unix-session") || !strcmp(kind, "unix-abstract");
     int unix_abstract = !strcmp(kind, "unix-abstract");
@@ -235,7 +255,40 @@ int main(int argc, char **argv) {
     }
     double began = now();
     for (unsigned i = 0; i < operations; i++) {
-        if (positioned_file >= 0) {
+        if (ip_messages) {
+            unsigned char sent[8][64], received[64];
+            struct iovec vectors[8][2];
+            struct msghdr messages[8] = {0};
+            unsigned count = ip_batch ? 8 : 1;
+            for (unsigned j = 0; j < count; j++) {
+                memset(sent[j], (unsigned char)(i+j), 64);
+                vectors[j][0] = (struct iovec){.iov_base = sent[j], .iov_len = 23};
+                vectors[j][1] = (struct iovec){.iov_base = sent[j]+23, .iov_len = 41};
+                messages[j] = (struct msghdr){.msg_iov = vectors[j], .msg_iovlen = 2};
+            }
+            if (ip_batch) {
+#ifdef __linux__
+                struct mmsghdr batch[8] = {0};
+                for (unsigned j = 0; j < 8; j++) batch[j].msg_hdr = messages[j];
+                assert(syscall(SYS_sendmmsg, ip_pair[0], batch, 8, 0) == 8);
+                for (unsigned j = 0; j < 8; j++) assert(batch[j].msg_len == 64);
+#else
+                // Contextual macOS reference uses eight POSIX calls.
+                for (unsigned j = 0; j < 8; j++) assert(sendmsg(ip_pair[0], &messages[j], 0) == 64);
+#endif
+            } else assert(sendmsg(ip_pair[0], &messages[0], 0) == 64);
+            for (unsigned j = 0; j < count; j++) {
+                size_t used = 0;
+                do {
+                    struct iovec input[2] = {{.iov_base = received+used, .iov_len = (64-used)/2}, {.iov_base = received+used+(64-used)/2, .iov_len = (64-used)-(64-used)/2}};
+                    struct msghdr message = {.msg_iov = input, .msg_iovlen = 2};
+                    ssize_t n = recvmsg(ip_pair[1], &message, 0); assert(n > 0 && (size_t)n <= 64-used);
+                    if (ip_udp) assert(n == 64);
+                    used += (size_t)n;
+                } while (used < 64);
+                assert(!memcmp(sent[j], received, 64));
+            }
+        } else if (positioned_file >= 0) {
             unsigned char sent[64], received[64]; memset(sent, (unsigned char)i, sizeof(sent));
             assert(pwrite(positioned_file, sent, sizeof(sent), 0) == (ssize_t)sizeof(sent));
             assert(pread(positioned_file, received, sizeof(received), 0) == (ssize_t)sizeof(received));
@@ -281,7 +334,7 @@ int main(int argc, char **argv) {
 #endif
             }
 #ifdef __linux__
-            assert(sendmmsg(packet_pair[0], messages, 8, 0) == 8);
+            assert(syscall(SYS_sendmmsg, packet_pair[0], messages, 8, 0) == 8);
             for (unsigned j = 0; j < 8; j++) assert(messages[j].msg_len == 1);
 #else
             // Contextual native reference: eight POSIX calls, not a batch API.
@@ -527,6 +580,7 @@ int main(int argc, char **argv) {
         checksum += (uint64_t)i + 1;
     }
     double elapsed = now() - began;
+    if (ip_messages) { assert(!close(ip_pair[0])); assert(!close(ip_pair[1])); }
     if (positioned_file >= 0) { assert(!close(positioned_file)); assert(!unlink(positioned_path)); }
     if (packet_pair[0] >= 0) { assert(!close(packet_pair[0])); assert(!close(packet_pair[1])); }
     if (right_source >= 0) assert(!close(right_source));

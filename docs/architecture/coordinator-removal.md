@@ -1883,7 +1883,7 @@ unaccepted owner-only rights item retains its existing owner decoder/ledger boun
 
 | Four processes × 1,000 checked iterations, longest-child median | Previous | Current | Native macOS* | Native ARM Linux, exact ELF | Improvement |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| Eight-packet sendmmsg / checked receive | 721.82 ms | 36.71 ms | 6.67 ms | 4.96 ms | 19.66x |
+| Eight-packet libc sendmmsg wrapper / checked receive | 721.82 ms | 36.71 ms | 6.67 ms | 4.96 ms | 19.66x |
 | Paired datagram scalar write/read | 157.00 ms | 6.04 ms | 0.42 ms | 0.80 ms | 25.99x |
 | Paired datagram vector writev/readv | 158.59 ms | 6.50 ms | 0.53 ms | 0.81 ms | 24.39x |
 | Existing addressed connected datagram write/read | 44.76 ms | 46.11 ms | 1.05 ms | 0.80 ms | No gain claimed |
@@ -1897,6 +1897,12 @@ mostly forced joined execution rather than counted resource services. Regression
 controls have about three percent higher loop medians, slightly lower process wall
 medians and similarly small cohort counts (**54 → 51**, **48 → 49**); no gain or
 statistical regression bound is claimed for those small differences.
+
+Measurement correction, discovered during stage26: disassembly of the exact
+recorded stage24 ELF (`defc37834ea0daf74675bb143962af8aafdf2063287d8cc5bd44665c02b99455`)
+shows libc sendmmsg looping over sendmsg, without a sendmmsg syscall. The row above
+measures that eight-message workload, not SYS_sendmmsg throughput. Actual batch
+syscall functional tests remain valid. Stage26 below uses an explicit kernel call.
 
 Batch iterations send eight checked one-byte datagrams and verify each receive;
 paired scalar/vector iterations check two bytes in one packet. Setup/cleanup is
@@ -2006,3 +2012,86 @@ remove repeated membership lookup; the ordinary-file control records the current
 cost rather than asserting all paths are free. See the
 [validation record](../validation/worker-simple-device-20261103.json) and
 [shared contract](../../runtime/docs/architecture/execution-backends.md#shared-stateless-memory-devices-2026-11-03).
+
+
+## Twenty-sixth migration implemented — retained IP messages and batches — 2026-11-03
+
+Runtime `6f8955705daa8149aefc24a0e616c29d976c19dc` moves IPv4/IPv6 sendto, recvfrom,
+sendmsg, recvmsg and sendmmsg onto the calling worker using the real shared socket
+OFD. The common prepared message decoder also serves the owner. Original native,
+hybrid and packet-stack socket algorithms, policy, accounting and locks remain;
+netlink namespace/control data still defers before guest import or packet effects.
+The existing connected TCP byte path is unchanged.
+
+Send bytes, destination and packet info are imported once per accepted item.
+Receive scatter/address/ancillary destinations retain their original identity.
+Blocking EAGAIN subscribes through the existing socket event sources and stack
+deadlines, releases the execution slot, then retries. Only parked receive outputs
+are rechecked before dequeue. FD close/reuse and later guest header edits cannot
+redirect accepted calls. Original live descriptor flags, MSG_DONTWAIT and socket
+timeouts still apply. No new service thread, global resource lock, polling bus,
+ordinary guest-memory fence or native permission layer is introduced.
+
+One accepted batch keeps completed count, its current prepared item and terminal
+result; later messages are imported lazily. The original 1,024 cap, empty-batch FD
+validation, compat rejection, requested-length checks, short stream termination,
+positive partial errors and post-send msg_len copyout order remain. A delivery
+followed by EFAULT is terminal and never replayed. The progress mutex belongs to
+one syscall only. Each item uses the existing socket publication guard separately,
+without a batch-wide socket algorithm lock. SIGPIPE uses a relaxed per-call flag
+and saved result; only task effects go back to the original owner, with no resend
+and no second seccomp entry. MSG_NOSIGNAL completes entirely on the worker.
+
+| Four processes × 1,000 iterations, longest-child median | Previous | Current | Native macOS* | Native ARM Linux, exact ELF | Improvement |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| UDP sendmsg/recvmsg | 179.36 ms | 15.32 ms | 19.96 ms | 1.39 ms | 11.71x |
+| TCP sendmsg/recvmsg | 190.31 ms | 15.84 ms | 10.16 ms | 2.42 ms | 12.02x |
+| UDP kernel batch + eight recvmsg | 888.57 ms | 87.73 ms | 30.71 ms | 6.38 ms | 10.13x |
+| TCP kernel batch + eight frame receives | 890.05 ms | 80.15 ms | 23.33 ms | 9.54 ms | 11.11x |
+| Existing TCP poll control (short sample) | 13.79 ms | 16.76 ms | 9.82 ms | 3.01 ms | See longer control below |
+
+Whole-process wall medians for single UDP/TCP are **211.71 → 46.15 ms** and
+**223.14 → 49.51 ms**; batch UDP/TCP are **925.63 → 120.00 ms** and
+**932.32 → 113.01 ms**. Separate diagnostic cohort counts fall **5,485 → 49**,
+**5,289 → 48**, **25,040 → 47** and **24,837 → 50**. Service requests remain
+three, including startup/teardown: old calls mostly joined rather than counted
+as resource services. This distinction prevents mistaking a flat service counter
+for the absence of coordination overhead.
+
+The short TCP-poll control increases **13.79 → 16.76 ms**, with overlapping
+sample ranges. A longer confirmation uses **10,000 iterations and nine unprofiled
+counterbalanced samples**: loops **125.451 → 125.480 ms**, wall **158.194 →
+157.938 ms**, cohorts **48 → 48**. No control gain or statistical regression bound
+is claimed. Both the initial short result and longer confirmation are retained.
+
+Single-message iterations check 64 bytes across two iovecs. Batch iterations
+explicitly invoke SYS_sendmmsg for eight 64-byte messages and verify each recvmsg;
+TCP handles any short receive while assembling each checked frame. Disassembly
+verifies syscall number269 entering x8 and SVC0. Endpoint setup/cleanup is outside
+the loop timer. *Native macOS uses eight POSIX sendmsg calls as its contextual
+batch reference.* Native Linux runs the same static musl ELF on six vCPUs; Trames
+uses four. All compilation, affected CI and FFI acceptance finish before final
+measurements, and Linux is stopped during Mac timing. Different kernels/APIs,
+CPU counts and short-sample variability make native numbers contextual. These are
+not whole-app, Firefox, physical-iPad or universally native-speed results.
+
+Apple/Linux ABI **197 each**, kernel **276 each**, strict checks, Mac **13**, all
+**13** FFI environment checks, product boundaries and the iPad static build pass.
+Actual guest IPv4/IPv6 tests on one/two slots each complete **nine calls on workers,
+with nine filter evaluations and zero services**. One-slot receive waits let the
+sender run. Native stream EPIPE tests cover sendto, sendmsg and sendmmsg, with and
+without MSG_NOSIGNAL. Other ABI cases cover lazy items, waits, short/partial
+errors, post-send faults without replay, original OFD/output after close/reuse,
+remap faults before dequeue, packet info/truncation, timeouts and netlink exclusion.
+The final cfg(test)-only SIGPIPE fixture accepts the connection first so Linux
+listener close cannot substitute ECONNRESET for EPIPE. Only that changed case and
+strict checks rerun; other results and unchanged production artifacts are reused.
+Physical iPad testing remains skipped per owner. The measured runner is installed
+in Trames Dev; the stable app hash remains unchanged.
+
+The coordinator-removal goal remains active. Raw UDP byte/vector I/O, netlink,
+Unix owning ancillary graphs, native-service/device and io_uring controls,
+task/job control, mount/proc ownership and structural file/VM/task transitions
+remain. recvmmsg is unimplemented, not an existing coordinator path. See the
+[validation record](../validation/worker-ip-message-20261103.json) and
+[shared contract](../../runtime/docs/architecture/execution-backends.md#retained-ip-messages-and-batches-2026-11-03).
