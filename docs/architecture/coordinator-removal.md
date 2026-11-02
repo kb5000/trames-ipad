@@ -1,5 +1,62 @@
 # Coordinator dependency audit
 
+## Fourteenth migration implemented — worker full socket controls — 2026-11-02
+
+Runtime `5acb2fb7a0b68348cd2c893937d706887f4791b0` moves bind/listen and nonblocking TCP connect/accept/accept4
+onto executing workers. Address, option, timeout and shutdown controls use the
+complete shared socket OFD, including virtual sockets, rather than requiring the
+old limited native projection. Blocking UDP/netlink connect is immediate and also
+runs there. Blocking TCP connect/accept still defer before effects to their
+original scheduler; their event wait and cross-cohort lifetime remain next work.
+The overall coordinator-removal objective is still active.
+
+Production owner and worker entries invoke one original control ABI. The creating
+credentials, low-port checks, namespaces, error ordering, flags, existing bounds
+and output preflight remain intact. Filtered worker entries carry exactly one
+seccomp decision through a completed call or joined fallback. AF_UNIX, tracing and
+mutable authority retain their original boundaries. Explicit native-only captures
+keep compatibility, while product captures carry the real descriptor factory.
+
+accept preflights output, reserves the actual Files slot, consumes the connection,
+writes output and prepares the new original OFD's native TCP view before its
+number becomes visible. It never re-looks up the new number for publication.
+Control mutation plus the resulting byte-capability/timeouts view reuse the
+existing per-OFD admission/publication transaction. No Files operation occurs
+under that mutation callback; accept owns its separate unpublished description.
+Pure queries/shutdown avoid unnecessary republication. Native bytes, quotas and
+guest-memory synchronization are unchanged; no service thread or polling bus is
+added.
+
+Native/virtual complete lifecycle and permission/error tests pass. Two CPUs run
+all ten control numbers under native/virtual networking and unfiltered/allow/deny
+policies: **60 cases**, zero coordinator service requests for allowed calls, and
+one decision per filtered syscall. Publication contention also proves actual
+control mutation waits for its transaction while unrelated Files remain usable.
+Affected Apple/Linux ABI and VFS checks, strict checks, 20 service regressions,
+Mac product tests, 13 real FFI checks and the iPad static build pass. Physical iPad
+verification remains skipped per owner; unaffected acceptance is reused.
+
+| Longest-child loop median | Previous | Current | Native macOS | Native Linux reference |
+| --- | ---: | ---: | ---: | ---: |
+| Complete TCP sessions, 256 each | 29.07 ms | 22.08 ms | 15.11 ms | 3.78 ms |
+| TCP state/options cycles, 2,000 each | 56.02 ms | 53.64 ms | 16.55 ms | 5.99 ms |
+| TCP epoll byte cycles, 2,000 each | 29.05 ms | 29.42 ms | 19.85 ms | 5.54 ms |
+
+Complete sessions improve **1.32x**, with process wall time
+61.50 → 53.81 ms. State/options and sustained
+TCP/epoll are approximately flat. In a separate session diagnostic sample,
+service requests fall **3,769 → 3**. Counters include startup/teardown and
+nonblocking retries; they are not CPU utilization. Four processes perform checked
+fixed work; timings are medians of three unprofiled counterbalanced runs. Native
+Linux references are reused after exact ELF/kind/work identity checks and use the
+local six-vCPU CI machine; native macOS uses corresponding kqueue APIs. No
+whole-application or Firefox speedup is inferred.
+
+The final measured runner is installed in Trames Dev, without restarting existing
+sessions. Continue with retained blocking TCP connect/accept waits, then excluded
+Unix/task/VM resources. See [the validation record](../validation/worker-network-control-20261102.json)
+and [the shared control contract](../../runtime/docs/architecture/execution-backends.md#worker-full-socket-controls-2026-11-02).
+
 ## Thirteenth migration implemented — complete socket ownership and worker creation — 2026-11-02
 
 Runtime `0104a848c7a130d32c782f45176d88734985a737` makes the complete network namespace, socket and virtual
