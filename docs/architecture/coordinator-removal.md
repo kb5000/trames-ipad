@@ -1,5 +1,63 @@
 # Coordinator dependency audit
 
+## Fifteenth migration implemented — retained blocking socket waits — 2026-11-02
+
+Runtime `b69b222fdb875ffbcae160d22da159f552f8a7ec` moves blocking TCP connect/accept/accept4
+onto executing workers. A task waiting for a connection releases its execution
+slot. The original socket OFD, creating Files/credentials, absolute deadline and
+handshake phase survive cohort changes and the existing owner fallback. Numeric
+close/reuse cannot retarget the call, and connect never repeats its side effects
+or rereads a changed peer buffer. The overall coordinator-removal goal remains active.
+
+The wait uses existing native edge queues and the packet stack's existing
+transport/timer sources. Stale edges are drained before the deciding retry;
+existing workers dispatch events and rearm the operation. No reactor/resource
+thread, polling bus, new quota or ordinary guest-memory synchronization is added.
+Normal native TCP bytes retain their existing implementation. Cold admission now
+recognizes related full socket OFDs, including listeners, so a connected peer or
+an all-blocked related cohort can retain worker execution without a GUI service.
+
+One-host-worker tests prove blocked accept releases the slot for a connecting
+peer, with zero coordinator service requests under both unfiltered and filtered
+entries. Other tests cover all-blocked adoption, original Files after close/reuse,
+idle listener events, virtual handshake recovery and timeout, missing-reactor
+fallback, later filter changes, and signal/restart cleanup. An accepted entry
+does not repeat BPF; the next SVC uses the current filter. Stop retains the
+operation; caught signals, exit and exec release it. Native accept output and
+publication use the existing shared ABI. Apple/Linux affected checks, strict
+checks, Mac product tests, 13 real FFI checks and the iPad static build pass.
+Physical iPad checks remain skipped per owner; unaffected acceptance is reused.
+
+| Longest-child loop median | Previous | Current | Native macOS | Native Linux reference |
+| --- | ---: | ---: | ---: | ---: |
+| Blocking TCP sessions, 256 each | 69.85 ms | 23.48 ms | 19.16 ms | 4.64 ms |
+| Nonblocking TCP sessions, 256 each | 21.88 ms | 22.53 ms | 16.27 ms | 3.78 ms |
+| TCP epoll byte cycles, 2,000 each | 29.16 ms | 29.59 ms | 19.45 ms | 5.54 ms |
+
+Blocking sessions improve **2.97x**, with process wall time
+102.36 → 55.50 ms. A separate diagnostic profile
+reduces service requests **731 → 3**, including startup/teardown.
+Nonblocking sessions and sustained TCP/epoll remain approximately flat. The
+blocking fixture measures complete connection lifecycles; the dedicated tests,
+rather than a throughput timing, prove actual wait/slot handoff. Four processes
+perform identical checked work; timing uses three unprofiled counterbalanced
+samples. Native Linux uses the existing six-vCPU local CI machine and the exact
+same ELF/work; it is a reference, not Trames. No Firefox/whole-app speedup is inferred.
+
+A first combined connection-heavy run failed a connect assertion. Adding failure
+diagnostics reproduced Linux EADDRNOTAVAIL (99) on both the old and new runners:
+native macOS had about 16,360 TIME_WAIT entries against its 16,384-port ephemeral
+range. The independent nonblocking rerun passes, and the native blocking reference
+above is measured again after those connections drain. Host settings and runtime
+limits are unchanged. This is preserved in the validation record rather than
+discarded as an unexplained retry; the fixture now prints the actual connect error.
+
+The final measured runner is installed in Trames Dev, without restarting existing
+sessions or changing the stable application. Continue with excluded Unix socket/
+SCM_RIGHTS ownership, then task and structural VM/device boundaries. See the
+[validation record](../validation/worker-socket-waits-20261102.json) and
+[shared wait contract](../../runtime/docs/architecture/execution-backends.md#retained-blocking-socket-controls-2026-11-02).
+
 ## Fourteenth migration implemented — worker full socket controls — 2026-11-02
 
 Runtime `5acb2fb7a0b68348cd2c893937d706887f4791b0` moves bind/listen and nonblocking TCP connect/accept/accept4

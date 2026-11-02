@@ -35,6 +35,14 @@ static int tcp_socket(void) {
     assert(!fcntl(fd, F_SETFL, O_NONBLOCK));
     return fd;
 }
+static int tcp_connect(int fd, const struct sockaddr_in *address) {
+    int result = connect(fd, (const struct sockaddr *)address, sizeof(*address));
+    int error = errno;
+    if (result && error != EINPROGRESS)
+        fprintf(stderr, "TCP connect failed: errno=%d (%s)\n", error, strerror(error));
+    assert(!result || error == EINPROGRESS);
+    return result;
+}
 static void tcp_read(int fd, unsigned char *byte, int eof) {
     double deadline = now() + 5;
     for (;;) {
@@ -94,9 +102,11 @@ int main(int argc, char **argv) {
     uint64_t checksum = 0;
     int listener = -1;
     struct sockaddr_in address = {0};
+    int tcp_blocking = !strcmp(kind, "tcp-blocking");
     int tcp_events = !strcmp(kind, "tcp-epoll") || !strcmp(kind, "tcp-poll");
-    if (!strcmp(kind, "tcp-session") || tcp_events) {
+    if (!strcmp(kind, "tcp-session") || tcp_blocking || tcp_events) {
         listener = tcp_socket(); address.sin_family = AF_INET;
+        if (tcp_blocking) assert(!fcntl(listener, F_SETFL, 0));
         address.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
         assert(!bind(listener, (struct sockaddr *)&address, sizeof(address)));
         socklen_t size = sizeof(address);
@@ -122,8 +132,7 @@ int main(int argc, char **argv) {
             queue = queue_create(); assert(queue >= 0);
             interest(queue, 1, pair[0], 0, 1); // register before connection
         }
-        int result = connect(pair[0], (struct sockaddr *)&address, sizeof(address));
-        assert(!result || errno == EINPROGRESS);
+        tcp_connect(pair[0], &address);
         double deadline = now() + 5;
         while ((pair[1] = accept(listener, NULL, NULL)) < 0) {
             assert(errno == EAGAIN || errno == EINTR); assert(now() < deadline); sched_yield();
@@ -168,10 +177,11 @@ int main(int argc, char **argv) {
             assert(!kevent(queue, &event, 1, NULL, 0, NULL));
             assert(!kevent(queue, NULL, 0, &event, 1, &zero));
 #endif
-        } else if (!strcmp(kind, "tcp-session")) {
+        } else if (!strcmp(kind, "tcp-session") || tcp_blocking) {
             int client = tcp_socket();
-            int result = connect(client, (struct sockaddr *)&address, sizeof(address));
-            assert(!result || errno == EINPROGRESS);
+            if (tcp_blocking) assert(!fcntl(client, F_SETFL, 0));
+            int result = tcp_connect(client, &address);
+            if (tcp_blocking) assert(!result);
             int peer; double deadline = now() + 5;
             while ((peer = accept(listener, NULL, NULL)) < 0) {
                 assert(errno == EAGAIN || errno == EINTR); assert(now() < deadline); sched_yield();
