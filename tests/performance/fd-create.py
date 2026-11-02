@@ -15,7 +15,7 @@ p = argparse.ArgumentParser(description=__doc__)
 for name in ('baseline', 'candidate', 'native', 'fixture', 'rootfs', 'output'):
     p.add_argument('--' + name, type=Path)
 p.add_argument('--native-only', action='store_true')
-p.add_argument('--kind', choices=('pipe', 'eventfd', 'timerfd', 'inotify', 'tcp', 'tcp-session', 'tcp-blocking', 'tcp-state', 'tcp-epoll', 'tcp-poll', 'epoll', 'inotify-watch', 'unix-rights'), required=True)
+p.add_argument('--kind', choices=('pipe', 'eventfd', 'timerfd', 'inotify', 'tcp', 'tcp-session', 'tcp-blocking', 'tcp-state', 'tcp-epoll', 'tcp-poll', 'epoll', 'inotify-watch', 'unix-rights', 'signalfd', 'signal-rights'), required=True)
 p.add_argument('--repeats', type=int, default=3)
 p.add_argument('--operations', type=int, default=10000)
 p.add_argument('--cpus', type=int, default=12)

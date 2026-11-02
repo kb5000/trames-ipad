@@ -17,6 +17,8 @@
 #include <poll.h>
 #ifdef __linux__
 #include <sys/eventfd.h>
+#include <sys/signalfd.h>
+#include <signal.h>
 #include <sys/epoll.h>
 #include <sys/inotify.h>
 #include <sys/timerfd.h>
@@ -115,8 +117,18 @@ int main(int argc, char **argv) {
     }
     int queue = -1, pair[2] = {-1,-1}, monitor = -1, local[2] = {-1,-1};
     char watched[] = "/tmp/trames-watch-XXXXXX";
-    if (!strcmp(kind, "unix-rights")) {
-        assert(!socketpair(AF_UNIX, SOCK_STREAM, 0, local)); assert(!pipe(pair));
+    int signal_rights = 0;
+#ifdef __linux__
+    signal_rights = !strcmp(kind, "signal-rights");
+    sigset_t signal_mask; assert(!sigemptyset(&signal_mask)); assert(!sigaddset(&signal_mask, SIGUSR1));
+#endif
+    if (!strcmp(kind, "unix-rights") || signal_rights) {
+        assert(!socketpair(AF_UNIX, SOCK_STREAM, 0, local));
+#ifdef __linux__
+        if (signal_rights) { pair[1] = signalfd(-1, &signal_mask, SFD_NONBLOCK); assert(pair[1] >= 0); }
+        else
+#endif
+        assert(!pipe(pair));
     } else if (!strcmp(kind, "epoll")) {
         queue = queue_create(); assert(queue >= 0); assert(!pipe(pair));
     } else if (!strcmp(kind, "inotify-watch")) {
@@ -144,7 +156,7 @@ int main(int argc, char **argv) {
     }
     double began = now();
     for (unsigned i = 0; i < operations; i++) {
-        if (!strcmp(kind, "unix-rights")) {
+        if (!strcmp(kind, "unix-rights") || signal_rights) {
             unsigned char sent = (unsigned char)i, received = 0;
             struct iovec vector = {.iov_base = &sent, .iov_len = 1};
             union { struct cmsghdr align; unsigned char bytes[CMSG_SPACE(sizeof(int))]; } control = {0};
@@ -159,8 +171,16 @@ int main(int argc, char **argv) {
             header = CMSG_FIRSTHDR(&message);
             assert(header && header->cmsg_level == SOL_SOCKET && header->cmsg_type == SCM_RIGHTS && header->cmsg_len == CMSG_LEN(sizeof(int)));
             int imported; memcpy(&imported, CMSG_DATA(header), sizeof(int));
-            assert(write(imported, &sent, 1) == 1);
-            assert(read(pair[0], &received, 1) == 1 && received == sent);
+#ifdef __linux__
+            if (signal_rights) {
+                assert(signalfd(imported, &signal_mask, 0) == imported);
+                assert(fcntl(imported, F_GETFL) & O_NONBLOCK);
+            } else
+#endif
+            {
+                assert(write(imported, &sent, 1) == 1);
+                assert(read(pair[0], &received, 1) == 1 && received == sent);
+            }
             assert(!close(imported));
         } else if (tcp_events) {
             if (queue >= 0) interest(queue, 3, pair[0], (uint64_t)i + 1, 1);
@@ -246,6 +266,12 @@ int main(int argc, char **argv) {
             assert(read(p[0], &received, 1) == 0);
             assert(!close(p[0]));
 #ifdef __linux__
+        } else if (!strcmp(kind, "signalfd")) {
+            int fd = signalfd(-1, &signal_mask, SFD_NONBLOCK | SFD_CLOEXEC); assert(fd >= 0);
+            int alias = dup(fd); assert(alias >= 0); assert(!close(fd));
+            sigset_t changed; assert(!sigemptyset(&changed)); assert(!sigaddset(&changed, SIGUSR2));
+            assert(signalfd(alias, &changed, 0) == alias);
+            assert(!fcntl(alias, F_GETFD)); assert(!close(alias));
         } else if (!strcmp(kind, "eventfd")) {
             int fd = eventfd(0, 0); assert(fd >= 0);
             uint64_t sent = (uint64_t)i + 1, received = 0;
@@ -275,7 +301,8 @@ int main(int argc, char **argv) {
     double elapsed = now() - began;
     if (listener >= 0) assert(!close(listener));
     if (queue >= 0) assert(!close(queue));
-    if (pair[0] >= 0) {assert(!close(pair[0])); assert(!close(pair[1]));}
+    if (pair[0] >= 0) assert(!close(pair[0]));
+    if (pair[1] >= 0) assert(!close(pair[1]));
     if (local[0] >= 0) {assert(!close(local[0])); assert(!close(local[1]));}
     if (monitor >= 0) assert(!close(monitor));
     if (!strcmp(kind, "inotify-watch")) assert(!rmdir(watched));

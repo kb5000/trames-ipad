@@ -1,5 +1,91 @@
 # Coordinator dependency audit
 
+## Eighteenth migration implemented — shared descriptor controls — 2026-11-03
+
+Final runtime `30accf899f60f4a47a558c4c763bcc546c6aaeb3` includes the tested
+ownership migration `dfbac7a34f5f24a7ef9c5dd3e3bf54476fa205aa` and a directory
+lock-scope correction discovered during its regression measurements. Both
+products retain these exact commits and pin the final runtime.
+
+| Resource | Shared authority and worker operations | Remaining owner boundary |
+| --- | --- | --- |
+| signalfd | One actual atomic mask; create/update, dup/close and Unix rights | Reads and signal-dependent poll/epoll use the reading task's original pending queues. |
+| BPF descriptor | Same immutable verified program, registry identity and last-reference quota; dup/close and rights | Program verification/load/attachment and task permissions retain their original paths. |
+| UTS/PID namespace descriptor | Original shared namespace object, metadata and descriptor lifetime | Proc open, unshare/setns and task transitions remain joined. |
+| IPC/cgroup namespace descriptor | Actual Arc identity, weak snapshots and atomic quota lease; one initialized mqueue filesystem | Task/namespace mutation remains joined; network/mount namespace graphs and nsfs mount topology stay excluded. |
+
+The mask uses relaxed atomic access without a task/global lock. Updating an
+existing signalfd preserves per-FD CLOEXEC and its original status flags. Common
+owner/worker input decoding retains the original size, fault, flag and type-error
+order. Shared descriptions retain the actual objects, not mirrored state or an
+owner-service endpoint. Proc namespace reopen preserves that capability in a
+fresh OFD; mount association is supplied before ownership classification so a
+temporary shared projection cannot discard an nsfs mount pin.
+
+Five resource tests cover whole-mask updates, current-task readiness, alias
+flags/fdinfo, original namespace types/permissions, nsfs mount pins and worker
+last-close quota reclamation. Real ancillary ABI tests transfer signalfd, BPF and
+namespace descriptors after sender close/reuse. A filtered two-task lifecycle
+test performs 80 calls on one/two execution slots with zero coordinator services
+and one filter decision per entry. Another test proves inherited signalfd reads
+consume the current task's queue, preserving the creator's pending signal.
+
+| Four processes, 1,000 operations each; longest-child median | Previous | Current | Native Linux, exact ELF | Improvement |
+| --- | ---: | ---: | ---: | ---: |
+| signalfd create/dup/update/close | 383.88 ms | 9.55 ms | 1.86 ms | 40.22x |
+| signalfd Unix-rights transfer/update/close | 317.78 ms | 9.88 ms | 1.81 ms | 32.15x |
+
+Process-wall medians fall **420.35 → 47.23 ms** and **352.97 → 48.88 ms**.
+Separate diagnostic cohort counts fall **14,013 → 52** and **10,610 → 57**;
+service requests remain **3 → 3** in both cases. This removes repeated
+whole-cohort joins. The native reference executes the same static musl ELF on
+the existing six-vCPU ARM64 Linux CI machine. No native macOS signalfd API is
+substituted. Three unprofiled counterbalanced samples are used, with that CI VM
+stopped during Mac measurements. No whole-app/Firefox/iPad speedup is inferred.
+
+The directory regression uncovered a real baseline deadlock, not a slow timing
+sample. getdents held a filesystem read guard while parent/mount resolution
+could acquire that same lock again. A queued writer could then wait for the
+first guard while blocking the recursive reader. Sampled hardware stacks show
+readers in parent/root-path resolution and writers in insert_entry. Child
+metadata now comes from a closed helper returning owned values; namespace
+resolution and encoding cannot retain that helper's guard. No new lock, check,
+barrier, service hop or serialization of unrelated operations is added.
+
+The corrected concurrent regression fails on the isolated committed unfixed
+runtime at its five-second progress deadline, and passes in about 30 ms after
+the fix. Its 512 created names remain within the existing memory fixture quota.
+Six final hardware cases also pass concurrent first-time creation/enumeration
+with fresh private/shared directories, three each. The failed baseline sample,
+explicit stack reproduction and negative control are retained in the record.
+
+Directory timing is reported separately with `--prepare-directory`, which
+prepares identical contents sequentially before hot-loop measurements:
+
+| Directory hot loop | Previous | Current | Native macOS |
+| --- | ---: | ---: | ---: |
+| Private | 50.24 ms | 48.36 ms | 33.19 ms |
+| Shared host | 158.98 ms | 164.63 ms | 33.19 ms |
+
+Private time falls about 3.7%; shared-host time rises about 3.6%. Three samples
+are insufficient to attribute these small differences to this change. They are
+not presented as additional directory speedups. The unchanged exact-ELF native
+Linux directory reference (6.62 ms) is reused from the previous stage.
+
+Final Apple/Linux VFS coverage is 432/431 passing cases. Full ABI (175 each),
+kernel (261 each), strict checks and Mac product checks (13) passed for the
+ownership migration. Only affected directory cases and failed permission-bound
+VFS cases were rerun for the follow-up, reusing unchanged passing checks.
+All 13 real FFI environment checks and the iPad static build also pass with
+the final fix. Physical iPad tests remain skipped per owner. The final measured
+runner is installed in Trames Dev; the stable application is unchanged.
+
+The overall goal remains active. Full Unix creation/listener/connection/addressed
+datagram ownership, PTY/ring/network/mount control graphs, pending signal queues,
+remaining native/OFD controls and task/structural VM/directory transitions still
+need migration. See the [validation record](../validation/worker-shared-controls-20261103.json)
+and [shared contract](../../runtime/docs/architecture/execution-backends.md#shared-descriptor-controls-and-worker-signalfd-2026-11-03).
+
 ## Seventeenth migration implemented — worker directories and memfd ownership — 2026-11-02
 
 Runtime `748d75e2cfed670d041f9a75e1e24152d7068dae` makes static directory and

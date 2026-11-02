@@ -17,6 +17,7 @@ for name in ('baseline', 'candidate', 'native', 'fixture', 'rootfs', 'output'):
     p.add_argument('--' + name, type=Path)
 p.add_argument('--native-only', action='store_true', help='run the same native reference on Linux or macOS')
 p.add_argument('--native-directory', type=Path, help='use a native filesystem directory separate from report output')
+p.add_argument('--prepare-directory', action='store_true', help='prepare directory contents sequentially before timing')
 p.add_argument('--repeats', type=int, default=3)
 p.add_argument('--cpus', type=int, default=12)
 p.add_argument('--operations', type=int, default=10000)
@@ -36,7 +37,7 @@ native = a.native_directory.resolve() if a.native_directory else a.output / 'nat
 native.mkdir()
 env = dict(os.environ, TRAMES_MAC_BUNDLED='1')
 report = dict(passed=False, processes=4, operations_each=a.operations,
-              cpus=a.cpus, mode=a.mode, repeats=a.repeats, native_directory=str(native), records=[], sha256={
+              cpus=a.cpus, mode=a.mode, repeats=a.repeats, native_directory=str(native), prepared_directory_contents=a.prepare_directory, records=[], sha256={
                   key: hashlib.sha256(getattr(a, key).read_bytes()).hexdigest()
                   for key in ('baseline', 'candidate', 'native', 'fixture', 'rootfs')
                   if getattr(a, key) is not None}, native_environment=dict(
@@ -94,6 +95,14 @@ try:
             '/bin/true'], capture_output=True, env=env, timeout=120)
         (a.output / 'setup.stderr').write_bytes(setup.stderr)
         assert setup.returncode == 0, setup.stderr
+        if a.mode == 'directory' and a.prepare_directory:
+            commands = [f'/bench {shlex.quote(directory + "/metadata-" + str(i))} directory 1'
+                        for directory in ('/tmp', '/work') for i in range(4)]
+            prepared = subprocess.run(options(a.candidate) + ['/bin/sh', '-c', ' && '.join(commands)],
+                                      capture_output=True, env=env, timeout=120)
+            (a.output / 'prepare.stdout').write_bytes(prepared.stdout)
+            (a.output / 'prepare.stderr').write_bytes(prepared.stderr)
+            assert prepared.returncode == 0, prepared.stderr
         for kind in ('private', 'shared'):
             # Profile separately; no clock/counter instrumentation in timed samples.
             for variant in ('before', 'after'):
