@@ -1,5 +1,15 @@
 # Coordinator dependency audit
 
+## Current status — 2026-11-03
+
+The latest completed stage is [retained Netlink data and resource wakeups](#twenty-eighth-migration-implemented--retained-netlink-data-and-resource-wakeups--2026-11-03).
+Ordinary Netlink I/O, supported link/route/address changes and resource-driven
+poll/epoll now execute on workers. nf_tables ruleset publication still joins to
+invalidate captured native TCP policy-free capabilities. Other remaining areas
+include Unix owning ancillary graphs, native-service/device and io_uring controls,
+task/job control, mount/proc ownership and structural file/VM/task transitions.
+The overall coordinator-removal goal remains active.
+
 ## Twenty-second migration implemented — worker Unix namespace controls and waits — 2026-11-03
 
 Runtime `fcfb8936848c36714a704c6c8ce30d9a2b86a347` moves Unix bind/connect and
@@ -2174,3 +2184,90 @@ mount/proc ownership and structural file/VM/task transitions remain. recvmmsg is
 unimplemented rather than an existing coordinator path. See the
 [validation record](../validation/worker-raw-ip-20261103.json) and
 [shared contract](../../runtime/docs/architecture/execution-backends.md#retained-raw-ip-byte-operations-2026-11-03).
+
+
+## Twenty-eighth migration implemented — retained Netlink data and resource wakeups — 2026-11-03
+
+Runtime `0119510ad2457277e72d1bdd2401f29fa3f3b015` moves Netlink raw/vector/message/batch
+data, supported route/link/address changes, and non-publishing netfilter/conntrack
+operations onto the calling worker, shared by Mac and iPad. The actual socket OFD,
+creating namespace, accepted credentials, input/output and batch progress remain
+the same across waits and owner handoff. Close/reuse cannot redirect accepted work.
+
+Each real Netlink queue owns its readiness. Replies and multicast wake reads, poll
+and epoll through existing resource subscriptions, without a reactor or periodic
+service. Poll captures and watches remain weak, so they do not pin final close.
+Notifications are deduplicated and flushed only after queue, registry, topology
+and outer Socket gates release; callbacks can receive and change options on the
+same socket. Blocking receives return execution slots instead of occupying them.
+
+Namespace-FD targets are resolved through actual shared namespace OFDs before the
+topology writer. Canonical validators retain original error order. Both Network
+and complete OFD lifetimes extend beyond topology/source gates and notification
+flush, preventing final namespace teardown from reentering those locks. Top-level
+and nested veth-peer targets are covered. No new global resource lock, coordinator
+or service thread, message bus, busy polling, ordinary guest-memory fence, native
+access policy or unsafe code is introduced. Existing TCP and accepted byte-resource
+paths retain their earlier admission without a new fallback lookup.
+
+**nf_tables ruleset publication remains joined.** Only a netfilter batch beginning
+with NFNL_MSG_BATCH_BEGIN takes that boundary. Newly published rules can invalidate
+already-captured native TCP policy-free capabilities. This stage preserves that
+invariant without adding a permission/generation load or fence to every TCP byte
+operation. Earlier sendmmsg items can finish on the worker; the original current
+item, source and completed count survive owner handoff without replay or another
+seccomp decision. Existing connected native TCP transport stays selected across
+route/link changes, so those updates can proceed without this policy boundary.
+
+| Four processes × 1,000 checked iterations, longest-child median | Previous | Current | Native macOS | Native ARM Linux, exact ELF | Improvement |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Netlink scalar write/read | 160.22 ms | 7.41 ms | No native API | 4.29 ms | 21.62x |
+| Netlink vector writev/readv | 163.38 ms | 7.62 ms | No native API | 2.25 ms | 21.45x |
+| Netlink sendmsg/recvmsg | 160.50 ms | 8.06 ms | No native API | 4.79 ms | 19.92x |
+| Netlink query + poll + read | 237.56 ms | 8.99 ms | No native API | 4.45 ms | 26.43x |
+| Existing native TCP scalar | 16.98 ms | 15.10 ms | 15.54 ms | 2.33 ms | No gain claimed |
+| Existing pipe lifecycle | 12.49 ms | 12.42 ms | 1.90 ms | 2.23 ms | No gain claimed |
+
+Netlink process-wall medians are **193.36 → 41.60 ms** (scalar),
+**197.65 → 41.67 ms** (vector), **193.70 → 42.39 ms** (message), and
+**272.43 → 44.55 ms** (poll). Separate diagnostic cohort counts fall
+**5,402 → 50**, **5,312 → 48**, **5,624 → 43**, and **7,961 → 51**.
+Service requests remain three, including startup/teardown; old Netlink calls
+usually joined rather than counted as resource services. TCP/pipe controls show
+no observed degradation; no control gain or statistical regression bound is claimed.
+
+Three unprofiled counterbalanced samples run after all compilation, affected CI
+and FFI checks; diagnostics use a separate repeat. Four Trames vCPUs serve four
+independent processes. Endpoint setup/cleanup is outside the loop timer. Queries
+use RTM_GETLINK for interface index 1 without dump; every reply checks declared
+length, type, sequence and interface index. Native ARM Linux runs the same static
+musl ELF on six vCPUs, then is stopped during Mac timing. **Trames replies contain
+292 bytes; native Linux replies contain 1,488 bytes**, reflecting different
+attribute sets. Native timing is therefore contextual, not identical reply work.
+macOS has no native Netlink API; only TCP/pipe controls have native Mac references.
+These are not whole-app, Firefox, physical-iPad or universally native-speed results.
+
+Apple/Linux ABI **205 each**, VFS **453/452**, network **81 unit + 11 integration
+each**, kernel **278 each**, Mac **13**, strict checks, all **13** production FFI
+environment checks, three project-boundary checks and iPad static build pass.
+Filtered distinct-process guest tests with one/two execution slots exchange link
+multicast, poll, receive and ACK: all **six calls finish on workers**, with **six
+filter decisions and zero services**; the single-slot case asserts a real wait.
+ABI tests cover scalar/vector/message/kernel-batch queries, reentrant callbacks,
+original OFD/output after close/reuse, pure resource wakeups, real epoll readiness,
+weak final-close lifetime and partial batch owner handoff. VFS/network tests cover
+namespace identity, original authority/error order and teardown outside locks.
+
+The final cfg(test)-only epoll assertion reruns its affected Apple/Linux case and
+strict checks; full passes and unchanged production artifacts are reused. Final
+full kernel runs include distinct VM identities. An initial new test attempted
+unsupported bridge placement; it was corrected to already-supported veth targets,
+without a production workaround. Physical iPad testing remains skipped per owner.
+The measured binary is installed in Trames Dev; stable remains unchanged.
+
+The coordinator-removal goal remains active. nf_tables publication, Unix owning
+ancillary graphs, native-service/device and io_uring controls, task/job control,
+mount/proc ownership and structural file/VM/task transitions remain. recvmmsg is
+unimplemented rather than an existing coordinator path. See the
+[validation record](../validation/worker-netlink-20261103.json) and
+[shared contract](../../runtime/docs/architecture/execution-backends.md#retained-netlink-data-and-resource-wakeups-2026-11-03).

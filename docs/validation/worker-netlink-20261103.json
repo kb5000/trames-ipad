@@ -1,0 +1,3716 @@
+{
+  "date": "2026-11-03",
+  "stage": 28,
+  "status": "stage-complete; coordinator-removal goal remains active",
+  "runtime_revision": "0119510ad2457277e72d1bdd2401f29fa3f3b015",
+  "baseline_runtime_revision": "0c051a18b2298b97fa31fa87a4e766faa3db271e",
+  "scope": "Retained Netlink raw/vector/message/batch I/O, supported route/link/address changes, non-publishing netfilter/conntrack calls, and actual queue-driven receive/poll/epoll wakeups on execution workers; preserve joined nf_tables ruleset publication.",
+  "performance": {
+    "bytes": {
+      "passed": true,
+      "kind": "netlink-bytes",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "before",
+          "repeat": 0,
+          "wall_seconds": 0.5554478330000001,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.087033959,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.130086333,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.1698445,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.170707917,
+              "checksum": 500500,
+              "response_bytes": 292000
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 5402,
+            "cohort_stop_us": 13419,
+            "service_caller_wait_us": 54,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 8126,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 8,
+            "worker_fd_syscalls": 7,
+            "worker_file_syscalls": 4,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 4,
+            "worker_syscalls": 15,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "after",
+          "repeat": 0,
+          "wall_seconds": 0.04329137499999991,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.007029,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.007751875,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.006852791,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.006699,
+              "checksum": 500500,
+              "response_bytes": 292000
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 50,
+            "cohort_stop_us": 1140,
+            "service_caller_wait_us": 41,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 8126,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 7996,
+            "worker_fd_syscalls": 7,
+            "worker_file_syscalls": 4,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 7992,
+            "worker_syscalls": 8003,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "before",
+          "repeat": 1,
+          "wall_seconds": 0.19659745899999992,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.067737542,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.11063,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.158514958,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.162175208,
+              "checksum": 500500,
+              "response_bytes": 292000
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 1,
+          "wall_seconds": 0.04160383299999992,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.006921792,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.00749625,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.0066945,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.006588416,
+              "checksum": 500500,
+              "response_bytes": 292000
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 2,
+          "wall_seconds": 0.04549625000000024,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.00683275,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.00741025,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.006610541,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.00654275,
+              "checksum": 500500,
+              "response_bytes": 292000
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 2,
+          "wall_seconds": 0.19336116699999994,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.063104625,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.1096275,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.157064208,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.160219375,
+              "checksum": 500500,
+              "response_bytes": 292000
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 3,
+          "wall_seconds": 0.19129545799999992,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.065105208,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.110215291,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.156448,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.159675791,
+              "checksum": 500500,
+              "response_bytes": 292000
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 3,
+          "wall_seconds": 0.040421292,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.006867458,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.007029666,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.0061045,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.006195084,
+              "checksum": 500500,
+              "response_bytes": 292000
+            }
+          ]
+        }
+      ],
+      "sha256": {
+        "baseline": "6bfcb59615ef302e29cabc251993bf222cb2ec2b244314c5ec0ed60715ab6263",
+        "candidate": "bc426dfdda9f7e8cfb448cab9719f1cb17a8aaa6253333f3446a2f64c35c3748",
+        "fixture": "40ec331dd209e7026467306c6aeedf46e03e7a54ae4a21b5b1c70a0fde00916e",
+        "rootfs": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe"
+      },
+      "native_environment": {
+        "system": "Darwin",
+        "release": "27.0.0",
+        "architecture": "arm64",
+        "logical_cpus": 12
+      },
+      "summary": {
+        "before": {
+          "loop_max_median_seconds": 0.160219375,
+          "process_wall_median_seconds": 0.19336116699999994,
+          "profile": {
+            "cohort_rounds": 5402,
+            "cohort_stop_us": 13419,
+            "service_caller_wait_us": 54,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 8126,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 8,
+            "worker_fd_syscalls": 7,
+            "worker_file_syscalls": 4,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 4,
+            "worker_syscalls": 15,
+            "worker_task_resumes": 3
+          }
+        },
+        "after": {
+          "loop_max_median_seconds": 0.00741025,
+          "process_wall_median_seconds": 0.04160383299999992,
+          "profile": {
+            "cohort_rounds": 50,
+            "cohort_stop_us": 1140,
+            "service_caller_wait_us": 41,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 8126,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 7996,
+            "worker_fd_syscalls": 7,
+            "worker_file_syscalls": 4,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 7992,
+            "worker_syscalls": 8003,
+            "worker_task_resumes": 3
+          }
+        }
+      }
+    },
+    "vector": {
+      "passed": true,
+      "kind": "netlink-vector",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "before",
+          "repeat": 0,
+          "wall_seconds": 0.22100912500000003,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.08476475,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.13042075,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.168302917,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.169586875,
+              "checksum": 500500,
+              "response_bytes": 292000
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 5312,
+            "cohort_stop_us": 14082,
+            "service_caller_wait_us": 56,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 8126,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 8,
+            "worker_fd_syscalls": 7,
+            "worker_file_syscalls": 4,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 4,
+            "worker_syscalls": 15,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "after",
+          "repeat": 0,
+          "wall_seconds": 0.04151250000000006,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.007413709,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.007591625,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.006838417,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.006935666,
+              "checksum": 500500,
+              "response_bytes": 292000
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 48,
+            "cohort_stop_us": 988,
+            "service_caller_wait_us": 22,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 8126,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 7917,
+            "worker_fd_syscalls": 7,
+            "worker_file_syscalls": 4,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 7913,
+            "worker_syscalls": 7924,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "before",
+          "repeat": 1,
+          "wall_seconds": 0.19765179199999994,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.067698875,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.111943959,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.160339958,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.163384333,
+              "checksum": 500500,
+              "response_bytes": 292000
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 1,
+          "wall_seconds": 0.041667542,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.007519042,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.007315125,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.006614791,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.006768958,
+              "checksum": 500500,
+              "response_bytes": 292000
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 2,
+          "wall_seconds": 0.04567512500000004,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.007472459,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.008019583,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.007088541,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.007108209,
+              "checksum": 500500,
+              "response_bytes": 292000
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 2,
+          "wall_seconds": 0.196326,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.063910875,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.115380375,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.15489225,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.156790208,
+              "checksum": 500500,
+              "response_bytes": 292000
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 3,
+          "wall_seconds": 0.19849387500000004,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.068522333,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.114216,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.161058291,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.164357083,
+              "checksum": 500500,
+              "response_bytes": 292000
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 3,
+          "wall_seconds": 0.04143025000000011,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.007341459,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.007616833,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.006816583,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.006818167,
+              "checksum": 500500,
+              "response_bytes": 292000
+            }
+          ]
+        }
+      ],
+      "sha256": {
+        "baseline": "6bfcb59615ef302e29cabc251993bf222cb2ec2b244314c5ec0ed60715ab6263",
+        "candidate": "bc426dfdda9f7e8cfb448cab9719f1cb17a8aaa6253333f3446a2f64c35c3748",
+        "fixture": "40ec331dd209e7026467306c6aeedf46e03e7a54ae4a21b5b1c70a0fde00916e",
+        "rootfs": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe"
+      },
+      "native_environment": {
+        "system": "Darwin",
+        "release": "27.0.0",
+        "architecture": "arm64",
+        "logical_cpus": 12
+      },
+      "summary": {
+        "before": {
+          "loop_max_median_seconds": 0.163384333,
+          "process_wall_median_seconds": 0.19765179199999994,
+          "profile": {
+            "cohort_rounds": 5312,
+            "cohort_stop_us": 14082,
+            "service_caller_wait_us": 56,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 8126,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 8,
+            "worker_fd_syscalls": 7,
+            "worker_file_syscalls": 4,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 4,
+            "worker_syscalls": 15,
+            "worker_task_resumes": 3
+          }
+        },
+        "after": {
+          "loop_max_median_seconds": 0.007616833,
+          "process_wall_median_seconds": 0.041667542,
+          "profile": {
+            "cohort_rounds": 48,
+            "cohort_stop_us": 988,
+            "service_caller_wait_us": 22,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 8126,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 7917,
+            "worker_fd_syscalls": 7,
+            "worker_file_syscalls": 4,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 7913,
+            "worker_syscalls": 7924,
+            "worker_task_resumes": 3
+          }
+        }
+      }
+    },
+    "message": {
+      "passed": true,
+      "kind": "netlink-message",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "before",
+          "repeat": 0,
+          "wall_seconds": 0.21769874999999994,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.080037333,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.126239666,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.165469333,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.165453417,
+              "checksum": 500500,
+              "response_bytes": 292000
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 5624,
+            "cohort_stop_us": 11380,
+            "service_caller_wait_us": 23,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 8127,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 8,
+            "worker_fd_syscalls": 7,
+            "worker_file_syscalls": 4,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 4,
+            "worker_syscalls": 15,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "after",
+          "repeat": 0,
+          "wall_seconds": 0.040716584,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.007802459,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.007753,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.007059167,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.007137625,
+              "checksum": 500500,
+              "response_bytes": 292000
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 43,
+            "cohort_stop_us": 1030,
+            "service_caller_wait_us": 20,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 8122,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 7933,
+            "worker_fd_syscalls": 7,
+            "worker_file_syscalls": 4,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 7929,
+            "worker_syscalls": 7940,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "before",
+          "repeat": 1,
+          "wall_seconds": 0.19469124999999998,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.06382925,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.113541167,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.156907541,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.16046325,
+              "checksum": 500500,
+              "response_bytes": 292000
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 1,
+          "wall_seconds": 0.04177041699999984,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.007640875,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.007563084,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.00693275,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.006992958,
+              "checksum": 500500,
+              "response_bytes": 292000
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 2,
+          "wall_seconds": 0.042387916999999886,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.007570917,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.008058334,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.007268375,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.007290958,
+              "checksum": 500500,
+              "response_bytes": 292000
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 2,
+          "wall_seconds": 0.19370050000000005,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.065578625,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.114187333,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.151821209,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.161571,
+              "checksum": 500500,
+              "response_bytes": 292000
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 3,
+          "wall_seconds": 0.19130879200000006,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.062581708,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.109792542,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.15712675,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.160502208,
+              "checksum": 500500,
+              "response_bytes": 292000
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 3,
+          "wall_seconds": 0.04271541600000006,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.007814,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.008480584,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.007636417,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.007620416,
+              "checksum": 500500,
+              "response_bytes": 292000
+            }
+          ]
+        }
+      ],
+      "sha256": {
+        "baseline": "6bfcb59615ef302e29cabc251993bf222cb2ec2b244314c5ec0ed60715ab6263",
+        "candidate": "bc426dfdda9f7e8cfb448cab9719f1cb17a8aaa6253333f3446a2f64c35c3748",
+        "fixture": "40ec331dd209e7026467306c6aeedf46e03e7a54ae4a21b5b1c70a0fde00916e",
+        "rootfs": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe"
+      },
+      "native_environment": {
+        "system": "Darwin",
+        "release": "27.0.0",
+        "architecture": "arm64",
+        "logical_cpus": 12
+      },
+      "summary": {
+        "before": {
+          "loop_max_median_seconds": 0.160502208,
+          "process_wall_median_seconds": 0.19370050000000005,
+          "profile": {
+            "cohort_rounds": 5624,
+            "cohort_stop_us": 11380,
+            "service_caller_wait_us": 23,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 8127,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 8,
+            "worker_fd_syscalls": 7,
+            "worker_file_syscalls": 4,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 4,
+            "worker_syscalls": 15,
+            "worker_task_resumes": 3
+          }
+        },
+        "after": {
+          "loop_max_median_seconds": 0.008058334,
+          "process_wall_median_seconds": 0.042387916999999886,
+          "profile": {
+            "cohort_rounds": 43,
+            "cohort_stop_us": 1030,
+            "service_caller_wait_us": 20,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 8122,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 7933,
+            "worker_fd_syscalls": 7,
+            "worker_file_syscalls": 4,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 7929,
+            "worker_syscalls": 7940,
+            "worker_task_resumes": 3
+          }
+        }
+      }
+    },
+    "poll": {
+      "passed": true,
+      "kind": "netlink-poll",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "before",
+          "repeat": 0,
+          "wall_seconds": 0.30176454199999997,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.128824875,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.188231416,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.243202541,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.247217375,
+              "checksum": 500500,
+              "response_bytes": 292000
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 7961,
+            "cohort_stop_us": 18402,
+            "service_caller_wait_us": 25,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 12127,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 8,
+            "worker_fd_syscalls": 7,
+            "worker_file_syscalls": 4,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 4,
+            "worker_syscalls": 15,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "after",
+          "repeat": 0,
+          "wall_seconds": 0.04224370899999996,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.008626375,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.008872208,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.007988958,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.008105333,
+              "checksum": 500500,
+              "response_bytes": 292000
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 51,
+            "cohort_stop_us": 966,
+            "service_caller_wait_us": 20,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 12126,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 11940,
+            "worker_fd_syscalls": 7,
+            "worker_file_syscalls": 4,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 3978,
+            "worker_socket_syscalls": 7958,
+            "worker_syscalls": 11947,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "before",
+          "repeat": 1,
+          "wall_seconds": 0.2700500830000001,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.099661875,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.168520833,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.232808625,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.23756175,
+              "checksum": 500500,
+              "response_bytes": 292000
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 1,
+          "wall_seconds": 0.04261700000000013,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.008439375,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.009045458,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.007628291,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.00777075,
+              "checksum": 500500,
+              "response_bytes": 292000
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 2,
+          "wall_seconds": 0.0446749999999998,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.008243458,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.008427291,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.007717541,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.007826875,
+              "checksum": 500500,
+              "response_bytes": 292000
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 2,
+          "wall_seconds": 0.27844112500000007,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.101534375,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.170414042,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.231816916,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.240968792,
+              "checksum": 500500,
+              "response_bytes": 292000
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 3,
+          "wall_seconds": 0.2724307910000001,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.09944375,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.167628834,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.231651709,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.236407375,
+              "checksum": 500500,
+              "response_bytes": 292000
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 3,
+          "wall_seconds": 0.04454858399999995,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.008339833,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.008987833,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.007904958,
+              "checksum": 500500,
+              "response_bytes": 292000
+            },
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.008137208,
+              "checksum": 500500,
+              "response_bytes": 292000
+            }
+          ]
+        }
+      ],
+      "sha256": {
+        "baseline": "6bfcb59615ef302e29cabc251993bf222cb2ec2b244314c5ec0ed60715ab6263",
+        "candidate": "bc426dfdda9f7e8cfb448cab9719f1cb17a8aaa6253333f3446a2f64c35c3748",
+        "fixture": "40ec331dd209e7026467306c6aeedf46e03e7a54ae4a21b5b1c70a0fde00916e",
+        "rootfs": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe"
+      },
+      "native_environment": {
+        "system": "Darwin",
+        "release": "27.0.0",
+        "architecture": "arm64",
+        "logical_cpus": 12
+      },
+      "summary": {
+        "before": {
+          "loop_max_median_seconds": 0.23756175,
+          "process_wall_median_seconds": 0.2724307910000001,
+          "profile": {
+            "cohort_rounds": 7961,
+            "cohort_stop_us": 18402,
+            "service_caller_wait_us": 25,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 12127,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 8,
+            "worker_fd_syscalls": 7,
+            "worker_file_syscalls": 4,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 4,
+            "worker_syscalls": 15,
+            "worker_task_resumes": 3
+          }
+        },
+        "after": {
+          "loop_max_median_seconds": 0.008987833,
+          "process_wall_median_seconds": 0.04454858399999995,
+          "profile": {
+            "cohort_rounds": 51,
+            "cohort_stop_us": 966,
+            "service_caller_wait_us": 20,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 12126,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 11940,
+            "worker_fd_syscalls": 7,
+            "worker_file_syscalls": 4,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 3978,
+            "worker_socket_syscalls": 7958,
+            "worker_syscalls": 11947,
+            "worker_task_resumes": 3
+          }
+        }
+      }
+    },
+    "tcp-control": {
+      "passed": true,
+      "kind": "tcp-raw",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "before",
+          "repeat": 0,
+          "wall_seconds": 0.119533958,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.028233167,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.028566625,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.030752042,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.029586625,
+              "checksum": 500500,
+              "response_bytes": 0
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 46,
+            "cohort_stop_us": 2288,
+            "service_caller_wait_us": 21,
+            "service_requests": 2,
+            "serviced_syscalls": 2,
+            "syscalls": 8159,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 8005,
+            "worker_fd_syscalls": 18,
+            "worker_file_syscalls": 4,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 8001,
+            "worker_syscalls": 8023,
+            "worker_task_resumes": 888
+          }
+        },
+        {
+          "variant": "after",
+          "repeat": 0,
+          "wall_seconds": 0.06810733300000005,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.025436417,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.027246791,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.027483875,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.027484375,
+              "checksum": 500500,
+              "response_bytes": 0
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 46,
+            "cohort_stop_us": 1740,
+            "service_caller_wait_us": 64,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 8167,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 7989,
+            "worker_fd_syscalls": 18,
+            "worker_file_syscalls": 4,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 7985,
+            "worker_syscalls": 8007,
+            "worker_task_resumes": 1551
+          }
+        },
+        {
+          "variant": "before",
+          "repeat": 1,
+          "wall_seconds": 0.048343374999999966,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.014866708,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.016495083,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.015707542,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.016978042,
+              "checksum": 500500,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 1,
+          "wall_seconds": 0.046812666999999974,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.013316708,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.014114334,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.015101208,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.01499575,
+              "checksum": 500500,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 2,
+          "wall_seconds": 0.04364183300000002,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.012038,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.013457958,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.013221875,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.013763834,
+              "checksum": 500500,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 2,
+          "wall_seconds": 0.041433791,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.008942708,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.009992917,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.009242958,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.010472958,
+              "checksum": 500500,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 3,
+          "wall_seconds": 0.050517540999999944,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.015644625,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.016579625,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.016521459,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.018070875,
+              "checksum": 500500,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 3,
+          "wall_seconds": 0.04655720799999996,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.013284667,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.013376042,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.014207042,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.015318916,
+              "checksum": 500500,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.2496032079999999,
+          "children": [
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.015462,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.01545,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.015472,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.015541,
+              "checksum": 500500,
+              "response_bytes": 0
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.033223583000000056,
+          "children": [
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.025909,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.025262,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.024234,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.023161,
+              "checksum": 500500,
+              "response_bytes": 0
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.016768375000000058,
+          "children": [
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.011746,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.012081,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.011793,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.011529,
+              "checksum": 500500,
+              "response_bytes": 0
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "baseline": "6bfcb59615ef302e29cabc251993bf222cb2ec2b244314c5ec0ed60715ab6263",
+        "candidate": "bc426dfdda9f7e8cfb448cab9719f1cb17a8aaa6253333f3446a2f64c35c3748",
+        "native": "e3295c5e4707bf7ace43ab86492363888de52b11950c2a71226ed90616730e6a",
+        "fixture": "40ec331dd209e7026467306c6aeedf46e03e7a54ae4a21b5b1c70a0fde00916e",
+        "rootfs": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe"
+      },
+      "native_environment": {
+        "system": "Darwin",
+        "release": "27.0.0",
+        "architecture": "arm64",
+        "logical_cpus": 12
+      },
+      "summary": {
+        "before": {
+          "loop_max_median_seconds": 0.016978042,
+          "process_wall_median_seconds": 0.048343374999999966,
+          "profile": {
+            "cohort_rounds": 46,
+            "cohort_stop_us": 2288,
+            "service_caller_wait_us": 21,
+            "service_requests": 2,
+            "serviced_syscalls": 2,
+            "syscalls": 8159,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 8005,
+            "worker_fd_syscalls": 18,
+            "worker_file_syscalls": 4,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 8001,
+            "worker_syscalls": 8023,
+            "worker_task_resumes": 888
+          }
+        },
+        "after": {
+          "loop_max_median_seconds": 0.015101208,
+          "process_wall_median_seconds": 0.04655720799999996,
+          "profile": {
+            "cohort_rounds": 46,
+            "cohort_stop_us": 1740,
+            "service_caller_wait_us": 64,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 8167,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 7989,
+            "worker_fd_syscalls": 18,
+            "worker_file_syscalls": 4,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 7985,
+            "worker_syscalls": 8007,
+            "worker_task_resumes": 1551
+          }
+        },
+        "native": {
+          "loop_max_median_seconds": 0.015541,
+          "process_wall_median_seconds": 0.033223583000000056
+        }
+      }
+    },
+    "pipe-control": {
+      "passed": true,
+      "kind": "pipe",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "before",
+          "repeat": 0,
+          "wall_seconds": 0.07874275000000008,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.023302292,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.02564325,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.023361125,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.022282,
+              "checksum": 500500,
+              "response_bytes": 0
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 48,
+            "cohort_stop_us": 2344,
+            "service_caller_wait_us": 29,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 24114,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 11876,
+            "worker_fd_syscalls": 11873,
+            "worker_file_syscalls": 4,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 23749,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "after",
+          "repeat": 0,
+          "wall_seconds": 0.05315391700000005,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.014554,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.013321375,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.016962917,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.016893917,
+              "checksum": 500500,
+              "response_bytes": 0
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 41,
+            "cohort_stop_us": 1648,
+            "service_caller_wait_us": 31,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 24109,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 11971,
+            "worker_fd_syscalls": 11967,
+            "worker_file_syscalls": 4,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 23938,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "before",
+          "repeat": 1,
+          "wall_seconds": 0.04521900000000001,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.012275667,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.01173975,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.013847791,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.012676167,
+              "checksum": 500500,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 1,
+          "wall_seconds": 0.04598387500000001,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.011294542,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.010928958,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.012894792,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.011423208,
+              "checksum": 500500,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 2,
+          "wall_seconds": 0.04347262499999993,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.011197417,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.012276667,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.011617375,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.011176667,
+              "checksum": 500500,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 2,
+          "wall_seconds": 0.04537983400000001,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.010390917,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.012492833,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.010263792,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.012049625,
+              "checksum": 500500,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 3,
+          "wall_seconds": 0.045818499999999984,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.011392625,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.012245375,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.011413458,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.011257166,
+              "checksum": 500500,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 3,
+          "wall_seconds": 0.04745050000000006,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.011527625,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.010704834,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.012421833,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.01149675,
+              "checksum": 500500,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.005530833000000013,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.001496,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.002036,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.001864,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.001663,
+              "checksum": 500500,
+              "response_bytes": 0
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.005578207999999973,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.00153,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.001784,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.001886,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.001575,
+              "checksum": 500500,
+              "response_bytes": 0
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.005715540999999935,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.001461,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.001896,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.001793,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.001494,
+              "checksum": 500500,
+              "response_bytes": 0
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "baseline": "6bfcb59615ef302e29cabc251993bf222cb2ec2b244314c5ec0ed60715ab6263",
+        "candidate": "bc426dfdda9f7e8cfb448cab9719f1cb17a8aaa6253333f3446a2f64c35c3748",
+        "native": "e3295c5e4707bf7ace43ab86492363888de52b11950c2a71226ed90616730e6a",
+        "fixture": "40ec331dd209e7026467306c6aeedf46e03e7a54ae4a21b5b1c70a0fde00916e",
+        "rootfs": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe"
+      },
+      "native_environment": {
+        "system": "Darwin",
+        "release": "27.0.0",
+        "architecture": "arm64",
+        "logical_cpus": 12
+      },
+      "summary": {
+        "before": {
+          "loop_max_median_seconds": 0.012492833,
+          "process_wall_median_seconds": 0.04537983400000001,
+          "profile": {
+            "cohort_rounds": 48,
+            "cohort_stop_us": 2344,
+            "service_caller_wait_us": 29,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 24114,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 11876,
+            "worker_fd_syscalls": 11873,
+            "worker_file_syscalls": 4,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 23749,
+            "worker_task_resumes": 3
+          }
+        },
+        "after": {
+          "loop_max_median_seconds": 0.012421833,
+          "process_wall_median_seconds": 0.04598387500000001,
+          "profile": {
+            "cohort_rounds": 41,
+            "cohort_stop_us": 1648,
+            "service_caller_wait_us": 31,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 24109,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 11971,
+            "worker_fd_syscalls": 11967,
+            "worker_file_syscalls": 4,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 23938,
+            "worker_task_resumes": 3
+          }
+        },
+        "native": {
+          "loop_max_median_seconds": 0.001896,
+          "process_wall_median_seconds": 0.005578207999999973
+        }
+      }
+    }
+  },
+  "native_linux_exact_elf": {
+    "bytes": {
+      "passed": true,
+      "kind": "netlink-bytes",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.006213381999998546,
+          "children": [
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.001781519,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            },
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.003422333,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            },
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.003296626,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            },
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.003054379,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.005537806999996064,
+          "children": [
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.004004784,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            },
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.004289572,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            },
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.004277114,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            },
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.004042826,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.005822845000011512,
+          "children": [
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.004180657,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            },
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.004357405,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            },
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.004287739,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            },
+            {
+              "kind": "netlink-bytes",
+              "operations": 1000,
+              "seconds": 0.004055076,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "native": "40ec331dd209e7026467306c6aeedf46e03e7a54ae4a21b5b1c70a0fde00916e"
+      },
+      "native_environment": {
+        "system": "Linux",
+        "release": "7.0.0-38-generic",
+        "architecture": "aarch64",
+        "logical_cpus": 6
+      },
+      "summary": {
+        "native": {
+          "loop_max_median_seconds": 0.004289572,
+          "process_wall_median_seconds": 0.005822845000011512
+        }
+      }
+    },
+    "vector": {
+      "passed": true,
+      "kind": "netlink-vector",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.006007300999954168,
+          "children": [
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.001302442,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            },
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.001757312,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            },
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.002250306,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            },
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.002069766,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.0064099220000457535,
+          "children": [
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.003372417,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            },
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.003528123,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            },
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.003437624,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            },
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.001674646,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.006120800000019244,
+          "children": [
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.001369983,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            },
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.001754436,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            },
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.002178849,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            },
+            {
+              "kind": "netlink-vector",
+              "operations": 1000,
+              "seconds": 0.002008726,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "native": "40ec331dd209e7026467306c6aeedf46e03e7a54ae4a21b5b1c70a0fde00916e"
+      },
+      "native_environment": {
+        "system": "Linux",
+        "release": "7.0.0-38-generic",
+        "architecture": "aarch64",
+        "logical_cpus": 6
+      },
+      "summary": {
+        "native": {
+          "loop_max_median_seconds": 0.002250306,
+          "process_wall_median_seconds": 0.006120800000019244
+        }
+      }
+    },
+    "message": {
+      "passed": true,
+      "kind": "netlink-message",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.006609044000015274,
+          "children": [
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.003321126,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            },
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.003292793,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            },
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.003057795,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            },
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.001199444,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.006135258000028898,
+          "children": [
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.004417529,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            },
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.004787275,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            },
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.004398779,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            },
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.004296822,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.006668000999979995,
+          "children": [
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.004785524,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            },
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.004605943,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            },
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.004501153,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            },
+            {
+              "kind": "netlink-message",
+              "operations": 1000,
+              "seconds": 0.004305614,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "native": "40ec331dd209e7026467306c6aeedf46e03e7a54ae4a21b5b1c70a0fde00916e"
+      },
+      "native_environment": {
+        "system": "Linux",
+        "release": "7.0.0-38-generic",
+        "architecture": "aarch64",
+        "logical_cpus": 6
+      },
+      "summary": {
+        "native": {
+          "loop_max_median_seconds": 0.004785524,
+          "process_wall_median_seconds": 0.006609044000015274
+        }
+      }
+    },
+    "poll": {
+      "passed": true,
+      "kind": "netlink-poll",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.006467837000002419,
+          "children": [
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.001632813,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            },
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.002390887,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            },
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.00258951,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            },
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.002408345,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.006413171000019702,
+          "children": [
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.004400529,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            },
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.004445529,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            },
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.004390405,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            },
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.004163407,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.006224339999960193,
+          "children": [
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.004756275,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            },
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.003880285,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            },
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.003371084,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            },
+            {
+              "kind": "netlink-poll",
+              "operations": 1000,
+              "seconds": 0.002186432,
+              "checksum": 500500,
+              "response_bytes": 1488000
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "native": "40ec331dd209e7026467306c6aeedf46e03e7a54ae4a21b5b1c70a0fde00916e"
+      },
+      "native_environment": {
+        "system": "Linux",
+        "release": "7.0.0-38-generic",
+        "architecture": "aarch64",
+        "logical_cpus": 6
+      },
+      "summary": {
+        "native": {
+          "loop_max_median_seconds": 0.004445529,
+          "process_wall_median_seconds": 0.006413171000019702
+        }
+      }
+    },
+    "tcp-control": {
+      "passed": true,
+      "kind": "tcp-raw",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.005939593999983117,
+          "children": [
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.001722354,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.002159807,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.001944101,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.001795103,
+              "checksum": 500500,
+              "response_bytes": 0
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.003791578000004847,
+          "children": [
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.002325679,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.002318805,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.001720353,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.001716688,
+              "checksum": 500500,
+              "response_bytes": 0
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.004141865000008238,
+          "children": [
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.002598051,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.002605176,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.002459011,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "tcp-raw",
+              "operations": 1000,
+              "seconds": 0.001973934,
+              "checksum": 500500,
+              "response_bytes": 0
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "native": "40ec331dd209e7026467306c6aeedf46e03e7a54ae4a21b5b1c70a0fde00916e"
+      },
+      "native_environment": {
+        "system": "Linux",
+        "release": "7.0.0-38-generic",
+        "architecture": "aarch64",
+        "logical_cpus": 6
+      },
+      "summary": {
+        "native": {
+          "loop_max_median_seconds": 0.002325679,
+          "process_wall_median_seconds": 0.004141865000008238
+        }
+      }
+    },
+    "pipe-control": {
+      "passed": true,
+      "kind": "pipe",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.004268697000043176,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.001990475,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.002175723,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.002073392,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.001748187,
+              "checksum": 500500,
+              "response_bytes": 0
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.005900635999978476,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.002472595,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.00223668,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.002001808,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.001556564,
+              "checksum": 500500,
+              "response_bytes": 0
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.003975283999977819,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.002143598,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.002231222,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.002107266,
+              "checksum": 500500,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 1000,
+              "seconds": 0.001875726,
+              "checksum": 500500,
+              "response_bytes": 0
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "native": "40ec331dd209e7026467306c6aeedf46e03e7a54ae4a21b5b1c70a0fde00916e"
+      },
+      "native_environment": {
+        "system": "Linux",
+        "release": "7.0.0-38-generic",
+        "architecture": "aarch64",
+        "logical_cpus": 6
+      },
+      "summary": {
+        "native": {
+          "loop_max_median_seconds": 0.002231222,
+          "process_wall_median_seconds": 0.004268697000043176
+        }
+      }
+    }
+  },
+  "method": "Four independent processes each perform 1,000 checked request/reply iterations; four Trames vCPUs; three unprofiled counterbalanced samples plus one separate diagnostic repeat. RTM_GETLINK requests query interface index 1 without dump; each reply is checked for declared length, RTM_NEWLINK type, sequence and interface index. Vector/message variants use two iovecs. Poll checks actual readiness before receive. Endpoint setup/cleanup is outside the loop timer. Native ARM Linux runs the identical static musl ELF on six vCPUs. All builds, affected CI and FFI checks finish before timing; local Linux is stopped during Mac timing. TCP/pipe controls also run through native macOS APIs. No native macOS Netlink substitute is used.",
+  "comparison_limits": {
+    "trames_netlink_reply_bytes_each": 292,
+    "native_linux_netlink_reply_bytes_each": 1488,
+    "note": "The identical query returns different attribute sets and response byte counts in the two kernels; native Linux is a contextual reference, not byte-for-byte identical reply processing. macOS has no native Netlink API. Controls show no observed degradation; no control gain or statistical regression bound is claimed. Results do not establish whole-app, Firefox, physical-iPad or universally native performance."
+  },
+  "validation": {
+    "apple_and_linux_abi": {
+      "passed": 205,
+      "ignored": 1
+    },
+    "apple_vfs": {
+      "passed": 453,
+      "ignored": 1
+    },
+    "linux_vfs": {
+      "passed": 452,
+      "ignored": 1
+    },
+    "apple_and_linux_network": {
+      "unit_passed": 81,
+      "integration_passed": 11
+    },
+    "apple_and_linux_kernel": {
+      "passed": 278,
+      "ignored": 3
+    },
+    "final_apple_and_linux_epoll_case": {
+      "passed": 1,
+      "actual_epoll_wait_result": 1,
+      "original_event_data": 77
+    },
+    "actual_guest_matrix": {
+      "execution_slots": [
+        1,
+        2
+      ],
+      "distinct_process_vm_ids": [
+        1,
+        2
+      ],
+      "calls_each": 6,
+      "worker_completed_each": 6,
+      "filter_evaluations_each": 6,
+      "services_each": 0,
+      "single_slot_waits_asserted": true
+    },
+    "cases": [
+      "Scalar/vector/sendto/sendmsg/kernel-sendmmsg route query results retain source, sequence and interface identity",
+      "Pending receive survives FD close/reuse and wakes from the real resource without a reactor",
+      "Actual epoll_ctl and epoll_wait retain original weak OFD identity and event data after numeric reuse",
+      "Poll snapshots and watches do not pin final socket close",
+      "Notification callback receives and changes options on the same socket after original gates release",
+      "Namespace FD resolution precedes topology writer; canonical error ACK and error order are preserved",
+      "Top-level and nested veth-peer namespace targets retain actual shared namespace OFDs and identity through notification flush",
+      "Missing namespace FD returns EBADF; wrong type returns EINVAL; missing NET_ADMIN preserves prior EPERM",
+      "Final target namespace teardown occurs outside topology and source socket gates",
+      "sendmmsg keeps completed query progress and accepted source across nf_tables owner handoff and FD reuse, without replay",
+      "Distinct guest processes with one/two execution slots exchange link multicast, poll, response ACK and recvmsg on workers"
+    ],
+    "mac_product": {
+      "passed": 13,
+      "ignored": 1
+    },
+    "ffi": {
+      "passed": true,
+      "checks": [
+        {
+          "case": "alpine-install",
+          "passed": true,
+          "reused": true
+        },
+        {
+          "case": "alpine",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "alpine",
+          "terminal": 2,
+          "passed": true
+        },
+        {
+          "case": "debian-install",
+          "passed": true,
+          "reused": true
+        },
+        {
+          "case": "debian",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "debian",
+          "terminal": 2,
+          "passed": true
+        },
+        {
+          "case": "debian-setup",
+          "passed": true
+        },
+        {
+          "case": "custom-install",
+          "passed": true,
+          "reused": true
+        },
+        {
+          "case": "custom",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "custom",
+          "terminal": 2,
+          "passed": true
+        },
+        {
+          "case": "custom-sha256-rejection",
+          "passed": true
+        },
+        {
+          "case": "systemd",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "systemd",
+          "terminal": 2,
+          "passed": true
+        }
+      ]
+    },
+    "linux_ci": {
+      "resources": {
+        "passed": true,
+        "checks": [
+          {
+            "check": "tests",
+            "exit": 0
+          },
+          {
+            "check": "clippy",
+            "exit": 0
+          }
+        ]
+      },
+      "kernel": {
+        "passed": true,
+        "checks": [
+          {
+            "check": "kernel-tests",
+            "exit": 0
+          },
+          {
+            "check": "kernel-clippy",
+            "exit": 0
+          }
+        ]
+      },
+      "epoll": {
+        "passed": true,
+        "checks": [
+          {
+            "check": "tests",
+            "exit": 0
+          },
+          {
+            "check": "clippy",
+            "exit": 0
+          }
+        ]
+      }
+    },
+    "ios_static_build": true,
+    "physical_ipad": "Skipped per owner",
+    "strict_checks": true,
+    "execution_boundaries": true,
+    "reuse": "The final epoll assertion is cfg(test)-only: its affected Apple/Linux ABI case and strict checks rerun; full ABI/VFS/net/kernel passes and unchanged production artifacts are reused. The strengthened distinct-process kernel case is included in final full278 passes. The final common contract paragraph is documentation-only. CPU/memory/graphics acceptance and unchanged guest artifacts are reused. No production source changes after builds or performance samples.",
+    "resolved_fixture_failure": "An initial new VFS test attempted unsupported bridge namespace placement. It was corrected to the already-supported veth with top-level and peer targets; final full VFS passes, without a production compatibility workaround."
+  },
+  "implementation": {
+    "ownership": "Actual shared SocketOperation and complete namespace OFDs retain the creating socket namespace, accepted credentials, copied current input/output and batch progress. Numeric FD reuse cannot substitute an accepted source or namespace target.",
+    "readiness": "Actual Netlink queues own shared readiness. Reply and multicast sources are deduplicated and notified after queue, registry, topology and outer Socket gates release. Existing subscriptions release execution slots; poll resources stay weak. No reactor is needed for internal Netlink waits.",
+    "namespace_lock_order": "Resolve schema-defined namespace FD attributes before topology writer, once per target number per request. Canonical validators still select errors at original points. Retain target Network refs beyond graph release and actual namespace OFDs beyond outer Socket release and notification flush.",
+    "policy_publication": "Only NETLINK_NETFILTER messages beginning with NFNL_MSG_BATCH_BEGIN defer through the original accepted-entry owner boundary. Publishing a new ruleset could invalidate captured policy-free native TCP capabilities; retain this invariant rather than adding a per-byte permission/generation check or memory barrier.",
+    "existing_paths": "Existing accepted native TCP and shared pipe/device/Unix byte capabilities return before the new socket fallback. Already-connected native TCP keeps its selected transport across route/link updates. No extra ordinary guest-memory check or native-only permission policy.",
+    "synchronization": "Existing object-local resource locks and notification sources; no new global resource lock, coordinator/service thread, polling bus, ordinary guest fence or unsafe code."
+  },
+  "remaining": [
+    "nf_tables ruleset publication and invalidation of captured native TCP policy-free capabilities",
+    "Unix-bearing owning ancillary graphs and cycle reclamation",
+    "Native-service/device and io_uring owner controls",
+    "Task/job control, pending task signals and mount/proc ownership",
+    "Structural file/VM/task transitions and residual whole-process cohort joins",
+    "recvmmsg is unimplemented, not a migrated coordinator dependency"
+  ],
+  "source_hashes": {
+    "runtime/Cargo.lock": "ce89696679c75b7436c45644752550aa4559376aa7808414bc6ca16d6d099c3a",
+    "runtime/crates/trames-linux/src/direct.rs": "627ec2ff49d38b525a70c0495a65453d35005b2b827950c2ff7796161845ffd1",
+    "runtime/crates/trames-linux/src/direct/ip_message.rs": "ba23b061445aed5d2b8949aaa32a87530b6917a27d4aec7cb320fe4c62c151f5",
+    "runtime/crates/trames-linux/src/direct/socket_wait.rs": "36959cae7033b2619c7de988234b183f9fd2d2f4593f0ee318a9f6184a50dae4",
+    "runtime/crates/trames-linux/src/network/data.rs": "56a2c0dec9876df766e34cbaa43a72b82fe42c3f78823a97cb6bc516a888aee5",
+    "runtime/crates/trames-net/Cargo.toml": "666bcccda6c8cdbd19441c75d8aeb0d56190bc87ce95d1bc898617afe25d91f9",
+    "runtime/crates/trames-net/src/lib.rs": "4dfc91c8353d3b20097c136bac798a1c565b1ef1c2b95be90c90f5cbf744033d",
+    "runtime/crates/trames-net/src/netlink.rs": "d62942c03057ffd1b92b29b10ab2b170504175808f1f83e9b43f02517b23a1d3",
+    "runtime/crates/trames-net/src/rtnetlink.rs": "63a41ee7d3ba9608db796f1d4931d7aa1688480a12abc50bc7ccf76605b6fbcc",
+    "runtime/crates/trames-session/src/process_socket_wait.rs": "c0e98b9b010f22e8ea1460f0d0e4ad6827083ddd160fc963da81dd724b628a28",
+    "runtime/crates/trames-vfs/src/descriptor_factory.rs": "0fe13d93cbf81a5f9021b05f1abe0c3da47da8b482ffc95593f37b80b395f5b7",
+    "runtime/crates/trames-vfs/src/direct_io.rs": "f79929902623d475bcf4cd17a3b472811d85c0cb5c90dfe7cb7b73fc115cf269",
+    "runtime/crates/trames-vfs/src/fd_table.rs": "0d01785028afad6c13d800932d7e78628accace34be0da3e7e2cbb9c8d0cf274",
+    "runtime/crates/trames-vfs/src/network.rs": "0904eb8bb1379203304ccf262f401ab562fe30cf3bb3c949376ab5f15a6f83b0",
+    "runtime/docs/architecture/execution-backends.md": "39a1210b90a1f9197d9ac2296cc0a8cd32233a80549768d7a259380bc85b5983",
+    "runtime/crates/trames-linux/src/direct/netlink.rs": "5259f8055d8ff6e39426b120c54406a0056a5aa1d46a49fda1a0cc15adf1fe7b"
+  },
+  "fixture_source_hashes": {
+    "tests/fixtures/fd-create-bench.c": "79eb700a85e96cf062539a87aae3f1ef775486a868edab9b67eeb87bf42e3176",
+    "tests/performance/fd-create.py": "89a074ffb803427a8e5903794810dbfbce8c19dc512b90c11e3b6bdf33417949"
+  },
+  "product_lock_hashes": {
+    "ipad/Cargo.lock": "54f9860635bdf55907b9858db6a07d891a62a3270d23a3106a5bf85891d26baa",
+    "mac/Cargo.lock": "96d69c37824b26552720f1d6cf89baaa1f7dce13732b481acdc2133a71a1e277"
+  },
+  "log_hashes": {
+    "target/netlink-tests-final2.log": "eaa9913ebd5ea91146e680df2ce9f98655ace011107abd792dbec9d990811aa5",
+    "target/netlink-net-tests.log": "673da38aea6d66fe3b381b1ec34fb0431040f61712807e53f8a3cb215a847085",
+    "target/netlink-clippy-final.log": "02783cf6df0f7dc1dba4872586a141f7e44d3919c53309cfdfe4b0cf9b18f45c",
+    "target/netlink-kernel-tests-final.log": "61fe545ebad63f5d92b13d9b39e23ad055c3ea60f859c1d1b77f71262938d684",
+    "target/netlink-kernel-clippy-final.log": "d3e61a2583da01bd01f161f1cad9720c983b5ccc37fcb0f3d05a9c6ce978cfc0",
+    "target/netlink-kernel-final-case.log": "6d834492efebce823a52831dceb4f5ef554332d3dd52926ba6b03412a3918772",
+    "target/netlink-epoll-final-case.log": "dc3c408e900c036049e57ce944e4e8cab51da96c39b737f608568c4d5b733a93",
+    "target/netlink-abi-clippy-final.log": "5f0d6d5eb756a1a3d8eb9f782b1a42deb3e3d95f98f8fa26b69f810175703ef4",
+    "target/netlink-linux-resources-ci.log": "82046578fe641e78fe8b8ccec07ee650bf1f7e8740a97e954b96c7263dfedf56",
+    "target/netlink-linux-kernel-ci.log": "04d7b832a2c02badc052b8a2847bc4d12d19a68157386c0e21171ca48ef9903d",
+    "target/netlink-linux-epoll-ci.log": "82046578fe641e78fe8b8ccec07ee650bf1f7e8740a97e954b96c7263dfedf56",
+    "target/netlink-mac-tests.log": "addefd2b7ea924413823376345a61e66fb604f2afd965f37355408eeedb645e3",
+    "target/netlink-mac-clippy.log": "0026f8583866c45fe2ba07bcc7bdb8c4a2068120680715cb63dbcbe82bd2d910",
+    "target/netlink-mac-build.log": "3d1871e2a825803ab316a1cba87e19fc7a486123c2559f5471e48f919beed8c6",
+    "target/netlink-product-lock-check.log": "0be16b2d02e904d9c0216fac7c3a480b9cf499a98c473d54dcb08c0cc227f641",
+    "target/netlink-mac-lock-check.log": "4c31e5d5329a8a41cbb57d2a3de9afed88b5f463474813bfa4179fb4b54ff83c",
+    "target/netlink-ffi-build.log": "c472e1d6ee4145ef2468697d400540db2fd14d710b08b001915ec4fd5ed24771",
+    "target/netlink-ios-build.log": "ec439e24e52d92e51af6a2a05aa07b7054b4b15a6f02af1780ad69c34b09ecf6",
+    "target/netlink-ffi-tests.log": "a0ed12eb6aa6fe034466b76f310acfdbcd27794a78dbf9cf6cf2b6e08298cc0d",
+    "target/netlink-ipad-boundaries.log": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651",
+    "target/netlink-runtime-boundaries.log": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651",
+    "target/netlink-mac-boundaries.log": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651",
+    "target/netlink-install.log": "d81b37faaef60b5a1b635ce5a81a399a304e89d9aee6498d2d7eecf5f3f5bd41",
+    "target/netlink-native-linux.log": "1e3557fda714ff4a64543a2639b4a1aa45dd5a96101888892b94d9f0e6e0f9cc",
+    "target/netlink-linux-stop.log": "f39fc9b7ba06ce5debcc20ee1157adc16dee1f005bad191f3c2584a4eac813d9",
+    "target/netlink-perf.log": "38ee012b4085771e9d15d9f9352aab6d2f0aa5537e793741463a3322995ade4d",
+    "target/netlink-perf-bytes-final.log": "8e1da1399b718f6aa7f53dd5c00e11803d3661eafeb9553d769408f2df1cbe2e",
+    "target/netlink-perf-vector-final.log": "313735bc810e7596b12be3a8ad932b5a911fc121757f56406b6994e430f23990",
+    "target/netlink-perf-message-final.log": "22a6e56ba6d8ae183a0c2c556e503bc44ab02eb3c1b3d7d31bd164f783afe7c8",
+    "target/netlink-perf-poll-final.log": "8cb53f85390792b864c82d2e73598af741f35beecc8b88962068d623682e8140",
+    "target/netlink-perf-tcp-control-final.log": "8c6288a346d8dd9560560b5cc5ab961ca3e51e55552554c1605bf8a9b99eff41",
+    "target/netlink-perf-pipe-control-final.log": "2eebb6c73bbbf823e24f1d774c9103919b66a5be2a78a71c389e6988c03cce2a",
+    "target/netlink-perf-bytes-final/results.json": "902ded044e9ff76017456afc781068e2113590fdf393e63965f73e9eb81fbc19",
+    "target/netlink-perf-vector-final/results.json": "e7bfe30bac7b1a194bb0165a6ac5ea2d1b9f1b4ebf7c2ffd56f31a280d05ad13",
+    "target/netlink-perf-message-final/results.json": "224cf1a1bc89a14d651d5d64e62196d849b5b5095695f6408913c900bab33543",
+    "target/netlink-perf-poll-final/results.json": "2c1b925020c57c50e32ac9040274730007a1ecc2b014758862aac7efc4e53e02",
+    "target/netlink-perf-tcp-control-final/results.json": "a8b4eedae155f2553d2fb46d5c205be937163bd7dbeb35872028897d45016ac8",
+    "target/netlink-perf-pipe-control-final/results.json": "7d6381d849c3f41afaec64aba778fe2c08818ce6dfaeb187d0439a708d5c78b3",
+    "target/local-ci/io/netlink-native-linux-bytes-final/results.json": "7825e53524820279cbbd85a5d0d1757345ed407208cca1b1b50712316392678e",
+    "target/local-ci/io/netlink-native-linux-vector-final/results.json": "23ab641a6ea8c2421a95b1f498c0eda478152f72672f82afeda7caf224d3f135",
+    "target/local-ci/io/netlink-native-linux-message-final/results.json": "7ce42c87d05ba2fb3eb75ec2e85d0affe216a76f2467d6fd3b093a17161bcca6",
+    "target/local-ci/io/netlink-native-linux-poll-final/results.json": "626142185fdfc00cca9a842efa389a79664c70edb64e0a1d78a130518ab3292e",
+    "target/local-ci/io/netlink-native-linux-tcp-control-final/results.json": "b406c6f842e1b2712f7d6dcb5678ca366873efeae0125616c7f330cdd32dff6c",
+    "target/local-ci/io/netlink-native-linux-pipe-control-final/results.json": "b7267b409b58fd4d03553a994b0fcd67ae58824edc85152822cfe56c966dd201",
+    "target/local-ci/io/netlink-linux-resources-tests.log": "e78a4dd88f8ce77983bff1da24d866bc634264057001b5bc583d3423ee0fd640",
+    "target/local-ci/io/netlink-linux-resources-clippy.log": "d41c5af7c8af8f85c98be0ebce8857c1ebc41a70d8e39536f7017189558b16aa",
+    "target/local-ci/io/netlink-linux-kernel-tests.log": "cf214cd806b3f0177fa29d72a51e03e61950645e37db3fbb4262792b6fe536b7",
+    "target/local-ci/io/netlink-linux-kernel-clippy.log": "51ace1c95e832d9b9486288f78793e15b4e083273876dc0ff071a6c781f7f24f",
+    "target/local-ci/io/netlink-linux-epoll-tests.log": "097cf1f26525ac796d4c404d9134204b8e48bb54d743b282af75eddaa1e6584e",
+    "target/local-ci/io/netlink-linux-epoll-clippy.log": "026d1f76684840593df4bfa5cad32c33d424ec09f28fa9cee12cc71f7a1e117f"
+  },
+  "installed_dev_runner_sha256": "bc426dfdda9f7e8cfb448cab9719f1cb17a8aaa6253333f3446a2f64c35c3748",
+  "stable_runner_sha256": "ec74a40ef7cef8a85279cdda2070c25d92fcb1538219f04d0f13008c360381ad",
+  "ios_library_sha256": "6e75cdf0356427ce681187f71849412d5de3510654801a1b7117dba9241ae294",
+  "baseline_runner_sha256": "6bfcb59615ef302e29cabc251993bf222cb2ec2b244314c5ec0ed60715ab6263",
+  "linux_fixture_sha256": "40ec331dd209e7026467306c6aeedf46e03e7a54ae4a21b5b1c70a0fde00916e",
+  "mac_native_fixture_sha256": "e3295c5e4707bf7ace43ab86492363888de52b11950c2a71226ed90616730e6a"
+}

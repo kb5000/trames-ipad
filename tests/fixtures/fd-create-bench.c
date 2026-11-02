@@ -107,7 +107,22 @@ int main(int argc, char **argv) {
     const char *kind = argv[1];
     unsigned operations = (unsigned)strtoul(argv[2], NULL, 10);
     assert(operations && operations <= 1000000);
-    uint64_t checksum = 0;
+    uint64_t checksum = 0, response_bytes = 0;
+    int netlink = !strncmp(kind, "netlink-", 8);
+    int netlink_vector = !strcmp(kind, "netlink-vector"), netlink_message = !strcmp(kind, "netlink-message"), netlink_poll = !strcmp(kind, "netlink-poll");
+    int netlink_fd = -1;
+    unsigned char netlink_request[32] = {0};
+    if (netlink) {
+#ifdef __linux__
+        netlink_fd = socket(16, SOCK_RAW, 0); assert(netlink_fd >= 0);
+        struct { uint16_t family, pad; uint32_t port, groups; } local = {.family = 16};
+        assert(!bind(netlink_fd, (struct sockaddr *)&local, sizeof(local)));
+        uint32_t length = 32, index = 1; uint16_t type = 18, flags = 1;
+        memcpy(netlink_request, &length, 4); memcpy(netlink_request+4, &type, 2); memcpy(netlink_request+6, &flags, 2); memcpy(netlink_request+20, &index, 4);
+#else
+        fprintf(stderr, "Netlink has no native macOS interface\n"); return 77;
+#endif
+    }
     int ip_raw = !strcmp(kind, "udp-raw") || !strcmp(kind, "udp-vector") || !strcmp(kind, "tcp-raw") || !strcmp(kind, "tcp-vector");
     int ip_vector = !strcmp(kind, "udp-vector") || !strcmp(kind, "tcp-vector");
     int ip_messages = ip_raw || !strcmp(kind, "udp-message") || !strcmp(kind, "tcp-message") || !strcmp(kind, "udp-batch") || !strcmp(kind, "tcp-batch");
@@ -257,7 +272,21 @@ int main(int argc, char **argv) {
     }
     double began = now();
     for (unsigned i = 0; i < operations; i++) {
-        if (ip_messages) {
+        if (netlink) {
+            uint32_t sequence = i+1; memcpy(netlink_request+8, &sequence, 4);
+            struct iovec output[2] = {{.iov_base = netlink_request, .iov_len = 16}, {.iov_base = netlink_request+16, .iov_len = 16}};
+            struct msghdr outgoing = {.msg_iov = output, .msg_iovlen = 2};
+            ssize_t n = netlink_message ? sendmsg(netlink_fd, &outgoing, 0) : netlink_vector ? writev(netlink_fd, output, 2) : write(netlink_fd, netlink_request, 32);
+            assert(n == 32);
+            if (netlink_poll) { struct pollfd interest = {.fd = netlink_fd, .events = POLLIN}; assert(poll(&interest, 1, 5000) == 1 && interest.revents & POLLIN); }
+            unsigned char reply[4096];
+            struct iovec input[2] = {{.iov_base = reply, .iov_len = 23}, {.iov_base = reply+23, .iov_len = sizeof(reply)-23}};
+            struct msghdr incoming = {.msg_iov = input, .msg_iovlen = 2};
+            n = netlink_message ? recvmsg(netlink_fd, &incoming, 0) : netlink_vector ? readv(netlink_fd, input, 2) : read(netlink_fd, reply, sizeof(reply));
+            assert(n >= 32);response_bytes += (uint64_t)n;uint32_t length, actual_sequence, index;uint16_t type;
+            memcpy(&length, reply, 4);memcpy(&type, reply+4, 2);memcpy(&actual_sequence, reply+8, 4);memcpy(&index, reply+20, 4);
+            assert(length == (uint32_t)n && type == 16 && actual_sequence == sequence && index == 1);
+        } else if (ip_messages) {
             unsigned char sent[8][64], received[64];
             struct iovec vectors[8][2];
             struct msghdr messages[8] = {0};
@@ -584,6 +613,7 @@ int main(int argc, char **argv) {
         checksum += (uint64_t)i + 1;
     }
     double elapsed = now() - began;
+    if (netlink_fd >= 0) assert(!close(netlink_fd));
     if (ip_messages) { assert(!close(ip_pair[0])); assert(!close(ip_pair[1])); }
     if (positioned_file >= 0) { assert(!close(positioned_file)); assert(!unlink(positioned_path)); }
     if (packet_pair[0] >= 0) { assert(!close(packet_pair[0])); assert(!close(packet_pair[1])); }
@@ -603,7 +633,7 @@ int main(int argc, char **argv) {
     if (monitor >= 0) assert(!close(monitor));
     if (!strcmp(kind, "inotify-watch")) assert(!rmdir(watched));
     assert(checksum == (uint64_t)operations * (operations + 1) / 2);
-    printf("{\"kind\":\"%s\",\"operations\":%u,\"seconds\":%.9f,\"checksum\":%llu}\n",
-           kind, operations, elapsed, (unsigned long long)checksum);
+    printf("{\"kind\":\"%s\",\"operations\":%u,\"seconds\":%.9f,\"checksum\":%llu,\"response_bytes\":%llu}\n",
+           kind, operations, elapsed, (unsigned long long)checksum, (unsigned long long)response_bytes);
     return 0;
 }
