@@ -1,5 +1,57 @@
 # Coordinator dependency audit
 
+## Eleventh migration implemented — shared native network lifetime — 2026-11-02
+
+Runtime `4d69b7e016ed83e5783d4c5b668c31c9084d440a` removes native namespace/DNS Rc ownership and the
+aggregate socket counter's dependency on the Linux namespace owner projection.
+The native transport namespace, its original quota, resolver and timed interface
+cache are shared actual resources. This does not make the complete Linux network
+namespace, topology, virtual stack or routing policy Send+Sync.
+
+Native creation now has a transferable prepared transport: one host descriptor,
+reservation and creating namespace. Attaching controls reuses that same endpoint.
+Aggregate socket creation/accept reserves its existing namespace slot before any
+backend effects; failure rolls back and final release requires no Rc access.
+The guest socket syscall still uses the existing owner service. This stage adds
+no worker opcode and does not claim another reduction in coordinator joins.
+
+DNS endpoints use Arc/Weak, per-endpoint framed input and reply state, and the
+original per-namespace resolver. Concurrent admission preserves the original
+eight-entry pending-plus-reply bound, including local/malformed replies. Errors
+return their reservation, weak pending requests do not retain closed endpoints,
+and buffered frames survive backpressure/half-close without duplicate delivery.
+No new host DNS workers, service thread, bus or polling loop is added. Ordinary
+TCP byte/poll paths take none of these DNS/interface-cache locks.
+
+Performance regression checks use four processes, each with 2,000 checked TCP
+epoll one-shot cycles or 256 complete TCP sessions. Timings are medians of three
+unprofiled counterbalanced runs; profiling is separate. Results are effectively
+flat, as expected for this ownership prerequisite:
+
+| Longest-child loop median | Previous | Current | Native macOS | Reused native Linux |
+| --- | ---: | ---: | ---: | ---: |
+| TCP epoll, 2,000 cycles each | 28.89 ms | 28.98 ms | 19.50 ms | 5.54 ms |
+| Complete TCP sessions, 256 each | 44.63 ms | 44.51 ms | 16.70 ms | 3.78 ms |
+
+Unchanged native Linux references are reused with the exact guest ELF hash
+verified per case. Native macOS equivalents are measured afresh; APIs, kernel
+and CPU allocation differ. Setup/teardown is excluded from child loops and
+included in process wall time. Diagnostic counts include nonblocking retries;
+changes in them are not a claimed performance gain. No Firefox speedup is inferred.
+
+Apple/native Linux network, VFS and ABI tests and strict checks passed, including
+parallel real socket cancellation, creator lifetime, namespace-quota rollback,
+accept queue preservation, concurrent DNS framing/capacity and dead requests.
+Mac product tests, 13 production FFI checks and the shared iPad static build
+passed. Physical iPad testing remains skipped per owner. Existing unaffected
+CPU/memory/graphics/interpreter-scheduling acceptance is reused.
+
+Next dependencies are complete Linux network namespace/policy ownership and
+shared socket OFD publication so factory, control and accept can actually run
+on workers. Unix rights, task/signal and structural VM/device work also remains.
+See [the validation record](../validation/native-network-shared-20261102.json)
+and [the resource contract](../../runtime/docs/architecture/execution-backends.md#shared-native-network-lifetime-and-socket-reservations-2026-11-02).
+
 ## Tenth migration implemented — 2026-11-02
 
 Runtime `cd78a85d7e2c163b9eec179e260222813879f11e` moves connected native TCP poll/epoll readiness onto
