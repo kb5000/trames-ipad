@@ -2236,8 +2236,9 @@ Service requests remain three, including startup/teardown; old Netlink calls
 usually joined rather than counted as resource services. TCP/pipe controls show
 no observed degradation; no control gain or statistical regression bound is claimed.
 
-Three unprofiled counterbalanced samples run after all compilation, affected CI
-and FFI checks; diagnostics use a separate repeat. Four Trames vCPUs serve four
+Three unprofiled counterbalanced samples run after release builds, initial affected
+CI and FFI checks; diagnostics use a separate repeat. The final test-only epoll
+assertion is checked afterward without changing measured production code. Four Trames vCPUs serve four
 independent processes. Endpoint setup/cleanup is outside the loop timer. Queries
 use RTM_GETLINK for interface index 1 without dump; every reply checks declared
 length, type, sequence and interface index. Native ARM Linux runs the same static

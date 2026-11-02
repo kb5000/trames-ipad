@@ -3433,7 +3433,7 @@
       }
     }
   },
-  "method": "Four independent processes each perform 1,000 checked request/reply iterations; four Trames vCPUs; three unprofiled counterbalanced samples plus one separate diagnostic repeat. RTM_GETLINK requests query interface index 1 without dump; each reply is checked for declared length, RTM_NEWLINK type, sequence and interface index. Vector/message variants use two iovecs. Poll checks actual readiness before receive. Endpoint setup/cleanup is outside the loop timer. Native ARM Linux runs the identical static musl ELF on six vCPUs. All builds, affected CI and FFI checks finish before timing; local Linux is stopped during Mac timing. TCP/pipe controls also run through native macOS APIs. No native macOS Netlink substitute is used.",
+  "method": "Four independent processes each perform 1,000 checked request/reply iterations; four Trames vCPUs; three unprofiled counterbalanced samples plus one separate diagnostic repeat. RTM_GETLINK requests query interface index 1 without dump; each reply is checked for declared length, RTM_NEWLINK type, sequence and interface index. Vector/message variants use two iovecs. Poll checks actual readiness before receive. Endpoint setup/cleanup is outside the loop timer. Native ARM Linux runs the identical static musl ELF on six vCPUs. All release builds, initial affected CI and FFI checks finish before timing; local Linux is stopped during Mac timing. A final test-only epoll assertion is validated afterward without changing the measured production code. TCP/pipe controls also run through native macOS APIs. No native macOS Netlink substitute is used.",
   "comparison_limits": {
     "trames_netlink_reply_bytes_each": 292,
     "native_linux_netlink_reply_bytes_each": 1488,
