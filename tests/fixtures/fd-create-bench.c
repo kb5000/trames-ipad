@@ -72,9 +72,18 @@ int main(int argc, char **argv) {
             unsigned char sent = (unsigned char)i, received = 0;
             assert(write(client, &sent, 1) == 1); tcp_read(peer, &received, 0); assert(received == sent);
             assert(!close(client)); tcp_read(peer, &received, 1); assert(!close(peer));
-        } else if (!strcmp(kind, "tcp")) {
+        } else if (!strcmp(kind, "tcp") || !strcmp(kind, "tcp-state")) {
             int fd = socket(AF_INET, SOCK_STREAM, 0); assert(fd >= 0);
             int enabled = 1, value = 0;
+            if (!strcmp(kind, "tcp-state")) {
+                socklen_t size = sizeof(value);
+                assert(!setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, &enabled, sizeof(enabled)));
+                assert(!getsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, &value, &size) && value);
+                assert(!getsockopt(fd, SOL_SOCKET, SO_ERROR, &value, &size) && !value);
+                int bytes = 65536;
+                assert(!setsockopt(fd, SOL_SOCKET, SO_RCVBUF, &bytes, sizeof(bytes)));
+                assert(!getsockopt(fd, SOL_SOCKET, SO_RCVBUF, &value, &size) && value >= bytes);
+            }
             assert(!setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &enabled, sizeof(enabled)));
             socklen_t size = sizeof(value);
             assert(!getsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &value, &size));

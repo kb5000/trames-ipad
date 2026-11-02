@@ -1,5 +1,61 @@
 # Coordinator dependency audit
 
+## Eighth migration implemented — 2026-11-02
+
+Runtime `d055678a2c897c498d0b9e3cededda268ff1ba2f` shares the original native TCP connection/error state
+between owners and workers. SO_ERROR now completes an admitted native connection
+on the worker and publishes its byte capability to the original OFD immediately,
+including already-running tasks and aliases. Error consumption is atomic across
+workers and the owner. There is no mirrored connection state or later repair.
+
+Native TCP keepalive/reuse/buffer/IPv4/IPv6 controls, SO_ACCEPTCONN and shutdown
+also run on workers through the original shared host option helpers. Hybrid
+option replay and the original Linux ABI preflight remain in place. A connection
+completion lock and a keepalive-helper lock synchronize only their actual
+multi-step socket invariants; TCP byte I/O gains no lock or guest-memory barrier.
+Namespace-dependent completion, filtered controls, virtual/DNS branches and guest
+timeout setters retain their previous boundaries.
+
+Three unprofiled counterbalanced repetitions compare the previous runner with the
+candidate. A separate diagnostic run supplies counts. Four processes execute
+2,000 socket lifecycles with TCP_NODELAY/address and keepalive/error/buffer
+controls, 256 complete TCP sessions, or the unchanged 5,000-cycle basic control
+fixture. Trames and native Linux run the identical static ARM64 ELF; native macOS
+compiles the same source. All references were freshly measured. The Linux
+reference has six vCPUs/8 GiB and was stopped before Mac timing.
+
+| Longest-child loop median | Previous | Current | Native macOS | Native Linux |
+| --- | ---: | ---: | ---: | ---: |
+| TCP state/options, 2,000 cycles each | 259.2 ms | 117.8 ms | 23.1 ms | 5.99 ms |
+| Complete TCP sessions, 256 each | 47.2 ms | 44.1 ms | 15.2 ms | 4.22 ms |
+| Basic TCP controls, 5,000 cycles each | 237.9 ms | 240.2 ms | 25.6 ms | 9.93 ms |
+
+The state/options fixture improves **2.20×**; owner requests decrease from
+**55,992 to 15,999** and worker socket calls rise from 24,000 to 64,000. Its
+remaining owner calls are predominantly creation/close, which this stage does
+not move. Complete sessions improve **1.07×**; requests decrease from 6,507 to
+5,254. Basic controls are approximately flat (**1.0% slower** in this sample).
+The state/options workload remains 5.10× native macOS; complete sessions remain
+2.90×. Linux uses a different kernel/CPU configuration. These are socket
+microbenchmarks, not bulk throughput or measured Firefox responsiveness. Summed
+caller waits are not CPU utilization.
+
+Validation: 412 VFS tests with host-directory support, 158 Linux ABI tests,
+60 network unit and 11 integration tests, 251 interpreter-kernel tests, 13 Mac
+product tests, strict affected-crate/kernel/Mac checks, 13 production FFI checks
+(Alpine, Debian, custom rootfs and original systemd/two PTYs), iPad static
+cross-build and paired-product boundaries. Later test-only additions were checked
+with targeted ABI parity and native-control runs. Unchanged CPU, guest-memory and
+graphics results were reused; physical iPad testing remains skipped.
+
+[Samples and validation](../validation/tcp-state-controls-20261102.json),
+[fixture](../../tests/fixtures/fd-create-bench.c),
+[harness](../../tests/performance/fd-create.py), and
+[shared state ownership](https://github.com/kb5000/trames-runtime/blob/main/docs/architecture/execution-backends.md#shared-native-tcp-connection-state-and-controls-2026-11-02)
+record this stage. Socket factory/full close ownership and the remaining
+connection/accept controls are still next, followed by epoll and task/signal
+ownership. The small lifecycle owner loop remains deliberate.
+
 ## Seventh migration implemented — 2026-11-02
 
 Runtime `7547fb8f8d3cecef3c04e88d0bfc6e104314d7dc` allows quiescent connected
