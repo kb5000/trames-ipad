@@ -1,5 +1,47 @@
 # Coordinator dependency audit
 
+## Tenth migration implemented — 2026-11-02
+
+Runtime `cd78a85d7e2c163b9eec179e260222813879f11e` moves connected native TCP poll/epoll readiness onto
+workers. Interests installed before connection completion migrate into the
+original live index with their ET/ONESHOT state and delivery cursor preserved.
+Worker control and waits no longer join every CPU for these interests.
+
+Waits register duplicates of the persistent native event queue, not the socket.
+They cannot delay final FIN or socket quota return. The existing host poller
+handles wakeups; no service thread, message bus, synthetic readiness lock or
+extra guest-memory barrier is introduced. Socket byte/policy admission remains
+unchanged. Factory/full teardown and namespace-dependent connection control,
+AF_UNIX/SCM_RIGHTS, task/signal and structural VM/device work remains open.
+
+Four processes each reuse one TCP connection for 2,000 checked byte transfers.
+The epoll case MOD-rearms a one-shot interest before each transfer/wait/read;
+the poll case waits for readability each time. Connections, queues, startup
+and teardown are outside the child loop and inside workload wall time.
+
+| Longest-child loop median | Previous | Current | Native macOS | Native Linux |
+| --- | ---: | ---: | ---: | ---: |
+| TCP epoll, 2,000 cycles each | 394.8 ms | 29.0 ms | 18.9 ms | 5.54 ms |
+| TCP ppoll, 2,000 cycles each | 225.3 ms | 25.0 ms | 19.5 ms | 5.16 ms |
+
+The loop improves 13.61× and 9.01× respectively. Full workload wall time
+decreases 428.2 → 62.5 ms and 257.6 → 59.6 ms. Diagnostic cohort rounds fall
+from 9,846 to 53 and 5,446 to 49. These include
+startup/teardown and are not CPU utilization. Each loop result is the median of
+three unprofiled counterbalanced runs; profiling uses separate samples.
+
+Trames and native Linux run the identical static ARM64 ELF. Native macOS uses
+the same source with kqueue READ/EV_DISPATCH for epoll and native poll for ppoll;
+these are corresponding APIs rather than identical syscall sequences. Native
+Linux runs on the existing six-vCPU/8 GiB reference, stopped before Mac timing.
+These are event-loop results, not Firefox or whole-product speedup claims.
+
+Apple-host and ARM64 Linux network/shared/VFS/ABI tests, interpreter-kernel and
+Mac product checks, strict affected-target checks, production FFI environments
+and the iPad static build passed. Physical iPad checks remain skipped per owner.
+See [the validation record](../validation/tcp-poll-20261102.json) and the
+[shared ownership contract](../../runtime/docs/architecture/execution-backends.md#connected-tcp-pollepoll-ownership-2026-11-02).
+
 ## Ninth migration implemented — 2026-11-02
 
 Runtime `0dd8d25685d58f51b477ec48a36c1a99ec3c05f6` replaces frozen admitted epoll interest snapshots with

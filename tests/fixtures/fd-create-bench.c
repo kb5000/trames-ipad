@@ -14,6 +14,7 @@
 #include <netinet/tcp.h>
 #include <fcntl.h>
 #include <sched.h>
+#include <poll.h>
 #ifdef __linux__
 #include <sys/eventfd.h>
 #include <sys/epoll.h>
@@ -73,6 +74,18 @@ static uint64_t queue_wait(int queue) {
     return (uint64_t)(uintptr_t)event.udata;
 #endif
 }
+static uint64_t tcp_queue_wait(int queue) {
+#ifdef __linux__
+    struct epoll_event event;
+    assert(epoll_wait(queue, &event, 1, 5000) == 1 && event.events & EPOLLIN);
+    return event.data.u64;
+#else
+    struct kevent event;
+    struct timespec timeout = {5, 0};
+    assert(kevent(queue, NULL, 0, &event, 1, &timeout) == 1 && event.filter == EVFILT_READ);
+    return (uint64_t)(uintptr_t)event.udata;
+#endif
+}
 int main(int argc, char **argv) {
     assert(argc == 3);
     const char *kind = argv[1];
@@ -81,7 +94,8 @@ int main(int argc, char **argv) {
     uint64_t checksum = 0;
     int listener = -1;
     struct sockaddr_in address = {0};
-    if (!strcmp(kind, "tcp-session")) {
+    int tcp_events = !strcmp(kind, "tcp-epoll") || !strcmp(kind, "tcp-poll");
+    if (!strcmp(kind, "tcp-session") || tcp_events) {
         listener = tcp_socket(); address.sin_family = AF_INET;
         address.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
         assert(!bind(listener, (struct sockaddr *)&address, sizeof(address)));
@@ -102,9 +116,35 @@ int main(int argc, char **argv) {
         monitor = open(watched, O_EVTONLY); assert(monitor >= 0);
 #endif
     }
+    if (tcp_events) {
+        pair[0] = tcp_socket();
+        if (!strcmp(kind, "tcp-epoll")) {
+            queue = queue_create(); assert(queue >= 0);
+            interest(queue, 1, pair[0], 0, 1); // register before connection
+        }
+        int result = connect(pair[0], (struct sockaddr *)&address, sizeof(address));
+        assert(!result || errno == EINPROGRESS);
+        double deadline = now() + 5;
+        while ((pair[1] = accept(listener, NULL, NULL)) < 0) {
+            assert(errno == EAGAIN || errno == EINTR); assert(now() < deadline); sched_yield();
+        }
+        int error = 0; socklen_t size = sizeof(error);
+        assert(!getsockopt(pair[0], SOL_SOCKET, SO_ERROR, &error, &size) && !error);
+    }
     double began = now();
     for (unsigned i = 0; i < operations; i++) {
-        if (!strcmp(kind, "epoll")) {
+        if (tcp_events) {
+            if (queue >= 0) interest(queue, 3, pair[0], (uint64_t)i + 1, 1);
+            unsigned char sent = (unsigned char)i, received = 0;
+            assert(write(pair[1], &sent, 1) == 1);
+            if (queue >= 0) {
+                assert(tcp_queue_wait(queue) == (uint64_t)i + 1);
+            } else {
+                struct pollfd event = {.fd = pair[0], .events = POLLIN};
+                assert(poll(&event, 1, 5000) == 1 && event.revents & POLLIN);
+            }
+            assert(read(pair[0], &received, 1) == 1 && received == sent);
+        } else if (!strcmp(kind, "epoll")) {
             interest(queue, 1, pair[0], 0, 0);
             interest(queue, 3, pair[0], (uint64_t)i + 1, 1);
             unsigned char sent = (unsigned char)i, received = 0;
