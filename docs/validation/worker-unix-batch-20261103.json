@@ -1,0 +1,3212 @@
+{
+  "date": "2026-11-03",
+  "stage": 24,
+  "status": "stage-complete; coordinator-removal goal remains active",
+  "runtime_revision": "a7a92f114c4f30a2756fce7646083b26c4c91e47",
+  "baseline_runtime_revision": "8c129587f5f5ea42e140962160f38dfecce0d787",
+  "scope": "Retained AF_UNIX sendmmsg on stream/datagram/seqpacket endpoints and paired packet scalar/vector/sendto/recvfrom I/O on workers, including progress across original-owner/task handoff.",
+  "performance": {
+    "batch": {
+      "passed": true,
+      "kind": "unix-batch",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "before",
+          "repeat": 0,
+          "wall_seconds": 1.1227903330000002,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.356783083,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.548644792,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.704905042,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.726215667,
+              "checksum": 500500
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 23172,
+            "cohort_stop_us": 48243,
+            "service_caller_wait_us": 44,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 64127,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 26244,
+            "worker_fd_syscalls": 10,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 26244,
+            "worker_syscalls": 26254,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "after",
+          "repeat": 0,
+          "wall_seconds": 0.07649000000000017,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.03583575,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.03732425,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.036314584,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.036337625,
+              "checksum": 500500
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 50,
+            "cohort_stop_us": 1203,
+            "service_caller_wait_us": 36,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 64126,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 63911,
+            "worker_fd_syscalls": 10,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 63911,
+            "worker_syscalls": 63921,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "before",
+          "repeat": 1,
+          "wall_seconds": 0.7590414170000002,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.342271333,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.535545459,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.700358833,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.721820459,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 1,
+          "wall_seconds": 0.0716748749999998,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.034171667,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.034507334,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.037198834,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.037497083,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 2,
+          "wall_seconds": 0.07072366600000013,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.03527675,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.035636833,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.035531375,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.036336833,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 2,
+          "wall_seconds": 0.754891041,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.3272175,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.534027875,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.696801,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.716768,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 3,
+          "wall_seconds": 0.7668457500000003,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.348228459,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.540074167,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.711016292,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.729098334,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 3,
+          "wall_seconds": 0.07331758300000057,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.0355595,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.035119708,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.036707041,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.035700375,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.25509966699999964,
+          "children": [
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.007267,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.006864,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.007038,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.007326,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.010903790999999607,
+          "children": [
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.005774,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.006584,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.006513,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.006092,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.01029750000000007,
+          "children": [
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.005762,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.00667,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.006508,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.005893,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "baseline": "ced9d79f00c421be5e0e3bd4704f614638ef92c29571d909c13e519e63bf9df9",
+        "candidate": "704cba656bcfa8e2dd3b703bccc8b88041efcfea349cb3de050946fda8123c2c",
+        "native": "0bd0a19c562a47c2674e088a00d81089c6711b08b66766ba95f94a97d4d31f9d",
+        "fixture": "defc37834ea0daf74675bb143962af8aafdf2063287d8cc5bd44665c02b99455",
+        "rootfs": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe"
+      },
+      "native_environment": {
+        "system": "Darwin",
+        "release": "27.0.0",
+        "architecture": "arm64",
+        "logical_cpus": 12
+      },
+      "summary": {
+        "before": {
+          "loop_max_median_seconds": 0.721820459,
+          "process_wall_median_seconds": 0.7590414170000002,
+          "profile": {
+            "cohort_rounds": 23172,
+            "cohort_stop_us": 48243,
+            "service_caller_wait_us": 44,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 64127,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 26244,
+            "worker_fd_syscalls": 10,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 26244,
+            "worker_syscalls": 26254,
+            "worker_task_resumes": 3
+          }
+        },
+        "after": {
+          "loop_max_median_seconds": 0.036707041,
+          "process_wall_median_seconds": 0.0716748749999998,
+          "profile": {
+            "cohort_rounds": 50,
+            "cohort_stop_us": 1203,
+            "service_caller_wait_us": 36,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 64126,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 63911,
+            "worker_fd_syscalls": 10,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 63911,
+            "worker_syscalls": 63921,
+            "worker_task_resumes": 3
+          }
+        },
+        "native": {
+          "loop_max_median_seconds": 0.00667,
+          "process_wall_median_seconds": 0.010903790999999607
+        }
+      }
+    },
+    "packet": {
+      "passed": true,
+      "kind": "unix-packet",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "before",
+          "repeat": 0,
+          "wall_seconds": 0.22016520900000003,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.087132458,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.1283925,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.166083542,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.15840825,
+              "checksum": 500500
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 5596,
+            "cohort_stop_us": 12876,
+            "service_caller_wait_us": 42,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 8127,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 0,
+            "worker_fd_syscalls": 10,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 10,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "after",
+          "repeat": 0,
+          "wall_seconds": 0.03854145799999997,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.005841375,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.006574375,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.005944625,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.005793292,
+              "checksum": 500500
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 50,
+            "cohort_stop_us": 1260,
+            "service_caller_wait_us": 25,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 8126,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 7886,
+            "worker_fd_syscalls": 10,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 7886,
+            "worker_syscalls": 7896,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "before",
+          "repeat": 1,
+          "wall_seconds": 0.1954962090000001,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.066898916,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.111491167,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.154239416,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.156997958,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 1,
+          "wall_seconds": 0.04043404099999992,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.005975208,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.006041208,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.00527525,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.005491208,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 2,
+          "wall_seconds": 0.04061345800000016,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.005758791,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.006365042,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.005567292,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.005749209,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 2,
+          "wall_seconds": 0.19292362500000015,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.069143125,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.111165625,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.155987208,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.158994167,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 3,
+          "wall_seconds": 0.18711524999999996,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.068450334,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.113545625,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.147966041,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.155225709,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 3,
+          "wall_seconds": 0.04263250000000007,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.005478667,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.005770792,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.005261541,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.005099125,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.005195542000000053,
+          "children": [
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.000447,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.000417,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.000416,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.000402,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.004370624999999961,
+          "children": [
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.000417,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.000418,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.000414,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.000421,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.004219208000000085,
+          "children": [
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.000416,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.000415,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.000413,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.000398,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "baseline": "ced9d79f00c421be5e0e3bd4704f614638ef92c29571d909c13e519e63bf9df9",
+        "candidate": "704cba656bcfa8e2dd3b703bccc8b88041efcfea349cb3de050946fda8123c2c",
+        "native": "0bd0a19c562a47c2674e088a00d81089c6711b08b66766ba95f94a97d4d31f9d",
+        "fixture": "defc37834ea0daf74675bb143962af8aafdf2063287d8cc5bd44665c02b99455",
+        "rootfs": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe"
+      },
+      "native_environment": {
+        "system": "Darwin",
+        "release": "27.0.0",
+        "architecture": "arm64",
+        "logical_cpus": 12
+      },
+      "summary": {
+        "before": {
+          "loop_max_median_seconds": 0.156997958,
+          "process_wall_median_seconds": 0.19292362500000015,
+          "profile": {
+            "cohort_rounds": 5596,
+            "cohort_stop_us": 12876,
+            "service_caller_wait_us": 42,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 8127,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 0,
+            "worker_fd_syscalls": 10,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 10,
+            "worker_task_resumes": 3
+          }
+        },
+        "after": {
+          "loop_max_median_seconds": 0.006041208,
+          "process_wall_median_seconds": 0.04061345800000016,
+          "profile": {
+            "cohort_rounds": 50,
+            "cohort_stop_us": 1260,
+            "service_caller_wait_us": 25,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 8126,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 7886,
+            "worker_fd_syscalls": 10,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 7886,
+            "worker_syscalls": 7896,
+            "worker_task_resumes": 3
+          }
+        },
+        "native": {
+          "loop_max_median_seconds": 0.000421,
+          "process_wall_median_seconds": 0.004370624999999961
+        }
+      }
+    },
+    "vector": {
+      "passed": true,
+      "kind": "unix-packet-vector",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "before",
+          "repeat": 0,
+          "wall_seconds": 0.21895254099999995,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.078989125,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.12447975,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.167001125,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.169706625,
+              "checksum": 500500
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 5626,
+            "cohort_stop_us": 10675,
+            "service_caller_wait_us": 44,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 8125,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 0,
+            "worker_fd_syscalls": 10,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 10,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "after",
+          "repeat": 0,
+          "wall_seconds": 0.0422913330000001,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.005918375,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.006656875,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.006535459,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.005650833,
+              "checksum": 500500
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 56,
+            "cohort_stop_us": 822,
+            "service_caller_wait_us": 19,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 8126,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 7740,
+            "worker_fd_syscalls": 10,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 7740,
+            "worker_syscalls": 7750,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "before",
+          "repeat": 1,
+          "wall_seconds": 0.19344962499999996,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.067688584,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.1113635,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.15697275,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.159925708,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 1,
+          "wall_seconds": 0.042533042000000076,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.006006209,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.006375166,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.005724791,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.005896292,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 2,
+          "wall_seconds": 0.040657541999999935,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.006046042,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.005057875,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.006758625,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.005794875,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 2,
+          "wall_seconds": 0.1886062500000001,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.067603875,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.111609917,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.140318125,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.155466042,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 3,
+          "wall_seconds": 0.19201433299999993,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.067901917,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.112757083,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.155759875,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.15858875,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 3,
+          "wall_seconds": 0.03746212500000001,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.006042584,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.006502167,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.005656084,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.005532791,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.004849749999999986,
+          "children": [
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.000534,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.000635,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.000544,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.000493,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.004334875000000071,
+          "children": [
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.000525,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.000521,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.000519,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.000518,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.004308125000000107,
+          "children": [
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.000521,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.000521,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.000523,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.000517,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "baseline": "ced9d79f00c421be5e0e3bd4704f614638ef92c29571d909c13e519e63bf9df9",
+        "candidate": "704cba656bcfa8e2dd3b703bccc8b88041efcfea349cb3de050946fda8123c2c",
+        "native": "0bd0a19c562a47c2674e088a00d81089c6711b08b66766ba95f94a97d4d31f9d",
+        "fixture": "defc37834ea0daf74675bb143962af8aafdf2063287d8cc5bd44665c02b99455",
+        "rootfs": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe"
+      },
+      "native_environment": {
+        "system": "Darwin",
+        "release": "27.0.0",
+        "architecture": "arm64",
+        "logical_cpus": 12
+      },
+      "summary": {
+        "before": {
+          "loop_max_median_seconds": 0.15858875,
+          "process_wall_median_seconds": 0.19201433299999993,
+          "profile": {
+            "cohort_rounds": 5626,
+            "cohort_stop_us": 10675,
+            "service_caller_wait_us": 44,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 8125,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 0,
+            "worker_fd_syscalls": 10,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 10,
+            "worker_task_resumes": 3
+          }
+        },
+        "after": {
+          "loop_max_median_seconds": 0.006502167,
+          "process_wall_median_seconds": 0.040657541999999935,
+          "profile": {
+            "cohort_rounds": 56,
+            "cohort_stop_us": 822,
+            "service_caller_wait_us": 19,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 8126,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 7740,
+            "worker_fd_syscalls": 10,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 7740,
+            "worker_syscalls": 7750,
+            "worker_task_resumes": 3
+          }
+        },
+        "native": {
+          "loop_max_median_seconds": 0.000525,
+          "process_wall_median_seconds": 0.004334875000000071
+        }
+      }
+    },
+    "datagram": {
+      "passed": true,
+      "kind": "unix-datagram",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "before",
+          "repeat": 0,
+          "wall_seconds": 0.19805629199999997,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.039410541,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.046513167,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.048360583,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.046887209,
+              "checksum": 500500
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 54,
+            "cohort_stop_us": 52019,
+            "service_caller_wait_us": 63,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 8167,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 6148,
+            "worker_fd_syscalls": 14,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 6148,
+            "worker_syscalls": 6170,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "after",
+          "repeat": 0,
+          "wall_seconds": 0.21683733299999997,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.042729208,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.053986917,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.058464709,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.044038792,
+              "checksum": 500500
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 51,
+            "cohort_stop_us": 53968,
+            "service_caller_wait_us": 74,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 8162,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 6156,
+            "worker_fd_syscalls": 14,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 6156,
+            "worker_syscalls": 6178,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "before",
+          "repeat": 1,
+          "wall_seconds": 0.19244749999999988,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.028645875,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.042330208,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.042533959,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.043798167,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 1,
+          "wall_seconds": 0.18887395800000006,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.036641833,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.042548833,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.046032292,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.043629041,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 2,
+          "wall_seconds": 0.19558904199999994,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.023832208,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.031015458,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.049916917,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.032176667,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 2,
+          "wall_seconds": 0.19530129200000013,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.031042042,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.044746459,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.044755875,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.043115667,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 3,
+          "wall_seconds": 0.17987933299999992,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.021011792,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.0479155,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.041223,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.048343958,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 3,
+          "wall_seconds": 0.1876721250000002,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.022733542,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.039139708,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.046109959,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.025823458,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.012827000000000144,
+          "children": [
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.001008,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.001129,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.001004,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.000943,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.008859750000000055,
+          "children": [
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.000843,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.001049,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.000845,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.000799,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.007089333000000142,
+          "children": [
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.00073,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.000842,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.000729,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.000648,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "baseline": "ced9d79f00c421be5e0e3bd4704f614638ef92c29571d909c13e519e63bf9df9",
+        "candidate": "704cba656bcfa8e2dd3b703bccc8b88041efcfea349cb3de050946fda8123c2c",
+        "native": "0bd0a19c562a47c2674e088a00d81089c6711b08b66766ba95f94a97d4d31f9d",
+        "fixture": "defc37834ea0daf74675bb143962af8aafdf2063287d8cc5bd44665c02b99455",
+        "rootfs": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe"
+      },
+      "native_environment": {
+        "system": "Darwin",
+        "release": "27.0.0",
+        "architecture": "arm64",
+        "logical_cpus": 12
+      },
+      "summary": {
+        "before": {
+          "loop_max_median_seconds": 0.044755875,
+          "process_wall_median_seconds": 0.19244749999999988,
+          "profile": {
+            "cohort_rounds": 54,
+            "cohort_stop_us": 52019,
+            "service_caller_wait_us": 63,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 8167,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 6148,
+            "worker_fd_syscalls": 14,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 6148,
+            "worker_syscalls": 6170,
+            "worker_task_resumes": 3
+          }
+        },
+        "after": {
+          "loop_max_median_seconds": 0.046109959,
+          "process_wall_median_seconds": 0.18887395800000006,
+          "profile": {
+            "cohort_rounds": 51,
+            "cohort_stop_us": 53968,
+            "service_caller_wait_us": 74,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 8162,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 6156,
+            "worker_fd_syscalls": 14,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 6156,
+            "worker_syscalls": 6178,
+            "worker_task_resumes": 3
+          }
+        },
+        "native": {
+          "loop_max_median_seconds": 0.001049,
+          "process_wall_median_seconds": 0.008859750000000055
+        }
+      }
+    },
+    "pair": {
+      "passed": true,
+      "kind": "unix-pair",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "before",
+          "repeat": 0,
+          "wall_seconds": 0.09126358300000004,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.03541075,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.039652167,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.038997709,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.035732458,
+              "checksum": 500500
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 48,
+            "cohort_stop_us": 2383,
+            "service_caller_wait_us": 30,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 52114,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 23892,
+            "worker_fd_syscalls": 27876,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 23892,
+            "worker_syscalls": 51768,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "after",
+          "repeat": 0,
+          "wall_seconds": 0.06339254100000002,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.023064042,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.022150375,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.024344708,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.023120208,
+              "checksum": 500500
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 49,
+            "cohort_stop_us": 1406,
+            "service_caller_wait_us": 22,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 52113,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 23740,
+            "worker_fd_syscalls": 27695,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 23740,
+            "worker_syscalls": 51435,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "before",
+          "repeat": 1,
+          "wall_seconds": 0.055673375000000025,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.019084792,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.020287583,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.022037917,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.022112417,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 1,
+          "wall_seconds": 0.05560029200000005,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.021619125,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.021024333,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.022197833,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.020496667,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 2,
+          "wall_seconds": 0.05455912500000004,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.021276875,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.022106917,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.021220792,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.021265917,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 2,
+          "wall_seconds": 0.05258758299999999,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.021468834,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.021420625,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.021019416,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.02044725,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 3,
+          "wall_seconds": 0.056460833000000044,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.021202459,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.021294708,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.020978958,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.020323584,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 3,
+          "wall_seconds": 0.0546596250000001,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.021025958,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.019793834,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.021680083,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.020745125,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.009136500000000103,
+          "children": [
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004208,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.005045,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.00477,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.00439,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.008625915999999956,
+          "children": [
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004354,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004989,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004839,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004296,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.008838750000000006,
+          "children": [
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004059,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004747,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004982,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004309,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "baseline": "ced9d79f00c421be5e0e3bd4704f614638ef92c29571d909c13e519e63bf9df9",
+        "candidate": "704cba656bcfa8e2dd3b703bccc8b88041efcfea349cb3de050946fda8123c2c",
+        "native": "0bd0a19c562a47c2674e088a00d81089c6711b08b66766ba95f94a97d4d31f9d",
+        "fixture": "defc37834ea0daf74675bb143962af8aafdf2063287d8cc5bd44665c02b99455",
+        "rootfs": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe"
+      },
+      "native_environment": {
+        "system": "Darwin",
+        "release": "27.0.0",
+        "architecture": "arm64",
+        "logical_cpus": 12
+      },
+      "summary": {
+        "before": {
+          "loop_max_median_seconds": 0.021468834,
+          "process_wall_median_seconds": 0.055673375000000025,
+          "profile": {
+            "cohort_rounds": 48,
+            "cohort_stop_us": 2383,
+            "service_caller_wait_us": 30,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 52114,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 23892,
+            "worker_fd_syscalls": 27876,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 23892,
+            "worker_syscalls": 51768,
+            "worker_task_resumes": 3
+          }
+        },
+        "after": {
+          "loop_max_median_seconds": 0.022106917,
+          "process_wall_median_seconds": 0.0546596250000001,
+          "profile": {
+            "cohort_rounds": 49,
+            "cohort_stop_us": 1406,
+            "service_caller_wait_us": 22,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 52113,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 23740,
+            "worker_fd_syscalls": 27695,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 23740,
+            "worker_syscalls": 51435,
+            "worker_task_resumes": 3
+          }
+        },
+        "native": {
+          "loop_max_median_seconds": 0.004989,
+          "process_wall_median_seconds": 0.008838750000000006
+        }
+      }
+    }
+  },
+  "native_linux_exact_elf": {
+    "batch": {
+      "passed": true,
+      "kind": "unix-batch",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.007068484000001263,
+          "children": [
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.004857239,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.004505323,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.004963739,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.004572365,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.009070312999995167,
+          "children": [
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.004756573,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.004469073,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.004451198,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.004460114,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.006956108999986554,
+          "children": [
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.005448029,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.004886239,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.004533739,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-batch",
+              "operations": 1000,
+              "seconds": 0.005022739,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "native": "defc37834ea0daf74675bb143962af8aafdf2063287d8cc5bd44665c02b99455"
+      },
+      "native_environment": {
+        "system": "Linux",
+        "release": "7.0.0-38-generic",
+        "architecture": "aarch64",
+        "logical_cpus": 6
+      },
+      "summary": {
+        "native": {
+          "loop_max_median_seconds": 0.004963739,
+          "process_wall_median_seconds": 0.007068484000001263
+        }
+      }
+    },
+    "packet": {
+      "passed": true,
+      "kind": "unix-packet",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.0026866190000305323,
+          "children": [
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.000776624,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.000850956,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.000684457,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.000513332,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.0027091189999737253,
+          "children": [
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.000729831,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.000742498,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.000664707,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.000576915,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.0032432419999963713,
+          "children": [
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.000800124,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.000782249,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.000674581,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet",
+              "operations": 1000,
+              "seconds": 0.000558124,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "native": "defc37834ea0daf74675bb143962af8aafdf2063287d8cc5bd44665c02b99455"
+      },
+      "native_environment": {
+        "system": "Linux",
+        "release": "7.0.0-38-generic",
+        "architecture": "aarch64",
+        "logical_cpus": 6
+      },
+      "summary": {
+        "native": {
+          "loop_max_median_seconds": 0.000800124,
+          "process_wall_median_seconds": 0.0027091189999737253
+        }
+      }
+    },
+    "vector": {
+      "passed": true,
+      "kind": "unix-packet-vector",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.0028033269999809818,
+          "children": [
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.000867165,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.00073479,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.000642623,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.00054079,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.0014861629999813886,
+          "children": [
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.000736665,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.000689373,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.000694498,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.000538082,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.002568827000004603,
+          "children": [
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.000808998,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.000733123,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.000714207,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-packet-vector",
+              "operations": 1000,
+              "seconds": 0.000544416,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "native": "defc37834ea0daf74675bb143962af8aafdf2063287d8cc5bd44665c02b99455"
+      },
+      "native_environment": {
+        "system": "Linux",
+        "release": "7.0.0-38-generic",
+        "architecture": "aarch64",
+        "logical_cpus": 6
+      },
+      "summary": {
+        "native": {
+          "loop_max_median_seconds": 0.000808998,
+          "process_wall_median_seconds": 0.002568827000004603
+        }
+      }
+    },
+    "datagram": {
+      "passed": true,
+      "kind": "unix-datagram",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.0027808269999809454,
+          "children": [
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.000802873,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.000701581,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.000725665,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.000604916,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.002300453000032121,
+          "children": [
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.000807457,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.00076679,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.000704331,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.000503498,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.002444328000024143,
+          "children": [
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.000750206,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.000773457,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.000699248,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.000545082,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "native": "defc37834ea0daf74675bb143962af8aafdf2063287d8cc5bd44665c02b99455"
+      },
+      "native_environment": {
+        "system": "Linux",
+        "release": "7.0.0-38-generic",
+        "architecture": "aarch64",
+        "logical_cpus": 6
+      },
+      "summary": {
+        "native": {
+          "loop_max_median_seconds": 0.000802873,
+          "process_wall_median_seconds": 0.002444328000024143
+        }
+      }
+    },
+    "pair": {
+      "passed": true,
+      "kind": "unix-pair",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.006758859999990818,
+          "children": [
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004795573,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004753198,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.00457949,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004422115,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.006895443000018986,
+          "children": [
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.00469399,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.00502653,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004244574,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004650906,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.006921900999998343,
+          "children": [
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004291657,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004912155,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004149032,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004709073,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "native": "defc37834ea0daf74675bb143962af8aafdf2063287d8cc5bd44665c02b99455"
+      },
+      "native_environment": {
+        "system": "Linux",
+        "release": "7.0.0-38-generic",
+        "architecture": "aarch64",
+        "logical_cpus": 6
+      },
+      "summary": {
+        "native": {
+          "loop_max_median_seconds": 0.004912155,
+          "process_wall_median_seconds": 0.006895443000018986
+        }
+      }
+    }
+  },
+  "method": "Four independent processes, each 1,000 checked iterations, four Trames vCPUs and three unprofiled counterbalanced before/after samples. Final compilation, affected local Linux CI and FFI acceptance finish before timing. Identical static ARM64 musl ELF for Trames/native Linux; Linux uses the existing six-vCPU ARM64 environment and is stopped before Mac timing. Batch iterations send eight checked one-byte datagrams with sendmmsg and receive each packet; native macOS explicitly uses eight POSIX sendmsg calls, not a claimed native batch API. Paired scalar/vector cases send and receive two checked bytes in one packet. Endpoint setup/cleanup is outside loop timing. Prior addressed-datagram and socketpair workloads are regression controls. Longest-child loop medians and process wall medians include different work and are recorded separately. Different APIs, kernels, compilers and CPU counts make native timings contextual; these are not whole-app/Firefox/physical-iPad or generally native-speed claims.",
+  "validation": {
+    "apple_and_linux_abi": {
+      "passed": 191,
+      "ignored": 1
+    },
+    "apple_and_linux_kernel": {
+      "passed": 273,
+      "ignored": 3
+    },
+    "unchanged_vfs": {
+      "apple_passed": 447,
+      "linux_passed": 446,
+      "reused_from": "worker-unix-datagram-20261103.json",
+      "reason": "No trames-vfs source changes in this runtime commit"
+    },
+    "packet_capacity_waits": {
+      "passed": true,
+      "cases": 48,
+      "execution_slots": [
+        1,
+        2
+      ],
+      "filtered_and_unfiltered": true,
+      "kinds": [
+        "addressed datagram",
+        "paired datagram",
+        "paired seqpacket"
+      ],
+      "syscall_pairs": [
+        [
+          64,
+          63
+        ],
+        [
+          66,
+          65
+        ],
+        [
+          206,
+          207
+        ],
+        [
+          211,
+          212
+        ]
+      ],
+      "calls_per_case": 5,
+      "filter_decisions_per_filtered_case": 5,
+      "services": 0
+    },
+    "batch_capacity_waits": {
+      "passed": true,
+      "cases": 12,
+      "execution_slots": [
+        1,
+        2
+      ],
+      "filtered_and_unfiltered": true,
+      "kinds": [
+        "addressed datagram",
+        "paired datagram",
+        "paired seqpacket"
+      ],
+      "calls_per_case": 6,
+      "filter_decisions_per_filtered_case": 6,
+      "services": 0,
+      "execution_slot_released": true
+    },
+    "partial_sigpipe": {
+      "passed": true,
+      "cases": 2,
+      "task_signal_with_positive_completed_count": true,
+      "nosignal_control": true,
+      "filter_evaluations": 3
+    },
+    "resource_regressions": [
+      "stream/datagram/seqpacket messages retain exact msg_len and packet boundaries",
+      "lazy later fault returns completed count; post-send msg_len EFAULT cannot undo delivery",
+      "zero/compat flags/1,024 cap, short stream send and partial EAGAIN preserve original results",
+      "waiting first item freezes its input and old target across FD close/reuse and pathname rebind; next unaccepted item resolves independently",
+      "a different later dispatcher factory cannot replace the accepted original descriptor/credential domain",
+      "legacy rights handoff after earlier success resumes at the original next item and original full OFD",
+      "partial EPIPE carries terminal positive count and task signal without replaying prior messages"
+    ],
+    "mac_product": {
+      "passed": 13,
+      "ignored": 1
+    },
+    "ffi": {
+      "passed": true,
+      "checks": [
+        {
+          "case": "alpine-install",
+          "passed": true,
+          "reused": true
+        },
+        {
+          "case": "alpine",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "alpine",
+          "terminal": 2,
+          "passed": true
+        },
+        {
+          "case": "debian-install",
+          "passed": true,
+          "reused": true
+        },
+        {
+          "case": "debian",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "debian",
+          "terminal": 2,
+          "passed": true
+        },
+        {
+          "case": "debian-setup",
+          "passed": true
+        },
+        {
+          "case": "custom-install",
+          "passed": true,
+          "reused": true
+        },
+        {
+          "case": "custom",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "custom",
+          "terminal": 2,
+          "passed": true
+        },
+        {
+          "case": "custom-sha256-rejection",
+          "passed": true
+        },
+        {
+          "case": "systemd",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "systemd",
+          "terminal": 2,
+          "passed": true
+        }
+      ]
+    },
+    "ios_static_build": true,
+    "physical_ipad": "Skipped per owner",
+    "strict_checks": true,
+    "execution_boundaries": true,
+    "linux_ci": {
+      "passed": true,
+      "checks": [
+        {
+          "check": "tests",
+          "exit": 0
+        },
+        {
+          "check": "clippy",
+          "exit": 0
+        }
+      ]
+    },
+    "linux_kernel_ci": {
+      "passed": true,
+      "checks": [
+        {
+          "check": "kernel-tests",
+          "exit": 0
+        },
+        {
+          "check": "kernel-clippy",
+          "exit": 0
+        }
+      ]
+    },
+    "unchanged_acceptance": "Unchanged VFS, CPU/memory/graphics acceptance and guest artifacts reused. No repeated full acceptance for documentation or pin-only edits."
+  },
+  "implementation": {
+    "progress": "Per-accepted-call state only: completed count, active prepared item, canonical target and terminal task effect. The mutex does not serialize unrelated guest calls; queue/Files locks remain their original object-local mechanisms.",
+    "message_import": "Original requested/sendmsg ABI, lazy later header import and accepted original Files/credentials. Only active portable input/rights are frozen; a still-unaccepted owner-only rights item retains its original owner decoder boundary.",
+    "waits": "Subscribe/retry on the original source and active target, first-item waits return execution slots. After prior success EAGAIN returns the completed count.",
+    "signal": "Partial EPIPE records the terminal count and hands task effects to the original owner, without packet replay or another filter decision.",
+    "single_message": "Keep single-message records inline in their existing Arc allocation; batch state alone uses separate allocation. Existing immediate paired message and stream paths preserved."
+  },
+  "remaining": [
+    "Native TCP/UDP batches and owner-only ancillary/resource effects",
+    "recvmmsg is currently unimplemented, not a remaining implemented coordinator path",
+    "Unix-bearing owning graphs, device opens/rights and native-service adapters",
+    "Legacy PTY/task/job-control and pending task signal paths",
+    "io_uring controls, mount/nsfs topology and proc controls",
+    "Structural file/VM/task transitions and residual whole-process cohort joins"
+  ],
+  "source_hashes": {
+    "runtime/crates/trames-linux/src/direct.rs": "dfe1b5f2a72097e43da63a074527abf0cd74263c151f64d45cc8945a1a7a49be",
+    "runtime/crates/trames-linux/src/direct/local_message.rs": "fd54b59ce8d43a561666497546c122584a8770f8adb60aa4cca85473f6d2f66b",
+    "runtime/crates/trames-linux/src/network/unix.rs": "7deef647153d1ac84c439e685ae27ef67520834aace4c86f54afebd1653512e2",
+    "runtime/crates/trames-linux/src/network_batch.rs": "6e2958344508d9af47ad22347593755b1c545b45dcc84910ff55c8bc3f2665e5",
+    "runtime/crates/trames-session/src/process.rs": "550b2b928b4bc61397d331b095e2e78e22f5855b49d10d8f996f9784f4bcfd04",
+    "runtime/crates/trames-session/src/process_socket_wait.rs": "94e241a8bff3861f94a4f1335e6918ab8021660174550bde307b8359a1d16e03",
+    "runtime/docs/architecture/execution-backends.md": "aa4f04d66ace23d00b4541bff27185e75c896642d3b6ca6d468b37a98148cbd7",
+    "runtime/crates/trames-linux/src/direct/local_message/batch.rs": "8969293d9384f84bdad2e0da92699800c8ccc3c89fe42592a600e87ea17d66bd"
+  },
+  "fixture_source_hashes": {
+    "tests/fixtures/fd-create-bench.c": "f6ea8374733d8b8d046b8ab4699ceb35d955493450b4f9fefe5f138d821563b0",
+    "tests/performance/fd-create.py": "64ef939871159c3e96c32d7b2952fa33343129ba2dacf67ed9ce233b5e617422"
+  },
+  "log_hashes": {
+    "target/unix-batch-abi-final.log": "03d7de5c2d5bb7ffc20dd8f5ae19b1aeeed93c96c02d3ae51d3b7d7c5e060805",
+    "target/unix-batch-clippy-final.log": "ba7e2c0cefe5bf9b6121d1d8e8570c9c82dc1e1880fe84a1a1b7a03d9fba96bb",
+    "target/unix-batch-kernel-final.log": "e5c81f43f82792d74fc97740d732763ce7f2d7888f08df34f7ed94710e25d741",
+    "target/unix-batch-kernel-clippy-final.log": "4981f3cb5a856459a81e037c4fb29e8160d9a36a6520b59521c0fa6b56603784",
+    "target/unix-batch-linux-ci-final.log": "82046578fe641e78fe8b8ccec07ee650bf1f7e8740a97e954b96c7263dfedf56",
+    "target/unix-batch-linux-kernel-ci-final.log": "04d7b832a2c02badc052b8a2847bc4d12d19a68157386c0e21171ca48ef9903d",
+    "target/unix-batch-ffi-build-final.log": "b820da89880f0db86e925527bbd26e9f086938434b02a80e268c938e4ecd0ab6",
+    "target/unix-batch-ffi-tests.log": "a0ed12eb6aa6fe034466b76f310acfdbcd27794a78dbf9cf6cf2b6e08298cc0d",
+    "target/unix-batch-ios-build-final.log": "c520129d7d58f5b54d83d346d1e294cd48e7f573bec00700d1d235d26df5adee",
+    "target/unix-batch-mac-tests-final.log": "b37e1c6da2b9313c3ef643b3afe2f2425e929789cd4e351c4e818f828c9694d9",
+    "target/unix-batch-mac-clippy-final.log": "4b3c212b968e03ebe275ff21ade68f633d6df22b93f4419679690e23029518b1",
+    "target/unix-batch-mac-build-final.log": "ab685a6efcff4df628295ee457c6470f41d47dd9948872d5d6b8e9721cca4173",
+    "target/unix-batch-runtime-boundaries.log": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651",
+    "target/unix-batch-ipad-boundaries.log": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651",
+    "target/unix-batch-mac-boundaries.log": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651",
+    "target/unix-batch-install.log": "d81b37faaef60b5a1b635ce5a81a399a304e89d9aee6498d2d7eecf5f3f5bd41",
+    "target/unix-batch-native-linux.log": "1086147cf03aee8ca56d409763e5c39de2ac3eef2a8ae0d4484074545963d50e",
+    "target/unix-batch-lima-stop.log": "3b00d89ed36a41dd86435d1928ddfa6377aa691a54ebae62773b33863684479a",
+    "target/local-ci/io/unix-batch-linux-tests.log": "e132bcdcc11c7e10693dde92b77f6593b898756ef11a482795fb754005916d2d",
+    "target/local-ci/io/unix-batch-linux-clippy.log": "5afa162ab3f6fd99ec7d67f510145e1f5f6df860b42994babe6e6af5e06ab795",
+    "target/local-ci/io/unix-batch-linux-kernel-tests.log": "26197ef395b28e0a8954a7e0ec2e7e6c1825b58e3d69151ed98950df56131442",
+    "target/local-ci/io/unix-batch-linux-kernel-clippy.log": "ab737e5e3cf33f1e2f3eb0c556a2c6f3551802e21109f3f56cbcc2132b4c6515",
+    "target/unix-batch-perf-batch.log": "25f2b4655f444c9d395c571d8bd37d38cc412169c518e2b906cb4c80d78a0995",
+    "target/unix-batch-perf-packet.log": "d2b4d09e6ac537cd65ffb70bf65843fa75da0ca2d5e905b9a58c603fb1e626d6",
+    "target/unix-batch-perf-vector.log": "e925eac360db4e0f277e5b3fe939193c9f972cc0fb9942a060358c730979b0db",
+    "target/unix-batch-perf-datagram.log": "a44dba537e445ee25b4d42647e60eba301f29dd9adf97f193f6987a154aed7e3",
+    "target/unix-batch-perf-pair.log": "9426d1f4646cd42b1393548b6811bbd230372a89b573ce7cbfa9378025bc77c1"
+  },
+  "installed_dev_runner_sha256": "704cba656bcfa8e2dd3b703bccc8b88041efcfea349cb3de050946fda8123c2c",
+  "stable_runner_sha256": "ec74a40ef7cef8a85279cdda2070c25d92fcb1538219f04d0f13008c360381ad",
+  "ios_library_sha256": "e781936c5ac8dd4cd26f03b1320e1b27aa5b8c7d2d66cb3dc5f3e8198f343f78"
+}

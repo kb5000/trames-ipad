@@ -1849,3 +1849,79 @@ sendmmsg/recvmmsg, Unix-bearing owning graphs, device opens/rights, native-servi
 adapters, task/job control, io_uring, mount/proc ownership and structural VM/task
 transitions. See the [validation record](../validation/worker-unix-datagram-20261103.json)
 and [shared contract](../../runtime/docs/architecture/execution-backends.md#worker-addressed-unix-datagrams-2026-11-03).
+
+## Twenty-fourth migration implemented — retained Unix batches and paired packet bytes — 2026-11-03
+
+Runtime `a7a92f114c4f30a2756fce7646083b26c4c91e47` runs AF_UNIX sendmmsg on
+workers for stream, datagram and seqpacket endpoints. It also admits paired packet
+read/write, readv/writev and sendto/recvfrom through the common retained packet ABI.
+The original immediate paired sendmsg/recvmsg and stream byte paths are preserved.
+
+One accepted batch keeps the original full source OFD and Files/credential context,
+completed count, active message and its resolved weak target. Later headers are
+imported lazily with the original ABI: a later fault cannot suppress earlier sends.
+Each addressed item resolves its own target. The currently waiting portable item
+keeps its input/rights/target, while the next unaccepted item can observe a new
+binding. Original-owner handoff resumes at the exact item and count without
+replaying prior messages, including after source FD reuse. A negative control
+supplies another factory on resume and proves the accepted Files domain survives.
+
+First-item capacity waits subscribe/retry and release their execution slot. EAGAIN
+after progress returns the completed count; short stream sends end the batch.
+The compat-flag check, empty batch, 1,024 cap and post-send msg_len write order remain
+unchanged. A msg_len EFAULT cannot undo delivery. Partial EPIPE retains the positive
+count and queues task-level SIGPIPE unless MSG_NOSIGNAL is set. The worker records
+that terminal result and hands task effects to the original owner; no packet is
+resent to rediscover the error, and the filter decision is not repeated.
+
+The progress mutex belongs to that accepted call, not to a socket, Files or resource
+service. It does not serialize unrelated guest calls. Single-message records stay
+inline in their existing Arc allocation rather than gaining another heap allocation
+for a batch feature. No global resource lock, new service thread, bus, polling loop,
+ordinary-memory fence or native-only permission policy is introduced. A still-
+unaccepted owner-only rights item retains its existing owner decoder/ledger boundary.
+
+| Four processes × 1,000 checked iterations, longest-child median | Previous | Current | Native macOS* | Native ARM Linux, exact ELF | Improvement |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Eight-packet sendmmsg / checked receive | 721.82 ms | 36.71 ms | 6.67 ms | 4.96 ms | 19.66x |
+| Paired datagram scalar write/read | 157.00 ms | 6.04 ms | 0.42 ms | 0.80 ms | 25.99x |
+| Paired datagram vector writev/readv | 158.59 ms | 6.50 ms | 0.53 ms | 0.81 ms | 24.39x |
+| Existing addressed connected datagram write/read | 44.76 ms | 46.11 ms | 1.05 ms | 0.80 ms | No gain claimed |
+| Existing socketpair lifecycle | 21.47 ms | 22.11 ms | 4.99 ms | 4.91 ms | No gain claimed |
+
+The first three whole-process wall medians are **759.04 → 71.68 ms**,
+**192.92 → 40.61 ms** and **192.01 → 40.66 ms**. Separate diagnostic cohort
+counts fall **23,172 → 50**, **5,596 → 50** and **5,626 → 56**. Whole-process
+service requests remain three, including startup/teardown; previous packet calls
+mostly forced joined execution rather than counted resource services. Regression
+controls have about three percent higher loop medians, slightly lower process wall
+medians and similarly small cohort counts (**54 → 51**, **48 → 49**); no gain or
+statistical regression bound is claimed for those small differences.
+
+Batch iterations send eight checked one-byte datagrams and verify each receive;
+paired scalar/vector iterations check two bytes in one packet. Setup/cleanup is
+outside loop timing. *The macOS batch row uses eight native POSIX sendmsg calls,
+not a claimed native sendmmsg implementation.* Native Linux uses the exact static
+musl ELF used by Trames, on the existing six-vCPU ARM64 environment. All compilation,
+affected Linux CI and FFI acceptance finish before the three unprofiled
+counterbalanced samples; Linux is stopped during Mac timing. Different APIs,
+kernels, compilers and CPU counts make these contextual references. No whole-app,
+Firefox, physical-iPad or generally native-speed claim follows.
+
+Apple/Linux ABI **191 each**, kernel **273 each**, strict checks, Mac **13**, both
+product boundaries, all **13** FFI environment checks and the iPad static build
+pass. Unchanged VFS **447/446**, CPU/memory/graphics acceptance and guest artifacts
+are reused. Physical iPad testing remains skipped per owner. Packet capacity tests
+cover **48** filtered/unfiltered one/two-slot cases with five calls, one decision
+per filtered entry and zero services. Batch capacity tests cover **12** cases with
+six calls and zero services. Real guest partial-SIGPIPE/NOSIGNAL controls retain
+three exact entry decisions. Further tests cover caps, empty/short/partial sends,
+post-send faults, target rebinding, descriptor reuse and owner-only rights handoff.
+The measured runner is installed in Trames Dev; the stable app is unchanged.
+
+The coordinator-removal goal remains active. Native TCP/UDP batches, Unix-bearing
+owning graphs, device opens/rights, native-service adapters, task/job control,
+io_uring, mount/proc ownership and structural VM/task changes remain. recvmmsg is
+currently unimplemented rather than an implemented coordinator path. See the
+[validation record](../validation/worker-unix-batch-20261103.json) and
+[shared contract](../../runtime/docs/architecture/execution-backends.md#retained-unix-batches-and-paired-packet-bytes-2026-11-03).

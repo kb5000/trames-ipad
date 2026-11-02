@@ -10,6 +10,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <sys/socket.h>
+#include <sys/uio.h>
 #include <sys/un.h>
 #include <stddef.h>
 #include <sys/ioctl.h>
@@ -156,6 +157,11 @@ int main(int argc, char **argv) {
         }
         if (!addressed) assert(!connect(packets[0], (struct sockaddr *)&packet_address[1], packet_size[1]));
     }
+    int unix_batch = !strcmp(kind, "unix-batch");
+    int unix_packet = !strcmp(kind, "unix-packet") || !strcmp(kind, "unix-packet-vector");
+    int packet_vector = !strcmp(kind, "unix-packet-vector");
+    int packet_pair[2] = {-1, -1};
+    if (unix_batch || unix_packet) assert(!socketpair(AF_UNIX, SOCK_DGRAM, 0, packet_pair));
     int listener = -1;
     struct sockaddr_in address = {0};
     int tcp_blocking = !strcmp(kind, "tcp-blocking");
@@ -222,7 +228,44 @@ int main(int argc, char **argv) {
     }
     double began = now();
     for (unsigned i = 0; i < operations; i++) {
-        if (datagram) {
+        if (unix_batch) {
+            unsigned char sent[8], received[8] = {0};
+            struct iovec vectors[8];
+#ifdef __linux__
+            struct mmsghdr messages[8] = {0};
+#else
+            struct msghdr messages[8] = {0};
+#endif
+            for (unsigned j = 0; j < 8; j++) {
+                sent[j] = (unsigned char)(i + j);
+                vectors[j] = (struct iovec){.iov_base = &sent[j], .iov_len = 1};
+#ifdef __linux__
+                messages[j].msg_hdr = (struct msghdr){.msg_iov = &vectors[j], .msg_iovlen = 1};
+#else
+                messages[j] = (struct msghdr){.msg_iov = &vectors[j], .msg_iovlen = 1};
+#endif
+            }
+#ifdef __linux__
+            assert(sendmmsg(packet_pair[0], messages, 8, 0) == 8);
+            for (unsigned j = 0; j < 8; j++) assert(messages[j].msg_len == 1);
+#else
+            // Contextual native reference: eight POSIX calls, not a batch API.
+            for (unsigned j = 0; j < 8; j++) assert(sendmsg(packet_pair[0], &messages[j], 0) == 1);
+#endif
+            for (unsigned j = 0; j < 8; j++) assert(recv(packet_pair[1], &received[j], 1, 0) == 1 && received[j] == sent[j]);
+        } else if (unix_packet) {
+            unsigned char sent[2] = {(unsigned char)i, (unsigned char)(i + 1)}, received[2] = {0};
+            if (packet_vector) {
+                struct iovec vectors[2] = {{.iov_base = &sent[0], .iov_len = 1}, {.iov_base = &sent[1], .iov_len = 1}};
+                assert(writev(packet_pair[0], vectors, 2) == 2);
+                vectors[0].iov_base = &received[0]; vectors[1].iov_base = &received[1];
+                assert(readv(packet_pair[1], vectors, 2) == 2);
+            } else {
+                assert(write(packet_pair[0], sent, 2) == 2);
+                assert(read(packet_pair[1], received, 2) == 2);
+            }
+            assert(!memcmp(sent, received, 2));
+        } else if (datagram) {
             unsigned char sent = (unsigned char)i, received = 0;
             if (addressed) {
                 struct sockaddr_un source = {0}; socklen_t size = sizeof(source);
@@ -449,6 +492,7 @@ int main(int argc, char **argv) {
         checksum += (uint64_t)i + 1;
     }
     double elapsed = now() - began;
+    if (packet_pair[0] >= 0) { assert(!close(packet_pair[0])); assert(!close(packet_pair[1])); }
     if (right_source >= 0) assert(!close(right_source));
     if (datagram) {
         for (unsigned j = 0; j < 2; j++) { assert(!close(packets[j])); assert(!unlink(packet_address[j].sun_path)); }

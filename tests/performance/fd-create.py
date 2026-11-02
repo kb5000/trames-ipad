@@ -15,7 +15,7 @@ p = argparse.ArgumentParser(description=__doc__)
 for name in ('baseline', 'candidate', 'native', 'fixture', 'rootfs', 'output'):
     p.add_argument('--' + name, type=Path)
 p.add_argument('--native-only', action='store_true')
-p.add_argument('--kind', choices=('pipe', 'eventfd', 'timerfd', 'inotify', 'tcp', 'tcp-session', 'tcp-blocking', 'tcp-state', 'tcp-epoll', 'tcp-poll', 'epoll', 'inotify-watch', 'unix-rights', 'unix-create', 'unix-pair', 'unix-datagram', 'unix-sendto', 'unix-datagram-rights', 'unix-datagram-owner', 'unix-session', 'unix-abstract', 'signalfd', 'signal-rights', 'pty', 'pty-rights', 'pty-peer', 'pty-create'), required=True)
+p.add_argument('--kind', choices=('pipe', 'eventfd', 'timerfd', 'inotify', 'tcp', 'tcp-session', 'tcp-blocking', 'tcp-state', 'tcp-epoll', 'tcp-poll', 'epoll', 'inotify-watch', 'unix-rights', 'unix-create', 'unix-pair', 'unix-batch', 'unix-packet', 'unix-packet-vector', 'unix-datagram', 'unix-sendto', 'unix-datagram-rights', 'unix-datagram-owner', 'unix-session', 'unix-abstract', 'signalfd', 'signal-rights', 'pty', 'pty-rights', 'pty-peer', 'pty-create'), required=True)
 p.add_argument('--repeats', type=int, default=3)
 p.add_argument('--operations', type=int, default=10000)
 p.add_argument('--cpus', type=int, default=12)
@@ -24,7 +24,7 @@ for name in (('native', 'output') if a.native_only else
              ('baseline', 'candidate', 'fixture', 'rootfs', 'output')):
     if getattr(a, name) is None:
         p.error('--' + name + ' is required')
-if a.native and platform.system() == 'Darwin' and a.kind not in ('pipe', 'tcp', 'tcp-session', 'tcp-blocking', 'tcp-state', 'tcp-epoll', 'tcp-poll', 'epoll', 'inotify-watch', 'unix-rights', 'unix-create', 'unix-pair', 'unix-datagram', 'unix-sendto', 'unix-datagram-rights', 'unix-datagram-owner', 'unix-session'):
+if a.native and platform.system() == 'Darwin' and a.kind not in ('pipe', 'tcp', 'tcp-session', 'tcp-blocking', 'tcp-state', 'tcp-epoll', 'tcp-poll', 'epoll', 'inotify-watch', 'unix-rights', 'unix-create', 'unix-pair', 'unix-batch', 'unix-packet', 'unix-packet-vector', 'unix-datagram', 'unix-sendto', 'unix-datagram-rights', 'unix-datagram-owner', 'unix-session'):
     p.error('this Linux ABI fixture has no native macOS reference; omit --native')
 assert a.repeats > 0 and 0 < a.operations <= 1000000 and a.cpus > 0
 a.output = a.output.resolve()
