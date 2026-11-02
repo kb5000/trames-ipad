@@ -1,5 +1,60 @@
 # Coordinator dependency audit
 
+## Thirteenth migration implemented — complete socket ownership and worker creation — 2026-11-02
+
+Runtime `0104a848c7a130d32c782f45176d88734985a737` makes the complete network namespace, socket and virtual
+fabric graphs Send+Sync by composition. Actual socket ownership now lives in the
+shared OFD. Production IP/netlink socket creation (syscall 198), duplication and
+final close complete on the executing worker through the original Files domain.
+The creating namespace, credentials, permissions, flags, error ordering and
+existing limits are preserved; AF_UNIX defers before effects.
+
+The socket owns its control gate; VFS no longer keeps an independent publication
+gate. Scalar metadata uses relaxed atomics and compound invariants use object
+locks. Packet-stack observers retain metadata without close callbacks, avoiding
+last-reference teardown under the fabric lock. Port/quota admission, cold stack
+creation and lazy binding/DNS/native/guest initialization are atomic transactions.
+Ordinary direct native TCP bytes keep their existing path. No new unsafe trait
+override, global native-I/O lock, service thread, bus, spin loop or quota is added.
+
+An admitted owner/service call retains its original socket OFD across eligibility,
+flags, accept/address copyout and TCP publication. Another worker can close/reuse
+the numeric FD without retargeting that operation. A deterministic regression
+accepts from a retained original listener while the reused FD names a different
+listener. Original epoll edge/oneshot and io_uring final-close behavior is retained;
+shared ownership alone never grants direct byte/poll capability.
+
+Two-CPU creation/close loops now make **zero coordinator service requests**.
+Allow/deny seccomp loops prove one decision per syscall. Mac/ARM64 Linux affected
+checks pass: 79 network unit + 11 integration, 420/419 VFS respectively, 161 ABI,
+9 worker-dispatch, 20 service and one multi-case seccomp regression. Strict product
+checks, 13 real FFI checks (Alpine/Debian/custom/systemd and dual PTYs), Mac product
+checks and the iPad static build pass. Physical iPad testing remains skipped per
+owner; unchanged CPU/memory/graphics acceptance is reused.
+
+| Longest-child loop median | Previous | Current | Native macOS | Native Linux reference |
+| --- | ---: | ---: | ---: | ---: |
+| TCP creation/configuration/close, 10,000 each | 503.84 ms | 171.00 ms | 52.96 ms | 19.79 ms |
+| Complete TCP sessions, 256 each | 44.26 ms | 27.83 ms | 15.32 ms | 3.78 ms |
+| TCP epoll byte cycles, 2,000 each | 29.19 ms | 29.24 ms | 19.29 ms | 5.54 ms |
+
+Creation/configuration/close is **2.95x faster**; complete sessions are
+**1.59x faster**; sustained TCP/epoll is approximately flat. Four processes
+perform the stated work with checked results. Timings are three unprofiled,
+counterbalanced runs. In a separate creation diagnostic sample, service requests
+fall from 79,982 to 3; these counters include startup/teardown and retries,
+and do not establish CPU utilization. Native Linux creation is measured afresh;
+other Linux references are reused only after exact fixture ELF identity checks.
+Linux uses the local 6-vCPU CI machine and a different kernel; native macOS uses
+corresponding kqueue APIs. No Firefox or whole-application speedup is inferred.
+
+The final measured binary is installed in Trames Dev. Running sessions were not
+restarted. Remaining work includes worker bind/connect/listen/accept, blocking and
+policy-aware byte paths, Unix/SCM_RIGHTS, task/signal and structural VM/device
+ownership. The coordinator-removal objective remains in progress.
+See [the validation record](../validation/shared-network-20261102.json) and the
+[shared socket contract](../../runtime/docs/architecture/execution-backends.md#shared-complete-sockets-and-worker-creation-2026-11-02).
+
 ## Twelfth migration implemented — shared live routing resources — 2026-11-02
 
 Runtime `4021141d5064d5f554f7bf94e0efa80ac34f4619` shares the actual topology/View, ruleset, conntrack
