@@ -1,5 +1,75 @@
 # Coordinator dependency audit
 
+## Fourth migration implemented — 2026-11-02
+
+Runtime `860005dff5f914a28fa88c4f1bce561a1b089d17` moves unfiltered Internet
+socket creation, bind/listen, address/option control, shutdown and nonblocking
+connect/accept into the existing single-caller owner service. Peer CPUs continue;
+the caller releases its execution slot. The original namespace, hybrid routing,
+firewall and connection control remain on their owner. This removes cohort
+drains for these calls; it does not remove their owner hop or create a new service
+thread. Mac and iPad use the same implementation.
+
+Connected TCP authority is now published on the actual shared OFD. Existing
+worker captures consult live Files membership and can immediately use newly
+connected/accepted transports without recapturing the cohort. Accepted lookup
+retains the real transport; stored publications remain weak and do not delay FIN.
+Only socket owner slots expose this transport projection, preserving unrelated
+exclusive-construction contracts and separate metadata admission. Routing and
+firewall authority changes retain their original joined boundary.
+
+Socket/accept reserve numbers through the same atomic Files allocator as worker
+resource creation. Accept preflights guest output and publishes its FD only after
+address copyout succeeds. Failure releases the reservation and accepted socket.
+The original Linux ABI accepts the caller's live memory View. Admission is before
+effects; EAGAIN/EINPROGRESS are final results, never a reason to replay the call.
+Blocking connect/accept, socket close/replacement, AF_UNIX/SCM_RIGHTS, netlink and
+seccomp-filtered socket controls keep their prior paths. Seccomp decision and
+denied-entry handling are unchanged.
+
+Four processes each run 5,000 `socket → TCP_NODELAY set/get → getsockname → close`
+cycles. Values are longest-child loop medians from three unprofiled, counterbalanced
+repetitions; a separate diagnostic repetition supplies cohort counts. This is a
+control-lifecycle benchmark with no payload traffic. Both Trames versions and the
+native Linux reference run the identical static ELF; macOS compiles the same
+fixture source against its native socket API.
+
+| Measurement | Previous | Current | Native macOS | Native Linux |
+| --- | ---: | ---: | ---: | ---: |
+| Longest-child loop | 2,062.8 ms | 986.2 ms | 38.6 ms | 9.54 ms |
+| Full workload wall | 2,099.9 ms | 1,023.9 ms | 43.0 ms | 10.1 ms |
+| Cohort rounds, diagnostic sample | 69,373 | 17,585 | — | — |
+
+The loop improves **2.09×** and whole-cohort rounds decrease **74.7%**. The current
+loop still costs approximately **25.6× macOS** and **103× native Linux**. Socket
+close still joins, and short controls still incur owner dispatch/resource work;
+73,808 requests used that service in the diagnostic sample. The next network
+stage should share the actual socket control/close ownership rather than treat
+this intermediate hop as finished. These numbers do not establish connected TCP
+throughput or Firefox performance. Diagnostic counts include startup/teardown
+and serial tails; they are not CPU percentages. The six-vCPU Linux reference ran
+after Mac timing and was restored to its original stopped state.
+
+Affected validation passed: 406 VFS, 151 Linux ABI, 67 network, 247 interpreter
+kernel and 13 Mac tests, strict shared/kernel/Mac Clippy, 13 production FFI
+checks including systemd with two PTYs, product boundaries and the iPad static
+cross-build. Passing unaffected results were reused; two new networking tests
+were corrected for asynchronous accept and closure field capture, and one new
+kernel helper for writable code/nonzero output capacity, then rerun successfully.
+Regression coverage includes live new-connection visibility, accepted transport
+lifetime across close/reuse, accept copyout rollback alongside worker allocation,
+blocking-before-effects admission, final nonblocking errors, and two CPUs making
+progress through repeated socket controls without per-call cohort joins.
+Physical iPad testing remains skipped at the owner's request. The installed Mac
+development app contains the measured binary; existing sessions keep their
+current executable until restarted.
+
+[Samples, hashes and validation](../validation/socket-control-20261102.json),
+the [fixture](../../tests/fixtures/fd-create-bench.c),
+[comparison harness](../../tests/performance/fd-create.py), and shared
+[ownership design](https://github.com/kb5000/trames-runtime/blob/main/docs/architecture/execution-backends.md#live-tcp-publication-and-short-socket-services-2026-11-02)
+record the result and remaining boundaries.
+
 ## Third migration implemented — 2026-11-02
 
 Runtime `eef3631c6f1dccdcf863d3765379be93cdcc6e4b` moves `pipe2`, `eventfd2`,
@@ -270,9 +340,11 @@ same runtime source, not rerun measurements; see
    concurrent metadata changes. Preserve normal Linux races; no stronger
    ordering, guest-race error or whole-function global lock.
 2. Regular-file open/create and pipe/eventfd/timerfd/inotify creation/publication
-   are implemented above. Next are socket/connect/accept/SCM_RIGHTS and epoll
-   interest ownership using shared Files and resource objects. Existing workers
-   should observe real membership without stopping every job to recapture it.
+   are implemented above. Short unfiltered Internet controls now use an in-epoch
+   owner service, and connected TCP publication is live. Next are direct socket
+   control/close ownership, blocking connect/accept, AF_UNIX/SCM_RIGHTS and epoll
+   interest ownership over shared Files and actual resource objects. Remove the
+   remaining owner hop while retaining the original namespace/policy semantics.
 3. Temporary signal-mask waits, signal delivery and task creation/exit using a
    shared task registry and targeted execution-queue events. Preserve seccomp
    decisions, EINTR/restart, process-group semantics and OFD lifetimes.

@@ -9,6 +9,9 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
 #ifdef __linux__
 #include <sys/eventfd.h>
 #include <sys/inotify.h>
@@ -29,7 +32,18 @@ int main(int argc, char **argv) {
     uint64_t checksum = 0;
     double began = now();
     for (unsigned i = 0; i < operations; i++) {
-        if (!strcmp(kind, "pipe")) {
+        if (!strcmp(kind, "tcp")) {
+            int fd = socket(AF_INET, SOCK_STREAM, 0); assert(fd >= 0);
+            int enabled = 1, value = 0;
+            assert(!setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &enabled, sizeof(enabled)));
+            socklen_t size = sizeof(value);
+            assert(!getsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &value, &size));
+            assert(value && size == sizeof(value));
+            struct sockaddr_in address; size = sizeof(address);
+            assert(!getsockname(fd, (struct sockaddr *)&address, &size));
+            assert(address.sin_family == AF_INET && size == sizeof(address));
+            assert(!close(fd));
+        } else if (!strcmp(kind, "pipe")) {
             int p[2];
 #ifdef __linux__
             assert(!pipe2(p, 0));

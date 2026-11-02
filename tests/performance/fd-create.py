@@ -15,7 +15,7 @@ p = argparse.ArgumentParser(description=__doc__)
 for name in ('baseline', 'candidate', 'native', 'fixture', 'rootfs', 'output'):
     p.add_argument('--' + name, type=Path)
 p.add_argument('--native-only', action='store_true')
-p.add_argument('--kind', choices=('pipe', 'eventfd', 'timerfd', 'inotify'), required=True)
+p.add_argument('--kind', choices=('pipe', 'eventfd', 'timerfd', 'inotify', 'tcp'), required=True)
 p.add_argument('--repeats', type=int, default=3)
 p.add_argument('--operations', type=int, default=10000)
 p.add_argument('--cpus', type=int, default=12)
@@ -24,8 +24,8 @@ for name in (('native', 'output') if a.native_only else
              ('baseline', 'candidate', 'fixture', 'rootfs', 'output')):
     if getattr(a, name) is None:
         p.error('--' + name + ' is required')
-if a.native and platform.system() == 'Darwin' and a.kind != 'pipe':
-    p.error('this fixture provides only pipe as a macOS native reference; omit --native')
+if a.native and platform.system() == 'Darwin' and a.kind not in ('pipe', 'tcp'):
+    p.error('this fixture provides pipe and TCP as macOS native references; omit --native')
 assert a.repeats > 0 and 0 < a.operations <= 1000000 and a.cpus > 0
 a.output = a.output.resolve()
 a.output.mkdir(parents=True, exist_ok=False)
@@ -52,7 +52,7 @@ def parse(stdout):
 
 
 def options(runner):
-    return [str(runner.resolve()), '--no-pty', '--no-windows', '--network', 'off',
+    return [str(runner.resolve()), '--no-pty', '--no-windows', '--network', 'loopback' if a.kind == 'tcp' else 'off',
             '--cpus', str(a.cpus), '--memory-mib', 'auto', '--timeout', '60',
             '--storage', str(a.output / 'store')]
 
