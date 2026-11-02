@@ -108,7 +108,9 @@ int main(int argc, char **argv) {
     unsigned operations = (unsigned)strtoul(argv[2], NULL, 10);
     assert(operations && operations <= 1000000);
     uint64_t checksum = 0;
-    int ip_messages = !strcmp(kind, "udp-message") || !strcmp(kind, "tcp-message") || !strcmp(kind, "udp-batch") || !strcmp(kind, "tcp-batch");
+    int ip_raw = !strcmp(kind, "udp-raw") || !strcmp(kind, "udp-vector") || !strcmp(kind, "tcp-raw") || !strcmp(kind, "tcp-vector");
+    int ip_vector = !strcmp(kind, "udp-vector") || !strcmp(kind, "tcp-vector");
+    int ip_messages = ip_raw || !strcmp(kind, "udp-message") || !strcmp(kind, "tcp-message") || !strcmp(kind, "udp-batch") || !strcmp(kind, "tcp-batch");
     int ip_batch = !strcmp(kind, "udp-batch") || !strcmp(kind, "tcp-batch");
     int ip_udp = !strncmp(kind, "udp-", 4);
     int ip_pair[2] = {-1,-1};
@@ -276,13 +278,15 @@ int main(int argc, char **argv) {
                 // Contextual macOS reference uses eight POSIX calls.
                 for (unsigned j = 0; j < 8; j++) assert(sendmsg(ip_pair[0], &messages[j], 0) == 64);
 #endif
+            } else if (ip_raw) {
+                assert((ip_vector ? writev(ip_pair[0], vectors[0], 2) : write(ip_pair[0], sent[0], 64)) == 64);
             } else assert(sendmsg(ip_pair[0], &messages[0], 0) == 64);
             for (unsigned j = 0; j < count; j++) {
                 size_t used = 0;
                 do {
                     struct iovec input[2] = {{.iov_base = received+used, .iov_len = (64-used)/2}, {.iov_base = received+used+(64-used)/2, .iov_len = (64-used)-(64-used)/2}};
                     struct msghdr message = {.msg_iov = input, .msg_iovlen = 2};
-                    ssize_t n = recvmsg(ip_pair[1], &message, 0); assert(n > 0 && (size_t)n <= 64-used);
+                    ssize_t n = ip_raw ? (ip_vector ? readv(ip_pair[1], input, 2) : read(ip_pair[1], received+used, 64-used)) : recvmsg(ip_pair[1], &message, 0); assert(n > 0 && (size_t)n <= 64-used);
                     if (ip_udp) assert(n == 64);
                     used += (size_t)n;
                 } while (used < 64);

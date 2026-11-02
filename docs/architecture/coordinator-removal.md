@@ -2095,3 +2095,82 @@ task/job control, mount/proc ownership and structural file/VM/task transitions
 remain. recvmmsg is unimplemented, not an existing coordinator path. See the
 [validation record](../validation/worker-ip-message-20261103.json) and
 [shared contract](../../runtime/docs/architecture/execution-backends.md#retained-ip-messages-and-batches-2026-11-03).
+
+
+## Twenty-seventh migration implemented — raw IP byte operations — 2026-11-03
+
+Runtime `0c051a18b2298b97fa31fa87a4e766faa3db271e` removes raw IPv4/IPv6 read, write,
+readv and writev ownership from the coordinator for UDP and IP sockets without a
+native TCP byte capability. Native connected TCP retains its original capability
+path, and existing pipe/device/Unix byte resources return before the new fallback.
+Those accepted paths gain no membership lookup, allocation or publication guard.
+The fallback accepts the actual complete shared socket OFD, rather than a numeric
+FD or a new resource-service proxy.
+
+Raw calls reuse the original Linux scalar/vector preparation helpers, preserving
+scalar caps, vector-count/signed-length errors, empty-vector behavior and original
+access-versus-buffer fault order. UDP vectors gather/scatter one packet. Scalar
+receive preflight is factored once; no duplicate ordinary check is added. Accepted
+send bytes or receive scatter destinations survive close/reuse and later iovec
+edits. Only parked receives recheck their original outputs before dequeue. The
+original live O_NONBLOCK status, accepted socket timeout, Socket algorithms,
+namespace policy and accounting remain in use. Raw writes do not acquire the TCP
+publication algorithm guard that the original raw VFS write did not acquire.
+
+Existing socket events and packet-stack timers release execution slots. Virtual
+TCP EPIPE retains its saved result and original socket through task handoff, with
+no packet resend or numeric re-resolution. Netlink byte/control calls still defer
+before guest input import. No new global resource lock, coordinator/service thread,
+message bus, busy polling or ordinary guest-memory barrier is introduced.
+
+| Four processes × 1,000 checked round trips, longest-child median | Previous | Current | Native macOS | Native ARM Linux, exact ELF | Improvement |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| UDP scalar write/read | 177.37 ms | 15.06 ms | 9.74 ms | 1.16 ms | 11.78x |
+| UDP vector writev/readv | 180.63 ms | 14.72 ms | 10.04 ms | 1.23 ms | 12.27x |
+| Existing native TCP scalar | 14.91 ms | 16.17 ms | 13.63 ms | 2.36 ms | No gain claimed |
+| Existing native TCP vector | 15.51 ms | 15.66 ms | 10.05 ms | 2.48 ms | No gain claimed |
+| Existing native TCP sendmsg/recvmsg | 15.94 ms | 17.25 ms | 10.72 ms | 2.66 ms | No gain claimed |
+| Existing pipe lifecycle | 12.52 ms | 12.34 ms | 1.84 ms | 2.18 ms | No gain claimed |
+
+UDP scalar/vector process-wall medians are **208.75 → 46.19 ms** and
+**213.00 → 45.66 ms**. Diagnostic cohort counts fall **5,650 → 48** and
+**5,759 → 49**. Service requests remain three, including process startup/teardown;
+old data calls generally joined rather than counted as resource services.
+
+The short native-TCP scalar and message controls initially show approximately
+8% higher loop medians; both raw data sets are retained. Longer confirmation uses
+**10,000 iterations and nine unprofiled counterbalanced samples**. Native-TCP
+scalar loops are **93.121 → 93.616 ms**, wall **126.363 → 126.582 ms**; existing
+message loops are **139.132 → 139.020 ms**, wall **171.204 → 172.480 ms**. No
+control gain or statistical regression bound is claimed. Native TCP vector and
+pipe short controls also remain close; their complete records are retained.
+
+Each new iteration checks a 64-byte round trip. Vector cases use two iovecs and
+preserve one UDP packet; TCP handles any short read while assembling its frame.
+Endpoint setup/cleanup is outside the loop timer. Native ARM Linux uses the same
+static musl ELF on six vCPUs; Trames uses four. macOS uses its native byte/vector
+APIs. All compilation, affected local CI and FFI acceptance finish before timing,
+and Linux is stopped during Mac timing. Different kernels/APIs/CPU counts and
+short-sample variability make native results contextual. These are not whole-app,
+Firefox, physical-iPad or universally native-speed results.
+
+Apple/Linux ABI **201 each**, kernel **277 each**, strict checks, Mac **13**, all
+**13** FFI environment checks, product boundaries and iPad static build pass.
+Sixteen actual guest combinations cover native/packet-stack × IPv4/IPv6 × TCP/UDP
+× one/two execution slots. Each completes **ten calls on workers, ten filter
+evaluations and zero services**. Virtual TCP is explicitly checked to have no
+native byte capability; single-slot cases assert a real socket wait. ABI cases
+cover packet boundaries, faults before effects, original OFD/output after reuse,
+parked remap faults before dequeue, live nonblocking/timeouts, virtual TCP EPIPE
+handoff and netlink exclusion. The final test-only wait assertion reruns its
+sixteen-combination Apple case and strict checks; other passes and unchanged
+production artifacts are reused. Linux full277 includes the assertion. Physical
+iPad testing remains skipped per owner. The measured binary is installed in
+Trames Dev; the stable application hash is unchanged.
+
+The coordinator-removal goal remains active. Netlink, Unix owning ancillary graphs,
+native-service/device and io_uring controls, task/job control and pending signals,
+mount/proc ownership and structural file/VM/task transitions remain. recvmmsg is
+unimplemented rather than an existing coordinator path. See the
+[validation record](../validation/worker-raw-ip-20261103.json) and
+[shared contract](../../runtime/docs/architecture/execution-backends.md#retained-raw-ip-byte-operations-2026-11-03).
