@@ -10,6 +10,8 @@
 #include <time.h>
 #include <unistd.h>
 #include <sys/socket.h>
+#include <sys/un.h>
+#include <stddef.h>
 #include <sys/ioctl.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
@@ -103,6 +105,32 @@ int main(int argc, char **argv) {
     unsigned operations = (unsigned)strtoul(argv[2], NULL, 10);
     assert(operations && operations <= 1000000);
     uint64_t checksum = 0;
+    int unix_listener = -1;
+    int unix_session = !strcmp(kind, "unix-session") || !strcmp(kind, "unix-abstract");
+    int unix_abstract = !strcmp(kind, "unix-abstract");
+    struct sockaddr_un unix_address = {0};
+    socklen_t unix_size = 0;
+    if (unix_session) {
+        unix_address.sun_family = AF_UNIX;
+        if (unix_abstract) {
+#ifdef __linux__
+            snprintf(unix_address.sun_path + 1, sizeof(unix_address.sun_path) - 1, "trames-bench-%ld", (long)getpid());
+            unix_size = (socklen_t)(offsetof(struct sockaddr_un, sun_path) + 1 + strlen(unix_address.sun_path + 1));
+#else
+            fprintf(stderr, "abstract Unix sockets require Linux\n"); return 77;
+#endif
+        } else {
+            snprintf(unix_address.sun_path, sizeof(unix_address.sun_path), "/tmp/trames-bench-%ld", (long)getpid());
+            unix_size = (socklen_t)(offsetof(struct sockaddr_un, sun_path) + strlen(unix_address.sun_path) + 1);
+            assert(!unlink(unix_address.sun_path) || errno == ENOENT);
+        }
+#ifdef __APPLE__
+        unix_address.sun_len = (uint8_t)unix_size;
+#endif
+        unix_listener = socket(AF_UNIX, SOCK_STREAM, 0); assert(unix_listener >= 0);
+        assert(!bind(unix_listener, (struct sockaddr *)&unix_address, unix_size));
+        assert(!listen(unix_listener, 4));
+    }
     int listener = -1;
     struct sockaddr_in address = {0};
     int tcp_blocking = !strcmp(kind, "tcp-blocking");
@@ -169,7 +197,16 @@ int main(int argc, char **argv) {
     }
     double began = now();
     for (unsigned i = 0; i < operations; i++) {
-        if (!strcmp(kind, "unix-rights") || signal_rights || pty_rights) {
+        if (unix_session) {
+            int client = socket(AF_UNIX, SOCK_STREAM, 0); assert(client >= 0);
+            assert(!connect(client, (struct sockaddr *)&unix_address, unix_size));
+            int peer = accept(unix_listener, NULL, NULL); assert(peer >= 0);
+            int alias = dup(peer); assert(alias >= 0); assert(!close(peer));
+            unsigned char sent = (unsigned char)i, received = 0;
+            assert(write(client, &sent, 1) == 1);
+            assert(read(alias, &received, 1) == 1 && received == sent);
+            assert(!close(client)); assert(read(alias, &received, 1) == 0); assert(!close(alias));
+        } else if (!strcmp(kind, "unix-rights") || signal_rights || pty_rights) {
             unsigned char sent = pty_rights ? (unsigned char)('a' + i % 26) : (unsigned char)i, received = 0;
             struct iovec vector = {.iov_base = &sent, .iov_len = 1};
             union { struct cmsghdr align; unsigned char bytes[CMSG_SPACE(sizeof(int))]; } control = {0};
@@ -359,6 +396,10 @@ int main(int argc, char **argv) {
         checksum += (uint64_t)i + 1;
     }
     double elapsed = now() - began;
+    if (unix_listener >= 0) {
+        assert(!close(unix_listener));
+        if (!unix_abstract) assert(!unlink(unix_address.sun_path));
+    }
     if (listener >= 0) assert(!close(listener));
     if (queue >= 0) assert(!close(queue));
     if (pair[0] >= 0) assert(!close(pair[0]));

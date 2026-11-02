@@ -1,5 +1,80 @@
 # Coordinator dependency audit
 
+## Twenty-second migration implemented — worker Unix namespace controls and waits — 2026-11-03
+
+Runtime `fcfb8936848c36714a704c6c8ce30d9a2b86a347` moves Unix bind/connect and
+accept/accept4 onto execution workers, shared by Mac and iPad. Pathnames use the
+same VFS resolver, original filesystem/inodes, credentials and actual shared route
+domain. Abstract addresses use the creating socket's original network namespace.
+Excluded owner paths defer before effects and retain the accepted full OFD and
+copied address bytes for the original owner resolver.
+
+| Operation | Original shared authority / worker behavior | Remaining boundary |
+| --- | --- | --- |
+| Bind | Existing permissions and namespace, exclusive inode insertion; competing binders cannot overwrite the winner | Excluded owner-only path resolution |
+| Connect | Original client and weak resolved target, existing listener queue and credentials | Native-service adapters and task-level signal effects |
+| Accept | Original listener OFD, exact queued peer/preflight, actual hidden Files reservation; distinct concurrent FD publication | Structural task/namespace effects |
+| Blocking controls | Internal Unix readiness subscriptions return the execution slot; original IP host waits/timeouts stay separate | Explicit original owner-resource fallback |
+
+A backlog waiter keeps the listener's notification source, not its open lifetime.
+Final listener close wakes it with the original refusal result, and replacing a
+name cannot redirect the call. The accepting call itself retains its original full
+listener OFD across close/reuse. Accept chooses the peer address and preflights that
+same queue item under one guard; flags/capacity order remains unchanged. The guard
+is released before notifications/output, and copyout or unwinding cannot publish a
+partial FD or leak its reservation. No normal byte operation takes connection locks.
+
+The one-slot test exposed a preexisting type assumption: any retained socket was
+treated as an external host wait. Unix controls now select their actual internal
+notification source, including headless runs without a host event hub. Worker task
+identity also reaches DescriptorFactory in either capture order, preserving original
+effective credentials while avoiding an inherited parent PID for child sockets and
+SO_PEERCRED. These changes add no global socket/VFS lock, resource thread, bus,
+polling loop, guest memory fence or native permission policy. Ordinary byte entry
+keeps its original path without an extra duplicate control-admission probe.
+
+| Four processes × 1,000 checked lifecycles, longest-child median | Previous | Current | Native macOS | Native ARM Linux, exact ELF | Improvement |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Pathname connect / accept / alias / bytes / EOF / close | 191.70 ms | 52.21 ms | 12.11 ms | 4.81 ms | 3.67x |
+| Abstract connect / accept / alias / bytes / EOF / close | 150.50 ms | 19.55 ms | Unsupported API | 5.10 ms | 7.70x |
+| Existing socketpair / flags / options / bytes / shutdown / close | 22.24 ms | 21.83 ms | 4.87 ms | 4.74 ms | No significant change claimed |
+
+Process-wall medians are **259.23 → 135.80 ms**, **189.53 → 57.80 ms**, and
+**61.48 → 54.68 ms**. Separate diagnostic cohort counts are **3,004 → 49**,
+**3,026 → 50**, and **48 → 48**. Service requests are **2,966 → 2**,
+**3,004 → 3**, and **3 → 3**, including process startup/teardown. Residual
+joins are recorded rather than presented as zero for a whole application.
+
+Three unprofiled counterbalanced samples run after all compilation and FFI checks,
+with local Linux CI stopped and four Trames vCPUs. Listener creation/bind/listen and
+unlink are outside the session timer; client creation, connection, acceptance, alias,
+data, EOF and final close are inside. Native Linux references are recollected after
+all host work has finished using the exact static musl ELF on the existing six-vCPU
+ARM64 machine. Native macOS uses its own APIs, with no abstract-socket substitute.
+Different kernels, filesystems/API semantics and compiler targets make these contextual
+references. No Firefox/whole-app/physical-iPad or generally native-speed claim follows.
+
+Apple/Linux VFS **445/444**, ABI **184 each**, kernel **270 each**, strict checks,
+Mac product **13**, both product boundaries, all **13** production FFI environment
+checks and the iPad static build pass. Unchanged VFS results are reused after the
+Linux-only identity/hot-entry changes; guest artifacts and unrelated acceptance are
+unchanged. Physical iPad testing remains skipped per owner. Eight binders produce one
+winner; eight acceptors produce 32 distinct FDs with exact peer addresses. Tests cover
+output/panic rollback, target close/rebind, accepted endpoint reuse and owner handoff.
+
+The filtered two-task lifecycle performs 192 control/byte/membership calls plus two
+final waits, with 194 filter decisions and zero services on one/two execution slots.
+Filtered/unfiltered blocking accept/connect performs nine calls; saturated-backlog
+connect/accept performs seven. Both release a single execution slot and finish without
+coordinator services. The guest CLOEXEC test uses the required shifted MOVZ encoding;
+bounded rounds observe final parked tasks without changing production wait policy.
+
+The goal remains active. Next are addressed unpaired-datagram I/O, Unix-bearing
+ancillary owning graphs/cycle reclamation, native-service adapters, task/job control,
+io_uring, mount/proc ownership and structural VM/task transitions. See the
+[validation record](../validation/worker-unix-connect-20261103.json) and
+[shared contract](../../runtime/docs/architecture/execution-backends.md#worker-unix-namespace-controls-and-connection-waits-2026-11-03).
+
 ## Twenty-first migration implemented — complete Unix socket resources and worker lifecycle — 2026-11-03
 
 Runtime `2b2194fee02e63b0ac6d0dcac11e9829206758ff` moves the actual Unix socket
