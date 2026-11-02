@@ -1,5 +1,78 @@
 # Coordinator dependency audit
 
+## Sixth migration implemented — 2026-11-02
+
+Runtime `d9c9cf9c86f567475a0f1979085c3409d2e14acf` executes unfiltered
+native TCP address queries, TCP_NODELAY set/get and immutable SO_TYPE/
+SO_DOMAIN/SO_PROTOCOL queries on the current CPU worker. The original host
+endpoint is used, with common owner/worker Linux ABI helpers. SO_ERROR, stateful
+options, routing/namespace authority and filtered controls retain their original
+paths. Ordinary worker byte I/O gains no new control lock or policy checks.
+
+Review of the initial control primitive identified integration work that was
+completed before enabling it:
+
+- A per-socket control read/write gate coordinates worker controls with owner
+  transitions, including retained io_uring bind/connect. Files membership is
+  released before waiting on that gate or touching guest memory; unrelated
+  sockets and Files allocation can continue.
+- Publication refresh targets the original OFD, preserving other aliases when
+  an FD is closed or reused. Weak stored projections do not delay final close;
+  accepted operations alone retain the actual endpoint.
+- TCP_NODELAY host changes and the real shared hybrid replay record update
+  together. Lazy creation of a guest route branch replays the same options.
+- Explicit DNS sendto/sendmsg can change the transport without connect. Those
+  owner transitions also retire the native control projection. UDP, virtual
+  branches and DNS transport remain outside this direct-control path.
+- Shared address/option helpers preserve output preflight and error ordering.
+  Filtered allow/deny calls still defer and evaluate once on their original
+  owner. No seccomp implementation or guest-memory policy was changed.
+
+The complete integrated candidate was tested independently before copying its
+verified sources into canonical runtime and product trees. This stage uses safe
+Rust, existing resources and object synchronization; it adds no coordinator,
+resource thread, message bus, busy loop or global network lock.
+
+The unchanged four-process fixture runs 5,000 TCP control lifecycles per process.
+Every cycle creates a socket, sets/gets TCP_NODELAY, queries its local address and
+closes it. Loop/wall figures are medians of three unprofiled counterbalanced
+repetitions. A separate diagnostic repetition supplies counts. macOS native is
+freshly measured; the same-ELF native Linux result is reused from the earlier
+2026-11-02 reference run, with unchanged fixture/workload and six vCPUs/8 GiB.
+
+| Measurement | Previous | Current | Native macOS | Native Linux, reused |
+| --- | ---: | ---: | ---: | ---: |
+| Longest-child loop | 477.8 ms | 235.4 ms | 25.7 ms | 9.54 ms |
+| Full workload wall | 514.6 ms | 274.7 ms | 29.9 ms | 10.1 ms |
+| Owner service requests, diagnostic | 99,993 | 39,996 | — | — |
+| Worker socket controls, diagnostic | 0 | 60,000 | — | — |
+| Cohort rounds, diagnostic | 41 | 45 | — | — |
+
+The loop improves **2.03×**; **60,000 controls** run directly and owner requests
+fall by approximately **60%**. Startup/teardown and scheduling tails account for
+small cohort-count differences; this stage targets remaining per-call owner
+transport, not another cohort-drain reduction. Creation and idle close still use
+the owner service, leaving roughly 40,000 requests. Current loops remain
+**9.16× native macOS** and **24.7× the reused native Linux reference**. These are
+control-lifecycle results with no payload traffic; they do not establish TCP
+throughput or Firefox performance. Drain/service counters are not CPU percentages.
+
+Validation passed: 410 VFS, 155 Linux ABI, 69 network and 249 interpreter-kernel
+tests; strict final shared/kernel/Mac Clippy; Mac product tests; 13 production FFI
+checks including systemd with two PTYs; iPad static cross-build and product
+boundaries. Passing unaffected results were reused; the direct/filtered dispatch
+regressions were rerun after placing the fast path in its specific syscall arm.
+Coverage includes gate ordering, independent sockets/Files progress, actual guest
+option replay, aliases and reuse, weak/final-close lifetimes, copyout faults, DNS/
+virtual exclusions and once-only owner seccomp decisions. Physical iPad testing
+remains skipped. The installed Mac development app contains the measured binary;
+existing sessions keep their prior executable until restarted.
+
+[Samples, reviewed source hashes and validation](../validation/socket-control-direct-20261102.json),
+the shared [control design](https://github.com/kb5000/trames-runtime/blob/main/docs/architecture/execution-backends.md#direct-native-tcp-controls-2026-11-02),
+and [native implementation](https://github.com/kb5000/trames-runtime/blob/main/crates/trames-net/src/native/control.rs)
+record the reviewed behavior and remaining scope.
+
 ## Fifth migration implemented — 2026-11-02
 
 Runtime `36c64a8109a9b53496a3f0cfd662a4ae302f63ce` moves eligible idle TCP
@@ -403,8 +476,10 @@ same runtime source, not rerun measurements; see
    ordering, guest-race error or whole-function global lock.
 2. Regular-file open/create and pipe/eventfd/timerfd/inotify creation/publication
    are implemented above. Short unfiltered Internet controls now use an in-epoch
-   owner service, and connected TCP publication is live. Next are direct socket
-   control/close ownership, blocking connect/accept, AF_UNIX/SCM_RIGHTS and epoll
+   owner service, and connected TCP publication is live. Native TCP address and
+   basic option controls now run directly on workers; idle close no longer joins.
+   Next are socket creation/broader close ownership, remaining stateful controls,
+   blocking connect/accept, AF_UNIX/SCM_RIGHTS and epoll
    interest ownership over shared Files and actual resource objects. Remove the
    remaining owner hop while retaining the original namespace/policy semantics.
 3. Temporary signal-mask waits, signal delivery and task creation/exit using a
