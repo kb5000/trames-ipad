@@ -1,5 +1,68 @@
 # Coordinator dependency audit
 
+## Seventeenth migration implemented — worker directories and memfd ownership — 2026-11-02
+
+Runtime `748d75e2cfed670d041f9a75e1e24152d7068dae` makes static directory and
+memfd descriptions complete shared OFDs. Ordinary directory open, getdents64,
+seek, dup and close now run on execution workers. Owner and worker enumeration
+use the same actual cursor and dirent encoder; directory offsets stay coherent
+across aliases, fork, fdinfo and Unix rights. Only the affected OFD's cursor
+commit is locked, after namespace lookup and before guest-memory output.
+
+Accepted enumeration retains the original descriptor before output preflight,
+so concurrent numeric FD reuse cannot redirect it. Dynamic pseudo directories
+and excluded mounts still defer before cursor effects. O_PATH reads return
+EBADF on both paths. Shared directory leases also preserve lazy-unmounted
+subtree traversal and release the original mount topology after last use.
+
+Directory and memfd Unix rights can now use the existing portable worker path.
+The received object keeps its real offset, storage, seals and backing even after
+the sender closes/reuses its descriptors. This grants no additional byte or VM
+capability: sealed/shared storage remains excluded from FileEpoch's ordinary
+file fast path. io_uring constructs its backing before publishing its final
+owner OFD, because its ring control graph remains owner-local.
+
+Five directory tests cover concurrent cursors, reuse/faults, dynamic fallback,
+detached traversal and live host contents. ABI tests compare worker/owner errors,
+output and cookies. A two-task filtered test runs 160 directory lifecycle calls
+on one and two execution slots with zero coordinator services and exactly one
+filter decision per entry. Apple/Linux VFS (426/425), ABI (174 each), kernel
+(259 each), strict checks, Mac product (13), real FFI environment checks (13)
+and the iPad static build pass. Physical iPad tests remain skipped per owner;
+unaffected standalone CPU/memory/graphics checks are reused.
+
+| Directory loop, longest-child median | Previous | Current | Improvement |
+| --- | ---: | ---: | ---: |
+| Private directory | 519.25 ms | 47.73 ms | 10.88x |
+| Shared host directory | 832.85 ms | 167.92 ms | 4.96x |
+
+Native macOS takes **35.39 ms** using its native libc APIs. Native Linux takes
+**6.62 ms** with the exact static musl ELF on its own filesystem in the existing
+six-vCPU ARM64 CI environment; a supplemental glibc reference takes 6.02 ms.
+An initial reference accidentally placed the native directory on virtiofs and
+is explicitly excluded. Four processes each perform 1,000 checked
+open/scan/rewind/scan/close iterations over 16 entries. Timings use three
+unprofiled counterbalanced samples, with the CI VM stopped for Mac runs.
+Private/shared process-wall medians fall **560.98 → 87.54 ms** and
+**878.82 → 209.04 ms**. Separate diagnostic cohort counts fall
+**14,555 → 51** and **14,607 → 52**. Whole-command diagnostic service counts
+are still nonzero and include setup/teardown; the zero-service assertion applies
+to the isolated directory test. No Firefox or iPad overall speedup is inferred.
+
+The measured runner is installed in Trames Dev; the stable binary and running
+sessions are preserved. Both products pin the same tested runtime commit.
+
+| Remaining ownership boundary | Next work |
+| --- | --- |
+| Unix creation, listener/connection controls, addressed datagrams | Share the actual socket graph; its ancillary ledger can still retain owner-only resources. Directory/memfd dependencies are removed in this stage. |
+| PTY job control/master lifetime, signalfd, namespaces and ring descriptions | Move their actual control/lifetime state before allowing the full Unix graph to cross workers. |
+| Directory/namespace mutations and structural file/VM/device transitions | Preserve original namespace and mapping commit boundaries while reducing the affected stop domain. |
+| Task, signal and process lifecycle | Shared task/resource authority with object-level synchronization, retaining existing blocking-slot release. |
+
+The overall coordinator-removal goal remains active. See the
+[validation record](../validation/worker-directories-20261102.json) and
+[shared contract](../../runtime/docs/architecture/execution-backends.md#worker-directories-and-portable-memfd-ownership-2026-11-02).
+
 ## Sixteenth migration implemented — worker Unix ancillary messages — 2026-11-02
 
 Runtime `245eb520bb19682fd01b325e1343f7e2dedf9ed7` moves paired Unix stream/datagram/seqpacket

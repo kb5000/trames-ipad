@@ -16,10 +16,11 @@ p = argparse.ArgumentParser(description=__doc__)
 for name in ('baseline', 'candidate', 'native', 'fixture', 'rootfs', 'output'):
     p.add_argument('--' + name, type=Path)
 p.add_argument('--native-only', action='store_true', help='run the same native reference on Linux or macOS')
+p.add_argument('--native-directory', type=Path, help='use a native filesystem directory separate from report output')
 p.add_argument('--repeats', type=int, default=3)
 p.add_argument('--cpus', type=int, default=12)
 p.add_argument('--operations', type=int, default=10000)
-p.add_argument('--mode', choices=('stat', 'openclose'), default='stat')
+p.add_argument('--mode', choices=('stat', 'openclose', 'directory'), default='stat')
 a = p.parse_args()
 for name in (('native', 'output') if a.native_only else
              ('baseline', 'candidate', 'native', 'fixture', 'rootfs', 'output')):
@@ -31,11 +32,11 @@ a.output.mkdir(parents=True, exist_ok=False)
 shared = a.output / 'shared'
 shared.mkdir()
 store = a.output / 'store'
-native = a.output / 'native'
+native = a.native_directory.resolve() if a.native_directory else a.output / 'native'
 native.mkdir()
 env = dict(os.environ, TRAMES_MAC_BUNDLED='1')
 report = dict(passed=False, processes=4, operations_each=a.operations,
-              cpus=a.cpus, mode=a.mode, repeats=a.repeats, records=[], sha256={
+              cpus=a.cpus, mode=a.mode, repeats=a.repeats, native_directory=str(native), records=[], sha256={
                   key: hashlib.sha256(getattr(a, key).read_bytes()).hexdigest()
                   for key in ('baseline', 'candidate', 'native', 'fixture', 'rootfs')
                   if getattr(a, key) is not None}, native_environment=dict(
@@ -75,6 +76,8 @@ def guest(kind, variant, repeat):
     assert result.returncode == 0, name
     row['children'] = [json.loads(line) for line in result.stdout.splitlines()]
     assert len(row['children']) == 4 and all(c['operations'] == a.operations for c in row['children'])
+    if a.mode == 'directory':
+        assert all(c['checksum'] == a.operations * (a.operations + 1) // 2 for c in row['children'])
     if repeat == 0:
         prefix = b'trames mac execution paths: '
         row['paths'] = next(json.loads(line[len(prefix):]) for line in result.stderr.splitlines()
@@ -107,7 +110,11 @@ try:
         for child in children:
             stdout, stderr = child.communicate(timeout=30)
             assert child.returncode == 0, stderr
-            rows.append(json.loads(stdout))
+            row = json.loads(stdout)
+            assert row['operations'] == a.operations
+            if a.mode == 'directory':
+                assert row['checksum'] == a.operations * (a.operations + 1) // 2
+            rows.append(row)
         report['records'].append(dict(kind='native', variant='native', repeat=repeat,
                                       wall_seconds=time.monotonic() - began, children=rows, exit=0))
     summary = {}

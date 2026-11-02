@@ -1,0 +1,1196 @@
+{
+  "date": "2026-11-02",
+  "status": "progress",
+  "stage": 17,
+  "runtime_revision": "748d75e2cfed670d041f9a75e1e24152d7068dae",
+  "baseline_runtime_revision": "245eb520bb19682fd01b325e1343f7e2dedf9ed7",
+  "scope": [
+    "Complete static directory OFD/cursor ownership",
+    "Worker directory open/getdents64/lseek/dup/close through original shared Files",
+    "Portable directory/memfd Unix rights",
+    "Original lazy-unmount subtree lifetime and unpublished io_uring backing construction"
+  ],
+  "performance": {
+    "passed": true,
+    "processes": 4,
+    "operations_each": 1000,
+    "cpus": 4,
+    "mode": "directory",
+    "repeats": 3,
+    "native_directory": "/Users/main/dev/trames/target/directory-worker-perf/native",
+    "records": [
+      {
+        "kind": "private",
+        "variant": "before",
+        "repeat": 0,
+        "wall_seconds": 1.781089625,
+        "exit": 0,
+        "children": [
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.506050459,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.589880542,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.607416,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.546320666,
+            "checksum": 500500
+          }
+        ],
+        "paths": {
+          "cohort_rounds": 14555,
+          "cohort_stop_us": 504978,
+          "service_caller_wait_us": 23815,
+          "service_requests": 3392,
+          "serviced_syscalls": 3392,
+          "syscalls": 33199,
+          "vm_local_syscalls": 521,
+          "worker_direct_syscalls": 64,
+          "worker_fd_syscalls": 3435,
+          "worker_file_syscalls": 64,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 3503,
+          "worker_task_resumes": 3392
+        }
+      },
+      {
+        "kind": "private",
+        "variant": "after",
+        "repeat": 0,
+        "wall_seconds": 0.09108287500000012,
+        "exit": 0,
+        "children": [
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.042196625,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.047146417,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.047447166,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.048409333,
+            "checksum": 500500
+          }
+        ],
+        "paths": {
+          "cohort_rounds": 51,
+          "cohort_stop_us": 1248,
+          "service_caller_wait_us": 4028,
+          "service_requests": 475,
+          "serviced_syscalls": 475,
+          "syscalls": 33196,
+          "vm_local_syscalls": 947,
+          "worker_direct_syscalls": 24028,
+          "worker_fd_syscalls": 8051,
+          "worker_file_syscalls": 24028,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 32083,
+          "worker_task_resumes": 475
+        }
+      },
+      {
+        "kind": "private",
+        "variant": "before",
+        "repeat": 1,
+        "wall_seconds": 0.557478417,
+        "exit": 0,
+        "children": [
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.290786708,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.405506083,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.502991166,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.5149245,
+            "checksum": 500500
+          }
+        ]
+      },
+      {
+        "kind": "private",
+        "variant": "after",
+        "repeat": 1,
+        "wall_seconds": 0.08800066599999967,
+        "exit": 0,
+        "children": [
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.040570167,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.042031042,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.044089208,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.047732791,
+            "checksum": 500500
+          }
+        ]
+      },
+      {
+        "kind": "private",
+        "variant": "after",
+        "repeat": 2,
+        "wall_seconds": 0.08459724999999985,
+        "exit": 0,
+        "children": [
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.044021833,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.047029416,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.0473525,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.048160625,
+            "checksum": 500500
+          }
+        ]
+      },
+      {
+        "kind": "private",
+        "variant": "before",
+        "repeat": 2,
+        "wall_seconds": 0.5609825830000004,
+        "exit": 0,
+        "children": [
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.293300667,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.40408725,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.507055,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.519248334,
+            "checksum": 500500
+          }
+        ]
+      },
+      {
+        "kind": "private",
+        "variant": "before",
+        "repeat": 3,
+        "wall_seconds": 0.5647375000000006,
+        "exit": 0,
+        "children": [
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.294778541,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.4040045,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.511151958,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.524233375,
+            "checksum": 500500
+          }
+        ]
+      },
+      {
+        "kind": "private",
+        "variant": "after",
+        "repeat": 3,
+        "wall_seconds": 0.08753704200000012,
+        "exit": 0,
+        "children": [
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.041628,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.04265475,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.04576,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.0465705,
+            "checksum": 500500
+          }
+        ]
+      },
+      {
+        "kind": "shared",
+        "variant": "before",
+        "repeat": 0,
+        "wall_seconds": 0.9357804170000001,
+        "exit": 0,
+        "children": [
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.44452025,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.643735166,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.832514167,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.890442084,
+            "checksum": 500500
+          }
+        ],
+        "paths": {
+          "cohort_rounds": 14607,
+          "cohort_stop_us": 52839,
+          "service_caller_wait_us": 25440,
+          "service_requests": 3624,
+          "serviced_syscalls": 3624,
+          "syscalls": 33203,
+          "vm_local_syscalls": 589,
+          "worker_direct_syscalls": 64,
+          "worker_fd_syscalls": 3457,
+          "worker_file_syscalls": 64,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 3525,
+          "worker_task_resumes": 3624
+        }
+      },
+      {
+        "kind": "shared",
+        "variant": "after",
+        "repeat": 0,
+        "wall_seconds": 0.21087366699999954,
+        "exit": 0,
+        "children": [
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.154998459,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.157759167,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.167926125,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.169150084,
+            "checksum": 500500
+          }
+        ],
+        "paths": {
+          "cohort_rounds": 52,
+          "cohort_stop_us": 1557,
+          "service_caller_wait_us": 2201,
+          "service_requests": 477,
+          "serviced_syscalls": 477,
+          "syscalls": 33202,
+          "vm_local_syscalls": 950,
+          "worker_direct_syscalls": 23997,
+          "worker_fd_syscalls": 8041,
+          "worker_file_syscalls": 23997,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 32042,
+          "worker_task_resumes": 477
+        }
+      },
+      {
+        "kind": "shared",
+        "variant": "before",
+        "repeat": 1,
+        "wall_seconds": 0.8788206669999994,
+        "exit": 0,
+        "children": [
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.448147708,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.59779075,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.774685584,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.833152917,
+            "checksum": 500500
+          }
+        ]
+      },
+      {
+        "kind": "shared",
+        "variant": "after",
+        "repeat": 1,
+        "wall_seconds": 0.20904091700000027,
+        "exit": 0,
+        "children": [
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.157094417,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.159013875,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.167477459,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.167666,
+            "checksum": 500500
+          }
+        ]
+      },
+      {
+        "kind": "shared",
+        "variant": "after",
+        "repeat": 2,
+        "wall_seconds": 0.21036637500000044,
+        "exit": 0,
+        "children": [
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.155237917,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.156745084,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.168696083,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.169403,
+            "checksum": 500500
+          }
+        ]
+      },
+      {
+        "kind": "shared",
+        "variant": "before",
+        "repeat": 2,
+        "wall_seconds": 0.8724733340000004,
+        "exit": 0,
+        "children": [
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.44416275,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.603482042,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.764957208,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.825645833,
+            "checksum": 500500
+          }
+        ]
+      },
+      {
+        "kind": "shared",
+        "variant": "before",
+        "repeat": 3,
+        "wall_seconds": 0.879058208,
+        "exit": 0,
+        "children": [
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.445712583,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.591742458,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.772778541,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.832849542,
+            "checksum": 500500
+          }
+        ]
+      },
+      {
+        "kind": "shared",
+        "variant": "after",
+        "repeat": 3,
+        "wall_seconds": 0.20587995900000067,
+        "exit": 0,
+        "children": [
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.153758917,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.158244333,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.166671625,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.167922792,
+            "checksum": 500500
+          }
+        ]
+      },
+      {
+        "kind": "native",
+        "variant": "native",
+        "repeat": 1,
+        "wall_seconds": 0.30434858299999945,
+        "children": [
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.060272,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.060307,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.059341,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.060784,
+            "checksum": 500500
+          }
+        ],
+        "exit": 0
+      },
+      {
+        "kind": "native",
+        "variant": "native",
+        "repeat": 2,
+        "wall_seconds": 0.039512458000000805,
+        "children": [
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.035393,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.034865,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.03482,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.034143,
+            "checksum": 500500
+          }
+        ],
+        "exit": 0
+      },
+      {
+        "kind": "native",
+        "variant": "native",
+        "repeat": 3,
+        "wall_seconds": 0.037650833000000716,
+        "children": [
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.032981,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.033824,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.033536,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.033177,
+            "checksum": 500500
+          }
+        ],
+        "exit": 0
+      }
+    ],
+    "sha256": {
+      "baseline": "ef5ffb35647b27a564c42951d792a76cf08c6e6eaa6b29edf60a3f718ddf5a60",
+      "candidate": "0fa06ee174dfb40e9c0b1b50207b81d0a50dbcf4e60342b4abed737144029711",
+      "native": "144696b4d81f6ec9f2a0860ab72406f80f9b96294c00402f9336a5b38486e860",
+      "fixture": "be8dd4004e210b36e2f51937ec9513296cb4adbd401d0ad222efbc1a0132ec1f",
+      "rootfs": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe"
+    },
+    "native_environment": {
+      "system": "Darwin",
+      "release": "27.0.0",
+      "architecture": "arm64",
+      "logical_cpus": 12
+    },
+    "summary": {
+      "private": {
+        "before": {
+          "loop_max_median_seconds": 0.519248334,
+          "process_wall_median_seconds": 0.5609825830000004,
+          "profile": {
+            "cohort_rounds": 14555,
+            "cohort_stop_us": 504978,
+            "service_caller_wait_us": 23815,
+            "service_requests": 3392,
+            "serviced_syscalls": 3392,
+            "syscalls": 33199,
+            "vm_local_syscalls": 521,
+            "worker_direct_syscalls": 64,
+            "worker_fd_syscalls": 3435,
+            "worker_file_syscalls": 64,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 3503,
+            "worker_task_resumes": 3392
+          }
+        },
+        "after": {
+          "loop_max_median_seconds": 0.047732791,
+          "process_wall_median_seconds": 0.08753704200000012,
+          "profile": {
+            "cohort_rounds": 51,
+            "cohort_stop_us": 1248,
+            "service_caller_wait_us": 4028,
+            "service_requests": 475,
+            "serviced_syscalls": 475,
+            "syscalls": 33196,
+            "vm_local_syscalls": 947,
+            "worker_direct_syscalls": 24028,
+            "worker_fd_syscalls": 8051,
+            "worker_file_syscalls": 24028,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 32083,
+            "worker_task_resumes": 475
+          }
+        }
+      },
+      "shared": {
+        "before": {
+          "loop_max_median_seconds": 0.832849542,
+          "process_wall_median_seconds": 0.8788206669999994,
+          "profile": {
+            "cohort_rounds": 14607,
+            "cohort_stop_us": 52839,
+            "service_caller_wait_us": 25440,
+            "service_requests": 3624,
+            "serviced_syscalls": 3624,
+            "syscalls": 33203,
+            "vm_local_syscalls": 589,
+            "worker_direct_syscalls": 64,
+            "worker_fd_syscalls": 3457,
+            "worker_file_syscalls": 64,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 3525,
+            "worker_task_resumes": 3624
+          }
+        },
+        "after": {
+          "loop_max_median_seconds": 0.167922792,
+          "process_wall_median_seconds": 0.20904091700000027,
+          "profile": {
+            "cohort_rounds": 52,
+            "cohort_stop_us": 1557,
+            "service_caller_wait_us": 2201,
+            "service_requests": 477,
+            "serviced_syscalls": 477,
+            "syscalls": 33202,
+            "vm_local_syscalls": 950,
+            "worker_direct_syscalls": 23997,
+            "worker_fd_syscalls": 8041,
+            "worker_file_syscalls": 23997,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 32042,
+            "worker_task_resumes": 477
+          }
+        }
+      },
+      "native": {
+        "native": {
+          "loop_max_median_seconds": 0.035393,
+          "process_wall_median_seconds": 0.039512458000000805
+        }
+      }
+    }
+  },
+  "native_linux_exact_elf": {
+    "passed": true,
+    "processes": 4,
+    "operations_each": 1000,
+    "cpus": 6,
+    "mode": "directory",
+    "repeats": 3,
+    "native_directory": "/tmp/trames-directory-musl-20261102",
+    "records": [
+      {
+        "kind": "native",
+        "variant": "native",
+        "repeat": 1,
+        "wall_seconds": 0.00901187499999967,
+        "children": [
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.007100458,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.006180625,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.005747292,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.006573125,
+            "checksum": 500500
+          }
+        ],
+        "exit": 0
+      },
+      {
+        "kind": "native",
+        "variant": "native",
+        "repeat": 2,
+        "wall_seconds": 0.00855604199999993,
+        "children": [
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.005508208,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.006622083,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.005148833,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.006342459,
+            "checksum": 500500
+          }
+        ],
+        "exit": 0
+      },
+      {
+        "kind": "native",
+        "variant": "native",
+        "repeat": 3,
+        "wall_seconds": 0.008386832999999871,
+        "children": [
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.006570042,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.005384084,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.005336833,
+            "checksum": 500500
+          },
+          {
+            "mode": "directory",
+            "operations": 1000,
+            "seconds": 0.00621275,
+            "checksum": 500500
+          }
+        ],
+        "exit": 0
+      }
+    ],
+    "sha256": {
+      "native": "be8dd4004e210b36e2f51937ec9513296cb4adbd401d0ad222efbc1a0132ec1f"
+    },
+    "native_environment": {
+      "system": "Linux",
+      "release": "7.0.0-38-generic",
+      "architecture": "aarch64",
+      "logical_cpus": 6
+    },
+    "summary": {
+      "native": {
+        "native": {
+          "loop_max_median_seconds": 0.006622083,
+          "process_wall_median_seconds": 0.00855604199999993
+        }
+      }
+    }
+  },
+  "native_linux_glibc_supplement": {
+    "native": {
+      "native": {
+        "loop_max_median_seconds": 0.006020334,
+        "process_wall_median_seconds": 0.008418666999999935
+      }
+    }
+  },
+  "excluded_references": [
+    {
+      "path": "target/local-ci/io/directory-worker-linux-native/results.json",
+      "reason": "Native directory accidentally used the mounted Mac report directory (virtiofs); excluded from native-Linux filesystem comparison."
+    }
+  ],
+  "validation": {
+    "apple_vfs": {
+      "passed": 426,
+      "ignored": 1
+    },
+    "linux_vfs": {
+      "passed": 425,
+      "ignored": 1
+    },
+    "apple_and_linux_abi": {
+      "passed": 174,
+      "ignored": 1
+    },
+    "apple_and_linux_kernel": {
+      "passed": 259,
+      "ignored": 3
+    },
+    "mac_product": {
+      "passed": 13,
+      "ignored": 1
+    },
+    "worker_directory_test": {
+      "passed": true,
+      "execution_slots": [
+        1,
+        2
+      ],
+      "vcpus": 2,
+      "syscalls_per_case": 160,
+      "coordinator_services": 0,
+      "one_filter_decision_per_entry": true
+    },
+    "coverage": [
+      "Concurrent same-OFD cursors across worker/dup/fork, no duplicate directory records",
+      "Seek rewind, SEEK_CUR, fdinfo cursor, host/native changes and common dirent cookies",
+      "FD close/reuse during preflight retains original OFD; output faults, short buffer and O_PATH errors",
+      "Dynamic proc directories defer before output validation or cursor effects",
+      "Lazy-unmounted subtree traversal, original mount membership and last-close retirement",
+      "Portable directory/memfd rights survive sender close/reuse; offset, seals, CLOEXEC and backing lifetime",
+      "Sealed storage remains excluded from direct byte authority; original io_uring suites pass"
+    ],
+    "ffi": {
+      "passed": true,
+      "checks": [
+        {
+          "case": "alpine-install",
+          "passed": true,
+          "reused": true
+        },
+        {
+          "case": "alpine",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "alpine",
+          "terminal": 2,
+          "passed": true
+        },
+        {
+          "case": "debian-install",
+          "passed": true,
+          "reused": true
+        },
+        {
+          "case": "debian",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "debian",
+          "terminal": 2,
+          "passed": true
+        },
+        {
+          "case": "debian-setup",
+          "passed": true
+        },
+        {
+          "case": "custom-install",
+          "passed": true,
+          "reused": true
+        },
+        {
+          "case": "custom",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "custom",
+          "terminal": 2,
+          "passed": true
+        },
+        {
+          "case": "custom-sha256-rejection",
+          "passed": true
+        },
+        {
+          "case": "systemd",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "systemd",
+          "terminal": 2,
+          "passed": true
+        }
+      ]
+    },
+    "ios_static_build": true,
+    "physical_ipad": "Skipped per owner",
+    "strict_checks": true,
+    "execution_boundaries": true,
+    "linux_ci": {
+      "passed": true,
+      "checks": [
+        {
+          "check": "tests",
+          "exit": 0
+        },
+        {
+          "check": "clippy",
+          "exit": 0
+        }
+      ]
+    },
+    "linux_kernel_ci": {
+      "passed": true,
+      "checks": [
+        {
+          "check": "kernel-tests",
+          "exit": 0
+        },
+        {
+          "check": "kernel-clippy",
+          "exit": 0
+        }
+      ]
+    },
+    "unchanged_acceptance": "Standalone CPU/memory/graphics and unchanged guest artifacts reused; only affected scopes rerun."
+  },
+  "method": "Four processes each run 1,000 checked open/scan/rewind/scan/close iterations over 16 named entries. Three unprofiled counterbalanced before/after runs; longest-child loop and process-wall medians. Separate diagnostic samples include setup/teardown. macOS uses native libc, Linux reference executes the exact static musl ELF on its native filesystem in the existing six-vCPU ARM64 local CI machine. The local CI VM is stopped during Mac timings. No whole-app/Firefox/iPad speedup inference.",
+  "remaining": [
+    "Unix creation/bind/listen/connect/accept and addressed datagrams; Rc socket control graph can still retain owner-only rights",
+    "PTY job control/master lifecycle, signalfd/task/namespace/ring owner descriptions",
+    "Directory/namespace mutations, structural file/VM and device transitions",
+    "Task/signal/process lifecycle and remaining joined service boundaries"
+  ],
+  "source_hashes": {
+    "runtime/crates/trames-linux/src/direct.rs": "c9fb5053ff6119583ae5a81719336faff7d61b2ea8f0e6961dde54dd837878d5",
+    "runtime/crates/trames-linux/src/direct/local_message.rs": "7961ae88932a2e50d193763801b7f14c01722081fd3e919d6356d7077a1ebccf",
+    "runtime/crates/trames-linux/src/path_queries.rs": "c22daafd91cde14e37337584b0721fd13eefd4c8b914ff9b33e6062a01aa9fe6",
+    "runtime/crates/trames-session/src/process_socket_wait.rs": "2afbc7eeb2411d1759607a2b3810250a860059b637272fb809aeef6b2fa14ee1",
+    "runtime/crates/trames-session/src/worker_syscalls.rs": "b64a0d756715ce49e8883982538da35e02b523e162de4ae0430b5637adf3be2b",
+    "runtime/crates/trames-vfs/src/descriptor_factory.rs": "6b5e6202e4a6a77026178277710c993f384e8751c3434ef0d3aae0d304bec489",
+    "runtime/crates/trames-vfs/src/directory.rs": "adf805073d03f1688dd0d611c5b40141645ebf973daec6a698df44314cdaa518",
+    "runtime/crates/trames-vfs/src/events.rs": "a9817f65bd331da51c83a7fd88e5886e6d30e832ff90edbae9d169a4b6f4b3b5",
+    "runtime/crates/trames-vfs/src/hostfs.rs": "8730134a9760f0a690ff521b7b54aef21f317a6ef82931c2c53533604f61fe4f",
+    "runtime/crates/trames-vfs/src/ipc.rs": "234436502b0a2c5f7abe043c234db61e52d2caa0ccc20c18dea5f8efd62a1f74",
+    "runtime/crates/trames-vfs/src/ipc/native.rs": "079ef8edf8c3a6e5582abbc667cf2e6043a901108efa0124aecd8955bf5c9953",
+    "runtime/crates/trames-vfs/src/lib.rs": "4315b15a04948cba75f69363860e1c0b3a1ec53c99cfb998a36b27c56b8c9d95",
+    "runtime/crates/trames-vfs/src/linux_namespace.rs": "bb7a65c5487698b577377232acefea6b45411d812daa3bc256f07e0dfc5fe5e9",
+    "runtime/crates/trames-vfs/src/memfd.rs": "9b8b6b3b8a43b6c01685f892dccabfe28b382812e7e89d747b65307b7b40be0a",
+    "runtime/crates/trames-vfs/src/mounts.rs": "8d6c102ad755b26f316cf64f569dbbe1d7ce8b08c1d77d6c9d3baf29261e45fc",
+    "runtime/crates/trames-vfs/src/native_images.rs": "78cc10ff60ef138da72bf33414bafdeea613beb0b02c5741755f63f95b101c72",
+    "runtime/crates/trames-vfs/src/network.rs": "825509dd4bcc4315fec2729c9f5ce73c723fc2d1b94455af2aa86cb87e1c054b",
+    "runtime/crates/trames-vfs/src/open_handle.rs": "a91c8026e7ca2c71513e2b113330ce4536cb51ed5289b63b3ff9691c5fb03c19",
+    "runtime/crates/trames-vfs/src/path_queries.rs": "6bc71e1407fead48b22816fdf21bde5b8c5e8be33a1ec0afaf3e00ed33dbd8b2",
+    "runtime/crates/trames-vfs/src/pseudo.rs": "c61909f071e272eebb069786cb7c6961796ae74fbc91e471d6698889fcdadcff",
+    "runtime/crates/trames-vfs/src/pty.rs": "4481bd46fe6ea095912f8db9fbf752cee3c2e9209c17d964bb14f8f6b9bde034",
+    "runtime/crates/trames-vfs/src/uring.rs": "9a2f4699f7d84a64dd8f1f58957fa0653c5ff6072443c67feb30d065d63c31c2",
+    "runtime/docs/architecture/execution-backends.md": "291c091b32eccbefb393b439148256f5303096da7bf0a923e9cc18016e71f22f",
+    "runtime/crates/trames-vfs/src/path_queries/directory_tests.rs": "88e1d927ed5f42679c405a3a7fedcb67314563fb7474ab5af70436035baefcdf"
+  },
+  "fixture_source_hashes": {
+    "tests/fixtures/directory-bench.c": "b201c3a27080a8464c41febfe2257b5be2a9ccff856ca0e67e232a30e7fcf5d0",
+    "tests/performance/path-metadata.py": "301c36c55a6e96913f807392675a300dd6e2809a755c9b2471a6907b98ac3c82"
+  },
+  "log_hashes": {
+    "target/directory-worker-tests-final.log": "d86e3bfb6252a360da9846b049c1839ec856266a1a2c0c582ace4f1aab05985a",
+    "target/directory-worker-kernel-final.log": "69524c970a680330b0e5224fd6e2e8c3edf2a510cfe5cbb5bdac1647e560e039",
+    "target/directory-worker-clippy.log": "400fe804a86eb3c57222c831589ce88742b8ba448a819e62629d32a68d95a73b",
+    "target/directory-worker-kernel-clippy.log": "60d79e995f4a9e2a00fbdb2c11ed74a82c8ba2f9b2f357c291df85ee2c619fe2",
+    "target/directory-worker-mac-tests.log": "2f957f83b2c5caaa14ffbc483a49d7632fa86fc76c9bef323cd02aaa8eb7c7c0",
+    "target/directory-worker-mac-clippy.log": "248bd120d91dc2f5c40d59b5727e15cb88543351a1e4af64817346c715f6762a",
+    "target/directory-worker-ffi-build.log": "7fb4331213f4a20cd4baa5fd4f4bc2deab4e04dd2dd4ff495e86bde4897fd0e2",
+    "target/directory-worker-ios-build.log": "35f401d01668ff7a676548d6cc76616b166c9504813b0eab614953e2c0950303",
+    "target/directory-worker-ffi.log": "a0ed12eb6aa6fe034466b76f310acfdbcd27794a78dbf9cf6cf2b6e08298cc0d",
+    "target/directory-worker-mac-build.log": "1d3889cd36b985069d151195471a3b9c1f8a0ccebace2086113e04e4d3f6d119",
+    "target/directory-worker-ipad-boundaries.log": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651",
+    "target/directory-worker-mac-boundaries.log": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651",
+    "target/directory-worker-install.log": "d81b37faaef60b5a1b635ce5a81a399a304e89d9aee6498d2d7eecf5f3f5bd41",
+    "target/directory-worker-kernel-directory.log": "1939d74537d617f7c8f9fc71cb4fd31c1def9d5590c2fcd21d5d39ccb77bb5a0",
+    "target/directory-worker-abi.log": "7092e9bf779d12a70222d24a43e578f856a210d88d8c63c3a388e969068a843f",
+    "target/directory-worker-directories.log": "58aeeb4d840f8dcdaacb9fde4d5049eeb9bced8e93bbe022057f87d68a3b58cd",
+    "target/directory-worker-memfd.log": "0927e0bec857c38d77757cb7a594a3dda1bb780f4270176813053835c309f274",
+    "target/local-ci/io/directory-worker-linux-tests.log": "588f1abda3b1a41a7bba61a6b4ac0839fd90bd5e76d7bb6ba766a4915e5e7290",
+    "target/local-ci/io/directory-worker-linux-clippy.log": "62be2bd6b385fc4904f8704750c163e4fcd6cc782d4dac0e1935170dd3e3b2dc",
+    "target/local-ci/io/directory-worker-linux-kernel-tests.log": "2f24556b9b53306d7c1d279bd9cd55517439277e861580a350d58eba10b0cd58",
+    "target/local-ci/io/directory-worker-linux-kernel-clippy.log": "32a0fd877a0e9650bf641911b793bfa9646ca75955206155ef58d3d34d7216ff"
+  },
+  "installed_dev_runner_sha256": "0fa06ee174dfb40e9c0b1b50207b81d0a50dbcf4e60342b4abed737144029711",
+  "stable_runner_sha256": "ec74a40ef7cef8a85279cdda2070c25d92fcb1538219f04d0f13008c360381ad"
+}
