@@ -10,6 +10,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <sys/socket.h>
+#include <sys/ioctl.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <fcntl.h>
@@ -118,17 +119,25 @@ int main(int argc, char **argv) {
     int queue = -1, pair[2] = {-1,-1}, monitor = -1, local[2] = {-1,-1};
     char watched[] = "/tmp/trames-watch-XXXXXX";
     int signal_rights = 0;
+    int pty_rights = 0, pty_lifecycle = 0;
 #ifdef __linux__
     signal_rights = !strcmp(kind, "signal-rights");
+    pty_rights = !strcmp(kind, "pty-rights");
+    pty_lifecycle = !strcmp(kind, "pty");
     sigset_t signal_mask; assert(!sigemptyset(&signal_mask)); assert(!sigaddset(&signal_mask, SIGUSR1));
+    if (pty_rights || pty_lifecycle) {
+        pair[0] = open("/dev/ptmx", O_RDWR | O_NOCTTY); assert(pair[0] >= 0);
+        int unlocked = 0; assert(!ioctl(pair[0], TIOCSPTLCK, &unlocked));
+        pair[1] = ioctl(pair[0], TIOCGPTPEER, O_RDWR | O_NOCTTY); assert(pair[1] >= 0);
+    }
 #endif
-    if (!strcmp(kind, "unix-rights") || signal_rights) {
+    if (!strcmp(kind, "unix-rights") || signal_rights || pty_rights) {
         assert(!socketpair(AF_UNIX, SOCK_STREAM, 0, local));
 #ifdef __linux__
         if (signal_rights) { pair[1] = signalfd(-1, &signal_mask, SFD_NONBLOCK); assert(pair[1] >= 0); }
         else
 #endif
-        assert(!pipe(pair));
+        if (!pty_rights) assert(!pipe(pair));
     } else if (!strcmp(kind, "epoll")) {
         queue = queue_create(); assert(queue >= 0); assert(!pipe(pair));
     } else if (!strcmp(kind, "inotify-watch")) {
@@ -156,8 +165,8 @@ int main(int argc, char **argv) {
     }
     double began = now();
     for (unsigned i = 0; i < operations; i++) {
-        if (!strcmp(kind, "unix-rights") || signal_rights) {
-            unsigned char sent = (unsigned char)i, received = 0;
+        if (!strcmp(kind, "unix-rights") || signal_rights || pty_rights) {
+            unsigned char sent = pty_rights ? (unsigned char)('a' + i % 26) : (unsigned char)i, received = 0;
             struct iovec vector = {.iov_base = &sent, .iov_len = 1};
             union { struct cmsghdr align; unsigned char bytes[CMSG_SPACE(sizeof(int))]; } control = {0};
             struct msghdr message = {.msg_iov = &vector, .msg_iovlen = 1,
@@ -182,6 +191,16 @@ int main(int argc, char **argv) {
                 assert(read(pair[0], &received, 1) == 1 && received == sent);
             }
             assert(!close(imported));
+        } else if (pty_lifecycle) {
+#ifdef __linux__
+            int alias = dup(pair[1]); assert(alias >= 0);
+            assert((fcntl(alias, F_GETFL) & O_ACCMODE) == O_RDWR);
+            int number = -1, locked = -1, packet = -1;
+            assert(!ioctl(pair[0], TIOCGPTN, &number) && number >= 0);
+            assert(!ioctl(pair[0], TIOCGPTLCK, &locked) && !locked);
+            assert(!ioctl(pair[0], TIOCGPKT, &packet) && !packet);
+            assert(!close(alias));
+#endif
         } else if (tcp_events) {
             if (queue >= 0) interest(queue, 3, pair[0], (uint64_t)i + 1, 1);
             unsigned char sent = (unsigned char)i, received = 0;

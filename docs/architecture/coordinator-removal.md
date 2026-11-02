@@ -1,5 +1,67 @@
 # Coordinator dependency audit
 
+## Nineteenth migration implemented — complete shared PTY endpoints — 2026-11-03
+
+Runtime `658f8d5b51089a7c490d9959ff47b7d8ad07f71a` preserves the shared
+ownership commit `b4a2352fb9073ad557191ec2f96687033bdb6714` and its tested
+joined-retry correction. Mac and iPad use the same endpoint implementation.
+
+| Resource or operation | Shared authority and worker behavior | Remaining joined boundary |
+| --- | --- | --- |
+| PTY master/slave OFDs | Actual Arc endpoint, original slave inode/devpts mount and terminal queues; dup/close, flags and portable Unix rights | Initial allocation, namespace/permission/device policy and TIOCGPTPEER |
+| Short PTY controls | TIOCGPTN, TIOCSPTLCK, TIOCGPTLCK, TIOCPKT and TIOCGPKT use the same accepted OFD and common ABI implementation | Remaining terminal ioctls and session/controlling-terminal changes |
+| PTY byte waits | Ordinary reads/writes park on their original resource; accepted operations retain the full endpoint across close/reuse | Background job checks and input requiring task signal delivery |
+| Last close and host notifications | Real slave count, original devpts unlink and wakeups; shared weak registry and relaxed state bits | SIGHUP/SIGCONT and host resize/signal routing to tasks |
+
+No owner-local Rc graph crosses the worker boundary. Prepared byte/poll captures
+remain weak; an accepted syscall owns the actual complete OFD. Independent slave
+opens create distinct endpoint leases, while aliases and rights share the original
+open. Final master drop only unlinks its own devpts inode, including when its last
+accepted operation finishes on a worker. Registry locks are released before terminal,
+filesystem and wake callbacks. No new service thread, bus, global terminal lock or
+ordinary-memory fence is introduced. Concurrent host signal bits use fetch-or/swap.
+
+Production FFI validation exposed an old joined-byte assumption: it could not receive
+a shared PTY, so initial shell input triggered an unreachable assertion. Joined retry
+now receives the original terminal authority. Task-level signal fallbacks retain the
+accepted endpoint and original call arguments, without storing an extra argument copy
+on every byte operation. A regression closes/reuses the slave during input wait and
+the master during control-C handoff, then verifies original bytes, signal and last
+close. The published ownership commit is retained with the correction as a follow-up.
+
+| Four processes × 1,000 checked operations, longest-child median | Previous | Current | Native Linux, exact ELF | Improvement |
+| --- | ---: | ---: | ---: | ---: |
+| PTY dup/flags/three short controls/close | 384.37 ms | 9.41 ms | 1.30 ms | 40.84x |
+| PTY Unix-rights transfer/write/read/close | 244.38 ms | 10.89 ms | 26.18 ms | 22.45x |
+
+Process-wall medians are **421.84 → 44.75 ms** and **282.92 → 48.62 ms**.
+Separate diagnostic cohort counts fall **13,387 → 46** and **7,735 → 63**;
+service requests remain **3 → 3**, including process startup/teardown. The loop
+creates its original PTY outside the timer. Three unprofiled counterbalanced
+repetitions run after compilation and with local Linux CI stopped. Earlier samples
+that overlapped product checks are excluded. The native reference runs the exact
+static musl ELF on the existing six-vCPU ARM64 Linux machine. It exercises Linux's
+TTY implementation, so the faster rights loop does not establish generally faster
+native execution. There is no substituted native macOS version of these Linux PTY
+control calls, nor a whole-app/Firefox/physical-iPad speedup claim.
+
+Apple/Linux VFS coverage is **433/432** passing cases, ABI **177 each**, kernel
+**263 each**, and Mac product **13**; strict checks pass. Passing unchanged cases
+are reused and affected byte/dispatch checks rerun for the correction. A filtered
+two-task test performs 112 lifecycle/control calls on one/two slots with zero
+coordinator services and one filter decision per entry. Real ancillary tests cover
+source FD reuse, original master/slave identity and final endpoint release. All
+13 real FFI environment checks and the final iPad static build pass. Physical iPad
+testing remains skipped per owner; guest artifacts and unrelated CPU/memory/graphics
+acceptance are unchanged and reused.
+
+The overall goal remains active. Next ownership boundaries include PTY creation/peer
+open and job control, full Unix socket creation/listener/connection/addressed datagram
+graphs, io_uring controls, network/mount namespaces and nsfs topology, pending task
+signal queues, and structural file/VM/task transitions. See the
+[validation record](../validation/worker-shared-pty-20261103.json) and
+[shared contract](../../runtime/docs/architecture/execution-backends.md#shared-pty-ownership-and-worker-controls-2026-11-03).
+
 ## Eighteenth migration implemented — shared descriptor controls — 2026-11-03
 
 Final runtime `30accf899f60f4a47a558c4c763bcc546c6aaeb3` includes the tested

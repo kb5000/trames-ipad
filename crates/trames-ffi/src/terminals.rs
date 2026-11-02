@@ -4,7 +4,7 @@
 use crate::session::{Buffers, QUEUE_LIMIT};
 use std::{
     collections::{BTreeMap, VecDeque},
-    rc::Rc,
+    sync::Arc,
 };
 use trames_vfs::{Vfs, AT_FDCWD, O_CLOEXEC, O_NONBLOCK};
 
@@ -33,7 +33,7 @@ impl Default for Channel {
 }
 struct Master {
     fd: u32,
-    pair: Rc<trames_vfs::Pty>,
+    pair: Arc<trames_vfs::Pty>,
 }
 pub(crate) struct NativeTerminals {
     vfs: Vfs,
@@ -109,7 +109,8 @@ impl NativeTerminals {
                 .ok_or("PTY master missing")?
                 .pair
                 .clone();
-            pair.locked.set(false);
+            pair.locked
+                .store(false, std::sync::atomic::Ordering::Relaxed);
             pair.resize_from_host(rows, columns);
             let path = format!("/dev/pts/{}\n", pair.number);
             if self
@@ -175,13 +176,13 @@ impl NativeTerminals {
                 let bytes: Vec<_> = channel.input.iter().take(4096).copied().collect();
                 if let Ok((count, signals)) = master.pair.master_write(&bytes) {
                     channel.input.drain(..count);
-                    master.pair.host_signals.set(
-                        signals
-                            .into_iter()
-                            .fold(master.pair.host_signals.get(), |mask, sig| {
-                                mask | (1 << (sig - 1))
-                            }),
-                    );
+                    let mask = signals
+                        .into_iter()
+                        .fold(0, |mask, sig| mask | (1 << (sig - 1)));
+                    master
+                        .pair
+                        .host_signals
+                        .fetch_or(mask, std::sync::atomic::Ordering::Relaxed);
                 }
             }
             master.pair.flush_echo();
