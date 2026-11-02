@@ -12,6 +12,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
+#include <fcntl.h>
+#include <sched.h>
 #ifdef __linux__
 #include <sys/eventfd.h>
 #include <sys/inotify.h>
@@ -24,15 +26,53 @@ static double now(void) {
     return t.tv_sec + t.tv_nsec * 1e-9;
 }
 
+static int tcp_socket(void) {
+    int fd = socket(AF_INET, SOCK_STREAM, 0); assert(fd >= 0);
+    assert(!fcntl(fd, F_SETFL, O_NONBLOCK));
+    return fd;
+}
+static void tcp_read(int fd, unsigned char *byte, int eof) {
+    double deadline = now() + 5;
+    for (;;) {
+        ssize_t n = read(fd, byte, 1);
+        if (n >= 0) { assert(n == (eof ? 0 : 1)); return; }
+        assert(errno == EAGAIN || errno == EINTR);
+        assert(now() < deadline); sched_yield();
+    }
+}
 int main(int argc, char **argv) {
     assert(argc == 3);
     const char *kind = argv[1];
     unsigned operations = (unsigned)strtoul(argv[2], NULL, 10);
     assert(operations && operations <= 1000000);
     uint64_t checksum = 0;
+    int listener = -1;
+    struct sockaddr_in address = {0};
+    if (!strcmp(kind, "tcp-session")) {
+        listener = tcp_socket(); address.sin_family = AF_INET;
+        address.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+        assert(!bind(listener, (struct sockaddr *)&address, sizeof(address)));
+        socklen_t size = sizeof(address);
+        assert(!getsockname(listener, (struct sockaddr *)&address, &size));
+        assert(!listen(listener, 4));
+    }
     double began = now();
     for (unsigned i = 0; i < operations; i++) {
-        if (!strcmp(kind, "tcp")) {
+        if (!strcmp(kind, "tcp-session")) {
+            int client = tcp_socket();
+            int result = connect(client, (struct sockaddr *)&address, sizeof(address));
+            assert(!result || errno == EINPROGRESS);
+            int peer; double deadline = now() + 5;
+            while ((peer = accept(listener, NULL, NULL)) < 0) {
+                assert(errno == EAGAIN || errno == EINTR); assert(now() < deadline); sched_yield();
+            }
+            assert(!fcntl(peer, F_SETFL, O_NONBLOCK));
+            int error = 0; socklen_t size = sizeof(error);
+            assert(!getsockopt(client, SOL_SOCKET, SO_ERROR, &error, &size) && !error);
+            unsigned char sent = (unsigned char)i, received = 0;
+            assert(write(client, &sent, 1) == 1); tcp_read(peer, &received, 0); assert(received == sent);
+            assert(!close(client)); tcp_read(peer, &received, 1); assert(!close(peer));
+        } else if (!strcmp(kind, "tcp")) {
             int fd = socket(AF_INET, SOCK_STREAM, 0); assert(fd >= 0);
             int enabled = 1, value = 0;
             assert(!setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &enabled, sizeof(enabled)));
@@ -84,6 +124,7 @@ int main(int argc, char **argv) {
         checksum += (uint64_t)i + 1;
     }
     double elapsed = now() - began;
+    if (listener >= 0) assert(!close(listener));
     assert(checksum == (uint64_t)operations * (operations + 1) / 2);
     printf("{\"kind\":\"%s\",\"operations\":%u,\"seconds\":%.9f,\"checksum\":%llu}\n",
            kind, operations, elapsed, (unsigned long long)checksum);

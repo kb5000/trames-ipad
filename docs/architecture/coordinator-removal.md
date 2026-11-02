@@ -1,5 +1,79 @@
 # Coordinator dependency audit
 
+## Seventh migration implemented — 2026-11-02
+
+Runtime `7547fb8f8d3cecef3c04e88d0bfc6e104314d7dc` allows quiescent connected
+native TCP to close through the existing single-caller owner service. A close no
+longer drains every CPU merely because the socket was connected. The owner still
+owns its Rc projection and performs teardown; socket creation/close themselves
+have not moved onto workers in this stage.
+
+TCP byte calls now hold one original transport from acceptance through transfer,
+nonblocking/deadline handling, readiness registration, same-cohort retries and
+completion accounting. They no longer re-resolve a possibly reused numeric FD
+between those phases. Quiescence checking and removal share the actual Files
+transaction, excluding a newly admitted worker lease. The predicate reads only
+existing owner metadata/reference counts; teardown occurs outside Files. Native
+controls remain excluded by the existing per-socket gate. There is no new guest
+quota, race errno, service thread, polling bus or guest-memory ordering rule.
+
+A second review covered queued work between cohorts: passive transport lifetime
+now survives PendingIo/IoCall/Process/job handoffs, preventing a pending read from
+being mistaken for an unused socket. This carries no native byte or namespace
+policy authority. The next cohort still resolves its current FD and policy;
+unsupported admission falls back before effects. Completion, cancellation,
+signals and exit release the token. Busy connections, rule-bearing connected
+transports, virtual/DNS branches, listeners, connecting/failed sockets and filtered
+closes retain their existing boundaries. Original idle close stays supported.
+
+The new fixture measures four processes, each running 256 complete local TCP
+sessions: create/nonblocking connect, accept, finalize SO_ERROR, transmit/check a
+byte, close the client, verify EOF on the peer, and close the peer. Per-process
+listener setup/teardown is outside the child loop but inside full workload time.
+The test client uses bounded nonblocking retry/yield loops; production code uses
+existing host notifications. The previous 5,000-cycle control fixture is also
+remeasured. Each result is a median of three unprofiled counterbalanced runs;
+separate profiles supply counts. Both Trames versions and the native ARM64 Linux
+reference run the exact same static ELF. macOS compiles the same fixture source.
+Native references are fresh, and the six-vCPU/8 GiB Linux reference ran after Mac
+timing and was restored to its original stopped state.
+
+| Measurement | Previous | Current | Native macOS | Native Linux |
+| --- | ---: | ---: | ---: | ---: |
+| TCP sessions, longest-child loop | 94.2 ms | 49.1 ms | 15.4 ms | 3.61 ms |
+| TCP sessions, full workload wall | 128.9 ms | 82.6 ms | 19.2 ms | 4.11 ms |
+| TCP controls, longest-child loop | 231.7 ms | 237.7 ms | 25.7 ms | 10.0 ms |
+| Session cohort rounds, diagnostic | 1,310 | 45 | — | — |
+| Session owner service requests, diagnostic | 3,991 | 6,283 | — | — |
+
+Complete sessions improve **1.92×** and diagnostic cohort rounds decrease **96.6%**.
+The original control workload is approximately flat (**2.6% slower** in this
+three-run sample); it has no connected-close drain to eliminate. Session loops
+remain **3.19× native macOS** and **13.6× native Linux**, whose kernel and CPU
+configuration differ. Owner requests increase because closes now complete as
+single-caller services instead of joining: successful services rise from 2,712
+to 6,280. Remaining cohort rounds include startup/teardown, listeners and other
+control. Drain time alone excludes repeated cohort preparation; summed caller
+waits are not CPU utilization. These are short connection lifecycles, not bulk
+TCP throughput or Firefox performance.
+
+Validation passed: 411 VFS, 157 Linux ABI, 69 network and 251 interpreter-kernel
+tests; strict shared/kernel/Mac checks; Mac product tests; 13 production FFI
+checks including original systemd with two PTYs; iPad static cross-build and
+product boundaries. Unchanged CPU, memory and graphics validation was reused.
+Coverage includes atomic close refusal without FD mutation, alias/EOF lifetime,
+original transport after forced close/reuse, cancellation/timeouts, passive
+handoffs and owner continuations without stale native authority. Physical iPad
+testing remains skipped. The installed Mac development app contains the measured
+binary; existing sessions keep their old executable until restarted.
+
+[Samples, hashes and validation](../validation/tcp-close-20261102.json),
+the [session/control fixture](../../tests/fixtures/fd-create-bench.c),
+[comparison harness](../../tests/performance/fd-create.py), and shared
+[ownership design](https://github.com/kb5000/trames-runtime/blob/main/docs/architecture/execution-backends.md#quiescent-connected-tcp-close-2026-11-02)
+record reproduction and remaining scope. Creation, stateful network controls and
+broader close ownership remain the next migration work.
+
 ## Sixth migration implemented — 2026-11-02
 
 Runtime `d9c9cf9c86f567475a0f1979085c3409d2e14acf` executes unfiltered
@@ -477,7 +551,8 @@ same runtime source, not rerun measurements; see
 2. Regular-file open/create and pipe/eventfd/timerfd/inotify creation/publication
    are implemented above. Short unfiltered Internet controls now use an in-epoch
    owner service, and connected TCP publication is live. Native TCP address and
-   basic option controls now run directly on workers; idle close no longer joins.
+   basic option controls now run directly on workers; idle and quiescent connected
+   close no longer join, with passive lifetime preserved across queued handoffs.
    Next are socket creation/broader close ownership, remaining stateful controls,
    blocking connect/accept, AF_UNIX/SCM_RIGHTS and epoll
    interest ownership over shared Files and actual resource objects. Remove the
