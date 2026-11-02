@@ -10,6 +10,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <sys/socket.h>
+#include <sys/stat.h>
 #include <sys/uio.h>
 #include <sys/un.h>
 #include <stddef.h>
@@ -162,6 +163,12 @@ int main(int argc, char **argv) {
     int packet_vector = !strcmp(kind, "unix-packet-vector");
     int packet_pair[2] = {-1, -1};
     if (unix_batch || unix_packet) assert(!socketpair(AF_UNIX, SOCK_DGRAM, 0, packet_pair));
+    int positioned_file = -1;
+    char positioned_path[96] = {0};
+    if (!strcmp(kind, "file-positioned")) {
+        snprintf(positioned_path, sizeof(positioned_path), "/tmp/trames-file-%ld", (long)getpid());
+        positioned_file = open(positioned_path, O_CREAT | O_EXCL | O_RDWR | O_CLOEXEC, 0600); assert(positioned_file >= 0);
+    }
     int listener = -1;
     struct sockaddr_in address = {0};
     int tcp_blocking = !strcmp(kind, "tcp-blocking");
@@ -228,7 +235,35 @@ int main(int argc, char **argv) {
     }
     double began = now();
     for (unsigned i = 0; i < operations; i++) {
-        if (unix_batch) {
+        if (positioned_file >= 0) {
+            unsigned char sent[64], received[64]; memset(sent, (unsigned char)i, sizeof(sent));
+            assert(pwrite(positioned_file, sent, sizeof(sent), 0) == (ssize_t)sizeof(sent));
+            assert(pread(positioned_file, received, sizeof(received), 0) == (ssize_t)sizeof(received));
+            assert(!memcmp(sent, received, sizeof(sent)));
+        } else if (!strncmp(kind, "device-", 7)) {
+            char path[64]; snprintf(path, sizeof(path), "/dev/%s", kind + 7);
+            int fd = open(path, O_RDWR | O_CLOEXEC); assert(fd >= 0);
+            int null = !strcmp(kind, "device-null"), full = !strcmp(kind, "device-full");
+            unsigned char bytes[64]; memset(bytes, (unsigned char)i, sizeof(bytes));
+            ssize_t written = write(fd, bytes, sizeof(bytes));
+            assert(full ? written == -1 && errno == ENOSPC : written == (ssize_t)sizeof(bytes));
+            assert(read(fd, bytes, sizeof(bytes)) == (null ? 0 : (ssize_t)sizeof(bytes)));
+            if (!strcmp(kind, "device-zero") || full) for (unsigned j = 0; j < sizeof(bytes); j++) assert(bytes[j] == 0);
+            written = pwrite(fd, bytes, sizeof(bytes), 33);
+            assert(full ? written == -1 && errno == ENOSPC : written == (ssize_t)sizeof(bytes));
+            assert(pread(fd, bytes, sizeof(bytes), 47) == (null ? 0 : (ssize_t)sizeof(bytes)));
+            struct iovec vectors[2] = {{.iov_base = &bytes[0], .iov_len = 1}, {.iov_base = &bytes[1], .iov_len = 1}};
+            written = writev(fd, vectors, 2);
+            assert(full ? written == -1 && errno == ENOSPC : written == 2);
+            assert(readv(fd, vectors, 2) == (null ? 0 : 2));
+#ifdef __APPLE__
+            assert(lseek(fd, 27, SEEK_END) == 27); // Native BSD device seek semantics.
+#else
+            assert(lseek(fd, 27, SEEK_END) == 0);
+#endif
+            struct stat stat; assert(!fstat(fd, &stat) && S_ISCHR(stat.st_mode));
+            assert(!close(fd));
+        } else if (unix_batch) {
             unsigned char sent[8], received[8] = {0};
             struct iovec vectors[8];
 #ifdef __linux__
@@ -492,6 +527,7 @@ int main(int argc, char **argv) {
         checksum += (uint64_t)i + 1;
     }
     double elapsed = now() - began;
+    if (positioned_file >= 0) { assert(!close(positioned_file)); assert(!unlink(positioned_path)); }
     if (packet_pair[0] >= 0) { assert(!close(packet_pair[0])); assert(!close(packet_pair[1])); }
     if (right_source >= 0) assert(!close(right_source));
     if (datagram) {

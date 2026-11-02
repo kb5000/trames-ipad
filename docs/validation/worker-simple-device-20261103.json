@@ -1,0 +1,4228 @@
+{
+  "date": "2026-11-03",
+  "stage": 25,
+  "status": "stage-complete; coordinator-removal goal remains active",
+  "runtime_revision": "e4a9f217ac17821cef0097d465466d3c340c7fa4",
+  "baseline_runtime_revision": "a7a92f114c4f30a2756fce7646083b26c4c91e47",
+  "scope": "Stateless null/zero/full/random/urandom device descriptions, original shared pseudo inode cache, worker/native byte and positioned I/O, metadata, lifetimes and portable Unix rights.",
+  "performance": {
+    "null": {
+      "passed": true,
+      "kind": "device-null",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "before",
+          "repeat": 0,
+          "wall_seconds": 0.749196042,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.390923208,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.551699417,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.684667166,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.696810292,
+              "checksum": 500500
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 20714,
+            "cohort_stop_us": 65136,
+            "service_caller_wait_us": 36092,
+            "service_requests": 6462,
+            "serviced_syscalls": 6462,
+            "syscalls": 44115,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 0,
+            "worker_fd_syscalls": 3432,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 3432,
+            "worker_task_resumes": 6462
+          }
+        },
+        {
+          "variant": "after",
+          "repeat": 0,
+          "wall_seconds": 0.0759797499999999,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.034641375,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.035410125,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.0350015,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.035303458,
+              "checksum": 500500
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 50,
+            "cohort_stop_us": 1062,
+            "service_caller_wait_us": 19,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 44115,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 35615,
+            "worker_fd_syscalls": 7913,
+            "worker_file_syscalls": 7917,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 43528,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "before",
+          "repeat": 1,
+          "wall_seconds": 0.7204354159999997,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.367190625,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.535334833,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.671385042,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.683159833,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 1,
+          "wall_seconds": 0.07726599999999983,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.03472325,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.035612667,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.036169125,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.042111792,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 2,
+          "wall_seconds": 0.07189154199999992,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.03638275,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.037628709,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.036345417,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.037952958,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 2,
+          "wall_seconds": 0.721098375,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.375032209,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.539483584,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.67003075,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.686741209,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 3,
+          "wall_seconds": 0.7188733750000003,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.356681333,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.534416208,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.672683167,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.684277333,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 3,
+          "wall_seconds": 0.0702411249999999,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.033455834,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.03493175,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.033961709,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.036314458,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.4062394999999994,
+          "children": [
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.048326,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.048635,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.049007,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.048089,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.036349540999999874,
+          "children": [
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.030073,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.030814,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.029904,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.029567,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.027491667000000497,
+          "children": [
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.024113,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.02346,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.02222,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.022637,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "baseline": "704cba656bcfa8e2dd3b703bccc8b88041efcfea349cb3de050946fda8123c2c",
+        "candidate": "c8916e768b7183c730397dca4a87368f2c3b0b75193351af457bdfdd2803e1e4",
+        "native": "537db26396c9f9769e99a34deaab54855219b067703eae5b5f93b41df89d8dcf",
+        "fixture": "43108b1d221f51a702ff4f6dcefe489a688718976ed0ef9d262d143fae90239b",
+        "rootfs": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe"
+      },
+      "native_environment": {
+        "system": "Darwin",
+        "release": "27.0.0",
+        "architecture": "arm64",
+        "logical_cpus": 12
+      },
+      "summary": {
+        "before": {
+          "loop_max_median_seconds": 0.684277333,
+          "process_wall_median_seconds": 0.7204354159999997,
+          "profile": {
+            "cohort_rounds": 20714,
+            "cohort_stop_us": 65136,
+            "service_caller_wait_us": 36092,
+            "service_requests": 6462,
+            "serviced_syscalls": 6462,
+            "syscalls": 44115,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 0,
+            "worker_fd_syscalls": 3432,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 3432,
+            "worker_task_resumes": 6462
+          }
+        },
+        "after": {
+          "loop_max_median_seconds": 0.037952958,
+          "process_wall_median_seconds": 0.07189154199999992,
+          "profile": {
+            "cohort_rounds": 50,
+            "cohort_stop_us": 1062,
+            "service_caller_wait_us": 19,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 44115,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 35615,
+            "worker_fd_syscalls": 7913,
+            "worker_file_syscalls": 7917,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 43528,
+            "worker_task_resumes": 3
+          }
+        },
+        "native": {
+          "loop_max_median_seconds": 0.030814,
+          "process_wall_median_seconds": 0.036349540999999874
+        }
+      }
+    },
+    "zero": {
+      "passed": true,
+      "kind": "device-zero",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "before",
+          "repeat": 0,
+          "wall_seconds": 0.770172417,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.398093,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.558256,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.697257792,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.708815042,
+              "checksum": 500500
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 20861,
+            "cohort_stop_us": 66751,
+            "service_caller_wait_us": 34554,
+            "service_requests": 6300,
+            "serviced_syscalls": 6300,
+            "syscalls": 44115,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 0,
+            "worker_fd_syscalls": 3434,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 3434,
+            "worker_task_resumes": 6300
+          }
+        },
+        {
+          "variant": "after",
+          "repeat": 0,
+          "wall_seconds": 0.07341779200000009,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.03363525,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.03642825,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.034856625,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.040976417,
+              "checksum": 500500
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 48,
+            "cohort_stop_us": 1001,
+            "service_caller_wait_us": 60,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 44113,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 34037,
+            "worker_fd_syscalls": 7563,
+            "worker_file_syscalls": 7567,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 41600,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "before",
+          "repeat": 1,
+          "wall_seconds": 0.7240763750000001,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.3728955,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.539781,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.676248125,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.68752575,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 1,
+          "wall_seconds": 0.07161404199999977,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.034168584,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.035625375,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.03589375,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.038564125,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 2,
+          "wall_seconds": 0.06877320800000009,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.032955167,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.035123584,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.03504575,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.036754833,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 2,
+          "wall_seconds": 0.7189514999999997,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.371256334,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.531454417,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.666658834,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.677913875,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 3,
+          "wall_seconds": 0.726395208,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.375384666,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.53872275,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.675861542,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.687807875,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 3,
+          "wall_seconds": 0.07130366700000002,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.034916209,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.035941833,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.036389,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.036368,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.02720079100000028,
+          "children": [
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.022816,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.022102,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.022469,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.022599,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.02686508299999968,
+          "children": [
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.023342,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.022668,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.022527,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.022587,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.026977499999999655,
+          "children": [
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.023301,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.024044,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.02275,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.022578,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "baseline": "704cba656bcfa8e2dd3b703bccc8b88041efcfea349cb3de050946fda8123c2c",
+        "candidate": "c8916e768b7183c730397dca4a87368f2c3b0b75193351af457bdfdd2803e1e4",
+        "native": "537db26396c9f9769e99a34deaab54855219b067703eae5b5f93b41df89d8dcf",
+        "fixture": "43108b1d221f51a702ff4f6dcefe489a688718976ed0ef9d262d143fae90239b",
+        "rootfs": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe"
+      },
+      "native_environment": {
+        "system": "Darwin",
+        "release": "27.0.0",
+        "architecture": "arm64",
+        "logical_cpus": 12
+      },
+      "summary": {
+        "before": {
+          "loop_max_median_seconds": 0.68752575,
+          "process_wall_median_seconds": 0.7240763750000001,
+          "profile": {
+            "cohort_rounds": 20861,
+            "cohort_stop_us": 66751,
+            "service_caller_wait_us": 34554,
+            "service_requests": 6300,
+            "serviced_syscalls": 6300,
+            "syscalls": 44115,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 0,
+            "worker_fd_syscalls": 3434,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 3434,
+            "worker_task_resumes": 6300
+          }
+        },
+        "after": {
+          "loop_max_median_seconds": 0.036754833,
+          "process_wall_median_seconds": 0.07130366700000002,
+          "profile": {
+            "cohort_rounds": 48,
+            "cohort_stop_us": 1001,
+            "service_caller_wait_us": 60,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 44113,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 34037,
+            "worker_fd_syscalls": 7563,
+            "worker_file_syscalls": 7567,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 41600,
+            "worker_task_resumes": 3
+          }
+        },
+        "native": {
+          "loop_max_median_seconds": 0.023342,
+          "process_wall_median_seconds": 0.026977499999999655
+        }
+      }
+    },
+    "full": {
+      "passed": true,
+      "kind": "device-full",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "before",
+          "repeat": 0,
+          "wall_seconds": 0.7528284580000001,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.389826958,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.546795541,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.68646625,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.69926125,
+              "checksum": 500500
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 20956,
+            "cohort_stop_us": 63916,
+            "service_caller_wait_us": 34303,
+            "service_requests": 6428,
+            "serviced_syscalls": 6428,
+            "syscalls": 44115,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 0,
+            "worker_fd_syscalls": 3433,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 3433,
+            "worker_task_resumes": 6428
+          }
+        },
+        {
+          "variant": "after",
+          "repeat": 0,
+          "wall_seconds": 0.07057937499999989,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.034795583,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.03501525,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.035610209,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.035076667,
+              "checksum": 500500
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 51,
+            "cohort_stop_us": 1010,
+            "service_caller_wait_us": 102,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 44115,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 35989,
+            "worker_fd_syscalls": 7997,
+            "worker_file_syscalls": 8001,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 43986,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "before",
+          "repeat": 1,
+          "wall_seconds": 0.717196709,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.364622666,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.530589209,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.667135709,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.679832,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 1,
+          "wall_seconds": 0.06849966600000013,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.032808833,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.033622209,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.035501084,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.03464875,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 2,
+          "wall_seconds": 0.07384262500000016,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.03587425,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.035331416,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.036620417,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.037428041,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 2,
+          "wall_seconds": 0.7220280420000003,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.366371041,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.53866525,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.674928542,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.687110625,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 3,
+          "wall_seconds": 0.7303606249999999,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.375777333,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.546133708,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.680520375,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.692234125,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 3,
+          "wall_seconds": 0.07225162500000026,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.035702209,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.034934125,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.037314709,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.037261375,
+              "checksum": 500500
+            }
+          ]
+        }
+      ],
+      "sha256": {
+        "baseline": "704cba656bcfa8e2dd3b703bccc8b88041efcfea349cb3de050946fda8123c2c",
+        "candidate": "c8916e768b7183c730397dca4a87368f2c3b0b75193351af457bdfdd2803e1e4",
+        "fixture": "43108b1d221f51a702ff4f6dcefe489a688718976ed0ef9d262d143fae90239b",
+        "rootfs": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe"
+      },
+      "native_environment": {
+        "system": "Darwin",
+        "release": "27.0.0",
+        "architecture": "arm64",
+        "logical_cpus": 12
+      },
+      "summary": {
+        "before": {
+          "loop_max_median_seconds": 0.687110625,
+          "process_wall_median_seconds": 0.7220280420000003,
+          "profile": {
+            "cohort_rounds": 20956,
+            "cohort_stop_us": 63916,
+            "service_caller_wait_us": 34303,
+            "service_requests": 6428,
+            "serviced_syscalls": 6428,
+            "syscalls": 44115,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 0,
+            "worker_fd_syscalls": 3433,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 3433,
+            "worker_task_resumes": 6428
+          }
+        },
+        "after": {
+          "loop_max_median_seconds": 0.037314709,
+          "process_wall_median_seconds": 0.07225162500000026,
+          "profile": {
+            "cohort_rounds": 51,
+            "cohort_stop_us": 1010,
+            "service_caller_wait_us": 102,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 44115,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 35989,
+            "worker_fd_syscalls": 7997,
+            "worker_file_syscalls": 8001,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 43986,
+            "worker_task_resumes": 3
+          }
+        }
+      }
+    },
+    "random": {
+      "passed": true,
+      "kind": "device-urandom",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "before",
+          "repeat": 0,
+          "wall_seconds": 0.77456925,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.394329625,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.5600335,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.700111917,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.720271458,
+              "checksum": 500500
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 20816,
+            "cohort_stop_us": 64107,
+            "service_caller_wait_us": 36722,
+            "service_requests": 6419,
+            "serviced_syscalls": 6419,
+            "syscalls": 44113,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 0,
+            "worker_fd_syscalls": 3434,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 3434,
+            "worker_task_resumes": 6419
+          }
+        },
+        {
+          "variant": "after",
+          "repeat": 0,
+          "wall_seconds": 0.07433566700000016,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.037269416,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.037337458,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.038443958,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.0389045,
+              "checksum": 500500
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 50,
+            "cohort_stop_us": 1081,
+            "service_caller_wait_us": 44,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 44115,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 35616,
+            "worker_fd_syscalls": 7914,
+            "worker_file_syscalls": 7918,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 43530,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "before",
+          "repeat": 1,
+          "wall_seconds": 0.728300417,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.381189084,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.552455667,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.677519084,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.691908583,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 1,
+          "wall_seconds": 0.07260462499999987,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.037034541,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.038101042,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.037402625,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.039283375,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 2,
+          "wall_seconds": 0.07448820899999964,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.03668075,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.038953416,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.037783875,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.041089292,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 2,
+          "wall_seconds": 0.7290149589999997,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.374368959,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.545455208,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.679982125,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.693767833,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 3,
+          "wall_seconds": 0.730738042,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.368178292,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.540271583,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.678448167,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.691028,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 3,
+          "wall_seconds": 0.07632112500000021,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.037627666,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.036455625,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.038369084,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.037173333,
+              "checksum": 500500
+            }
+          ]
+        }
+      ],
+      "sha256": {
+        "baseline": "704cba656bcfa8e2dd3b703bccc8b88041efcfea349cb3de050946fda8123c2c",
+        "candidate": "c8916e768b7183c730397dca4a87368f2c3b0b75193351af457bdfdd2803e1e4",
+        "fixture": "43108b1d221f51a702ff4f6dcefe489a688718976ed0ef9d262d143fae90239b",
+        "rootfs": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe"
+      },
+      "native_environment": {
+        "system": "Darwin",
+        "release": "27.0.0",
+        "architecture": "arm64",
+        "logical_cpus": 12
+      },
+      "summary": {
+        "before": {
+          "loop_max_median_seconds": 0.691908583,
+          "process_wall_median_seconds": 0.7290149589999997,
+          "profile": {
+            "cohort_rounds": 20816,
+            "cohort_stop_us": 64107,
+            "service_caller_wait_us": 36722,
+            "service_requests": 6419,
+            "serviced_syscalls": 6419,
+            "syscalls": 44113,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 0,
+            "worker_fd_syscalls": 3434,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 3434,
+            "worker_task_resumes": 6419
+          }
+        },
+        "after": {
+          "loop_max_median_seconds": 0.039283375,
+          "process_wall_median_seconds": 0.07448820899999964,
+          "profile": {
+            "cohort_rounds": 50,
+            "cohort_stop_us": 1081,
+            "service_caller_wait_us": 44,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 44115,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 35616,
+            "worker_fd_syscalls": 7914,
+            "worker_file_syscalls": 7918,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 43530,
+            "worker_task_resumes": 3
+          }
+        }
+      }
+    },
+    "rights": {
+      "passed": true,
+      "kind": "unix-datagram-owner",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "before",
+          "repeat": 0,
+          "wall_seconds": 0.6680930829999999,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.290542833,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.412779458,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.525210708,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.536098666,
+              "checksum": 500500
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 14684,
+            "cohort_stop_us": 100741,
+            "service_caller_wait_us": 50,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 24167,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 12,
+            "worker_fd_syscalls": 14,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 12,
+            "worker_syscalls": 34,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "after",
+          "repeat": 0,
+          "wall_seconds": 0.17960504199999994,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.056735542,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.0547175,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.05562075,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.099306875,
+              "checksum": 500500
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 57,
+            "cohort_stop_us": 44855,
+            "service_caller_wait_us": 84,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 24165,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 16016,
+            "worker_fd_syscalls": 8016,
+            "worker_file_syscalls": 4004,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 8012,
+            "worker_syscalls": 24040,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "before",
+          "repeat": 1,
+          "wall_seconds": 0.645054542,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.252441375,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.406095709,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.503722125,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.506914167,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 1,
+          "wall_seconds": 0.17869766599999992,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.026610708,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.067743958,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.082776209,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.070028042,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 2,
+          "wall_seconds": 0.18357912500000007,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.060663542,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.075700709,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.059347292,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.08615075,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 2,
+          "wall_seconds": 0.636600917,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.249144958,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.396864666,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.529123917,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.5265275,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 3,
+          "wall_seconds": 0.6318277499999998,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.238055458,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.3931715,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.520239708,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.5016055,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 3,
+          "wall_seconds": 0.1802884170000003,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.042674167,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.07014425,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.084998584,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.070654167,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.018077416000000124,
+          "children": [
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.013183,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.013271,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.013101,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.012867,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.01612745800000015,
+          "children": [
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.011715,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.012309,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.012454,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.011919,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.016220750000000006,
+          "children": [
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.011424,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.011669,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.011819,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.011949,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "baseline": "704cba656bcfa8e2dd3b703bccc8b88041efcfea349cb3de050946fda8123c2c",
+        "candidate": "c8916e768b7183c730397dca4a87368f2c3b0b75193351af457bdfdd2803e1e4",
+        "native": "537db26396c9f9769e99a34deaab54855219b067703eae5b5f93b41df89d8dcf",
+        "fixture": "43108b1d221f51a702ff4f6dcefe489a688718976ed0ef9d262d143fae90239b",
+        "rootfs": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe"
+      },
+      "native_environment": {
+        "system": "Darwin",
+        "release": "27.0.0",
+        "architecture": "arm64",
+        "logical_cpus": 12
+      },
+      "summary": {
+        "before": {
+          "loop_max_median_seconds": 0.520239708,
+          "process_wall_median_seconds": 0.636600917,
+          "profile": {
+            "cohort_rounds": 14684,
+            "cohort_stop_us": 100741,
+            "service_caller_wait_us": 50,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 24167,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 12,
+            "worker_fd_syscalls": 14,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 12,
+            "worker_syscalls": 34,
+            "worker_task_resumes": 3
+          }
+        },
+        "after": {
+          "loop_max_median_seconds": 0.084998584,
+          "process_wall_median_seconds": 0.1802884170000003,
+          "profile": {
+            "cohort_rounds": 57,
+            "cohort_stop_us": 44855,
+            "service_caller_wait_us": 84,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 24165,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 16016,
+            "worker_fd_syscalls": 8016,
+            "worker_file_syscalls": 4004,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 8012,
+            "worker_syscalls": 24040,
+            "worker_task_resumes": 3
+          }
+        },
+        "native": {
+          "loop_max_median_seconds": 0.012454,
+          "process_wall_median_seconds": 0.016220750000000006
+        }
+      }
+    },
+    "pair": {
+      "passed": true,
+      "kind": "unix-pair",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "before",
+          "repeat": 0,
+          "wall_seconds": 0.081227875,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.036492667,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.036086791,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.038850834,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.036311042,
+              "checksum": 500500
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 48,
+            "cohort_stop_us": 1914,
+            "service_caller_wait_us": 29,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 52113,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 24000,
+            "worker_fd_syscalls": 27999,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 24000,
+            "worker_syscalls": 51999,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "after",
+          "repeat": 0,
+          "wall_seconds": 0.06432929199999993,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.027983833,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.027827125,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.027248625,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.026864917,
+              "checksum": 500500
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 50,
+            "cohort_stop_us": 1450,
+            "service_caller_wait_us": 19,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 52115,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 23884,
+            "worker_fd_syscalls": 27861,
+            "worker_file_syscalls": 4,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 23880,
+            "worker_syscalls": 51745,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "before",
+          "repeat": 1,
+          "wall_seconds": 0.05570000000000008,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.021163042,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.021524125,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.020793542,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.021227625,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 1,
+          "wall_seconds": 0.05857583300000002,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.021329541,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.0218895,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.021377667,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.021151375,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 2,
+          "wall_seconds": 0.055464665999999996,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.020670084,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.020324208,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.022081583,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.020994792,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 2,
+          "wall_seconds": 0.05676862500000002,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.021566125,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.021690292,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.021282,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.020990792,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 3,
+          "wall_seconds": 0.05245345900000009,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.019010667,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.021773333,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.020481375,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.022511084,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 3,
+          "wall_seconds": 0.055575416000000044,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.021841708,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.021910042,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.021591208,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.021176083,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.00886208300000002,
+          "children": [
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004074,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004813,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.005034,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004422,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.00890395799999999,
+          "children": [
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004042,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.00473,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.00454,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.00414,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.008628666000000007,
+          "children": [
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004823,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004642,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004644,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004429,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "baseline": "704cba656bcfa8e2dd3b703bccc8b88041efcfea349cb3de050946fda8123c2c",
+        "candidate": "c8916e768b7183c730397dca4a87368f2c3b0b75193351af457bdfdd2803e1e4",
+        "native": "537db26396c9f9769e99a34deaab54855219b067703eae5b5f93b41df89d8dcf",
+        "fixture": "43108b1d221f51a702ff4f6dcefe489a688718976ed0ef9d262d143fae90239b",
+        "rootfs": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe"
+      },
+      "native_environment": {
+        "system": "Darwin",
+        "release": "27.0.0",
+        "architecture": "arm64",
+        "logical_cpus": 12
+      },
+      "summary": {
+        "before": {
+          "loop_max_median_seconds": 0.021690292,
+          "process_wall_median_seconds": 0.05570000000000008,
+          "profile": {
+            "cohort_rounds": 48,
+            "cohort_stop_us": 1914,
+            "service_caller_wait_us": 29,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 52113,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 24000,
+            "worker_fd_syscalls": 27999,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 24000,
+            "worker_syscalls": 51999,
+            "worker_task_resumes": 3
+          }
+        },
+        "after": {
+          "loop_max_median_seconds": 0.021910042,
+          "process_wall_median_seconds": 0.055575416000000044,
+          "profile": {
+            "cohort_rounds": 50,
+            "cohort_stop_us": 1450,
+            "service_caller_wait_us": 19,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 52115,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 23884,
+            "worker_fd_syscalls": 27861,
+            "worker_file_syscalls": 4,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 23880,
+            "worker_syscalls": 51745,
+            "worker_task_resumes": 3
+          }
+        },
+        "native": {
+          "loop_max_median_seconds": 0.004823,
+          "process_wall_median_seconds": 0.00886208300000002
+        }
+      }
+    },
+    "file": {
+      "passed": true,
+      "kind": "file-positioned",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "before",
+          "repeat": 0,
+          "wall_seconds": 0.14599795799999998,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.027995541,
+              "checksum": 500500
+            },
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.050686291,
+              "checksum": 500500
+            },
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.029976667,
+              "checksum": 500500
+            },
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.03754,
+              "checksum": 500500
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 50,
+            "cohort_stop_us": 38902,
+            "service_caller_wait_us": 90,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 8134,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 6263,
+            "worker_fd_syscalls": 7,
+            "worker_file_syscalls": 6263,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 6274,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "after",
+          "repeat": 0,
+          "wall_seconds": 0.134176458,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.011608292,
+              "checksum": 500500
+            },
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.032731833,
+              "checksum": 500500
+            },
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.052749042,
+              "checksum": 500500
+            },
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.03480725,
+              "checksum": 500500
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 50,
+            "cohort_stop_us": 33450,
+            "service_caller_wait_us": 116,
+            "service_requests": 4,
+            "serviced_syscalls": 4,
+            "syscalls": 8133,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 6022,
+            "worker_fd_syscalls": 7,
+            "worker_file_syscalls": 6022,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 6033,
+            "worker_task_resumes": 4
+          }
+        },
+        {
+          "variant": "before",
+          "repeat": 1,
+          "wall_seconds": 0.12752475000000008,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.03405325,
+              "checksum": 500500
+            },
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.019166375,
+              "checksum": 500500
+            },
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.03995225,
+              "checksum": 500500
+            },
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.026279166,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 1,
+          "wall_seconds": 0.13529837499999997,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.02263725,
+              "checksum": 500500
+            },
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.045173083,
+              "checksum": 500500
+            },
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.030906208,
+              "checksum": 500500
+            },
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.026097167,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 2,
+          "wall_seconds": 0.13333604199999982,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.0234765,
+              "checksum": 500500
+            },
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.01881325,
+              "checksum": 500500
+            },
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.051108458,
+              "checksum": 500500
+            },
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.026390708,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 2,
+          "wall_seconds": 0.13601741700000014,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.024825625,
+              "checksum": 500500
+            },
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.020465834,
+              "checksum": 500500
+            },
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.05455275,
+              "checksum": 500500
+            },
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.027108,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 3,
+          "wall_seconds": 0.13464958300000007,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.01110925,
+              "checksum": 500500
+            },
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.033190416,
+              "checksum": 500500
+            },
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.052147291,
+              "checksum": 500500
+            },
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.027424542,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 3,
+          "wall_seconds": 0.13162433400000007,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.023824958,
+              "checksum": 500500
+            },
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.035703542,
+              "checksum": 500500
+            },
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.029899917,
+              "checksum": 500500
+            },
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.02497825,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.011788458999999918,
+          "children": [
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.003167,
+              "checksum": 500500
+            },
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.005134,
+              "checksum": 500500
+            },
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.005161,
+              "checksum": 500500
+            },
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.004218,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.009495167000000082,
+          "children": [
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.002903,
+              "checksum": 500500
+            },
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.004517,
+              "checksum": 500500
+            },
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.004319,
+              "checksum": 500500
+            },
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.003813,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.008526457999999959,
+          "children": [
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.002526,
+              "checksum": 500500
+            },
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.00381,
+              "checksum": 500500
+            },
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.003891,
+              "checksum": 500500
+            },
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.003049,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "baseline": "704cba656bcfa8e2dd3b703bccc8b88041efcfea349cb3de050946fda8123c2c",
+        "candidate": "c8916e768b7183c730397dca4a87368f2c3b0b75193351af457bdfdd2803e1e4",
+        "native": "537db26396c9f9769e99a34deaab54855219b067703eae5b5f93b41df89d8dcf",
+        "fixture": "43108b1d221f51a702ff4f6dcefe489a688718976ed0ef9d262d143fae90239b",
+        "rootfs": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe"
+      },
+      "native_environment": {
+        "system": "Darwin",
+        "release": "27.0.0",
+        "architecture": "arm64",
+        "logical_cpus": 12
+      },
+      "summary": {
+        "before": {
+          "loop_max_median_seconds": 0.052147291,
+          "process_wall_median_seconds": 0.13464958300000007,
+          "profile": {
+            "cohort_rounds": 50,
+            "cohort_stop_us": 38902,
+            "service_caller_wait_us": 90,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 8134,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 6263,
+            "worker_fd_syscalls": 7,
+            "worker_file_syscalls": 6263,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 6274,
+            "worker_task_resumes": 3
+          }
+        },
+        "after": {
+          "loop_max_median_seconds": 0.045173083,
+          "process_wall_median_seconds": 0.13333604199999982,
+          "profile": {
+            "cohort_rounds": 50,
+            "cohort_stop_us": 33450,
+            "service_caller_wait_us": 116,
+            "service_requests": 4,
+            "serviced_syscalls": 4,
+            "syscalls": 8133,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 6022,
+            "worker_fd_syscalls": 7,
+            "worker_file_syscalls": 6022,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 6033,
+            "worker_task_resumes": 4
+          }
+        },
+        "native": {
+          "loop_max_median_seconds": 0.004517,
+          "process_wall_median_seconds": 0.009495167000000082
+        }
+      }
+    }
+  },
+  "native_linux_exact_elf": {
+    "null": {
+      "passed": true,
+      "kind": "device-null",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.00485766700000001,
+          "children": [
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.002715166,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.002813583,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.0025155,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.002473875,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.004879625000000054,
+          "children": [
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.002616,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.002737791,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.002366875,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.0025045,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.0034889999999996313,
+          "children": [
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.002889333,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.002666125,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.002452875,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-null",
+              "operations": 1000,
+              "seconds": 0.00245075,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "native": "43108b1d221f51a702ff4f6dcefe489a688718976ed0ef9d262d143fae90239b"
+      },
+      "native_environment": {
+        "system": "Linux",
+        "release": "7.0.0-38-generic",
+        "architecture": "aarch64",
+        "logical_cpus": 6
+      },
+      "summary": {
+        "native": {
+          "loop_max_median_seconds": 0.002813583,
+          "process_wall_median_seconds": 0.00485766700000001
+        }
+      }
+    },
+    "zero": {
+      "passed": true,
+      "kind": "device-zero",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.00422045800000026,
+          "children": [
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.002684041,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.002863708,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.002665417,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.002309167,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.004761749999999676,
+          "children": [
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.002993208,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.002752917,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.002600167,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.002417375,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.004639291999999795,
+          "children": [
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.002978875,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.00262225,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.002756042,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-zero",
+              "operations": 1000,
+              "seconds": 0.002350458,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "native": "43108b1d221f51a702ff4f6dcefe489a688718976ed0ef9d262d143fae90239b"
+      },
+      "native_environment": {
+        "system": "Linux",
+        "release": "7.0.0-38-generic",
+        "architecture": "aarch64",
+        "logical_cpus": 6
+      },
+      "summary": {
+        "native": {
+          "loop_max_median_seconds": 0.002978875,
+          "process_wall_median_seconds": 0.004639291999999795
+        }
+      }
+    },
+    "full": {
+      "passed": true,
+      "kind": "device-full",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.005180500000000254,
+          "children": [
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.003107708,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.002975,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.002974416,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.002722708,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.0044344579999999745,
+          "children": [
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.002604334,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.002783292,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.00241725,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.0025685,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.004611957999999916,
+          "children": [
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.00271175,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.002831708,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.002716958,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-full",
+              "operations": 1000,
+              "seconds": 0.002302084,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "native": "43108b1d221f51a702ff4f6dcefe489a688718976ed0ef9d262d143fae90239b"
+      },
+      "native_environment": {
+        "system": "Linux",
+        "release": "7.0.0-38-generic",
+        "architecture": "aarch64",
+        "logical_cpus": 6
+      },
+      "summary": {
+        "native": {
+          "loop_max_median_seconds": 0.002831708,
+          "process_wall_median_seconds": 0.004611957999999916
+        }
+      }
+    },
+    "random": {
+      "passed": true,
+      "kind": "device-urandom",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.005802167000000136,
+          "children": [
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.004008167,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.003887916,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.003313875,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.003191333,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.0054230000000004,
+          "children": [
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.00395675,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.003819458,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.003290958,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.003142625,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.004892041999999819,
+          "children": [
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.003514458,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.003836125,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.003626625,
+              "checksum": 500500
+            },
+            {
+              "kind": "device-urandom",
+              "operations": 1000,
+              "seconds": 0.003146625,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "native": "43108b1d221f51a702ff4f6dcefe489a688718976ed0ef9d262d143fae90239b"
+      },
+      "native_environment": {
+        "system": "Linux",
+        "release": "7.0.0-38-generic",
+        "architecture": "aarch64",
+        "logical_cpus": 6
+      },
+      "summary": {
+        "native": {
+          "loop_max_median_seconds": 0.00395675,
+          "process_wall_median_seconds": 0.0054230000000004
+        }
+      }
+    },
+    "rights": {
+      "passed": true,
+      "kind": "unix-datagram-owner",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.004369999999999763,
+          "children": [
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.002184292,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.002325125,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.002407083,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.002307666,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.004112791000000282,
+          "children": [
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.002633542,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.002727708,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.002618083,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.002208416,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.00601616699999985,
+          "children": [
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.0024835,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.002440625,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.0019765,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.001598166,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "native": "43108b1d221f51a702ff4f6dcefe489a688718976ed0ef9d262d143fae90239b"
+      },
+      "native_environment": {
+        "system": "Linux",
+        "release": "7.0.0-38-generic",
+        "architecture": "aarch64",
+        "logical_cpus": 6
+      },
+      "summary": {
+        "native": {
+          "loop_max_median_seconds": 0.0024835,
+          "process_wall_median_seconds": 0.004369999999999763
+        }
+      }
+    },
+    "pair": {
+      "passed": true,
+      "kind": "unix-pair",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.00605141699999967,
+          "children": [
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004437708,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004373542,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004708709,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004561083,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.006541333000000371,
+          "children": [
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004329208,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004778375,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004680208,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004007958,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.005792750000000346,
+          "children": [
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004306625,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004705958,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.00394825,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004378625,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "native": "43108b1d221f51a702ff4f6dcefe489a688718976ed0ef9d262d143fae90239b"
+      },
+      "native_environment": {
+        "system": "Linux",
+        "release": "7.0.0-38-generic",
+        "architecture": "aarch64",
+        "logical_cpus": 6
+      },
+      "summary": {
+        "native": {
+          "loop_max_median_seconds": 0.004708709,
+          "process_wall_median_seconds": 0.00605141699999967
+        }
+      }
+    },
+    "file": {
+      "passed": true,
+      "kind": "file-positioned",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.0026507909999997636,
+          "children": [
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.0007015,
+              "checksum": 500500
+            },
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.000649375,
+              "checksum": 500500
+            },
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.00057175,
+              "checksum": 500500
+            },
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.000472875,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.0021774159999994325,
+          "children": [
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.000664125,
+              "checksum": 500500
+            },
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.000627791,
+              "checksum": 500500
+            },
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.000572458,
+              "checksum": 500500
+            },
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.000432667,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.0025308749999997104,
+          "children": [
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.000559916,
+              "checksum": 500500
+            },
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.00057825,
+              "checksum": 500500
+            },
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.000541708,
+              "checksum": 500500
+            },
+            {
+              "kind": "file-positioned",
+              "operations": 1000,
+              "seconds": 0.000455083,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "native": "43108b1d221f51a702ff4f6dcefe489a688718976ed0ef9d262d143fae90239b"
+      },
+      "native_environment": {
+        "system": "Linux",
+        "release": "7.0.0-38-generic",
+        "architecture": "aarch64",
+        "logical_cpus": 6
+      },
+      "summary": {
+        "native": {
+          "loop_max_median_seconds": 0.000664125,
+          "process_wall_median_seconds": 0.0025308749999997104
+        }
+      }
+    }
+  },
+  "native_macos_api": {
+    "platform": "macOS",
+    "full_device_exists": false,
+    "devices": {
+      "null": {
+        "write64": {
+          "result": 64
+        },
+        "read64_count": {
+          "result": 0
+        },
+        "pwrite64_at33": {
+          "result": 64
+        },
+        "pread64_at47_count": {
+          "result": 0
+        },
+        "seek_end27": {
+          "result": 27
+        }
+      },
+      "zero": {
+        "write64": {
+          "result": 64
+        },
+        "read64_count": {
+          "result": 64
+        },
+        "pwrite64_at33": {
+          "result": 64
+        },
+        "pread64_at47_count": {
+          "result": 64
+        },
+        "seek_end27": {
+          "result": 27
+        }
+      },
+      "urandom": {
+        "write64": {
+          "errno": 1
+        },
+        "read64_count": {
+          "result": 64
+        },
+        "pwrite64_at33": {
+          "errno": 1
+        },
+        "pread64_at47_count": {
+          "result": 64
+        },
+        "seek_end27": {
+          "result": 27
+        }
+      }
+    }
+  },
+  "method": "Four independent processes each perform 1,000 checked fixed-work iterations, four Trames vCPUs and three unprofiled counterbalanced before/after samples. Final compilation, local Linux CI and FFI acceptance finish before timing; native Linux runs first on the existing six-vCPU ARM64 environment using the identical static musl ELF, then is stopped during Mac timing. Device cases open/read/write/pread/pwrite/readv/writev/seek/fstat/close each iteration and validate EOF/zeros/counts/ENOSPC/character type. Existing null-device rights case includes open/send/close/recv/alias read/close. Socketpair and an added ordinary positioned-file read/write workload are controls. File setup/cleanup is outside its loop timer. Native macOS uses its own device APIs: null/zero seek returns 27 for the fixture request while Linux returns zero, explicitly checked per platform. macOS provides no full device here, and unprivileged urandom writes return EPERM, so those rows have no macOS throughput substitute. Existing Trames RNG write behavior remains acknowledged discard; native Linux executes native entropy-device semantics. Longest-child loop and whole-process wall medians include different work and are recorded separately. Different kernels/APIs/filesystems/CPU counts make native numbers contextual, not whole-app, Firefox, physical-iPad or universally native-speed claims.",
+  "validation": {
+    "apple_vfs": {
+      "passed": 452,
+      "ignored": 1
+    },
+    "linux_vfs": {
+      "passed": 451,
+      "ignored": 1
+    },
+    "apple_and_linux_abi": {
+      "passed": 192,
+      "ignored": 1
+    },
+    "apple_and_linux_kernel": {
+      "passed": 274,
+      "ignored": 3
+    },
+    "filtered_lifecycles": {
+      "passed": true,
+      "devices": [
+        "null",
+        "zero"
+      ],
+      "execution_slots": [
+        1,
+        2
+      ],
+      "tasks": 2,
+      "loops_each": 4,
+      "calls_per_loop": 15,
+      "total_calls": 122,
+      "worker_completed_calls": 122,
+      "filter_evaluations": 122,
+      "services": 0
+    },
+    "resources": [
+      "original inode/device behavior with five kinds and both native/worker interfaces",
+      "eight cold worker opens share one actual cached inode and distinct real OFDs",
+      "renamed mknod device and live readonly/nodev policy plus original mount retained after namespace copy",
+      "actual access/modify/open/final-close notifications after alias, worker release and numeric FD reuse",
+      "concrete access/synchronous results and raw versus positioned readonly error precedence",
+      "scalar/vector/positioned ABI, bad offsets, bad guest buffers and original accepted OFDs",
+      "dynamic pseudo controls remain owner-bound through aliases"
+    ],
+    "mac_product": {
+      "passed": 13,
+      "ignored": 1
+    },
+    "ffi": {
+      "passed": true,
+      "checks": [
+        {
+          "case": "alpine-install",
+          "passed": true,
+          "reused": true
+        },
+        {
+          "case": "alpine",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "alpine",
+          "terminal": 2,
+          "passed": true
+        },
+        {
+          "case": "debian-install",
+          "passed": true,
+          "reused": true
+        },
+        {
+          "case": "debian",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "debian",
+          "terminal": 2,
+          "passed": true
+        },
+        {
+          "case": "debian-setup",
+          "passed": true
+        },
+        {
+          "case": "custom-install",
+          "passed": true,
+          "reused": true
+        },
+        {
+          "case": "custom",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "custom",
+          "terminal": 2,
+          "passed": true
+        },
+        {
+          "case": "custom-sha256-rejection",
+          "passed": true
+        },
+        {
+          "case": "systemd",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "systemd",
+          "terminal": 2,
+          "passed": true
+        }
+      ]
+    },
+    "ios_static_build": true,
+    "physical_ipad": "Skipped per owner",
+    "strict_checks": true,
+    "execution_boundaries": true,
+    "linux_ci": {
+      "passed": true,
+      "checks": [
+        {
+          "check": "tests",
+          "exit": 0
+        },
+        {
+          "check": "clippy",
+          "exit": 0
+        }
+      ]
+    },
+    "linux_kernel_ci": {
+      "passed": true,
+      "checks": [
+        {
+          "check": "kernel-tests",
+          "exit": 0
+        },
+        {
+          "check": "kernel-clippy",
+          "exit": 0
+        }
+      ]
+    },
+    "linux_added_abi": {
+      "passed": true,
+      "checks": [
+        {
+          "check": "tests",
+          "exit": 0
+        },
+        {
+          "check": "clippy",
+          "exit": 0
+        }
+      ]
+    },
+    "reuse": "Full VFS/kernel/product/FFI passes and production binaries reused after the final Linux cfg(test)-only ABI matrix addition. Only the affected Apple/Linux ABI and strict checks rerun for that addition. Unchanged CPU/memory/graphics acceptance and guest artifacts reused.",
+    "environment": "Initial compiler ENOSPC recovered by removing only generated incremental caches in known target directories. Final debug checks use CARGO_INCREMENTAL=0; release build settings are unchanged. Sources, rootfs, logs, measured baselines and installed stable app were retained."
+  },
+  "implementation": {
+    "identity": "Immutable device behavior in the original inode; original full shared OFD, mount, status and close notification. No path-name device bypass.",
+    "pseudo": "Only the actual Send+Sync Arc-backed inode cache crosses into the private PathQueries island. Its BTreeMap and u64 identity allocation share a short cache guard; hits release it before content updates, fixed device hits need no content rewrite. Runtime/task Rc/control state stays private.",
+    "io": "Original device algorithms and common access/mount/timestamp/notification behavior for owner/native and workers; raw/positioned admission uses compile-time paths and preserves original error order. No additional native permission policy or storage/file-size charge.",
+    "rights": "Actual device OFDs are portable SCM_RIGHTS; queued rights preserve full original descriptions and final-close ownership across numeric reuse.",
+    "hot_path": "Byte I/O acquires no pseudo cache lock or name lookup. Ordinary CPU/memory/Unix paths gain no global resource lock, service thread, bus, polling loop or memory fence."
+  },
+  "remaining": [
+    "Dynamic/privileged device controls, native-service adapters and Unix-bearing owning graphs",
+    "Native TCP/UDP batches, legacy PTY/task/job-control and pending task signals",
+    "io_uring controls, mount/nsfs topology and proc controls",
+    "Structural file/VM/task transitions and residual whole-process cohort joins",
+    "Continue consolidating FD routing/admission to avoid repeated membership lookups; the added file control has no observed material timing regression"
+  ],
+  "source_hashes": {
+    "runtime/crates/trames-linux/src/direct.rs": "1ca72713a3adeb49a8fb59f3cdd6ac475c614a7622eabd018a3dd754c263b5aa",
+    "runtime/crates/trames-session/src/process_socket_wait.rs": "b05a1f259a11f047aa2106a49abe479d95300b322159dcedbadc82fc80723580",
+    "runtime/crates/trames-vfs/src/direct_io.rs": "39c06432faa67fc0a55b279b98a62bc0c392b9a5dc541d000c6c6735a61f04b9",
+    "runtime/crates/trames-vfs/src/lib.rs": "53f52d68be907cc176773b2781b5e8006c1b0fad61571688c7298136fec696ed",
+    "runtime/crates/trames-vfs/src/open_handle.rs": "e871f89f0484b46fd4fd9a9e0d5c75c3e8be563947d382414ab7067af5fce4a3",
+    "runtime/crates/trames-vfs/src/path_queries.rs": "598b568d65281c73a01ead0a1b30daca019b2ac8fd8e62219f0bc2b3d102252a",
+    "runtime/crates/trames-vfs/src/pseudo.rs": "b8c82e7cb35a0d93abcf339d76a7d7dcf20bb4474e6d20a1b995f0c2dfabdcdf",
+    "runtime/crates/trames-vfs/src/pty.rs": "ba8b24d5369fde1fe5253b502764858bae09c0356cd110b0e8b905f1d116312d",
+    "runtime/docs/architecture/execution-backends.md": "320b81e122e9e9f42006d64368c4ba9ce54e6ed5dd2c38db3d564900917f936b",
+    "runtime/crates/trames-vfs/src/simple_device.rs": "65630387ffafd03900a10a90a72babd03cd03db6e3cc9369291c321f9178a291"
+  },
+  "fixture_source_hashes": {
+    "tests/fixtures/fd-create-bench.c": "9024b3544f54070b670f3c67fed43b98708bccc8339c1513b6ecc118cbed11d2",
+    "tests/performance/fd-create.py": "02f83d8813c469a4841a0cea7a71705c24955060b1f428da131b7be6d5c16c9c"
+  },
+  "log_hashes": {
+    "target/simple-device-tests-final.log": "01dca9bb1234d23d95dd78f33b97ea8b1d36d8db004f738a19c09570a8196e0f",
+    "target/simple-device-abi-final.log": "dad858c790376ad83e3bda8684256e9808603e242f2523c0b6f063cd410e31e9",
+    "target/simple-device-clippy-final.log": "65ce70fee58ba7a39a6f932e408c84131cef2b03478e93ca1dd31275c1cbe760",
+    "target/simple-device-kernel-final.log": "b144e1ae0e68e59228b55c48f7a38115cbaaee2ac8f0a3866dfba86102141645",
+    "target/simple-device-kernel-clippy-final.log": "2ff050e7367df0ce31f82db547ba10ccf23e760908bf84d9a0bbfdc73bf6b58d",
+    "target/simple-device-linux-ci.log": "82046578fe641e78fe8b8ccec07ee650bf1f7e8740a97e954b96c7263dfedf56",
+    "target/simple-device-linux-kernel-ci.log": "04d7b832a2c02badc052b8a2847bc4d12d19a68157386c0e21171ca48ef9903d",
+    "target/simple-device-linux-abi-ci.log": "82046578fe641e78fe8b8ccec07ee650bf1f7e8740a97e954b96c7263dfedf56",
+    "target/simple-device-ffi-build.log": "f5b7c091879bc29b7e996b0ff548c51bd66f78119148a4639f1586e84159a11a",
+    "target/simple-device-ffi-tests.log": "a0ed12eb6aa6fe034466b76f310acfdbcd27794a78dbf9cf6cf2b6e08298cc0d",
+    "target/simple-device-ios-build.log": "dc8f00b45ad4c444c5864bab439bf56da584a3ee71db266b4e4a17dcb0b016c9",
+    "target/simple-device-mac-tests.log": "59f7c7bdbf0f920fa83e403e6b487b837356ff9e5fa41c136783eea48b05fea4",
+    "target/simple-device-mac-clippy.log": "1e37c67d2e6053ed1017ae1eae2826bfb1bc2c1d8d6996c016f5a16be2043a77",
+    "target/simple-device-mac-build.log": "be869a7555d3da5998cec0330817186ab6fc3abdc4246b607876a7269cfc1875",
+    "target/simple-device-runtime-boundaries.log": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651",
+    "target/simple-device-ipad-boundaries.log": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651",
+    "target/simple-device-mac-boundaries.log": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651",
+    "target/simple-device-install.log": "d81b37faaef60b5a1b635ce5a81a399a304e89d9aee6498d2d7eecf5f3f5bd41",
+    "target/simple-device-native-linux-final.log": "1ca8e55f3cf0b16d9d29890d0b676b9f2caa37c722137cced2da294b14d814df",
+    "target/simple-device-native-final-stop.log": "2bca638cd23f0395bed9148637d0b55f084dd08ce3b54e72897532116649b77a",
+    "target/local-ci/io/simple-device-linux-tests.log": "987fc4626ebc3641c24c204c0014c318b08483cb3f13900d59585cda770eb0c2",
+    "target/local-ci/io/simple-device-linux-clippy.log": "5d20c639b157f38004cafa06d04083d5ab25024a708a04a0c6671dcd1e454c5d",
+    "target/local-ci/io/simple-device-linux-kernel-tests.log": "6f4110a2a0c54e86f70558014777b4f18d911997ba77b69bfb74b24657f4ceca",
+    "target/local-ci/io/simple-device-linux-kernel-clippy.log": "5948129c68376f493100cb785e2e0e5688636485501de37bc6cb6a65451e8b63",
+    "target/local-ci/io/simple-device-linux-abi-tests.log": "52664b0d5d5febc81b2f3052bc34e9f7e9d8be9674f58ef096f942166ee693b5",
+    "target/local-ci/io/simple-device-linux-abi-clippy.log": "69384d90b32e02ecbf5761c33803338ff6d5d0cff12423b1357aea74cce86dc5",
+    "target/simple-device-perf-null-final.log": "3aa2c45e0972bb6f2b7b49b7ddde33eaeccd5af9876117d4727e3b0812a5bacc",
+    "target/simple-device-perf-zero-final.log": "f612d5b345d3f702bd7d2e2362ee28fb92932d1d09b79c25898d521e80d0e13c",
+    "target/simple-device-perf-full-final.log": "163ebb8166701a134e570aebd95c8ade50f6e905d6fda444950e0b1d97f18bf5",
+    "target/simple-device-perf-random-final.log": "579f0d1323f9f163a7543c0484768b48d864a21471ca32fda4ca7e49f8fc6264",
+    "target/simple-device-perf-rights-final.log": "b55d0d5751431f08390d43b1f5749705556ad0d5ded76ae9e8da694fd8761646",
+    "target/simple-device-perf-pair-final.log": "91b1f733462dfeecfc0cd723cc9a10dc178628656bb394c085695f6fb648aa01",
+    "target/simple-device-perf-file-final.log": "297c86d7941f7102675bb43d499cf7c907cdb6264aee1d959d3031ce30c43a24"
+  },
+  "installed_dev_runner_sha256": "c8916e768b7183c730397dca4a87368f2c3b0b75193351af457bdfdd2803e1e4",
+  "stable_runner_sha256": "ec74a40ef7cef8a85279cdda2070c25d92fcb1538219f04d0f13008c360381ad",
+  "ios_library_sha256": "5478fdddf7ef26424e92eca021bca5c5f391bdbdf8705e82ba2327c831c0f367"
+}

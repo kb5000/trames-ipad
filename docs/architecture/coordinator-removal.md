@@ -1925,3 +1925,84 @@ io_uring, mount/proc ownership and structural VM/task changes remain. recvmmsg i
 currently unimplemented rather than an implemented coordinator path. See the
 [validation record](../validation/worker-unix-batch-20261103.json) and
 [shared contract](../../runtime/docs/architecture/execution-backends.md#retained-unix-batches-and-paired-packet-bytes-2026-11-03).
+
+## Twenty-fifth migration implemented — shared stateless memory devices — 2026-11-03
+
+Runtime `e4a9f217ac17821cef0097d465466d3c340c7fa4` moves null, zero, full,
+random and urandom descriptions into actual shared Files/OFD ownership. Admission
+uses immutable inode behavior, not a pathname shortcut. Renamed/custom mknod nodes
+and opened mount identities retain their original policy and lifetime. Owner/native
+and workers use the same device algorithms and access/mount/timestamp/notification
+handling. Raw and positioned error order and existing synchronous results remain.
+Stateless operations gain no storage or RLIMIT_FSIZE charge.
+
+The fixed synthetic devices use the original shared pseudo-inode cache even on
+concurrent first opens. The cache guard protects only registration, identity and
+pruning; hits release it before content refresh, and fixed behavior needs no rewrite.
+Hot reads/writes never acquire it or resolve a name. The PathQueries Rc/control
+island stays private: only the actual Arc cache, whose fields are Send+Sync by
+composition, crosses the boundary. Proc/sysfs, magic device links, terminals, PTMX,
+render/bridge/block/kernel-log controls retain their owner boundaries. The common
+walker still applies original credentials, device policy, nodev and mount checks.
+No new service thread, bus, polling, global resource lock or ordinary-memory fence
+is introduced. Actual device OFDs can now travel as portable Unix rights without
+the owner ledger; last close and notification occur on the real last reference.
+
+| Four processes × 1,000 checked iterations, longest-child median | Previous | Current | Native macOS | Native ARM Linux, exact ELF | Improvement |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Null complete device lifecycle | 684.28 ms | 37.95 ms | 30.81 ms | 2.81 ms | 18.03x |
+| Zero complete device lifecycle | 687.53 ms | 36.75 ms | 23.34 ms | 2.98 ms | 18.71x |
+| Full complete device lifecycle + ENOSPC | 687.11 ms | 37.31 ms | No device | 2.83 ms | 18.41x |
+| Urandom complete device lifecycle | 691.91 ms | 39.28 ms | Different write permission | 3.96 ms | 17.61x |
+| Null OFD open / Unix rights / alias read / close | 520.24 ms | 85.00 ms | 12.45 ms | 2.48 ms | 6.12x |
+| Existing socketpair lifecycle | 21.69 ms | 21.91 ms | 4.82 ms | 4.71 ms | No gain claimed |
+| Ordinary positioned-file write/read control | 52.15 ms | 45.17 ms | 4.52 ms | 0.66 ms | No gain claimed |
+
+Whole-process wall medians for null/zero/full/urandom are **720.44 → 71.89 ms**,
+**724.08 → 71.30 ms**, **722.03 → 72.25 ms**, **729.02 → 74.49 ms**;
+null-rights are **636.60 → 180.29 ms**. Separate diagnostic cohort counts fall
+**20,714 → 50**, **20,861 → 48**, **20,956 → 51**, **20,816 → 50**, and
+**14,684 → 57**. Device lifecycle service requests fall from roughly 6,300–6,500
+to three, including process startup/teardown; rights requests remain three because
+previous rights mostly forced joined execution rather than counted services.
+Socketpair loops are **21.69 → 21.91 ms**, wall **55.70 → 55.58 ms**, cohorts
+**48 → 50**. The additional ordinary positioned-file control is **52.15 → 45.17 ms**,
+wall **134.65 → 133.34 ms**, with **50 → 50** cohorts. No statistically established
+gain/regression bound is claimed for those controls; they check for cross-path cost.
+
+Device iterations include open/read/write/pread/pwrite/readv/writev/seek/fstat/close,
+checking counts, EOF/zeros, character type and ENOSPC. File setup/cleanup is outside
+its timer. All final compilation, local Linux CI and FFI acceptance precede the
+three unprofiled counterbalanced samples. Native Linux uses the exact static ARM64
+musl ELF on the existing six-vCPU environment and is stopped during Mac timing;
+Trames uses four vCPUs. macOS null/zero seek returns the requested end offset 27,
+while Linux returns zero, explicitly checked per platform. This Mac has no full
+device and unprivileged urandom writes return EPERM, so no throughput substitute is
+invented for those rows. Original Trames RNG writes remain acknowledged discard;
+native Linux executes its own entropy-device behavior. Different kernels, APIs,
+filesystems, compiler targets and CPU counts make native results contextual.
+These loops do not establish whole-app, Firefox, iPad or universal native speed.
+
+Apple/Linux VFS **452/451**, ABI **192 each**, kernel **274 each**, strict checks,
+Mac **13**, both product boundaries, all **13** FFI environment checks and the iPad
+static build pass. The final added cfg(test)-only ABI matrix reruns only affected
+Apple/Linux ABI/strict checks; unchanged production passes/artifacts are reused.
+Physical iPad testing remains skipped per owner. Five device tests cover cold
+identity, renamed nodes, live/retained mounts, actual notifications and numeric
+reuse. The ABI matrix checks scalar/vector/positioned buffers, offsets and concrete
+errors. Four real guest null/zero cases on one/two slots each complete **122 calls
+entirely on workers**, with **122 filter decisions and zero services**, including
+open, byte/positioned I/O, seek/stat, flags/alias/close and Unix rights.
+
+An initial compiler ENOSPC was resolved by clearing only regenerable incremental
+caches; final debug checks disable incremental caching and release settings stay
+unchanged. Source, rootfs and measured artifacts remain intact. The measured runner
+is installed in Trames Dev, and the stable app is unchanged.
+
+The coordinator-removal goal remains active. Dynamic device/native-service controls,
+Unix owning graphs, native IP batches, task/job control, io_uring, mount/proc ownership
+and structural VM/task transitions remain. Further FD routing consolidation should
+remove repeated membership lookup; the ordinary-file control records the current
+cost rather than asserting all paths are free. See the
+[validation record](../validation/worker-simple-device-20261103.json) and
+[shared contract](../../runtime/docs/architecture/execution-backends.md#shared-stateless-memory-devices-2026-11-03).
