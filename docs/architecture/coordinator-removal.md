@@ -1,5 +1,78 @@
 # Coordinator dependency audit
 
+## Twentieth migration implemented — worker PTY creation and live device policy — 2026-11-03
+
+Runtime `8bb98ca0706c2192ce01064c11b6e0d92035063e` shares the actual per-cgroup
+device attachment graph and moves peer opening and real-devpts creation onto
+execution workers, common to Mac and iPad.
+
+| Operation | Shared authority and worker behavior | Remaining joined boundary |
+| --- | --- | --- |
+| Device policy | Original per-group program list/flags and immutable parent resources; owner attach/detach/query and worker checks use the same fields | Structural cgroup and task membership transitions |
+| TIOCGPTPEER | Accepted original master OFD, original inode/mount, original credentials, actual live policy and hidden Files reservation | Excluded owner controls retain their original path |
+| Real devpts creation | Common pathname resolver, actual PTY registry, atomic number/node publication and real shared OFDs | Legacy pseudo-devpts node cache; slave opens that can acquire a controlling terminal |
+| Ordinary permissions | One unchanged Credentials permission implementation for owner and worker | No additional native or device permission policy is layered on top |
+
+There is no effective-policy copy or allow/deny cache. Retained factories observe
+ancestor attach/detach through the same original shared objects. Each group's
+program list and attachment flags share one object lock; the cgroup/task graph
+stays owner-local. Workers retain their actual current domain and credentials for
+that epoch, like the existing namespace/credential captures. Checks use no whole
+cgroup/VFS lock, new service thread or message bus.
+
+Peer opening accepts once and keeps the existing type, flags, locked-master,
+FD-capacity, inode-permission and device-policy error order. Failed opens roll back
+the hidden reservation before opening a slave lease. The common constructor keeps
+the original devpts resource after namespace changes and CLOEXEC remains per FD.
+
+Concurrent allocation previously searched for a local slave number separately from
+insertion. It now selects and inserts under one devpts filesystem write guard, while
+the existing registry lock protects scheduler ID selection/publication. Eight worker
+creators retain distinct scheduler IDs and local numbers and the original slave
+nodes; final closes remove their own nodes. Locks cover allocation metadata and do
+not span ordinary terminal I/O or notification callbacks. PTY admission checks the
+shared resource boundary before allocation, rather than walking ancestry on every
+node lookup. Slave pathname opens without O_NOCTTY still defer before task effects.
+
+| Four processes × 1,000 checked operations, longest-child median | Previous | Current | Native Linux, exact ELF | Improvement |
+| --- | ---: | ---: | ---: | ---: |
+| Peer open / CLOEXEC query / write / read / close | 98.28 ms | 9.83 ms | 25.67 ms | 10.00x |
+| Real-devpts master create / unlock / peer / flags / I/O / close | 229.34 ms | 34.94 ms | 54.14 ms | 6.56x |
+
+Process-wall medians fall **135.88 → 46.90 ms** and **274.48 → 75.56 ms**.
+Separate diagnostic cohort counts fall **2,574 → 61** and **5,375 → 58**;
+service requests remain **3 → 3**, including startup/teardown. These counts are
+reported rather than claiming all whole-cohort joins have disappeared. The remaining
+joins have not all been attributed; task/PTY control, legacy pseudo resources and
+startup/teardown still require separate examination.
+
+Three unprofiled counterbalanced samples run after compilation and with local Linux
+CI stopped. Peer setup is outside its loop; full creation is inside the second loop.
+The full-creation guest mounts one real devpts instance before launching the children.
+Native Linux runs the identical static musl ELF against its original /dev/ptmx on the
+existing six-vCPU ARM64 CI machine. Linux's native TTY implementation differs, so the
+lower Trames loop times establish neither generally faster native execution nor a
+Firefox/whole-app/iPad speedup. No native macOS variant of Linux-specific controls is
+substituted.
+
+Apple/Linux VFS checks pass **436/435**, ABI **178 each**, kernel **264 each**, and
+Mac product **13**, with strict checks and both product boundary checks passing.
+The worker regression performs 80 creation/control/close calls plus two final futex
+waits on one/two slots, with zero services and one filter decision per entry. Completed
+test tasks park instead of burning the shared instruction budget while a peer finishes
+host metadata. Only that affected test is rerun after the wait adjustment; unchanged
+full-suite results are reused. Real tests also cover live ancestor policy, original
+credentials, exact errors, rollback, eight simultaneous allocations and cleanup.
+All 13 production FFI environment checks and the iPad static build pass. Physical iPad
+testing remains skipped per owner; guest artifacts and unrelated acceptance are reused.
+
+The goal remains active. Pending work includes the legacy pseudo-devpts allocation
+cache, controlling-terminal and task signal/hangup paths; full Unix socket creation,
+listener/connection/addressed datagram ownership; io_uring controls; network/mount
+namespace graphs; and task/structural VM transitions. See the
+[validation record](../validation/worker-pty-creation-20261103.json) and
+[shared contract](../../runtime/docs/architecture/execution-backends.md#worker-devpts-creation-and-live-device-policy-2026-11-03).
+
 ## Nineteenth migration implemented — complete shared PTY endpoints — 2026-11-03
 
 Runtime `658f8d5b51089a7c490d9959ff47b7d8ad07f71a` preserves the shared

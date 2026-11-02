@@ -119,16 +119,20 @@ int main(int argc, char **argv) {
     int queue = -1, pair[2] = {-1,-1}, monitor = -1, local[2] = {-1,-1};
     char watched[] = "/tmp/trames-watch-XXXXXX";
     int signal_rights = 0;
-    int pty_rights = 0, pty_lifecycle = 0;
+    int pty_rights = 0, pty_lifecycle = 0, pty_peer = 0, pty_create = 0;
 #ifdef __linux__
     signal_rights = !strcmp(kind, "signal-rights");
     pty_rights = !strcmp(kind, "pty-rights");
     pty_lifecycle = !strcmp(kind, "pty");
+    pty_peer = !strcmp(kind, "pty-peer");
+    pty_create = !strcmp(kind, "pty-create");
+    const char *ptmx = getenv("TRAMES_BENCH_PTMX");
+    if (!ptmx) ptmx = "/dev/ptmx";
     sigset_t signal_mask; assert(!sigemptyset(&signal_mask)); assert(!sigaddset(&signal_mask, SIGUSR1));
-    if (pty_rights || pty_lifecycle) {
-        pair[0] = open("/dev/ptmx", O_RDWR | O_NOCTTY); assert(pair[0] >= 0);
+    if (pty_rights || pty_lifecycle || pty_peer) {
+        pair[0] = open(ptmx, O_RDWR | O_NOCTTY); assert(pair[0] >= 0);
         int unlocked = 0; assert(!ioctl(pair[0], TIOCSPTLCK, &unlocked));
-        pair[1] = ioctl(pair[0], TIOCGPTPEER, O_RDWR | O_NOCTTY); assert(pair[1] >= 0);
+        if (!pty_peer) { pair[1] = ioctl(pair[0], TIOCGPTPEER, O_RDWR | O_NOCTTY); assert(pair[1] >= 0); }
     }
 #endif
     if (!strcmp(kind, "unix-rights") || signal_rights || pty_rights) {
@@ -191,6 +195,21 @@ int main(int argc, char **argv) {
                 assert(read(pair[0], &received, 1) == 1 && received == sent);
             }
             assert(!close(imported));
+        } else if (pty_peer || pty_create) {
+#ifdef __linux__
+            int master = pair[0];
+            if (pty_create) {
+                master = open(ptmx, O_RDWR | O_NOCTTY); assert(master >= 0);
+                int unlocked = 0; assert(!ioctl(master, TIOCSPTLCK, &unlocked));
+            }
+            int slave = ioctl(master, TIOCGPTPEER, O_RDWR | O_NOCTTY | O_CLOEXEC); assert(slave >= 0);
+            assert(fcntl(slave, F_GETFD) & FD_CLOEXEC);
+            unsigned char sent = (unsigned char)('a' + i % 26), received = 0;
+            assert(write(slave, &sent, 1) == 1);
+            assert(read(master, &received, 1) == 1 && received == sent);
+            assert(!close(slave));
+            if (pty_create) assert(!close(master));
+#endif
         } else if (pty_lifecycle) {
 #ifdef __linux__
             int alias = dup(pair[1]); assert(alias >= 0);

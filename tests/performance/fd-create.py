@@ -15,7 +15,7 @@ p = argparse.ArgumentParser(description=__doc__)
 for name in ('baseline', 'candidate', 'native', 'fixture', 'rootfs', 'output'):
     p.add_argument('--' + name, type=Path)
 p.add_argument('--native-only', action='store_true')
-p.add_argument('--kind', choices=('pipe', 'eventfd', 'timerfd', 'inotify', 'tcp', 'tcp-session', 'tcp-blocking', 'tcp-state', 'tcp-epoll', 'tcp-poll', 'epoll', 'inotify-watch', 'unix-rights', 'signalfd', 'signal-rights', 'pty', 'pty-rights'), required=True)
+p.add_argument('--kind', choices=('pipe', 'eventfd', 'timerfd', 'inotify', 'tcp', 'tcp-session', 'tcp-blocking', 'tcp-state', 'tcp-epoll', 'tcp-poll', 'epoll', 'inotify-watch', 'unix-rights', 'signalfd', 'signal-rights', 'pty', 'pty-rights', 'pty-peer', 'pty-create'), required=True)
 p.add_argument('--repeats', type=int, default=3)
 p.add_argument('--operations', type=int, default=10000)
 p.add_argument('--cpus', type=int, default=12)
@@ -58,8 +58,12 @@ def options(runner):
 
 
 def guest(variant, repeat):
-    jobs = [f'/bench {a.kind} {a.operations} & p{i}=$!' for i in range(4)]
+    prefix = 'TRAMES_BENCH_PTMX=/bench-pts/ptmx ' if a.kind == 'pty-create' else ''
+    jobs = [f'{prefix}/bench {a.kind} {a.operations} & p{i}=$!' for i in range(4)]
     command = '; '.join(jobs + [f'wait $p{i} || exit $?' for i in range(4)])
+    if a.kind == 'pty-create':
+        command = ('mkdir -p /bench-pts && mount -t devpts -o newinstance,ptmxmode=0666,mode=0620,max=16 '
+                   'devpts /bench-pts || exit $?; ' + command)
     args = options(a.baseline if variant == 'before' else a.candidate)
     if repeat == 0:
         args.append('--metrics')

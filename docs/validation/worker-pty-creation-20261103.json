@@ -1,0 +1,1211 @@
+{
+  "date": "2026-11-03",
+  "status": "progress",
+  "stage": 20,
+  "runtime_revision": "8bb98ca0706c2192ce01064c11b6e0d92035063e",
+  "baseline_runtime_revision": "658f8d5b51089a7c490d9959ff47b7d8ad07f71a",
+  "scope": [
+    "Actual shared per-group BPF device attachment objects and immutable parent capability graph",
+    "Common original Credentials inode-permission implementation",
+    "TIOCGPTPEER on the accepted original master with real hidden Files reservation and original devpts/inode",
+    "Worker pathname master creation and explicit O_NOCTTY slave open on real devpts",
+    "Single locked scheduler ID publication and devpts-local number/node selection and insertion"
+  ],
+  "performance": {
+    "peer": {
+      "passed": true,
+      "kind": "pty-peer",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "before",
+          "repeat": 0,
+          "wall_seconds": 0.47792491700000006,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.054675291,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.075539833,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.097936292,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.103511459,
+              "checksum": 500500
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 2574,
+            "cohort_stop_us": 13127,
+            "service_caller_wait_us": 65,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 20127,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 6628,
+            "worker_fd_syscalls": 6627,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 13255,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "after",
+          "repeat": 0,
+          "wall_seconds": 0.050336332999999955,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.009217166,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.009587333,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.009791125,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.008820417,
+              "checksum": 500500
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 61,
+            "cohort_stop_us": 832,
+            "service_caller_wait_us": 35,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 20125,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 11825,
+            "worker_fd_syscalls": 7884,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 19709,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "before",
+          "repeat": 1,
+          "wall_seconds": 0.13573837500000008,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.049683,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.07156275,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.093905084,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.099761792,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 1,
+          "wall_seconds": 0.04821125000000004,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.00874475,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.007686375,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.009826375,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.009122417,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 2,
+          "wall_seconds": 0.04689720800000008,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.008800166,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.00935075,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.008534334,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.008821833,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 2,
+          "wall_seconds": 0.1370355000000001,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.048517833,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.06981475,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.092480166,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.0982,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 3,
+          "wall_seconds": 0.13588216600000003,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.048441708,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.070308417,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.092699,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.098283583,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 3,
+          "wall_seconds": 0.04529891599999991,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.008806875,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.00749225,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.009935875,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.008626208,
+              "checksum": 500500
+            }
+          ]
+        }
+      ],
+      "sha256": {
+        "baseline": "5dee676b57073b200e2675212ad6a6e7ef410c4c1458a0cd4f43940354b64ca9",
+        "candidate": "851fd079662967c3173d9e309ab23cc24e980a7b4b63b2ed5d36a573608a0486",
+        "fixture": "584be3e97f249d6d21fb8672c09fdf8272d82b04bb1bd08d7660175d5f5c65a4",
+        "rootfs": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe"
+      },
+      "native_environment": {
+        "system": "Darwin",
+        "release": "27.0.0",
+        "architecture": "arm64",
+        "logical_cpus": 12
+      },
+      "summary": {
+        "before": {
+          "loop_max_median_seconds": 0.098283583,
+          "process_wall_median_seconds": 0.13588216600000003,
+          "profile": {
+            "cohort_rounds": 2574,
+            "cohort_stop_us": 13127,
+            "service_caller_wait_us": 65,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 20127,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 6628,
+            "worker_fd_syscalls": 6627,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 13255,
+            "worker_task_resumes": 3
+          }
+        },
+        "after": {
+          "loop_max_median_seconds": 0.009826375,
+          "process_wall_median_seconds": 0.04689720800000008,
+          "profile": {
+            "cohort_rounds": 61,
+            "cohort_stop_us": 832,
+            "service_caller_wait_us": 35,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 20125,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 11825,
+            "worker_fd_syscalls": 7884,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 19709,
+            "worker_task_resumes": 3
+          }
+        }
+      }
+    },
+    "create": {
+      "passed": true,
+      "kind": "pty-create",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "before",
+          "repeat": 0,
+          "wall_seconds": 0.311000375,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.113738458,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.188933291,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.231516125,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.240589583,
+              "checksum": 500500
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 5375,
+            "cohort_stop_us": 31469,
+            "service_caller_wait_us": 31,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 32210,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 10180,
+            "worker_fd_syscalls": 10178,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 20358,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "after",
+          "repeat": 0,
+          "wall_seconds": 0.079464125,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.030353334,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.029759959,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.033663583,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.03696325,
+              "checksum": 500500
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 58,
+            "cohort_stop_us": 1350,
+            "service_caller_wait_us": 41,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 32210,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 18609,
+            "worker_fd_syscalls": 11164,
+            "worker_file_syscalls": 3722,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 29773,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "before",
+          "repeat": 1,
+          "wall_seconds": 0.279361875,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.11599825,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.169375125,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.22310075,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.233602833,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 1,
+          "wall_seconds": 0.07660458400000003,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.027940375,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.029149167,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.028387209,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.036120125,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 2,
+          "wall_seconds": 0.07246329200000012,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.029170167,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.027406,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.030452792,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.033669167,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 2,
+          "wall_seconds": 0.2744787499999999,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.116049958,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.169110125,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.218109167,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.228794417,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 3,
+          "wall_seconds": 0.2721627910000002,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.1163005,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.169568542,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.217753042,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.229342375,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 3,
+          "wall_seconds": 0.07555954200000015,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.029958,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.032241459,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.034478125,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.034944375,
+              "checksum": 500500
+            }
+          ]
+        }
+      ],
+      "sha256": {
+        "baseline": "5dee676b57073b200e2675212ad6a6e7ef410c4c1458a0cd4f43940354b64ca9",
+        "candidate": "851fd079662967c3173d9e309ab23cc24e980a7b4b63b2ed5d36a573608a0486",
+        "fixture": "584be3e97f249d6d21fb8672c09fdf8272d82b04bb1bd08d7660175d5f5c65a4",
+        "rootfs": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe"
+      },
+      "native_environment": {
+        "system": "Darwin",
+        "release": "27.0.0",
+        "architecture": "arm64",
+        "logical_cpus": 12
+      },
+      "summary": {
+        "before": {
+          "loop_max_median_seconds": 0.229342375,
+          "process_wall_median_seconds": 0.2744787499999999,
+          "profile": {
+            "cohort_rounds": 5375,
+            "cohort_stop_us": 31469,
+            "service_caller_wait_us": 31,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 32210,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 10180,
+            "worker_fd_syscalls": 10178,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 20358,
+            "worker_task_resumes": 3
+          }
+        },
+        "after": {
+          "loop_max_median_seconds": 0.034944375,
+          "process_wall_median_seconds": 0.07555954200000015,
+          "profile": {
+            "cohort_rounds": 58,
+            "cohort_stop_us": 1350,
+            "service_caller_wait_us": 41,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 32210,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 18609,
+            "worker_fd_syscalls": 11164,
+            "worker_file_syscalls": 3722,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 29773,
+            "worker_task_resumes": 3
+          }
+        }
+      }
+    }
+  },
+  "native_linux_exact_elf": {
+    "peer": {
+      "passed": true,
+      "kind": "pty-peer",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 12,
+      "records": [
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.026968957999997656,
+          "children": [
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.024800333,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.024883042,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.024793833,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.024719458,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.02709595900000039,
+          "children": [
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.02558725,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.025667792,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.025549083,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.025562084,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.02747416700000116,
+          "children": [
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.025083,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.025668458,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.024779167,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-peer",
+              "operations": 1000,
+              "seconds": 0.024548791,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "native": "584be3e97f249d6d21fb8672c09fdf8272d82b04bb1bd08d7660175d5f5c65a4",
+        "fixture": "584be3e97f249d6d21fb8672c09fdf8272d82b04bb1bd08d7660175d5f5c65a4"
+      },
+      "native_environment": {
+        "system": "Linux",
+        "release": "7.0.0-38-generic",
+        "architecture": "aarch64",
+        "logical_cpus": 6
+      },
+      "summary": {
+        "native": {
+          "loop_max_median_seconds": 0.025667792,
+          "process_wall_median_seconds": 0.02709595900000039
+        }
+      }
+    },
+    "create": {
+      "passed": true,
+      "kind": "pty-create",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 12,
+      "records": [
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.058703583000003334,
+          "children": [
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.058150792,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.057240333,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.0576985,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.057664792,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.0546323330000007,
+          "children": [
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.054136459,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.0535045,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.053053083,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.053275208,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.054864416999997445,
+          "children": [
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.052918541,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.053546292,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.053236791,
+              "checksum": 500500
+            },
+            {
+              "kind": "pty-create",
+              "operations": 1000,
+              "seconds": 0.052832625,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "native": "584be3e97f249d6d21fb8672c09fdf8272d82b04bb1bd08d7660175d5f5c65a4",
+        "fixture": "584be3e97f249d6d21fb8672c09fdf8272d82b04bb1bd08d7660175d5f5c65a4"
+      },
+      "native_environment": {
+        "system": "Linux",
+        "release": "7.0.0-38-generic",
+        "architecture": "aarch64",
+        "logical_cpus": 6
+      },
+      "summary": {
+        "native": {
+          "loop_max_median_seconds": 0.054136459,
+          "process_wall_median_seconds": 0.054864416999997445
+        }
+      }
+    }
+  },
+  "method": "Four processes each perform 1,000 checked operations; three unprofiled counterbalanced before/after repetitions after compilation, with Linux CI stopped. Longest-child loop median and process-wall median; separate profiles include process startup/teardown. Peer setup outside its timer. Full-creation guest mounts one real devpts instance before children, then includes open/unlock/peer/flags/I/O/final close inside each iteration. Native Linux runs the identical static musl ELF against its original /dev/ptmx on the existing six-vCPU ARM64 Linux CI machine. Linux TTY implementation differs: lower Trames times do not imply generally faster native execution. No native macOS substitute for Linux-specific controls; no Firefox/whole-app/physical-iPad speedup inference.",
+  "validation": {
+    "apple_vfs": {
+      "passed": 436,
+      "ignored": 1
+    },
+    "linux_vfs": {
+      "passed": 435,
+      "ignored": 1
+    },
+    "apple_and_linux_abi": {
+      "passed": 178,
+      "ignored": 1
+    },
+    "apple_kernel": {
+      "unique_passed": 264,
+      "ignored": 3,
+      "method": "Reuse 263 passing full-suite cases; rerun the one affected worker regression after its final resource-wait correction."
+    },
+    "linux_kernel": {
+      "unique_passed": 264,
+      "ignored": 3,
+      "method": "Full suite passes; only the final worker test wait adjustment rerun, without repeating unchanged full CI."
+    },
+    "worker_pty_creation": {
+      "passed": true,
+      "execution_slots": [
+        1,
+        2
+      ],
+      "vcpus": 2,
+      "lifecycle_syscalls_per_case": 80,
+      "final_futex_waits": 2,
+      "filter_evaluations": 82,
+      "services": 0,
+      "one_filter_decision_per_entry": true
+    },
+    "resources": {
+      "passed": true,
+      "simultaneous_creators": 8,
+      "distinct_scheduler_ids": true,
+      "distinct_local_numbers": true,
+      "original_slave_nodes": true,
+      "worker_final_close_cleanup": true,
+      "live_ancestor_policy_through_retained_capture": true,
+      "original_credentials": true,
+      "hidden_fd_and_pty_quota_rollback": true,
+      "type_flag_lock_capacity_permission_policy_error_order": true,
+      "task_transition_defers_before_effects": true
+    },
+    "mac_product": {
+      "passed": 13,
+      "ignored": 1
+    },
+    "ffi": {
+      "passed": true,
+      "checks": [
+        {
+          "case": "alpine-install",
+          "passed": true,
+          "reused": true
+        },
+        {
+          "case": "alpine",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "alpine",
+          "terminal": 2,
+          "passed": true
+        },
+        {
+          "case": "debian-install",
+          "passed": true,
+          "reused": true
+        },
+        {
+          "case": "debian",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "debian",
+          "terminal": 2,
+          "passed": true
+        },
+        {
+          "case": "debian-setup",
+          "passed": true
+        },
+        {
+          "case": "custom-install",
+          "passed": true,
+          "reused": true
+        },
+        {
+          "case": "custom",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "custom",
+          "terminal": 2,
+          "passed": true
+        },
+        {
+          "case": "custom-sha256-rejection",
+          "passed": true
+        },
+        {
+          "case": "systemd",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "systemd",
+          "terminal": 2,
+          "passed": true
+        }
+      ]
+    },
+    "ios_static_build": true,
+    "physical_ipad": "Skipped per owner",
+    "strict_checks": true,
+    "execution_boundaries": true,
+    "linux_ci": {
+      "passed": true,
+      "checks": [
+        {
+          "check": "tests",
+          "exit": 0
+        },
+        {
+          "check": "clippy",
+          "exit": 0
+        }
+      ]
+    },
+    "linux_kernel_ci": {
+      "passed": true,
+      "checks": [
+        {
+          "check": "kernel-tests",
+          "exit": 0
+        },
+        {
+          "check": "kernel-clippy",
+          "exit": 0
+        }
+      ]
+    },
+    "unchanged_acceptance": "Unchanged guest artifacts and standalone CPU/memory/graphics acceptance reused. Test-wait and documentation changes do not trigger repeat full acceptance."
+  },
+  "test_wait_correction": {
+    "observed": "During the Apple full batch, the first completed test task could spin through the shared instruction allowance before the peer completed its host metadata operations. The assertion saw 46 total filter evaluations instead of 80; individual and Linux full checks had passed.",
+    "fix": "Completed tasks now park with original worker futex waits. Final assertions require all 80 lifecycle/control calls plus two waits, 82 filter evaluations and zero services on both hosts.",
+    "production_change": false
+  },
+  "implementation": {
+    "policy": "Original attachment Vec and flags moved into a per-group object lock; same Arc programs and immutable parent graph. No effective-policy copy, decision cache or whole-cgroup lock.",
+    "allocation": "Existing PTY registry lock covers scheduler ID selection/publication; one devpts filesystem write guard covers local number selection and node insertion. No registry lock spans normal terminal I/O or callbacks.",
+    "permissions": "Original inode permission algorithm factored into Credentials and reused by owner and factory; no additional policy layer.",
+    "guest_memory": "No guest memory, CPU permission, native-call or ordinary-memory fence policy added."
+  },
+  "remaining": [
+    "Legacy pseudo-devpts allocation/cache, non-O_NOCTTY controlling-terminal acquisition, task/job-control signals and master-hangup task effects",
+    "Full Unix socket creation/listener/connection/addressed datagram graph and excluded ancillary resources",
+    "io_uring control graph, network/mount namespaces and nsfs topology",
+    "Pending task signals, OOM/network proc controls and structural file/VM/task transitions",
+    "Attribute the residual diagnostic cohort joins; current counts include startup/teardown and do not prove zero joins"
+  ],
+  "source_hashes": {
+    "runtime/crates/trames-linux/src/direct.rs": "78a1708bf8b011dac83104551b7a617b28278b22d3173693792987d5000739ed",
+    "runtime/crates/trames-session/src/process_socket_wait.rs": "56b6c2e4a1bc8ad479e8c964640c7726446560260ae7e472d1aa34bc62e1815d",
+    "runtime/crates/trames-vfs/src/cgroup.rs": "ea2702b344b37a0f93b0dea4df5c7c7729547b606d59e35fed8bbc15d6d6cdb2",
+    "runtime/crates/trames-vfs/src/credentials.rs": "c799fa8d28be95d08c385d614a6c6db0e32d9ea59ee3a37190aabeb440de6ce8",
+    "runtime/crates/trames-vfs/src/descriptor_factory.rs": "71b63a7b68615a8e6b1b24d03c3716b8e2e04df0939b0649181dd8cdde86f4cd",
+    "runtime/crates/trames-vfs/src/lib.rs": "1c6034573b9bad56f1dd1ce1e633e61b8a2606f68def4756331021ccfe079827",
+    "runtime/crates/trames-vfs/src/path_queries.rs": "f21723837a35e4ed1c441e61285e1247782894f9efbec76c3d434518ae327e67",
+    "runtime/crates/trames-vfs/src/pty.rs": "211584e79c217f41df94dca9ab87a3b2d648f9f8080df44b7cc7ffba2624eaba",
+    "runtime/docs/architecture/execution-backends.md": "12a46be67dc6920b83274d4b2bf56c5f8b93bb551ccb852eb9ad88c0515d3e7d"
+  },
+  "fixture_source_hashes": {
+    "tests/fixtures/fd-create-bench.c": "fa4e16160cb1231ea036df611e459a30121f5df780ab8745d01cf3deb65b3a7d",
+    "tests/performance/fd-create.py": "f09134683fd5a4e3afb5b6430d1b8996ec84f4b6963ed8459d16155fab96d491"
+  },
+  "log_hashes": {
+    "target/pty-creation-tests-final.log": "2b19584525963b689a76e64ebd63043a407dc3620da7a26b28bce40d84ebddad",
+    "target/pty-creation-clippy-final.log": "190f8d12e1a9e16d5c4d1515e43f4bee69e04df6f124fb4b23a99d12d332d19d",
+    "target/pty-creation-kernel.log": "d0a476d32dd987cb0df05be5948ccd0d066e1f64478e66cc8a3af1646ac02eac",
+    "target/pty-creation-worker-final.log": "3c2a7ac569b575b8914d32a416de8d90f9d82816736550fbf156fee54f9d842c",
+    "target/pty-creation-kernel-clippy.log": "f9fb76b8335b2ada97cdfaafdef7b0376090a3533d3f4c3667d96c01c3db27ce",
+    "target/pty-creation-linux-worker-final.log": "87dc5b1d67cacd879cc7404210590f5a9512b63f18a6603b47d0e67830e7603d",
+    "target/pty-creation-ffi-build.log": "24c82f5a76a95b2368a8815b2046c3ad7576324f7c83fd5a7117531f8ccde528",
+    "target/pty-creation-ffi-tests.log": "a0ed12eb6aa6fe034466b76f310acfdbcd27794a78dbf9cf6cf2b6e08298cc0d",
+    "target/pty-creation-ios-build.log": "e654208c7d4735e637beb78ef3c6a2c6d5c19b7665236842e11250d136d6cdce",
+    "target/pty-creation-mac-build.log": "38091e685f1397eb24d1ae60d2f3d913ebc8b94463814e5a668e10f79ae8aa7a",
+    "target/pty-creation-mac-tests.log": "61dd3e9fb153b075d849ed45787db6c7688bc5e5b5d3031c9a503577a48fce66",
+    "target/pty-creation-mac-clippy.log": "91f4bc50e99ea2625dced361549b666e891adc9d54013a5060cf82c406aefd27",
+    "target/pty-creation-mac-boundaries.log": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651",
+    "target/pty-creation-ipad-boundaries.log": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651",
+    "target/pty-creation-perf-peer.log": "7c1ceaba60b3f951c8946500e6f7ad4c7f20f699703f9f26707dd4d476575f43",
+    "target/pty-creation-perf-create.log": "c632af4879da3dda20f0a619ec7e5910fe7db0e4657c483a2dbc682a592bb71a",
+    "target/pty-creation-install.log": "d81b37faaef60b5a1b635ce5a81a399a304e89d9aee6498d2d7eecf5f3f5bd41",
+    "target/local-ci/io/pty-creation-linux-tests.log": "6bf8a6e2ba65c47b810f8fd8e4daf157d0d05ef96721a1db62fce6fe8d539474",
+    "target/local-ci/io/pty-creation-linux-clippy.log": "b258a49b8df1bebf8e1f6e7e9105ef8209d1305468bfd664a2e4483506419677",
+    "target/local-ci/io/pty-creation-linux-kernel-tests.log": "bb987c6f9d3e03da84075fb4cee469e1100bce5b4feb038087959e0a481308c2",
+    "target/local-ci/io/pty-creation-linux-kernel-clippy.log": "9ac762685e8a23e22be07ea47debae019cf8f2aa2f3ff31e1b99d79a9d716027"
+  },
+  "installed_dev_runner_sha256": "851fd079662967c3173d9e309ab23cc24e980a7b4b63b2ed5d36a573608a0486",
+  "stable_runner_sha256": "ec74a40ef7cef8a85279cdda2070c25d92fcb1538219f04d0f13008c360381ad",
+  "ios_library_sha256": "a44c6462e844cdbad3a829ef5afeae899a2838a1f024b9339e98dd47e84464e2"
+}
