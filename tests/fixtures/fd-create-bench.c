@@ -113,9 +113,11 @@ int main(int argc, char **argv) {
         assert(!getsockname(listener, (struct sockaddr *)&address, &size));
         assert(!listen(listener, 4));
     }
-    int queue = -1, pair[2] = {-1,-1}, monitor = -1;
+    int queue = -1, pair[2] = {-1,-1}, monitor = -1, local[2] = {-1,-1};
     char watched[] = "/tmp/trames-watch-XXXXXX";
-    if (!strcmp(kind, "epoll")) {
+    if (!strcmp(kind, "unix-rights")) {
+        assert(!socketpair(AF_UNIX, SOCK_STREAM, 0, local)); assert(!pipe(pair));
+    } else if (!strcmp(kind, "epoll")) {
         queue = queue_create(); assert(queue >= 0); assert(!pipe(pair));
     } else if (!strcmp(kind, "inotify-watch")) {
         assert(mkdtemp(watched));
@@ -142,7 +144,25 @@ int main(int argc, char **argv) {
     }
     double began = now();
     for (unsigned i = 0; i < operations; i++) {
-        if (tcp_events) {
+        if (!strcmp(kind, "unix-rights")) {
+            unsigned char sent = (unsigned char)i, received = 0;
+            struct iovec vector = {.iov_base = &sent, .iov_len = 1};
+            union { struct cmsghdr align; unsigned char bytes[CMSG_SPACE(sizeof(int))]; } control = {0};
+            struct msghdr message = {.msg_iov = &vector, .msg_iovlen = 1,
+                .msg_control = control.bytes, .msg_controllen = sizeof(control.bytes)};
+            struct cmsghdr *header = CMSG_FIRSTHDR(&message);
+            header->cmsg_len = CMSG_LEN(sizeof(int)); header->cmsg_level = SOL_SOCKET; header->cmsg_type = SCM_RIGHTS;
+            memcpy(CMSG_DATA(header), &pair[1], sizeof(int));
+            assert(sendmsg(local[0], &message, 0) == 1);
+            memset(&control, 0, sizeof(control)); vector.iov_base = &received;
+            assert(recvmsg(local[1], &message, 0) == 1 && received == sent && !message.msg_flags);
+            header = CMSG_FIRSTHDR(&message);
+            assert(header && header->cmsg_level == SOL_SOCKET && header->cmsg_type == SCM_RIGHTS && header->cmsg_len == CMSG_LEN(sizeof(int)));
+            int imported; memcpy(&imported, CMSG_DATA(header), sizeof(int));
+            assert(write(imported, &sent, 1) == 1);
+            assert(read(pair[0], &received, 1) == 1 && received == sent);
+            assert(!close(imported));
+        } else if (tcp_events) {
             if (queue >= 0) interest(queue, 3, pair[0], (uint64_t)i + 1, 1);
             unsigned char sent = (unsigned char)i, received = 0;
             assert(write(pair[1], &sent, 1) == 1);
@@ -256,6 +276,7 @@ int main(int argc, char **argv) {
     if (listener >= 0) assert(!close(listener));
     if (queue >= 0) assert(!close(queue));
     if (pair[0] >= 0) {assert(!close(pair[0])); assert(!close(pair[1]));}
+    if (local[0] >= 0) {assert(!close(local[0])); assert(!close(local[1]));}
     if (monitor >= 0) assert(!close(monitor));
     if (!strcmp(kind, "inotify-watch")) assert(!rmdir(watched));
     assert(checksum == (uint64_t)operations * (operations + 1) / 2);

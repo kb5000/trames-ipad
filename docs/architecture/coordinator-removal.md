@@ -1,5 +1,68 @@
 # Coordinator dependency audit
 
+## Sixteenth migration implemented — worker Unix ancillary messages — 2026-11-02
+
+Runtime `245eb520bb19682fd01b325e1343f7e2dedf9ed7` moves paired Unix stream/datagram/seqpacket
+sendmsg/recvmsg onto executing workers through one original ancillary ABI.
+Portable rights travel as the actual shared OFDs in their packet, without the
+owner-only rights ledger. The original identity, offsets, flags, close lifetime,
+MSG_PEEK, CMSG_CLOEXEC, truncation, credentials, timestamps and existing Files
+limits remain intact. Owner-only or mixed unsupported rights defer before effects.
+The full coordinator-removal objective remains active.
+
+Accepted waits import the message header, vectors, credentials and source OFDs
+once. They retain the message through source FD close/reuse, changed guest headers
+and cohort changes. Receive rechecks original output ranges after a possible VM
+change before consuming input. Existing resource subscriptions return execution
+slots. Filtered calls retain exactly one accepted decision, while the next SVC
+uses the current filter. Ready messages need no retained-message allocation,
+empty rights avoid Files locking, and receive options are captured under the
+existing channel lock instead of taking extra option locks.
+
+The Unix control graph still has owner projections. On handoff, the joined owner
+retains the original local OFD before any returned owner mutation executes; that
+lease stays outside worker state and drops on completion, signal or exit. Fallback
+uses the original transport and accepted message. Tests close/reuse the receiver's
+numeric endpoint while preserving the accepted receive, and reuse a blocked
+sender's source FD while proving the original right and bytes are delivered.
+Stopped tasks are now excluded before I/O eligibility, so a retained wait cannot
+accidentally resume guest execution while stopped; SIGCONT restores the wait.
+
+Five new direct-message tests cover cross-thread independent Files, original OFDs,
+credentials/timestamps, peeking, truncation, faults, mixed owner rights, blocked
+source reuse and owner fallback. A single-worker filtered cohort test covers
+cross-cohort receiver FD reuse, stop/continue and a later denying filter, with
+zero coordinator service requests and one decision per entry. Apple/Linux VFS,
+ABI, affected kernel and strict checks pass, together with Mac product tests,
+13 actual FFI checks and the iPad static build. A mistaken test expectation for
+SIGCONT was corrected and rerun alone; unaffected passing checks were reused.
+Targeted final Mac hardware runs also pass real descriptor transfers on paired
+datagram and seqpacket transports (32 checked iterations per process, four
+processes, worker execution verified). These are functional checks, not timing
+comparisons. Physical iPad checks remain skipped per owner.
+
+| Longest-child loop median | Previous | Current | Native macOS | Native Linux reference |
+| --- | ---: | ---: | ---: | ---: |
+| Unix FD transfers, 1,000 each | 173.38 ms | 10.87 ms | 3.46 ms | 1.87 ms |
+| TCP epoll byte cycles, 2,000 each | 28.89 ms | 29.38 ms | 19.51 ms | 5.54 ms |
+
+Unix descriptor-transfer loops improve **15.95x**, and process wall time
+falls **210.02 → 49.52 ms**. A separate diagnostic sample
+reduces cohort rounds **5,109 → 52**. Service requests remain
+3 → 3: this migration removes repeated whole-cohort joins,
+not an already-rare service hop. The sustained TCP/epoll comparison stays
+approximately flat. Native macOS remains about 3.14x faster in the
+rights loop; no whole-app, Firefox or iPad speedup is inferred. Four processes
+perform identical checked work, including real I/O through each imported FD and
+its close. Timings use three unprofiled counterbalanced runs. The native Linux
+reference uses the exact ELF/work on the existing six-vCPU ARM64 CI machine.
+
+The final measured runner is installed in Trames Dev, preserving running sessions
+and the stable application. Unix creation/control, addressed datagrams,
+owner-only rights, native service pumping and task/VM/device ownership remain
+separate migration work. See the [validation record](../validation/worker-unix-rights-20261102.json)
+and [shared contract](../../runtime/docs/architecture/execution-backends.md#worker-unix-ancillary-messages-2026-11-02).
+
 ## Fifteenth migration implemented — retained blocking socket waits — 2026-11-02
 
 Runtime `b69b222fdb875ffbcae160d22da159f552f8a7ec` moves blocking TCP connect/accept/accept4
