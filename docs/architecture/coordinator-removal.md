@@ -1775,3 +1775,77 @@ for admission, cached-decision identity and negative-control coverage. Mac's
 not unique first-stop causes or wall-time percentages. The Mac navigation
 validation records the intermediate display-only result as well as the final
 combined result, including failed/error observations and sampling exclusions.
+
+## Twenty-third migration implemented — worker addressed Unix datagrams — 2026-11-03
+
+Runtime `8c129587f5f5ea42e140962160f38dfecce0d787` moves unpaired AF_UNIX
+read/write, readv/writev, sendto/recvfrom and sendmsg/recvmsg to workers in the common
+Mac/iPad runtime. Source address, sender credentials and portable shared OFDs now
+travel with the actual packet. A byte-only datagram no longer creates an owner
+ancillary-ledger entry. Unix-bearing owning graphs keep their original owner ledger,
+cycle checks and reclamation; no Rc graph is declared Send.
+
+An accepted send keeps its original full source OFD, copied input and one resolved
+target. The target is a weak endpoint plus the original queue/readiness, so a blocked
+call cannot keep the receiver open or follow an unlinked/rebound pathname. Sender
+capacity waits subscribe to the actual destination queue and include its resource
+in scheduling hints. Original output records survive waits and owner handoffs;
+copyout ranges are checked before dequeue without rereading changed guest headers.
+Owner waits now also subscribe then retry before parking. Callbacks and final OFD
+drops run outside queue/name/peer guards. Native default-connected interfaces use
+that same queue. No global socket/VFS lock, service thread, bus, polling loop,
+ordinary-memory fence or extra native permission policy is added.
+
+The single-slot test caught an old admission assumption: all nonstream Unix sockets
+were restricted to controls/messages, so the new byte implementation still fell
+back to the owner. Addressed byte/packet entry now admits the retained call, including
+the existing filtered path. Sixteen filtered/unfiltered, one/two-slot cases cover
+all four byte/message syscall pairs. Each case performs one send, two receives and
+two final waits: five calls, five filtered decisions when enabled, zero services,
+and slot release under queue-capacity pressure.
+
+| Four processes × 1,000 checked iterations, longest-child median | Previous | Current | Native macOS | Native ARM Linux, exact ELF | Improvement |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Connected datagram write/read | 211.85 ms | 44.10 ms | 0.97 ms | 0.86 ms | 4.80x |
+| Addressed sendto/recvfrom + source check | 212.84 ms | 61.86 ms | 3.93 ms | 0.91 ms | 3.44x |
+| Portable pipe rights / alias EOF / close | 197.33 ms | 46.02 ms | 1.74 ms | 1.61 ms | 4.29x |
+| Owner-only device open / rights / read / close | 523.41 ms | 524.02 ms | 12.38 ms | 2.51 ms | No significant change claimed |
+| Existing socketpair lifecycle | 21.91 ms | 21.65 ms | 5.06 ms | 4.64 ms | No significant change claimed |
+
+The first three whole-process wall medians are **330.67 → 160.79 ms**,
+**323.66 → 168.97 ms** and **322.70 → 136.81 ms**. Separate diagnostic cohort
+counts fall **5,405 → 60**, **5,091 → 69** and **4,892 → 60**. Service requests
+remain three in those whole-process diagnostic runs, including startup/teardown;
+previous byte operations mostly forced cohort joins rather than counted services.
+The owner-device case remains **15,331 → 15,102** cohorts and is explicitly not
+claimed as migrated. Existing socketpair counts are **43 → 42**, with no meaningful
+regression or improvement claimed.
+
+Endpoint setup and cleanup are outside datagram loop timing; each one-byte packet
+is checked, and addressed receive verifies its exact source pathname. Portable
+rights use a precreated pipe and check the received alias with EOF/read/close. The
+separate device case includes `/dev/null` open/rights/alias operations and records
+the still-owned boundary. An initial device-rights measurement showed no material
+gain; it was retained as that separate case, not represented as portable rights.
+
+Three unprofiled counterbalanced samples run after all compilation, FFI acceptance
+and local Linux CI, with the Linux instance stopped during Mac timing. Native Linux
+uses the identical static ARM64 musl ELF on the existing six-vCPU environment;
+Trames uses four vCPUs and native macOS uses native APIs. Kernel/API/compiler and
+CPU-count differences make native values contextual. These microbenchmarks do not
+establish Firefox/whole-app/iPad performance or generally native-speed execution.
+
+Apple/Linux VFS **447/446**, ABI **186 each**, kernel **271 each**, strict checks,
+Mac **13**, both product execution boundaries, all **13** production FFI environment
+checks and the iPad static build pass. Tests include 64 packets from eight concurrent
+senders, exact source/credential association, portable rights without ledger entries,
+late passcred, timestamps, final target close/rebind, sender FD reuse, frozen vectors
+and original owner-only rights fallback. Unchanged checks/guest artifacts are reused;
+physical iPad testing remains skipped per owner. The measured runner is installed
+in Trames Dev; the stable app is unchanged.
+
+The coordinator-removal goal remains active. Next boundaries include batch
+sendmmsg/recvmmsg, Unix-bearing owning graphs, device opens/rights, native-service
+adapters, task/job control, io_uring, mount/proc ownership and structural VM/task
+transitions. See the [validation record](../validation/worker-unix-datagram-20261103.json)
+and [shared contract](../../runtime/docs/architecture/execution-backends.md#worker-addressed-unix-datagrams-2026-11-03).

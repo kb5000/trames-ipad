@@ -1,0 +1,3210 @@
+{
+  "date": "2026-11-03",
+  "stage": 23,
+  "status": "stage-complete; coordinator-removal goal remains active",
+  "runtime_revision": "8c129587f5f5ea42e140962160f38dfecce0d787",
+  "baseline_runtime_revision": "fcfb8936848c36714a704c6c8ce30d9a2b86a347",
+  "scope": "Addressed/unpaired AF_UNIX read/write, readv/writev, sendto/recvfrom and sendmsg/recvmsg on workers, actual packet metadata/portable rights, canonical target waits and original-owner fallback.",
+  "performance": {
+    "datagram": {
+      "passed": true,
+      "kind": "unix-datagram",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "before",
+          "repeat": 0,
+          "wall_seconds": 0.3486545000000001,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.12760675,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.175271042,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.21181325,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.204184084,
+              "checksum": 500500
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 5405,
+            "cohort_stop_us": 77181,
+            "service_caller_wait_us": 36,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 8167,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 12,
+            "worker_fd_syscalls": 14,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 12,
+            "worker_syscalls": 34,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "after",
+          "repeat": 0,
+          "wall_seconds": 0.164030542,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.027946042,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.047542833,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.027019458,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.039631792,
+              "checksum": 500500
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 60,
+            "cohort_stop_us": 55022,
+            "service_caller_wait_us": 41,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 8166,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 7973,
+            "worker_fd_syscalls": 14,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 7973,
+            "worker_syscalls": 7995,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "before",
+          "repeat": 1,
+          "wall_seconds": 0.330675375,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.113951833,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.16522975,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.194770041,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.18771475,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 1,
+          "wall_seconds": 0.15815295899999993,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.019794166,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.043393458,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.0423665,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.033101958,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 2,
+          "wall_seconds": 0.16962049999999995,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.028870417,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.043593958,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.042659542,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.044097542,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 2,
+          "wall_seconds": 0.3453899169999999,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.122286792,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.177283833,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.211847708,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.200603625,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 3,
+          "wall_seconds": 0.3197099579999998,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.074350333,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.160870416,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.217673958,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.187409875,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 3,
+          "wall_seconds": 0.16078954200000029,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.010524166,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.049117209,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.020126125,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.038383875,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.3573911249999999,
+          "children": [
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.000826,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.000829,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.000857,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.00085,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.01370300000000002,
+          "children": [
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.001278,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.001415,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.001228,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.001147,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.010436583000000166,
+          "children": [
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.000966,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.000871,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.000836,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.000813,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "baseline": "7858c00c9c5e713c8a261af6184cfb724c026cc2e482d9a6b752e3bbbac86485",
+        "candidate": "ced9d79f00c421be5e0e3bd4704f614638ef92c29571d909c13e519e63bf9df9",
+        "native": "5975e27695b29c7d0b656880314d1ab0eb9419330522676fb53023ae00ef8d1b",
+        "fixture": "625686d5fbd0a86d8ee84cd42e52993b9806e7b1c8ee08a662de91f950317727",
+        "rootfs": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe"
+      },
+      "native_environment": {
+        "system": "Darwin",
+        "release": "27.0.0",
+        "architecture": "arm64",
+        "logical_cpus": 12
+      },
+      "summary": {
+        "before": {
+          "loop_max_median_seconds": 0.211847708,
+          "process_wall_median_seconds": 0.330675375,
+          "profile": {
+            "cohort_rounds": 5405,
+            "cohort_stop_us": 77181,
+            "service_caller_wait_us": 36,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 8167,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 12,
+            "worker_fd_syscalls": 14,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 12,
+            "worker_syscalls": 34,
+            "worker_task_resumes": 3
+          }
+        },
+        "after": {
+          "loop_max_median_seconds": 0.044097542,
+          "process_wall_median_seconds": 0.16078954200000029,
+          "profile": {
+            "cohort_rounds": 60,
+            "cohort_stop_us": 55022,
+            "service_caller_wait_us": 41,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 8166,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 7973,
+            "worker_fd_syscalls": 14,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 7973,
+            "worker_syscalls": 7995,
+            "worker_task_resumes": 3
+          }
+        },
+        "native": {
+          "loop_max_median_seconds": 0.000966,
+          "process_wall_median_seconds": 0.01370300000000002
+        }
+      }
+    },
+    "sendto": {
+      "passed": true,
+      "kind": "unix-sendto",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "before",
+          "repeat": 0,
+          "wall_seconds": 0.34458254200000005,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.123895542,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.160997792,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.197378875,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.254976125,
+              "checksum": 500500
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 5091,
+            "cohort_stop_us": 74299,
+            "service_caller_wait_us": 38,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 8160,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 8,
+            "worker_fd_syscalls": 14,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 8,
+            "worker_syscalls": 30,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "after",
+          "repeat": 0,
+          "wall_seconds": 0.16716883399999993,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.023642583,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.023758042,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.086634542,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.082301,
+              "checksum": 500500
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 69,
+            "cohort_stop_us": 41479,
+            "service_caller_wait_us": 26,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 8162,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 7978,
+            "worker_fd_syscalls": 14,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 7978,
+            "worker_syscalls": 8000,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "before",
+          "repeat": 1,
+          "wall_seconds": 0.323663625,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.115243,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.170213167,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.208000542,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.202616541,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 1,
+          "wall_seconds": 0.1603994590000002,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.047266,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.037641,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.05152475,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.048561709,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 2,
+          "wall_seconds": 0.17168633300000002,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.049678459,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.056995333,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.04006475,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.0685475,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 2,
+          "wall_seconds": 0.34283050000000004,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.133093208,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.177935458,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.212837667,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.20070725,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 3,
+          "wall_seconds": 0.3124726670000002,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.081960875,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.157852667,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.220826541,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.178667542,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 3,
+          "wall_seconds": 0.16896779199999967,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.029637917,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.060768833,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.039887541,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.061855541,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.010523125000000189,
+          "children": [
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.003111,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.004095,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.004432,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.003813,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.008946292000000078,
+          "children": [
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.002694,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.00361,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.003931,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.003221,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.007759500000000141,
+          "children": [
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.00271,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.003427,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.003654,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.002825,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "baseline": "7858c00c9c5e713c8a261af6184cfb724c026cc2e482d9a6b752e3bbbac86485",
+        "candidate": "ced9d79f00c421be5e0e3bd4704f614638ef92c29571d909c13e519e63bf9df9",
+        "native": "5975e27695b29c7d0b656880314d1ab0eb9419330522676fb53023ae00ef8d1b",
+        "fixture": "625686d5fbd0a86d8ee84cd42e52993b9806e7b1c8ee08a662de91f950317727",
+        "rootfs": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe"
+      },
+      "native_environment": {
+        "system": "Darwin",
+        "release": "27.0.0",
+        "architecture": "arm64",
+        "logical_cpus": 12
+      },
+      "summary": {
+        "before": {
+          "loop_max_median_seconds": 0.212837667,
+          "process_wall_median_seconds": 0.323663625,
+          "profile": {
+            "cohort_rounds": 5091,
+            "cohort_stop_us": 74299,
+            "service_caller_wait_us": 38,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 8160,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 8,
+            "worker_fd_syscalls": 14,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 8,
+            "worker_syscalls": 30,
+            "worker_task_resumes": 3
+          }
+        },
+        "after": {
+          "loop_max_median_seconds": 0.061855541,
+          "process_wall_median_seconds": 0.16896779199999967,
+          "profile": {
+            "cohort_rounds": 69,
+            "cohort_stop_us": 41479,
+            "service_caller_wait_us": 26,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 8162,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 7978,
+            "worker_fd_syscalls": 14,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 7978,
+            "worker_syscalls": 8000,
+            "worker_task_resumes": 3
+          }
+        },
+        "native": {
+          "loop_max_median_seconds": 0.003931,
+          "process_wall_median_seconds": 0.008946292000000078
+        }
+      }
+    },
+    "rights": {
+      "passed": true,
+      "kind": "unix-datagram-rights",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "before",
+          "repeat": 0,
+          "wall_seconds": 0.35951708400000004,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.158336666,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.192299625,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.2176885,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.229909583,
+              "checksum": 500500
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 4892,
+            "cohort_stop_us": 82557,
+            "service_caller_wait_us": 45,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 16179,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 3342,
+            "worker_fd_syscalls": 3355,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 12,
+            "worker_syscalls": 6705,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "after",
+          "repeat": 0,
+          "wall_seconds": 0.13749083299999998,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.02745275,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.03796,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.03908825,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.032271334,
+              "checksum": 500500
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 60,
+            "cohort_stop_us": 43848,
+            "service_caller_wait_us": 86,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 16178,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 11036,
+            "worker_fd_syscalls": 3700,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 7362,
+            "worker_syscalls": 14744,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "before",
+          "repeat": 1,
+          "wall_seconds": 0.32378320800000004,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.091508584,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.167603292,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.234299166,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.189025916,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 1,
+          "wall_seconds": 0.16153962500000008,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.00888875,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.040904292,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.032644333,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.0469845,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 2,
+          "wall_seconds": 0.13680970799999992,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.015010375,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.033923459,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.033494334,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.04601675,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 2,
+          "wall_seconds": 0.31582449999999995,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.10718575,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.16491725,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.197330042,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.161915167,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 3,
+          "wall_seconds": 0.3227010829999999,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.104810084,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.1617865,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.188872333,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.181518625,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 3,
+          "wall_seconds": 0.13637925000000006,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.015275375,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.03015675,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.020103417,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.041495875,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.006743290999999818,
+          "children": [
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.001451,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.00213,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.001716,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.001615,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.005855957999999717,
+          "children": [
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.001609,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.001744,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.00155,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.001497,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.005597000000000296,
+          "children": [
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.001536,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.001474,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.001692,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.00135,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "baseline": "7858c00c9c5e713c8a261af6184cfb724c026cc2e482d9a6b752e3bbbac86485",
+        "candidate": "ced9d79f00c421be5e0e3bd4704f614638ef92c29571d909c13e519e63bf9df9",
+        "native": "5975e27695b29c7d0b656880314d1ab0eb9419330522676fb53023ae00ef8d1b",
+        "fixture": "625686d5fbd0a86d8ee84cd42e52993b9806e7b1c8ee08a662de91f950317727",
+        "rootfs": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe"
+      },
+      "native_environment": {
+        "system": "Darwin",
+        "release": "27.0.0",
+        "architecture": "arm64",
+        "logical_cpus": 12
+      },
+      "summary": {
+        "before": {
+          "loop_max_median_seconds": 0.197330042,
+          "process_wall_median_seconds": 0.3227010829999999,
+          "profile": {
+            "cohort_rounds": 4892,
+            "cohort_stop_us": 82557,
+            "service_caller_wait_us": 45,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 16179,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 3342,
+            "worker_fd_syscalls": 3355,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 12,
+            "worker_syscalls": 6705,
+            "worker_task_resumes": 3
+          }
+        },
+        "after": {
+          "loop_max_median_seconds": 0.04601675,
+          "process_wall_median_seconds": 0.13680970799999992,
+          "profile": {
+            "cohort_rounds": 60,
+            "cohort_stop_us": 43848,
+            "service_caller_wait_us": 86,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 16178,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 11036,
+            "worker_fd_syscalls": 3700,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 7362,
+            "worker_syscalls": 14744,
+            "worker_task_resumes": 3
+          }
+        },
+        "native": {
+          "loop_max_median_seconds": 0.001744,
+          "process_wall_median_seconds": 0.005855957999999717
+        }
+      }
+    },
+    "owner": {
+      "passed": true,
+      "kind": "unix-datagram-owner",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "before",
+          "repeat": 0,
+          "wall_seconds": 0.644064,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.231395125,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.397823792,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.528203208,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.540260084,
+              "checksum": 500500
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 15331,
+            "cohort_stop_us": 80452,
+            "service_caller_wait_us": 31,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 24166,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 12,
+            "worker_fd_syscalls": 14,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 12,
+            "worker_syscalls": 34,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "after",
+          "repeat": 0,
+          "wall_seconds": 0.634849708,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.236268167,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.3860715,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.541642375,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.507471209,
+              "checksum": 500500
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 15102,
+            "cohort_stop_us": 96650,
+            "service_caller_wait_us": 31,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 24166,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 12,
+            "worker_fd_syscalls": 14,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 12,
+            "worker_syscalls": 34,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "before",
+          "repeat": 1,
+          "wall_seconds": 0.621394542,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.217779292,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.386425,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.521797292,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.498605333,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 1,
+          "wall_seconds": 0.6248556660000002,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.247592,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.364002625,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.496543959,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.555044542,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 2,
+          "wall_seconds": 0.6228624999999997,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.236004666,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.3860275,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.524019459,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.490961875,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 2,
+          "wall_seconds": 0.6194621249999996,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.22820425,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.387400834,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.523414083,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.497749375,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 3,
+          "wall_seconds": 0.6239679580000006,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.222695625,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.354375625,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.515556542,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.550977041,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 3,
+          "wall_seconds": 0.6174262909999992,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.227513,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.387756167,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.522750083,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.500068,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.01743104200000012,
+          "children": [
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.011844,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.012416,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.012234,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.011591,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.016323000000000754,
+          "children": [
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.011321,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.011794,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.012383,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.011842,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.01622633299999965,
+          "children": [
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.011629,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.012028,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.012201,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.011956,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "baseline": "7858c00c9c5e713c8a261af6184cfb724c026cc2e482d9a6b752e3bbbac86485",
+        "candidate": "ced9d79f00c421be5e0e3bd4704f614638ef92c29571d909c13e519e63bf9df9",
+        "native": "5975e27695b29c7d0b656880314d1ab0eb9419330522676fb53023ae00ef8d1b",
+        "fixture": "625686d5fbd0a86d8ee84cd42e52993b9806e7b1c8ee08a662de91f950317727",
+        "rootfs": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe"
+      },
+      "native_environment": {
+        "system": "Darwin",
+        "release": "27.0.0",
+        "architecture": "arm64",
+        "logical_cpus": 12
+      },
+      "summary": {
+        "before": {
+          "loop_max_median_seconds": 0.523414083,
+          "process_wall_median_seconds": 0.621394542,
+          "profile": {
+            "cohort_rounds": 15331,
+            "cohort_stop_us": 80452,
+            "service_caller_wait_us": 31,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 24166,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 12,
+            "worker_fd_syscalls": 14,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 12,
+            "worker_syscalls": 34,
+            "worker_task_resumes": 3
+          }
+        },
+        "after": {
+          "loop_max_median_seconds": 0.524019459,
+          "process_wall_median_seconds": 0.6228624999999997,
+          "profile": {
+            "cohort_rounds": 15102,
+            "cohort_stop_us": 96650,
+            "service_caller_wait_us": 31,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 24166,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 12,
+            "worker_fd_syscalls": 14,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 12,
+            "worker_syscalls": 34,
+            "worker_task_resumes": 3
+          }
+        },
+        "native": {
+          "loop_max_median_seconds": 0.012383,
+          "process_wall_median_seconds": 0.016323000000000754
+        }
+      }
+    },
+    "pair": {
+      "passed": true,
+      "kind": "unix-pair",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "before",
+          "repeat": 0,
+          "wall_seconds": 0.09224691699999998,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.03502425,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.035274708,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.039709125,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.041455292,
+              "checksum": 500500
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 43,
+            "cohort_stop_us": 2647,
+            "service_caller_wait_us": 29,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 52108,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 23994,
+            "worker_fd_syscalls": 27995,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 23994,
+            "worker_syscalls": 51989,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "after",
+          "repeat": 0,
+          "wall_seconds": 0.05962062499999998,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.023983416,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.022611666,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.0246335,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.023006667,
+              "checksum": 500500
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 42,
+            "cohort_stop_us": 1336,
+            "service_caller_wait_us": 22,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 52108,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 23927,
+            "worker_fd_syscalls": 27917,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 23927,
+            "worker_syscalls": 51844,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "before",
+          "repeat": 1,
+          "wall_seconds": 0.055752625,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.021206917,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.020440542,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.021913791,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.020709917,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 1,
+          "wall_seconds": 0.05362166699999993,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.021338083,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.02180725,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.021047708,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.021159917,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 2,
+          "wall_seconds": 0.052644417,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.020941458,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.020179167,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.021654666,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.021099791,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 2,
+          "wall_seconds": 0.05354000000000003,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.021530791,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.022069083,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.020887,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.020987375,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 3,
+          "wall_seconds": 0.05554791699999995,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.021084708,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.0211205,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.020796541,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.021273916,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 3,
+          "wall_seconds": 0.05560441599999999,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.021224791,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.02150075,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.021125959,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.0210605,
+              "checksum": 500500
+            }
+          ]
+        },
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.009093875000000029,
+          "children": [
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.003956,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.005072,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004849,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004406,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.008833708000000051,
+          "children": [
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004048,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004812,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004898,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004426,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.008649250000000164,
+          "children": [
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004192,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.005061,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004897,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004467,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "baseline": "7858c00c9c5e713c8a261af6184cfb724c026cc2e482d9a6b752e3bbbac86485",
+        "candidate": "ced9d79f00c421be5e0e3bd4704f614638ef92c29571d909c13e519e63bf9df9",
+        "native": "5975e27695b29c7d0b656880314d1ab0eb9419330522676fb53023ae00ef8d1b",
+        "fixture": "625686d5fbd0a86d8ee84cd42e52993b9806e7b1c8ee08a662de91f950317727",
+        "rootfs": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe"
+      },
+      "native_environment": {
+        "system": "Darwin",
+        "release": "27.0.0",
+        "architecture": "arm64",
+        "logical_cpus": 12
+      },
+      "summary": {
+        "before": {
+          "loop_max_median_seconds": 0.021913791,
+          "process_wall_median_seconds": 0.05554791699999995,
+          "profile": {
+            "cohort_rounds": 43,
+            "cohort_stop_us": 2647,
+            "service_caller_wait_us": 29,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 52108,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 23994,
+            "worker_fd_syscalls": 27995,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 23994,
+            "worker_syscalls": 51989,
+            "worker_task_resumes": 3
+          }
+        },
+        "after": {
+          "loop_max_median_seconds": 0.021654666,
+          "process_wall_median_seconds": 0.05362166699999993,
+          "profile": {
+            "cohort_rounds": 42,
+            "cohort_stop_us": 1336,
+            "service_caller_wait_us": 22,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 52108,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 23927,
+            "worker_fd_syscalls": 27917,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 23927,
+            "worker_syscalls": 51844,
+            "worker_task_resumes": 3
+          }
+        },
+        "native": {
+          "loop_max_median_seconds": 0.005061,
+          "process_wall_median_seconds": 0.008833708000000051
+        }
+      }
+    }
+  },
+  "native_linux_exact_elf": {
+    "datagram": {
+      "passed": true,
+      "kind": "unix-datagram",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.002496262999999832,
+          "children": [
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.000861179,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.000774882,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.000736903,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.000655858,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.004658003000000299,
+          "children": [
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.001184915,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.000839075,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.000682519,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.000577457,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.003450373000000173,
+          "children": [
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.000490794,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.0006929,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.000586779,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram",
+              "operations": 1000,
+              "seconds": 0.000561949,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "native": "625686d5fbd0a86d8ee84cd42e52993b9806e7b1c8ee08a662de91f950317727"
+      },
+      "native_environment": {
+        "system": "Linux",
+        "release": "7.0.0-38-generic",
+        "architecture": "aarch64",
+        "logical_cpus": 6
+      },
+      "summary": {
+        "native": {
+          "loop_max_median_seconds": 0.000861179,
+          "process_wall_median_seconds": 0.003450373000000173
+        }
+      }
+    },
+    "sendto": {
+      "passed": true,
+      "kind": "unix-sendto",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.002577308999999861,
+          "children": [
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.0009097,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.000900135,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.000794014,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.000604202,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.002647119000000142,
+          "children": [
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.000928995,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.001021683,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.000839726,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.000626101,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.0025938349999998778,
+          "children": [
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.000901559,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.000856172,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.000740159,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-sendto",
+              "operations": 1000,
+              "seconds": 0.000755343,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "native": "625686d5fbd0a86d8ee84cd42e52993b9806e7b1c8ee08a662de91f950317727"
+      },
+      "native_environment": {
+        "system": "Linux",
+        "release": "7.0.0-38-generic",
+        "architecture": "aarch64",
+        "logical_cpus": 6
+      },
+      "summary": {
+        "native": {
+          "loop_max_median_seconds": 0.0009097,
+          "process_wall_median_seconds": 0.0025938349999998778
+        }
+      }
+    },
+    "rights": {
+      "passed": true,
+      "kind": "unix-datagram-rights",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.004545124000000289,
+          "children": [
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.001395854,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.0016118,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.001411037,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.00099209,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.004449627000000067,
+          "children": [
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.001643143,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.001800513,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.001426546,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.001040408,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.004352461999999946,
+          "children": [
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.001047939,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.001413235,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.001462164,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-rights",
+              "operations": 1000,
+              "seconds": 0.001162892,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "native": "625686d5fbd0a86d8ee84cd42e52993b9806e7b1c8ee08a662de91f950317727"
+      },
+      "native_environment": {
+        "system": "Linux",
+        "release": "7.0.0-38-generic",
+        "architecture": "aarch64",
+        "logical_cpus": 6
+      },
+      "summary": {
+        "native": {
+          "loop_max_median_seconds": 0.0016118,
+          "process_wall_median_seconds": 0.004449627000000067
+        }
+      }
+    },
+    "owner": {
+      "passed": true,
+      "kind": "unix-datagram-owner",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.005383874000000066,
+          "children": [
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.002147044,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.002508352,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.002394701,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.001798926,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.005517226999999902,
+          "children": [
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.002301199,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.001972293,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.002279259,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.001613632,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.0033816619999997855,
+          "children": [
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.002589724,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.002689006,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.002185064,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-datagram-owner",
+              "operations": 1000,
+              "seconds": 0.00232835,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "native": "625686d5fbd0a86d8ee84cd42e52993b9806e7b1c8ee08a662de91f950317727"
+      },
+      "native_environment": {
+        "system": "Linux",
+        "release": "7.0.0-38-generic",
+        "architecture": "aarch64",
+        "logical_cpus": 6
+      },
+      "summary": {
+        "native": {
+          "loop_max_median_seconds": 0.002508352,
+          "process_wall_median_seconds": 0.005383874000000066
+        }
+      }
+    },
+    "pair": {
+      "passed": true,
+      "kind": "unix-pair",
+      "processes": 4,
+      "operations_each": 1000,
+      "repeats": 3,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.006330942000000395,
+          "children": [
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004155037,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004397035,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004680065,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004429275,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.00651969699999988,
+          "children": [
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004636672,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004216584,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004090233,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004367483,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.0058487380000000755,
+          "children": [
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004385597,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004189108,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.004540321,
+              "checksum": 500500
+            },
+            {
+              "kind": "unix-pair",
+              "operations": 1000,
+              "seconds": 0.003895332,
+              "checksum": 500500
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "native": "625686d5fbd0a86d8ee84cd42e52993b9806e7b1c8ee08a662de91f950317727"
+      },
+      "native_environment": {
+        "system": "Linux",
+        "release": "7.0.0-38-generic",
+        "architecture": "aarch64",
+        "logical_cpus": 6
+      },
+      "summary": {
+        "native": {
+          "loop_max_median_seconds": 0.004636672,
+          "process_wall_median_seconds": 0.006330942000000395
+        }
+      }
+    }
+  },
+  "method": "Four independent processes, each 1,000 checked iterations, four Trames vCPUs and three unprofiled counterbalanced before/after samples. All compilation, local Linux CI and FFI acceptance finish before final timing. Identical static ARM64 musl ELF for Trames/native Linux, with native Linux collected on the existing six-vCPU environment and stopped before Mac timings. Native macOS uses native APIs. One-byte datagram data is checked on every iteration; sendto/recvfrom also checks the exact source pathname. Endpoint creation/bind/connect/unlink is outside the datagram timer; the portable-rights case creates its pipe outside the loop and times sendmsg/recvmsg, alias EOF read and alias close. The separate owner-device case includes /dev/null open/send/close/recv/alias read/close and intentionally retains the existing owner boundary. Socketpair lifecycle is the unchanged-path regression. Longest-child loop medians and whole-process wall medians include different work and are reported separately. Kernel/API/compiler/CPU-count differences make native values contextual; these are not application, Firefox, iPad or generally native-speed claims.",
+  "validation": {
+    "apple_vfs": {
+      "passed": 447,
+      "ignored": 1
+    },
+    "linux_vfs": {
+      "passed": 446,
+      "ignored": 1
+    },
+    "apple_and_linux_abi": {
+      "passed": 186,
+      "ignored": 1
+    },
+    "apple_and_linux_kernel": {
+      "passed": 271,
+      "ignored": 3
+    },
+    "capacity_waits": {
+      "passed": true,
+      "execution_slots": [
+        1,
+        2
+      ],
+      "vcpus": 2,
+      "filtered_and_unfiltered": true,
+      "syscall_pairs": [
+        [
+          64,
+          63
+        ],
+        [
+          66,
+          65
+        ],
+        [
+          206,
+          207
+        ],
+        [
+          211,
+          212
+        ]
+      ],
+      "calls_per_case": 5,
+      "filter_decisions_per_filtered_case": 5,
+      "services": 0,
+      "parked_tasks_release_slot": true
+    },
+    "resource_regressions": [
+      "64 packets from eight concurrent senders keep exact packet/source/credential association without owner ledger entries",
+      "portable rights, timestamps and late-enabled passcred preserve metadata in the actual queue",
+      "native Core/LocalSocket/DirectFd default-connected sends reach the same target queue",
+      "target capacity notification, final receiver close and pathname rebind never redirect a retained call",
+      "sender FD reuse preserves original full OFD and frozen payload/address",
+      "raw/vector/message receive and legacy-rights handoff retain original output metadata and owner authority",
+      "subscribe/retry on the original owner closes the unlock-before-park gap"
+    ],
+    "mac_product": {
+      "passed": 13,
+      "ignored": 1
+    },
+    "ffi": {
+      "passed": true,
+      "checks": [
+        {
+          "case": "alpine-install",
+          "passed": true,
+          "reused": true
+        },
+        {
+          "case": "alpine",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "alpine",
+          "terminal": 2,
+          "passed": true
+        },
+        {
+          "case": "debian-install",
+          "passed": true,
+          "reused": true
+        },
+        {
+          "case": "debian",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "debian",
+          "terminal": 2,
+          "passed": true
+        },
+        {
+          "case": "debian-setup",
+          "passed": true
+        },
+        {
+          "case": "custom-install",
+          "passed": true,
+          "reused": true
+        },
+        {
+          "case": "custom",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "custom",
+          "terminal": 2,
+          "passed": true
+        },
+        {
+          "case": "custom-sha256-rejection",
+          "passed": true
+        },
+        {
+          "case": "systemd",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "systemd",
+          "terminal": 2,
+          "passed": true
+        }
+      ]
+    },
+    "ios_static_build": true,
+    "physical_ipad": "Skipped per owner",
+    "strict_checks": true,
+    "execution_boundaries": true,
+    "linux_ci": {
+      "passed": true,
+      "checks": [
+        {
+          "check": "tests",
+          "exit": 0
+        },
+        {
+          "check": "clippy",
+          "exit": 0
+        }
+      ]
+    },
+    "linux_kernel_ci": {
+      "passed": true,
+      "checks": [
+        {
+          "check": "kernel-tests",
+          "exit": 0
+        },
+        {
+          "check": "kernel-clippy",
+          "exit": 0
+        }
+      ]
+    },
+    "unchanged_acceptance": "Source-unchanged passes reused after documentation, runtime pin and benchmark-fixture updates. Unrelated CPU/memory/graphics acceptance and guest artifacts reused."
+  },
+  "implementation": {
+    "queue": "Source address, credentials and portable shared OFDs travel in actual packet queues. Ordinary datagrams need no owner ancillary ID; Unix-bearing owning graphs retain the original owner ledger/cycle checks.",
+    "target": "One accepted target: original source full OFD, weak destination endpoint and original queue/readiness. No FD/path relookup after EAGAIN or owner handoff; target-space and source notifications, plus actual target scheduling relation.",
+    "abi": "Original decoder/transport rules, frozen input bytes and vector/address records, original output-range preflight before dequeue; one seccomp decision per accepted filtered entry.",
+    "waits": "Worker and owner subscribe/retry return execution slots. Source/name/peer guards do not span readiness callbacks or final OFD drops. No new global lock, resource thread, bus, polling, ordinary-memory fence or native-only permission layer."
+  },
+  "discovered_assumptions": [
+    {
+      "observed": "Existing supports_fd admitted only control/message calls for every nonstream Unix socket, so newly implemented retained datagram byte I/O still joined the owner.",
+      "fix": "Admit addressed/unpaired datagram byte and packet calls, including the dedicated filtered entry; prove zero services and one decision per entry in one/two-slot tests."
+    },
+    {
+      "observed": "Pure unpaired datagrams previously stored source/credentials in the owner ancillary ledger, forcing unnecessary owner bookkeeping.",
+      "fix": "Move per-packet metadata into the actual shared queue, retain ledger entries only for legacy owning rights."
+    },
+    {
+      "observed": "An initial rights benchmark used /dev/null, whose opens/rights still cross an owner boundary, and showed no material gain.",
+      "fix": "Keep that explicit unchanged-boundary workload and add a separate portable pipe-rights benchmark; final measurements cover both without treating device rights as migrated."
+    },
+    {
+      "observed": "Owner retry subscribed only after EAGAIN without a second original-resource check.",
+      "fix": "Subscribe then retry before parking, using the same accepted records and full OFD."
+    }
+  ],
+  "remaining": [
+    "Batch sendmmsg/recvmmsg retained I/O",
+    "Unix-bearing ancillary owning graphs and cycle reclamation",
+    "Owner-only device opens/rights and native-service adapters",
+    "Legacy PTY/task/job-control paths",
+    "io_uring controls, mount/nsfs topology and proc controls",
+    "Pending task signals and structural file/VM/task transitions; residual whole-process cohort joins"
+  ],
+  "source_hashes": {
+    "runtime/crates/trames-linux/src/direct.rs": "92cb6c78b708315f4ddbceb6720cb1696711a0d2d4b884a92f0eac7ec79113b6",
+    "runtime/crates/trames-linux/src/direct/local_message.rs": "338b9736ad8aeb1ca9aa4eb7622e6151c379ad70626f69719274aa858794bc08",
+    "runtime/crates/trames-linux/src/network/unix.rs": "b3b24b235b405f9da3250d818b822b7f21f66edaff4d51e854fc5f35c6e7cc61",
+    "runtime/crates/trames-session/src/process.rs": "fa2b0e82ffa24521d555a81bacd314e086850f4634541e10043672187c3baec9",
+    "runtime/crates/trames-session/src/process_socket_wait.rs": "0ea1d20a11e04e062e01cb86106372fa7f69e91d5fbd50c0847b731a6089f150",
+    "runtime/crates/trames-session/src/workers.rs": "85fd72091e7fd9e046608a41b67d66b1418fd57e246aa77aab11eed8e86ce6a9",
+    "runtime/crates/trames-vfs/src/direct_io.rs": "d87a1d6b1af2685015b2b2b48ad0b89e22d6d7efb17082b5724473bcbf92c8c4",
+    "runtime/crates/trames-vfs/src/ipc.rs": "bbe373d9802028410a0ce00ea482257952ba30042f8c57f9e57b87c6ea85e8cc",
+    "runtime/crates/trames-vfs/src/ipc/channel.rs": "e672f056932f43908384902f034fb45b6c9a9fafa007027d1db086e8545112cc",
+    "runtime/crates/trames-vfs/src/ipc/control.rs": "7eaf5a0f59a41b3135f504c10dd2521d94285134b9678c860848218a03813812",
+    "runtime/crates/trames-vfs/src/ipc/datagram.rs": "e2bc4c648ffd056398162edf85c39fad0b785fabf535b3b27cb0cf4275235828",
+    "runtime/crates/trames-vfs/src/ipc/shared_rights.rs": "0dbbe65806c5db1f2db614a24ae411bad608eda44432ce2e0366c825c7c7950e",
+    "runtime/crates/trames-vfs/src/lib.rs": "aae8dcfd2a3f251f520d50b1b98dc19fe30d1bf3ebeee499e77be3075c2bbf10",
+    "runtime/crates/trames-vfs/src/path_queries.rs": "e4c89d9a2c871ccfe7659db10d4cdea15e3bbfbd9d48ad2aa677b603fdba666f",
+    "runtime/docs/architecture/execution-backends.md": "12a17868d299f48e2d4bbd99f838686ab3308f709492b8c3a5a094cadfc373e1",
+    "runtime/crates/trames-linux/src/network/unix/packet.rs": "479cec30b33152669a66910e82bbdc61fae8d035caa56c18badac0f1a8f38e8c"
+  },
+  "fixture_source_hashes": {
+    "tests/fixtures/fd-create-bench.c": "f6424d01134383bfb18971a209958fabd48e5d7481aba4c2c94b834dfac37ac9",
+    "tests/performance/fd-create.py": "82da078cc63e462ee872675da434dc880a98d60d61021a02a597e7fa19c9a5ca"
+  },
+  "log_hashes": {
+    "target/unix-datagram-tests-final.log": "4e7981fc67abf7eaab102bf97371986564423a374d30fc2916fd4a027ed58980",
+    "target/unix-datagram-clippy-final.log": "3eae6888800cbf738edbe4bb8d69a28e86b00d353a9f440c65918552b8cba5cd",
+    "target/unix-datagram-kernel-final.log": "bf6c52ae3ff55a59de652ce4299015d2798025bc10b3198f330add042595b862",
+    "target/unix-datagram-kernel-clippy-final.log": "3072a3300adb078a83df244a6c7fa79470dbf6d06dd74b29b60b026d51d486ff",
+    "target/unix-datagram-linux-ci.log": "82046578fe641e78fe8b8ccec07ee650bf1f7e8740a97e954b96c7263dfedf56",
+    "target/unix-datagram-linux-kernel-ci.log": "04d7b832a2c02badc052b8a2847bc4d12d19a68157386c0e21171ca48ef9903d",
+    "target/unix-datagram-ffi-build.log": "876efe550d20e6146fb4d0de160b4221f54e8ee1663e7db58e9a3a897d4a6f55",
+    "target/unix-datagram-ffi-tests.log": "a0ed12eb6aa6fe034466b76f310acfdbcd27794a78dbf9cf6cf2b6e08298cc0d",
+    "target/unix-datagram-ios-build.log": "9a747d7755f6987f1ba88df4511b6f8965bd637e67512603f5339ff7804e2854",
+    "target/unix-datagram-mac-tests.log": "7ef9af00bbb62acd4412643c34e41cb2c98aea77123cc16b85d16de0a6d87c57",
+    "target/unix-datagram-mac-clippy.log": "ac7ed9a035a2c6be1215adbe115b9cffdb78b4f47086afbb6c75b676b5d79fc8",
+    "target/unix-datagram-mac-build.log": "1762e053e2fe09b204338892de0e4e68c8cc7e57435182ee92e9c7d8dbc3752f",
+    "target/unix-datagram-runtime-boundaries.log": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651",
+    "target/unix-datagram-ipad-boundaries.log": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651",
+    "target/unix-datagram-mac-boundaries.log": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651",
+    "target/unix-datagram-install.log": "d81b37faaef60b5a1b635ce5a81a399a304e89d9aee6498d2d7eecf5f3f5bd41",
+    "target/unix-datagram-native-linux-final.log": "266bbae89159e69da4eb1d6c0f6c13f5781b2a589ae9f3bcc6883377c4e4b938",
+    "target/unix-datagram-native-final-stop.log": "4597782d460f34b07ca94ef86ddd1f90ba7d4b52f03af8e863c949123093b911",
+    "target/local-ci/io/unix-datagram-linux-tests.log": "1401fa9d356e943b09d454fb4905f3d78c7b5b43c1c979915adb642337847875",
+    "target/local-ci/io/unix-datagram-linux-clippy.log": "d8f36e862f1edef145f5ccd152a76e31a37797c0957017f0ec2518bfe4673478",
+    "target/local-ci/io/unix-datagram-linux-kernel-tests.log": "f26eb3ab0ad8f3fc00ea26ef3f6525b7da60048ddaba01d99bbb01b3572e895c",
+    "target/local-ci/io/unix-datagram-linux-kernel-clippy.log": "434674446505be33127b31458a435d676a9e865ecf65c720c2c61d89fbb72d8b",
+    "target/unix-datagram-perf-datagram-final.log": "7b8cc37dad267edb22229b82c6f693abfede6fdaa75332321d16baf94542d09e",
+    "target/unix-datagram-perf-sendto-final.log": "04a4d6b3b17aedcf5b503a7cc1f9717351134913c62a7b537030d9465601d17b",
+    "target/unix-datagram-perf-rights-final.log": "60e58c671a92cdbbc3552949b1487c723533674082e3eda77c5c65d04f70dd92",
+    "target/unix-datagram-perf-owner-final.log": "876fa0efc0f380558e77769a2f758045fff7d7259ec4d86c1668018c9abd56fc",
+    "target/unix-datagram-perf-pair-final.log": "8088a57134b2554601fd7e08c4815be3d200c70173fcf4c7d74d861b4deaaac1"
+  },
+  "installed_dev_runner_sha256": "ced9d79f00c421be5e0e3bd4704f614638ef92c29571d909c13e519e63bf9df9",
+  "stable_runner_sha256": "ec74a40ef7cef8a85279cdda2070c25d92fcb1538219f04d0f13008c360381ad",
+  "ios_library_sha256": "0653ec412a945f270b2fff35af188087b0b1c7af5df766c4bf672b23a8c441f9"
+}

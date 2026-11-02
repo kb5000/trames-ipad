@@ -131,6 +131,31 @@ int main(int argc, char **argv) {
         assert(!bind(unix_listener, (struct sockaddr *)&unix_address, unix_size));
         assert(!listen(unix_listener, 4));
     }
+    int datagram = !strcmp(kind, "unix-datagram") || !strcmp(kind, "unix-sendto") || !strcmp(kind, "unix-datagram-rights") || !strcmp(kind, "unix-datagram-owner");
+    int addressed = !strcmp(kind, "unix-sendto");
+    int datagram_owner = !strcmp(kind, "unix-datagram-owner");
+    int datagram_rights = !strcmp(kind, "unix-datagram-rights") || datagram_owner;
+    int right_source = -1;
+    if (datagram_rights && !datagram_owner) {
+        int ends[2]; assert(!pipe(ends)); assert(!close(ends[1])); right_source = ends[0];
+    }
+    int packets[2] = {-1, -1};
+    struct sockaddr_un packet_address[2] = {{0}, {0}};
+    socklen_t packet_size[2] = {0, 0};
+    if (datagram) {
+        for (unsigned j = 0; j < 2; j++) {
+            packet_address[j].sun_family = AF_UNIX;
+            snprintf(packet_address[j].sun_path, sizeof(packet_address[j].sun_path), "/tmp/trames-datagram-%ld-%u", (long)getpid(), j);
+            packet_size[j] = (socklen_t)(offsetof(struct sockaddr_un, sun_path) + strlen(packet_address[j].sun_path) + 1);
+#ifdef __APPLE__
+            packet_address[j].sun_len = (uint8_t)packet_size[j];
+#endif
+            assert(!unlink(packet_address[j].sun_path) || errno == ENOENT);
+            packets[j] = socket(AF_UNIX, SOCK_DGRAM, 0); assert(packets[j] >= 0);
+            assert(!bind(packets[j], (struct sockaddr *)&packet_address[j], packet_size[j]));
+        }
+        if (!addressed) assert(!connect(packets[0], (struct sockaddr *)&packet_address[1], packet_size[1]));
+    }
     int listener = -1;
     struct sockaddr_in address = {0};
     int tcp_blocking = !strcmp(kind, "tcp-blocking");
@@ -197,7 +222,35 @@ int main(int argc, char **argv) {
     }
     double began = now();
     for (unsigned i = 0; i < operations; i++) {
-        if (unix_session) {
+        if (datagram) {
+            unsigned char sent = (unsigned char)i, received = 0;
+            if (addressed) {
+                struct sockaddr_un source = {0}; socklen_t size = sizeof(source);
+                assert(sendto(packets[0], &sent, 1, 0, (struct sockaddr *)&packet_address[1], packet_size[1]) == 1);
+                assert(recvfrom(packets[1], &received, 1, 0, (struct sockaddr *)&source, &size) == 1);
+                assert(size == packet_size[0] && !memcmp(source.sun_path, packet_address[0].sun_path, strlen(packet_address[0].sun_path) + 1));
+            } else if (datagram_rights) {
+                struct iovec vector = {.iov_base = &sent, .iov_len = 1};
+                union { struct cmsghdr align; unsigned char bytes[CMSG_SPACE(sizeof(int))]; } control = {0};
+                struct msghdr message = {.msg_iov = &vector, .msg_iovlen = 1, .msg_control = control.bytes, .msg_controllen = sizeof(control.bytes)};
+                struct cmsghdr *header = CMSG_FIRSTHDR(&message);
+                header->cmsg_level = SOL_SOCKET; header->cmsg_type = SCM_RIGHTS; header->cmsg_len = CMSG_LEN(sizeof(int));
+                int original = datagram_owner ? open("/dev/null", O_RDONLY) : right_source; assert(original >= 0);
+                memcpy(CMSG_DATA(header), &original, sizeof(original));
+                assert(sendmsg(packets[0], &message, 0) == 1); if (datagram_owner) assert(!close(original));
+                vector.iov_base = &received;
+                memset(control.bytes, 0, sizeof(control.bytes));
+                assert(recvmsg(packets[1], &message, 0) == 1);
+                header = CMSG_FIRSTHDR(&message);
+                assert(header && header->cmsg_level == SOL_SOCKET && header->cmsg_type == SCM_RIGHTS && header->cmsg_len == CMSG_LEN(sizeof(int)));
+                int alias = -1; memcpy(&alias, CMSG_DATA(header), sizeof(alias));
+                assert(alias >= 0 && read(alias, &sent, 1) == 0 && !close(alias));
+            } else {
+                assert(write(packets[0], &sent, 1) == 1);
+                assert(read(packets[1], &received, 1) == 1);
+            }
+            assert(received == sent);
+        } else if (unix_session) {
             int client = socket(AF_UNIX, SOCK_STREAM, 0); assert(client >= 0);
             assert(!connect(client, (struct sockaddr *)&unix_address, unix_size));
             int peer = accept(unix_listener, NULL, NULL); assert(peer >= 0);
@@ -396,6 +449,10 @@ int main(int argc, char **argv) {
         checksum += (uint64_t)i + 1;
     }
     double elapsed = now() - began;
+    if (right_source >= 0) assert(!close(right_source));
+    if (datagram) {
+        for (unsigned j = 0; j < 2; j++) { assert(!close(packets[j])); assert(!unlink(packet_address[j].sun_path)); }
+    }
     if (unix_listener >= 0) {
         assert(!close(unix_listener));
         if (!unix_abstract) assert(!unlink(unix_address.sun_path));
