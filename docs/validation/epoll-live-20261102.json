@@ -1,0 +1,2088 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-02",
+  "passed": true,
+  "runtime_revision": "0dd8d25685d58f51b477ec48a36c1a99ec3c05f6",
+  "baseline_runtime_revision": "d055678a2c897c498d0b9e3cededda268ff1ba2f",
+  "baseline_mac_revision": "26900fa6d88d1a58f6b96c202ef2cc806fbcbc87",
+  "candidate_mac_revision": "0d5b2542f8a37c4ed529516f8a3d0a85f31e0bf2",
+  "scope": {
+    "epoll": "Four processes, 2000 iterations each on one queue/pipe pair: ADD, MOD with one-shot/data, write/check byte via wait/read, DEL.",
+    "inotify": "Four processes, 2000 add-watch/remove-watch/consume-IN_IGNORED cycles each on a private temporary directory.",
+    "tcp": "Unchanged complete TCP fixture, 256 sessions per process.",
+    "timing": "Median of three unprofiled counterbalanced repetitions and separate profiling samples. Queue/pipe/directory creation and teardown excluded from child loop but included in wall time.",
+    "native_reference": "Identical static ARM64 Linux ELF in both Trames versions and native Linux. Same C source on native macOS uses kqueue equivalents. Existing Linux reference: six vCPUs, 8 GiB configured; stopped before Mac timing and after targeted CI.",
+    "limitations": [
+      "macOS equivalents use kqueue READ/EV_DISPATCH or VNODE add/delete/drain; notification payloads and syscall sequences differ from Linux.",
+      "Native TCP/task-signal/nested or unsupported epoll interests retain owner authority; epoll creation is a single-caller owner service, while factory and close/dup ownership remain owner-side.",
+      "Socket creation/full teardown/connect/accept, task/signal registry and scoped VM/device registration work remains.",
+      "No new resource-service thread, polling bus, guest quota/race errno or guest-memory barriers. Existing cursor/watch and source/publication synchronization remain object-local.",
+      "Cohort/owner counts include startup/teardown; summed caller waits are not CPU utilization. These fixtures do not establish whole-application or Firefox speedups.",
+      "Native Linux and macOS have different kernels and CPU allocation.",
+      "Final post-timing edits are architecture text and standalone ownership comments; production Rust code text is unchanged and passing validation was reused.",
+      "Physical iPad checks remain skipped per owner; its static cross-build passed."
+    ]
+  },
+  "summary": {
+    "epoll": {
+      "loop_before_ms": 471.716917,
+      "loop_after_ms": 18.364874999999998,
+      "loop_speedup": 25.685822364704364,
+      "wall_before_ms": 507.99150000000014,
+      "wall_after_ms": 55.37970800000025,
+      "wall_speedup": 9.172881518262932,
+      "mac_native_equivalent_ms": 5.791,
+      "linux_native_ms": 2.8551729999999997,
+      "mac_native_ratio": 3.171278708340528,
+      "linux_native_ratio": 6.43214088953629,
+      "cohort_before": 15505,
+      "cohort_after": 47,
+      "owner_requests_before": 3,
+      "owner_requests_after": 4,
+      "worker_fd_syscalls_before": 10,
+      "worker_fd_syscalls_after": 23970,
+      "worker_file_syscalls_before": 0,
+      "worker_file_syscalls_after": 0
+    },
+    "inotify": {
+      "loop_before_ms": 239.41075,
+      "loop_after_ms": 83.08033400000001,
+      "loop_speedup": 2.8816777505973916,
+      "wall_before_ms": 304.03670900000003,
+      "wall_after_ms": 150.2426670000001,
+      "wall_speedup": 2.023637592908277,
+      "mac_native_equivalent_ms": 25.058,
+      "linux_native_ms": 3.5573010000000003,
+      "mac_native_ratio": 3.3155213504669168,
+      "linux_native_ratio": 23.354878881489086,
+      "cohort_before": 4998,
+      "cohort_after": 45,
+      "owner_requests_before": 3,
+      "owner_requests_after": 3,
+      "worker_fd_syscalls_before": 6662,
+      "worker_fd_syscalls_after": 7929,
+      "worker_file_syscalls_before": 0,
+      "worker_file_syscalls_after": 7923
+    },
+    "tcp": {
+      "loop_before_ms": 44.712624999999996,
+      "loop_after_ms": 44.218833,
+      "loop_speedup": 1.011167006601011,
+      "wall_before_ms": 78.1447500000001,
+      "wall_after_ms": 79.40666700000021,
+      "wall_speedup": 0.9841081731839959,
+      "mac_native_equivalent_ms": 15.63,
+      "linux_native_ms": 3.776884,
+      "mac_native_ratio": 2.8290999999999995,
+      "linux_native_ratio": 11.70775512300616,
+      "cohort_before": 50,
+      "cohort_after": 50,
+      "owner_requests_before": 5579,
+      "owner_requests_after": 5281,
+      "worker_fd_syscalls_before": 2052,
+      "worker_fd_syscalls_after": 2052,
+      "worker_file_syscalls_before": 0,
+      "worker_file_syscalls_after": 0
+    }
+  },
+  "cases": {
+    "epoll": {
+      "passed": true,
+      "kind": "epoll",
+      "processes": 4,
+      "operations_each": 2000,
+      "repeats": 3,
+      "cpus": 12,
+      "records": [
+        {
+          "variant": "before",
+          "repeat": 0,
+          "wall_seconds": 0.8723027920000002,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.240509542,
+              "checksum": 2001000
+            },
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.367221833,
+              "checksum": 2001000
+            },
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.474523959,
+              "checksum": 2001000
+            },
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.493223542,
+              "checksum": 2001000
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 15505,
+            "cohort_stop_us": 39955,
+            "service_caller_wait_us": 36,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 48132,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 19353,
+            "worker_fd_syscalls": 10,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 6451,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 19363,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "after",
+          "repeat": 0,
+          "wall_seconds": 0.05473404100000012,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.017148542,
+              "checksum": 2001000
+            },
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.018289167,
+              "checksum": 2001000
+            },
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.017689084,
+              "checksum": 2001000
+            },
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.019283167,
+              "checksum": 2001000
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 47,
+            "cohort_stop_us": 840,
+            "service_caller_wait_us": 55,
+            "service_requests": 4,
+            "serviced_syscalls": 4,
+            "syscalls": 48128,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 23957,
+            "worker_fd_syscalls": 23970,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 7985,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 47927,
+            "worker_task_resumes": 4
+          }
+        },
+        {
+          "variant": "before",
+          "repeat": 1,
+          "wall_seconds": 0.5061095419999999,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.212678375,
+              "checksum": 2001000
+            },
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.343775333,
+              "checksum": 2001000
+            },
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.452450375,
+              "checksum": 2001000
+            },
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.469790458,
+              "checksum": 2001000
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 1,
+          "wall_seconds": 0.05537970800000025,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.016505916,
+              "checksum": 2001000
+            },
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.017397292,
+              "checksum": 2001000
+            },
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.018173417,
+              "checksum": 2001000
+            },
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.017297042,
+              "checksum": 2001000
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 2,
+          "wall_seconds": 0.05159254199999985,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.016151833,
+              "checksum": 2001000
+            },
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.017565833,
+              "checksum": 2001000
+            },
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.016886708,
+              "checksum": 2001000
+            },
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.018490333,
+              "checksum": 2001000
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 2,
+          "wall_seconds": 0.509107041,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.212843584,
+              "checksum": 2001000
+            },
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.342608792,
+              "checksum": 2001000
+            },
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.454681833,
+              "checksum": 2001000
+            },
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.47194925,
+              "checksum": 2001000
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 3,
+          "wall_seconds": 0.5079915000000002,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.212336625,
+              "checksum": 2001000
+            },
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.343647542,
+              "checksum": 2001000
+            },
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.454412458,
+              "checksum": 2001000
+            },
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.471716917,
+              "checksum": 2001000
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 3,
+          "wall_seconds": 0.05720683400000004,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.01745725,
+              "checksum": 2001000
+            },
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.017117875,
+              "checksum": 2001000
+            },
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.016773416,
+              "checksum": 2001000
+            },
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.018364875,
+              "checksum": 2001000
+            }
+          ]
+        },
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.2516447500000001,
+          "children": [
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.008436,
+              "checksum": 2001000
+            },
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.0084,
+              "checksum": 2001000
+            },
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.008409,
+              "checksum": 2001000
+            },
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.008417,
+              "checksum": 2001000
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.015140875000000165,
+          "children": [
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.005059,
+              "checksum": 2001000
+            },
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.004849,
+              "checksum": 2001000
+            },
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.004527,
+              "checksum": 2001000
+            },
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.004246,
+              "checksum": 2001000
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.014714834000000288,
+          "children": [
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.005346,
+              "checksum": 2001000
+            },
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.005791,
+              "checksum": 2001000
+            },
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.005415,
+              "checksum": 2001000
+            },
+            {
+              "kind": "epoll",
+              "operations": 2000,
+              "seconds": 0.004904,
+              "checksum": 2001000
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "baseline": "76361dd2d28f80244eacf706951607735ac4198c3be22e082babdaf84a2a4363",
+        "candidate": "eacf4092a5693970ef1c93fa00db410b77d58b8cd8097ed546d373e0e21eec98",
+        "native": "b1b5cce65f2bfc89be0342f635752aace93308396f9ac29105aa06bc8d010e40",
+        "fixture": "4028b2573165dffceb6c0e08d84d0de6ab6197c3f5c1d825c0ca9deb92238c10",
+        "rootfs": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe"
+      },
+      "native_environment": {
+        "system": "Darwin",
+        "release": "27.0.0",
+        "architecture": "arm64",
+        "logical_cpus": 12
+      },
+      "summary": {
+        "before": {
+          "loop_max_median_seconds": 0.471716917,
+          "process_wall_median_seconds": 0.5079915000000002,
+          "profile": {
+            "cohort_rounds": 15505,
+            "cohort_stop_us": 39955,
+            "service_caller_wait_us": 36,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 48132,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 19353,
+            "worker_fd_syscalls": 10,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 6451,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 19363,
+            "worker_task_resumes": 3
+          }
+        },
+        "after": {
+          "loop_max_median_seconds": 0.018364875,
+          "process_wall_median_seconds": 0.05537970800000025,
+          "profile": {
+            "cohort_rounds": 47,
+            "cohort_stop_us": 840,
+            "service_caller_wait_us": 55,
+            "service_requests": 4,
+            "serviced_syscalls": 4,
+            "syscalls": 48128,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 23957,
+            "worker_fd_syscalls": 23970,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 7985,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 47927,
+            "worker_task_resumes": 4
+          }
+        },
+        "native": {
+          "loop_max_median_seconds": 0.005791,
+          "process_wall_median_seconds": 0.015140875000000165
+        }
+      }
+    },
+    "inotify": {
+      "passed": true,
+      "kind": "inotify-watch",
+      "processes": 4,
+      "operations_each": 2000,
+      "repeats": 3,
+      "cpus": 12,
+      "records": [
+        {
+          "variant": "before",
+          "repeat": 0,
+          "wall_seconds": 0.346717041,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.136619291,
+              "checksum": 2001000
+            },
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.166202833,
+              "checksum": 2001000
+            },
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.220235875,
+              "checksum": 2001000
+            },
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.269681583,
+              "checksum": 2001000
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 4998,
+            "cohort_stop_us": 24725,
+            "service_caller_wait_us": 32,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 24132,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 13309,
+            "worker_fd_syscalls": 6662,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 13320,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "after",
+          "repeat": 0,
+          "wall_seconds": 0.14873304100000007,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.055845666,
+              "checksum": 2001000
+            },
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.048608333,
+              "checksum": 2001000
+            },
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.07189075,
+              "checksum": 2001000
+            },
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.0619675,
+              "checksum": 2001000
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 45,
+            "cohort_stop_us": 1041,
+            "service_caller_wait_us": 55,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 24128,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 23766,
+            "worker_fd_syscalls": 7929,
+            "worker_file_syscalls": 7923,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 23777,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "before",
+          "repeat": 1,
+          "wall_seconds": 0.30595591599999983,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.114290459,
+              "checksum": 2001000
+            },
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.15678675,
+              "checksum": 2001000
+            },
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.199345959,
+              "checksum": 2001000
+            },
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.23941075,
+              "checksum": 2001000
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 1,
+          "wall_seconds": 0.1468084169999999,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.050419292,
+              "checksum": 2001000
+            },
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.058755167,
+              "checksum": 2001000
+            },
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.055814417,
+              "checksum": 2001000
+            },
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.075664458,
+              "checksum": 2001000
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 2,
+          "wall_seconds": 0.16465054099999987,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.065299541,
+              "checksum": 2001000
+            },
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.047928459,
+              "checksum": 2001000
+            },
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.079542625,
+              "checksum": 2001000
+            },
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.083080334,
+              "checksum": 2001000
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 2,
+          "wall_seconds": 0.30381337500000005,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.106420667,
+              "checksum": 2001000
+            },
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.144129709,
+              "checksum": 2001000
+            },
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.184744667,
+              "checksum": 2001000
+            },
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.234711833,
+              "checksum": 2001000
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 3,
+          "wall_seconds": 0.304036709,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.110228417,
+              "checksum": 2001000
+            },
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.158265958,
+              "checksum": 2001000
+            },
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.1735685,
+              "checksum": 2001000
+            },
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.2412555,
+              "checksum": 2001000
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 3,
+          "wall_seconds": 0.1502426670000001,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.057384291,
+              "checksum": 2001000
+            },
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.04565625,
+              "checksum": 2001000
+            },
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.077576125,
+              "checksum": 2001000
+            },
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.08350825,
+              "checksum": 2001000
+            }
+          ]
+        },
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.029154166000000092,
+          "children": [
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.024532,
+              "checksum": 2001000
+            },
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.024688,
+              "checksum": 2001000
+            },
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.024545,
+              "checksum": 2001000
+            },
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.024586,
+              "checksum": 2001000
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.02846270899999981,
+          "children": [
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.025232,
+              "checksum": 2001000
+            },
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.024909,
+              "checksum": 2001000
+            },
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.024689,
+              "checksum": 2001000
+            },
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.024626,
+              "checksum": 2001000
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.028515625000000266,
+          "children": [
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.025058,
+              "checksum": 2001000
+            },
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.024941,
+              "checksum": 2001000
+            },
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.024663,
+              "checksum": 2001000
+            },
+            {
+              "kind": "inotify-watch",
+              "operations": 2000,
+              "seconds": 0.024865,
+              "checksum": 2001000
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "baseline": "76361dd2d28f80244eacf706951607735ac4198c3be22e082babdaf84a2a4363",
+        "candidate": "eacf4092a5693970ef1c93fa00db410b77d58b8cd8097ed546d373e0e21eec98",
+        "native": "b1b5cce65f2bfc89be0342f635752aace93308396f9ac29105aa06bc8d010e40",
+        "fixture": "4028b2573165dffceb6c0e08d84d0de6ab6197c3f5c1d825c0ca9deb92238c10",
+        "rootfs": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe"
+      },
+      "native_environment": {
+        "system": "Darwin",
+        "release": "27.0.0",
+        "architecture": "arm64",
+        "logical_cpus": 12
+      },
+      "summary": {
+        "before": {
+          "loop_max_median_seconds": 0.23941075,
+          "process_wall_median_seconds": 0.304036709,
+          "profile": {
+            "cohort_rounds": 4998,
+            "cohort_stop_us": 24725,
+            "service_caller_wait_us": 32,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 24132,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 13309,
+            "worker_fd_syscalls": 6662,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 13320,
+            "worker_task_resumes": 3
+          }
+        },
+        "after": {
+          "loop_max_median_seconds": 0.083080334,
+          "process_wall_median_seconds": 0.1502426670000001,
+          "profile": {
+            "cohort_rounds": 45,
+            "cohort_stop_us": 1041,
+            "service_caller_wait_us": 55,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 24128,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 23766,
+            "worker_fd_syscalls": 7929,
+            "worker_file_syscalls": 7923,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 23777,
+            "worker_task_resumes": 3
+          }
+        },
+        "native": {
+          "loop_max_median_seconds": 0.025058,
+          "process_wall_median_seconds": 0.028515625000000266
+        }
+      }
+    },
+    "tcp": {
+      "passed": true,
+      "kind": "tcp-session",
+      "processes": 4,
+      "operations_each": 256,
+      "repeats": 3,
+      "cpus": 12,
+      "records": [
+        {
+          "variant": "before",
+          "repeat": 0,
+          "wall_seconds": 0.121959916,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.063430833,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.063341875,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.0621985,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.061992625,
+              "checksum": 32896
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 50,
+            "cohort_stop_us": 1921,
+            "service_caller_wait_us": 131171,
+            "service_requests": 5579,
+            "serviced_syscalls": 5576,
+            "syscalls": 14203,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 5037,
+            "worker_fd_syscalls": 2052,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 5037,
+            "worker_syscalls": 8488,
+            "worker_task_resumes": 5576
+          }
+        },
+        {
+          "variant": "after",
+          "repeat": 0,
+          "wall_seconds": 0.07531041700000007,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.042489458,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.044144583,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.044329459,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.043649625,
+              "checksum": 32896
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 50,
+            "cohort_stop_us": 980,
+            "service_caller_wait_us": 92491,
+            "service_requests": 5281,
+            "serviced_syscalls": 5278,
+            "syscalls": 12782,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 4634,
+            "worker_fd_syscalls": 2052,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 4634,
+            "worker_syscalls": 7376,
+            "worker_task_resumes": 5278
+          }
+        },
+        {
+          "variant": "before",
+          "repeat": 1,
+          "wall_seconds": 0.075723125,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.042872333,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.044322083,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.044321875,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.043477875,
+              "checksum": 32896
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 1,
+          "wall_seconds": 0.07892258299999999,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.042969292,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.042056625,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.041989,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.04358375,
+              "checksum": 32896
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 2,
+          "wall_seconds": 0.0818206669999999,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.043375875,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.043315209,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.044218833,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.043695458,
+              "checksum": 32896
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 2,
+          "wall_seconds": 0.0781447500000001,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.042813583,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.043858791,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.044712625,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.04368475,
+              "checksum": 32896
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 3,
+          "wall_seconds": 0.07980733400000006,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.044535083,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.045091042,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.044984458,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.044516916,
+              "checksum": 32896
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 3,
+          "wall_seconds": 0.07940666700000021,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.044880917,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.0456565,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.045009084,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.045119042,
+              "checksum": 32896
+            }
+          ]
+        },
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.019565874999999844,
+          "children": [
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.01563,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.01554,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.015513,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.015202,
+              "checksum": 32896
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.019681166000000028,
+          "children": [
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.015344,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.015528,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.015276,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.014889,
+              "checksum": 32896
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.01956116699999999,
+          "children": [
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.015503,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.015662,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.015664,
+              "checksum": 32896
+            },
+            {
+              "kind": "tcp-session",
+              "operations": 256,
+              "seconds": 0.015218,
+              "checksum": 32896
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "baseline": "76361dd2d28f80244eacf706951607735ac4198c3be22e082babdaf84a2a4363",
+        "candidate": "eacf4092a5693970ef1c93fa00db410b77d58b8cd8097ed546d373e0e21eec98",
+        "native": "b1b5cce65f2bfc89be0342f635752aace93308396f9ac29105aa06bc8d010e40",
+        "fixture": "4028b2573165dffceb6c0e08d84d0de6ab6197c3f5c1d825c0ca9deb92238c10",
+        "rootfs": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe"
+      },
+      "native_environment": {
+        "system": "Darwin",
+        "release": "27.0.0",
+        "architecture": "arm64",
+        "logical_cpus": 12
+      },
+      "summary": {
+        "before": {
+          "loop_max_median_seconds": 0.044712625,
+          "process_wall_median_seconds": 0.0781447500000001,
+          "profile": {
+            "cohort_rounds": 50,
+            "cohort_stop_us": 1921,
+            "service_caller_wait_us": 131171,
+            "service_requests": 5579,
+            "serviced_syscalls": 5576,
+            "syscalls": 14203,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 5037,
+            "worker_fd_syscalls": 2052,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 5037,
+            "worker_syscalls": 8488,
+            "worker_task_resumes": 5576
+          }
+        },
+        "after": {
+          "loop_max_median_seconds": 0.044218833,
+          "process_wall_median_seconds": 0.07940666700000021,
+          "profile": {
+            "cohort_rounds": 50,
+            "cohort_stop_us": 980,
+            "service_caller_wait_us": 92491,
+            "service_requests": 5281,
+            "serviced_syscalls": 5278,
+            "syscalls": 12782,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 4634,
+            "worker_fd_syscalls": 2052,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 4634,
+            "worker_syscalls": 7376,
+            "worker_task_resumes": 5278
+          }
+        },
+        "native": {
+          "loop_max_median_seconds": 0.01563,
+          "process_wall_median_seconds": 0.019565874999999844
+        }
+      }
+    }
+  },
+  "linux_reference": {
+    "passed": true,
+    "cases": {
+      "epoll": {
+        "passed": true,
+        "kind": "epoll",
+        "processes": 4,
+        "operations_each": 2000,
+        "repeats": 3,
+        "cpus": 6,
+        "records": [
+          {
+            "variant": "native",
+            "repeat": 1,
+            "wall_seconds": 0.004476344000011068,
+            "children": [
+              {
+                "kind": "epoll",
+                "operations": 2000,
+                "seconds": 0.002699548,
+                "checksum": 2001000
+              },
+              {
+                "kind": "epoll",
+                "operations": 2000,
+                "seconds": 0.00277084,
+                "checksum": 2001000
+              },
+              {
+                "kind": "epoll",
+                "operations": 2000,
+                "seconds": 0.002621298,
+                "checksum": 2001000
+              },
+              {
+                "kind": "epoll",
+                "operations": 2000,
+                "seconds": 0.002559381,
+                "checksum": 2001000
+              }
+            ],
+            "exit": 0
+          },
+          {
+            "variant": "native",
+            "repeat": 2,
+            "wall_seconds": 0.003525966999973207,
+            "children": [
+              {
+                "kind": "epoll",
+                "operations": 2000,
+                "seconds": 0.002654047,
+                "checksum": 2001000
+              },
+              {
+                "kind": "epoll",
+                "operations": 2000,
+                "seconds": 0.002884924,
+                "checksum": 2001000
+              },
+              {
+                "kind": "epoll",
+                "operations": 2000,
+                "seconds": 0.002789715,
+                "checksum": 2001000
+              },
+              {
+                "kind": "epoll",
+                "operations": 2000,
+                "seconds": 0.002449506,
+                "checksum": 2001000
+              }
+            ],
+            "exit": 0
+          },
+          {
+            "variant": "native",
+            "repeat": 3,
+            "wall_seconds": 0.004656511000007413,
+            "children": [
+              {
+                "kind": "epoll",
+                "operations": 2000,
+                "seconds": 0.002837507,
+                "checksum": 2001000
+              },
+              {
+                "kind": "epoll",
+                "operations": 2000,
+                "seconds": 0.002855173,
+                "checksum": 2001000
+              },
+              {
+                "kind": "epoll",
+                "operations": 2000,
+                "seconds": 0.002657132,
+                "checksum": 2001000
+              },
+              {
+                "kind": "epoll",
+                "operations": 2000,
+                "seconds": 0.002535798,
+                "checksum": 2001000
+              }
+            ],
+            "exit": 0
+          }
+        ],
+        "sha256": {
+          "native": "4028b2573165dffceb6c0e08d84d0de6ab6197c3f5c1d825c0ca9deb92238c10"
+        },
+        "native_environment": {
+          "system": "Linux",
+          "release": "7.0.0-38-generic",
+          "architecture": "aarch64",
+          "logical_cpus": 6
+        },
+        "summary": {
+          "native": {
+            "loop_max_median_seconds": 0.002855173,
+            "process_wall_median_seconds": 0.004476344000011068
+          }
+        }
+      },
+      "inotify-watch": {
+        "passed": true,
+        "kind": "inotify-watch",
+        "processes": 4,
+        "operations_each": 2000,
+        "repeats": 3,
+        "cpus": 6,
+        "records": [
+          {
+            "variant": "native",
+            "repeat": 1,
+            "wall_seconds": 0.00966277300000229,
+            "children": [
+              {
+                "kind": "inotify-watch",
+                "operations": 2000,
+                "seconds": 0.003674884,
+                "checksum": 2001000
+              },
+              {
+                "kind": "inotify-watch",
+                "operations": 2000,
+                "seconds": 0.003605759,
+                "checksum": 2001000
+              },
+              {
+                "kind": "inotify-watch",
+                "operations": 2000,
+                "seconds": 0.003696925,
+                "checksum": 2001000
+              },
+              {
+                "kind": "inotify-watch",
+                "operations": 2000,
+                "seconds": 0.003443716,
+                "checksum": 2001000
+              }
+            ],
+            "exit": 0
+          },
+          {
+            "variant": "native",
+            "repeat": 2,
+            "wall_seconds": 0.008367561000000023,
+            "children": [
+              {
+                "kind": "inotify-watch",
+                "operations": 2000,
+                "seconds": 0.003347508,
+                "checksum": 2001000
+              },
+              {
+                "kind": "inotify-watch",
+                "operations": 2000,
+                "seconds": 0.003399091,
+                "checksum": 2001000
+              },
+              {
+                "kind": "inotify-watch",
+                "operations": 2000,
+                "seconds": 0.003284383,
+                "checksum": 2001000
+              },
+              {
+                "kind": "inotify-watch",
+                "operations": 2000,
+                "seconds": 0.003182341,
+                "checksum": 2001000
+              }
+            ],
+            "exit": 0
+          },
+          {
+            "variant": "native",
+            "repeat": 3,
+            "wall_seconds": 0.01042756599997574,
+            "children": [
+              {
+                "kind": "inotify-watch",
+                "operations": 2000,
+                "seconds": 0.00297784,
+                "checksum": 2001000
+              },
+              {
+                "kind": "inotify-watch",
+                "operations": 2000,
+                "seconds": 0.003537925,
+                "checksum": 2001000
+              },
+              {
+                "kind": "inotify-watch",
+                "operations": 2000,
+                "seconds": 0.003557301,
+                "checksum": 2001000
+              },
+              {
+                "kind": "inotify-watch",
+                "operations": 2000,
+                "seconds": 0.002371839,
+                "checksum": 2001000
+              }
+            ],
+            "exit": 0
+          }
+        ],
+        "sha256": {
+          "native": "4028b2573165dffceb6c0e08d84d0de6ab6197c3f5c1d825c0ca9deb92238c10"
+        },
+        "native_environment": {
+          "system": "Linux",
+          "release": "7.0.0-38-generic",
+          "architecture": "aarch64",
+          "logical_cpus": 6
+        },
+        "summary": {
+          "native": {
+            "loop_max_median_seconds": 0.003557301,
+            "process_wall_median_seconds": 0.00966277300000229
+          }
+        }
+      },
+      "tcp-session": {
+        "passed": true,
+        "kind": "tcp-session",
+        "processes": 4,
+        "operations_each": 256,
+        "repeats": 3,
+        "cpus": 6,
+        "records": [
+          {
+            "variant": "native",
+            "repeat": 1,
+            "wall_seconds": 0.00592630599999211,
+            "children": [
+              {
+                "kind": "tcp-session",
+                "operations": 256,
+                "seconds": 0.004208052,
+                "checksum": 32896
+              },
+              {
+                "kind": "tcp-session",
+                "operations": 256,
+                "seconds": 0.004111759,
+                "checksum": 32896
+              },
+              {
+                "kind": "tcp-session",
+                "operations": 256,
+                "seconds": 0.003894051,
+                "checksum": 32896
+              },
+              {
+                "kind": "tcp-session",
+                "operations": 256,
+                "seconds": 0.002665798,
+                "checksum": 32896
+              }
+            ],
+            "exit": 0
+          },
+          {
+            "variant": "native",
+            "repeat": 2,
+            "wall_seconds": 0.005370471000048838,
+            "children": [
+              {
+                "kind": "tcp-session",
+                "operations": 256,
+                "seconds": 0.003776884,
+                "checksum": 32896
+              },
+              {
+                "kind": "tcp-session",
+                "operations": 256,
+                "seconds": 0.003612091,
+                "checksum": 32896
+              },
+              {
+                "kind": "tcp-session",
+                "operations": 256,
+                "seconds": 0.00269284,
+                "checksum": 32896
+              },
+              {
+                "kind": "tcp-session",
+                "operations": 256,
+                "seconds": 0.002594964,
+                "checksum": 32896
+              }
+            ],
+            "exit": 0
+          },
+          {
+            "variant": "native",
+            "repeat": 3,
+            "wall_seconds": 0.005041262000020197,
+            "children": [
+              {
+                "kind": "tcp-session",
+                "operations": 256,
+                "seconds": 0.0035858,
+                "checksum": 32896
+              },
+              {
+                "kind": "tcp-session",
+                "operations": 256,
+                "seconds": 0.003663009,
+                "checksum": 32896
+              },
+              {
+                "kind": "tcp-session",
+                "operations": 256,
+                "seconds": 0.002696548,
+                "checksum": 32896
+              },
+              {
+                "kind": "tcp-session",
+                "operations": 256,
+                "seconds": 0.002499798,
+                "checksum": 32896
+              }
+            ],
+            "exit": 0
+          }
+        ],
+        "sha256": {
+          "native": "4028b2573165dffceb6c0e08d84d0de6ab6197c3f5c1d825c0ca9deb92238c10"
+        },
+        "native_environment": {
+          "system": "Linux",
+          "release": "7.0.0-38-generic",
+          "architecture": "aarch64",
+          "logical_cpus": 6
+        },
+        "summary": {
+          "native": {
+            "loop_max_median_seconds": 0.003776884,
+            "process_wall_median_seconds": 0.005370471000048838
+          }
+        }
+      }
+    }
+  },
+  "linux_ci": {
+    "passed": true,
+    "checks": [
+      {
+        "check": "tests",
+        "exit": 0
+      },
+      {
+        "check": "clippy",
+        "exit": 0
+      }
+    ]
+  },
+  "reviewed_sources": [
+    {
+      "path": "crates/trames-linux/src/direct.rs",
+      "sha256": "e9e49696ced64286caff60b6b13311bfbce4846af24b903153db17470ce3a0d9"
+    },
+    {
+      "path": "crates/trames-linux/src/direct/uring.rs",
+      "sha256": "091fede8b9539d0cfa0419e18c9d013ee57c7c183c02cc7db5d828e0767245e3"
+    },
+    {
+      "path": "crates/trames-linux/src/path_queries.rs",
+      "sha256": "77294308807f5e06aec97340e1fcaa43ae920045b91be3c130588bb9f319a6a2"
+    },
+    {
+      "path": "crates/trames-linux/src/state.rs",
+      "sha256": "20d10c81953ea5643fdca5e69c67c4de75bb5bdffa73ec8ff4e3e2d0450b7fcd"
+    },
+    {
+      "path": "crates/trames-session/src/gpu.rs",
+      "sha256": "2c0b00efa0b05cd5d1d01a255f2060707c70403216dbdbbf61c81d7f088e07fb"
+    },
+    {
+      "path": "crates/trames-session/src/process_seccomp.rs",
+      "sha256": "068502c8d69c131a126aa0c18398917806f4181d859282b69fb67b114c567822"
+    },
+    {
+      "path": "crates/trames-session/src/process_service.rs",
+      "sha256": "2f846c75c43fc72d14ffc50050b10e0f1b92d699452fc48bf30dea2bc8255206"
+    },
+    {
+      "path": "crates/trames-session/src/worker_syscalls.rs",
+      "sha256": "0e7d58f4514044b8ed0def88bd7439796e14dcbd9f98cc4d99236c56c90cc1f7"
+    },
+    {
+      "path": "crates/trames-session/src/workers.rs",
+      "sha256": "e4733e7fa8397b9d98bfe5dcb5b706448b17a2acdb71be16e0d13179389c690a"
+    },
+    {
+      "path": "crates/trames-shared/src/lib.rs",
+      "sha256": "57e82f040d095960d9b8383b483ef2e277e55c438ab91f0daa6a6e6827e6dbca"
+    },
+    {
+      "path": "crates/trames-shared/src/readiness.rs",
+      "sha256": "188429e0673a656cf43b86e4eb1db9f1a19237407ce8498e158b5dfe51d31b99"
+    },
+    {
+      "path": "crates/trames-vfs/src/direct_io.rs",
+      "sha256": "7847e485040ddb85f0059fa4bf033e34121cc2f98ef47cee6cce324c0e36ade6"
+    },
+    {
+      "path": "crates/trames-vfs/src/events.rs",
+      "sha256": "cd47b0a55c6d70aaad2127ab9723b82dc280fec89b031016f12dc52f6bd55158"
+    },
+    {
+      "path": "crates/trames-vfs/src/fd_table.rs",
+      "sha256": "07ebbf2989583aa759242d4cbc3688be0b7468eefc037c94a3f279f7d91ec093"
+    },
+    {
+      "path": "crates/trames-vfs/src/hostfs/interop_tests.rs",
+      "sha256": "89cb53c441f9b7edcd9997a89cd8eefd79c3d0738ff785faba184f2ae0b5edb7"
+    },
+    {
+      "path": "crates/trames-vfs/src/inotify/queue.rs",
+      "sha256": "aebe5ac5186628c29e26a2485e9741719cb8956a779d04fc22cee9e5a21422c8"
+    },
+    {
+      "path": "crates/trames-vfs/src/lib.rs",
+      "sha256": "3c188b9e04f73baf8ee5d8b249d229109f62f07973211741d3957d9b2cb5357d"
+    },
+    {
+      "path": "crates/trames-vfs/src/open_handle.rs",
+      "sha256": "e1015e2891092f06f1f6506a1eb0be0103746a315852e668ee7148ef5587d208"
+    },
+    {
+      "path": "crates/trames-vfs/src/path_queries.rs",
+      "sha256": "4b44d32446f0e9a2a3414519f05cbdecbec22ba0f3d37c7c45fc3b3a0b87afa9"
+    },
+    {
+      "path": "crates/trames-vfs/src/epoll.rs",
+      "sha256": "ab13e97873922e78bf3350333afe79c51badcee1ed04ce270f29a050eb134621"
+    },
+    {
+      "path": "docs/architecture/execution-backends.md",
+      "sha256": "d0bebc9745ec3202a203c8316a615b08a8c64dde8fcd24f4f05834ed8537af5a"
+    }
+  ],
+  "validation": {
+    "mac_host": {
+      "vfs_passed": 417,
+      "vfs_ignored": 1,
+      "linux_abi_passed": 160,
+      "linux_abi_ignored": 1,
+      "shared_notifications_passed": 14
+    },
+    "linux_host": {
+      "vfs_passed": 416,
+      "vfs_ignored": 1,
+      "linux_abi_passed": 160,
+      "linux_abi_ignored": 1,
+      "shared_notifications_passed": 14
+    },
+    "kernel": {
+      "passed": 252,
+      "ignored": 3
+    },
+    "mac_product": {
+      "passed": 13,
+      "ignored": 1
+    },
+    "strict_checks": [
+      "Mac-host shared affected crates/tests with hostfs",
+      "ARM64 Linux shared affected crates/tests with hostfs",
+      "interpreter-kernel tests",
+      "Mac product tests"
+    ],
+    "production_ffi": {
+      "passed": true,
+      "checks": [
+        {
+          "case": "alpine-install",
+          "passed": true,
+          "reused": true
+        },
+        {
+          "case": "alpine",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "alpine",
+          "terminal": 2,
+          "passed": true
+        },
+        {
+          "case": "debian-install",
+          "passed": true,
+          "reused": true
+        },
+        {
+          "case": "debian",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "debian",
+          "terminal": 2,
+          "passed": true
+        },
+        {
+          "case": "debian-setup",
+          "passed": true
+        },
+        {
+          "case": "custom-install",
+          "passed": true,
+          "reused": true
+        },
+        {
+          "case": "custom",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "custom",
+          "terminal": 2,
+          "passed": true
+        },
+        {
+          "case": "custom-sha256-rejection",
+          "passed": true
+        },
+        {
+          "case": "systemd",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "systemd",
+          "terminal": 2,
+          "passed": true
+        }
+      ]
+    },
+    "ios_static_cross_build": true,
+    "product_boundaries": true
+  },
+  "source_hashes": {
+    "tests/fixtures/fd-create-bench.c": "6708a741a9ddd117b43afaa29135e641c41a08b15e434c039b6d53163307f58a",
+    "tests/performance/fd-create.py": "fcf284023a91eab839bf0cbab06d557cb541f8616814f4baf75413e383d5c501",
+    "target/epoll-live-baseline/trames-mac-run": "76361dd2d28f80244eacf706951607735ac4198c3be22e082babdaf84a2a4363",
+    "target/epoll-live-fixture/linux": "4028b2573165dffceb6c0e08d84d0de6ab6197c3f5c1d825c0ca9deb92238c10",
+    "target/epoll-live-fixture/native-mac": "b1b5cce65f2bfc89be0342f635752aace93308396f9ac29105aa06bc8d010e40",
+    "target/release/libtrames_ffi.dylib": "07b61265c8522cf25367555eae3ef234be248352edf107b14cb6509ca5811e3d",
+    "target/aarch64-apple-ios/release/libtrames_ffi.a": "cc679b75b42868813db05b9635966b2f925a3356cfba4ab9cf14ac1dd2048dad"
+  },
+  "log_hashes": {
+    "target/epoll-live-tests-final.log": "18aa417fcaaf19862a562fce9347c1b324e7a9ed5610573e466641aab23c9486",
+    "target/epoll-live-kernel-final.log": "72ae0ed03bf261a6593feac56d2e0d52226cb6be4b4bb5639fb10813cd577058",
+    "target/epoll-live-clippy-final.log": "36860247d41617a05796c42cd4759ab19deee24316821c1d6902fed3861d8fdb",
+    "target/epoll-live-kernel-clippy.log": "6f59db201b4694968fbd8b599711b359489e7193b6dcc4c0d7946c0278ecb313",
+    "target/epoll-live-mac-tests.log": "180800180c286a4e8a9af5230d889f07624026c539104c30deae5a6f6aae250a",
+    "target/epoll-live-mac-clippy.log": "01fb8363d5451f3a7fc0d5d6c6c94b3f298c760722929fd61fa22aec56fb9a7a",
+    "target/epoll-live-ffi.log": "a0ed12eb6aa6fe034466b76f310acfdbcd27794a78dbf9cf6cf2b6e08298cc0d",
+    "target/epoll-live-ios-build.log": "5935275be28235d139ba809302370fd4aedd7fe26d58b3e91d53997ce7421a9e",
+    "target/epoll-live-ipad-boundaries.log": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651",
+    "target/epoll-live-mac-boundaries.log": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651",
+    "target/local-ci/io/epoll-live-linux-tests.log": "a990c15e3a69301b2d847a150725df52465ad8ed1c2da5c8adc4209d3a56953f",
+    "target/local-ci/io/epoll-live-linux-clippy.log": "11b75c780b697f77a0ad303231a870b1a634548235046e26d9ca1ec9d6b45659"
+  },
+  "installed_dev_runner_sha256": "eacf4092a5693970ef1c93fa00db410b77d58b8cd8097ed546d373e0e21eec98"
+}

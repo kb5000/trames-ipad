@@ -16,8 +16,11 @@
 #include <sched.h>
 #ifdef __linux__
 #include <sys/eventfd.h>
+#include <sys/epoll.h>
 #include <sys/inotify.h>
 #include <sys/timerfd.h>
+#elif defined(__APPLE__)
+#include <sys/event.h>
 #endif
 
 static double now(void) {
@@ -40,6 +43,36 @@ static void tcp_read(int fd, unsigned char *byte, int eof) {
         assert(now() < deadline); sched_yield();
     }
 }
+static int queue_create(void) {
+#ifdef __linux__
+    return epoll_create1(0);
+#else
+    return kqueue();
+#endif
+}
+static void interest(int queue, int operation, int fd, uint64_t data, int oneshot) {
+#ifdef __linux__
+    struct epoll_event event = {.events = EPOLLIN | (oneshot ? EPOLLONESHOT : 0), .data.u64 = data};
+    assert(!epoll_ctl(queue, operation, fd, operation == 2 ? NULL : &event));
+#else
+    struct kevent event;
+    unsigned flags = operation == 2 ? EV_DELETE : EV_ADD | EV_ENABLE | (oneshot ? EV_DISPATCH : 0);
+    EV_SET(&event, fd, EVFILT_READ, flags, 0, 0, (void *)(uintptr_t)data);
+    assert(!kevent(queue, &event, 1, NULL, 0, NULL));
+#endif
+}
+static uint64_t queue_wait(int queue) {
+#ifdef __linux__
+    struct epoll_event event;
+    assert(epoll_wait(queue, &event, 1, 0) == 1 && event.events & EPOLLIN);
+    return event.data.u64;
+#else
+    struct kevent event;
+    struct timespec zero = {0};
+    assert(kevent(queue, NULL, 0, &event, 1, &zero) == 1 && event.filter == EVFILT_READ);
+    return (uint64_t)(uintptr_t)event.udata;
+#endif
+}
 int main(int argc, char **argv) {
     assert(argc == 3);
     const char *kind = argv[1];
@@ -56,9 +89,46 @@ int main(int argc, char **argv) {
         assert(!getsockname(listener, (struct sockaddr *)&address, &size));
         assert(!listen(listener, 4));
     }
+    int queue = -1, pair[2] = {-1,-1}, monitor = -1;
+    char watched[] = "/tmp/trames-watch-XXXXXX";
+    if (!strcmp(kind, "epoll")) {
+        queue = queue_create(); assert(queue >= 0); assert(!pipe(pair));
+    } else if (!strcmp(kind, "inotify-watch")) {
+        assert(mkdtemp(watched));
+#ifdef __linux__
+        queue = inotify_init1(IN_NONBLOCK); assert(queue >= 0);
+#else
+        queue = kqueue(); assert(queue >= 0);
+        monitor = open(watched, O_EVTONLY); assert(monitor >= 0);
+#endif
+    }
     double began = now();
     for (unsigned i = 0; i < operations; i++) {
-        if (!strcmp(kind, "tcp-session")) {
+        if (!strcmp(kind, "epoll")) {
+            interest(queue, 1, pair[0], 0, 0);
+            interest(queue, 3, pair[0], (uint64_t)i + 1, 1);
+            unsigned char sent = (unsigned char)i, received = 0;
+            assert(write(pair[1], &sent, 1) == 1);
+            assert(queue_wait(queue) == (uint64_t)i + 1);
+            assert(read(pair[0], &received, 1) == 1 && received == sent);
+            interest(queue, 2, pair[0], 0, 0);
+        } else if (!strcmp(kind, "inotify-watch")) {
+#ifdef __linux__
+            int wd = inotify_add_watch(queue, watched, IN_CREATE); assert(wd >= 0);
+            assert(!inotify_rm_watch(queue, wd));
+            unsigned char bytes[64]; ssize_t n = read(queue, bytes, sizeof(bytes));
+            assert(n >= (ssize_t)sizeof(struct inotify_event));
+            const struct inotify_event *event = (const struct inotify_event *)bytes;
+            assert(event->wd == wd && event->mask & IN_IGNORED);
+#else
+            struct kevent event; struct timespec zero = {0};
+            EV_SET(&event, monitor, EVFILT_VNODE, EV_ADD | EV_CLEAR, NOTE_WRITE, 0, NULL);
+            assert(!kevent(queue, &event, 1, NULL, 0, NULL));
+            EV_SET(&event, monitor, EVFILT_VNODE, EV_DELETE, 0, 0, NULL);
+            assert(!kevent(queue, &event, 1, NULL, 0, NULL));
+            assert(!kevent(queue, NULL, 0, &event, 1, &zero));
+#endif
+        } else if (!strcmp(kind, "tcp-session")) {
             int client = tcp_socket();
             int result = connect(client, (struct sockaddr *)&address, sizeof(address));
             assert(!result || errno == EINPROGRESS);
@@ -134,6 +204,10 @@ int main(int argc, char **argv) {
     }
     double elapsed = now() - began;
     if (listener >= 0) assert(!close(listener));
+    if (queue >= 0) assert(!close(queue));
+    if (pair[0] >= 0) {assert(!close(pair[0])); assert(!close(pair[1]));}
+    if (monitor >= 0) assert(!close(monitor));
+    if (!strcmp(kind, "inotify-watch")) assert(!rmdir(watched));
     assert(checksum == (uint64_t)operations * (operations + 1) / 2);
     printf("{\"kind\":\"%s\",\"operations\":%u,\"seconds\":%.9f,\"checksum\":%llu}\n",
            kind, operations, elapsed, (unsigned long long)checksum);

@@ -1,5 +1,71 @@
 # Coordinator dependency audit
 
+## Ninth migration implemented — 2026-11-02
+
+Runtime `0dd8d25685d58f51b477ec48a36c1a99ec3c05f6` replaces frozen admitted epoll interest snapshots with
+one shared live index on the original epoll object. Worker ADD/MOD/DEL and waits
+share membership, ET/ONESHOT state and the original delivery cursor. Changes to
+these interests no longer invalidate global FD snapshots or drain every CPU.
+Only owner-only interests retain the original capture boundary. Allowed filtered
+calls also run directly with one seccomp decision; denials and unsupported cases
+retain their existing owner effects and entry token.
+
+Epoll creation uses a single-caller owner service and is visible to existing
+workers immediately. Creation and close/dup ownership themselves remain on the
+owner. Worker inotify add-watch now uses the original inode/instance authority
+through the sealed pathname resolver. Native watcher topology changes update
+already-parked reads/epoll subscriptions through the existing host poller. No new
+service thread, polling bus, guest quota, race errno or memory barrier is added.
+
+Four processes each execute 2,000 event-loop or watch-registration cycles. The
+epoll fixture reuses one queue and pipe pair per process, executes ADD/MOD,
+transmits/checks one byte with a one-shot wait, then DEL. The inotify fixture adds
+and removes a watch on its private directory and consumes IN_IGNORED. Setup and
+teardown are outside the child loop but included in full workload wall time.
+The unchanged 256-session TCP fixture supplies a regression comparison.
+
+| Longest-child loop median | Previous | Current | Native macOS equivalent | Native Linux |
+| --- | ---: | ---: | ---: | ---: |
+| Pipe epoll control/I/O, 2,000 cycles each | 471.7 ms | 18.4 ms | 5.79 ms | 2.86 ms |
+| Directory watch registration, 2,000 cycles each | 239.4 ms | 83.1 ms | 25.1 ms | 3.56 ms |
+| Complete TCP sessions, 256 each | 44.7 ms | 44.2 ms | 15.6 ms | 3.78 ms |
+
+The event loop improves **25.69×**; diagnostic cohort rounds decrease from
+**15,505 to 47**. Full workload wall time decreases **508.0 to 55.4 ms** (9.17×).
+Watch registration improves **2.88×**, with rounds decreasing **4,998 to 45**;
+full workload wall time decreases **304.0 to 150.2 ms** (2.02×). TCP loop/wall
+results are approximately flat. Diagnostic counts include startup/teardown;
+summed caller waits are not CPU utilization.
+
+Timings are medians of three unprofiled counterbalanced runs, with separate
+profiling samples. Trames and native Linux execute the exact same static ARM64
+ELF. The same C source uses macOS kqueue READ/EV_DISPATCH for the epoll equivalent
+and VNODE add/delete/drain for the watch equivalent; those are corresponding
+functional operations, not identical Linux syscalls or notification payloads.
+The six-vCPU/8 GiB Linux reference was stopped before Mac timings and restored
+after targeted Linux CI. Event loops still take 3.17× native macOS and 6.43× the
+Linux reference; watch registration takes 3.32× macOS. Kernels and CPU allocation
+differ. These fixtures do not establish Firefox or whole-application speedups.
+
+Admitted resources include pipes, eventfd/timerfd/inotify and supported Unix/PTY
+poll resources. Native TCP, task-signal and unsupported/nested epoll interests
+still need owner authority; socket factory/full close, connect/accept and task
+registry work also remain. This is not complete epoll/coordinator removal.
+
+Validation passed: on Mac, 417 VFS, 160 Linux ABI and 14 shared-notification tests;
+on native ARM64 Linux, 416 VFS, 160 Linux ABI and 14 shared-notification tests.
+Strict affected-crate checks passed on both hosts. Also passed: 252 interpreter
+kernel tests including filtered controls, strict kernel/Mac checks, 13 Mac product
+tests, 13 production FFI checks (Alpine/Debian/custom/original systemd/two PTYs),
+iPad static cross-build and paired-product boundaries. Unchanged CPU, guest-memory
+and graphics checks were reused; physical iPad checks remain skipped.
+
+[Samples and validation](../validation/epoll-live-20261102.json),
+[fixture](../../tests/fixtures/fd-create-bench.c),
+[harness](../../tests/performance/fd-create.py), and
+[shared ownership](https://github.com/kb5000/trames-runtime/blob/main/docs/architecture/execution-backends.md#live-epoll-interests-and-worker-inotify-registration-2026-11-02)
+record the implementation and remaining boundaries.
+
 ## Eighth migration implemented — 2026-11-02
 
 Runtime `d055678a2c897c498d0b9e3cededda268ff1ba2f` shares the original native TCP connection/error state
@@ -598,21 +664,18 @@ about 150% to 6% on the physical iPad HUD. These are reused earlier checks of th
 same runtime source, not rerun measurements; see
 [iPad environment validation](../validation/ipad-environments-20261102.json).
 
-### Recommended migration order
+### Migration order — updated after the ninth stage
 
-1. Path metadata (`newfstatat`/statx/access/readlink) over shared namespace/inode
-   authority. Test rename/unlink, symlinks, mount boundaries, host mutations and
-   concurrent metadata changes. Preserve normal Linux races; no stronger
-   ordering, guest-race error or whole-function global lock.
-2. Regular-file open/create and pipe/eventfd/timerfd/inotify creation/publication
-   are implemented above. Short unfiltered Internet controls now use an in-epoch
-   owner service, and connected TCP publication is live. Native TCP address and
-   basic option controls now run directly on workers; idle and quiescent connected
-   close no longer join, with passive lifetime preserved across queued handoffs.
-   Next are socket creation/broader close ownership, remaining stateful controls,
-   blocking connect/accept, AF_UNIX/SCM_RIGHTS and epoll
-   interest ownership over shared Files and actual resource objects. Remove the
-   remaining owner hop while retaining the original namespace/policy semantics.
+1. Path metadata, ordinary regular-file open/create and anonymous resource
+   creation are implemented above. Namespace/inode topology changes and special
+   backing/endpoint lifetimes still retain their real owner boundaries.
+2. Native TCP bytes, addresses, common options, shutdown and admitted SO_ERROR
+   completion run on workers. Idle/quiescent connected close and epoll creation
+   use single-caller services. Admitted epoll ADD/MOD/DEL and inotify add/remove
+   are live shared operations. Next are socket factory/full close ownership,
+   remaining bind/connect/listen/accept controls, AF_UNIX/SCM_RIGHTS and
+   native-TCP/task-signal/nested or unsupported epoll interests. Preserve original
+   policy/routing and actual OFD lifetimes while removing the remaining hops.
 3. Temporary signal-mask waits, signal delivery and task creation/exit using a
    shared task registry and targeted execution-queue events. Preserve seccomp
    decisions, EINTR/restart, process-group semantics and OFD lifetimes.
