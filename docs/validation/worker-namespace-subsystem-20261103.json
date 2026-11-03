@@ -1,0 +1,2549 @@
+{
+  "date": "2026-11-03",
+  "stage": 34,
+  "status": "Namespace/metadata subsystem batch closed; remaining architecture dependencies inventoried; no further migration started",
+  "runtime_revision": "af0aa49e60127236b2bf7858f95757306238ddee",
+  "baseline_runtime_revision": "7739836e2302f8fb43f0a7b437f8038ae854ddd6",
+  "sources": [
+    {
+      "path": "crates/trames-linux/src/direct.rs",
+      "sha256": "0bfa10d519ffdf767207182115f45356bf2075930664e30732c06b50ea180101"
+    },
+    {
+      "path": "crates/trames-linux/src/direct/file.rs",
+      "sha256": "89477106e8340f39d1dc18764a2d5224ad06c745458b45d40cda113a13725ac4"
+    },
+    {
+      "path": "crates/trames-linux/src/direct/file_tests.rs",
+      "sha256": "bf377594aed56e03c851a53793899e7cd6ba26ed197216a9f424ea1a019d65cb"
+    },
+    {
+      "path": "crates/trames-linux/src/direct/namespace.rs",
+      "sha256": "d9d9c6c9dcfe59cbaefbb00f30bde9adb47588b96746514134cd681080722c92"
+    },
+    {
+      "path": "crates/trames-linux/src/direct/uring/actor_file.rs",
+      "sha256": "13e6a40b3d6009401b49ee4a2b0f0fb62d47446b4b44d5949a182b3eb213401f"
+    },
+    {
+      "path": "crates/trames-linux/src/file_calls.rs",
+      "sha256": "b95a15329f932821bd2d9bebc2a2f4584ff58fd453459ffe73f9f43a9eff9502"
+    },
+    {
+      "path": "crates/trames-linux/src/lib.rs",
+      "sha256": "ba2633701de33e915ffe5a58e15ead3fa68875e9496690b85ae0fce5991f0148"
+    },
+    {
+      "path": "crates/trames-linux/src/state.rs",
+      "sha256": "8f5a17c32e15711bf9ce4f85bf22261652b8f85fc3a13917200e35b011c10b17"
+    },
+    {
+      "path": "crates/trames-linux/src/xattr.rs",
+      "deleted": true,
+      "prior_sha256": "dbc5db95c0fc2a291c89bd2b9f4e9a0262106a6a3b7f6d583ff3fefb4cdcbac8"
+    },
+    {
+      "path": "crates/trames-session/src/process_file_io.rs",
+      "sha256": "9846d1127ccd8194ce21ae9b732101e3aeae86fac3e81053bcfea0e15f7a015d"
+    },
+    {
+      "path": "crates/trames-session/src/process_seccomp.rs",
+      "sha256": "15b80cccece47ee629b65f56939e1ac9406ddd2d4683aa485c46f5bdf19c7824"
+    },
+    {
+      "path": "crates/trames-session/src/worker_syscalls.rs",
+      "sha256": "f6772166f051cdcbf6e9d279a03b557eefdc1c374ffcbcf06496de658e674777"
+    },
+    {
+      "path": "crates/trames-vfs/src/credentials.rs",
+      "sha256": "aa8d4d74c41cf1b2b4104de8f5b9b940daa062b62c764eb08940f41ea0616572"
+    },
+    {
+      "path": "crates/trames-vfs/src/file_work.rs",
+      "sha256": "f903741fb2c81dbd190dfbb7681e5d88830a4627ca4a08bc39646e5a782f4b80"
+    },
+    {
+      "path": "crates/trames-vfs/src/file_work_tests.rs",
+      "sha256": "b0f2a4096e9d35d6903cfb4cba57fe9b56e9f2aab7821b9aa9c0ad7a277578a7"
+    },
+    {
+      "path": "crates/trames-vfs/src/fs_context.rs",
+      "sha256": "7d6245d080b817a4294035ce0cfd1c523a64895c1e215a4668ecbe7c03553024"
+    },
+    {
+      "path": "crates/trames-vfs/src/fs_data.rs",
+      "sha256": "28a0fda7cd7a6876520bca60c01fb3c8bc0e49d84b149081a518f0225c2c05e7"
+    },
+    {
+      "path": "crates/trames-vfs/src/lib.rs",
+      "sha256": "2f7c69d59b9c94023315902a8130ae3e9531fb14b067e5fc2737cbd7b8090ba2"
+    },
+    {
+      "path": "crates/trames-vfs/src/mounts.rs",
+      "sha256": "434903a612c59b12d61c17b8fef456eceb3f036d0e7ef3b11783c2eb5b8fe8d8"
+    },
+    {
+      "path": "crates/trames-vfs/src/namespace.rs",
+      "sha256": "cfeabf5dedcaa1998efae2adfbafa5e9e0e70dc65eaae20597fc0025d2cf7dff"
+    },
+    {
+      "path": "crates/trames-vfs/src/namespace_work.rs",
+      "sha256": "0ee76f4f5c9715e36815ac9e1b15fef46e027c91bf74a66719c5e659c7ba9209"
+    },
+    {
+      "path": "crates/trames-vfs/src/path_queries.rs",
+      "sha256": "959279b55c725459db032862fbf8922869eeffc3005adb79dd98da166c359cb2"
+    },
+    {
+      "path": "crates/trames-vfs/src/pty.rs",
+      "sha256": "77895a8300a8bb3635f31b19f6bcd701fe84a5babaac6b2953637379b8f7b6ed"
+    },
+    {
+      "path": "crates/trames-vfs/src/xattr.rs",
+      "sha256": "aa4a264bf6f6a614f5891df829e9d2acbff5e055aa177ddca53351c15edd269d"
+    },
+    {
+      "path": "docs/architecture/coordination-boundaries.md",
+      "sha256": "2236a619e4432b98fcb0edf80342cb2499986b7cfad2fa10e0e4bbadbaa2adb0"
+    },
+    {
+      "path": "docs/architecture/execution-backends.md",
+      "sha256": "aff7fab7b8cd839911b4db605bba201f4064c3c077fc5969f660d89592059c32"
+    }
+  ],
+  "scope": [
+    "One namespace ABI for workers and original joined compatibility entry; duplicate old xattr/namespace import removed",
+    "Original shared fs_struct cwd/root/pins; private mount-control islands; compile-time Send+Sync proof",
+    "Actual filesystem namespace and inode metadata transactions, including PTY insertion/final close",
+    "Short calls borrow the current island; native/retained work reuses the existing disk pool and source completion",
+    "Typed owner-only before-effects handoff retains copied inputs and accepted original FD/OFD identities",
+    "Architecture-wide owner dependency and fallback audit, shared by Mac HVF and iPad interpreter"
+  ],
+  "checks": {
+    "apple_vfs": {
+      "passed": 477,
+      "ignored": 1
+    },
+    "linux_vfs": {
+      "passed": 476,
+      "ignored": 1
+    },
+    "apple_abi": {
+      "passed": 224,
+      "ignored": 1
+    },
+    "linux_abi": {
+      "passed": 224,
+      "ignored": 1
+    },
+    "apple_kernel": {
+      "unique_passed": 276,
+      "ignored": 3,
+      "method": "275 unchanged passing cases plus exact one-case retry after fixing the new filter harness; no production edit for the harness correction",
+      "initial_new_harness_failure": "First pool size mismatched cpu_count; then denied first-epoch test incorrectly required >100 calls. Corrected eligible affinity and denial-only call minimum; ALLOW still checks >100 and all calls on worker_file_syscalls."
+    },
+    "linux_kernel": {
+      "passed": 276,
+      "ignored": 3
+    },
+    "mac_namespace": {
+      "passed": true,
+      "count": 12,
+      "cpu_counts": [
+        1,
+        2,
+        4
+      ],
+      "storage": [
+        "memory",
+        "private"
+      ],
+      "modes": [
+        "semantic",
+        "lifecycle"
+      ],
+      "results": {
+        "passed": true,
+        "rows": [
+          {
+            "storage": "memory",
+            "cpus": 1,
+            "mode": "semantic",
+            "returncode": 0,
+            "paths": {
+              "cohort_rounds": 0,
+              "cohort_stop_us": 0,
+              "service_caller_wait_us": 0,
+              "service_requests": 0,
+              "serviced_syscalls": 0,
+              "syscalls": 25,
+              "vm_local_syscalls": 0,
+              "worker_direct_syscalls": 0,
+              "worker_fd_syscalls": 0,
+              "worker_file_syscalls": 0,
+              "worker_futex_waits": 0,
+              "worker_futex_wakes": 0,
+              "worker_gpu_calls": 0,
+              "worker_gpu_waits": 0,
+              "worker_poll_syscalls": 0,
+              "worker_socket_syscalls": 0,
+              "worker_syscalls": 0,
+              "worker_task_resumes": 0,
+              "worker_uring_syscalls": 0
+            },
+            "elapsed": 0.204350958,
+            "command": [
+              "/Users/main/dev/trames-mac/target/release/Trames Dev.app/Contents/MacOS/trames-mac-run",
+              "--rootfs",
+              "/Users/main/dev/trames/target/namespace-subsystem/empty-root",
+              "--cpus",
+              "1",
+              "--network",
+              "off",
+              "--timeout",
+              "30",
+              "--no-pty",
+              "--no-windows",
+              "--metrics",
+              "--exec-file",
+              "/self=/Users/main/dev/trames/target/local-ci/io/namespace-subsystem/fixtures/namespace-worker-subsystem",
+              "/self",
+              "semantic"
+            ]
+          },
+          {
+            "storage": "memory",
+            "cpus": 1,
+            "mode": "lifecycle",
+            "returncode": 0,
+            "paths": {
+              "cohort_rounds": 0,
+              "cohort_stop_us": 0,
+              "service_caller_wait_us": 0,
+              "service_requests": 0,
+              "serviced_syscalls": 0,
+              "syscalls": 1035,
+              "vm_local_syscalls": 0,
+              "worker_direct_syscalls": 0,
+              "worker_fd_syscalls": 0,
+              "worker_file_syscalls": 0,
+              "worker_futex_waits": 0,
+              "worker_futex_wakes": 0,
+              "worker_gpu_calls": 0,
+              "worker_gpu_waits": 0,
+              "worker_poll_syscalls": 0,
+              "worker_socket_syscalls": 0,
+              "worker_syscalls": 0,
+              "worker_task_resumes": 0,
+              "worker_uring_syscalls": 0
+            },
+            "elapsed": 0.046165625000000016,
+            "command": [
+              "/Users/main/dev/trames-mac/target/release/Trames Dev.app/Contents/MacOS/trames-mac-run",
+              "--rootfs",
+              "/Users/main/dev/trames/target/namespace-subsystem/empty-root",
+              "--cpus",
+              "1",
+              "--network",
+              "off",
+              "--timeout",
+              "30",
+              "--no-pty",
+              "--no-windows",
+              "--metrics",
+              "--exec-file",
+              "/self=/Users/main/dev/trames/target/local-ci/io/namespace-subsystem/fixtures/namespace-worker-subsystem",
+              "/self",
+              "lifecycle",
+              "4",
+              "16"
+            ]
+          },
+          {
+            "storage": "memory",
+            "cpus": 2,
+            "mode": "semantic",
+            "returncode": 0,
+            "paths": {
+              "cohort_rounds": 0,
+              "cohort_stop_us": 0,
+              "service_caller_wait_us": 0,
+              "service_requests": 0,
+              "serviced_syscalls": 0,
+              "syscalls": 25,
+              "vm_local_syscalls": 0,
+              "worker_direct_syscalls": 0,
+              "worker_fd_syscalls": 0,
+              "worker_file_syscalls": 0,
+              "worker_futex_waits": 0,
+              "worker_futex_wakes": 0,
+              "worker_gpu_calls": 0,
+              "worker_gpu_waits": 0,
+              "worker_poll_syscalls": 0,
+              "worker_socket_syscalls": 0,
+              "worker_syscalls": 0,
+              "worker_task_resumes": 0,
+              "worker_uring_syscalls": 0
+            },
+            "elapsed": 0.012916041999999961,
+            "command": [
+              "/Users/main/dev/trames-mac/target/release/Trames Dev.app/Contents/MacOS/trames-mac-run",
+              "--rootfs",
+              "/Users/main/dev/trames/target/namespace-subsystem/empty-root",
+              "--cpus",
+              "2",
+              "--network",
+              "off",
+              "--timeout",
+              "30",
+              "--no-pty",
+              "--no-windows",
+              "--metrics",
+              "--exec-file",
+              "/self=/Users/main/dev/trames/target/local-ci/io/namespace-subsystem/fixtures/namespace-worker-subsystem",
+              "/self",
+              "semantic"
+            ]
+          },
+          {
+            "storage": "memory",
+            "cpus": 2,
+            "mode": "lifecycle",
+            "returncode": 0,
+            "paths": {
+              "cohort_rounds": 20,
+              "cohort_stop_us": 73,
+              "service_caller_wait_us": 0,
+              "service_requests": 0,
+              "serviced_syscalls": 0,
+              "syscalls": 1034,
+              "vm_local_syscalls": 9,
+              "worker_direct_syscalls": 841,
+              "worker_fd_syscalls": 130,
+              "worker_file_syscalls": 841,
+              "worker_futex_waits": 7,
+              "worker_futex_wakes": 8,
+              "worker_gpu_calls": 0,
+              "worker_gpu_waits": 0,
+              "worker_poll_syscalls": 0,
+              "worker_socket_syscalls": 0,
+              "worker_syscalls": 989,
+              "worker_task_resumes": 6,
+              "worker_uring_syscalls": 0
+            },
+            "elapsed": 0.024303375000000016,
+            "command": [
+              "/Users/main/dev/trames-mac/target/release/Trames Dev.app/Contents/MacOS/trames-mac-run",
+              "--rootfs",
+              "/Users/main/dev/trames/target/namespace-subsystem/empty-root",
+              "--cpus",
+              "2",
+              "--network",
+              "off",
+              "--timeout",
+              "30",
+              "--no-pty",
+              "--no-windows",
+              "--metrics",
+              "--exec-file",
+              "/self=/Users/main/dev/trames/target/local-ci/io/namespace-subsystem/fixtures/namespace-worker-subsystem",
+              "/self",
+              "lifecycle",
+              "4",
+              "16"
+            ]
+          },
+          {
+            "storage": "memory",
+            "cpus": 4,
+            "mode": "semantic",
+            "returncode": 0,
+            "paths": {
+              "cohort_rounds": 0,
+              "cohort_stop_us": 0,
+              "service_caller_wait_us": 0,
+              "service_requests": 0,
+              "serviced_syscalls": 0,
+              "syscalls": 25,
+              "vm_local_syscalls": 0,
+              "worker_direct_syscalls": 0,
+              "worker_fd_syscalls": 0,
+              "worker_file_syscalls": 0,
+              "worker_futex_waits": 0,
+              "worker_futex_wakes": 0,
+              "worker_gpu_calls": 0,
+              "worker_gpu_waits": 0,
+              "worker_poll_syscalls": 0,
+              "worker_socket_syscalls": 0,
+              "worker_syscalls": 0,
+              "worker_task_resumes": 0,
+              "worker_uring_syscalls": 0
+            },
+            "elapsed": 0.01206195800000004,
+            "command": [
+              "/Users/main/dev/trames-mac/target/release/Trames Dev.app/Contents/MacOS/trames-mac-run",
+              "--rootfs",
+              "/Users/main/dev/trames/target/namespace-subsystem/empty-root",
+              "--cpus",
+              "4",
+              "--network",
+              "off",
+              "--timeout",
+              "30",
+              "--no-pty",
+              "--no-windows",
+              "--metrics",
+              "--exec-file",
+              "/self=/Users/main/dev/trames/target/local-ci/io/namespace-subsystem/fixtures/namespace-worker-subsystem",
+              "/self",
+              "semantic"
+            ]
+          },
+          {
+            "storage": "memory",
+            "cpus": 4,
+            "mode": "lifecycle",
+            "returncode": 0,
+            "paths": {
+              "cohort_rounds": 19,
+              "cohort_stop_us": 179,
+              "service_caller_wait_us": 0,
+              "service_requests": 0,
+              "serviced_syscalls": 0,
+              "syscalls": 1032,
+              "vm_local_syscalls": 8,
+              "worker_direct_syscalls": 841,
+              "worker_fd_syscalls": 131,
+              "worker_file_syscalls": 841,
+              "worker_futex_waits": 5,
+              "worker_futex_wakes": 8,
+              "worker_gpu_calls": 0,
+              "worker_gpu_waits": 0,
+              "worker_poll_syscalls": 0,
+              "worker_socket_syscalls": 0,
+              "worker_syscalls": 988,
+              "worker_task_resumes": 5,
+              "worker_uring_syscalls": 0
+            },
+            "elapsed": 0.02397170799999998,
+            "command": [
+              "/Users/main/dev/trames-mac/target/release/Trames Dev.app/Contents/MacOS/trames-mac-run",
+              "--rootfs",
+              "/Users/main/dev/trames/target/namespace-subsystem/empty-root",
+              "--cpus",
+              "4",
+              "--network",
+              "off",
+              "--timeout",
+              "30",
+              "--no-pty",
+              "--no-windows",
+              "--metrics",
+              "--exec-file",
+              "/self=/Users/main/dev/trames/target/local-ci/io/namespace-subsystem/fixtures/namespace-worker-subsystem",
+              "/self",
+              "lifecycle",
+              "4",
+              "16"
+            ]
+          },
+          {
+            "storage": "private",
+            "cpus": 1,
+            "mode": "semantic",
+            "returncode": 0,
+            "paths": {
+              "cohort_rounds": 0,
+              "cohort_stop_us": 0,
+              "service_caller_wait_us": 0,
+              "service_requests": 0,
+              "serviced_syscalls": 0,
+              "syscalls": 90,
+              "vm_local_syscalls": 0,
+              "worker_direct_syscalls": 0,
+              "worker_fd_syscalls": 0,
+              "worker_file_syscalls": 0,
+              "worker_futex_waits": 0,
+              "worker_futex_wakes": 0,
+              "worker_gpu_calls": 0,
+              "worker_gpu_waits": 0,
+              "worker_poll_syscalls": 0,
+              "worker_socket_syscalls": 0,
+              "worker_syscalls": 0,
+              "worker_task_resumes": 0,
+              "worker_uring_syscalls": 0
+            },
+            "elapsed": 0.204760459,
+            "command": [
+              "/Users/main/dev/trames-mac/target/release/Trames Dev.app/Contents/MacOS/trames-mac-run",
+              "--rootfs",
+              "/Users/main/dev/trames/target/namespace-subsystem/empty-root",
+              "--cpus",
+              "1",
+              "--network",
+              "off",
+              "--timeout",
+              "30",
+              "--no-pty",
+              "--no-windows",
+              "--metrics",
+              "--storage",
+              "/Users/main/dev/trames/target/namespace-subsystem/final-mac-private-semantic-1/store",
+              "--exec-file",
+              "/self=/Users/main/dev/trames/target/local-ci/io/namespace-subsystem/fixtures/namespace-worker-subsystem",
+              "/self",
+              "semantic"
+            ]
+          },
+          {
+            "storage": "private",
+            "cpus": 1,
+            "mode": "lifecycle",
+            "returncode": 0,
+            "paths": {
+              "cohort_rounds": 0,
+              "cohort_stop_us": 0,
+              "service_caller_wait_us": 0,
+              "service_requests": 0,
+              "serviced_syscalls": 0,
+              "syscalls": 3478,
+              "vm_local_syscalls": 0,
+              "worker_direct_syscalls": 0,
+              "worker_fd_syscalls": 0,
+              "worker_file_syscalls": 0,
+              "worker_futex_waits": 0,
+              "worker_futex_wakes": 0,
+              "worker_gpu_calls": 0,
+              "worker_gpu_waits": 0,
+              "worker_poll_syscalls": 0,
+              "worker_socket_syscalls": 0,
+              "worker_syscalls": 0,
+              "worker_task_resumes": 0,
+              "worker_uring_syscalls": 0
+            },
+            "elapsed": 5.370490166,
+            "command": [
+              "/Users/main/dev/trames-mac/target/release/Trames Dev.app/Contents/MacOS/trames-mac-run",
+              "--rootfs",
+              "/Users/main/dev/trames/target/namespace-subsystem/empty-root",
+              "--cpus",
+              "1",
+              "--network",
+              "off",
+              "--timeout",
+              "30",
+              "--no-pty",
+              "--no-windows",
+              "--metrics",
+              "--storage",
+              "/Users/main/dev/trames/target/namespace-subsystem/final-mac-private-lifecycle-1/store",
+              "--exec-file",
+              "/self=/Users/main/dev/trames/target/local-ci/io/namespace-subsystem/fixtures/namespace-worker-subsystem",
+              "/self",
+              "lifecycle",
+              "4",
+              "16"
+            ]
+          },
+          {
+            "storage": "private",
+            "cpus": 2,
+            "mode": "semantic",
+            "returncode": 0,
+            "paths": {
+              "cohort_rounds": 0,
+              "cohort_stop_us": 0,
+              "service_caller_wait_us": 0,
+              "service_requests": 0,
+              "serviced_syscalls": 0,
+              "syscalls": 97,
+              "vm_local_syscalls": 0,
+              "worker_direct_syscalls": 0,
+              "worker_fd_syscalls": 0,
+              "worker_file_syscalls": 0,
+              "worker_futex_waits": 0,
+              "worker_futex_wakes": 0,
+              "worker_gpu_calls": 0,
+              "worker_gpu_waits": 0,
+              "worker_poll_syscalls": 0,
+              "worker_socket_syscalls": 0,
+              "worker_syscalls": 0,
+              "worker_task_resumes": 0,
+              "worker_uring_syscalls": 0
+            },
+            "elapsed": 0.19609341700000016,
+            "command": [
+              "/Users/main/dev/trames-mac/target/release/Trames Dev.app/Contents/MacOS/trames-mac-run",
+              "--rootfs",
+              "/Users/main/dev/trames/target/namespace-subsystem/empty-root",
+              "--cpus",
+              "2",
+              "--network",
+              "off",
+              "--timeout",
+              "30",
+              "--no-pty",
+              "--no-windows",
+              "--metrics",
+              "--storage",
+              "/Users/main/dev/trames/target/namespace-subsystem/final-mac-private-semantic-2/store",
+              "--exec-file",
+              "/self=/Users/main/dev/trames/target/local-ci/io/namespace-subsystem/fixtures/namespace-worker-subsystem",
+              "/self",
+              "semantic"
+            ]
+          },
+          {
+            "storage": "private",
+            "cpus": 2,
+            "mode": "lifecycle",
+            "returncode": 0,
+            "paths": {
+              "cohort_rounds": 19,
+              "cohort_stop_us": 12985,
+              "service_caller_wait_us": 0,
+              "service_requests": 0,
+              "serviced_syscalls": 0,
+              "syscalls": 1062,
+              "vm_local_syscalls": 6,
+              "worker_direct_syscalls": 838,
+              "worker_fd_syscalls": 128,
+              "worker_file_syscalls": 838,
+              "worker_futex_waits": 5,
+              "worker_futex_wakes": 8,
+              "worker_gpu_calls": 0,
+              "worker_gpu_waits": 0,
+              "worker_poll_syscalls": 0,
+              "worker_socket_syscalls": 0,
+              "worker_syscalls": 982,
+              "worker_task_resumes": 579,
+              "worker_uring_syscalls": 0
+            },
+            "elapsed": 3.910403625,
+            "command": [
+              "/Users/main/dev/trames-mac/target/release/Trames Dev.app/Contents/MacOS/trames-mac-run",
+              "--rootfs",
+              "/Users/main/dev/trames/target/namespace-subsystem/empty-root",
+              "--cpus",
+              "2",
+              "--network",
+              "off",
+              "--timeout",
+              "30",
+              "--no-pty",
+              "--no-windows",
+              "--metrics",
+              "--storage",
+              "/Users/main/dev/trames/target/namespace-subsystem/final-mac-private-lifecycle-2/store",
+              "--exec-file",
+              "/self=/Users/main/dev/trames/target/local-ci/io/namespace-subsystem/fixtures/namespace-worker-subsystem",
+              "/self",
+              "lifecycle",
+              "4",
+              "16"
+            ]
+          },
+          {
+            "storage": "private",
+            "cpus": 4,
+            "mode": "semantic",
+            "returncode": 0,
+            "paths": {
+              "cohort_rounds": 0,
+              "cohort_stop_us": 0,
+              "service_caller_wait_us": 0,
+              "service_requests": 0,
+              "serviced_syscalls": 0,
+              "syscalls": 94,
+              "vm_local_syscalls": 0,
+              "worker_direct_syscalls": 0,
+              "worker_fd_syscalls": 0,
+              "worker_file_syscalls": 0,
+              "worker_futex_waits": 0,
+              "worker_futex_wakes": 0,
+              "worker_gpu_calls": 0,
+              "worker_gpu_waits": 0,
+              "worker_poll_syscalls": 0,
+              "worker_socket_syscalls": 0,
+              "worker_syscalls": 0,
+              "worker_task_resumes": 0,
+              "worker_uring_syscalls": 0
+            },
+            "elapsed": 0.19994670900000067,
+            "command": [
+              "/Users/main/dev/trames-mac/target/release/Trames Dev.app/Contents/MacOS/trames-mac-run",
+              "--rootfs",
+              "/Users/main/dev/trames/target/namespace-subsystem/empty-root",
+              "--cpus",
+              "4",
+              "--network",
+              "off",
+              "--timeout",
+              "30",
+              "--no-pty",
+              "--no-windows",
+              "--metrics",
+              "--storage",
+              "/Users/main/dev/trames/target/namespace-subsystem/final-mac-private-semantic-4/store",
+              "--exec-file",
+              "/self=/Users/main/dev/trames/target/local-ci/io/namespace-subsystem/fixtures/namespace-worker-subsystem",
+              "/self",
+              "semantic"
+            ]
+          },
+          {
+            "storage": "private",
+            "cpus": 4,
+            "mode": "lifecycle",
+            "returncode": 0,
+            "paths": {
+              "cohort_rounds": 18,
+              "cohort_stop_us": 18028,
+              "service_caller_wait_us": 0,
+              "service_requests": 0,
+              "serviced_syscalls": 0,
+              "syscalls": 1051,
+              "vm_local_syscalls": 8,
+              "worker_direct_syscalls": 840,
+              "worker_fd_syscalls": 130,
+              "worker_file_syscalls": 840,
+              "worker_futex_waits": 6,
+              "worker_futex_wakes": 8,
+              "worker_gpu_calls": 0,
+              "worker_gpu_waits": 0,
+              "worker_poll_syscalls": 0,
+              "worker_socket_syscalls": 0,
+              "worker_syscalls": 987,
+              "worker_task_resumes": 580,
+              "worker_uring_syscalls": 0
+            },
+            "elapsed": 4.94643675,
+            "command": [
+              "/Users/main/dev/trames-mac/target/release/Trames Dev.app/Contents/MacOS/trames-mac-run",
+              "--rootfs",
+              "/Users/main/dev/trames/target/namespace-subsystem/empty-root",
+              "--cpus",
+              "4",
+              "--network",
+              "off",
+              "--timeout",
+              "30",
+              "--no-pty",
+              "--no-windows",
+              "--metrics",
+              "--storage",
+              "/Users/main/dev/trames/target/namespace-subsystem/final-mac-private-lifecycle-4/store",
+              "--exec-file",
+              "/self=/Users/main/dev/trames/target/local-ci/io/namespace-subsystem/fixtures/namespace-worker-subsystem",
+              "/self",
+              "lifecycle",
+              "4",
+              "16"
+            ]
+          }
+        ],
+        "runner_sha256": "46bcc8f29418ca5efa7722837be2d0ced57c4364887d7e57a558547019894f4f",
+        "fixture_sha256": "c848f3d64c8c40ea4cff495fb6ec7c0bb6bef514ceeba088d2c90cad69038bad"
+      }
+    },
+    "mac_uring": {
+      "passed": true,
+      "count": 66,
+      "fixtures": [
+        {
+          "fixture": "io-uring",
+          "checks": 9,
+          "result_sha256": "7e41a2858a146f8a305eb29a75eec3b446c7ab7bae6aa38dab81a1bbc540e369"
+        },
+        {
+          "fixture": "io-uring-extended",
+          "checks": 9,
+          "result_sha256": "38faa3652e330575d6f29b964663211d29e8767052d970c9ecffaf7413577c49"
+        },
+        {
+          "fixture": "io-uring-multishot",
+          "checks": 15,
+          "result_sha256": "46e4900486b212b7fddfe341f0ea83afa079bd35dbb07e835a8d2f5db0aec6c1"
+        },
+        {
+          "fixture": "io-uring-worker",
+          "checks": 9,
+          "result_sha256": "00c46ef0b8d709f56e2bc5d7dc2041c3698a1aea694fbe125f6b7094257b9c74"
+        },
+        {
+          "fixture": "io-uring-worker-registered",
+          "checks": 9,
+          "result_sha256": "6bbf23252b4aeb45d798d6c70cc004bfa42aff688060727126f54c20c50aaf0a"
+        },
+        {
+          "fixture": "io-uring-worker-async",
+          "checks": 15,
+          "result_sha256": "6bf0bbc59db10468a5a80a86af95ee78377ffff5ad8fb48444c48a5933f87815"
+        }
+      ]
+    },
+    "ffi_environments": {
+      "passed": true,
+      "checks": [
+        {
+          "case": "alpine-install",
+          "passed": true,
+          "reused": true
+        },
+        {
+          "case": "alpine",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "alpine",
+          "terminal": 2,
+          "passed": true
+        },
+        {
+          "case": "debian-install",
+          "passed": true,
+          "reused": true
+        },
+        {
+          "case": "debian",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "debian",
+          "terminal": 2,
+          "passed": true
+        },
+        {
+          "case": "debian-setup",
+          "passed": true
+        },
+        {
+          "case": "custom-install",
+          "passed": true,
+          "reused": true
+        },
+        {
+          "case": "custom",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "custom",
+          "terminal": 2,
+          "passed": true
+        },
+        {
+          "case": "custom-sha256-rejection",
+          "passed": true
+        },
+        {
+          "case": "systemd",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "systemd",
+          "terminal": 2,
+          "passed": true
+        }
+      ]
+    },
+    "wayland": {
+      "passed": true,
+      "stages": [
+        "info",
+        "windows",
+        "shm",
+        "editor",
+        "cube"
+      ],
+      "cube_frame_revisions": 27,
+      "retained_frame_shutdown_release": true
+    },
+    "native_linux_fixture": {
+      "passed": true,
+      "semantic": true,
+      "lifecycle_threads": 4,
+      "iterations": 16
+    }
+  },
+  "strict_checks": {
+    "apple_runtime": "passed: all-targets hostfs, -D warnings, includes canonical fs_struct Send+Sync proof",
+    "apple_root_kernel": "passed: all-targets affected kernel, -D warnings",
+    "linux_runtime": "passed: all-targets hostfs, -D warnings",
+    "runtime_format": "passed",
+    "root_format": "passed",
+    "product_boundaries": "passed: both iPad and Mac product rules against the clean paired runtime pin"
+  },
+  "builds": {
+    "mac_dev": "release, ad-hoc signed; final paired metadata build follows integration",
+    "ffi": "production host dylib",
+    "ipad": "device-target static library and unsigned native app link passed; final Package.resolved restored exactly"
+  },
+  "performance": {
+    "memory": {
+      "passed": true,
+      "fixture_sha256": "c848f3d64c8c40ea4cff495fb6ec7c0bb6bef514ceeba088d2c90cad69038bad",
+      "runners": {
+        "before": "ceb606f786cf2501fd9bc514d7fab11f523c843d575268f0332f699ac99b9fcf",
+        "after": "46bcc8f29418ca5efa7722837be2d0ced57c4364887d7e57a558547019894f4f"
+      },
+      "parameters": {
+        "samples": 5,
+        "iterations": 1000,
+        "workers": [
+          1,
+          2,
+          4
+        ],
+        "storage": [
+          "memory"
+        ]
+      },
+      "rows": [
+        {
+          "storage": "memory",
+          "mode": "lifecycle",
+          "workers": 1,
+          "runner": "before",
+          "sample": 0,
+          "diagnostics": false,
+          "longest_ns": 55811875,
+          "wall_seconds": 0.06406162500000001
+        },
+        {
+          "storage": "memory",
+          "mode": "lifecycle",
+          "workers": 1,
+          "runner": "after",
+          "sample": 0,
+          "diagnostics": false,
+          "longest_ns": 56980125,
+          "wall_seconds": 0.06311829200000002
+        },
+        {
+          "storage": "memory",
+          "mode": "lifecycle",
+          "workers": 1,
+          "runner": "after",
+          "sample": 1,
+          "diagnostics": false,
+          "longest_ns": 56716542,
+          "wall_seconds": 0.062417792
+        },
+        {
+          "storage": "memory",
+          "mode": "lifecycle",
+          "workers": 1,
+          "runner": "before",
+          "sample": 1,
+          "diagnostics": false,
+          "longest_ns": 55802583,
+          "wall_seconds": 0.06135941600000003
+        },
+        {
+          "storage": "memory",
+          "mode": "lifecycle",
+          "workers": 1,
+          "runner": "before",
+          "sample": 2,
+          "diagnostics": false,
+          "longest_ns": 55790500,
+          "wall_seconds": 0.061402959000000035
+        },
+        {
+          "storage": "memory",
+          "mode": "lifecycle",
+          "workers": 1,
+          "runner": "after",
+          "sample": 2,
+          "diagnostics": false,
+          "longest_ns": 56804083,
+          "wall_seconds": 0.062426375000000034
+        },
+        {
+          "storage": "memory",
+          "mode": "lifecycle",
+          "workers": 1,
+          "runner": "after",
+          "sample": 3,
+          "diagnostics": false,
+          "longest_ns": 57066500,
+          "wall_seconds": 0.06269575
+        },
+        {
+          "storage": "memory",
+          "mode": "lifecycle",
+          "workers": 1,
+          "runner": "before",
+          "sample": 3,
+          "diagnostics": false,
+          "longest_ns": 56152333,
+          "wall_seconds": 0.061934875000000056
+        },
+        {
+          "storage": "memory",
+          "mode": "lifecycle",
+          "workers": 1,
+          "runner": "before",
+          "sample": 4,
+          "diagnostics": false,
+          "longest_ns": 55878625,
+          "wall_seconds": 0.061551750000000016
+        },
+        {
+          "storage": "memory",
+          "mode": "lifecycle",
+          "workers": 1,
+          "runner": "after",
+          "sample": 4,
+          "diagnostics": false,
+          "longest_ns": 57256042,
+          "wall_seconds": 0.06309870900000003
+        },
+        {
+          "storage": "memory",
+          "mode": "lifecycle",
+          "workers": 2,
+          "runner": "before",
+          "sample": 0,
+          "diagnostics": false,
+          "longest_ns": 503656959,
+          "wall_seconds": 0.5101242920000001
+        },
+        {
+          "storage": "memory",
+          "mode": "lifecycle",
+          "workers": 2,
+          "runner": "after",
+          "sample": 0,
+          "diagnostics": false,
+          "longest_ns": 62644583,
+          "wall_seconds": 0.07024049999999993
+        },
+        {
+          "storage": "memory",
+          "mode": "lifecycle",
+          "workers": 2,
+          "runner": "after",
+          "sample": 1,
+          "diagnostics": false,
+          "longest_ns": 63049459,
+          "wall_seconds": 0.07024991600000008
+        },
+        {
+          "storage": "memory",
+          "mode": "lifecycle",
+          "workers": 2,
+          "runner": "before",
+          "sample": 1,
+          "diagnostics": false,
+          "longest_ns": 503001083,
+          "wall_seconds": 0.510188292
+        },
+        {
+          "storage": "memory",
+          "mode": "lifecycle",
+          "workers": 2,
+          "runner": "before",
+          "sample": 2,
+          "diagnostics": false,
+          "longest_ns": 496424542,
+          "wall_seconds": 0.503611083
+        },
+        {
+          "storage": "memory",
+          "mode": "lifecycle",
+          "workers": 2,
+          "runner": "after",
+          "sample": 2,
+          "diagnostics": false,
+          "longest_ns": 63071125,
+          "wall_seconds": 0.07020087499999983
+        },
+        {
+          "storage": "memory",
+          "mode": "lifecycle",
+          "workers": 2,
+          "runner": "after",
+          "sample": 3,
+          "diagnostics": false,
+          "longest_ns": 62144125,
+          "wall_seconds": 0.0684875410000001
+        },
+        {
+          "storage": "memory",
+          "mode": "lifecycle",
+          "workers": 2,
+          "runner": "before",
+          "sample": 3,
+          "diagnostics": false,
+          "longest_ns": 500493042,
+          "wall_seconds": 0.5069106670000001
+        },
+        {
+          "storage": "memory",
+          "mode": "lifecycle",
+          "workers": 2,
+          "runner": "before",
+          "sample": 4,
+          "diagnostics": false,
+          "longest_ns": 494836917,
+          "wall_seconds": 0.5019165409999999
+        },
+        {
+          "storage": "memory",
+          "mode": "lifecycle",
+          "workers": 2,
+          "runner": "after",
+          "sample": 4,
+          "diagnostics": false,
+          "longest_ns": 62341167,
+          "wall_seconds": 0.06970549999999998
+        },
+        {
+          "storage": "memory",
+          "mode": "lifecycle",
+          "workers": 4,
+          "runner": "before",
+          "sample": 0,
+          "diagnostics": false,
+          "longest_ns": 1193301208,
+          "wall_seconds": 1.2012760829999998
+        },
+        {
+          "storage": "memory",
+          "mode": "lifecycle",
+          "workers": 4,
+          "runner": "after",
+          "sample": 0,
+          "diagnostics": false,
+          "longest_ns": 127751917,
+          "wall_seconds": 0.13592337499999996
+        },
+        {
+          "storage": "memory",
+          "mode": "lifecycle",
+          "workers": 4,
+          "runner": "after",
+          "sample": 1,
+          "diagnostics": false,
+          "longest_ns": 128676708,
+          "wall_seconds": 0.1369250829999995
+        },
+        {
+          "storage": "memory",
+          "mode": "lifecycle",
+          "workers": 4,
+          "runner": "before",
+          "sample": 1,
+          "diagnostics": false,
+          "longest_ns": 1209730667,
+          "wall_seconds": 1.2177089160000003
+        },
+        {
+          "storage": "memory",
+          "mode": "lifecycle",
+          "workers": 4,
+          "runner": "before",
+          "sample": 2,
+          "diagnostics": false,
+          "longest_ns": 1195467459,
+          "wall_seconds": 1.2035310419999998
+        },
+        {
+          "storage": "memory",
+          "mode": "lifecycle",
+          "workers": 4,
+          "runner": "after",
+          "sample": 2,
+          "diagnostics": false,
+          "longest_ns": 127739125,
+          "wall_seconds": 0.13575708299999967
+        },
+        {
+          "storage": "memory",
+          "mode": "lifecycle",
+          "workers": 4,
+          "runner": "after",
+          "sample": 3,
+          "diagnostics": false,
+          "longest_ns": 125943375,
+          "wall_seconds": 0.13338170900000001
+        },
+        {
+          "storage": "memory",
+          "mode": "lifecycle",
+          "workers": 4,
+          "runner": "before",
+          "sample": 3,
+          "diagnostics": false,
+          "longest_ns": 1199373084,
+          "wall_seconds": 1.2074216669999993
+        },
+        {
+          "storage": "memory",
+          "mode": "lifecycle",
+          "workers": 4,
+          "runner": "before",
+          "sample": 4,
+          "diagnostics": false,
+          "longest_ns": 1194826792,
+          "wall_seconds": 1.2029127919999993
+        },
+        {
+          "storage": "memory",
+          "mode": "lifecycle",
+          "workers": 4,
+          "runner": "after",
+          "sample": 4,
+          "diagnostics": false,
+          "longest_ns": 125133500,
+          "wall_seconds": 0.13328862499999872
+        },
+        {
+          "storage": "memory",
+          "mode": "lifecycle",
+          "workers": 1,
+          "runner": "before",
+          "sample": "diagnostic",
+          "diagnostics": true,
+          "longest_ns": 56237333,
+          "wall_seconds": 0.0622732079999988,
+          "paths": {
+            "cohort_rounds": 0,
+            "cohort_stop_us": 0,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 15024,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 0,
+            "worker_fd_syscalls": 0,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 0,
+            "worker_task_resumes": 0,
+            "worker_uring_syscalls": 0
+          }
+        },
+        {
+          "storage": "memory",
+          "mode": "lifecycle",
+          "workers": 1,
+          "runner": "after",
+          "sample": "diagnostic",
+          "diagnostics": true,
+          "longest_ns": 57121750,
+          "wall_seconds": 0.0630898749999993,
+          "paths": {
+            "cohort_rounds": 0,
+            "cohort_stop_us": 0,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 15024,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 0,
+            "worker_fd_syscalls": 0,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 0,
+            "worker_task_resumes": 0,
+            "worker_uring_syscalls": 0
+          }
+        },
+        {
+          "storage": "memory",
+          "mode": "lifecycle",
+          "workers": 2,
+          "runner": "before",
+          "sample": "diagnostic",
+          "diagnostics": true,
+          "longest_ns": 498743459,
+          "wall_seconds": 0.5053691669999996,
+          "paths": {
+            "cohort_rounds": 16787,
+            "cohort_stop_us": 20909,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 30038,
+            "vm_local_syscalls": 2,
+            "worker_direct_syscalls": 8001,
+            "worker_fd_syscalls": 4000,
+            "worker_file_syscalls": 8001,
+            "worker_futex_waits": 3,
+            "worker_futex_wakes": 4,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 12009,
+            "worker_task_resumes": 3,
+            "worker_uring_syscalls": 0
+          }
+        },
+        {
+          "storage": "memory",
+          "mode": "lifecycle",
+          "workers": 2,
+          "runner": "after",
+          "sample": "diagnostic",
+          "diagnostics": true,
+          "longest_ns": 63032250,
+          "wall_seconds": 0.07034637499999974,
+          "paths": {
+            "cohort_rounds": 9,
+            "cohort_stop_us": 0,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 30038,
+            "vm_local_syscalls": 2,
+            "worker_direct_syscalls": 26002,
+            "worker_fd_syscalls": 4000,
+            "worker_file_syscalls": 26002,
+            "worker_futex_waits": 3,
+            "worker_futex_wakes": 4,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 30010,
+            "worker_task_resumes": 3,
+            "worker_uring_syscalls": 0
+          }
+        },
+        {
+          "storage": "memory",
+          "mode": "lifecycle",
+          "workers": 4,
+          "runner": "before",
+          "sample": "diagnostic",
+          "diagnostics": true,
+          "longest_ns": 1195447041,
+          "wall_seconds": 1.2035653750000002,
+          "paths": {
+            "cohort_rounds": 31958,
+            "cohort_stop_us": 66944,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 60075,
+            "vm_local_syscalls": 7,
+            "worker_direct_syscalls": 16003,
+            "worker_fd_syscalls": 8003,
+            "worker_file_syscalls": 16003,
+            "worker_futex_waits": 8,
+            "worker_futex_wakes": 8,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 24025,
+            "worker_task_resumes": 8,
+            "worker_uring_syscalls": 0
+          }
+        },
+        {
+          "storage": "memory",
+          "mode": "lifecycle",
+          "workers": 4,
+          "runner": "after",
+          "sample": "diagnostic",
+          "diagnostics": true,
+          "longest_ns": 125727250,
+          "wall_seconds": 0.13381416599999874,
+          "paths": {
+            "cohort_rounds": 19,
+            "cohort_stop_us": 140,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 60074,
+            "vm_local_syscalls": 7,
+            "worker_direct_syscalls": 52007,
+            "worker_fd_syscalls": 8001,
+            "worker_file_syscalls": 52007,
+            "worker_futex_waits": 7,
+            "worker_futex_wakes": 8,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 60026,
+            "worker_task_resumes": 6,
+            "worker_uring_syscalls": 0
+          }
+        }
+      ],
+      "native": [
+        {
+          "mode": "lifecycle",
+          "workers": 1,
+          "sample": 0,
+          "longest_ns": 593980000
+        },
+        {
+          "mode": "lifecycle",
+          "workers": 1,
+          "sample": 1,
+          "longest_ns": 545245000
+        },
+        {
+          "mode": "lifecycle",
+          "workers": 1,
+          "sample": 2,
+          "longest_ns": 538333000
+        },
+        {
+          "mode": "lifecycle",
+          "workers": 1,
+          "sample": 3,
+          "longest_ns": 532529000
+        },
+        {
+          "mode": "lifecycle",
+          "workers": 1,
+          "sample": 4,
+          "longest_ns": 531029000
+        },
+        {
+          "mode": "lifecycle",
+          "workers": 2,
+          "sample": 0,
+          "longest_ns": 718699000
+        },
+        {
+          "mode": "lifecycle",
+          "workers": 2,
+          "sample": 1,
+          "longest_ns": 719149000
+        },
+        {
+          "mode": "lifecycle",
+          "workers": 2,
+          "sample": 2,
+          "longest_ns": 729179000
+        },
+        {
+          "mode": "lifecycle",
+          "workers": 2,
+          "sample": 3,
+          "longest_ns": 723609000
+        },
+        {
+          "mode": "lifecycle",
+          "workers": 2,
+          "sample": 4,
+          "longest_ns": 717546000
+        },
+        {
+          "mode": "lifecycle",
+          "workers": 4,
+          "sample": 0,
+          "longest_ns": 1151153000
+        },
+        {
+          "mode": "lifecycle",
+          "workers": 4,
+          "sample": 1,
+          "longest_ns": 1085078000
+        },
+        {
+          "mode": "lifecycle",
+          "workers": 4,
+          "sample": 2,
+          "longest_ns": 1082481000
+        },
+        {
+          "mode": "lifecycle",
+          "workers": 4,
+          "sample": 3,
+          "longest_ns": 1086049000
+        },
+        {
+          "mode": "lifecycle",
+          "workers": 4,
+          "sample": 4,
+          "longest_ns": 1074190000
+        }
+      ],
+      "native_darwin_sha256": "5690422d128319668f35ad3edc93971f99ed3a76c6e037ef2e0e2ce6206746fe",
+      "medians": [
+        {
+          "storage": "memory",
+          "mode": "lifecycle",
+          "workers": 1,
+          "before_ns": 55811875,
+          "before_wall_seconds": 0.061551750000000016,
+          "after_ns": 56980125,
+          "after_wall_seconds": 0.06269575,
+          "speedup": 0.9794972369751733,
+          "native_darwin_ns": 538333000
+        },
+        {
+          "storage": "memory",
+          "mode": "lifecycle",
+          "workers": 2,
+          "before_ns": 500493042,
+          "before_wall_seconds": 0.5069106670000001,
+          "after_ns": 62644583,
+          "after_wall_seconds": 0.07020087499999983,
+          "speedup": 7.989406554114982,
+          "native_darwin_ns": 719149000
+        },
+        {
+          "storage": "memory",
+          "mode": "lifecycle",
+          "workers": 4,
+          "before_ns": 1195467459,
+          "before_wall_seconds": 1.2035310419999998,
+          "after_ns": 127739125,
+          "after_wall_seconds": 0.13575708299999967,
+          "speedup": 9.358663283469337,
+          "native_darwin_ns": 1085078000
+        }
+      ],
+      "method": "5 counterbalanced unprofiled samples; separate diagnostic runs. Parent directory creation, thread creation, barrier setup and process startup/teardown are outside the longest-worker timer. Child directory/file creation, bytes, metadata, links, rename, stat, unlink and close remain inside the checked lifecycle timer.",
+      "native_limit": "Darwin reference uses its filesystem APIs; no native RAM-filesystem score is substituted. Linux reference, when supplied separately, uses the identical static ARM64 ELF on the local ARM Linux CI instance."
+    },
+    "private": {
+      "passed": true,
+      "fixture_sha256": "c848f3d64c8c40ea4cff495fb6ec7c0bb6bef514ceeba088d2c90cad69038bad",
+      "runners": {
+        "before": "ceb606f786cf2501fd9bc514d7fab11f523c843d575268f0332f699ac99b9fcf",
+        "after": "46bcc8f29418ca5efa7722837be2d0ced57c4364887d7e57a558547019894f4f"
+      },
+      "parameters": {
+        "samples": 5,
+        "iterations": 16,
+        "workers": [
+          1,
+          2,
+          4
+        ],
+        "storage": [
+          "private"
+        ]
+      },
+      "rows": [
+        {
+          "storage": "private",
+          "mode": "lifecycle",
+          "workers": 1,
+          "runner": "before",
+          "sample": 0,
+          "diagnostics": false,
+          "longest_ns": 1218984792,
+          "wall_seconds": 1.343871208
+        },
+        {
+          "storage": "private",
+          "mode": "lifecycle",
+          "workers": 1,
+          "runner": "after",
+          "sample": 0,
+          "diagnostics": false,
+          "longest_ns": 1447039083,
+          "wall_seconds": 1.571686083
+        },
+        {
+          "storage": "private",
+          "mode": "lifecycle",
+          "workers": 1,
+          "runner": "after",
+          "sample": 1,
+          "diagnostics": false,
+          "longest_ns": 1408307875,
+          "wall_seconds": 1.5245742919999996
+        },
+        {
+          "storage": "private",
+          "mode": "lifecycle",
+          "workers": 1,
+          "runner": "before",
+          "sample": 1,
+          "diagnostics": false,
+          "longest_ns": 1206404083,
+          "wall_seconds": 1.3239410419999995
+        },
+        {
+          "storage": "private",
+          "mode": "lifecycle",
+          "workers": 1,
+          "runner": "before",
+          "sample": 2,
+          "diagnostics": false,
+          "longest_ns": 1224320000,
+          "wall_seconds": 1.333088708
+        },
+        {
+          "storage": "private",
+          "mode": "lifecycle",
+          "workers": 1,
+          "runner": "after",
+          "sample": 2,
+          "diagnostics": false,
+          "longest_ns": 1359763042,
+          "wall_seconds": 1.4773964589999995
+        },
+        {
+          "storage": "private",
+          "mode": "lifecycle",
+          "workers": 1,
+          "runner": "after",
+          "sample": 3,
+          "diagnostics": false,
+          "longest_ns": 1426043000,
+          "wall_seconds": 1.5381728330000008
+        },
+        {
+          "storage": "private",
+          "mode": "lifecycle",
+          "workers": 1,
+          "runner": "before",
+          "sample": 3,
+          "diagnostics": false,
+          "longest_ns": 1299500542,
+          "wall_seconds": 1.408489834000001
+        },
+        {
+          "storage": "private",
+          "mode": "lifecycle",
+          "workers": 1,
+          "runner": "before",
+          "sample": 4,
+          "diagnostics": false,
+          "longest_ns": 1276253958,
+          "wall_seconds": 1.4050287500000014
+        },
+        {
+          "storage": "private",
+          "mode": "lifecycle",
+          "workers": 1,
+          "runner": "after",
+          "sample": 4,
+          "diagnostics": false,
+          "longest_ns": 1364682875,
+          "wall_seconds": 1.4876614999999997
+        },
+        {
+          "storage": "private",
+          "mode": "lifecycle",
+          "workers": 2,
+          "runner": "before",
+          "sample": 0,
+          "diagnostics": false,
+          "longest_ns": 2410773958,
+          "wall_seconds": 2.5475492080000013
+        },
+        {
+          "storage": "private",
+          "mode": "lifecycle",
+          "workers": 2,
+          "runner": "after",
+          "sample": 0,
+          "diagnostics": false,
+          "longest_ns": 2473102042,
+          "wall_seconds": 2.6176864170000016
+        },
+        {
+          "storage": "private",
+          "mode": "lifecycle",
+          "workers": 2,
+          "runner": "after",
+          "sample": 1,
+          "diagnostics": false,
+          "longest_ns": 2391830417,
+          "wall_seconds": 2.533199374999999
+        },
+        {
+          "storage": "private",
+          "mode": "lifecycle",
+          "workers": 2,
+          "runner": "before",
+          "sample": 1,
+          "diagnostics": false,
+          "longest_ns": 2508841500,
+          "wall_seconds": 2.644366958999999
+        },
+        {
+          "storage": "private",
+          "mode": "lifecycle",
+          "workers": 2,
+          "runner": "before",
+          "sample": 2,
+          "diagnostics": false,
+          "longest_ns": 2401758209,
+          "wall_seconds": 2.529760917000001
+        },
+        {
+          "storage": "private",
+          "mode": "lifecycle",
+          "workers": 2,
+          "runner": "after",
+          "sample": 2,
+          "diagnostics": false,
+          "longest_ns": 2407753917,
+          "wall_seconds": 2.5453216659999995
+        },
+        {
+          "storage": "private",
+          "mode": "lifecycle",
+          "workers": 2,
+          "runner": "after",
+          "sample": 3,
+          "diagnostics": false,
+          "longest_ns": 2396385459,
+          "wall_seconds": 2.531993832999998
+        },
+        {
+          "storage": "private",
+          "mode": "lifecycle",
+          "workers": 2,
+          "runner": "before",
+          "sample": 3,
+          "diagnostics": false,
+          "longest_ns": 2469670000,
+          "wall_seconds": 2.6023227920000025
+        },
+        {
+          "storage": "private",
+          "mode": "lifecycle",
+          "workers": 2,
+          "runner": "before",
+          "sample": 4,
+          "diagnostics": false,
+          "longest_ns": 2400536333,
+          "wall_seconds": 2.53261775
+        },
+        {
+          "storage": "private",
+          "mode": "lifecycle",
+          "workers": 2,
+          "runner": "after",
+          "sample": 4,
+          "diagnostics": false,
+          "longest_ns": 2452962875,
+          "wall_seconds": 2.5930836249999984
+        },
+        {
+          "storage": "private",
+          "mode": "lifecycle",
+          "workers": 4,
+          "runner": "before",
+          "sample": 0,
+          "diagnostics": false,
+          "longest_ns": 4827815833,
+          "wall_seconds": 4.977104750000002
+        },
+        {
+          "storage": "private",
+          "mode": "lifecycle",
+          "workers": 4,
+          "runner": "after",
+          "sample": 0,
+          "diagnostics": false,
+          "longest_ns": 4911843583,
+          "wall_seconds": 5.064077875000002
+        },
+        {
+          "storage": "private",
+          "mode": "lifecycle",
+          "workers": 4,
+          "runner": "after",
+          "sample": 1,
+          "diagnostics": false,
+          "longest_ns": 4832832875,
+          "wall_seconds": 4.993819125000002
+        },
+        {
+          "storage": "private",
+          "mode": "lifecycle",
+          "workers": 4,
+          "runner": "before",
+          "sample": 1,
+          "diagnostics": false,
+          "longest_ns": 5002841042,
+          "wall_seconds": 5.165677707999997
+        },
+        {
+          "storage": "private",
+          "mode": "lifecycle",
+          "workers": 4,
+          "runner": "before",
+          "sample": 2,
+          "diagnostics": false,
+          "longest_ns": 5066832416,
+          "wall_seconds": 5.223265999999995
+        },
+        {
+          "storage": "private",
+          "mode": "lifecycle",
+          "workers": 4,
+          "runner": "after",
+          "sample": 2,
+          "diagnostics": false,
+          "longest_ns": 4995978750,
+          "wall_seconds": 5.161456041000008
+        },
+        {
+          "storage": "private",
+          "mode": "lifecycle",
+          "workers": 4,
+          "runner": "after",
+          "sample": 3,
+          "diagnostics": false,
+          "longest_ns": 4961904916,
+          "wall_seconds": 5.117383750000002
+        },
+        {
+          "storage": "private",
+          "mode": "lifecycle",
+          "workers": 4,
+          "runner": "before",
+          "sample": 3,
+          "diagnostics": false,
+          "longest_ns": 5014083500,
+          "wall_seconds": 5.16913079199999
+        },
+        {
+          "storage": "private",
+          "mode": "lifecycle",
+          "workers": 4,
+          "runner": "before",
+          "sample": 4,
+          "diagnostics": false,
+          "longest_ns": 5082813916,
+          "wall_seconds": 5.237137082999993
+        },
+        {
+          "storage": "private",
+          "mode": "lifecycle",
+          "workers": 4,
+          "runner": "after",
+          "sample": 4,
+          "diagnostics": false,
+          "longest_ns": 4915741416,
+          "wall_seconds": 5.090986041999997
+        },
+        {
+          "storage": "private",
+          "mode": "lifecycle",
+          "workers": 1,
+          "runner": "before",
+          "sample": "diagnostic",
+          "diagnostics": true,
+          "longest_ns": 1232420417,
+          "wall_seconds": 1.3481226659999948,
+          "paths": {
+            "cohort_rounds": 0,
+            "cohort_stop_us": 0,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 264,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 0,
+            "worker_fd_syscalls": 0,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 0,
+            "worker_task_resumes": 0,
+            "worker_uring_syscalls": 0
+          }
+        },
+        {
+          "storage": "private",
+          "mode": "lifecycle",
+          "workers": 1,
+          "runner": "after",
+          "sample": "diagnostic",
+          "diagnostics": true,
+          "longest_ns": 1381015000,
+          "wall_seconds": 1.5009984590000016,
+          "paths": {
+            "cohort_rounds": 0,
+            "cohort_stop_us": 0,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 1200,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 0,
+            "worker_fd_syscalls": 0,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 0,
+            "worker_task_resumes": 0,
+            "worker_uring_syscalls": 0
+          }
+        },
+        {
+          "storage": "private",
+          "mode": "lifecycle",
+          "workers": 2,
+          "runner": "before",
+          "sample": "diagnostic",
+          "diagnostics": true,
+          "longest_ns": 2513641250,
+          "wall_seconds": 2.6481324580000063,
+          "paths": {
+            "cohort_rounds": 204,
+            "cohort_stop_us": 116430,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 519,
+            "vm_local_syscalls": 2,
+            "worker_direct_syscalls": 129,
+            "worker_fd_syscalls": 64,
+            "worker_file_syscalls": 129,
+            "worker_futex_waits": 4,
+            "worker_futex_wakes": 4,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 202,
+            "worker_task_resumes": 2,
+            "worker_uring_syscalls": 0
+          }
+        },
+        {
+          "storage": "private",
+          "mode": "lifecycle",
+          "workers": 2,
+          "runner": "after",
+          "sample": "diagnostic",
+          "diagnostics": true,
+          "longest_ns": 2558281542,
+          "wall_seconds": 2.6889764999999954,
+          "paths": {
+            "cohort_rounds": 7,
+            "cohort_stop_us": 52,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 537,
+            "vm_local_syscalls": 2,
+            "worker_direct_syscalls": 418,
+            "worker_fd_syscalls": 64,
+            "worker_file_syscalls": 418,
+            "worker_futex_waits": 4,
+            "worker_futex_wakes": 4,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 491,
+            "worker_task_resumes": 291,
+            "worker_uring_syscalls": 0
+          }
+        },
+        {
+          "storage": "private",
+          "mode": "lifecycle",
+          "workers": 4,
+          "runner": "before",
+          "sample": "diagnostic",
+          "diagnostics": true,
+          "longest_ns": 5145630792,
+          "wall_seconds": 5.302310625000004,
+          "paths": {
+            "cohort_rounds": 265,
+            "cohort_stop_us": 660892,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 1037,
+            "vm_local_syscalls": 7,
+            "worker_direct_syscalls": 259,
+            "worker_fd_syscalls": 130,
+            "worker_file_syscalls": 259,
+            "worker_futex_waits": 10,
+            "worker_futex_wakes": 8,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 410,
+            "worker_task_resumes": 5,
+            "worker_uring_syscalls": 0
+          }
+        },
+        {
+          "storage": "private",
+          "mode": "lifecycle",
+          "workers": 4,
+          "runner": "after",
+          "sample": "diagnostic",
+          "diagnostics": true,
+          "longest_ns": 5102535250,
+          "wall_seconds": 5.266783208999996,
+          "paths": {
+            "cohort_rounds": 17,
+            "cohort_stop_us": 7613,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 1066,
+            "vm_local_syscalls": 7,
+            "worker_direct_syscalls": 839,
+            "worker_fd_syscalls": 129,
+            "worker_file_syscalls": 839,
+            "worker_futex_waits": 9,
+            "worker_futex_wakes": 8,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 988,
+            "worker_task_resumes": 579,
+            "worker_uring_syscalls": 0
+          }
+        }
+      ],
+      "native": [
+        {
+          "mode": "lifecycle",
+          "workers": 1,
+          "sample": 0,
+          "longest_ns": 22175000
+        },
+        {
+          "mode": "lifecycle",
+          "workers": 1,
+          "sample": 1,
+          "longest_ns": 16780000
+        },
+        {
+          "mode": "lifecycle",
+          "workers": 1,
+          "sample": 2,
+          "longest_ns": 11291000
+        },
+        {
+          "mode": "lifecycle",
+          "workers": 1,
+          "sample": 3,
+          "longest_ns": 10603000
+        },
+        {
+          "mode": "lifecycle",
+          "workers": 1,
+          "sample": 4,
+          "longest_ns": 8784000
+        },
+        {
+          "mode": "lifecycle",
+          "workers": 2,
+          "sample": 0,
+          "longest_ns": 12774000
+        },
+        {
+          "mode": "lifecycle",
+          "workers": 2,
+          "sample": 1,
+          "longest_ns": 11843000
+        },
+        {
+          "mode": "lifecycle",
+          "workers": 2,
+          "sample": 2,
+          "longest_ns": 12429000
+        },
+        {
+          "mode": "lifecycle",
+          "workers": 2,
+          "sample": 3,
+          "longest_ns": 12234000
+        },
+        {
+          "mode": "lifecycle",
+          "workers": 2,
+          "sample": 4,
+          "longest_ns": 12041000
+        },
+        {
+          "mode": "lifecycle",
+          "workers": 4,
+          "sample": 0,
+          "longest_ns": 17735000
+        },
+        {
+          "mode": "lifecycle",
+          "workers": 4,
+          "sample": 1,
+          "longest_ns": 17531000
+        },
+        {
+          "mode": "lifecycle",
+          "workers": 4,
+          "sample": 2,
+          "longest_ns": 17825000
+        },
+        {
+          "mode": "lifecycle",
+          "workers": 4,
+          "sample": 3,
+          "longest_ns": 17529000
+        },
+        {
+          "mode": "lifecycle",
+          "workers": 4,
+          "sample": 4,
+          "longest_ns": 18001000
+        }
+      ],
+      "native_darwin_sha256": "5690422d128319668f35ad3edc93971f99ed3a76c6e037ef2e0e2ce6206746fe",
+      "medians": [
+        {
+          "storage": "private",
+          "mode": "lifecycle",
+          "workers": 1,
+          "before_ns": 1224320000,
+          "before_wall_seconds": 1.343871208,
+          "after_ns": 1408307875,
+          "after_wall_seconds": 1.5245742919999996,
+          "speedup": 0.8693553602403877,
+          "native_darwin_ns": 11291000
+        },
+        {
+          "storage": "private",
+          "mode": "lifecycle",
+          "workers": 2,
+          "before_ns": 2410773958,
+          "before_wall_seconds": 2.5475492080000013,
+          "after_ns": 2407753917,
+          "after_wall_seconds": 2.5453216659999995,
+          "speedup": 1.0012542980321522,
+          "native_darwin_ns": 12234000
+        },
+        {
+          "storage": "private",
+          "mode": "lifecycle",
+          "workers": 4,
+          "before_ns": 5014083500,
+          "before_wall_seconds": 5.16913079199999,
+          "after_ns": 4915741416,
+          "after_wall_seconds": 5.090986041999997,
+          "speedup": 1.0200055445715495,
+          "native_darwin_ns": 17735000
+        }
+      ],
+      "method": "5 counterbalanced unprofiled samples; separate diagnostic runs. Parent directory creation, thread creation, barrier setup and process startup/teardown are outside the longest-worker timer. Child directory/file creation, bytes, metadata, links, rename, stat, unlink and close remain inside the checked lifecycle timer.",
+      "native_limit": "Darwin reference uses its filesystem APIs; no native RAM-filesystem score is substituted. Linux reference, when supplied separately, uses the identical static ARM64 ELF on the local ARM Linux CI instance."
+    },
+    "native_linux": {
+      "passed": true,
+      "fixture_sha256": "c848f3d64c8c40ea4cff495fb6ec7c0bb6bef514ceeba088d2c90cad69038bad",
+      "context": "Identical static ARM64 musl ELF on existing six-vCPU VZ Linux CI instance, native ext4 filesystem; no host builds running. Different persistence semantics from Trames private metadata checkpoints; contextual reference, not a product Linux-kernel VM.",
+      "rows": [
+        {
+          "iterations": 16,
+          "workers": 1,
+          "sample": 0,
+          "longest_ns": 394343,
+          "wall_seconds": 0.002241422999986753
+        },
+        {
+          "iterations": 16,
+          "workers": 1,
+          "sample": 1,
+          "longest_ns": 346904,
+          "wall_seconds": 0.0018607009999414004
+        },
+        {
+          "iterations": 16,
+          "workers": 1,
+          "sample": 2,
+          "longest_ns": 333368,
+          "wall_seconds": 0.0019930429999703847
+        },
+        {
+          "iterations": 16,
+          "workers": 1,
+          "sample": 3,
+          "longest_ns": 331230,
+          "wall_seconds": 0.0019765729999789983
+        },
+        {
+          "iterations": 16,
+          "workers": 1,
+          "sample": 4,
+          "longest_ns": 358848,
+          "wall_seconds": 0.001974226000015733
+        },
+        {
+          "iterations": 16,
+          "workers": 2,
+          "sample": 0,
+          "longest_ns": 541854,
+          "wall_seconds": 0.0019329070000821957
+        },
+        {
+          "iterations": 16,
+          "workers": 2,
+          "sample": 1,
+          "longest_ns": 467218,
+          "wall_seconds": 0.0018959440000116956
+        },
+        {
+          "iterations": 16,
+          "workers": 2,
+          "sample": 2,
+          "longest_ns": 521823,
+          "wall_seconds": 0.0009070290000181558
+        },
+        {
+          "iterations": 16,
+          "workers": 2,
+          "sample": 3,
+          "longest_ns": 474300,
+          "wall_seconds": 0.0020843149999336674
+        },
+        {
+          "iterations": 16,
+          "workers": 2,
+          "sample": 4,
+          "longest_ns": 481634,
+          "wall_seconds": 0.0019392770000195014
+        },
+        {
+          "iterations": 16,
+          "workers": 4,
+          "sample": 0,
+          "longest_ns": 646998,
+          "wall_seconds": 0.0021856449999404504
+        },
+        {
+          "iterations": 16,
+          "workers": 4,
+          "sample": 1,
+          "longest_ns": 614939,
+          "wall_seconds": 0.0023380189999215872
+        },
+        {
+          "iterations": 16,
+          "workers": 4,
+          "sample": 2,
+          "longest_ns": 626506,
+          "wall_seconds": 0.0010066419999930076
+        },
+        {
+          "iterations": 16,
+          "workers": 4,
+          "sample": 3,
+          "longest_ns": 594949,
+          "wall_seconds": 0.0024369189999333685
+        },
+        {
+          "iterations": 16,
+          "workers": 4,
+          "sample": 4,
+          "longest_ns": 569890,
+          "wall_seconds": 0.0023436339999989286
+        },
+        {
+          "iterations": 1000,
+          "workers": 1,
+          "sample": 0,
+          "longest_ns": 19473473,
+          "wall_seconds": 0.021168224000007285
+        },
+        {
+          "iterations": 1000,
+          "workers": 1,
+          "sample": 1,
+          "longest_ns": 20122357,
+          "wall_seconds": 0.021751230000063515
+        },
+        {
+          "iterations": 1000,
+          "workers": 1,
+          "sample": 2,
+          "longest_ns": 20213002,
+          "wall_seconds": 0.020519422999996095
+        },
+        {
+          "iterations": 1000,
+          "workers": 1,
+          "sample": 3,
+          "longest_ns": 20201854,
+          "wall_seconds": 0.02189870000006522
+        },
+        {
+          "iterations": 1000,
+          "workers": 1,
+          "sample": 4,
+          "longest_ns": 20077769,
+          "wall_seconds": 0.02036612899996726
+        },
+        {
+          "iterations": 1000,
+          "workers": 2,
+          "sample": 0,
+          "longest_ns": 28715083,
+          "wall_seconds": 0.030439880000017183
+        },
+        {
+          "iterations": 1000,
+          "workers": 2,
+          "sample": 1,
+          "longest_ns": 28665506,
+          "wall_seconds": 0.030120508999971207
+        },
+        {
+          "iterations": 1000,
+          "workers": 2,
+          "sample": 2,
+          "longest_ns": 28619326,
+          "wall_seconds": 0.030153949999998986
+        },
+        {
+          "iterations": 1000,
+          "workers": 2,
+          "sample": 3,
+          "longest_ns": 29361242,
+          "wall_seconds": 0.03090311699997983
+        },
+        {
+          "iterations": 1000,
+          "workers": 2,
+          "sample": 4,
+          "longest_ns": 28610147,
+          "wall_seconds": 0.030285158999959094
+        },
+        {
+          "iterations": 1000,
+          "workers": 4,
+          "sample": 0,
+          "longest_ns": 37015882,
+          "wall_seconds": 0.03743282899995393
+        },
+        {
+          "iterations": 1000,
+          "workers": 4,
+          "sample": 1,
+          "longest_ns": 37360175,
+          "wall_seconds": 0.03902035500004786
+        },
+        {
+          "iterations": 1000,
+          "workers": 4,
+          "sample": 2,
+          "longest_ns": 37360342,
+          "wall_seconds": 0.037806273000001056
+        },
+        {
+          "iterations": 1000,
+          "workers": 4,
+          "sample": 3,
+          "longest_ns": 38015712,
+          "wall_seconds": 0.038461683999912566
+        },
+        {
+          "iterations": 1000,
+          "workers": 4,
+          "sample": 4,
+          "longest_ns": 38391118,
+          "wall_seconds": 0.040296585999954004
+        }
+      ],
+      "medians": [
+        {
+          "iterations": 16,
+          "workers": 1,
+          "longest_ns": 346904
+        },
+        {
+          "iterations": 16,
+          "workers": 2,
+          "longest_ns": 481634
+        },
+        {
+          "iterations": 16,
+          "workers": 4,
+          "longest_ns": 614939
+        },
+        {
+          "iterations": 1000,
+          "workers": 1,
+          "longest_ns": 20122357
+        },
+        {
+          "iterations": 1000,
+          "workers": 2,
+          "longest_ns": 28665506
+        },
+        {
+          "iterations": 1000,
+          "workers": 4,
+          "longest_ns": 37360342
+        }
+      ]
+    },
+    "context": "All builds and functional checks finished; local Linux CI stopped before Mac timings. Five counterbalanced before/after pairs, separate diagnostics; direct executable on both sides. Native Linux reference collected without concurrent host builds. Memory: 1000 lifecycles per worker; private disk: 16 per worker. Native POSIX references do not supply Trames private namespace per-mutation durable manifest semantics.",
+    "limits": [
+      "Different memory/APFS/ext4 backings, kernels, compiler targets and persistence semantics; native scores are contextual",
+      "No whole-application Firefox, physical-iPad or generally native-speed claim",
+      "Zero services in both namespace versions does not prove no owner joins; inspect cohort counts and timing"
+    ]
+  },
+  "regressions": [
+    {
+      "workflow": "single-worker private-disk namespace lifecycle",
+      "before_ms": 1224.32,
+      "after_ms": 1408.307875,
+      "latency_increase_percent": 15.027760307762673,
+      "throughput_decrease_percent": 13.064463975961226,
+      "note": "Native retained preparation/queueing remains an added path cost; exact attribution versus persistence was not separately profiled. No further subsystem optimization started."
+    },
+    {
+      "workflow": "early WIP memory-only single-worker context cloning",
+      "status": "fixed before final acceptance by borrowing the current worker island and using original joined VFS for short memory-only calls",
+      "probe_result_sha256": "aac860aa80b87961626dd96c831e34eb5b453f15222f405ae0e4b66f71253505",
+      "final_memory_single_speedup": 0.9794972369751733
+    }
+  ],
+  "remaining_boundaries": {
+    "inventory": "https://github.com/kb5000/trames-runtime/blob/af0aa49e60127236b2bf7858f95757306238ddee/docs/architecture/coordination-boundaries.md",
+    "scopes": [
+      "joined task/control/lifecycle",
+      "residual in-cohort compatibility service",
+      "affected mm/backing structural publication",
+      "mixed owner resources, masks, transfers and ring owner escalation",
+      "exceptional native mapping/context boundary",
+      "host embedding/session administration",
+      "same-worker local fallbacks and coordinated solo execution"
+    ]
+  },
+  "reused_acceptance": [
+    "Stage 33 unchanged memory: 159 plus 2/4 focused cases",
+    "Stage 33 unchanged Mac product: 13 tests and strict checks; final pin boundaries checked at integration",
+    "Unchanged installed Alpine/Debian/custom rootfs installation acceptance (3 of the 13 FFI checks)",
+    "Unchanged musl/Vulkan/audio/video guest artifacts and unrelated CPU/network/graphics acceptance"
+  ],
+  "physical_ipad_test": "Skipped per owner; no physical device installation requested for this batch",
+  "artifacts": [
+    {
+      "path": "target/namespace-subsystem/apple-final-batch.log",
+      "sha256": "3cca217cef7f35db80535dee4e0c4aca450fe60224776e220cd87b5d7a13879d"
+    },
+    {
+      "path": "target/namespace-subsystem/linux-final-batch.log",
+      "sha256": "b143e3509779b35849bdf2f2ba3548ad71eed34d228624258af3980656bea30f"
+    },
+    {
+      "path": "target/namespace-subsystem/apple-final-kernel.log",
+      "sha256": "fee5ea0e18d5acfdb4aacb96234c5ebdb4b134ab1cc9a920885d0ce60e1ddaeb"
+    },
+    {
+      "path": "target/namespace-subsystem/apple-filter-retry.log",
+      "sha256": "e36e0f70f9eafbcb109aeb912aff91d715a76313500dd39fe49adfb7d1e80547"
+    },
+    {
+      "path": "target/namespace-subsystem/linux-final-kernel.log",
+      "sha256": "71292d76c91cdc905360dccc80781665bdfa24ac8b10767e0eeb5aa647dfdf58"
+    },
+    {
+      "path": "target/namespace-subsystem/runtime-proof-strict.log",
+      "sha256": "438c577c165bd6f54355f3856d3c1c4f33e1ded4ef25594a55b4d0e8d254d1fa"
+    },
+    {
+      "path": "target/namespace-subsystem/kernel-final-strict.log",
+      "sha256": "abd0006cda60bf701b0d70c31d7171705e0a759c0a736609ede26003b3b24745"
+    },
+    {
+      "path": "target/namespace-subsystem/linux-final-strict.log",
+      "sha256": "4c43460c45fb28370f071457c7d1465313ec616e3fa29dff660ee940a04b59d3"
+    },
+    {
+      "path": "target/namespace-subsystem/runtime-format.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "target/namespace-subsystem/root-format.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "target/namespace-subsystem/ffi-final-build.log",
+      "sha256": "259875a8b6bff37f1eb7bd8cbd64644055f60534b67b7e8798fbbcb783c5ea49"
+    },
+    {
+      "path": "target/namespace-subsystem/ios-final-link.log",
+      "sha256": "78761eeb62b6aadf116033caea34154f2eab1d30703800d105b7f7ad6ca5a5d4"
+    },
+    {
+      "path": "target/namespace-subsystem/mac-final-build.log",
+      "sha256": "3947f3785352fd77f0f8559aa5b1bc1f4eec7dd22d585624afdc70a126c15e4f"
+    },
+    {
+      "path": "target/namespace-subsystem/mac-final-acceptance.json",
+      "sha256": "a37424d6018b9a7a2cd8dba8bbc60a99293367221a900d8c36da163d475fd866"
+    },
+    {
+      "path": "target/namespace-subsystem/mac-uring.json",
+      "sha256": "d6222727b69bd1b493a6c9d453c35b1341b77bbeced7468d5ca2531b42f256c1"
+    },
+    {
+      "path": "target/namespace-subsystem/ffi-environments/results.json",
+      "sha256": "1ffbe3a90df316ace973c3ba09567d585bcc0a32b1b9ade01ab5e121ddb7e748"
+    },
+    {
+      "path": "target/namespace-subsystem/wayland.log",
+      "sha256": "4121a726d4328c9d60dd83f9255298f8b363ac0d5988073e76c5fe08da0982bd"
+    },
+    {
+      "path": "target/namespace-subsystem/linux-native-semantic.log",
+      "sha256": "3d1be3d56ccb05204228d38efc57cb6240b4e7571b8974ae30b2b9dc906db3fe"
+    },
+    {
+      "path": "target/namespace-subsystem/linux-strict-stop.log",
+      "sha256": "fa6a5b83d42131f417db30e05d5a9ba4bc113ac2d733d0c60cc67f7b67bb02af"
+    },
+    {
+      "path": "target/namespace-subsystem/ipad-boundaries.log",
+      "sha256": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651"
+    },
+    {
+      "path": "target/namespace-subsystem/mac-boundaries.log",
+      "sha256": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651"
+    }
+  ],
+  "verification_sources": [
+    {
+      "path": "tests/fixtures/namespace-worker-subsystem.c",
+      "sha256": "2e94930b9ea551e38f28ece307b300d5fc9a8574ed7338abe6991a74241d7727"
+    },
+    {
+      "path": "tests/performance/namespace-worker-subsystem.py",
+      "sha256": "249c53873f45de85f35b7610f51c684f33f3f68a98989d9f47c0dd0a05f43b05"
+    }
+  ]
+}

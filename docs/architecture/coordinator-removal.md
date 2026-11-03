@@ -2,13 +2,30 @@
 
 ## Current status — 2026-11-03
 
-The latest completed batch is [regular-file data, EOF and durability](#thirty-third-migration-implemented--regular-file-subsystem--2026-11-03).
-File I/O and io_uring share accepted original resources and direct native
-completion. Ordinary Unix transport, owning ancillary graphs, native Wayland
-transport and native device controls already use original shared resources.
-Remaining boundaries are directory/namespace mutation, owner-only task/mount/proc
-controls, cross-resource file/pipe/socket transfers, affected-mm VM topology and
-lifecycle/cancellation. The overall coordinator-removal goal remains active.
+The latest completed batch is [namespace, metadata and fs_struct](#thirty-fourth-migration-implemented--namespace-and-metadata-subsystem--2026-11-03).
+Ordinary directory mutations now join file I/O, io_uring, Unix transport, ancillary
+graphs and native device controls on original shared resources. Mac HVF and the
+iPad interpreter use the same implementation. Further migration stops after this
+batch at the owner's request; the architecture still has owner dependencies.
+
+The [consolidated runtime audit](../../runtime/docs/architecture/coordination-boundaries.md)
+is the current source inventory, including actual admission and fallback gates.
+Earlier sections below record the boundary and goal status at each historical
+stage; they do not override this current inventory.
+
+| Remaining boundary | Scope / examples |
+| --- | --- |
+| Joined task and control work | Process creation/exec/exit/wait, signal effects, security policy, mount/unshare/setns, dynamic proc/sys and excluded owner controls; the current cohort returns its Views |
+| Residual compatibility service | Some actual FD/network kinds, old epoll creation and eligible stream paths still use in-cohort owner service; peer CPUs can continue unless admission refuses |
+| VM/backing publication | Structural mappings, pins and mapped-file resize quiesce affected mm/backing users; exceptional admission/control conditions can require a broader join |
+| Mixed resource waits and transfers | Masked/owner poll, actual owner SCM_RIGHTS controls, unsupported ring resources and file-to-pipe/socket transfer retain explicit owner boundaries |
+| Native and embedding lifecycle | Exceptional native/GPU mapping checkpoints, unfinished context teardown, pause/cancel, transfer/timezone, terminal lifecycle and actual supervision/administration events |
+| Local fallbacks | Native libc to guest body, DirectFile to full FileWork, and HVF mapping delta to coarse comparison do not by themselves imply coordinator RPC; single-CPU/solo execution retains the coordinated caller path |
+
+Neither zero Service events nor fewer host threads proves owner independence.
+Read worker completions, service waits, cohort stop/dispatch, affected-mm groups
+and actual resource work together. UI-thread affinity is a separate requirement;
+ordinary Wayland bytes and presentation are not owner syscall RPCs.
 
 ## Twenty-second migration implemented — worker Unix namespace controls and waits — 2026-11-03
 
@@ -2689,3 +2706,80 @@ contains full timings and limitations. The [shared ownership contract](../../run
 describes scoped layout waits. Directory/namespace mutation, task/proc/mount
 controls, cross-resource file/pipe/socket transfer and structural VM/lifecycle
 remain separate complete-subsystem work. The overall goal remains active.
+
+## Thirty-fourth migration implemented — namespace and metadata subsystem — 2026-11-03
+
+Runtime `af0aa49e60127236b2bf7858f95757306238ddee` moves ordinary directory
+create/remove, link/symlink/rename, mode/owner/times/xattrs, cwd/chdir/fchdir/chroot
+and statfs onto one imported ABI and original shared filesystem resources. The
+canonical fs_struct owns shared cwd/root and detached pins; private Rc mount
+projections stay inside their control island. CLONE_FS shares the original state;
+fork/unshare retains its original copy behavior. Send+Sync is checked by the
+compiler without widening the existing sealed PathQueries boundary.
+
+Short calls borrow the current worker island; memory-only joined calls use the
+original VFS directly. Only retained/native work builds a private island. Native
+namespace work reuses the existing bounded disk pool, accepted original FDs and
+source completion. Owner-only resources defer before effects through a distinct
+FileOutcome::Owner, retaining copied operands and original identities. The
+per-filesystem transaction protects flat namespace/checkpoint/rollback invariants,
+including PTY creation/final-close; inode metadata transactions cover their actual
+multi-field changes. Ordinary bytes do not acquire these transaction locks. There
+is no new service thread, polling bus, guest memory fence or production unsafe block.
+
+Five counterbalanced unprofiled pairs give the following longest-worker medians.
+Each memory worker performs 1,000 checked lifecycles; each private-disk worker
+performs 16, retaining the original per-mutation durable manifest checkpoints.
+
+| Backing / workers | Previous | Current | Native macOS filesystem | Native ARM Linux ext4, exact ELF | Speedup |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Memory / 1 | 55.81 ms | 56.98 ms | 538.33 ms | 20.12 ms | 0.98x |
+| Memory / 2 | 500.49 ms | 62.64 ms | 719.15 ms | 28.67 ms | 7.99x |
+| Memory / 4 | 1,195.47 ms | 127.74 ms | 1,085.08 ms | 37.36 ms | 9.36x |
+| Private disk / 1 | 1,224.32 ms | 1,408.31 ms | 11.29 ms | 0.35 ms | 0.87x |
+| Private disk / 2 | 2,410.77 ms | 2,407.75 ms | 12.23 ms | 0.48 ms | 1.00x |
+| Private disk / 4 | 5,014.08 ms | 4,915.74 ms | 17.74 ms | 0.61 ms | 1.02x |
+
+Single-worker private-disk latency increases **15.0%** (throughput decreases 13.1%):
+retained preparation/native queueing remains an added path cost; its contribution
+versus persistence has not been separately profiled. Two/four-worker private results show no material speedup claim. An early
+implementation copied a whole private island for every call and doubled single-core
+memory latency; borrowing the current island removed that architectural regression
+before final acceptance. Further persistence/offload optimization is not started.
+
+Separate diagnostics reduce two/four-worker memory cohort rounds **16,787 → 9**
+and **31,958 → 19**; stop time falls **20,909 → 0 us** and **66,944 → 140 us**.
+Service requests are zero on both versions: the old namespace path joined the
+cohort without a Service RPC. These counts include scheduling/lifecycle and are
+not a claim of zero checkpoints for a whole application. Private-disk cohort rounds
+fall **204 → 7** and **265 → 17**, while original persistence still dominates time.
+
+Parent-directory/thread/barrier setup and process startup/teardown are outside the
+worker timer. Child mkdir/open/create, bytes, metadata, links, rename, stat, unlink
+and close are inside. Process-wall medians and separate diagnostics are retained in
+the record. All builds finish and the Linux reference machine is stopped before
+Mac timing. Native macOS uses its own filesystem APIs; no native RAM-filesystem
+substitute is used. Native Linux runs the exact static musl ELF on the existing
+six-vCPU VZ test machine. Different backings, kernels and compiler targets, and
+especially the absence of equivalent per-operation durable manifest flushes in the
+native references, prevent a pure coordinator-overhead or generally native-speed
+interpretation. No Firefox or physical-iPad performance result is claimed.
+
+Concentrated acceptance passes Apple/Linux VFS **477/476**, ABI **224 each**,
+and kernel **276 unique cases each**, plus affected strict and format checks.
+The Apple kernel total combines 275 passing cases with the corrected new filtered
+harness's one-case retry; unchanged production code and passing tests are reused.
+Actual Mac HVF passes **12** namespace workflows and **66** existing io_uring flows
+on **1/2/4 CPUs**. The production interpreter's **13** environment checks pass
+(including three reused rootfs-install checks), as do **5** real Wayland stages,
+the iPad static library and device-target native app link. Unchanged memory,
+product/guest artifacts and unrelated acceptance are reused. Physical iPad testing
+remains skipped per owner.
+
+The [source-bound validation record](../validation/worker-namespace-subsystem-20261103.json)
+contains hashes, complete samples and the regression. The
+[shared contract](../../runtime/docs/architecture/execution-backends.md#namespace-metadata-and-canonical-fs_struct-2026-11-03)
+and [architecture-wide inventory](../../runtime/docs/architecture/coordination-boundaries.md)
+separate owner services, full cohort joins, affected-domain checkpoints, resource
+waits and local fallbacks. This closes the current implementation round; remaining
+boundaries are recorded without starting another subsystem migration.
