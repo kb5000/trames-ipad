@@ -38,20 +38,51 @@ static unsigned query(int target,int effective,uint32_t *ids,unsigned count,int 
 }
 static void move(const char *path) { int f=open(path,O_WRONLY);assert(f>=0);assert(write(f,"0",1)==1);close(f); }
 static void wait_ok(pid_t p) { int s;assert(waitpid(p,&s,0)==p && WIFEXITED(s) && WEXITSTATUS(s)==0); }
-int main(void) {
+static unsigned identity(int fd,unsigned expected) {
+ uint32_t info[3]={0,0,0xfeedbeef};struct attr a={0};
+ u32(&a,0,fd);u32(&a,4,8);u64(&a,8,(uintptr_t)info);
+ assert(bpf(15,&a)==0 && get32(&a,4)==8);
+ assert(info[0]==15 && info[1]>0 && (!expected || info[1]==expected) && info[2]==0xfeedbeef);
+ unsigned id=info[1];u32(&a,4,4);info[1]=0x12345678;
+ assert(bpf(15,&a)==0 && get32(&a,4)==4 && info[1]==0x12345678);
+ u32(&a,4,8);u64(&a,8,1);DENIED(bpf(15,&a),EFAULT);assert(get32(&a,4)==8);
+ return id;
+}
+int main(int argc,char **argv) {
  const struct insn allow[]={{0xb7,0,0,1},{0x95,0,0,0}};
  const struct insn deny[]={{0xb7,0,0,0},{0x95,0,0,0}};
+ if(argc==2 && !strcmp(argv[1],"--info-only")) {
+  int fd=load(allow,2);if(fd<0){perror("load device program");return 1;}
+  unsigned id=identity(fd,0);int copy=getfd(id);assert(copy>=0);
+  DENIED(attach(-1,fd,2,-1),EBADF);
+  struct attr skb={0};u32(&skb,0,8);u32(&skb,4,2);
+  u64(&skb,8,(uintptr_t)allow);u64(&skb,16,(uintptr_t)"MIT");
+  int probe=bpf(5,&skb);assert(probe>=0);
+  uint32_t kind=0;memset(&skb,0,sizeof skb);u32(&skb,0,probe);u32(&skb,4,4);u64(&skb,8,(uintptr_t)&kind);
+  assert(bpf(15,&skb)==0 && kind==8);close(probe);
+
+  assert(identity(copy,id)==id);close(copy);close(fd);
+  struct attr a={0};DENIED(bpf(999,&a),EINVAL);
+  puts("BPF program identity: type, ID, truncation, bounds and unsupported command: ok");return 0;
+ }
  const struct insn invalid[]={{0x61,0x10,12,0},{0x95,0,0,0}};
  DENIED(load(invalid,2),EINVAL);DENIED(load(allow,0),EINVAL);DENIED(load(allow,4097),E2BIG);
  DENIED(load((void*)1,2),EFAULT);
+ struct attr unsupported={0};DENIED(bpf(999,&unsupported),EINVAL);
  struct attr a={0};u32(&a,0,15);u32(&a,4,2);u64(&a,8,(uintptr_t)allow);u64(&a,16,(uintptr_t)"GPL");
  u32(&a,24,1);u32(&a,28,64);u64(&a,32,1);DENIED(bpf(5,&a),EFAULT);
  u32(&a,24,0);u32(&a,28,0);u64(&a,32,0);a.b[151]=1;DENIED(bpf(5,&a),E2BIG);
  int yes=load(allow,2),no=load(deny,2);assert(yes>=0 && no>=0);assert(fcntl(yes,F_GETFD)&FD_CLOEXEC);
  assert(mkdir(CG "/bpf",0755)==0 && mkdir(CG "/bpf/leaf",0755)==0);
  int parent=open(CG "/bpf",O_RDONLY|O_DIRECTORY),child=open(CG "/bpf/leaf",O_PATH);assert(parent>=0 && child>=0);
- assert(attach(parent,no,2,0)==0);DENIED(attach(parent,no,2,0),EEXIST);
+ assert(attach(parent,no,2,-1)==0);DENIED(attach(parent,no,2,0),EEXIST);
  uint32_t ids[8];assert(query(parent,0,NULL,0,ENOSPC)==1);assert(query(parent,0,ids,8,0)==1);unsigned denyid=ids[0];
+
+ // Program identity discovery used by runc when updating an existing filter.
+ assert(identity(no,denyid)==denyid);
+ struct attr identity_attr={0};uint32_t info[2]={0};
+ u32(&identity_attr,0,parent);u32(&identity_attr,4,8);u64(&identity_attr,8,(uintptr_t)info);
+ DENIED(bpf(15,&identity_attr),EINVAL);
  close(no);no=getfd(denyid);assert(no>=0);
  assert(query(child,1,ids,8,0)==1 && ids[0]==denyid);assert(attach(child,yes,2,0)==0);
  int existing=open("/dev/null",O_RDWR);assert(existing>=0);

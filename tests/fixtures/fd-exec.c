@@ -71,6 +71,10 @@ int main(int argc, char **argv) {
     execute("CLOEXEC ELF and proc exe inode pin", 1, fd, "", AT_EMPTY_PATH, 0, fd, 1, 1, "Hello from ARM64 syscalls\n");
     assert(fcntl(fd, F_GETFD) == FD_CLOEXEC); // child exec never closes parent's fd
     close(fd);
+    fd = memfd("runc_cloned:/proc/self/exe", MFD_CLOEXEC | MFD_ALLOW_SEALING);
+    assert(fcntl(fd, F_ADD_SEALS, F_SEAL_SEAL | F_SEAL_GROW | F_SEAL_SHRINK | F_SEAL_WRITE) == 0);
+    execute("sealed runc-style reexec retains proc executable", 1, fd, "", AT_EMPTY_PATH, 0, fd, 1, 1, "Hello from ARM64 syscalls\n");
+    close(fd);
     char directory[] = "/tmp/fd-exec-XXXXXX"; assert(mkdtemp(directory));
     int dir = open(directory, O_PATH | O_DIRECTORY); assert(dir >= 0);
     execute("directory fd is not executable", 1, dir, "", AT_EMPTY_PATH, EACCES, -1, 0, 0, "");

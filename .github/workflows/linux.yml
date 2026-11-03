@@ -1410,6 +1410,10 @@ jobs:
         run: |
           bash scripts/build-fd-exec-fixtures.sh
           python3 tests/integration/fd-exec.py
+      - name: Compare buffered AIO, SIGIO and exclusive epoll with native Linux
+        run: |
+          bash scripts/build-async-io-fixtures.sh
+          python3 tests/integration/async-io.py
       - name: Validate guest UTS/mount/PID namespaces, init lifecycle and direct listeners
         run: |
           bash scripts/build-namespace-fixtures.sh

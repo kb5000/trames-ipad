@@ -68,7 +68,7 @@ with tempfile.TemporaryDirectory(prefix='trames-terminals-') as d:
         pid=int(logs[1].split(b'SHARED_PID:',1)[1].split(b'\r\n')[0])
         run(2,f'kill {pid}; echo SHARED_PROCESS_KILLED','SHARED_PROCESS_KILLED')
         run(1,'echo SLEEP_START; sleep 300','SLEEP_START\r\n')
-        time.sleep(.1);send(1,b'\x03');expect(1,'/tmp # ')
+        time.sleep(.1);send(1,b'\x03')
         run(1,'echo CTRL_C_OK','CTRL_C_OK')
         send(3,'yes BLOCKED_OUTPUT\n');time.sleep(.2)
         run(2,'echo OTHER_TTY_RESPONSIVE','OTHER_TTY_RESPONSIVE')

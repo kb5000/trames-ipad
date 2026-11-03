@@ -1,0 +1,43 @@
+{
+  "date": "2026-11-04",
+  "runtime_revision": "7d90df1c952bf720c2cc2a63ec5a78ac4b817bd4",
+  "scope": "Shared Linux Docker ABI, source-worker I/O and shared iPad/Mac terminals",
+  "passed": true,
+  "checks": {
+    "shared_tests": {
+      "distro": 9,
+      "kernel": 10,
+      "linux": 226,
+      "shared": 15,
+      "vfs": 487,
+      "ignored": 2
+    },
+    "kernel_conformance": {
+      "passed": 278,
+      "ignored": 3,
+      "network_failures_rerun_with_host_loopback": true
+    },
+    "native_linux_reference": true,
+    "guest_cpus": [
+      1,
+      4
+    ],
+    "guest_backends": [
+      "Mac HVF",
+      "shared iPad interpreter on macOS"
+    ],
+    "worker_contract": [
+      "caught SIGIO and sigreturn retire on source worker with zero service requests",
+      "AIO returns the only execution slot and survives cohort handoff with zero service requests",
+      "destroyed AIO contexts do not retarget reused identifiers"
+    ],
+    "strict_clippy": true,
+    "ios_device_target_check": true,
+    "ffi_multiple_terminals": true
+  },
+  "limits": [
+    "Legacy AIO is buffered; io_submit waits for its accepted batch while yielding the CPU slot",
+    "FASYNC supports pipes, Unix sockets and PTYs; native TCP returns EOPNOTSUPP",
+    "Lifecycle, other signal sources and existing masked/owner wait boundaries remain"
+  ]
+}

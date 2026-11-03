@@ -17,7 +17,7 @@ use trames_core::{Runtime, RuntimeError, Terminal};
 use trames_linux::{GuestOutput, OutputFd, TerminalEvent};
 use trames_vfs::{DiskOptions, NetworkMode, Vfs, VolumeSpace};
 
-pub const QUEUE_LIMIT: usize = 65536;
+pub const QUEUE_LIMIT: usize = trames_distro::terminals::QUEUE_LIMIT;
 static WORKERS: AtomicUsize = AtomicUsize::new(0);
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -994,12 +994,12 @@ impl GuestOutput for Adapter {
                 let Some(terminals) = self.terminals.as_mut() else {
                     return Ok(true);
                 };
-                if !terminals.can_pump_live(&buffers) {
+                if !terminals.can_pump_live(&buffers.terminals) {
                     return Ok(true);
                 }
                 // Existing PTY object locks protect the byte transport. Open,
                 // close, resize signals and process changes still join.
-                terminals.pump(&mut buffers);
+                terminals.pump(&mut buffers.terminals);
             } else if buffers.terminals.get(&1).is_some_and(|b| b.size.is_some()) {
                 return Ok(true);
             }
@@ -1031,7 +1031,7 @@ impl GuestOutput for Adapter {
             self.terminals
                 .as_mut()
                 .expect("initialized")
-                .pump(&mut buffers);
+                .pump(&mut buffers.terminals);
         }
         if let Some(command) = self
             .pending
