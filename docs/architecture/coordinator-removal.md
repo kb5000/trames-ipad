@@ -2,14 +2,13 @@
 
 ## Current status — 2026-11-03
 
-The latest completed batch is [the io_uring subsystem](#thirty-second-migration-implemented--io_uring-subsystem--2026-11-03).
-Ordinary Unix transport, owning ancillary graphs, native Wayland transport and
-native device controls already use original shared resources. io_uring now uses
-one canonical queue/resource state for caller workers, source-task maintenance
-and the joined compatibility path. Remaining owner boundaries are explicit:
-owner-only task/mount/proc projections, job control and task cancellation, buffer
-pin/VM topology checkpoints, and structural filesystem/backing mutations. The
-overall coordinator-removal goal remains active.
+The latest completed batch is [regular-file data, EOF and durability](#thirty-third-migration-implemented--regular-file-subsystem--2026-11-03).
+File I/O and io_uring share accepted original resources and direct native
+completion. Ordinary Unix transport, owning ancillary graphs, native Wayland
+transport and native device controls already use original shared resources.
+Remaining boundaries are directory/namespace mutation, owner-only task/mount/proc
+controls, cross-resource file/pipe/socket transfers, affected-mm VM topology and
+lifecycle/cancellation. The overall coordinator-removal goal remains active.
 
 ## Twenty-second migration implemented — worker Unix namespace controls and waits — 2026-11-03
 
@@ -2623,3 +2622,70 @@ HVF io_uring cases, **13** production FFI environment checks, strict checks and
 native-linked Mac/iPad builds pass. Apple ABI includes the failed-only retry after
 fixing its new test fixture; unrelated passing suites are reused. The five real
 Wayland stages also pass. Full evidence and limits are in the validation record.
+
+## Thirty-third migration implemented — regular-file subsystem — 2026-11-03
+
+Runtime `7739836e2302f8fb43f0a7b437f8038ae854ddd6` moves the complete regular-file
+data/EOF/durability ownership boundary together, common to Mac and iPad. Scalar/vector/positioned I/O, append/growth,
+seek/stat, truncate/fallocate, all file sync variants, O_TRUNC and file-to-file
+copy/sendfile share the accepted original OFD and common FileWork contract.
+io_uring uses that same implementation. Short data work runs on the source;
+blocking native work releases the execution slot, uses the existing bounded disk
+pool and wakes the source directly. The Session disk service and separate ring
+disk executor are removed. Metadata/quota no longer need cohort scan/copyback.
+
+| Resource | Original authority / ownership | Retained boundary |
+| --- | --- | --- |
+| Bytes, EOF, position and metadata | Original per-file locks, shared quota account and canonical mode/times | Actual mapped-layout change quiesces only affected mm views |
+| Native file completion | Accepted OFD and owned inputs; result/readiness to original source | Source copyout and original task signal disposition |
+| Truncating opens | Resolved inode and hidden Files reservation; publish after success | Excluded owner-only path controls |
+| Durability and copy | Original filesystem/file snapshot; accepted copy bytes and offsets retained | Namespace mutations and cross-resource file/pipe/socket transfer remain separate |
+
+Concentrated acceptance caught and fixed deferred-page writeback, staged-import
+quota double charging, filtered byte-call dispatch and pathname-truncate FD
+ownership. A measured single-core regression exposed temporary descriptor-table
+allocation: data calls now use the accepted original descriptor directly, sharing
+the existing VFS algorithm rather than constructing a parallel implementation.
+
+Five counterbalanced unprofiled samples, 1,000 checked 32-byte writes per worker,
+produce these four-worker longest-worker medians:
+
+| Workflow | Previous | Current | Native macOS | Native ARM Linux, exact ELF | Speedup |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Memory-backed shared-OFD append | 18.55 ms | 2.86 ms | 12.37 ms | 1.43 ms | 6.49x |
+| Memory-backed independent-file growth | 18.53 ms | 2.06 ms | 5.66 ms | 0.29 ms | 9.00x |
+| Private disk shared-OFD append | 24.07 ms | 27.97 ms | 12.37 ms | 1.43 ms | 0.86x |
+| Private disk independent-file growth | 31.50 ms | 13.38 ms | 5.66 ms | 0.29 ms | 2.35x |
+
+One-worker memory append/growth improve about 10%; private disk append improves
+4%, while growth is about 4% slower. Four-way private append is about 16% slower:
+contention on one actual disk/OFD still incurs native wait/resume overhead. This
+remaining cost is recorded rather than hidden by the independent-file results.
+Separate diagnostics show zero coordinator services for the append/growth loops;
+the bulk-read fixture still has two residual compatibility services on two/four
+CPUs, with all 128 file reads executing on workers. Their exact syscall identities
+have not been instrumented. No whole-process zero-service claim follows.
+
+File/thread creation, start-barrier setup, record verification, close and process
+startup/teardown are outside the worker timer; process-wall measurements remain in
+the validation record. Timings run with compilation finished and local Linux CI
+stopped. Darwin uses native filesystem APIs, with no native RAM-filesystem score
+substituted. The identical static ARM64 ELF runs on the existing six-vCPU VZ Linux
+CI instance/ext4 for context. Kernel/filesystem/compiler differences prevent these
+references from establishing generally native speed or whole-application gains.
+
+Apple/Linux VFS **473/472**, ABI **222 each**, kernel **275 each**, memory **159**
+plus **2/4** focused cases, strict checks, Mac product **13**, real HVF file workflows
+on **1/2/4 CPUs**, **66** io_uring flows, **13** production interpreter environment
+checks and **5** real Wayland stages pass. The iPad device-target static/native app
+link passes; physical iPad testing remains skipped per owner. Eleven obsolete
+coordinator-service/slot/copyback kernel cases are replaced by resource-lifetime
+and ABI coverage, plus two affected-mm/signal kernel cases, rather than retained
+as assertions that the removed mechanism still exists. Unchanged passing evidence
+and guest artifacts are reused; only changed or failed checks are repeated.
+
+The [source-bound validation record](../validation/worker-file-subsystem-20261103.json)
+contains full timings and limitations. The [shared ownership contract](../../runtime/docs/architecture/execution-backends.md#regular-file-data-eof-and-durability-subsystem-2026-11-03)
+describes scoped layout waits. Directory/namespace mutation, task/proc/mount
+controls, cross-resource file/pipe/socket transfer and structural VM/lifecycle
+remain separate complete-subsystem work. The overall goal remains active.
