@@ -82,6 +82,8 @@ final class TerminalSession: NSObject, ObservableObject, Identifiable, TerminalV
                 }
                 guard let self, !self.closed else { local.close(); return }
                 self.local = local
+                try local.suspendGPU(UIApplication.shared.applicationState != .active)
+                waylandCommand(["op":"output_scale","window":0,"scale":Int(UIScreen.main.scale.rounded(.up))])
                 bridge.attach(local)
                 if UIApplication.shared.applicationState != .active {self.paused=true}
                 if !self.paused {await applyFileProviderEdits(local)}
@@ -199,7 +201,7 @@ final class TerminalSession: NSObject, ObservableObject, Identifiable, TerminalV
         pendingInput.append(data)
 
     }
-    func pause(_ paused: Bool) {
+    func pause(_ paused: Bool, commitEdits:Bool = true) {
         let resuming=self.paused && !paused
         self.paused = paused
         cpuSample=nil
@@ -207,6 +209,7 @@ final class TerminalSession: NSObject, ObservableObject, Identifiable, TerminalV
         if environmentOwner == nil {
             if paused { waylandCommand(["op":"focus","window":NSNull()]) }
             if paused {try? local?.pause(true)}
+            else if !commitEdits {try? local?.pause(false)}
             else if let local,resuming || FileProviderService.hasPendingEdits() {
                 try? local.pause(true)
                 Task { [weak self] in

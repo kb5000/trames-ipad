@@ -14,7 +14,8 @@ struct TramesApp: App {
                 .ignoresSafeArea(.keyboard)
                 .preferredColorScheme(.dark)
                 .onChange(of: scenePhase) { _, phase in
-                    if phase == .background { workspace.background() }
+                    if phase == .inactive { workspace.inactive() }
+                    else if phase == .background { workspace.background() }
                     else if phase == .active { workspace.foreground() }
                 }
         }
@@ -22,6 +23,8 @@ struct TramesApp: App {
 }
 struct WorkspaceView: View {
     @ObservedObject var workspace: WorkspaceModel
+    @ObservedObject private var pictureInPicture:WindowPictureInPicture
+    init(workspace:WorkspaceModel) {self.workspace=workspace;self.pictureInPicture=workspace.pictureInPicture}
     @State private var filesSheet = false
     @State private var settingsSheet = false
     @State private var environmentsSheet = false
@@ -63,6 +66,10 @@ struct WorkspaceView: View {
                         }
                     }
                 }.workspaceFrame("tabs")
+                if let active=workspace.layout.focused ?? workspace.layout.selected,pictureInPicture.supported {
+                    Button {workspace.preview(active)} label: {Image(systemName:pictureInPicture.item == active ? "pip.exit" : "pip.enter").frame(width:44,height:44)}
+                        .accessibilityLabel(L10n.text("画中画")).accessibilityIdentifier("window-pip")
+                }
                 Button { sessionActions = true } label: {
                     Label(L10n.text("新建或管理会话"), systemImage: "plus")
                         .labelStyle(.iconOnly).frame(minWidth: 44, minHeight: 44)
@@ -101,6 +108,11 @@ struct WorkspaceView: View {
                 WorkspaceTabLabel(session:session,item:item).padding(10).background(.ultraThinMaterial)
                     .clipShape(RoundedRectangle(cornerRadius:6)).offset(x:dragLocation.x-40,y:dragLocation.y-18).allowsHitTesting(false)
             }
+        }
+        .overlay(alignment:.bottomTrailing) {
+            PictureInPictureSource(controller:pictureInPicture)
+                .frame(width:pictureInPicture.item != nil ? 160 : 1,height:pictureInPicture.item != nil ? 100 : 1)
+                .opacity(pictureInPicture.item != nil ? 1 : 0.01).allowsHitTesting(false).accessibilityHidden(true)
         }
         .background(.black)
         .background { if let owner=workspace.localOwner {BridgeConsentPresenter(controller:owner.bridge)} }

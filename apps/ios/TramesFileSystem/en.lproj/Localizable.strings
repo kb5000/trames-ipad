@@ -126,3 +126,7 @@
 "部分 Files 编辑未写回，修改副本已保留。\n" = "Some Files edits could not be written back. Modified copies were preserved.\n";
 "已关闭" = "Closed";
 "待写回的编辑" = "Pending Edits";
+
+"画中画" = "Picture in Picture";
+"此设备不支持画中画" = "Picture in Picture is unavailable on this device";
+"画中画未能启动，请保持窗口可见后重试" = "Picture in Picture could not start. Keep the window visible and try again.";

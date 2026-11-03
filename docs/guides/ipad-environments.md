@@ -63,3 +63,22 @@ Application language does not configure Linux locale. The existing `C.UTF-8`
 default remains available for UTF-8 terminal text; no locale packages or
 `locale-gen` setup is needed for the app's interface. Configure a locale inside
 a guest only when that Linux application's own behavior requires it.
+
+## Display density and Picture in Picture
+
+Wayland clients receive the screen's integer density. Scale-aware applications
+render sharper buffers while keeping window sizes and pointer coordinates in
+logical units. Fractional scaling and physical monitor metadata are not exposed.
+
+Select a terminal or graphical window and tap **Picture in Picture / 画中画** in
+the toolbar or floating window title bar. The preview follows that selected
+window; tapping its button again closes it. A playing PiP keeps its environment
+running in the background. Closing or pausing PiP restores normal background
+pausing. iPadOS still controls resource termination and suspension.
+
+Terminal and software-rendered Wayland content can update in the background.
+Native GPU windows show their last foreground frame until Trames returns, since
+iPadOS restricts background Metal execution. Preview capture runs only while
+requested, at up to 5 fps and 960×720. Staged Files edits continue to commit on a
+foreground return. See the shared [display lifecycle design](https://github.com/kb5000/trames-runtime/blob/main/docs/architecture/display-lifecycle.md)
+and [validation record](../validation/display-lifecycle-20261104.json).

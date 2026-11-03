@@ -1,0 +1,145 @@
+{
+  "date": "2026-11-04",
+  "status": "development-validated",
+  "product_version": "1.5.0",
+  "ipad_build": 47,
+  "runtime_revision": "789eddf3772dd88760a63cbaef3a83a430037db6",
+  "baseline_runtime_revision": "af0aa49e60127236b2bf7858f95757306238ddee",
+  "scope": [
+    "Integer Wayland output density and independent surface membership on iPad and Mac",
+    "Selected-window iPad Picture in Picture using shared IOSurface sample buffers",
+    "Resource-local GPU lifecycle suspension through existing readiness and execution slots",
+    "Mac static-window redraw and pressed-input release across synthetic sleep/wake",
+    "Continuous CLOCK_BOOTTIME, original session origin through exec and native sleep-aware timerfds"
+  ],
+  "checks": {
+    "apple_shared": 15,
+    "apple_vfs": {
+      "passed": 480,
+      "ignored": 1
+    },
+    "apple_linux_abi": {
+      "passed": 224,
+      "ignored": 1,
+      "permission_denied_cases_retried_with_host_network_access": 23
+    },
+    "wayland_unit": 21,
+    "vulkan_unit": 58,
+    "original_wayland_c_abi": {
+      "passed": 5,
+      "includes": [
+        "legacy compositor v4 at 2x",
+        "compositor v6 preferred scale at 2x",
+        "independent window transition from 2x to 1x",
+        "physical buffer resize with unchanged logical geometry"
+      ]
+    },
+    "linux_shared": 15,
+    "linux_vfs": {
+      "passed": 479,
+      "ignored": 1
+    },
+    "linux_linux_abi": {
+      "passed": 224,
+      "ignored": 1,
+      "test_stack_bytes": 16777216
+    },
+    "linux_kernel": {
+      "passed": 276,
+      "ignored": 3
+    },
+    "apple_kernel": {
+      "passed": 276,
+      "ignored": 3
+    },
+    "mac_product": {
+      "passed": 14,
+      "ignored": 1,
+      "synthetic_sleep_wake_mask": 15
+    },
+    "strict_checks": [
+      "Apple runtime affected all-targets hostfs",
+      "Apple product kernel/FFI all-targets",
+      "Linux runtime affected all-targets hostfs",
+      "Mac product workspace all-targets"
+    ],
+    "mac_real_windows": {
+      "passed": true,
+      "cycles": 3,
+      "windows_created": 6,
+      "console_survives": true,
+      "headless_console_has_no_AppKit": true,
+      "hidpi_extra_frames": 600,
+      "actual_guest_scale": 2
+    },
+    "physical_ipad": {
+      "model": "iPad Air 11-inch (M3)",
+      "os": "iPadOS 27.0.1",
+      "passed": true,
+      "graphics": [
+        "integer 2x buffers at original logical dimensions",
+        "window resize",
+        "SHM native presentation",
+        "Chinese IME",
+        "vkcube native presentation and hide/restore",
+        "vkmark clear/texture/Phong scenes"
+      ],
+      "terminal_pip_background": true,
+      "background_observation_minutes_minimum": 20,
+      "final_1_5_background_recheck": true,
+      "close_and_resume_recheck": "PiP closed, overlay removed, foreground terminal continued; normal background/foreground round-trip restored the same session"
+    },
+    "clock_same_elf": {
+      "passed": true,
+      "executors": [
+        "native Linux ARM64",
+        "Mac HVF 1 CPU",
+        "Mac HVF 4 CPUs",
+        "production interpreter FFI"
+      ],
+      "coverage": [
+        "libc/vDSO versus direct syscall CLOCK_BOOTTIME",
+        "absolute and periodic timerfds",
+        "fork/exec origin preservation"
+      ]
+    },
+    "simulated_sleep": {
+      "passed": true,
+      "checks": [
+        "periodic missed expiration count and phase",
+        "monotonic deadline unaffected",
+        "native timer readiness",
+        "wide interval native-unit bounds"
+      ]
+    },
+    "actual_host_sleep_performed": false
+  },
+  "limits": [
+    "Integer scaling only; virtual output geometry does not expose physical monitor metadata",
+    "iPad GPU windows retain the last foreground frame in background; CPU/SHM previews can update",
+    "PiP is subject to iPadOS resource and suspension policies",
+    "Realtime-based wait and wall-clock-step conformance is outside this change",
+    "Mac stable package is unnotarized by the owner choice; iPad canonical release IPA requires owner signing with matching App Group entitlements"
+  ],
+  "evidence_sha256": {
+    "runtime-tests.log": "58e2cda315bfba4f3d0ca966e1fe0d7c30d1fe96969a3646f186763f8e7e111f",
+    "runtime-final-rest.log": "786ad37914e83a40959dc97af52b500c18b39363729a13a451ffb5c95729a444",
+    "abi-permission-retries.log": "e0b4317c0672652a05ad2eff91539a803d34ab6934460ad95e633eaeabfade5d",
+    "wayland-native-tests.log": "08c2d2a6d81de4813b2d49db34d93acefd7e634c771a11f171d57a5885526cd9",
+    "linux-runtime-tests-final.log": "6c68a13f415d27d8f0f68e39a4e699ebf407da5b3fd29090212374207925630c",
+    "linux-kernel-tests-final.log": "c636e2f5cd8bad29f07ae4b181f3b5bb5c3a7cd26dfbf2e397829f9f8112a19b",
+    "apple-kernel-final.log": "6520be5b57ccdda14e5f939ddfbf2e4b2ff1fbb7e104ab7c7552e02e7464c344",
+    "linux-strict.log": "3499c23924e7a2c71f116c46b6a0a5b70f1708583d8476c91ea712201e96a945",
+    "runtime-strict.log": "b38aed45bfa71829cee47bde7987b8543b4c4b650d22cce48d63c3dc74d8681c",
+    "root-strict.log": "7ebfd90b6b3d57a3ed9eee3b410e00767300b3fa053e42cb597e3964e7d9529d",
+    "ipad-wayland-test.log": "fdf2357b41fcebdd2bf5053b14cfa511e50434fccd9d3388b4c8066c1881832c",
+    "mac-tests.log": "72cca9835d23828061e103549ca8d625006492c54ef1f1059791add8d671bc21",
+    "mac-hidpi-real.log": "1d84e20cf00a860688a6766c622a993c6113616915512a3f1bbc0c1e32b939df",
+    "linux-clock-native-reference-final.log": "09640426570364feb90d0c5490738f5ac30ee2b0a3f3f05f65eb34a23166babe",
+    "clock-hvf-1.log": "16bfa0d35a038e122b994bac6fe4a98b365553a587b9148b08082882c842be78",
+    "clock-hvf-4.log": "16bfa0d35a038e122b994bac6fe4a98b365553a587b9148b08082882c842be78",
+    "clock-interpreter.log": "4eb886f947e1d67d6e9ab72c09896a77f82a5aad36acab4256c2f9b50615e652",
+    "mac-strict.log": "6c76240bd932a97b32e588e4eb43fa72b3335fb39a8087c420111b9abd8f3ed1"
+  },
+  "guest_artifacts": "Reused verified unchanged native driver/musl payloads; rebuilt only the source C acceptance fixture."
+}

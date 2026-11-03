@@ -3,6 +3,7 @@ import SwiftUI
 import TramesKit
 @MainActor
 final class WorkspaceModel: ObservableObject {
+    let pictureInPicture=WindowPictureInPicture()
     @Published var sessions: [TerminalSession] = []
     @Published private(set) var localOwner: TerminalSession?
     @Published private(set) var profiles = RootfsCatalog.alpine.environments
@@ -28,6 +29,10 @@ final class WorkspaceModel: ObservableObject {
     private(set) var environment: EnvironmentStore?
     private(set) var directories: ScopedDirectories?
     init(prepareEnvironment: Bool = true) {
+        pictureInPicture.onActivityChanged={ [weak self] in self?.applyActivityPolicy() }
+        pictureInPicture.onRestore={ [weak self] in self?.activate($0) }
+        pictureInPicture.onError={ [weak self] in self?.error=$0 }
+
         #if DEBUG
         if ProcessInfo.processInfo.arguments.contains("--workspace-ui-acceptance") || ProcessInfo.processInfo.arguments.contains("--keyboard-ui-acceptance") {
             let session=TerminalSession(title:"Alpine",isLocal:true)
@@ -128,6 +133,7 @@ final class WorkspaceModel: ObservableObject {
     func updateViewport(_ size:CGSize) { change { $0.updateViewport(size) } }
     func saveFrame(_ id: WorkspaceItemID, _ frame: DisplayWindowGeometry) { change { $0.frames[id]=frame } }
     func closeItem(_ id: WorkspaceItemID) {
+        if pictureInPicture.item == id {pictureInPicture.stop()}
         if case .terminal = id, let session=session(for:id) { close(session) }
         else if case .wayland(_,let window)=id { session(for:id)?.waylandCommand(["op":"close","window":window]) }
     }
@@ -242,19 +248,34 @@ final class WorkspaceModel: ObservableObject {
         }
     }
     func close(_ session: TerminalSession) {
+        if pictureInPicture.item?.session == session.id {pictureInPicture.stop()}
         session.closeTerminalWindow(); sessions.removeAll { $0.id == session.id }
         change { $0.close(.terminal(session.id)) }
     }
-    func background() {
-        appActive = false
-        Task {await environment?.pausePreparation(true)}
+    func preview(_ item:WorkspaceItemID) {
+        pictureInPicture.toggle(item) { [weak self] in self?.session(for:item) }
+    }
+    func inactive() {
+        // UIKit announces deactivation before it restricts new Metal work.
+        for session in environmentOwners {try? session.local?.suspendGPU(true)}
+    }
+    private func applyActivityPolicy() {
+        let selected=pictureInPicture.item.flatMap {session(for:$0)}
+        let owner=selected?.environmentOwner ?? selected
         for session in environmentOwners {
-            session.pause(true)
+            let preview=pictureInPicture.keepsRunning && owner?.id == session.id
+            session.pause(!appActive && !preview,commitEdits:appActive)
         }
     }
+    func background() {
+        appActive=false;inactive()
+        Task {await environment?.pausePreparation(true)}
+        applyActivityPolicy()
+    }
     func foreground() {
-        appActive = true
+        appActive=true
+        for session in environmentOwners {try? session.local?.suspendGPU(false)}
         Task {await environment?.pausePreparation(false)}
-        for session in environmentOwners { session.pause(false) }
+        applyActivityPolicy()
     }
 }

@@ -126,6 +126,9 @@ public final class LocalSession: @unchecked Sendable {
         guard count >= 0 else {throw Self.lastError()};data.count=Int(count)
         return try JSONDecoder().decode(LocalTerminalStatus.self,from:data)
     }
+    public func suspendGPU(_ value: Bool) throws {
+        if trames_session_gpu_suspended(try currentHandle(), value ? 1 : 0) < 0 { throw Self.lastError() }
+    }
     public func pause(_ value: Bool) throws {
         if trames_session_pause(try currentHandle(), value ? 1 : 0) < 0 { throw Self.lastError() }
     }

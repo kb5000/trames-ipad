@@ -54,6 +54,8 @@ struct WorkspaceWindow: View {
                         .accessibilityIdentifier("window-title-\(item.token)")
                 }
                 Spacer()
+                windowButton("pip.enter",label:L10n.text("画中画")) {workspace.preview(item)}
+                    .accessibilityIdentifier("pip-\(item.token)")
                 windowButton("minus",label:L10n.text("最小化到标签栏")) { workspace.minimize(item) }
                     .accessibilityIdentifier("minimize-\(item.token)")
                 windowButton("arrow.up.left.and.arrow.down.right",label:L10n.text("停靠为标签页")) { workspace.dock(item) }

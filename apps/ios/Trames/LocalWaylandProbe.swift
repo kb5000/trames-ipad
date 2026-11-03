@@ -14,6 +14,7 @@ struct WaylandProbeResult {
     let resized: Bool
     let resumedPresentation: Bool
     let textConfirmed: Bool
+    let hidpi: Bool
 }
 @MainActor
 private final class WaylandPixelCapture {
@@ -115,8 +116,8 @@ enum LocalWaylandProbe {
             try await Task.sleep(for:.milliseconds(10))
         }
         print("Wayland acceptance: original apk setup passed at \(Date().timeIntervalSince(began))s")
-        var cubeResized=false, textConfirmed=false, resumedPresentation=false
-        for (stage,program) in [("info","wayland-info"),("windows","/tmp/wayland-client 1 hold"),("shm","weston-simple-shm"),("editor","weston-editor"),("cube","vkcube --wsi wayland --c 30"),("vkmark","vkmark --winsys wayland --size 320x240 -b clear:duration=0.1 -b texture:anisotropy=16:duration=0.1 -b shading:shading=phong:duration=0.1")] {
+        var cubeResized=false, textConfirmed=false, resumedPresentation=false, hidpi=false
+        for (stage,program) in [("info","wayland-info"),("windows","/tmp/wayland-client 1 hold-hidpi"),("shm","weston-simple-shm"),("editor","weston-editor"),("cube","vkcube --wsi wayland --c 30"),("vkmark","vkmark --winsys wayland --size 320x240 -b clear:duration=0.1 -b texture:anisotropy=16:duration=0.1 -b shading:shading=phong:duration=0.1")] {
             print("Wayland acceptance: starting \(stage) at \(Date().timeIntervalSince(began))s")
             let start=Date(), baseline=canvas.rendered, presentationBaseline=canvas.frameProgress, completionBaseline=canvas.completed, shownBaseline=canvas.presented
             var focused=false, resized=false, closed=false
@@ -161,6 +162,10 @@ enum LocalWaylandProbe {
                         resumedPresentation=true
                     }
                     let sizeOK=first.width==320 && first.height==240
+                    if stage=="windows",sizeOK,let frame=try session.waylandFrame(window:first.id) {
+                        let density=max(1,min(4,Int(scene.screen.scale.rounded(.up))))
+                        hidpi=frame.images.contains {Int($0.scale)==density && Int($0.width)==320*density && Int($0.height)==240*density}
+                    }
                     if stage=="cube" { cubeResized = cubeResized || resized && sizeOK }
                     if stage=="editor", let context=status.text {
                         canvas.textContext=context
@@ -184,7 +189,7 @@ enum LocalWaylandProbe {
                             canvas.insertText("返回");editorStep=5
                         } else if editorStep == 5 && context.text.contains("返回") { textConfirmed=true }
                     }
-                    let complete = stage=="windows" && resized && sizeOK && status.windows.count==2 && canvas.rendered>=baseline+2
+                    let complete = stage=="windows" && resized && sizeOK && hidpi && status.windows.count==2 && canvas.rendered>=baseline+2
                         || stage=="shm" && canvas.rendered>=baseline+4 || stage=="editor" && textConfirmed
                     if complete && !closed { try session.waylandCommand(["op":"close","window":first.id]); closed=true }
                 }
@@ -211,7 +216,7 @@ enum LocalWaylandProbe {
             for at in stride(from:0,to:p.count,by:4) { colors.insert(UInt32(p[at]) | UInt32(p[at+1])<<8 | UInt32(p[at+2])<<16) }
         }
         guard colors.count>64, cubeResized, textConfirmed, resumedPresentation else { throw TramesError.message("Wayland acceptance incomplete: colors=\(colors.count), resize=\(cubeResized), IME=\(textConfirmed)") }
-        return WaylandProbeResult(text:text,png:try capture.png(),presented:canvas.presented,completed:canvas.completed,presentationFeedbackAvailable:canvas.presentationFeedbackAvailable,copiedBytes:canvas.copiedBytes+second.copiedBytes,resized:cubeResized,resumedPresentation:resumedPresentation,textConfirmed:textConfirmed)
+        return WaylandProbeResult(text:text,png:try capture.png(),presented:canvas.presented,completed:canvas.completed,presentationFeedbackAvailable:canvas.presentationFeedbackAvailable,copiedBytes:canvas.copiedBytes+second.copiedBytes,resized:cubeResized,resumedPresentation:resumedPresentation,textConfirmed:textConfirmed,hidpi:hidpi)
     }
 }
 #endif

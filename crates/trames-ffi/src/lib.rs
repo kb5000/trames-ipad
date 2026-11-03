@@ -365,6 +365,17 @@ pub extern "C" fn trames_session_terminal_resize(
         }
     })
 }
+/// Suspend only new GPU entries; CPU/terminal work remains schedulable for PiP.
+#[no_mangle]
+pub extern "C" fn trames_session_gpu_suspended(handle: u64, suspended: u32) -> i32 {
+    boundary(|| match session(handle) {
+        Ok(s) => {
+            s.display.set_suspended(suspended != 0);
+            0
+        }
+        Err(e) => error(e),
+    })
+}
 #[no_mangle]
 pub extern "C" fn trames_session_pause(handle: u64, paused: u32) -> i32 {
     boundary(|| match session(handle) {

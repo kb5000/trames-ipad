@@ -47,7 +47,11 @@ final class WaylandCanvas: WaylandInputView {
     private let texturePipeline: MTLRenderPipelineState
     private let inFlight = DispatchSemaphore(value: 2)
     weak var session: LocalSession?
-    var windowID: UInt64 = 0
+    var windowID: UInt64 = 0 {
+        didSet {
+            if oldValue != windowID { outputDensity=nil;lastRevision=nil;setNeedsLayout() }
+        }
+    }
     var presentationEnabled = true {
         didSet {
             guard oldValue != presentationEnabled else { return }
@@ -197,9 +201,16 @@ final class WaylandCanvas: WaylandInputView {
         }
     }
     deinit { if let foregroundObserver { NotificationCenter.default.removeObserver(foregroundObserver) } }
+    var pictureCapture:((CGImage)->Void)? {didSet {lastRevision=nil}}
+    private var lastPictureCapture:CFTimeInterval=0
+    private var outputDensity: Int?
     override func layoutSubviews() {
         super.layoutSubviews()
         let scale=window?.screen.scale ?? 2
+        let density=max(1,min(4,Int(scale.rounded(.up))))
+        if outputDensity != density, session != nil, windowID != 0 {
+            sendInput?(["op":"output_scale","window":windowID,"scale":density]);outputDensity=density
+        }
         let size=CGSize(width:max(1,bounds.width * scale),height:max(1,bounds.height * scale))
         if metal.contentsScale != scale || metal.drawableSize != size {
             metal.contentsScale=scale;metal.drawableSize=size;lastRevision=nil
@@ -273,6 +284,42 @@ final class WaylandCanvas: WaylandInputView {
                 encoder.drawPrimitives(type: .triangleStrip,vertexStart: 0,vertexCount: 4)
             }
             encoder.endEncoding()
+            if let capture=pictureCapture,CACurrentMediaTime()-lastPictureCapture>=0.2 {
+                lastPictureCapture=CACurrentMediaTime()
+                let factor=min(1,960/max(1,bounds.width),720/max(1,bounds.height))
+                let width=max(2,Int(bounds.width*factor)),height=max(2,Int(bounds.height*factor)),row=(width*4+255) & ~255
+                let spec=MTLTextureDescriptor.texture2DDescriptor(pixelFormat:.bgra8Unorm,width:width,height:height,mipmapped:false)
+                spec.usage = .renderTarget;spec.storageMode = .private
+                if let texture=device.makeTexture(descriptor:spec),let pixels=device.makeBuffer(length:row*height,options:.storageModeShared) {
+                    let pass=MTLRenderPassDescriptor();pass.colorAttachments[0].texture=texture
+                    pass.colorAttachments[0].loadAction = .clear;pass.colorAttachments[0].storeAction = .store
+                    if let encoder=command.makeRenderCommandEncoder(descriptor:pass) {
+            for (source, value) in buffers {
+                var uniform = value
+                encoder.setVertexBytes(&uniform,length: MemoryLayout<ImageUniform>.stride,index: 0)
+                switch source {
+                case .shared(let buffer):
+                    encoder.setRenderPipelineState(pipeline)
+                    encoder.setFragmentBuffer(buffer,offset:0,index:0)
+                case .texture(let texture):
+                    encoder.setRenderPipelineState(texturePipeline)
+                    encoder.setFragmentTexture(texture,index:0)
+                }
+                encoder.setFragmentBytes(&uniform,length: MemoryLayout<ImageUniform>.stride,index: 1)
+                encoder.drawPrimitives(type: .triangleStrip,vertexStart: 0,vertexCount: 4)
+            }
+                        encoder.endEncoding()
+                        if let blit=command.makeBlitCommandEncoder() {
+                            blit.copy(from:texture,sourceSlice:0,sourceLevel:0,sourceOrigin:MTLOrigin(x:0,y:0,z:0),sourceSize:MTLSize(width:width,height:height,depth:1),to:pixels,destinationOffset:0,destinationBytesPerRow:row,destinationBytesPerImage:row*height);blit.endEncoding()
+                            command.addCompletedHandler { result in
+                                guard result.status == .completed,let data=CGDataProvider(data:Data(bytes:pixels.contents(),count:row*height) as CFData),let image=CGImage(width:width,height:height,bitsPerComponent:8,bitsPerPixel:32,bytesPerRow:row,space:CGColorSpaceCreateDeviceRGB(),bitmapInfo:[.byteOrder32Little,CGBitmapInfo(rawValue:CGImageAlphaInfo.premultipliedFirst.rawValue)],provider:data,decode:nil,shouldInterpolate:false,intent:.defaultIntent) else {return}
+                                Task { @MainActor in capture(image) }
+                            }
+                        }
+                    }
+                }
+            }
+
             #if DEBUG
             inspectFrame?(drawable.texture, command)
             #endif

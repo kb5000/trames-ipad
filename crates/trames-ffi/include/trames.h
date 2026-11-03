@@ -33,6 +33,7 @@ int32_t trames_session_input(uint64_t handle, const uint8_t *bytes, uint32_t len
 int32_t trames_session_output(uint64_t handle, uint8_t *bytes, uint32_t capacity);
 int32_t trames_session_status(uint64_t handle, uint8_t *json, uint32_t capacity);
 int32_t trames_session_resize(uint64_t handle, uint16_t rows, uint16_t columns);
+int32_t trames_session_gpu_suspended(uint64_t handle, uint32_t suspended);
 int32_t trames_session_pause(uint64_t handle, uint32_t paused);
 /* Opt-in {"multiple_terminals":true}: one Linux/init/VFS/network, independent
  * guest PTYs/shells. Legacy input/output/resize address terminal 1. Closing a
