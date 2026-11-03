@@ -109,16 +109,38 @@ int main(int argc, char **argv) {
     assert(operations && operations <= 1000000);
     uint64_t checksum = 0, response_bytes = 0;
     int netlink = !strncmp(kind, "netlink-", 8);
+    int netlink_publish = !strcmp(kind, "netlink-publish");
     int netlink_vector = !strcmp(kind, "netlink-vector"), netlink_message = !strcmp(kind, "netlink-message"), netlink_poll = !strcmp(kind, "netlink-poll");
     int netlink_fd = -1;
-    unsigned char netlink_request[32] = {0};
+    unsigned char netlink_request[256] = {0};
+    size_t netlink_length = 32;
     if (netlink) {
 #ifdef __linux__
-        netlink_fd = socket(16, SOCK_RAW, 0); assert(netlink_fd >= 0);
+        netlink_fd = socket(16, SOCK_RAW, netlink_publish ? 12 : 0); assert(netlink_fd >= 0);
         struct { uint16_t family, pad; uint32_t port, groups; } local = {.family = 16};
         assert(!bind(netlink_fd, (struct sockaddr *)&local, sizeof(local)));
         uint32_t length = 32, index = 1; uint16_t type = 18, flags = 1;
         memcpy(netlink_request, &length, 4); memcpy(netlink_request+4, &type, 2); memcpy(netlink_request+6, &flags, 2); memcpy(netlink_request+20, &index, 4);
+        if (netlink_publish) {
+            char name[64]; int count = snprintf(name, sizeof(name), "bench-%ld", (long)getpid());
+            assert(count > 0 && count < 60);
+            size_t attribute = 4 + (size_t)count + 1, body_size = 4 + ((attribute + 3) & ~(size_t)3);
+            netlink_length = 0;
+            for (unsigned item = 0; item < 4; item++) {
+                unsigned char *message = netlink_request + netlink_length;
+                uint32_t size = (uint32_t)(16 + (item == 0 || item == 3 ? 4 : body_size));
+                uint16_t message_type = item == 0 ? 16 : item == 1 ? 0xa00 : item == 2 ? 0xa02 : 17;
+                uint16_t message_flags = item == 1 ? 0x401 : item == 2 ? 5 : 1;
+                memset(message, 0, size);memcpy(message, &size, 4);memcpy(message+4, &message_type, 2);memcpy(message+6, &message_flags, 2);
+                if (item == 0 || item == 3) message[19] = 10;
+                else {
+                    message[16] = 2;
+                    uint16_t attr_size = (uint16_t)attribute, attr_type = 1;
+                    memcpy(message+20, &attr_size, 2);memcpy(message+22, &attr_type, 2);memcpy(message+24, name, (size_t)count+1);
+                }
+                netlink_length += size;
+            }
+        }
 #else
         fprintf(stderr, "Netlink has no native macOS interface\n"); return 77;
 #endif
@@ -273,11 +295,14 @@ int main(int argc, char **argv) {
     double began = now();
     for (unsigned i = 0; i < operations; i++) {
         if (netlink) {
-            uint32_t sequence = i+1; memcpy(netlink_request+8, &sequence, 4);
-            struct iovec output[2] = {{.iov_base = netlink_request, .iov_len = 16}, {.iov_base = netlink_request+16, .iov_len = 16}};
+            uint32_t sequence = i+1;
+            if (netlink_publish) {
+                for (size_t at = 0; at < netlink_length; ) { uint32_t size;memcpy(&size, netlink_request+at, 4);memcpy(netlink_request+at+8, &sequence, 4);at += size; }
+            } else memcpy(netlink_request+8, &sequence, 4);
+            struct iovec output[2] = {{.iov_base = netlink_request, .iov_len = 16}, {.iov_base = netlink_request+16, .iov_len = netlink_length-16}};
             struct msghdr outgoing = {.msg_iov = output, .msg_iovlen = 2};
-            ssize_t n = netlink_message ? sendmsg(netlink_fd, &outgoing, 0) : netlink_vector ? writev(netlink_fd, output, 2) : write(netlink_fd, netlink_request, 32);
-            assert(n == 32);
+            ssize_t n = netlink_message ? sendmsg(netlink_fd, &outgoing, 0) : netlink_vector ? writev(netlink_fd, output, 2) : write(netlink_fd, netlink_request, netlink_length);
+            assert(n == (ssize_t)netlink_length);
             if (netlink_poll) { struct pollfd interest = {.fd = netlink_fd, .events = POLLIN}; assert(poll(&interest, 1, 5000) == 1 && interest.revents & POLLIN); }
             unsigned char reply[4096];
             struct iovec input[2] = {{.iov_base = reply, .iov_len = 23}, {.iov_base = reply+23, .iov_len = sizeof(reply)-23}};
@@ -285,7 +310,9 @@ int main(int argc, char **argv) {
             n = netlink_message ? recvmsg(netlink_fd, &incoming, 0) : netlink_vector ? readv(netlink_fd, input, 2) : read(netlink_fd, reply, sizeof(reply));
             assert(n >= 32);response_bytes += (uint64_t)n;uint32_t length, actual_sequence, index;uint16_t type;
             memcpy(&length, reply, 4);memcpy(&type, reply+4, 2);memcpy(&actual_sequence, reply+8, 4);memcpy(&index, reply+20, 4);
-            assert(length == (uint32_t)n && type == 16 && actual_sequence == sequence && index == 1);
+            assert(length == (uint32_t)n && actual_sequence == sequence);
+            if (netlink_publish) { int32_t error;memcpy(&error, reply+16, 4);assert(type == 2 && error == 0); }
+            else assert(type == 16 && index == 1);
         } else if (ip_messages) {
             unsigned char sent[8][64], received[64];
             struct iovec vectors[8][2];

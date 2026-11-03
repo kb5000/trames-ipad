@@ -2,13 +2,13 @@
 
 ## Current status — 2026-11-03
 
-The latest completed stage is [retained Netlink data and resource wakeups](#twenty-eighth-migration-implemented--retained-netlink-data-and-resource-wakeups--2026-11-03).
-Ordinary Netlink I/O, supported link/route/address changes and resource-driven
-poll/epoll now execute on workers. nf_tables ruleset publication still joins to
-invalidate captured native TCP policy-free capabilities. Other remaining areas
-include Unix owning ancillary graphs, native-service/device and io_uring controls,
-task/job control, mount/proc ownership and structural file/VM/task transitions.
-The overall coordinator-removal goal remains active.
+The latest completed stage is [worker firewall publication](#twenty-ninth-migration-implemented--worker-firewall-publication--2026-11-03).
+Netlink data, supported link/route/address changes, poll/epoll wakeups and nf_tables
+publication now execute on workers. Existing native TCP capabilities observe live
+rules without a whole-cohort publication join. Remaining areas include Unix owning
+ancillary graphs, native-service/device and io_uring controls, task/job control,
+mount/proc ownership and structural file/VM/task transitions. The overall
+coordinator-removal goal remains active.
 
 ## Twenty-second migration implemented — worker Unix namespace controls and waits — 2026-11-03
 
@@ -2272,3 +2272,83 @@ mount/proc ownership and structural file/VM/task transitions remain. recvmmsg is
 unimplemented rather than an existing coordinator path. See the
 [validation record](../validation/worker-netlink-20261103.json) and
 [shared contract](../../runtime/docs/architecture/execution-backends.md#retained-netlink-data-and-resource-wakeups-2026-11-03).
+
+
+## Twenty-ninth migration implemented — worker firewall publication — 2026-11-03
+
+Runtime `8e7cb1f5cf1c2e6edbf4c207810410d2c3708fa8` removes the nf_tables publication join.
+The calling worker uses the original shared rules writer, bounded staging,
+rollback, validation, generation, response-capacity and counter algorithms.
+Netlink no longer needs per-message worker admission or owner/deferred state for
+these batches. This stage supersedes the firewall boundary retained in stage 28.
+
+The actual rules object now includes a relaxed atomic empty-hook selector, updated
+with successful rules publication under its existing writer. TCP capabilities
+refer to their original shared socket and live policy, instead of capturing an
+unfiltered decision. With no hook, a byte attempt adds one selector read and takes
+no namespace/rules lock. The original general socket policy path also loses its
+empty-policy locks. With hooks, the same original packet/conntrack/counter/error
+algorithm runs; rule removal restores the same fast endpoint. Overlapping calls
+may observe either side of publication, but a parked call does not retain an allow.
+
+Policy attachment is immutable before socket publication. Byte/control/poll
+capabilities keep one weak original-socket pointer; their size and per-admission
+reference-count operation counts stay unchanged. Accepted leases retain the full
+original shared native socket and namespace after close/reuse. Poll snapshots do
+not pin final close. Host registries retain that same Arc without a new wrapper;
+their existing final-resource destruction runs outside the registry lock. Original
+conditional-close admission observes both socket and transport leases. SO_ERROR
+uses original live-policy connection completion, closing the second stale-decision
+path. Ordinary byte I/O takes no connection-completion or control algorithm lock.
+No global resource lock, coordinator/service thread, polling bus, ordinary guest
+fence, unsafe code or native-only access policy is added.
+
+| Four processes, longest-child median | Iterations each | Previous | Current | Native macOS | Native ARM Linux, exact ELF |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| nf_tables create/delete batch | 1,000 | 81.89 ms | 6.93 ms | No native API | 25.73 ms |
+| Existing Netlink query | 1,000 | 7.74 ms | 7.08 ms | No native API | 4.28 ms |
+| Existing native TCP scalar | 10,000 | 92.25 ms | 91.19 ms | 99.35 ms | 20.51 ms |
+| Existing native TCP vector | 10,000 | 94.68 ms | 94.63 ms | 101.20 ms | 20.77 ms |
+| Existing TCP sendmsg/recvmsg | 10,000 | 139.82 ms | 137.00 ms | 101.08 ms | 21.26 ms |
+| Existing pipe lifecycle | 1,000 | 12.31 ms | 12.04 ms | 1.81 ms | 2.39 ms |
+
+Publication loops improve **11.82x**, with process wall **114.29 → 43.30 ms**
+and diagnostic cohort counts **2,295 → 48**. Service requests remain three,
+including startup/teardown; the old publication usually joined rather than counted
+as a resource service. TCP scalar/vector/message controls use **10,000 iterations
+and nine unprofiled counterbalanced samples**: loop medians **92.250 → 91.186 ms**,
+**94.678 → 94.633 ms**, and **139.820 → 137.003 ms**. Controls show no observed degradation. No control gain or statistical regression
+bound is claimed. Query/pipe use three
+unprofiled samples; complete raw results and separate diagnostic repeats are saved.
+
+Each publication iteration creates and deletes a process-specific table in one
+NFNL batch, then checks its 36-byte success ACK and sequence. It measures the
+publication mechanism without live hooks; live DROP, counters, receive shutdown
+and connection completion are verified separately. Native Linux runs the identical
+static musl ELF on six vCPUs, with NET_ADMIN/root only inside the isolated local
+validation machine. Its full kernel nf_tables semantics and differing PID/name
+lengths make it a contextual reference. Trames has four vCPUs. Native macOS has no
+Netlink API; TCP/pipe use original native APIs. Query replies remain 292 versus
+1,488 bytes in Trames/Linux. All final compilation, affected CI and FFI checks
+finish before timing; Linux is stopped before Mac timing. Setup/cleanup is outside
+the loop. These are scoped results, not whole-app/Firefox/physical-iPad measurements
+or a general faster-than-native claim.
+
+Final Apple/Linux ABI **205 each**, VFS **453/452**, network **82 unit + 11
+integration each**, kernel **279 each**, Mac **13**, strict checks, all **13**
+production FFI environment checks, project boundaries and iPad static build pass.
+Actual guest tests on one/two execution slots publish DROP, reject an old TCP
+capability, delete rules and send again while a distinct process uses an eventfd.
+All **seven calls finish on workers**, with **seven filter decisions and zero
+services**. New network cases check active counters exactly once, captured
+send/receive policy, retained original lifetime, weak final namespace teardown and
+SO_ERROR denial/error consumption after publication. Existing concurrent rules and
+packet-counter tests pass. Physical iPad testing remains skipped per owner. The
+measured binary is installed in Trames Dev; stable remains unchanged.
+
+The goal remains active. Unix owning ancillary graphs, native-service/device and
+io_uring controls, task/job control, mount/proc ownership and structural file/VM/task
+transitions still depend on separate owner boundaries. recvmmsg is unimplemented
+rather than an existing coordinator path. See the
+[validation record](../validation/worker-nft-publication-20261103.json) and
+[shared contract](../../runtime/docs/architecture/execution-backends.md#worker-nf_tables-publication-and-live-native-tcp-policy-2026-11-03).
