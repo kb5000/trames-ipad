@@ -1,0 +1,3431 @@
+{
+  "date": "2026-11-03",
+  "stage": 31,
+  "status": "Native device controls integrated as one subsystem batch; overall coordinator removal remains active",
+  "runtime_revision": "ee0102c867930bb6b47cd6bc101ab471eed36a46",
+  "baseline_runtime_revision": "6ab059a7f0b57be7cab7e867c315ed8ed06ecd05",
+  "sources": [
+    {
+      "path": "crates/trames-audio/src/lib.rs",
+      "sha256": "ba6e2b37c2e5651424011fa0d4b4dbc0e86c7f8c5aef030fc74f9771bfb19d9c"
+    },
+    {
+      "path": "crates/trames-linux/src/direct.rs",
+      "sha256": "b7b0373018cda3835c19d1b905f92625fca7f5abdfca8f848f4361844f4f9ba4"
+    },
+    {
+      "path": "crates/trames-session/src/gpu.rs",
+      "sha256": "550a3c60906618ea5f3058674023b357d8e17e4fbbf3605e318f46017e07588f"
+    },
+    {
+      "path": "crates/trames-session/src/lib.rs",
+      "sha256": "b7a6e068bd0c09fd64f35e4825a7cd66e933b4d09cd03504465f7d66d50d7937"
+    },
+    {
+      "path": "crates/trames-session/src/process.rs",
+      "sha256": "1ae4cd17ba7af5c514f87061631dbdc4d47b291c447938c57d792c1608c28b29"
+    },
+    {
+      "path": "crates/trames-session/src/run_queue.rs",
+      "sha256": "54f3220d1437248dde72b31ed7565c965e3efc44570dfadfde4893ddf132c7a0"
+    },
+    {
+      "path": "crates/trames-session/src/workers.rs",
+      "sha256": "2663054ba3261ce36bd7c4adf9938439ac487e2b6f4ade0c44a11ea920c5d51c"
+    },
+    {
+      "path": "crates/trames-shared/src/readiness.rs",
+      "sha256": "d3adcab796a491c407a12059fbf70200726e695bc895e85999ae70f2393fc096"
+    },
+    {
+      "path": "crates/trames-vfs/src/direct_io.rs",
+      "sha256": "897d821d399fa50b062afc4bbc21f0255e8e6ac9f602549728cfdce3c2f95040"
+    },
+    {
+      "path": "crates/trames-vfs/src/fd_table.rs",
+      "sha256": "eae6ac8321778589f8fb43bca49338a091b7f6fc19c6fe562ac40c2689968e16"
+    },
+    {
+      "path": "crates/trames-vfs/src/ipc.rs",
+      "sha256": "3148936983d3560d7a468ee26570cd08198b7f93621f9617917cdd7e7a0f1878"
+    },
+    {
+      "path": "crates/trames-vfs/src/ipc/native.rs",
+      "sha256": "f4e917626a3b020e768d80864c70cf9c9c080d4afea879fa8c61f57fdf067318"
+    },
+    {
+      "path": "crates/trames-vfs/src/lib.rs",
+      "sha256": "2639011dd1f2a64b0e84f20189804aae8e943c7aec1d5894b28036be18edbb45"
+    },
+    {
+      "path": "crates/trames-vfs/src/native_images.rs",
+      "sha256": "fa9f2b9d83222e760076902aaa16ddac7fc2b56c2939f1d39da6e0daa903bcdb"
+    },
+    {
+      "path": "crates/trames-video/src/lib.rs",
+      "sha256": "f77ce81c8f42ce8c59f1773e7f749d11e9c7c8de4fc8aac90d48c5caaa666395"
+    },
+    {
+      "path": "crates/trames-vulkan/src/backend.rs",
+      "sha256": "927328a7948755586f92a7219d901fda499d7cbd7a6ae41b22624bed6ec65df5"
+    },
+    {
+      "path": "crates/trames-vulkan/src/backend/completion.rs",
+      "sha256": "8ae6ea46d5d0fcfe6507d7b29fbeadc6c5e6afca1404d11e99c445593704c7cc"
+    },
+    {
+      "path": "crates/trames-vulkan/src/backend/graphics.rs",
+      "sha256": "0c30025a2ff71c929a4ed31b245d410e95f7b648169490c6ddd964dd04706aa1"
+    },
+    {
+      "path": "crates/trames-vulkan/src/backend/wayland.rs",
+      "sha256": "35ccb83fd8a06472ae54d309f2e25452b85a10084aff49279b2d79743c7449a5"
+    },
+    {
+      "path": "crates/trames-vulkan/src/context.rs",
+      "sha256": "797a03936c0f3936cbd5b8e199494c3f00f7d7b2043abf79160c80a078d3ea2a"
+    },
+    {
+      "path": "crates/trames-vulkan/src/task.rs",
+      "sha256": "146b8d0de2e44f7340ff21890462fbf6d975a9fe892417a209f4f4fc8d037395"
+    },
+    {
+      "path": "docs/architecture/execution-backends.md",
+      "sha256": "6dd03a89a93cd785b9670b9320ebf341c6cdc1d166e2adcab67e980af5849917"
+    },
+    {
+      "path": "crates/trames-session/src/devices.rs",
+      "sha256": "d064365943f421fb4b00c66c22cdec9efb273c7fae0cce1f2f07bfbfe146e614"
+    }
+  ],
+  "builds": {
+    "baseline": {
+      "path": "target/native-devices-baseline/trames-mac-run",
+      "sha256": "948ff456cfb73ad5d2a9fd822ab747476db5c1a057aee4a004fc34f21ade2c79"
+    },
+    "mac": {
+      "path": "/Users/main/dev/trames-mac/target/release/trames-mac-run",
+      "sha256": "47488f8a4bd2f93bd2a5d706afab12ce58aaeffa58f081ecf58eaa0491cd4aba"
+    },
+    "ffi": {
+      "path": "target/release/libtrames_ffi.dylib",
+      "sha256": "7cf7e4f4c2fdb4dc2750c8a8965a8ed99ce79fdf478f4d5698e4ffdfc81c4d84"
+    },
+    "ipad": {
+      "path": "target/aarch64-apple-ios/release/libtrames_ffi.a",
+      "sha256": "3fdd37f72f4d169cf6e69222886a09889705622cfe393e024a8c9cbc9231d49a"
+    },
+    "guest": {
+      "path": "target/local-ci/io/native-device-controls-final-linux",
+      "sha256": "c5ec636ddd01b095e697e381dc0d6c7c32dff6070893c3e8f10075b84cad1176"
+    },
+    "native_macos": {
+      "path": "target/native-devices-bench-macos",
+      "sha256": "423df793c825a86711b2e25dd3c1cfd6829069e4deddd424eda62c736022ac4f"
+    }
+  },
+  "checks": {
+    "linux_resources": {
+      "passed": true,
+      "checks": [
+        {
+          "check": "tests",
+          "exit": 0
+        },
+        {
+          "check": "clippy",
+          "exit": 0
+        }
+      ]
+    },
+    "linux_kernel": {
+      "passed": true,
+      "checks": [
+        {
+          "check": "kernel-tests",
+          "exit": 0
+        },
+        {
+          "check": "kernel-clippy",
+          "exit": 0
+        }
+      ]
+    },
+    "ffi": {
+      "passed": true,
+      "checks": [
+        {
+          "case": "alpine-install",
+          "passed": true,
+          "reused": true
+        },
+        {
+          "case": "alpine",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "alpine",
+          "terminal": 2,
+          "passed": true
+        },
+        {
+          "case": "debian-install",
+          "passed": true,
+          "reused": true
+        },
+        {
+          "case": "debian",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "debian",
+          "terminal": 2,
+          "passed": true
+        },
+        {
+          "case": "debian-setup",
+          "passed": true
+        },
+        {
+          "case": "custom-install",
+          "passed": true,
+          "reused": true
+        },
+        {
+          "case": "custom",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "custom",
+          "terminal": 2,
+          "passed": true
+        },
+        {
+          "case": "custom-sha256-rejection",
+          "passed": true
+        },
+        {
+          "case": "systemd",
+          "terminal": 1,
+          "passed": true
+        },
+        {
+          "case": "systemd",
+          "terminal": 2,
+          "passed": true
+        }
+      ]
+    },
+    "vaapi": {
+      "passed": true,
+      "returncode": 0,
+      "sha256": {
+        "check": "92bf81dcd8eddb46c827e9ab004045839f6409da11d6acd28a71248824e68118",
+        "ld-musl-aarch64.so.1": "42fb025bc758b76e60e7b3b0fcdcfab93b6ba1694b363244c2e8e6f51847e28c",
+        "libEGL.so.1": "567feb56db01fb475f2a114182d746ae56be6a615be9ae4c373f196168ba6e4c",
+        "libGLESv2.so.2": "1be4cbcf9ccb483a0135f5af76644f6fd7aa894ca4b39dac09857176b1d4dce7",
+        "libLLVM.so.20.1": "1a80aa18733cd9579b43a61a5848c6d05a0c84fa6cfeffb464cb9aa1a817971a",
+        "libSPIRV-Tools.so": "9978afd1907cdcf857ad6e875547921eef9dba63582cf2b5b7361a374b6e6cbd",
+        "libSvtAv1Enc.so.2": "332b429da9ef607f2a73f4f7feb450f38f700db22d74e37c910f8f16a9cccc29",
+        "libX11-xcb.so.1": "ebdb66a7bd5e2eba10663b395cfea22b656f5ca86dcef605b1142c9ed0aa8ec4",
+        "libX11.so.6": "adba92fc1c990fddba0fceaa249c6d0c7a24908ab8ac9e5cba7daede9c6a6dd1",
+        "libXau.so.6": "541039f77baf79bff82c859dbecb41d046fe1c13b172392160312cc2d39f5a52",
+        "libXdmcp.so.6": "f79259348abadc0b32ae61fef7032ac7afcd3c1319b0095c190bdc1394c483ad",
+        "libXext.so.6": "9ebd0896513279794d5ba6f86566581a0683c1e49e79d74e2efc2fa958457c88",
+        "libXfixes.so.3": "2da0ee289779003ce4381806d47f207398b3cd04996b7d8d5ed60c833f8296a4",
+        "libaom.so.3": "3229f3e3478583fab36252376569534605e2d75efd0c2236426dd4f8c3a96ab5",
+        "libavcodec.so.60": "f2df65ffb1d8a9a3d4656d89cdbe7bf112abea442844cb07effd32b003b9671b",
+        "libavformat.so.60": "79ed2ccaaac785cd4fd7c12a5ca42fc2fbad1a670d26074d1d9b698aeb323fae",
+        "libavutil.so.58": "fddc6b53fa004fabc701c99ae6208bf7da7e12e4bf4ad525583f5143c3d91e6a",
+        "libbluray.so.2": "c0487392906e183f9f004582fee0b0448586d92512e16c534db4fbc830d14f81",
+        "libbrotlicommon.so.1": "abdf1f7c44fabb16ca538c8650290f4cdc0727884f12c3bd713d8a16dc5a805f",
+        "libbrotlidec.so.1": "ea9b5fe7e7ec9943a4331bee7d5b41fdface6a8e2398101821dc51e98a1c1c9c",
+        "libbrotlienc.so.1": "d927d06c4a9a49f32cf7765f9b56526e24fa2361152fe2754d49075a77d40872",
+        "libbsd.so.0": "6304e54559e94174d59cd30f3f2876f6269f329bf7034952f94573ac49038d02",
+        "libbz2.so.1": "c1360c1241bc5dff6ad1d62b1b39f848afefb202e9f439504db8cda684789a10",
+        "libcjson.so.1": "911fdbdec7222a1e9e094720c08383110ff8496c5a9115ced76e935988db11de",
+        "libcrypto.so.3": "911da5b5135cec3a520d294e56aefae5d753c9e1ed45aeabe8093d3ba986c284",
+        "libdav1d.so.7": "df05a1a20eba22e1286268df46a1c57b46b9a9dc725da42ef6f309871f2dc85e",
+        "libdrm.so.2": "a6f7b31feec2b1a28b0e88827c215bd7828db0fe7b86e44ae1a9558fff1b3ebd",
+        "libdrm_amdgpu.so.1": "32e262eaae832f29deebce8aee6bf563fc901f1a337d280300c2637f137dc2cd",
+        "libelf.so.1": "ba5fcfee734c258c3ba5b666e6967bca47ba2ca63c6373cf439a617794c089bb",
+        "libexpat.so.1": "51237d47a0a25c1a938398d26a21ba9e708ac647aebc5d38ddf5366a9a20f6f2",
+        "libffi.so.8": "9e9631cbbd1e9f1de646dccbfe6357dabb085c07bf4eb0b870dba887a1f11053",
+        "libgallium-25.1.9.so": "f968e6d3c009d9e0722a6a8463fea3199205745b1aacd8089dc5bb300bc34cc9",
+        "libgbm.so.1": "b2016afc92ff8681136e06f96d6b976d6a93f968299c5e4746786eb79aacbbf6",
+        "libgcc_s.so.1": "2d945d6ce360769b41fbffc652c2440014bbd69416f13fe206fbac19d32c9431",
+        "libgomp.so.1": "1ede7ee7f575f2f7cd32768930769d993d0283d7a87ca7b7d19d791570a14320",
+        "libhwy.so.1": "53e2c5498884009e08c0a9e88ce42b18a88448000cf152812dc23e7310735a7b",
+        "libjxl.so.0.10": "dd33445d24d6f86f382b21b993cb110545e475c9335258677cc5422cc20a96b6",
+        "libjxl_cms.so.0.10": "49710a3fe4e2bb5888f14b78d3056d18ae356575797d602817b2525262248b30",
+        "libjxl_threads.so.0.10": "ba65831dc3d61c73d0f769863cff43f2d494b41c9d021ef42e0a3a1bb82d950d",
+        "liblcms2.so.2": "11b958c675995a6c938f16c59fc7e0f66d87bbcc8fe68ddae1e6e203ca533341",
+        "liblzma.so.5": "684bf2cbc78ba9e8956818b02a07cc0c1f6ef1738bb0d6b2bf59a72d5aff0b94",
+        "libmbedcrypto.so.16": "fd5166802ef82dd9d8ff4b52f2de980eecec5180c3df7fbfb8a705015dc85423",
+        "libmd.so.0": "e6555b271864e03a0229410b971d4e62541775fef7b846ff64f162450043bc85",
+        "libmp3lame.so.0": "c959e807473ea8089b56c59553f6ca5e2bde773c8d17cf5f76b6fc7d648e2833",
+        "libmpg123.so.0": "ed51ff9212b8100d17ba865dcb102b1b39faeefae356c16c4152973bb285026d",
+        "libnuma.so.1": "7e31fa618ef75a625aaf0a8edc2edca6c3e3241186077c04798558295f68e185",
+        "libogg.so.0": "808f73b5a3d25f3f272a19056bdcb807e9d03c6afbc14bbb28e36ead2327141f",
+        "libopenmpt.so.0": "d6ace66b0ca780ab8a1abedd15fb43d854f08c69d3d094e0ee5750ce535cd39d",
+        "libopus.so.0": "0ba25c946e712e546b0cf7ab01ada3cd3bade90a77af06234bd37eea623efaa8",
+        "librav1e.so.0.7": "2c26f3731641f15119b431d7efe8550ebeb244422f32757963bc24ffc01688fe",
+        "librist.so.4": "ff2ff5744df4b147d9daeb8ec5994b6d3e445b03f87280967de9220b0484c4ce",
+        "libsharpyuv.so.0": "babcef2376deb66dadcb31bc153e52972089c2251b421f3ced4bd4058d12e35c",
+        "libsodium.so.26": "61cc35a08a847227e3848ecd6d4bf03af08e6a7c5930022e3bf8fa996caa361c",
+        "libsoxr.so.0": "ac339f92c877d6974c804abb2b3f3bee31bc6b73c5fe8b66460b1a7ef377ee1e",
+        "libsrt.so.1.5": "71554b9b3c375b0d203f4e7e07eefde9b5d58fb0fd35a302bfe4386f4bebeb42",
+        "libssh.so.4": "56e3d672a7024a7db54b6cfb532302b0d75eaafaa2977a920433a3fa4cc87681",
+        "libssl.so.3": "c2c68f2588b1c919d716d6bd998da35541e5f8ff415ad657f52ac4e8f61c929d",
+        "libstdc++.so.6": "85f2cd6db79578ab58be4d12b7df7482ebc003a37496c7544956d9157f8a2b3f",
+        "libswresample.so.4": "8ce4ed0f13f88610b18232b71d17589acbb2cecf66bc35ed1dc1d62d17a11911",
+        "libtheoradec.so.1": "beb0cc60bc5872b0a4a7b5b25f023f4fd8640a5a44b0d49789b6838a263c551b",
+        "libtheoraenc.so.1": "ccb7c4ef7fdcf1b71538d32e254d9d1f85328b47d3c852c09912b22dab534d74",
+        "libtrames_vulkan_icd.so": "ab472cf4f8ade5d0bab47a9242c13e7e50f67d087df0a9db05a15c0715552ebd",
+        "libva-drm.so.2": "69e5c0eb63e86480724652b0d65030d83b8aae96b146f860e167a84df0228d6d",
+        "libva-x11.so.2": "93a8502e9c3ef6c175bee89ad1d54c1e88b5797860b2848a967381d6c581605b",
+        "libva.so.2": "20cbb8bc83c93c72bdacdfcc183e4a3c4893956ae030e2026c3046af5cafb00f",
+        "libvdpau.so.1": "9867fb1be0b64c4fff51134be3575728fa2a1224b0da987c7f0b20e4e974afd2",
+        "libvorbis.so.0": "d2242b199a96ddb9c5541691d4b9d1048fefedf8a5754a7767eae4a0b545814c",
+        "libvorbisenc.so.2": "4999017c8b1093ff111fda21c9b97a69c4d7bf4e4eee521d09fc38d2ec42cd41",
+        "libvorbisfile.so.3": "3cd96432a3c0351230c65bfba5d50bedf210342a336a6157efb3bb51a148a6c8",
+        "libvpx.so.9": "46a42e812232b67e0118f82fde41938331eb473c03fb536c16fe42233d1dcc83",
+        "libvulkan.so.1": "382419ec9f138dd2a980fc988482a72b643c32901599b568a27fe7742946c752",
+        "libwayland-client.so.0": "b1a0f560b02802dcdac26811fcd726638590ae3af369d1367c1c3a1c1dc3c596",
+        "libwayland-server.so.0": "95e137b859ed8d98d76c38f6c7c90fbc899b43777bcee7f983ac0170051f9d65",
+        "libwebp.so.7": "adb7048aa7f7a63d7bf0ba2806a1d905a5a3d0aaa84790b36e515cd7ad8efdde",
+        "libwebpmux.so.3": "c8ea34468c5c5c2746b31cb671ea4a7fa419a0b461e9123d94ac112b855ce474",
+        "libx264.so.164": "87e40f7e90e125d4b7bc09a466679b8aa77f525606728a2e6609d26b3f0e7b14",
+        "libx265.so.209": "a59214787bbda5fd8caa96e34b98b3deced9d9ddf121a1b2b12ba6a7c883a0a6",
+        "libxcb-dri3.so.0": "719d3b552d4fa9a449e304792c2105bfb3dc9b06af834dbdc015f8295d904529",
+        "libxcb-present.so.0": "dbb4e4bc054f4d8c76829fb3e26fd28b0837e00a959782d0b85c21612a0e4c65",
+        "libxcb-randr.so.0": "9e8ea50bf477819df945d4320be1d90640840c582727b083ca7d9e308d50641c",
+        "libxcb-shm.so.0": "c81ab82b5c307c8b8e584b111d692c8e33297b29e493f2f6e26aa56c61d5f86d",
+        "libxcb-sync.so.1": "5e4c699c715e42c7f782f4e60886457e8fae0b238ffe5fadbe0405ca0a5eea98",
+        "libxcb-xfixes.so.0": "e4da99d415cc7b633b09083b1c8440c547e0940ee45694319c0da7677727beff",
+        "libxcb.so.1": "37b5950b0a216608ed5f9eb3e3c8244c6839aa7920901ee4ee2c663bc9ddfe4a",
+        "libxml2.so.2": "8f0ef3b255a82fa577bd59b102c8742accf4ee4847655c11297797d8b2295b7c",
+        "libxshmfence.so.1": "8d7b7132936a3c09ff1a3a84426bb7b2577e70cc43b694d4a63e41eacd1b69fd",
+        "libxvidcore.so.4": "3e690dd98fe8c2dfd6e38aa99560b32aa173d4d66f718d8b0259aa115566c1b1",
+        "libz.so.1": "1dfd2166dd6124fbd4cbba54ea3d5b2de60e308c252de39d1369e71d301ddea4",
+        "libzmq.so.5": "6d23680f3d55707b9eee7fcd98398d70e1ae84931c899a6416fb7b03b8820d41",
+        "libzstd.so.1": "0261e625d796007a4688f12b5bea20ca8af9d6767d645286501245a0f0187699",
+        "sample.h264": "9d0ac0fb2a9f3f51ac4d42b4d5980bf478e416ef1000a5dfd7fb6616eaaafb52",
+        "trames_drv_video.so": "406c3c1b304fbafb6cb9a325af22642641f5481d9e8e459d6d5c872dc0fbdc10"
+      },
+      "scope": "hardware H.264; export before sync; fork/SCM_RIGHTS; native GPU plane pixels",
+      "frontend": "Vulkan",
+      "denied_sysinfo": false
+    },
+    "audio_virtual": {
+      "passed": true,
+      "returncode": 0,
+      "mode": "duplex",
+      "samples": [
+        {
+          "capture_frames": 48000,
+          "elapsed": 1.063672,
+          "rms": 0.0,
+          "peak": 0.0
+        },
+        {
+          "playback_frames": 144000,
+          "rate": 48000,
+          "channels": 2,
+          "elapsed": 3.076102,
+          "drain": 0
+        }
+      ],
+      "sha256": {
+        "audio-native": "c24fcb698d80d5f17e90e02099e75f6653f074d093262f05736370e7a739e51c",
+        "libasound_module_pcm_trames.so": "0fec04537271ea3a458b51bf7b691787906064ad0b950c06f9db5153dd3293f2",
+        "asound.conf": "3dd2775eecc8bc05a399ba9761fbfc8f8fd2c2852ea2f97b9466773f2f158722"
+      }
+    }
+  },
+  "performance": {
+    "native-devices-perf-final": {
+      "passed": true,
+      "scope": "Native device controls with a concurrent ordinary Linux CPU thread.\n\nBuild the static ARM64 guest with musl-gcc -static -O2 -pthread, linking\nnative-device-controls.c/.S and worker-gpu-native.S. The optional native macOS\nGPU reference uses the same C source with DEVICE_NATIVE_GPU and the same\nMoltenVK archive. Video surface metadata has no equivalent native Linux/macOS\nAPI and is deliberately omitted from native reference timing.\n",
+      "records": [
+        {
+          "mode": "video",
+          "cpus": 1,
+          "version": "before",
+          "repeat": 0,
+          "wall_seconds": 0.31008004199999994,
+          "result": {
+            "mode": "video",
+            "operations": 2000,
+            "seconds": 0.256547291,
+            "peer_calls": 522624
+          },
+          "paths": {
+            "cohort_rounds": 0,
+            "cohort_stop_us": 0,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 28,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 0,
+            "worker_fd_syscalls": 0,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 0,
+            "worker_task_resumes": 0
+          },
+          "native_returns": "trames mac cohort-return native: {}"
+        },
+        {
+          "mode": "video",
+          "cpus": 1,
+          "version": "after",
+          "repeat": 0,
+          "wall_seconds": 0.2917792079999999,
+          "result": {
+            "mode": "video",
+            "operations": 2000,
+            "seconds": 0.255542083,
+            "peer_calls": 571001
+          },
+          "paths": {
+            "cohort_rounds": 0,
+            "cohort_stop_us": 0,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 28,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 0,
+            "worker_fd_syscalls": 0,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 0,
+            "worker_task_resumes": 0
+          },
+          "native_returns": "trames mac cohort-return native: {}"
+        },
+        {
+          "mode": "video",
+          "cpus": 4,
+          "version": "before",
+          "repeat": 0,
+          "wall_seconds": 0.9020442079999997,
+          "result": {
+            "mode": "video",
+            "operations": 2000,
+            "seconds": 0.867667417,
+            "peer_calls": 1877693
+          },
+          "paths": {
+            "cohort_rounds": 2003,
+            "cohort_stop_us": 824716,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 25,
+            "vm_local_syscalls": 4,
+            "worker_direct_syscalls": 0,
+            "worker_fd_syscalls": 0,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 2,
+            "worker_futex_wakes": 2,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 5,
+            "worker_task_resumes": 2
+          },
+          "native_returns": "trames mac cohort-return native: {(65543, 1): 2000}"
+        },
+        {
+          "mode": "video",
+          "cpus": 4,
+          "version": "after",
+          "repeat": 0,
+          "wall_seconds": 0.03742529200000044,
+          "result": {
+            "mode": "video",
+            "operations": 2000,
+            "seconds": 0.004010583,
+            "peer_calls": 8877
+          },
+          "paths": {
+            "cohort_rounds": 3,
+            "cohort_stop_us": 1,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 25,
+            "vm_local_syscalls": 4,
+            "worker_direct_syscalls": 0,
+            "worker_fd_syscalls": 0,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 2,
+            "worker_futex_wakes": 2,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 5,
+            "worker_task_resumes": 2
+          },
+          "native_returns": "trames mac cohort-return native: {}"
+        },
+        {
+          "mode": "video",
+          "cpus": 4,
+          "version": "before",
+          "repeat": 1,
+          "wall_seconds": 0.833092792,
+          "result": {
+            "mode": "video",
+            "operations": 2000,
+            "seconds": 0.797579917,
+            "peer_calls": 1728032
+          }
+        },
+        {
+          "mode": "video",
+          "cpus": 4,
+          "version": "after",
+          "repeat": 1,
+          "wall_seconds": 0.035601500000000286,
+          "result": {
+            "mode": "video",
+            "operations": 2000,
+            "seconds": 0.004037541,
+            "peer_calls": 8717
+          }
+        },
+        {
+          "mode": "video",
+          "cpus": 4,
+          "version": "after",
+          "repeat": 2,
+          "wall_seconds": 0.036600292000000145,
+          "result": {
+            "mode": "video",
+            "operations": 2000,
+            "seconds": 0.004078167,
+            "peer_calls": 8805
+          }
+        },
+        {
+          "mode": "video",
+          "cpus": 4,
+          "version": "before",
+          "repeat": 2,
+          "wall_seconds": 0.7765255839999998,
+          "result": {
+            "mode": "video",
+            "operations": 2000,
+            "seconds": 0.743278417,
+            "peer_calls": 1606207
+          }
+        },
+        {
+          "mode": "video",
+          "cpus": 4,
+          "version": "before",
+          "repeat": 3,
+          "wall_seconds": 0.7713003330000006,
+          "result": {
+            "mode": "video",
+            "operations": 2000,
+            "seconds": 0.735653958,
+            "peer_calls": 1589840
+          }
+        },
+        {
+          "mode": "video",
+          "cpus": 4,
+          "version": "after",
+          "repeat": 3,
+          "wall_seconds": 0.03728499999999979,
+          "result": {
+            "mode": "video",
+            "operations": 2000,
+            "seconds": 0.0039605,
+            "peer_calls": 8843
+          }
+        },
+        {
+          "mode": "gpu",
+          "cpus": 1,
+          "version": "before",
+          "repeat": 0,
+          "wall_seconds": 0.06610366700000014,
+          "result": {
+            "mode": "gpu",
+            "operations": 20,
+            "seconds": 0.024621667,
+            "peer_calls": 32350
+          },
+          "paths": {
+            "cohort_rounds": 0,
+            "cohort_stop_us": 0,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 28,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 0,
+            "worker_fd_syscalls": 0,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 0,
+            "worker_task_resumes": 0
+          },
+          "native_returns": "trames mac cohort-return native: {}"
+        },
+        {
+          "mode": "gpu",
+          "cpus": 1,
+          "version": "after",
+          "repeat": 0,
+          "wall_seconds": 0.06948266599999986,
+          "result": {
+            "mode": "gpu",
+            "operations": 20,
+            "seconds": 0.02466525,
+            "peer_calls": 32228
+          },
+          "paths": {
+            "cohort_rounds": 0,
+            "cohort_stop_us": 0,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 28,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 0,
+            "worker_fd_syscalls": 0,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 0,
+            "worker_task_resumes": 0
+          },
+          "native_returns": "trames mac cohort-return native: {}"
+        },
+        {
+          "mode": "gpu",
+          "cpus": 4,
+          "version": "before",
+          "repeat": 0,
+          "wall_seconds": 0.09040049999999944,
+          "result": {
+            "mode": "gpu",
+            "operations": 20,
+            "seconds": 0.046413875,
+            "peer_calls": 113211
+          },
+          "paths": {
+            "cohort_rounds": 45,
+            "cohort_stop_us": 33054,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 25,
+            "vm_local_syscalls": 4,
+            "worker_direct_syscalls": 0,
+            "worker_fd_syscalls": 0,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 2,
+            "worker_futex_wakes": 2,
+            "worker_gpu_calls": 63,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 5,
+            "worker_task_resumes": 2
+          },
+          "native_returns": "trames mac cohort-return native: {(65542, 1): 42}"
+        },
+        {
+          "mode": "gpu",
+          "cpus": 4,
+          "version": "after",
+          "repeat": 0,
+          "wall_seconds": 0.05354470800000044,
+          "result": {
+            "mode": "gpu",
+            "operations": 20,
+            "seconds": 0.01275075,
+            "peer_calls": 44218
+          },
+          "paths": {
+            "cohort_rounds": 3,
+            "cohort_stop_us": 8,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 25,
+            "vm_local_syscalls": 4,
+            "worker_direct_syscalls": 0,
+            "worker_fd_syscalls": 0,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 2,
+            "worker_futex_wakes": 2,
+            "worker_gpu_calls": 105,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 5,
+            "worker_task_resumes": 2
+          },
+          "native_returns": "trames mac cohort-return native: {}"
+        },
+        {
+          "mode": "gpu",
+          "cpus": 4,
+          "version": "before",
+          "repeat": 1,
+          "wall_seconds": 0.0913349160000001,
+          "result": {
+            "mode": "gpu",
+            "operations": 20,
+            "seconds": 0.044540917,
+            "peer_calls": 108605
+          }
+        },
+        {
+          "mode": "gpu",
+          "cpus": 4,
+          "version": "after",
+          "repeat": 1,
+          "wall_seconds": 0.053632541999999894,
+          "result": {
+            "mode": "gpu",
+            "operations": 20,
+            "seconds": 0.013036667,
+            "peer_calls": 44388
+          }
+        },
+        {
+          "mode": "gpu",
+          "cpus": 4,
+          "version": "native",
+          "repeat": 1,
+          "wall_seconds": 0.4766015829999999,
+          "result": {
+            "mode": "gpu",
+            "operations": 20,
+            "seconds": 0.019202,
+            "peer_calls": 45762
+          }
+        },
+        {
+          "mode": "gpu",
+          "cpus": 4,
+          "version": "after",
+          "repeat": 2,
+          "wall_seconds": 0.06124845799999967,
+          "result": {
+            "mode": "gpu",
+            "operations": 20,
+            "seconds": 0.014569417,
+            "peer_calls": 44408
+          }
+        },
+        {
+          "mode": "gpu",
+          "cpus": 4,
+          "version": "before",
+          "repeat": 2,
+          "wall_seconds": 0.08860612500000009,
+          "result": {
+            "mode": "gpu",
+            "operations": 20,
+            "seconds": 0.044595542,
+            "peer_calls": 108502
+          }
+        },
+        {
+          "mode": "gpu",
+          "cpus": 4,
+          "version": "native",
+          "repeat": 2,
+          "wall_seconds": 0.02845895899999995,
+          "result": {
+            "mode": "gpu",
+            "operations": 20,
+            "seconds": 0.01251,
+            "peer_calls": 52454
+          }
+        },
+        {
+          "mode": "gpu",
+          "cpus": 4,
+          "version": "before",
+          "repeat": 3,
+          "wall_seconds": 0.08915145899999999,
+          "result": {
+            "mode": "gpu",
+            "operations": 20,
+            "seconds": 0.04463225,
+            "peer_calls": 107662
+          }
+        },
+        {
+          "mode": "gpu",
+          "cpus": 4,
+          "version": "after",
+          "repeat": 3,
+          "wall_seconds": 0.05467774999999975,
+          "result": {
+            "mode": "gpu",
+            "operations": 20,
+            "seconds": 0.013412875,
+            "peer_calls": 45525
+          }
+        },
+        {
+          "mode": "gpu",
+          "cpus": 4,
+          "version": "native",
+          "repeat": 3,
+          "wall_seconds": 0.028773042000000082,
+          "result": {
+            "mode": "gpu",
+            "operations": 20,
+            "seconds": 0.012222,
+            "peer_calls": 52707
+          }
+        }
+      ],
+      "sha256": {
+        "baseline": "948ff456cfb73ad5d2a9fd822ab747476db5c1a057aee4a004fc34f21ade2c79",
+        "candidate": "47488f8a4bd2f93bd2a5d706afab12ce58aaeffa58f081ecf58eaa0491cd4aba",
+        "fixture": "c5ec636ddd01b095e697e381dc0d6c7c32dff6070893c3e8f10075b84cad1176",
+        "rootfs": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe",
+        "native": "423df793c825a86711b2e25dd3c1cfd6829069e4deddd424eda62c736022ac4f"
+      },
+      "summary": {
+        "video": {
+          "before": {
+            "loop_median_seconds": 0.743278417,
+            "wall_median_seconds": 0.7765255839999998
+          },
+          "after": {
+            "loop_median_seconds": 0.004037541,
+            "wall_median_seconds": 0.036600292000000145
+          }
+        },
+        "gpu": {
+          "before": {
+            "loop_median_seconds": 0.044595542,
+            "wall_median_seconds": 0.08915145899999999
+          },
+          "after": {
+            "loop_median_seconds": 0.013412875,
+            "wall_median_seconds": 0.05467774999999975
+          },
+          "native": {
+            "loop_median_seconds": 0.01251,
+            "wall_median_seconds": 0.028773042000000082
+          }
+        }
+      }
+    },
+    "native-devices-eventfd-control": {
+      "passed": true,
+      "kind": "eventfd",
+      "processes": 4,
+      "operations_each": 10000,
+      "repeats": 9,
+      "cpus": 12,
+      "records": [
+        {
+          "variant": "before",
+          "repeat": 0,
+          "wall_seconds": 0.134857083,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.077142334,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.077213833,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.076404084,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.076414083,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 49,
+            "cohort_stop_us": 2442,
+            "service_caller_wait_us": 40,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 160115,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 79787,
+            "worker_fd_syscalls": 79782,
+            "worker_file_syscalls": 4,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 159569,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "after",
+          "repeat": 0,
+          "wall_seconds": 0.101251584,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.061499959,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.063202417,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.06239475,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.061937541,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 43,
+            "cohort_stop_us": 1183,
+            "service_caller_wait_us": 20,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 160109,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 80004,
+            "worker_fd_syscalls": 80000,
+            "worker_file_syscalls": 4,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 160004,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "before",
+          "repeat": 1,
+          "wall_seconds": 0.09967679100000004,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.059382,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.060092083,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.061404084,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.063026875,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 1,
+          "wall_seconds": 0.10008483299999993,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.05911175,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.061794167,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.061133334,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.062368875,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 2,
+          "wall_seconds": 0.09872162500000004,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.060961958,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.061286666,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.060053,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.061213334,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 2,
+          "wall_seconds": 0.09649258300000008,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.059101625,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.059896166,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.060957083,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.059620333,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 3,
+          "wall_seconds": 0.09988466699999998,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.058019333,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.059180708,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.060856041,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.062169709,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 3,
+          "wall_seconds": 0.09969995799999998,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.060991209,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.060668459,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.060230166,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.059924625,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 4,
+          "wall_seconds": 0.0967226670000001,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.059414125,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.060755209,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.060385542,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.061443625,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 4,
+          "wall_seconds": 0.09976749999999979,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.059613917,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.059997209,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.060957542,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.06082625,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 5,
+          "wall_seconds": 0.10042083400000013,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.059976917,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.060045542,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.060084417,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.060235625,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 5,
+          "wall_seconds": 0.0960733330000001,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.059270375,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.058673041,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.059546084,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.062139959,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 6,
+          "wall_seconds": 0.0986047080000001,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.059422833,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.058902,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.061136333,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.062174666,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 6,
+          "wall_seconds": 0.09785133299999993,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.059400125,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.059715667,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.059775459,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.062258292,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 7,
+          "wall_seconds": 0.0994651249999996,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.058425875,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.060448833,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.060754791,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.060222958,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 7,
+          "wall_seconds": 0.09955370799999974,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.058316,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.059143041,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.059476208,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.061740667,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 8,
+          "wall_seconds": 0.09773087500000033,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.05979225,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.0603305,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.061554208,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.059875417,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 8,
+          "wall_seconds": 0.10045858299999999,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.05989125,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.060159542,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.060126583,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.062196084,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 9,
+          "wall_seconds": 0.0963503750000001,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.059817458,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.06011325,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.060034667,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.062488708,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 9,
+          "wall_seconds": 0.09861799999999965,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.059921458,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.05922375,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.061768792,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.061287792,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ]
+        }
+      ],
+      "sha256": {
+        "baseline": "948ff456cfb73ad5d2a9fd822ab747476db5c1a057aee4a004fc34f21ade2c79",
+        "candidate": "47488f8a4bd2f93bd2a5d706afab12ce58aaeffa58f081ecf58eaa0491cd4aba",
+        "fixture": "96ad0fe5ee5c10c82d78ae16df809804fd82377f2a02acfbad87dadf237a7dfa",
+        "rootfs": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe"
+      },
+      "native_environment": {
+        "system": "Darwin",
+        "release": "27.0.0",
+        "architecture": "arm64",
+        "logical_cpus": 12
+      },
+      "summary": {
+        "before": {
+          "loop_max_median_seconds": 0.062169709,
+          "process_wall_median_seconds": 0.09967679100000004,
+          "profile": {
+            "cohort_rounds": 49,
+            "cohort_stop_us": 2442,
+            "service_caller_wait_us": 40,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 160115,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 79787,
+            "worker_fd_syscalls": 79782,
+            "worker_file_syscalls": 4,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 159569,
+            "worker_task_resumes": 3
+          }
+        },
+        "after": {
+          "loop_max_median_seconds": 0.061740667,
+          "process_wall_median_seconds": 0.09861799999999965,
+          "profile": {
+            "cohort_rounds": 43,
+            "cohort_stop_us": 1183,
+            "service_caller_wait_us": 20,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 160109,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 80004,
+            "worker_fd_syscalls": 80000,
+            "worker_file_syscalls": 4,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 160004,
+            "worker_task_resumes": 3
+          }
+        }
+      }
+    },
+    "native-devices-pipe-control": {
+      "passed": true,
+      "kind": "pipe",
+      "processes": 4,
+      "operations_each": 10000,
+      "repeats": 9,
+      "cpus": 12,
+      "records": [
+        {
+          "variant": "before",
+          "repeat": 0,
+          "wall_seconds": 0.1811919580000001,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.118050292,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.117587291,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.123274916,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.119457084,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 46,
+            "cohort_stop_us": 2403,
+            "service_caller_wait_us": 23,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 240113,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 119952,
+            "worker_fd_syscalls": 119946,
+            "worker_file_syscalls": 4,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 239898,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "after",
+          "repeat": 0,
+          "wall_seconds": 0.142469042,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.101748959,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.103762917,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.104894166,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.104129125,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ],
+          "paths": {
+            "cohort_rounds": 48,
+            "cohort_stop_us": 1004,
+            "service_caller_wait_us": 26,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 240113,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 119979,
+            "worker_fd_syscalls": 119975,
+            "worker_file_syscalls": 4,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 239954,
+            "worker_task_resumes": 3
+          }
+        },
+        {
+          "variant": "before",
+          "repeat": 1,
+          "wall_seconds": 0.14357116699999994,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.09876575,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.09812125,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.101006041,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.100835042,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 1,
+          "wall_seconds": 0.14306816600000016,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.100591958,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.100624,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.100806042,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.104250959,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 2,
+          "wall_seconds": 0.13971108399999999,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.097223833,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.100291125,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.099007875,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.099580334,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 2,
+          "wall_seconds": 0.14596891600000017,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.100250917,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.099920792,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.101715292,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.101616916,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 3,
+          "wall_seconds": 0.14173529200000012,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.098411084,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.101794375,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.101887458,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.100667625,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 3,
+          "wall_seconds": 0.1416004999999998,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.099032583,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.100667209,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.100257375,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.102435625,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 4,
+          "wall_seconds": 0.1413107090000003,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.099089625,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.099890833,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.102315333,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.101376208,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 4,
+          "wall_seconds": 0.13620129199999997,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.099949792,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.099857125,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.099911042,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.102026042,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 5,
+          "wall_seconds": 0.1388115830000003,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.098262375,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.0986325,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.098592,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.100821,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 5,
+          "wall_seconds": 0.14104800000000006,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.099696917,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.099946958,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.099789584,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.102303041,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 6,
+          "wall_seconds": 0.14009529199999982,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.098696417,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.099908875,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.10026325,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.103389833,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 6,
+          "wall_seconds": 0.13997816699999976,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.101620625,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.101558875,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.101469,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.101762833,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 7,
+          "wall_seconds": 0.13938495799999995,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.09821275,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.099545834,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.098411333,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.101455125,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 7,
+          "wall_seconds": 0.1368454589999999,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.098677458,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.098979083,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.100217834,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.099647709,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 8,
+          "wall_seconds": 0.13550416600000004,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.0997995,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.099535875,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.100662208,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.100886042,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 8,
+          "wall_seconds": 0.14241595900000004,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.099680208,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.101734167,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.100871334,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.103013709,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "before",
+          "repeat": 9,
+          "wall_seconds": 0.1373975839999999,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.098840459,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.098487709,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.10121,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.099759333,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "after",
+          "repeat": 9,
+          "wall_seconds": 0.14288166600000007,
+          "exit": 0,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.100951375,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.101604125,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.100134083,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.102599875,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ]
+        },
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.025786333000000106,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.020339,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.02155,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.021352,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.020964,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.0251061250000002,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.020571,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.021108,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.020997,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.020846,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.024970499999999785,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.02081,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.020779,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.020985,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.020764,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 4,
+          "wall_seconds": 0.02496595800000012,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.020637,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.021202,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.020846,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.020766,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 5,
+          "wall_seconds": 0.02537199999999995,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.020718,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.020822,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.021006,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.020573,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 6,
+          "wall_seconds": 0.025580624999999912,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.02042,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.021112,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.021034,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.020767,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 7,
+          "wall_seconds": 0.02472225000000039,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.020343,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.021318,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.021152,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.020775,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 8,
+          "wall_seconds": 0.02495545900000007,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.020661,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.021159,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.021247,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.020706,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 9,
+          "wall_seconds": 0.025183624999999932,
+          "children": [
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.020509,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.021304,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.021131,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "pipe",
+              "operations": 10000,
+              "seconds": 0.020965,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "baseline": "948ff456cfb73ad5d2a9fd822ab747476db5c1a057aee4a004fc34f21ade2c79",
+        "candidate": "47488f8a4bd2f93bd2a5d706afab12ce58aaeffa58f081ecf58eaa0491cd4aba",
+        "native": "2e18f525fe9a4b184caae7b78df9ae4fd7a227d0d0aa04488bf437414f965b32",
+        "fixture": "96ad0fe5ee5c10c82d78ae16df809804fd82377f2a02acfbad87dadf237a7dfa",
+        "rootfs": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe"
+      },
+      "native_environment": {
+        "system": "Darwin",
+        "release": "27.0.0",
+        "architecture": "arm64",
+        "logical_cpus": 12
+      },
+      "summary": {
+        "before": {
+          "loop_max_median_seconds": 0.101715292,
+          "process_wall_median_seconds": 0.13997816699999976,
+          "profile": {
+            "cohort_rounds": 46,
+            "cohort_stop_us": 2403,
+            "service_caller_wait_us": 23,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 240113,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 119952,
+            "worker_fd_syscalls": 119946,
+            "worker_file_syscalls": 4,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 239898,
+            "worker_task_resumes": 3
+          }
+        },
+        "after": {
+          "loop_max_median_seconds": 0.102315333,
+          "process_wall_median_seconds": 0.14104800000000006,
+          "profile": {
+            "cohort_rounds": 48,
+            "cohort_stop_us": 1004,
+            "service_caller_wait_us": 26,
+            "service_requests": 3,
+            "serviced_syscalls": 3,
+            "syscalls": 240113,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 119979,
+            "worker_fd_syscalls": 119975,
+            "worker_file_syscalls": 4,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 239954,
+            "worker_task_resumes": 3
+          }
+        },
+        "native": {
+          "loop_max_median_seconds": 0.021202,
+          "process_wall_median_seconds": 0.0251061250000002
+        }
+      }
+    }
+  },
+  "native_references": {
+    "native-devices-eventfd-native": {
+      "passed": true,
+      "kind": "eventfd",
+      "processes": 4,
+      "operations_each": 10000,
+      "repeats": 3,
+      "cpus": 12,
+      "records": [
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.016430621000012025,
+          "children": [
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.014665483,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.014599029,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.014559698,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.014344421,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.01642208000001233,
+          "children": [
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.014563364,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.014599987,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.014580905,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.014347504,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.01629812999999558,
+          "children": [
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.014488328,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.014579572,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.014527367,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "eventfd",
+              "operations": 10000,
+              "seconds": 0.014315839,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "native": "96ad0fe5ee5c10c82d78ae16df809804fd82377f2a02acfbad87dadf237a7dfa"
+      },
+      "native_environment": {
+        "system": "Linux",
+        "release": "7.0.0-38-generic",
+        "architecture": "aarch64",
+        "logical_cpus": 6
+      },
+      "summary": {
+        "native": {
+          "loop_max_median_seconds": 0.014599987,
+          "process_wall_median_seconds": 0.01642208000001233
+        }
+      }
+    },
+    "unix-owning-native-linux-pipe-control-final": {
+      "passed": true,
+      "kind": "unix-rights",
+      "processes": 4,
+      "operations_each": 10000,
+      "repeats": 9,
+      "cpus": 4,
+      "records": [
+        {
+          "variant": "native",
+          "repeat": 1,
+          "wall_seconds": 0.01844991799998752,
+          "children": [
+            {
+              "kind": "unix-rights",
+              "operations": 10000,
+              "seconds": 0.015501106,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "unix-rights",
+              "operations": 10000,
+              "seconds": 0.016199361,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "unix-rights",
+              "operations": 10000,
+              "seconds": 0.015363355,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "unix-rights",
+              "operations": 10000,
+              "seconds": 0.016008943,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 2,
+          "wall_seconds": 0.01852150199999869,
+          "children": [
+            {
+              "kind": "unix-rights",
+              "operations": 10000,
+              "seconds": 0.016505322,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "unix-rights",
+              "operations": 10000,
+              "seconds": 0.014775601,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "unix-rights",
+              "operations": 10000,
+              "seconds": 0.015915984,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "unix-rights",
+              "operations": 10000,
+              "seconds": 0.015352688,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 3,
+          "wall_seconds": 0.01827749999995376,
+          "children": [
+            {
+              "kind": "unix-rights",
+              "operations": 10000,
+              "seconds": 0.01522748,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "unix-rights",
+              "operations": 10000,
+              "seconds": 0.014993103,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "unix-rights",
+              "operations": 10000,
+              "seconds": 0.016242736,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "unix-rights",
+              "operations": 10000,
+              "seconds": 0.016334695,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 4,
+          "wall_seconds": 0.01782320500001333,
+          "children": [
+            {
+              "kind": "unix-rights",
+              "operations": 10000,
+              "seconds": 0.016278153,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "unix-rights",
+              "operations": 10000,
+              "seconds": 0.015904609,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "unix-rights",
+              "operations": 10000,
+              "seconds": 0.015134603,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "unix-rights",
+              "operations": 10000,
+              "seconds": 0.015233021,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 5,
+          "wall_seconds": 0.01744378599994434,
+          "children": [
+            {
+              "kind": "unix-rights",
+              "operations": 10000,
+              "seconds": 0.01574615,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "unix-rights",
+              "operations": 10000,
+              "seconds": 0.015294771,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "unix-rights",
+              "operations": 10000,
+              "seconds": 0.015937026,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "unix-rights",
+              "operations": 10000,
+              "seconds": 0.015566482,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 6,
+          "wall_seconds": 0.017405201999963538,
+          "children": [
+            {
+              "kind": "unix-rights",
+              "operations": 10000,
+              "seconds": 0.015815733,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "unix-rights",
+              "operations": 10000,
+              "seconds": 0.015309355,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "unix-rights",
+              "operations": 10000,
+              "seconds": 0.015819525,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "unix-rights",
+              "operations": 10000,
+              "seconds": 0.01572215,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 7,
+          "wall_seconds": 0.01807195700007469,
+          "children": [
+            {
+              "kind": "unix-rights",
+              "operations": 10000,
+              "seconds": 0.016258278,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "unix-rights",
+              "operations": 10000,
+              "seconds": 0.014898102,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "unix-rights",
+              "operations": 10000,
+              "seconds": 0.015021728,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "unix-rights",
+              "operations": 10000,
+              "seconds": 0.015852442,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 8,
+          "wall_seconds": 0.01799037299997508,
+          "children": [
+            {
+              "kind": "unix-rights",
+              "operations": 10000,
+              "seconds": 0.01616586,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "unix-rights",
+              "operations": 10000,
+              "seconds": 0.015086729,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "unix-rights",
+              "operations": 10000,
+              "seconds": 0.016472488,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "unix-rights",
+              "operations": 10000,
+              "seconds": 0.014388307,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ],
+          "exit": 0
+        },
+        {
+          "variant": "native",
+          "repeat": 9,
+          "wall_seconds": 0.01802733099998477,
+          "children": [
+            {
+              "kind": "unix-rights",
+              "operations": 10000,
+              "seconds": 0.016582572,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "unix-rights",
+              "operations": 10000,
+              "seconds": 0.016133194,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "unix-rights",
+              "operations": 10000,
+              "seconds": 0.014923019,
+              "checksum": 50005000,
+              "response_bytes": 0
+            },
+            {
+              "kind": "unix-rights",
+              "operations": 10000,
+              "seconds": 0.014522183,
+              "checksum": 50005000,
+              "response_bytes": 0
+            }
+          ],
+          "exit": 0
+        }
+      ],
+      "sha256": {
+        "native": "96ad0fe5ee5c10c82d78ae16df809804fd82377f2a02acfbad87dadf237a7dfa"
+      },
+      "native_environment": {
+        "system": "Linux",
+        "release": "7.0.0-38-generic",
+        "architecture": "aarch64",
+        "logical_cpus": 6
+      },
+      "summary": {
+        "native": {
+          "loop_max_median_seconds": 0.016278153,
+          "process_wall_median_seconds": 0.01802733099998477
+        }
+      }
+    }
+  },
+  "logs": [
+    {
+      "path": "target/native-devices-subsystem-tests.log",
+      "sha256": "cc4021d2d1335115213823d7b8c078c0fd25e7eac3a5e045a3903f368b09fb84"
+    },
+    {
+      "path": "target/native-devices-subsystem-clippy.log",
+      "sha256": "b69ba562d903542f78d72f6b71a11b2f70bd10b165bdb1f281517d3cdcf9530a"
+    },
+    {
+      "path": "target/native-devices-auth-final.log",
+      "sha256": "45284cfa630baec63d173361caba617154caa2ec387b131dac9dba64c5a87555"
+    },
+    {
+      "path": "target/native-devices-vulkan-final.log",
+      "sha256": "095f4011d44902bfb0775d9aac0206a08b37397e1c58200b5c4e3949855dd846"
+    },
+    {
+      "path": "target/native-devices-kernel-tests.log",
+      "sha256": "771c7107491d3b8f02e6cea3f45c5d4c473cf2b9ea3a4b5205bbd8ccfc69beee"
+    },
+    {
+      "path": "target/native-devices-late-notification.log",
+      "sha256": "bc2664cf48e0eb146dcce528c1d1eec163cb4670292ff101eae32b740b52ecf4"
+    },
+    {
+      "path": "target/native-devices-kernel-clippy.log",
+      "sha256": "b4ab34f4c454dbaad60464af361e8d630b1b7f4dfcf50920e9468de040c7437d"
+    },
+    {
+      "path": "target/native-devices-mac-build.log",
+      "sha256": "507d30adfd2d0f00bfd67c9c9fd3ed88890d05b9c39ad67252e8766ffd09a441"
+    },
+    {
+      "path": "target/native-devices-mac-tests.log",
+      "sha256": "9734948a3c560d672bc4df0435d41607bf9c91d49405a90132daadab0dd75aed"
+    },
+    {
+      "path": "target/native-devices-mac-clippy.log",
+      "sha256": "e41778bb0763fa3ca78bf193e25d3c41fcd3ecf5c9199320707a1f42135842b3"
+    },
+    {
+      "path": "target/native-devices-ffi-build.log",
+      "sha256": "5ce7058f2fc625e0ef2ddfe0982db7b16a63a79c65b5c535de09f0802d15c9e0"
+    },
+    {
+      "path": "target/native-devices-ios-build.log",
+      "sha256": "1361194fe0b98494da73faa5305c0dbca7f052496597b4173a85c3273cc52e28"
+    },
+    {
+      "path": "target/native-devices-wayland.log",
+      "sha256": "76ce4f5cc9ff6ace349ecf7f4553945f8790469cea1309ef7933071378c9f931"
+    },
+    {
+      "path": "target/native-devices-linux-ci.log",
+      "sha256": "118403efabb6af600cb6de32681c6cbd3068149514d428cd20dee3f7e153d9a5"
+    },
+    {
+      "path": "target/native-devices-linux-stop.log",
+      "sha256": "5ea2bdb5905e38ee23ead4c58d4035a3c22da416a899d1dae79c1b555e3d1220"
+    }
+  ],
+  "coverage": {
+    "apple": {
+      "vfs": 464,
+      "shared": 15,
+      "vulkan": 57,
+      "audio": 1,
+      "kernel": 283,
+      "kernel_full_passes_reused": 282,
+      "kernel_failed_case_rechecked": 1,
+      "unchanged_abi_207_reused": true
+    },
+    "linux": {
+      "vfs": 463,
+      "shared": 15,
+      "vulkan": 57,
+      "audio": 1,
+      "abi": 207,
+      "kernel": 283
+    },
+    "mac_product_tests": 13,
+    "physical_ipad": "skipped per owner",
+    "real_wayland_stages": 5,
+    "frame_revisions": 28
+  },
+  "notes": [
+    "One subsystem batch; no per-operation integration or replay of unrelated full CI.",
+    "No new production unsafe or resource/coordinator thread. Existing private GPU context mutex remains.",
+    "GPU timing includes one untimed warmup; native macOS uses minimum features and the same static MoltenVK archive, while Trames also processes runtime capabilities/resources. Contextual native API reference, not identical configuration.",
+    "Local ARM Linux test machine has no comparable GPU; no CPU renderer substituted.",
+    "Native Linux eventfd is freshly collected; unchanged same-ELF pipe reference reused. macOS has no native eventfd or equivalent video surface metadata API.",
+    "Three unprofiled counterbalanced device samples; nine ordinary control samples. No Firefox or physical-iPad FPS claim.",
+    "Completed compiler tasks can release their joined handle after result/disconnect publication; unfinished task cancellation retains the existing join boundary.",
+    "Fixture configuration failures were corrected with selected reruns; resource/kernel passes reused.",
+    "Final native driver idle/destruction and structural mapping/task/filesystem owner boundaries remain."
+  ]
+}

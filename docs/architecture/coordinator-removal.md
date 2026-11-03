@@ -2,11 +2,13 @@
 
 ## Current status — 2026-11-03
 
-The latest completed batch is [the Unix IPC subsystem](#thirtieth-migration-implemented--unix-ipc-subsystem--2026-11-03).
+The latest completed batch is [native device controls](#thirty-first-migration-implemented--native-device-controls--2026-11-03).
 Ordinary Unix bytes, controls, addressed messages, owning ancillary graphs and
 native Wayland/XWM/clipboard transport now advance on workers or the existing
-idle executor. Remaining owner boundaries belong to task/mount/proc control
-projections, native GPU/device and io_uring controls, job control and structural
+idle executor. Audio/video notification creation, live graphics FD authority and
+explicit GPU device/instance destruction also run on the calling worker. Remaining
+owner boundaries belong to task/mount/proc control projections, io_uring controls,
+job control, final task/context cancellation and structural
 filesystem/VM/task transitions. The overall coordinator-removal goal remains active.
 
 ## Twenty-second migration implemented — worker Unix namespace controls and waits — 2026-11-03
@@ -2451,3 +2453,93 @@ GPU auth refresh/device controls, io_uring controls, job control and structural
 filesystem/VM/task changes remain separate batches. See the
 [validation record](../validation/worker-unix-ipc-20261103.json) and
 [shared contract](../../runtime/docs/architecture/execution-backends.md#event-driven-native-unix-adapters-2026-11-03).
+
+## Thirty-first migration implemented — native device controls — 2026-11-03
+
+Runtime `ee0102c867930bb6b47cd6bc101ab471eed36a46` integrates audio OPEN, video surface
+creation, live graphics FD authority and explicit GPU device/instance destruction
+as one complete subsystem batch, with concentrated validation and one paired
+runtime pin for both products. Unix IPC stage 30 remains the baseline.
+
+Native audio/video callbacks retain the original event counter and the joined
+executor's wake token. A producer can appear after a task parks, and survives
+closing/reusing its descriptor without notifying a replacement. First/last native
+producer transitions update existing subscriptions. The weak notification driver
+is installed only for an actual native producer; ordinary eventfds keep their
+previous construction path. The idle executor initializes its existing wait hub
+under the original queue arm lock, closing the late-producer wake race.
+
+Graphics calls resolve one live original OFD, retaining it only through that call.
+Frozen grant tables, membership revision invalidation and their inode retention
+are removed. New connections are visible immediately; foreign/copy-only FDs keep
+original backend errors on the calling worker. Original shared-file flags and
+fault/error order are preserved. Native image FD publication observes the actual
+live Linux descriptor limit.
+
+GPU close is an asynchronous job while native compilation or observed submissions
+remain unfinished. It retains the accepted original target and releases its
+execution slot. The pinned driver completion observer also covers native Wayland
+frame fences. The original final native idle/destruction algorithm still runs on
+the caller. Existing compiler threads publish completion before backend dependency
+release; completed work does not join notification callbacks under a context lease.
+No new resource thread, whole-cohort service pump, ordinary guest memory barrier,
+native-only permission policy or production unsafe is introduced.
+
+| Workload | Previous | Current | Native macOS | Native ARM Linux |
+| --- | ---: | ---: | ---: | ---: |
+| 2,000 video surface create/drop pairs, concurrent CPU peer | 743.28 ms | 4.04 ms | No equivalent API | No equivalent API |
+| 20 GPU instance/device create/destroy cycles, concurrent CPU peer | 44.60 ms | 13.41 ms | 12.51 ms | No comparable GPU in local test machine |
+| 4 processes × 10,000 ordinary eventfd lifecycles, longest child | 62.17 ms | 61.74 ms | No eventfd API | 14.60 ms |
+| 4 processes × 10,000 existing pipe lifecycles, longest child | 101.72 ms | 102.32 ms | 21.20 ms | 16.28 ms (unchanged reference reused) |
+
+Video/GPU loops improve **184.09x / 3.32x** in this scoped control benchmark.
+Separate diagnostics show video cohort returns **2,003 → 3**, with **2,000 → 0**
+native returns; GPU returns **45 → 3**, with **42 → 0** native returns. Both
+candidate device cases have zero resource-service requests. One-slot execution
+also passes. The GPU case includes one untimed warmup cycle on all implementations;
+20 timed cycles use the same static MoltenVK archive as the native macOS reference.
+Trames also performs its full capability/resource processing, while the native
+reference uses minimum Vulkan features. This is a native API context reference,
+not an assertion of identical driver configuration or Firefox frame rate.
+
+Three unprofiled counterbalanced samples determine device medians; diagnostics
+are separate. Total process-wall medians are **776.53 → 36.60 ms** for video and
+**89.15 → 54.68 ms** for GPU, versus **28.77 ms** native macOS GPU. Native Linux
+has no comparable GPU in this test environment, so a CPU driver is not substituted.
+Ordinary controls use nine unprofiled samples: eventfd changes -0.7%, pipe +0.6%;
+no control speedup or statistical regression bound is claimed. The current exact
+Linux eventfd ELF is measured natively; the unchanged native Linux pipe reference
+is reused. Builds/functional checks finish and Linux CI stops before Mac timing.
+Both baseline and candidate are native-linked development runners. CPU controls
+record zero GPU calls. These results do not predict physical-iPad or Firefox FPS.
+
+Apple resource validation verifies **464 VFS, 15 shared, 57 Vulkan and 1 audio**
+cases. Apple kernel validation reuses 282 passing cases plus the corrected late
+notification case (283 total); only that failed test was repeated after correcting
+its standalone/persistent-epoch setup. Linux runs the final affected suite:
+**207 ABI, 463 VFS, 15 shared, 57 Vulkan, 1 audio and 283 kernel** cases. Strict
+checks, Mac's 13 product tests and both product boundaries pass. Unchanged Apple
+ABI and CPU/memory/network checks are reused rather than replayed.
+
+The native-linked iPad static build and Mac development bundle build successfully.
+All **13** production FFI environment checks pass, including Alpine, Debian,
+systemd, custom roots and multiple terminals. Original Wayland info, windows,
+SHM, Chinese editor and native vkcube pass with **28 frame revisions**; retained
+frames survive session shutdown and release cleanly. Stock FFmpeg/libva hardware
+H.264 export before sync, fork/SCM_RIGHTS and real GPU plane import pass.
+Virtual Steam audio devices pass **48,000 input frames / 144,000 output frames**;
+output drains successfully in 3.076 seconds. Capture retains aggregate levels
+only and does not access the unreliable physical USB microphone. Physical iPad
+validation remains skipped per owner.
+
+Early extra acceptance failures were test configuration issues (unsupported raw
+pure-profile calls in a Mac fixture, a nested rather than flat library directory,
+and loader portability flags on the direct static native reference). The final
+fixtures use ordinary Linux CPU work, the correct prepared dependencies and
+supported direct driver initialization. Unaffected suites were not replayed.
+
+The remaining boundaries are io_uring controls, task/job/proc/mount control,
+structural filesystem/VM/task transitions, native guest mapping import and final
+cancellation of unfinished context work. The overall removal goal remains active.
+See the [source-bound validation record](../validation/worker-native-devices-20261103.json)
+and [shared contract](../../runtime/docs/architecture/execution-backends.md#live-native-device-authority--2026-11-03).
