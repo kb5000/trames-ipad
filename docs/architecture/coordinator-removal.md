@@ -2,14 +2,14 @@
 
 ## Current status — 2026-11-03
 
-The latest completed batch is [native device controls](#thirty-first-migration-implemented--native-device-controls--2026-11-03).
-Ordinary Unix bytes, controls, addressed messages, owning ancillary graphs and
-native Wayland/XWM/clipboard transport now advance on workers or the existing
-idle executor. Audio/video notification creation, live graphics FD authority and
-explicit GPU device/instance destruction also run on the calling worker. Remaining
-owner boundaries belong to task/mount/proc control projections, io_uring controls,
-job control, final task/context cancellation and structural
-filesystem/VM/task transitions. The overall coordinator-removal goal remains active.
+The latest completed batch is [the io_uring subsystem](#thirty-second-migration-implemented--io_uring-subsystem--2026-11-03).
+Ordinary Unix transport, owning ancillary graphs, native Wayland transport and
+native device controls already use original shared resources. io_uring now uses
+one canonical queue/resource state for caller workers, source-task maintenance
+and the joined compatibility path. Remaining owner boundaries are explicit:
+owner-only task/mount/proc projections, job control and task cancellation, buffer
+pin/VM topology checkpoints, and structural filesystem/backing mutations. The
+overall coordinator-removal goal remains active.
 
 ## Twenty-second migration implemented — worker Unix namespace controls and waits — 2026-11-03
 
@@ -2543,3 +2543,83 @@ structural filesystem/VM/task transitions, native guest mapping import and final
 cancellation of unfinished context work. The overall removal goal remains active.
 See the [source-bound validation record](../validation/worker-native-devices-20261103.json)
 and [shared contract](../../runtime/docs/architecture/execution-backends.md#live-native-device-authority--2026-11-03).
+
+
+## Thirty-second migration implemented — io_uring subsystem — 2026-11-03
+
+Runtime `f9b6aec3a9eff34b7f733c2f1058684d49fbe80f` replaces the per-cohort io_uring mirror
+with the original shared OFD, queue pages and one progression engine. This is one
+subsystem batch, validated together across creation, registration, submission,
+completion, cancellation, provided buffers, source-task background work and disk
+sync. Mac and iPad use the same implementation.
+
+| Subsystem operation | Execution and authority | Actual retained boundary |
+| --- | --- | --- |
+| Setup and register | Calling worker; original Files reservation, fixed tables and mmap pages | Buffer pinning changes the affected mm through its existing checkpoint |
+| Submission and completion | One metadata importer/progression engine, original OFD and SQ/CQ cursors | Actual unsupported owner resource defers before effects |
+| Bytes and socket controls | Calling/source worker, original byte/socket algorithms and namespace | Owner-only task/proc/mount descriptions retain their original owner projection |
+| Timers, links, cancellation, multishot and provided buffers | Canonical per-ring state; data operations outside its mutex | Original validation, in-flight cancellation and CQ backpressure rules remain |
+| Outstanding work after enter returns | Existing source task's View and event subscriptions | A foreign task never executes another address space's pointers |
+| Plain disk fsync | Existing bounded disk pool; direct readiness result to the source task | Mapped/overlay writeback, file growth/append, backing allocation/truncation and O_TRUNC still use the filesystem boundary |
+
+An accepted enter retains its original ring, submission count and deadline across
+cohort stop, FD close/reuse and unmap. No queue/table restoration or request replay
+occurs. Source maintenance can run while that guest task sleeps, waits on a futex
+or waits for an owner lifecycle event; it cannot finish the unrelated syscall.
+A real owner fallback is remembered until owner progress, preventing empty cohort
+loops. Owner-accepted SQEs acquire their original source execution context before
+the first worker pump, without re-importing guest metadata.
+
+Queue publication alone uses the protocol's acquire/release instructions. Ordinary
+payload bytes keep their existing raw access and region/hardware ownership. Native
+fixed buffers retain that same SharedPage and borrow gate; the former blanket HVF
+rejection of mapped pins is removed. Pins survive remap without observing a new
+allocation. Provided buffer group reuse retains the old in-flight generation, so
+an old completion cannot advance a newly registered group with the same number.
+
+Unix descriptor transfer and ring registrations share one ownership graph. Both
+admission orders reject an actual strong cycle; graph handles and original OFDs
+retire outside metadata locks. Worker-owned records contain only Send-capable
+original resource handles. Original owner Rc projections stay in the owner ledger
+and are released at the owner boundary. No Rc is made Send, and no new resource
+thread, message bus, stronger ordinary memory barrier or native permission policy
+is added. Disk work reuses the existing pool.
+
+The source-bound [validation record](../validation/worker-uring-subsystem-20261103.json)
+records concentrated checks and scoped performance comparisons. Physical iPad
+validation remains skipped per owner; the native-linked iOS build checks product
+compatibility. These results do not establish whole-application speed or eliminate
+structural filesystem, VM and task boundaries.
+
+
+Three counterbalanced samples per case, with setup outside the longest-worker
+timer and 1,000 checked iterations per worker, give these four-worker medians:
+
+| Complete workflow | Previous | Current | Native ARM Linux, same ELF | Improvement |
+| --- | ---: | ---: | ---: | ---: |
+| SQE NOP / enter / CQ consume | 85.38 ms | 2.31 ms | 0.32 ms | 36.95x |
+| Fixed-file registration / unregister | 260.47 ms | 3.45 ms | 0.44 ms | 75.56x |
+| SQE STATX / enter / checked output / CQ consume | 102.92 ms | 30.94 ms | 18.39 ms | 3.33x |
+
+Process-wall medians are 94.40 → 10.80 ms, 268.93 → 12.22 ms and
+110.54 → 39.14 ms. Both signed runners are invoked directly, avoiding the Mac
+CLI's extra bundle re-exec on only one side. Separate diagnostic cohort counts
+are 31 → 26, 7,414 → 26 and 1,492 → 26; whole-process service requests remain
+three on both sides, including startup/teardown. The new paths complete all
+4,000 enters or 8,000 registration controls on workers. NOP already used workers;
+its improvement primarily removes repeated queue-memory/metadata access costs.
+
+Two-worker improvements are 14.82x, 39.62x and 7.86x. Single-worker loop medians
+regress by roughly 8–18%, while process-wall medians remain close; the shared
+canonical metadata has a measurable local cost. Four-way STATX still contends on
+filesystem metadata. Native Linux references use the identical static ARM64 ELF
+on the existing six-vCPU VZ test machine after host builds finish. Linux is stopped
+for Mac samples. There is no native macOS io_uring equivalent; no substitute score
+or whole-application/native-speed claim is presented.
+
+Concentrated Apple/Linux memory **159 each**, Linux ABI **216 each**, kernel
+**284 each**, Linux VFS with hostfs **465**, Mac product **13**, all **66** actual
+HVF io_uring cases, **13** production FFI environment checks, strict checks and
+native-linked Mac/iPad builds pass. Apple ABI includes the failed-only retry after
+fixing its new test fixture; unrelated passing suites are reused. The five real
+Wayland stages also pass. Full evidence and limits are in the validation record.

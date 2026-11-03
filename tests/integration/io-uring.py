@@ -14,6 +14,7 @@ import time
 
 p=argparse.ArgumentParser(description=__doc__)
 p.add_argument('--runner',type=Path,required=True)
+p.add_argument('--backend',choices=['interpreter','mac'],default='interpreter')
 p.add_argument('--fixture',type=Path,default=Path('tests/fixtures/bin/io-uring'))
 p.add_argument('--output',type=Path,required=True)
 p.add_argument('--cpus',type=int,nargs='+',default=[1,2,4])
@@ -24,19 +25,23 @@ p.add_argument('--require-worker-uring',action='store_true',help='Assert multi-C
 p.add_argument('--min-worker-uring',type=int,help='Override the worker ABI fixture minimum for another targeted fixture')
 p.add_argument('--require-worker-cq-poll',action='store_true',help='Require worker ppoll/epoll completion in non-pressure TCP cases')
 a=p.parse_args(); a.output.mkdir(parents=True,exist_ok=False)
+if a.backend=='mac':(a.output/'empty-rootfs').mkdir()
 if a.abi_only and a.tcp_only:p.error('--abi-only and --tcp-only are mutually exclusive')
 sha=lambda path:hashlib.sha256(path.read_bytes()).hexdigest()
 report=dict(passed=False,runner_sha256=sha(a.runner),fixture_sha256=sha(a.fixture),rows=[])
 def run(label,cpus,extra):
     command=[str(a.runner.resolve()),'--memory','--cpus',str(cpus),'--network','loopback','--metrics','--max-instructions','200000000','--exec-file',f'/uring-self={a.fixture.resolve()}','--guest','/uring-self',*extra]
+    if a.backend=='mac':
+        command=[str(a.runner.resolve()),'--rootfs',str((a.output/'empty-rootfs').resolve()),'--cpus',str(cpus),'--network','loopback','--metrics','--timeout','25','--no-pty','--no-windows','--exec-file',f'/uring-self={a.fixture.resolve()}','/uring-self',*extra]
     before=resource.getrusage(resource.RUSAGE_CHILDREN); began=time.monotonic()
     result=subprocess.run(command,capture_output=True,timeout=30)
     elapsed=time.monotonic()-began; after=resource.getrusage(resource.RUSAGE_CHILDREN)
     host_cpu=after.ru_utime+after.ru_stime-before.ru_utime-before.ru_stime
     (a.output/(label+'.stdout')).write_bytes(result.stdout); (a.output/(label+'.stderr')).write_bytes(result.stderr)
     assert result.returncode==0 and result.stdout.endswith(b'io-uring PASS\n'),(label,result.returncode,result.stdout,result.stderr[-2000:])
-    metrics=json.loads(next(line.split(': ',1)[1] for line in result.stderr.decode().splitlines() if line.startswith('trames metrics: ')))
-    assert metrics['runtime_error'] is None
+    prefix='trames mac execution paths: ' if a.backend=='mac' else 'trames metrics: '
+    metrics=json.loads(next(line[len(prefix):] for line in result.stderr.decode().splitlines() if line.startswith(prefix)))
+    if a.backend=='interpreter':assert metrics['runtime_error'] is None
     if a.require_worker_uring:
         minimum=3 if label.startswith('tcp') else a.min_worker_uring if a.min_worker_uring is not None else 280
         assert metrics['worker_uring_syscalls']>=minimum if cpus>1 else metrics['worker_uring_syscalls']==0,(label,'worker io_uring path not exercised',metrics)

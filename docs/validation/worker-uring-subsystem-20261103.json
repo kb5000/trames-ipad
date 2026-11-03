@@ -1,0 +1,1459 @@
+{
+  "date": "2026-11-03",
+  "stage": 32,
+  "status": "io_uring subsystem integrated as one batch; overall coordinator-removal goal remains active",
+  "runtime_revision": "f9b6aec3a9eff34b7f733c2f1058684d49fbe80f",
+  "baseline_runtime_revision": "ee0102c867930bb6b47cd6bc101ab471eed36a46",
+  "sources": [
+    {
+      "path": "crates/trames-linux/src/direct.rs",
+      "sha256": "0e5a72695639136ab722c9c81f66980665589dba5aed9163a763719536ac3ab5"
+    },
+    {
+      "path": "crates/trames-linux/src/direct/socket_wait.rs",
+      "sha256": "6498f2d5b8ecd9f3273404a51039002bf7ff0915f057081e4a3954cc5543e50c"
+    },
+    {
+      "path": "crates/trames-linux/src/direct/uring.rs",
+      "sha256": "2c3a7f988056cfefd0ebb3553a1f288c15d8c0879cf94eedbc75b260525b5360"
+    },
+    {
+      "path": "crates/trames-linux/src/direct/uring/actor.rs",
+      "sha256": "dd31f8692880e332322de75f6b20a2231303c24bc5a94917456d1641b96de62b"
+    },
+    {
+      "path": "crates/trames-linux/src/direct/uring/async_tests.rs",
+      "sha256": "fa4e08561305993d86895fa09fc01d94cdddbdad12b3d27ea17fb39a03a6b888"
+    },
+    {
+      "path": "crates/trames-linux/src/direct/uring/background.rs",
+      "sha256": "69814776fd043373ee14e72cc9cabbc8cde196dd3481cbe2b9585e0ba06fa1ea"
+    },
+    {
+      "path": "crates/trames-linux/src/direct/uring/control.rs",
+      "sha256": "cfa79b62c5cfd69975def079ae972d424c8f1a541b149910c5f4ba98d7f3cde7"
+    },
+    {
+      "path": "crates/trames-linux/src/direct/uring/disk.rs",
+      "sha256": "9eb8761f78660d1a8d41ebc34a2d367690667ad8f4e2934440038c8ac815a3a4"
+    },
+    {
+      "path": "crates/trames-linux/src/direct/uring/owned_tests.rs",
+      "sha256": "abdd03c767ca6d0478c06cbb18e951586e658ba6ae825f7f9976fb9fab27bd1c"
+    },
+    {
+      "path": "crates/trames-linux/src/direct/uring/poll.rs",
+      "sha256": "0f0a6bf2ec6441ec01af6f7922b77d6bcbcfa56be64a23b0bdc370f623814031"
+    },
+    {
+      "path": "crates/trames-linux/src/direct/uring/subsystem_tests.rs",
+      "sha256": "6cf2016ceaff31b52c46e50fb269ec6795a72b86aec3c797f624ca37fe62cf8b"
+    },
+    {
+      "path": "crates/trames-linux/src/direct/uring/wait.rs",
+      "sha256": "cf094909b30699af116682ff712d2c0215ff54efcbeddc7c8f3f8dd887e26e16"
+    },
+    {
+      "path": "crates/trames-linux/src/direct/uring/wait_tests.rs",
+      "sha256": "cde357af29e8af3e9adb190122072de708bb7192c186ec4a4c0d7c5858363365"
+    },
+    {
+      "path": "crates/trames-linux/src/lib.rs",
+      "sha256": "c71a8d03637958f36bef31ed4d6128aac5ddc1f6290c6473ce0e7835d59208a8"
+    },
+    {
+      "path": "crates/trames-linux/src/poll.rs",
+      "sha256": "44163a903931f7c9ea54be4eb58b2f5223d36b56f0846f96767557c3ba14946b"
+    },
+    {
+      "path": "crates/trames-linux/src/state.rs",
+      "sha256": "1700664207befd660124a7cc5af8f4ba8b431997db606fe647577e3db9bd4ca4"
+    },
+    {
+      "path": "crates/trames-linux/src/uring.rs",
+      "sha256": "7f83a28a3b8e56ab15595fb59108cb727e5502be6199df219516ec9fa6442ec3"
+    },
+    {
+      "path": "crates/trames-linux/src/uring/buffers.rs",
+      "sha256": "b88b4f33aec9992a28eceb03b9412b23034b3162deedfea98d689e887baa4000"
+    },
+    {
+      "path": "crates/trames-linux/src/uring/execute.rs",
+      "sha256": "7e89602969fa28c8855c485b174dde6d4e19256df38221443d4f2a68cbb940e8"
+    },
+    {
+      "path": "crates/trames-memory/src/cpu_memory.rs",
+      "sha256": "9177dd9851ab36cc0a946c239b64ccab677be111c8c8c45e073cba71f112b12b"
+    },
+    {
+      "path": "crates/trames-memory/src/hardware_shared.rs",
+      "sha256": "f1923cc9a20c05320c93bbe000d5b803c6250c61570b1512384f767250212039"
+    },
+    {
+      "path": "crates/trames-memory/src/parallel.rs",
+      "sha256": "e5c3eb4e3154b348771a74ff29c5263813b7e3d7e949e4a99451245044e599dd"
+    },
+    {
+      "path": "crates/trames-memory/src/parallel/page.rs",
+      "sha256": "9b0ba761499f928098c93a9fd2288910d3e3a276b74b5d32a55ec1c28fa176cc"
+    },
+    {
+      "path": "crates/trames-memory/src/raw.rs",
+      "sha256": "f69b0136e3faa6302d381df3bb2eab7290e294c125769bd65d95d7007073783f"
+    },
+    {
+      "path": "crates/trames-session/src/lib.rs",
+      "sha256": "e6ab78e3369d3f14ec37800288d0d5ca2d83fb18170a9bc81170de2b208e9866"
+    },
+    {
+      "path": "crates/trames-session/src/process.rs",
+      "sha256": "78a9713412aad47bf8256f79eaa08519288a5092d10aea898d1fb017ba5ecb25"
+    },
+    {
+      "path": "crates/trames-session/src/process_vm.rs",
+      "sha256": "c99ceae51de8c908d5208396e0ec32dff29081502957276be0b31ae703254816"
+    },
+    {
+      "path": "crates/trames-session/src/run_queue.rs",
+      "sha256": "bf8adcfbbf21f1b2bddee00fc3be173e1f106051fda8ce05d87d0865985febf2"
+    },
+    {
+      "path": "crates/trames-session/src/worker_syscalls.rs",
+      "sha256": "fca2425e50cc144f2bdae364767dcb33c5d8ba259ec7cf216183837c289dc62a"
+    },
+    {
+      "path": "crates/trames-session/src/workers.rs",
+      "sha256": "cfba954b111c6f2aab049b818af16d16081fe9ff0461d71b63a8a4828768079a"
+    },
+    {
+      "path": "crates/trames-session/src/workers_uring_tests.rs",
+      "sha256": "4db5e6bb5c182e0f8a6a8b86ac232e193dd093cbd1b33bff93cbe10f71f49f97"
+    },
+    {
+      "path": "crates/trames-vfs/src/descriptor_factory.rs",
+      "sha256": "2ac94356d944c73ffcf14cbd5297b483d64f82e0c9ad14f885ed400832911582"
+    },
+    {
+      "path": "crates/trames-vfs/src/direct_io.rs",
+      "sha256": "d8ffdc13b8a1cd68638da6a1408220c45c2669675fa228515d3b52ec2270d8d4"
+    },
+    {
+      "path": "crates/trames-vfs/src/events.rs",
+      "sha256": "f1c40fbfb1839dad91831dcd49570a9dd45fc43469fb3ecebe680d328ac51065"
+    },
+    {
+      "path": "crates/trames-vfs/src/fd_table.rs",
+      "sha256": "66208a1d20e3adf3307130856724a19960b32431a101d34d33050d9c46f0d0e6"
+    },
+    {
+      "path": "crates/trames-vfs/src/file_io.rs",
+      "sha256": "587c090339d0d027adebcdeb74630a0c11109587a25b3feacdbd62e2323c33b9"
+    },
+    {
+      "path": "crates/trames-vfs/src/ipc.rs",
+      "sha256": "a7bb21fe256fedfe48c17fda37d00833a89f1acd57c5d77db4395cd9a55125df"
+    },
+    {
+      "path": "crates/trames-vfs/src/ipc/ownership.rs",
+      "sha256": "80de4ac1c741afad78e51550bf50431d4d50e53d78f7a146631c78f7b1a376b9"
+    },
+    {
+      "path": "crates/trames-vfs/src/ipc/shared_graph_tests.rs",
+      "sha256": "16cd6d417ce0d5d768c4c307d846afaf8f561a4748763bbf510c3670d1b3b098"
+    },
+    {
+      "path": "crates/trames-vfs/src/ipc/shared_rights.rs",
+      "sha256": "7c0feeb53131b0172fd5735ee9cf53b7132621c0c7af5ee599dfb3986d65dd77"
+    },
+    {
+      "path": "crates/trames-vfs/src/lib.rs",
+      "sha256": "011403ce1a051d340ee746db7a38cb97b0d78f6fe07ffd417f8787953acc98d4"
+    },
+    {
+      "path": "crates/trames-vfs/src/mapped.rs",
+      "sha256": "dc15d9e0caf73bd28b65e739593e30693c091704b59b34a9a20a01fab03ba5cc"
+    },
+    {
+      "path": "crates/trames-vfs/src/memfd.rs",
+      "sha256": "94bde433f6c704a5fe6d77066e933381d52f6b45342a3b672edc15d978eefc9f"
+    },
+    {
+      "path": "crates/trames-vfs/src/path_queries.rs",
+      "sha256": "c1afb059dd30648e1e925cd5e8525717326f60c26d5970ce90996a56762646f8"
+    },
+    {
+      "path": "crates/trames-vfs/src/shared_control_tests.rs",
+      "sha256": "8b039468ceef7b22782a05063a035e5d739369596e400891e40adc83cc9986e1"
+    },
+    {
+      "path": "crates/trames-vfs/src/uring.rs",
+      "sha256": "3ed8ada17a81f283896901b5d6179a78471a717783431400c76768f36aa7c8bc"
+    },
+    {
+      "path": "docs/architecture/execution-backends.md",
+      "sha256": "1638013169d0da99d4825a3727dd70fa680c82c007cff94bc2af908901c2cdb2"
+    },
+    {
+      "path": "docs/architecture/region-memory.md",
+      "sha256": "4d3eab47312e0054221264c4b3e230415fecc0e5b07925056a7d056b6d57c460"
+    }
+  ],
+  "checks": [
+    {
+      "check": "Apple memory",
+      "passed": 159,
+      "ignored": 1,
+      "logs": [
+        "target/uring-subsystem/apple-memory-pins-final.log"
+      ],
+      "reused": false,
+      "detail": null
+    },
+    {
+      "check": "Apple VFS default features",
+      "passed": 436,
+      "ignored": 1,
+      "logs": [
+        "target/uring-subsystem/apple-vfs-core-fixes.log"
+      ],
+      "reused": true,
+      "detail": "Later VFS changes covered by Linux hostfs and native Mac integration; no repeated unchanged default suite."
+    },
+    {
+      "check": "Apple Linux ABI",
+      "passed": 216,
+      "ignored": 1,
+      "logs": [
+        "target/uring-subsystem/apple-linux-final.log",
+        "target/uring-subsystem/apple-source-retry-final.log"
+      ],
+      "reused": false,
+      "detail": "215 passed in the full final run, plus the failed-only regression retry after correcting its parent directory and file publication fixture. No outstanding failure."
+    },
+    {
+      "check": "Apple kernel scheduling",
+      "passed": 284,
+      "ignored": 3,
+      "logs": [
+        "target/uring-subsystem/apple-kernel-final.log"
+      ],
+      "reused": false,
+      "detail": null
+    },
+    {
+      "check": "Linux memory",
+      "passed": 159,
+      "ignored": 1,
+      "logs": [
+        "target/local-ci/io/uring-subsystem/memory-pins.log"
+      ],
+      "reused": false,
+      "detail": null
+    },
+    {
+      "check": "Linux VFS with hostfs",
+      "passed": 465,
+      "ignored": 1,
+      "logs": [
+        "target/local-ci/io/uring-subsystem/resources-tests.log"
+      ],
+      "reused": true,
+      "detail": "Functional VFS source unchanged after passing; only lint-equivalent spelling/type alias changes."
+    },
+    {
+      "check": "Linux ABI with hostfs",
+      "passed": 216,
+      "ignored": 1,
+      "logs": [
+        "target/local-ci/io/uring-subsystem/linux-final.log"
+      ],
+      "reused": false,
+      "detail": null
+    },
+    {
+      "check": "Linux kernel scheduling",
+      "passed": 284,
+      "ignored": 3,
+      "logs": [
+        "target/local-ci/io/uring-subsystem/kernel-final.log"
+      ],
+      "reused": false,
+      "detail": null
+    },
+    {
+      "check": "Mac product",
+      "passed": 13,
+      "ignored": 1,
+      "logs": [
+        "target/uring-subsystem/mac-tests.log"
+      ],
+      "reused": true,
+      "detail": "Mac source only adds an existing diagnostic counter; ignored test requires manual GUI inspection."
+    },
+    {
+      "check": "Mac HVF actual io_uring scenarios",
+      "passed": 66,
+      "ignored": 0,
+      "logs": [
+        "target/uring-subsystem/final-io-uring/results.json",
+        "target/uring-subsystem/final-io-uring-extended/results.json",
+        "target/uring-subsystem/final-io-uring-multishot/results.json",
+        "target/uring-subsystem/final-io-uring-worker/results.json",
+        "target/uring-subsystem/final-io-uring-worker-registered/results.json",
+        "target/uring-subsystem/final-io-uring-worker-async/results.json"
+      ],
+      "reused": false,
+      "detail": null
+    },
+    {
+      "check": "Production FFI environments",
+      "passed": 13,
+      "ignored": 0,
+      "logs": [
+        "target/uring-subsystem/ffi-environments-final/results.json"
+      ],
+      "reused": false,
+      "detail": null
+    },
+    {
+      "check": "Production FFI Wayland",
+      "passed": 5,
+      "ignored": 0,
+      "logs": [
+        "target/uring-subsystem/wayland.log"
+      ],
+      "reused": true,
+      "detail": "Real guest info/windows/shm/editor/cube; later io_uring-only source-context changes do not alter these exercised paths."
+    }
+  ],
+  "strict_checks": {
+    "apple": true,
+    "linux": true,
+    "mac_product": true,
+    "product_boundaries": true
+  },
+  "builds": {
+    "baseline": {
+      "runtime": "ee0102c867930bb6b47cd6bc101ab471eed36a46",
+      "sha256": "47488f8a4bd2f93bd2a5d706afab12ce58aaeffa58f081ecf58eaa0491cd4aba"
+    },
+    "timed_mac_runner": {
+      "path": "/Users/main/dev/trames-mac/target/release/Trames Dev.app/Contents/MacOS/trames-mac-run",
+      "sha256": "96623d946cd0cea3f7a74ea2ab23bfa521b355c7ab15c0e37d6d87cddf88c98b"
+    },
+    "mac": {
+      "path": "/Users/main/dev/trames-mac/target/release/Trames Dev.app/Contents/MacOS/trames-mac-run",
+      "sha256": "be008f256fa1bf134128c88abd0e843555d1d3d127ef1c59191c2b3e4da87231",
+      "runtime_revision": "f9b6aec3a9eff34b7f733c2f1058684d49fbe80f",
+      "version": "Trames Dev 1.4.0 (dev) runtime {\n  \"repository\": \"https://github.com/kb5000/trames-runtime.git\",\n  \"revision\": \"f9b6aec3a9eff34b7f733c2f1058684d49fbe80f\",\n  \"extracted_content_sha256\": \"e99e6ada9e4e80cd18289288ed1b007fec9cfb653676b7cc15b427a9352fa25e\"\n}",
+      "signature": "ad hoc development; codesign verified",
+      "functional_source": "Identical to timed/accepted build; only embedded paired runtime revision relinked"
+    },
+    "ffi": {
+      "path": "target/release/libtrames_ffi.dylib",
+      "sha256": "1194ac7918ccf76638852d7b593de9ff27db5296bfc1e86a7d22a3d9965aec6e"
+    },
+    "ios_static": {
+      "path": "target/aarch64-apple-ios/release/libtrames_ffi.a",
+      "sha256": "2a3f1b943a25112e69ed3011c81ed59b0fca22e3a07a895d23b5f7ffc19e84b8"
+    },
+    "ios_app": {
+      "path": "apps/ios/build/device/Build/Products/Release-iphoneos/Trames.app/Trames",
+      "sha256": "b3aa068c6c8adbc5583b42db7e9d08c44cc2c522b86d6b358824070b7021a7ba",
+      "signed": false,
+      "physical_device_tested": false
+    }
+  },
+  "performance": {
+    "method": "Three counterbalanced unprofiled samples per case. One/two/four pthread workers, each 1000 checked iterations, longest worker median; setup/mmap/file creation outside that timer. Process-wall medians include setup/teardown and direct executable launch on both versions. Diagnostic runs separate. No builds or Linux CI running during Mac samples.",
+    "mac_api_equivalent": "No native macOS io_uring API exists; no substituted native macOS score.",
+    "medians": [
+      {
+        "case": "nop",
+        "workers": 1,
+        "before_worker_ms": 1.726875,
+        "before_wall_ms": 8.254207999999998,
+        "after_worker_ms": 2.040458,
+        "after_wall_ms": 8.228,
+        "speedup": 0.8463173463996808
+      },
+      {
+        "case": "nop",
+        "workers": 2,
+        "before_worker_ms": 26.658125,
+        "before_wall_ms": 33.17704100000002,
+        "after_worker_ms": 1.799125,
+        "after_wall_ms": 8.611542,
+        "speedup": 14.817272285138607
+      },
+      {
+        "case": "nop",
+        "workers": 4,
+        "before_worker_ms": 85.38375,
+        "before_wall_ms": 94.40420799999998,
+        "after_worker_ms": 2.310792,
+        "after_wall_ms": 10.804458000000071,
+        "speedup": 36.94999376837033
+      },
+      {
+        "case": "register",
+        "workers": 1,
+        "before_worker_ms": 2.773625,
+        "before_wall_ms": 8.627417000000026,
+        "after_worker_ms": 2.983666,
+        "after_wall_ms": 8.747958999999916,
+        "speedup": 0.929603045381085
+      },
+      {
+        "case": "register",
+        "workers": 2,
+        "before_worker_ms": 103.163125,
+        "before_wall_ms": 110.13500000000009,
+        "after_worker_ms": 2.603958,
+        "after_wall_ms": 10.146584000000125,
+        "speedup": 39.61781449623995
+      },
+      {
+        "case": "register",
+        "workers": 4,
+        "before_worker_ms": 260.469959,
+        "before_wall_ms": 268.92870800000026,
+        "after_worker_ms": 3.447291,
+        "after_wall_ms": 12.215625000000063,
+        "speedup": 75.55786819273453
+      },
+      {
+        "case": "statx",
+        "workers": 1,
+        "before_worker_ms": 4.7455,
+        "before_wall_ms": 10.375041000000085,
+        "after_worker_ms": 5.215417,
+        "after_wall_ms": 10.714334000000214,
+        "speedup": 0.909898479833923
+      },
+      {
+        "case": "statx",
+        "workers": 2,
+        "before_worker_ms": 50.029584,
+        "before_wall_ms": 56.606625000000136,
+        "after_worker_ms": 6.36125,
+        "after_wall_ms": 13.007791000000157,
+        "speedup": 7.864741049322067
+      },
+      {
+        "case": "statx",
+        "workers": 4,
+        "before_worker_ms": 102.924208,
+        "before_wall_ms": 110.53566700000017,
+        "after_worker_ms": 30.938125,
+        "after_wall_ms": 39.13979099999976,
+        "speedup": 3.326775879275166
+      }
+    ],
+    "diagnostics": [
+      {
+        "case": "nop",
+        "sample": 0,
+        "runner": "before",
+        "diagnostics": true,
+        "wall_seconds": 0.007817999999999992,
+        "mode": "nop",
+        "workers": 1,
+        "iterations": 1000,
+        "longest_worker_ns": 1844541,
+        "metrics": {
+          "cohort_rounds": 0,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 1033,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 0
+        }
+      },
+      {
+        "case": "nop",
+        "sample": 0,
+        "runner": "after",
+        "diagnostics": true,
+        "wall_seconds": 0.007827874999999998,
+        "mode": "nop",
+        "workers": 1,
+        "iterations": 1000,
+        "longest_worker_ns": 1960792,
+        "metrics": {
+          "cohort_rounds": 0,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 1033,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 0,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "case": "nop",
+        "sample": 0,
+        "runner": "before",
+        "diagnostics": true,
+        "wall_seconds": 0.033525291999999984,
+        "mode": "nop",
+        "workers": 2,
+        "iterations": 1000,
+        "longest_worker_ns": 26487875,
+        "metrics": {
+          "cohort_rounds": 14,
+          "cohort_stop_us": 115,
+          "service_caller_wait_us": 16,
+          "service_requests": 1,
+          "serviced_syscalls": 1,
+          "syscalls": 2055,
+          "vm_local_syscalls": 10,
+          "worker_direct_syscalls": 2001,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 1,
+          "worker_futex_waits": 3,
+          "worker_futex_wakes": 4,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 2009,
+          "worker_task_resumes": 4
+        }
+      },
+      {
+        "case": "nop",
+        "sample": 0,
+        "runner": "after",
+        "diagnostics": true,
+        "wall_seconds": 0.008823917000000014,
+        "mode": "nop",
+        "workers": 2,
+        "iterations": 1000,
+        "longest_worker_ns": 1625375,
+        "metrics": {
+          "cohort_rounds": 11,
+          "cohort_stop_us": 46,
+          "service_caller_wait_us": 6,
+          "service_requests": 1,
+          "serviced_syscalls": 1,
+          "syscalls": 2056,
+          "vm_local_syscalls": 10,
+          "worker_direct_syscalls": 2001,
+          "worker_fd_syscalls": 2,
+          "worker_file_syscalls": 1,
+          "worker_futex_waits": 4,
+          "worker_futex_wakes": 4,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 2012,
+          "worker_task_resumes": 4,
+          "worker_uring_syscalls": 2000
+        }
+      },
+      {
+        "case": "nop",
+        "sample": 0,
+        "runner": "before",
+        "diagnostics": true,
+        "wall_seconds": 0.10029845800000003,
+        "mode": "nop",
+        "workers": 4,
+        "iterations": 1000,
+        "longest_worker_ns": 92005708,
+        "metrics": {
+          "cohort_rounds": 31,
+          "cohort_stop_us": 139,
+          "service_caller_wait_us": 12,
+          "service_requests": 3,
+          "serviced_syscalls": 3,
+          "syscalls": 4100,
+          "vm_local_syscalls": 24,
+          "worker_direct_syscalls": 4003,
+          "worker_fd_syscalls": 2,
+          "worker_file_syscalls": 3,
+          "worker_futex_waits": 4,
+          "worker_futex_wakes": 6,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 4018,
+          "worker_task_resumes": 9
+        }
+      },
+      {
+        "case": "nop",
+        "sample": 0,
+        "runner": "after",
+        "diagnostics": true,
+        "wall_seconds": 0.011122874999999977,
+        "mode": "nop",
+        "workers": 4,
+        "iterations": 1000,
+        "longest_worker_ns": 2302083,
+        "metrics": {
+          "cohort_rounds": 26,
+          "cohort_stop_us": 100,
+          "service_caller_wait_us": 19,
+          "service_requests": 3,
+          "serviced_syscalls": 3,
+          "syscalls": 4100,
+          "vm_local_syscalls": 22,
+          "worker_direct_syscalls": 4003,
+          "worker_fd_syscalls": 4,
+          "worker_file_syscalls": 3,
+          "worker_futex_waits": 5,
+          "worker_futex_wakes": 6,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 4021,
+          "worker_task_resumes": 8,
+          "worker_uring_syscalls": 4000
+        }
+      },
+      {
+        "case": "register",
+        "sample": 0,
+        "runner": "before",
+        "diagnostics": true,
+        "wall_seconds": 0.008617624999999962,
+        "mode": "register",
+        "workers": 1,
+        "iterations": 1000,
+        "longest_worker_ns": 2819250,
+        "metrics": {
+          "cohort_rounds": 0,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 2033,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 0
+        }
+      },
+      {
+        "case": "register",
+        "sample": 0,
+        "runner": "after",
+        "diagnostics": true,
+        "wall_seconds": 0.008624916000000038,
+        "mode": "register",
+        "workers": 1,
+        "iterations": 1000,
+        "longest_worker_ns": 3016333,
+        "metrics": {
+          "cohort_rounds": 0,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 2033,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 0,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "case": "register",
+        "sample": 0,
+        "runner": "before",
+        "diagnostics": true,
+        "wall_seconds": 0.09242270900000005,
+        "mode": "register",
+        "workers": 2,
+        "iterations": 1000,
+        "longest_worker_ns": 85061042,
+        "metrics": {
+          "cohort_rounds": 3848,
+          "cohort_stop_us": 1908,
+          "service_caller_wait_us": 8,
+          "service_requests": 1,
+          "serviced_syscalls": 1,
+          "syscalls": 4055,
+          "vm_local_syscalls": 10,
+          "worker_direct_syscalls": 1,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 1,
+          "worker_futex_waits": 2,
+          "worker_futex_wakes": 4,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 8,
+          "worker_task_resumes": 4
+        }
+      },
+      {
+        "case": "register",
+        "sample": 0,
+        "runner": "after",
+        "diagnostics": true,
+        "wall_seconds": 0.010234666999999975,
+        "mode": "register",
+        "workers": 2,
+        "iterations": 1000,
+        "longest_worker_ns": 2849750,
+        "metrics": {
+          "cohort_rounds": 12,
+          "cohort_stop_us": 31,
+          "service_caller_wait_us": 4,
+          "service_requests": 1,
+          "serviced_syscalls": 1,
+          "syscalls": 4056,
+          "vm_local_syscalls": 8,
+          "worker_direct_syscalls": 4001,
+          "worker_fd_syscalls": 2,
+          "worker_file_syscalls": 1,
+          "worker_futex_waits": 3,
+          "worker_futex_wakes": 4,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 4011,
+          "worker_task_resumes": 4,
+          "worker_uring_syscalls": 4000
+        }
+      },
+      {
+        "case": "register",
+        "sample": 0,
+        "runner": "before",
+        "diagnostics": true,
+        "wall_seconds": 0.26366229200000024,
+        "mode": "register",
+        "workers": 4,
+        "iterations": 1000,
+        "longest_worker_ns": 255813542,
+        "metrics": {
+          "cohort_rounds": 7414,
+          "cohort_stop_us": 6734,
+          "service_caller_wait_us": 12,
+          "service_requests": 3,
+          "serviced_syscalls": 3,
+          "syscalls": 8103,
+          "vm_local_syscalls": 23,
+          "worker_direct_syscalls": 3,
+          "worker_fd_syscalls": 1,
+          "worker_file_syscalls": 3,
+          "worker_futex_waits": 8,
+          "worker_futex_wakes": 6,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 21,
+          "worker_task_resumes": 9
+        }
+      },
+      {
+        "case": "register",
+        "sample": 0,
+        "runner": "after",
+        "diagnostics": true,
+        "wall_seconds": 0.0128313750000002,
+        "mode": "register",
+        "workers": 4,
+        "iterations": 1000,
+        "longest_worker_ns": 4389458,
+        "metrics": {
+          "cohort_rounds": 26,
+          "cohort_stop_us": 102,
+          "service_caller_wait_us": 12,
+          "service_requests": 3,
+          "serviced_syscalls": 3,
+          "syscalls": 8099,
+          "vm_local_syscalls": 22,
+          "worker_direct_syscalls": 8003,
+          "worker_fd_syscalls": 6,
+          "worker_file_syscalls": 3,
+          "worker_futex_waits": 3,
+          "worker_futex_wakes": 6,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 8021,
+          "worker_task_resumes": 8,
+          "worker_uring_syscalls": 8000
+        }
+      },
+      {
+        "case": "statx",
+        "sample": 0,
+        "runner": "before",
+        "diagnostics": true,
+        "wall_seconds": 0.010733541000000013,
+        "mode": "statx",
+        "workers": 1,
+        "iterations": 1000,
+        "longest_worker_ns": 4863083,
+        "metrics": {
+          "cohort_rounds": 0,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 1033,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 0
+        }
+      },
+      {
+        "case": "statx",
+        "sample": 0,
+        "runner": "after",
+        "diagnostics": true,
+        "wall_seconds": 0.01093212500000007,
+        "mode": "statx",
+        "workers": 1,
+        "iterations": 1000,
+        "longest_worker_ns": 5122417,
+        "metrics": {
+          "cohort_rounds": 0,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 1033,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 0,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "case": "statx",
+        "sample": 0,
+        "runner": "before",
+        "diagnostics": true,
+        "wall_seconds": 0.05655158300000007,
+        "mode": "statx",
+        "workers": 2,
+        "iterations": 1000,
+        "longest_worker_ns": 49801541,
+        "metrics": {
+          "cohort_rounds": 1024,
+          "cohort_stop_us": 9444,
+          "service_caller_wait_us": 5,
+          "service_requests": 1,
+          "serviced_syscalls": 1,
+          "syscalls": 2056,
+          "vm_local_syscalls": 11,
+          "worker_direct_syscalls": 1,
+          "worker_fd_syscalls": 1,
+          "worker_file_syscalls": 1,
+          "worker_futex_waits": 3,
+          "worker_futex_wakes": 4,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 10,
+          "worker_task_resumes": 5
+        }
+      },
+      {
+        "case": "statx",
+        "sample": 0,
+        "runner": "after",
+        "diagnostics": true,
+        "wall_seconds": 0.013387124999999944,
+        "mode": "statx",
+        "workers": 2,
+        "iterations": 1000,
+        "longest_worker_ns": 6570042,
+        "metrics": {
+          "cohort_rounds": 11,
+          "cohort_stop_us": 24,
+          "service_caller_wait_us": 4,
+          "service_requests": 1,
+          "serviced_syscalls": 1,
+          "syscalls": 2056,
+          "vm_local_syscalls": 9,
+          "worker_direct_syscalls": 2001,
+          "worker_fd_syscalls": 3,
+          "worker_file_syscalls": 1,
+          "worker_futex_waits": 3,
+          "worker_futex_wakes": 4,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 2012,
+          "worker_task_resumes": 5,
+          "worker_uring_syscalls": 2000
+        }
+      },
+      {
+        "case": "statx",
+        "sample": 0,
+        "runner": "before",
+        "diagnostics": true,
+        "wall_seconds": 0.11127058400000012,
+        "mode": "statx",
+        "workers": 4,
+        "iterations": 1000,
+        "longest_worker_ns": 103145875,
+        "metrics": {
+          "cohort_rounds": 1492,
+          "cohort_stop_us": 20792,
+          "service_caller_wait_us": 15,
+          "service_requests": 3,
+          "serviced_syscalls": 3,
+          "syscalls": 4101,
+          "vm_local_syscalls": 20,
+          "worker_direct_syscalls": 3,
+          "worker_fd_syscalls": 2,
+          "worker_file_syscalls": 3,
+          "worker_futex_waits": 6,
+          "worker_futex_wakes": 6,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 20,
+          "worker_task_resumes": 9
+        }
+      },
+      {
+        "case": "statx",
+        "sample": 0,
+        "runner": "after",
+        "diagnostics": true,
+        "wall_seconds": 0.03925229200000002,
+        "mode": "statx",
+        "workers": 4,
+        "iterations": 1000,
+        "longest_worker_ns": 31011084,
+        "metrics": {
+          "cohort_rounds": 26,
+          "cohort_stop_us": 97,
+          "service_caller_wait_us": 12,
+          "service_requests": 3,
+          "serviced_syscalls": 3,
+          "syscalls": 4099,
+          "vm_local_syscalls": 25,
+          "worker_direct_syscalls": 4003,
+          "worker_fd_syscalls": 7,
+          "worker_file_syscalls": 3,
+          "worker_futex_waits": 4,
+          "worker_futex_wakes": 6,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 4023,
+          "worker_task_resumes": 8,
+          "worker_uring_syscalls": 4000
+        }
+      }
+    ],
+    "native_linux": {
+      "passed": true,
+      "platform": "native Linux ARM64, existing 6-vCPU VZ test machine",
+      "fixture_sha256": "0181b501ab80027a0cfabefbe59836528fe888a6c829452036c237077005118b",
+      "rows": [
+        {
+          "sample": 0,
+          "wall_seconds": 0.0008353880000129266,
+          "mode": "nop",
+          "workers": 1,
+          "iterations": 1000,
+          "longest_worker_ns": 269962
+        },
+        {
+          "sample": 1,
+          "wall_seconds": 0.0019043629999941913,
+          "mode": "nop",
+          "workers": 1,
+          "iterations": 1000,
+          "longest_worker_ns": 296671
+        },
+        {
+          "sample": 2,
+          "wall_seconds": 0.0019839480000030107,
+          "mode": "nop",
+          "workers": 1,
+          "iterations": 1000,
+          "longest_worker_ns": 266921
+        },
+        {
+          "sample": 0,
+          "wall_seconds": 0.0007150110000111454,
+          "mode": "nop",
+          "workers": 2,
+          "iterations": 1000,
+          "longest_worker_ns": 275588
+        },
+        {
+          "sample": 1,
+          "wall_seconds": 0.0006233430000008866,
+          "mode": "nop",
+          "workers": 2,
+          "iterations": 1000,
+          "longest_worker_ns": 235920
+        },
+        {
+          "sample": 2,
+          "wall_seconds": 0.001665442000017947,
+          "mode": "nop",
+          "workers": 2,
+          "iterations": 1000,
+          "longest_worker_ns": 266171
+        },
+        {
+          "sample": 0,
+          "wall_seconds": 0.0019856139999774314,
+          "mode": "nop",
+          "workers": 4,
+          "iterations": 1000,
+          "longest_worker_ns": 322047
+        },
+        {
+          "sample": 1,
+          "wall_seconds": 0.0008379300000171952,
+          "mode": "nop",
+          "workers": 4,
+          "iterations": 1000,
+          "longest_worker_ns": 309796
+        },
+        {
+          "sample": 2,
+          "wall_seconds": 0.002254451999988305,
+          "mode": "nop",
+          "workers": 4,
+          "iterations": 1000,
+          "longest_worker_ns": 321255
+        },
+        {
+          "sample": 0,
+          "wall_seconds": 0.0018412789999899815,
+          "mode": "register",
+          "workers": 1,
+          "iterations": 1000,
+          "longest_worker_ns": 409548
+        },
+        {
+          "sample": 1,
+          "wall_seconds": 0.0020812410000132786,
+          "mode": "register",
+          "workers": 1,
+          "iterations": 1000,
+          "longest_worker_ns": 391506
+        },
+        {
+          "sample": 2,
+          "wall_seconds": 0.0019045290000008208,
+          "mode": "register",
+          "workers": 1,
+          "iterations": 1000,
+          "longest_worker_ns": 397923
+        },
+        {
+          "sample": 0,
+          "wall_seconds": 0.001978947999987213,
+          "mode": "register",
+          "workers": 2,
+          "iterations": 1000,
+          "longest_worker_ns": 502466
+        },
+        {
+          "sample": 1,
+          "wall_seconds": 0.0020427810000001045,
+          "mode": "register",
+          "workers": 2,
+          "iterations": 1000,
+          "longest_worker_ns": 401715
+        },
+        {
+          "sample": 2,
+          "wall_seconds": 0.0020393650000016805,
+          "mode": "register",
+          "workers": 2,
+          "iterations": 1000,
+          "longest_worker_ns": 402757
+        },
+        {
+          "sample": 0,
+          "wall_seconds": 0.002802417999987483,
+          "mode": "register",
+          "workers": 4,
+          "iterations": 1000,
+          "longest_worker_ns": 444798
+        },
+        {
+          "sample": 1,
+          "wall_seconds": 0.0022149920000060774,
+          "mode": "register",
+          "workers": 4,
+          "iterations": 1000,
+          "longest_worker_ns": 433548
+        },
+        {
+          "sample": 2,
+          "wall_seconds": 0.0025914569999940795,
+          "mode": "register",
+          "workers": 4,
+          "iterations": 1000,
+          "longest_worker_ns": 435882
+        },
+        {
+          "sample": 0,
+          "wall_seconds": 0.01542773899998906,
+          "mode": "statx",
+          "workers": 1,
+          "iterations": 1000,
+          "longest_worker_ns": 13705463
+        },
+        {
+          "sample": 1,
+          "wall_seconds": 0.014117469000012761,
+          "mode": "statx",
+          "workers": 1,
+          "iterations": 1000,
+          "longest_worker_ns": 13809922
+        },
+        {
+          "sample": 2,
+          "wall_seconds": 0.01510015100001283,
+          "mode": "statx",
+          "workers": 1,
+          "iterations": 1000,
+          "longest_worker_ns": 13578628
+        },
+        {
+          "sample": 0,
+          "wall_seconds": 0.020618070000011812,
+          "mode": "statx",
+          "workers": 2,
+          "iterations": 1000,
+          "longest_worker_ns": 18784875
+        },
+        {
+          "sample": 1,
+          "wall_seconds": 0.019122005000014042,
+          "mode": "statx",
+          "workers": 2,
+          "iterations": 1000,
+          "longest_worker_ns": 18719540
+        },
+        {
+          "sample": 2,
+          "wall_seconds": 0.020223479999998517,
+          "mode": "statx",
+          "workers": 2,
+          "iterations": 1000,
+          "longest_worker_ns": 18572954
+        },
+        {
+          "sample": 0,
+          "wall_seconds": 0.021154036000012866,
+          "mode": "statx",
+          "workers": 4,
+          "iterations": 1000,
+          "longest_worker_ns": 19389843
+        },
+        {
+          "sample": 1,
+          "wall_seconds": 0.020288814000025468,
+          "mode": "statx",
+          "workers": 4,
+          "iterations": 1000,
+          "longest_worker_ns": 18393702
+        },
+        {
+          "sample": 2,
+          "wall_seconds": 0.017523396000001412,
+          "mode": "statx",
+          "workers": 4,
+          "iterations": 1000,
+          "longest_worker_ns": 15888955
+        }
+      ],
+      "medians": [
+        {
+          "mode": "nop",
+          "workers": 1,
+          "worker_ms": 0.269962
+        },
+        {
+          "mode": "nop",
+          "workers": 2,
+          "worker_ms": 0.266171
+        },
+        {
+          "mode": "nop",
+          "workers": 4,
+          "worker_ms": 0.321255
+        },
+        {
+          "mode": "register",
+          "workers": 1,
+          "worker_ms": 0.397923
+        },
+        {
+          "mode": "register",
+          "workers": 2,
+          "worker_ms": 0.402757
+        },
+        {
+          "mode": "register",
+          "workers": 4,
+          "worker_ms": 0.435882
+        },
+        {
+          "mode": "statx",
+          "workers": 1,
+          "worker_ms": 13.705463
+        },
+        {
+          "mode": "statx",
+          "workers": 2,
+          "worker_ms": 18.71954
+        },
+        {
+          "mode": "statx",
+          "workers": 4,
+          "worker_ms": 18.393702
+        }
+      ]
+    },
+    "limitations": [
+      "Native Linux reference uses the exact static musl ARM64 ELF on the existing six-vCPU VZ Linux test machine; different kernel/filesystem/CPU scheduling, not a full Trames VM architecture.",
+      "Single-core loop medians regress by about 8\u201318%; process-wall medians remain close. The batch removes parallel ownership/cohort costs, not every per-operation cost.",
+      "Four-way statx still has shared filesystem metadata contention and is slower than the native Linux reference.",
+      "These are scoped io_uring workflows, not whole-application or physical-iPad performance claims."
+    ]
+  },
+  "regressions": [
+    "Original accepted enter survives cohort stop, ring FD close/reuse and queue unmap without resubmission.",
+    "Source maintenance advances on one execution slot while the guest remains in its original sleep/futex/lifecycle wait.",
+    "Owner-accepted drained path operations acquire original source context; genuine fallback suppresses empty cohort readmission until owner progress.",
+    "Native fixed pins use the canonical SharedPage/hardware gate and retain old bytes after unmap/remap.",
+    "Provided-buffer unregister/reuse retains the in-flight generation rather than advancing the replacement group.",
+    "Unix SCM_RIGHTS/ring registrations share one ownership graph; both admission orders and concurrent reciprocal registration retire without a leaked strong cycle.",
+    "Disk fsync uses the existing bounded disk pool and retains the actual original OFD through ring/FD close."
+  ],
+  "remaining_boundaries": [
+    "Buffer registration requiring page pinning is an affected-mm VM mutation checkpoint.",
+    "Owner-only task/mount/proc descriptions retain original owner Rc projections and admission rules.",
+    "Disk/mapped/overlay allocation and truncation, O_TRUNC, backing write growth/append and structural filesystem commits.",
+    "Job/task controls, final task/context cancellation and structural VM/task topology."
+  ],
+  "reused_acceptance": [
+    "Unchanged guest musl/Vulkan/audio/video artifacts and prior stage31 audio/VAAPI acceptance; no repeated whole-graphics or CPU acceptance for documentation/pin changes."
+  ],
+  "artifacts": [
+    {
+      "path": "target/local-ci/io/uring-subsystem/kernel-final.log",
+      "sha256": "fe77a798d98803eb461b69d642e9fe3ac062b6d00384ef2a836a69f6c4c4789c"
+    },
+    {
+      "path": "target/local-ci/io/uring-subsystem/linux-final.log",
+      "sha256": "b42ea4e0f2a6d75ef44251f7c0b7d81fcda76019d3fe2f3291a40833b563e408"
+    },
+    {
+      "path": "target/local-ci/io/uring-subsystem/memory-pins.log",
+      "sha256": "a95a1711ce1590a1ce6b94cdc9fdd112230da61a74c6f439e4ffed3f1fcec031"
+    },
+    {
+      "path": "target/local-ci/io/uring-subsystem/native-reference.json",
+      "sha256": "c9ac8f1cc1275834ed08d9d82658d799d86a4ac2409d864a0b4de1d6ebd94886"
+    },
+    {
+      "path": "target/local-ci/io/uring-subsystem/resources-tests.log",
+      "sha256": "4cda397a982b7caea778a3ffe6990abfed47d70ed6dc716a3d90a1a47f886da4"
+    },
+    {
+      "path": "target/local-ci/io/uring-subsystem/strict-kernel.log",
+      "sha256": "d93569a5afb8b6430c18d99d603c8b3440f16cb6dc73788f52c4df12acafd210"
+    },
+    {
+      "path": "target/local-ci/io/uring-subsystem/strict-subsystem.log",
+      "sha256": "15647c45a2102f14b08bd4fd1e6479afdf1158e0235bce2a4103f1272ccb025b"
+    },
+    {
+      "path": "target/local-ci/io/uring-subsystem/subsystem-final-ci.json",
+      "sha256": "1f8854a049b8933ba449b3717d9da06b7e107152e772113c90656a9e9f8f33d3"
+    },
+    {
+      "path": "target/uring-subsystem/apple-kernel-final.log",
+      "sha256": "7a51ebdab318d4d5f1521958f0764463c3c8dcdb199378a3a1a33671bb3557fd"
+    },
+    {
+      "path": "target/uring-subsystem/apple-linux-final.log",
+      "sha256": "16f4dbe7a69dfb55b6dfe3b45b92d0b92e51f2c1f8489c72cd97b6fe9b5e7d27"
+    },
+    {
+      "path": "target/uring-subsystem/apple-linux-strict-final.log",
+      "sha256": "15fd538104e3eca2ab2d1b3359aa688e44570c792f69e1f3053074bfddf91a71"
+    },
+    {
+      "path": "target/uring-subsystem/apple-memory-pins-final.log",
+      "sha256": "3e4d582926b45b4f23fe02dea869d8070fdd5bc889ea59de77b6ab8f713beeb9"
+    },
+    {
+      "path": "target/uring-subsystem/apple-source-retry-final.log",
+      "sha256": "c7a46dfc82cab79f89bdcf79f069d968ccee775b07b6c38dd336ecb59bbb365d"
+    },
+    {
+      "path": "target/uring-subsystem/apple-strict-final.log",
+      "sha256": "fd8055ce52907b1fda7a2c2658f7427f74e992b8c1b0f30de56f86095d12c581"
+    },
+    {
+      "path": "target/uring-subsystem/apple-vfs-core-fixes.log",
+      "sha256": "6885aa580e7d790938bc23ba2db6d034edd56075f0bc15da5fae9e0a1e8ce8bf"
+    },
+    {
+      "path": "target/uring-subsystem/ffi-build-final.log",
+      "sha256": "cc27987d89430ffe5f03bc33512ad7c753fe1c3f1e972ea464c2ba740f903b52"
+    },
+    {
+      "path": "target/uring-subsystem/ffi-environments-final/results.json",
+      "sha256": "1ffbe3a90df316ace973c3ba09567d585bcc0a32b1b9ade01ab5e121ddb7e748"
+    },
+    {
+      "path": "target/uring-subsystem/final-io-uring-extended/results.json",
+      "sha256": "d73794db615042d1acbfe1eb498c65d066164a436aa83b66c794c06496837ed2"
+    },
+    {
+      "path": "target/uring-subsystem/final-io-uring-multishot/results.json",
+      "sha256": "0e20b9a058bfa4d17eee8e3fbaf69793a2951737e827f08c22bd884e191d6f4f"
+    },
+    {
+      "path": "target/uring-subsystem/final-io-uring-worker-async/results.json",
+      "sha256": "5b0e37f497dad88611d9d84719a4b659774155bedcbacbd5a262d9a8ef71c3b1"
+    },
+    {
+      "path": "target/uring-subsystem/final-io-uring-worker-registered/results.json",
+      "sha256": "e3f229db3f2e1c4b07a3e92cda1a60f2a5b174953637a3ef1bbfc9d50d12ba43"
+    },
+    {
+      "path": "target/uring-subsystem/final-io-uring-worker/results.json",
+      "sha256": "e0a6fb255ceeab267234df184747183f1026fbef84b5d6f88dccee9856933c2f"
+    },
+    {
+      "path": "target/uring-subsystem/final-io-uring/results.json",
+      "sha256": "a68edcee4df6cc45964ce136add5edd4c8a0d0a5d6fb20d78da86ad62ce65744"
+    },
+    {
+      "path": "target/uring-subsystem/ios-final-link.log",
+      "sha256": "22d1ec9aafbd5c063c48abc0446c3df45347ba9cda5ecbe417cc262f9b7e6892"
+    },
+    {
+      "path": "target/uring-subsystem/ios-library-final.log",
+      "sha256": "45f3e6cc058227239bcb9e33ffb4508b3b71f186ce3471a2f41db38a83dc2ec2"
+    },
+    {
+      "path": "target/uring-subsystem/mac-source-build.log",
+      "sha256": "29876fb09b91e0eeace41bc94505d9b2d4e6f998f9a6f4dbcbaa4ade6e4d10e2"
+    },
+    {
+      "path": "target/uring-subsystem/mac-strict.log",
+      "sha256": "21a40ce0cd9a990002436c28e7ba9b12a4f2c5b1d36263abca6524de70512bf2"
+    },
+    {
+      "path": "target/uring-subsystem/mac-tests.log",
+      "sha256": "ac00fa822cef2b1df7116743c536617dec729e43bd55efd5966b7781bca05258"
+    },
+    {
+      "path": "target/uring-subsystem/performance-direct/results.json",
+      "sha256": "7f7f38a51c8b2a640f163ebbf57b4a2380d96a26805411a55d8dafed95b5d1ec"
+    },
+    {
+      "path": "target/uring-subsystem/wayland.log",
+      "sha256": "d24c89706378bb0973ba58a74989ccf82e57451ca0a5990034dc1adf67bbe50e"
+    },
+    {
+      "path": "target/uring-subsystem/mac-paired-build.log",
+      "sha256": "d7e6e82eb932a7e274a3aab51e7c72c635a225639928db7da58e16bc21a791af"
+    },
+    {
+      "path": "target/uring-subsystem/ipad-boundary.log",
+      "sha256": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651"
+    },
+    {
+      "path": "target/uring-subsystem/mac-boundary.log",
+      "sha256": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651"
+    }
+  ],
+  "physical_ipad_test": "Skipped per owner; native static and device-target app linking passed",
+  "product_sources": [
+    {
+      "repository": "trames-mac",
+      "path": "crates/trames-mac/src/session.rs",
+      "sha256": "06c5aeded1bb91db14bb98dd3a9417331a3f2971551d512a9262eee54a20857e"
+    }
+  ]
+}
