@@ -2,13 +2,12 @@
 
 ## Current status — 2026-11-03
 
-The latest completed stage is [worker firewall publication](#twenty-ninth-migration-implemented--worker-firewall-publication--2026-11-03).
-Netlink data, supported link/route/address changes, poll/epoll wakeups and nf_tables
-publication now execute on workers. Existing native TCP capabilities observe live
-rules without a whole-cohort publication join. Remaining areas include Unix owning
-ancillary graphs, native-service/device and io_uring controls, task/job control,
-mount/proc ownership and structural file/VM/task transitions. The overall
-coordinator-removal goal remains active.
+The latest completed batch is [the Unix IPC subsystem](#thirtieth-migration-implemented--unix-ipc-subsystem--2026-11-03).
+Ordinary Unix bytes, controls, addressed messages, owning ancillary graphs and
+native Wayland/XWM/clipboard transport now advance on workers or the existing
+idle executor. Remaining owner boundaries belong to task/mount/proc control
+projections, native GPU/device and io_uring controls, job control and structural
+filesystem/VM/task transitions. The overall coordinator-removal goal remains active.
 
 ## Twenty-second migration implemented — worker Unix namespace controls and waits — 2026-11-03
 
@@ -2352,3 +2351,103 @@ transitions still depend on separate owner boundaries. recvmmsg is unimplemented
 rather than an existing coordinator path. See the
 [validation record](../validation/worker-nft-publication-20261103.json) and
 [shared contract](../../runtime/docs/architecture/execution-backends.md#worker-nf_tables-publication-and-live-native-tcp-policy-2026-11-03).
+
+
+## Thirtieth migration implemented — Unix IPC subsystem — 2026-11-03
+
+Runtime `6ab059a7f0b57be7cab7e867c315ed8ed06ecd05` completes this batch across owning SCM_RIGHTS,
+cycle admission/reclamation, native Wayland/XWM connections and clipboard relays.
+Implementation is integrated as one subsystem change after concentrated local
+validation. Unchanged passing checks are reused; failed-stage selection avoids
+replaying complete graphics acceptance for a fixture correction.
+
+Unix-bearing rights retain complete original shared OFDs. One runtime ownership
+root validates/reserves the graph before queue publication; queue links are weak
+back to that root, avoiding an Arc ownership cycle. Concurrent reciprocal sends
+cannot both create a cycle. Listener-owned unaccepted endpoints participate in the
+same graph. Last-close reclamation drains actual removed rights iteratively after
+graph/queue/Files guards leave. No normal byte call takes the ownership graph
+mutex. Non-Unix shared rights keep their direct queue path. Endpoint identity weak
+references move into the existing byte resource rather than adding a second set;
+there is one additional weak ownership-root reference per endpoint and a strong
+root reference in owner socket views. No unchanged-total-refcount claim is made.
+
+Native adapters now contain shared endpoints/OFDs and use per-connection state.
+Guest queue changes drive the connection on the calling worker; native socket/pipe
+readiness is nested into the existing idle executor's one-shot event queue.
+Connection registry locks cover membership/auth revisions only, without native
+I/O, callbacks or final destruction. There is no cohort-control pump, new resource
+thread or polling bus. The joined single-task executor waits on that same queue
+and dispatches actual events instead of scanning connections. Original compositor
+and presenter affinity remains. Native import uses the original shared filesystem
+and open-ID domain; the receiving task publishes actual guest FDs through Files.
+
+Pipe readiness comes from the original PipeGuard. Full guest queues suppress host
+reads; draining them rearms the original socket. Export acknowledgements notify
+after the inode registry unlocks; compositor command capacity is subscribed only
+when exports actually block. Closing the last compositor lease from its own event
+loop cannot send into a full self-owned queue or join its own thread. No ordinary
+guest memory fence, native-only permission model, global I/O algorithm lock or new
+production unsafe is introduced.
+
+| Four processes, longest-child median | Iterations each | Previous | Current | Native macOS | Native ARM Linux, exact ELF |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Unix OFD sendmsg/recvmsg + original endpoint use | 1,000 | 180.61 ms | 12.67 ms | 1.37 ms | 2.36 ms |
+| Unix OFD raw-read discard + last-close EOF | 1,000 | 185.59 ms | 16.03 ms | Omitted (local API behavior) | 4.33 ms |
+| Addressed datagram carrying a Unix OFD | 1,000 | 221.71 ms | 49.30 ms | 1.78 ms | 2.04 ms |
+| Existing pipe-FD ancillary control | 10,000 | 93.46 ms | 93.67 ms | 16.42 ms | 16.28 ms |
+| Existing socketpair/control/close | 10,000 | 200.92 ms | 201.91 ms | 50.88 ms | 44.25 ms |
+| Existing pathname connect/accept/close | 10,000 | 227.65 ms | 226.12 ms | 62.65 ms | 43.42 ms |
+| Existing native TCP scalar | 10,000 | 92.08 ms | 93.50 ms | 98.54 ms | 20.29 ms |
+
+The three owning-rights loops improve **14.26x / 11.58x / 4.50x**; process-wall
+medians are **215.49 → 48.48 ms**, **221.04 → 49.63 ms**, and
+**341.32 → 172.89 ms**. Separate diagnostic cohort counts fall from
+**5,241 / 4,706 / 4,913** to **46 / 50 / 52**. The three service requests still
+include startup/teardown; a whole application is not claimed coordinator-free.
+
+Owning cases use three unprofiled counterbalanced samples; ordinary controls use
+10,000 iterations and nine samples. Controls remain close (pipe +0.2%, socketpair
++0.5%, connect -0.7%, TCP +1.5%); no control improvement or statistical regression
+bound is claimed. All final builds/functional acceptance finish before host timing,
+with local Linux CI stopped. Unchanged native references are reused; the two longer
+controls are recollected at the same iteration counts. Both Trames CPU benchmark
+paths disable windows/Vulkan and record zero GPU calls. The final candidate includes
+pinned static MoltenVK, whereas the saved baseline used the dynamic-loader build.
+These are scoped CPU/IPC measurements, not Firefox/GUI or physical-iPad speedups.
+Native kernel, compiler and API differences make contextual references.
+
+A bounded local Darwin probe found raw read made a previously closed descriptor
+number live again while discarding ancillary bytes, keeping its peer open until
+explicit cleanup. That raw native macOS workload is omitted; no different
+recvmsg/close workload is substituted. Native ARM Linux runs the identical ELF.
+This records the local observation without generalizing to every macOS version.
+
+Apple/Linux ABI **207 each**, verified VFS cases **462/461**, shared resources
+**15 each**, Wayland **21 each**, kernel **280 each**, strict checks and both
+product boundaries pass. The Apple VFS full pass plus affected native refinements
+are reused rather than replayed; Linux runs the final complete affected suite.
+The filtered owning-rights guest finishes ten calls/ten policy decisions with zero
+services on one/two slots. All three real native Wayland cohort scenarios finish
+with **one cohort and zero services**: an unrelated CPU runs, all CPUs park, and an
+already idle cohort is admitted. New regressions exercise reciprocal/listener
+cycles, close/reuse, deterministic parked receive, reentrant final release, independent
+native connections, bidirectional backpressure and clipboard EOF.
+
+The production FFI passes all **13** Alpine/Debian/custom/systemd/multi-terminal
+checks. Original guest Wayland info, two-window resize/close, weston SHM and Chinese
+editor input pass. Native-linked vkcube passes with **27 frame revisions**; retained
+SHM and GPU capabilities remain valid after session shutdown and release cleanly.
+The initial cube failure was a fixture/native-link configuration issue; the final
+script supports selecting failed stages, explicitly supplies the musl runtime and
+fails immediately on a nonzero guest exit. The iPad static build includes the
+pinned native GPU archive; unchanged guest outputs are reused. Physical iPad
+validation remains skipped per owner. The measured complete native-linked binary
+is installed in Trames Dev; the stable binary is verified unchanged.
+
+Passing an actual owner-only task, mount or proc control projection still crosses
+that resource's boundary; a shared Unix carrier cannot invent its thread authority.
+GPU auth refresh/device controls, io_uring controls, job control and structural
+filesystem/VM/task changes remain separate batches. See the
+[validation record](../validation/worker-unix-ipc-20261103.json) and
+[shared contract](../../runtime/docs/architecture/execution-backends.md#event-driven-native-unix-adapters-2026-11-03).

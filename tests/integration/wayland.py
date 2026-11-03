@@ -17,6 +17,8 @@ import uuid
 ROOT=Path(__file__).resolve().parents[2]
 parser=argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--prepare',action='store_true',help='install original signed offline inputs into a new store')
+parser.add_argument('--stages',nargs='+',choices=('info','windows','shm','editor','cube'),default=('info','windows','shm','editor','cube'))
+parser.add_argument('--musl-libc',type=Path,default=ROOT/'target/musl-hybrid/libc.so')
 args=parser.parse_args()
 store=Path(os.environ['TRAMES_WAYLAND_STORE']).resolve()
 if args.prepare:assert not store.exists(), 'prepare requires an absent test store'
@@ -44,7 +46,8 @@ def send(value):
     data=value.encode();assert api.trames_session_input(session,data,len(data))==len(data)
 def status():return json.loads(read('trames_session_wayland_status',session))
 options={'store':str(store),'volume_total':16<<30,'volume_available':16<<30,'network':'off','wayland':True,
-         'vulkan_accelerator':True,'vulkan_icd':str(ROOT/'target/vulkan-guest/libtrames_vulkan_icd.so')}
+         'vulkan_accelerator':True,'vulkan_icd':str(ROOT/'target/vulkan-guest/libtrames_vulkan_icd.so'),
+         'musl_libc':str(args.musl_libc.resolve())}
 if args.prepare:options['rootfs']=str(ROOT/'target/alpine-download/alpine-minirootfs-3.22.6-aarch64.tar.gz')
 data=json.dumps(options).encode();session=api.trames_session_open(data,len(data));assert session
 retained=[];text='';start=time.monotonic()
@@ -68,6 +71,7 @@ try:
     peer='/tmp/wayland-ffi-'+uuid.uuid4().hex
     payload('trames_session_transfer',session,{'guest':peer,'host':str(ROOT/'target/vulkan-guest/wayland-acceptance/wayland-client'),'export':False})
     for stage,program in [('info','wayland-info'),('windows',peer+' 1 hold'),('shm','weston-simple-shm'),('editor','weston-editor'),('cube','vkcube --wsi wayland --c 30')]:
+        if stage not in args.stages:continue
         before=time.monotonic();frames=0;focused=False;closed=False;resized=False;confirmed=False;edited=False;editor_step=0;first_context=None;last={};held=False
         send(f'chmod 755 {peer}; XDG_RUNTIME_DIR=/run/user/0 WAYLAND_DISPLAY=wayland-0 VK_DRIVER_FILES=/usr/share/vulkan/icd.d/trames.json {program}; printf "\\nWAYLAND_FFI:{stage}:%d\\n" $?\n')
         marker=f'\r\nWAYLAND_FFI:{stage}:0\r\n'
@@ -114,6 +118,7 @@ try:
                             command(dict(values,commit='返回'));editor_step=5
                         ready=editor_step==5 and '返回' in context['text']
                     if ready and not closed:command(dict(op='close',window=wid));closed=True
+            if f'\r\nWAYLAND_FFI:{stage}:' in text and marker not in text:raise AssertionError((stage,text[-4096:],scene))
             assert time.monotonic()-before<90,(stage,text[-4096:],scene)
             time.sleep(.004)
         if stage=='cube':assert confirmed
@@ -121,7 +126,7 @@ try:
         print(f'{stage}: original guest client and production ABI passed; frame revisions={frames}',flush=True)
         while status()['windows']:
             assert time.monotonic()-before<95;time.sleep(.005)
-    assert len(retained)==2
+    assert len(retained)==sum(stage in args.stages for stage in ('windows','cube'))
     assert api.trames_session_close(session)==0;session=0
     for frame,kind in retained:
         info=Info();image=Image();assert api.trames_wayland_frame_info(frame,C.byref(info))==0
@@ -129,7 +134,7 @@ try:
         if kind==1:assert C.string_at(image.address+image.offset,4)==bytes.fromhex('664422ff')
         assert api.trames_wayland_frame_release(frame,0,0)==0
     retained=[]
-    print('SHM and GPU frame capabilities remain valid after VM session shutdown, then release cleanly',flush=True)
+    print('Retained frame capabilities remain valid after VM session shutdown, then release cleanly',flush=True)
 finally:
     if session:api.trames_session_close(session)
     for frame,_ in retained:api.trames_wayland_frame_release(frame,0,0)

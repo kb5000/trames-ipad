@@ -105,6 +105,8 @@ static uint64_t tcp_queue_wait(int queue) {
 int main(int argc, char **argv) {
     assert(argc == 3);
     const char *kind = argv[1];
+    int unix_owning = !strcmp(kind, "unix-owning-rights"), unix_raw = !strcmp(kind, "unix-owning-raw");
+    int datagram_unix = !strcmp(kind, "unix-owning-datagram");
     unsigned operations = (unsigned)strtoul(argv[2], NULL, 10);
     assert(operations && operations <= 1000000);
     uint64_t checksum = 0, response_bytes = 0;
@@ -192,13 +194,16 @@ int main(int argc, char **argv) {
         assert(!bind(unix_listener, (struct sockaddr *)&unix_address, unix_size));
         assert(!listen(unix_listener, 4));
     }
-    int datagram = !strcmp(kind, "unix-datagram") || !strcmp(kind, "unix-sendto") || !strcmp(kind, "unix-datagram-rights") || !strcmp(kind, "unix-datagram-owner");
+    int datagram = !strcmp(kind, "unix-datagram") || !strcmp(kind, "unix-sendto") || !strcmp(kind, "unix-datagram-rights") || !strcmp(kind, "unix-datagram-owner") || datagram_unix;
     int addressed = !strcmp(kind, "unix-sendto");
     int datagram_owner = !strcmp(kind, "unix-datagram-owner");
-    int datagram_rights = !strcmp(kind, "unix-datagram-rights") || datagram_owner;
+    int datagram_rights = !strcmp(kind, "unix-datagram-rights") || datagram_owner || datagram_unix;
     int right_source = -1;
     if (datagram_rights && !datagram_owner) {
-        int ends[2]; assert(!pipe(ends)); assert(!close(ends[1])); right_source = ends[0];
+        int ends[2];
+        if (datagram_unix) assert(!socketpair(AF_UNIX, SOCK_STREAM, 0, ends));
+        else assert(!pipe(ends));
+        assert(!close(ends[1])); right_source = ends[0];
     }
     int packets[2] = {-1, -1};
     struct sockaddr_un packet_address[2] = {{0}, {0}};
@@ -260,13 +265,16 @@ int main(int argc, char **argv) {
         if (!pty_peer) { pair[1] = ioctl(pair[0], TIOCGPTPEER, O_RDWR | O_NOCTTY); assert(pair[1] >= 0); }
     }
 #endif
-    if (!strcmp(kind, "unix-rights") || signal_rights || pty_rights) {
+    if (!strcmp(kind, "unix-rights") || unix_owning || unix_raw || signal_rights || pty_rights) {
         assert(!socketpair(AF_UNIX, SOCK_STREAM, 0, local));
 #ifdef __linux__
         if (signal_rights) { pair[1] = signalfd(-1, &signal_mask, SFD_NONBLOCK); assert(pair[1] >= 0); }
         else
 #endif
-        if (!pty_rights) assert(!pipe(pair));
+        if (!pty_rights && !unix_raw) {
+            if (unix_owning) assert(!socketpair(AF_UNIX, SOCK_STREAM, 0, pair));
+            else assert(!pipe(pair));
+        }
     } else if (!strcmp(kind, "epoll")) {
         queue = queue_create(); assert(queue >= 0); assert(!pipe(pair));
     } else if (!strcmp(kind, "inotify-watch")) {
@@ -450,16 +458,25 @@ int main(int argc, char **argv) {
             assert(write(client, &sent, 1) == 1);
             assert(read(alias, &received, 1) == 1 && received == sent);
             assert(!close(client)); assert(read(alias, &received, 1) == 0); assert(!close(alias));
-        } else if (!strcmp(kind, "unix-rights") || signal_rights || pty_rights) {
+        } else if (!strcmp(kind, "unix-rights") || unix_owning || unix_raw || signal_rights || pty_rights) {
             unsigned char sent = pty_rights ? (unsigned char)('a' + i % 26) : (unsigned char)i, received = 0;
+            int transient[2] = {-1, -1};
+            if (unix_raw) assert(!socketpair(AF_UNIX, SOCK_STREAM, 0, transient));
+            int passed = unix_raw ? transient[1] : pair[1];
             struct iovec vector = {.iov_base = &sent, .iov_len = 1};
             union { struct cmsghdr align; unsigned char bytes[CMSG_SPACE(sizeof(int))]; } control = {0};
             struct msghdr message = {.msg_iov = &vector, .msg_iovlen = 1,
                 .msg_control = control.bytes, .msg_controllen = sizeof(control.bytes)};
             struct cmsghdr *header = CMSG_FIRSTHDR(&message);
             header->cmsg_len = CMSG_LEN(sizeof(int)); header->cmsg_level = SOL_SOCKET; header->cmsg_type = SCM_RIGHTS;
-            memcpy(CMSG_DATA(header), &pair[1], sizeof(int));
+            memcpy(CMSG_DATA(header), &passed, sizeof(int));
             assert(sendmsg(local[0], &message, 0) == 1);
+            if (unix_raw) {
+                assert(!close(transient[1]));
+                assert(read(local[1], &received, 1) == 1 && received == sent);
+                assert(read(transient[0], &received, 1) == 0);
+                assert(!close(transient[0]));
+            } else {
             memset(&control, 0, sizeof(control)); vector.iov_base = &received;
             assert(recvmsg(local[1], &message, 0) == 1 && received == sent && !message.msg_flags);
             header = CMSG_FIRSTHDR(&message);
@@ -476,6 +493,7 @@ int main(int argc, char **argv) {
                 assert(read(pair[0], &received, 1) == 1 && received == sent);
             }
             assert(!close(imported));
+            }
         } else if (pty_peer || pty_create) {
 #ifdef __linux__
             int master = pair[0];
