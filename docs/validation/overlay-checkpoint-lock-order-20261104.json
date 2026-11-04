@@ -158,5 +158,159 @@
     "Scoped VFS lock-order source audit, not proof of a globally acyclic runtime lock graph.",
     "No new coordinator, service thread, global lock, try-lock polling or guest errno.",
     "Original report/archive and project data are not redistributed; only derived technical findings and minimal reproduction results are recorded."
+  ],
+  "stable_release": {
+    "version": "1.5.1",
+    "product_revision": "36aef0f562b3c6d935cfd13b53fef5260b44c3a8",
+    "runtime_revision": "d828821b907f8a0d84df01eb934b778858ef873f",
+    "url": "https://github.com/kb5000/trames-mac/releases/tag/v1.5.1",
+    "notarized": false,
+    "mac_ci": {
+      "local_passed": true,
+      "remote_passed": true,
+      "run_id": 41776133541
+    },
+    "stable_and_dev_installed": true
+  },
+  "final_stable_clone_acceptance": [
+    {
+      "label": "startup-0",
+      "returncode": 3,
+      "seconds": 0.087310875,
+      "stdout": "DEBIAN_ALIVE\nactivating\n",
+      "stderr": ""
+    },
+    {
+      "label": "startup-1",
+      "returncode": 3,
+      "seconds": 0.07027516700000003,
+      "stdout": "DEBIAN_ALIVE\nactivating\n",
+      "stderr": ""
+    },
+    {
+      "label": "startup-2",
+      "returncode": 3,
+      "seconds": 0.2054434999999999,
+      "stdout": "DEBIAN_ALIVE\nactivating\n",
+      "stderr": ""
+    },
+    {
+      "label": "startup-3",
+      "returncode": 3,
+      "seconds": 0.12892133399999972,
+      "stdout": "DEBIAN_ALIVE\nactivating\n",
+      "stderr": ""
+    },
+    {
+      "label": "startup-4",
+      "returncode": 0,
+      "seconds": 0.1408472500000002,
+      "stdout": "DEBIAN_ALIVE\nactive\n",
+      "stderr": ""
+    },
+    {
+      "label": "original-useradd",
+      "returncode": 0,
+      "seconds": 8.571734584,
+      "stdout": "BEFORE_USERADD\nUSERADD_EXIT=0\n",
+      "stderr": ""
+    },
+    {
+      "label": "docker-build-account-and-import",
+      "returncode": 1,
+      "seconds": 11.739746125,
+      "stdout": "",
+      "stderr": "#0 building with \"default\" instance using docker driver\n\n#1 [internal] load build definition from Dockerfile\n#1 transferring dockerfile:\n#1 transferring dockerfile: 223B 0.1s done\n#1 DONE 0.5s\n\n#2 [internal] load metadata for docker.io/library/python:3.12-slim\n#2 DONE 0.0s\n\n#3 [internal] load .dockerignore\n#3 transferring context:\n#3 transferring context: 2B done\n#3 DONE 0.6s\n\n#4 [1/2] FROM docker.io/library/python:3.12-slim\n#4 CACHED\n\n#5 [2/2] RUN groupadd -g 10001 tramesrepro && useradd -u 10001 -g 10001 -M tramesrepro && python -B -c \"import ssl,urllib.request; print(\"'BUILD_ACCOUNT_AND_IMPORT_OK'\")\"\n#5 4.838 Traceback (most recent call last):\n#5 4.838   File \"<string>\", line 1, in <module>\n#5 4.838 NameError: name 'BUILD_ACCOUNT_AND_IMPORT_OK' is not defined\n#5 ERROR: process \"/bin/sh -c groupadd -g 10001 tramesrepro && useradd -u 10001 -g 10001 -M tramesrepro && python -B -c \\\"import ssl,urllib.request; print(\\\"'BUILD_ACCOUNT_AND_IMPORT_OK'\\\")\\\"\" did not complete successfully: exit code: 1\n------\n > [2/2] RUN groupadd -g 10001 tramesrepro && useradd -u 10001 -g 10001 -M tramesrepro && python -B -c \"import ssl,urllib.request; print(\"'BUILD_ACCOUNT_AND_IMPORT_OK'\")\":\n4.838 Traceback (most recent call last):\n4.838   File \"<string>\", line 1, in <module>\n4.838 NameError: name 'BUILD_ACCOUNT_AND_IMPORT_OK' is not defined\n------\nDockerfile:2\n--------------------\n   1 |     FROM python:3.12-slim\n   2 | >>> RUN groupadd -g 10001 tramesrepro && useradd -u 10001 -g 10001 -M tramesrepro && python -B -c \"import ssl,urllib.request; print(\"'BUILD_ACCOUNT_AND_IMPORT_OK'\")\"\n   3 |     \n--------------------\nERROR: failed to solve: process \"/bin/sh -c groupadd -g 10001 tramesrepro && useradd -u 10001 -g 10001 -M tramesrepro && python -B -c \\\"import ssl,urllib.request; print(\\\"'BUILD_ACCOUNT_AND_IMPORT_OK'\\\")\\\"\" did not complete successfully: exit code: 1\n"
+    },
+    {
+      "label": "docker-build-corrected-marker",
+      "returncode": 0,
+      "seconds": 13.294498791,
+      "stdout": "",
+      "stderr": "#0 building with \"default\" instance using docker driver\n\n#1 [internal] load build definition from Dockerfile\n#1 transferring dockerfile:\n#1 transferring dockerfile: 219B 0.1s done\n#1 DONE 0.6s\n\n#2 [internal] load metadata for docker.io/library/python:3.12-slim\n#2 DONE 0.0s\n\n#3 [internal] load .dockerignore\n#3 transferring context:\n#3 transferring context: 2B done\n#3 DONE 0.5s\n\n#4 [1/2] FROM docker.io/library/python:3.12-slim\n#4 CACHED\n\n#5 [2/2] RUN groupadd -g 10001 tramesrepro && useradd -u 10001 -g 10001 -M tramesrepro && python -B -c \"import ssl,urllib.request\" && echo BUILD_ACCOUNT_AND_IMPORT_OK\n#5 4.429 BUILD_ACCOUNT_AND_IMPORT_OK\n#5 DONE 4.7s\n\n#6 exporting to image\n#6 exporting layers\n#6 exporting layers 0.8s done\n#6 writing image sha256:9f67506dff00b2fb7aacb1b39f947205d73ad751b94a3be28dbb1a9a19de52f7 0.1s done\n#6 naming to docker.io/library/trames-lock-repro:1.5.1 0.2s done\n#6 DONE 1.5s\n"
+    },
+    {
+      "label": "alive-after-build",
+      "returncode": 0,
+      "seconds": 0.03063966700000087,
+      "stdout": "DEBIAN_ALIVE\n",
+      "stderr": ""
+    }
+  ],
+  "harness_correction": "The first supplementary Dockerfile incorrectly quoted its output marker and reached a Python NameError after user/group creation and imports. Corrected only that marker, reran the failed build and obtained BUILD_ACCOUNT_AND_IMPORT_OK and an exported image. This is a harness error, not a runtime failure.",
+  "installed_original_environment_acceptance": [
+    {
+      "label": "stop-deadlocked-debian",
+      "returncode": null,
+      "timeout": true,
+      "seconds": 5.004148583,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "label": "terminate-deadlocked-instance",
+      "pid": 27946,
+      "signal": "SIGTERM"
+    },
+    {
+      "label": "terminate-deadlocked-instance",
+      "pid": 27946,
+      "signal": "SIGKILL"
+    },
+    {
+      "label": "start-original-store",
+      "returncode": 0,
+      "seconds": 0.09892158400000017,
+      "stdout": "",
+      "stderr": "Started debian in background\n"
+    },
+    {
+      "label": "original-repro-installed-stable",
+      "returncode": 0,
+      "seconds": 8.744942000000002,
+      "stdout": "BEFORE_USERADD\nUSERADD_EXIT=0\n",
+      "stderr": ""
+    },
+    {
+      "label": "alive-after-original-repro",
+      "returncode": 0,
+      "seconds": 0.03575316700000286,
+      "stdout": "DEBIAN_ALIVE\n",
+      "stderr": ""
+    },
+    {
+      "label": "original-environment-config-preserved",
+      "passed": true
+    }
+  ],
+  "persistent_docker_upgrade": {
+    "persistent_docker_http": true,
+    "container": "web",
+    "volume": "trames-persist",
+    "restarted_with_new_runtime": true,
+    "config_preserved": true,
+    "seconds": 12.244429459
+  },
+  "artifacts": [
+    {
+      "name": "Trames-1.5.1-mac-arm64-unnotarized.zip",
+      "bytes": 26506689,
+      "sha256": "bbbf42a8d6114805fc14b566db5def88cd8c166e99faf325aefe070b795db297"
+    },
+    {
+      "name": "Trames-1.5.1-mac-arm64-unnotarized.zip.sha256",
+      "bytes": 105,
+      "sha256": "f9c2e172f480ffa724ca2136100419b6f1bae3f20e5417d63b104f2a34e58a97"
+    },
+    {
+      "name": "Trames-Dev-1.5.1-mac-arm64-unnotarized.zip",
+      "bytes": 26507530,
+      "sha256": "1712c4c01ce415144b8dfd4822e10295cad00a931dcd8dd9d7e1806765215b20"
+    },
+    {
+      "name": "Trames-Dev-1.5.1-mac-arm64-unnotarized.zip.sha256",
+      "bytes": 109,
+      "sha256": "297fd6c52f63e7e3084e2ba07fd02f6f4d24c32b355ef3e17247c0c023b473f9"
+    }
   ]
 }
