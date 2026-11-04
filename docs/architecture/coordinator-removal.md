@@ -2897,3 +2897,20 @@ The Linux reference uses the exact static ARM64 ELF in the existing local ARM Li
 Local acceptance passes 287 Apple kernel cases, 17 signal-kernel cases, two public signal API cases, 230 ABI cases and 493 VFS cases. Linux passes the affected ABI/VFS suites and final 29/13 signal subsets, reusing the already passing unrelated kernel cases. Mac product tests, strict affected clippy/format, paired boundaries and iPad device-target FFI compilation pass. The same existing ELF fixtures pass all 25 signalfd workflows and five POSIX timer workflows on final HVF and interpreter builds at 1/4 CPUs. New regressions cover six wait APIs with one worker slot and zero owner services, mask restoration across handoff, reaped PID/reader lifetime, and async fixed-file/buffer identity.
 
 The [source-bound validation record](../validation/worker-signals-20261104.json) contains native comparisons, all source/binary/log hashes, longer solo results and separate path diagnostics. The [shared signal contract](../../runtime/docs/architecture/execution-backends.md#shared-signal-queues-controls-and-reader-scoped-waits-2026-11-04) and [remaining dependencies](../../runtime/docs/architecture/coordination-boundaries.md#shared-signals-and-remaining-lifecycle-dependency) explicitly retain the connected lifecycle unit: STOP/CONT/default termination, parent wait/SIGCHLD, robust/clear-tid cleanup, resource release and reaping. This batch does not claim that chain is coordinator-free. Mac Dev is installed; stable 1.5.1 and its running Docker environment are unchanged. No new coordinator/service thread, polling bus, unsafe block or ordinary guest-memory fence is added.
+
+
+## Futex retirement correction after shared signals — 2026-11-04
+
+Runtime `d9c4a811faf316a51b1a8f33f055247943a18855` fixes logical wait
+cancellation independently of retained owner-state lifetime. A caught signal on
+a worker used to drop its wait while an owner checkpoint still retained an Arc.
+The old WAITING ticket could then consume a later FUTEX_WAKE intended for the
+same task's new wait, stranding Go GC and Docker operations. Worker/owner caught
+signal entry and active/stopped exit now explicitly cancel and unlink it using
+the original keyed protocol. Drop remains the final cleanup backstop.
+
+This correction adds no coordinator/service request, global algorithm lock,
+ordinary-memory fence or Go preemption workaround. Deterministic tests retain
+owner clones across interruption and exit; normal-preemption stock Go stress and
+eight isolated Docker lifecycle cycles pass. The existing lifecycle boundaries
+remain unchanged. [Source-bound evidence](../validation/reader-runtime-20261104.json).

@@ -1,0 +1,292 @@
+{
+  "date": "2026-11-04",
+  "product_version": "1.5.3",
+  "runtime_revision": "d9c4a811faf316a51b1a8f33f055247943a18855",
+  "previous_runtime": "c973060c485df0ab88352fe35e8ee9cce07646a3",
+  "status": "validated; Mac stable/dev 1.5.3 installed; Debian restarted and real HTTP/Docker acceptance passed",
+  "input_reproducer": {
+    "path": "trames-tcp-sendall.py",
+    "sha256": "2ed3e66003d57ee17889163ff38a4cce2e7b985ff4dfb8dfba6d12eeba89c889"
+  },
+  "sources": [
+    {
+      "path": "runtime/crates/trames-linux/src/direct/ip_message.rs",
+      "sha256": "c096623adafd92b5d92c51735845f4a0ce63cb3703f96d165861ab8994a473a1"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/direct/socket_wait.rs",
+      "sha256": "54a62bf8480d16dcafdf8ff9a362d56a46c74d7d512fedb2d23c7326c0bab8cc"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/network.rs",
+      "sha256": "55985a585f032cd09c03ffec55068530e3cd5bb6176300f18e4fdb656886ed06"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/network/data.rs",
+      "sha256": "115bf63177187900dcf840bad97eaceed05cdc6cf304f1757ac7fbed35d7414a"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/network_batch.rs",
+      "sha256": "052fcba6e593cef248e9acb048ee31d3c2f809765e460b23c7f9fb124cbd0fef"
+    },
+    {
+      "path": "runtime/crates/trames-net/src/lib.rs",
+      "sha256": "8b1540713dbc0a72ab4eaf8d2accd248d00b5bad1e82a0b9d68c22af14b25700"
+    },
+    {
+      "path": "runtime/crates/trames-net/src/native.rs",
+      "sha256": "c9c3bf037eef8da56ee0929fd4b8d7e440f6146477a64e70fa18abbdac09e290"
+    },
+    {
+      "path": "runtime/crates/trames-net/src/root_routing_tests.rs",
+      "sha256": "96f58ef52b999478c46c3cfb0270b458101dfa0d2d56b02089259023620b3255"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/futex.rs",
+      "sha256": "328b617ab2d3a3f41e2d4153c49ca16e6d3185f1fa6bf100c7791231735785ac"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/process.rs",
+      "sha256": "6fd5beb7227acb04d2ec41acaba0d272e1ec1215f41e2ec364f77f5a71f612a2"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/workers.rs",
+      "sha256": "5578344cd83b890168bc4d87a18be5848b032dcd71836505b7566fe21c92fb72"
+    },
+    {
+      "path": "runtime/docs/architecture/execution-backends.md",
+      "sha256": "199707fce2be4386903bbe9a25e45f3a975eaabe09997594fe38934b9956cf06"
+    },
+    {
+      "path": "tests/fixtures/tcp-sendall.py",
+      "sha256": "313a08a77f5bcdea2c67fe3fade620879ae369b82d4d319f9e5617b36810dcc2"
+    },
+    {
+      "path": "tests/fixtures/go-gc-preemption.sh",
+      "sha256": "f4b9214e8d1538ba6d455d4eb35ff62370a907218160bab8810c07ddb5babdb3"
+    }
+  ],
+  "corrections": [
+    "TCP stream transfer staging accepts a bounded short prefix instead of EMSGSIZE; datagrams remain atomic",
+    "Caught signals and exit explicitly retire futex tickets while owner Arc checkpoints survive"
+  ],
+  "execution": {
+    "new_coordinator_request": false,
+    "new_service_thread": false,
+    "go_preemption_disabled": false,
+    "new_global_lock": false
+  },
+  "local_results": {
+    "apple_arm64": {
+      "linux_abi_passed": 231,
+      "linux_abi_ignored": 1,
+      "network_passed": 83,
+      "kernel_conformance_passed": 291,
+      "kernel_conformance_ignored": 3,
+      "kernel_lib_passed": 17
+    },
+    "linux_arm64": {
+      "linux_abi_passed": 231,
+      "linux_abi_ignored": 1,
+      "network_passed": 83,
+      "kernel_conformance_passed": 291,
+      "kernel_conformance_ignored": 3,
+      "kernel_lib_passed": 17
+    }
+  },
+  "external_acceptance": {
+    "tcp_sendall": {
+      "bytes": 3777458,
+      "whole_write": "pass",
+      "chunked_control": "pass",
+      "small_control": "pass",
+      "native_mac": "pass",
+      "previous_runtime": "EMSGSIZE; zero bytes received"
+    },
+    "stock_debian_go_gc": {
+      "normal_async_preemption": true,
+      "GOGC": 1,
+      "hvf_4_cpus_runs": 30,
+      "hvf_12_cpus_runs": 100,
+      "native_linux_runs": 30,
+      "passed": true
+    },
+    "docker_recreate": {
+      "rounds": 8,
+      "operations": [
+        "start",
+        "healthcheck",
+        "exec x3",
+        "inspect",
+        "stop",
+        "remove",
+        "list"
+      ],
+      "cpus": 12,
+      "passed": true,
+      "site_data_used": false
+    }
+  },
+  "logs": [
+    {
+      "path": "target/reader-ui-repair/native.out",
+      "sha256": "6541bac503e2a1f937e076086409ff9411449470da592a1bebbc6c7dc17d61d1"
+    },
+    {
+      "path": "target/reader-ui-repair/guest-repro.out",
+      "sha256": "99970889758d822e8fc00e83380fae4b1b2f397816e73ee0141be6fcb03794d7"
+    },
+    {
+      "path": "target/reader-ui-repair/tcp-fixed-python.log",
+      "sha256": "18b0ab2279d074d2c08760c08789f05b5bdce0c823f33b044f84570b857a2058"
+    },
+    {
+      "path": "target/reader-ui-repair/go-gc-cancel4.log",
+      "sha256": "e8dd5e3fae6fa8b3df1090acd43b111cb7b1c7e49b8c57ade35be6d498d7b52e"
+    },
+    {
+      "path": "target/reader-ui-repair/go-gc-cancel12-100.log",
+      "sha256": "fc7823f3c6d2f581ec028fb8eb08b1be7a8633b75608ba39d41fbbd4ab3c37a5"
+    },
+    {
+      "path": "target/reader-ui-repair/docker-futex-cancel.log",
+      "sha256": "8c2c7a037c85eff530833bbdebf5a73203314a486cf642d3920fbda679249952"
+    },
+    {
+      "path": "target/reader-ui-repair/network-tests.log",
+      "sha256": "bc09553aa5c570e7d5d6aaf83aa3da33ec7fa6b8b505a19a5e2a9563ad0b1ed0"
+    },
+    {
+      "path": "target/reader-ui-repair/kernel-tests.log",
+      "sha256": "999905f3d5443be5cf79ba6e433ec74e12da03be5255924fab18554e78b0a044"
+    },
+    {
+      "path": "target/reader-ui-repair/network-clippy.log",
+      "sha256": "624b1c112b7e98a4a1a4cef8bacb1ed6a73bf49eaebd9f7ae711cfb6c57c7807"
+    },
+    {
+      "path": "target/reader-ui-repair/kernel-clippy.log",
+      "sha256": "6d545c9bdbc468dd704a62af55eae7354ff1e9789582ad1673da0b96adb3e5e6"
+    },
+    {
+      "path": "target/reader-ui-repair/ipad-check.log",
+      "sha256": "49bd55e0139b6aae8ec200389930625c942fc6cbcafcf141872378fd160b60f4"
+    },
+    {
+      "path": "target/local-ci/io/reader-repair-network-linux.log",
+      "sha256": "609fee048fdc1b44f0c9912aec398874773bb2b2d0e40a48996b511206ddb51f"
+    },
+    {
+      "path": "target/local-ci/io/reader-repair-kernel-linux.log",
+      "sha256": "3928e7dfe1b50b5a3c23ec8a364ab979d907f44af464cb4ba6d77fe3b35d0abc"
+    },
+    {
+      "path": "target/local-ci/io/reader-repair-go-native.log",
+      "sha256": "4a0394e520a999c43e12ed706f25f2101781c83e37cbd885caf0bfa12a444c54"
+    },
+    {
+      "path": "target/reader-ui-repair/final-dev-tcp.log",
+      "sha256": "18b0ab2279d074d2c08760c08789f05b5bdce0c823f33b044f84570b857a2058"
+    },
+    {
+      "path": "target/reader-ui-repair/final-dev-go-gc.log",
+      "sha256": "e8dd5e3fae6fa8b3df1090acd43b111cb7b1c7e49b8c57ade35be6d498d7b52e"
+    },
+    {
+      "path": "target/reader-ui-repair/final-stable-docker.log",
+      "sha256": "e6f04d2f6f7ada45b72332e3d984bbd1175fa6d91d563251471205f852350391"
+    },
+    {
+      "path": "target/reader-ui-repair/installed-stable-tcp.log",
+      "sha256": "6541bac503e2a1f937e076086409ff9411449470da592a1bebbc6c7dc17d61d1"
+    },
+    {
+      "path": "target/reader-ui-repair/deployment-after.json",
+      "sha256": "7b9760d80e99455fbade5f7b2e9ca701a682fef80c31e695f3900c2222e4d220"
+    },
+    {
+      "path": "target/reader-ui-repair/mac-ci/summary.json",
+      "sha256": "0e5e5464f3d3cf8e014b79943a3e239f748054ace938e78fcbc30d6b3a25b2db"
+    }
+  ],
+  "limitations": [
+    "No Techo frontend activation or paid API requests",
+    "No new physical iPad test; shared FFI target compilation passed",
+    "Stress acceptance does not prove that all unrelated Docker/Go defects are absent"
+  ],
+  "final_bundles": [
+    {
+      "channel": "stable",
+      "version": "Trames 1.5.3 (stable) runtime d9c4a811faf316a51b1a8f33f055247943a18855",
+      "binary_sha256": "4f40615213e731b2a4ef9d8c6a0e85c5c7bdf31ab0c60b0354b55113f2a6a55d",
+      "icon_sha256": "0c756a6656a6d16f2b1d83a0ba71fa45ec646a2f74525d6d5e6163589c7c8686"
+    },
+    {
+      "channel": "dev",
+      "version": "Trames Dev 1.5.3 (dev) runtime d9c4a811faf316a51b1a8f33f055247943a18855",
+      "binary_sha256": "e5957f74a12298163a7a1dfe77566ad4078578ed891f11978a7e1ba3e699093a",
+      "icon_sha256": "0c756a6656a6d16f2b1d83a0ba71fa45ec646a2f74525d6d5e6163589c7c8686"
+    }
+  ],
+  "final_pinned_acceptance": {
+    "dev": {
+      "binary_sha256": "e5957f74a12298163a7a1dfe77566ad4078578ed891f11978a7e1ba3e699093a",
+      "results": [
+        {
+          "case": "final-dev-tcp",
+          "returncode": 0,
+          "seconds": 0.27156195899999996
+        },
+        {
+          "case": "final-dev-go-gc",
+          "returncode": 0,
+          "seconds": 3.5424298750000003
+        }
+      ]
+    },
+    "stable": {
+      "binary_sha256": "4f40615213e731b2a4ef9d8c6a0e85c5c7bdf31ab0c60b0354b55113f2a6a55d",
+      "returncode": 0,
+      "seconds": 84.037918042,
+      "rounds": 8
+    },
+    "installed_stable_tcp": "original three-case reproducer passed"
+  },
+  "deployment": {
+    "debian_restarted": true,
+    "health": {
+      "status": 200,
+      "bytes": 15,
+      "content_length": "15",
+      "seconds": 0.023236833000000012
+    },
+    "weekly_response": {
+      "status": 200,
+      "bytes": 3777458,
+      "content_length": "3777458",
+      "seconds": 0.06263637499999997,
+      "valid_json": true
+    },
+    "docker_list_seconds": 0.11899841700000002,
+    "docker_inspect_seconds": 0.11122970799999998,
+    "preview_healthy": true,
+    "collection_service": "inactive; previously stuck in Docker startup without holding collection lock",
+    "collection_timer": "active/waiting",
+    "unrelated_docker_http": {
+      "status": 200,
+      "bytes": 25,
+      "content_length": "25",
+      "seconds": 0.02486541600000003
+    },
+    "frontend_candidate_activated": false,
+    "paid_api_requests": 0
+  },
+  "workflow": {
+    "mac_prebuild_steps": 8,
+    "all_passed": true,
+    "dev_build": "pass",
+    "stable_build": "pass",
+    "package_verification": "recorded by release artifact manifests",
+    "ipad_ffi_compile": "pass"
+  }
+}

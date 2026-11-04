@@ -77,3 +77,17 @@ IPv4/IPv6 echo、identifier 和校验和，不能用模拟回复代替验证。
 仍保留 Linux ABI 转换、guest 内存复制和现有内核调度边界。没有改变 CPU
 工作线程的访存模型，也没有增加逐指令检查。本批没有新的吞吐/延迟跑分，
 不报告推测的加速比。
+
+
+## Large stream writes (2026-11-04)
+
+Runtime `d9c4a811faf316a51b1a8f33f055247943a18855` treats the existing
+1 MiB staging bound as one accepted TCP prefix. A larger `sendall` therefore
+progresses through ordinary short writes instead of receiving EMSGSIZE. The
+socket's immutable type follows accept and endpoint transitions without a host
+query or another hot-path lock. UDP keeps atomic message size enforcement.
+Retained sendmsg/sendmmsg/uring preparation copies only the accepted prefix;
+batch accounting retains the original request length and prevents replay.
+The original 3,777,458-byte Python reproducer passes without application changes.
+See the [shared contract](../../runtime/docs/architecture/execution-backends.md#stream-prefixes-and-logical-futex-retirement-2026-11-04)
+and [validation record](../validation/reader-runtime-20261104.json).
