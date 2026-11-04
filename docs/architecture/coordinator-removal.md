@@ -2975,3 +2975,76 @@ cycles at twelve CPUs. Public Debian tools and Alpine content are used; no
 application data, frontend activation or paid model requests are involved.
 Mac Dev is installed. The physical iPad execution is not claimed; its shared
 runtime pin and device-target compile are verified.
+
+## 40. Original child waits and lifecycle event ownership (2026-11-05)
+
+The task-lifecycle migration now has an original shared parent/child event
+model. A process owns its `Children` family; threads share that family and the
+child group's wait event, while fork creates new objects. Supported wait4 and
+waitid calls execute over those objects on their source workers, including
+blocking waits, WNOHANG/WNOWAIT, stopped/continued events, PID namespaces,
+competing reapers, output faults and caught-signal EINTR/SA_RESTART. Accepted
+waits subscribe before checking and relinquish their execution slot. They do
+not scan the owner's Process table, send an owner request or copy out guest
+bytes while holding resource locks.
+
+Reaping updates one shared PID-visibility bit immediately. Signal/limit
+lookups and proc observations stop exposing that task even before its owner
+projection is collected. Projection collection now precedes returned owner
+PID queries, so an immediate getpgid after source reaping returns ESRCH. A
+retained resource handle owns neither the task lifetime nor a replacement PID.
+Structural relationships publish only on custody changes; solo wait polling
+also avoids rebuilding the full directory on every call.
+
+Nine counterbalanced before/after pairs use the same static ARM64 musl fixture.
+The four-thread workload performs 4,000 wait queries; the solo control performs
+1,000. Native reference measurements use the local native ARM Linux instance,
+not bare-metal Darwin.
+
+| Work | CPUs | Old HVF | New HVF | Relative speed |
+| --- | ---: | ---: | ---: | ---: |
+| wait4 poll | 1 | 1.487 ms | 1.458 ms | 1.020x |
+| waitid poll | 1 | 1.579 ms | 1.620 ms | 0.975x |
+| wait4 poll | 4 | 172.905 ms | 4.214 ms | 41.031x |
+| waitid poll | 4 | 172.291 ms | 4.192 ms | 41.098x |
+
+The solo controls vary within about 3%; the waitid solo result is a small
+regression rather than a claimed improvement. Diagnostic runs separately
+verify that wait syscalls no longer return their cohorts to the owner. Both
+old and new paths have zero service requests, so RPC counts alone would miss
+the removed coordination. This is a wait-subsystem result, not a whole-system
+or browser speedup claim.
+
+The isolated twelve-CPU Docker run exposed a real integration error: an
+owner-blocked child wait acquired both its typed child-wait request and a
+legacy I/O retry envelope. After the child event completed, it was replayed as
+unsupported I/O. Child custody now excludes that duplicate envelope; the real
+Kernel regression imports a blocked wait, completes it and follows it with an
+owner PID query. Native Linux also corrected previous pointer-fault semantics:
+no-result WNOHANG does not preflight output pointers, while failed copyout after
+consumption does not resurrect the child. wait4/waitid retain Linux's differing
+rusage copy order. Temporary event tracing is removed from the final build.
+
+[Source-bound evidence, samples and acceptance](../validation/worker-child-waits-20261105.json)
+· [Shared lifecycle boundary contract](../../runtime/docs/architecture/coordination-boundaries.md).
+Apple and ARM Linux pass 296 process conformance cases (three ignored); the
+unchanged final kernel sources retain their 32 passing unit cases. Strict
+checks and the iPad device-target FFI compile pass. Real binary acceptance uses
+HVF at one/four/twelve CPUs and the production interpreter at one/four CPUs;
+this does not claim physical-iPad execution. Unchanged ABI/VFS results from
+stage 39 are reused.
+
+**The full lifecycle migration remains open.** Default STOP/CONT/termination,
+exit/group-exit cleanup, clear_tid, parent-death/reparenting policy,
+namespace-init teardown and resource finalizers still retain their documented
+boundaries. In particular, `Epoch::finish` still stops the cohort. This batch
+adds no coordinator/service thread, polling bus, global algorithm lock or
+ordinary-memory barrier. Mac Dev is the review target; the installed stable
+1.5.3 environment is kept separate.
+
+The final normal build additionally passes 30 stock Go GC stress starts with
+normal asynchronous preemption and eight isolated Docker lifecycle rounds at
+twelve CPUs. The successful eight-round run contains no temporary event tracing.
+Mac Dev is installed from this paired runtime pin; the stable binary hash is
+unchanged. Failed pilot logs, both custody fixes and every timing sample remain
+in the source-bound evidence.

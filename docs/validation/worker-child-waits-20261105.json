@@ -1,0 +1,2319 @@
+{
+  "date": "2026-11-05",
+  "stage": 40,
+  "scope": "Shared child waits and lifecycle event foundation; full lifecycle migration remains active",
+  "runtime_revision": "decc86ef7ea3a81611ab1410046d2a3deb8b15d4",
+  "runtime_commits": [
+    "5954f86e63470080b3c14fc70bb6afe1011d9fa6",
+    "726aa3160ad7cdc757c13e31c02e23ed6f71c56e",
+    "decc86ef7ea3a81611ab1410046d2a3deb8b15d4"
+  ],
+  "baseline_runtime": "f361bde2824f6b629a85e336774f8eceee3492e7",
+  "benchmark_method": "Nine counterbalanced before/after pairs per API and CPU count; same static ARM64 musl ELF; startup/teardown excluded by guest timestamps; fixture includes start/end barriers. Native reference is the local Lima ARM Linux instance, not bare-metal Darwin.",
+  "summary": [
+    {
+      "mode": "wait4",
+      "cpus": 1,
+      "calls": 1000,
+      "before": 1487000,
+      "after": 1457875,
+      "speedup": 1.0199777072794307,
+      "native_arm_linux_ns": null
+    },
+    {
+      "mode": "wait4",
+      "cpus": 4,
+      "calls": 4000,
+      "before": 172905250,
+      "after": 4214042,
+      "speedup": 41.03073723517706,
+      "native_arm_linux_ns": 1312876
+    },
+    {
+      "mode": "waitid",
+      "cpus": 1,
+      "calls": 1000,
+      "before": 1579209,
+      "after": 1619916,
+      "speedup": 0.9748709192328491,
+      "native_arm_linux_ns": null
+    },
+    {
+      "mode": "waitid",
+      "cpus": 4,
+      "calls": 4000,
+      "before": 172291125,
+      "after": 4192167,
+      "speedup": 41.0983448417012,
+      "native_arm_linux_ns": 1280167
+    }
+  ],
+  "benchmark": {
+    "binaries": {
+      "before": {
+        "path": "/Users/main/dev/trames/target/worker-lifecycle/before-mac-run",
+        "sha256": "5ee1f6cd8d3a165d6495119c71e0b5ca51055357622304b3635cef9db4416ae3"
+      },
+      "after": {
+        "path": "/Users/main/dev/trames-mac/target/release/Trames Dev.app/Contents/MacOS/trames-mac-run",
+        "sha256": "946addf1197d6e34adfd5f02f2c0aa3cfe3656cd32aaf5415ed48d6a25750a90"
+      }
+    },
+    "fixture_sha256": "68e71d4650fa1f0e82f75f674d16dddbbaa75bef0435a9881c427c95e0294cf5",
+    "samples": [
+      {
+        "mode": "wait4",
+        "cpus": 1,
+        "sample": 0,
+        "phase": "before",
+        "elapsed_ns": 1684375
+      },
+      {
+        "mode": "wait4",
+        "cpus": 1,
+        "sample": 0,
+        "phase": "after",
+        "elapsed_ns": 2922334
+      },
+      {
+        "mode": "wait4",
+        "cpus": 1,
+        "sample": 1,
+        "phase": "after",
+        "elapsed_ns": 2187542
+      },
+      {
+        "mode": "wait4",
+        "cpus": 1,
+        "sample": 1,
+        "phase": "before",
+        "elapsed_ns": 1964250
+      },
+      {
+        "mode": "wait4",
+        "cpus": 1,
+        "sample": 2,
+        "phase": "before",
+        "elapsed_ns": 1657208
+      },
+      {
+        "mode": "wait4",
+        "cpus": 1,
+        "sample": 2,
+        "phase": "after",
+        "elapsed_ns": 1445375
+      },
+      {
+        "mode": "wait4",
+        "cpus": 1,
+        "sample": 3,
+        "phase": "after",
+        "elapsed_ns": 1467000
+      },
+      {
+        "mode": "wait4",
+        "cpus": 1,
+        "sample": 3,
+        "phase": "before",
+        "elapsed_ns": 1483209
+      },
+      {
+        "mode": "wait4",
+        "cpus": 1,
+        "sample": 4,
+        "phase": "before",
+        "elapsed_ns": 1504959
+      },
+      {
+        "mode": "wait4",
+        "cpus": 1,
+        "sample": 4,
+        "phase": "after",
+        "elapsed_ns": 1445208
+      },
+      {
+        "mode": "wait4",
+        "cpus": 1,
+        "sample": 5,
+        "phase": "after",
+        "elapsed_ns": 1457958
+      },
+      {
+        "mode": "wait4",
+        "cpus": 1,
+        "sample": 5,
+        "phase": "before",
+        "elapsed_ns": 1477500
+      },
+      {
+        "mode": "wait4",
+        "cpus": 1,
+        "sample": 6,
+        "phase": "before",
+        "elapsed_ns": 1473000
+      },
+      {
+        "mode": "wait4",
+        "cpus": 1,
+        "sample": 6,
+        "phase": "after",
+        "elapsed_ns": 1457875
+      },
+      {
+        "mode": "wait4",
+        "cpus": 1,
+        "sample": 7,
+        "phase": "after",
+        "elapsed_ns": 1447333
+      },
+      {
+        "mode": "wait4",
+        "cpus": 1,
+        "sample": 7,
+        "phase": "before",
+        "elapsed_ns": 1487000
+      },
+      {
+        "mode": "wait4",
+        "cpus": 1,
+        "sample": 8,
+        "phase": "before",
+        "elapsed_ns": 1479708
+      },
+      {
+        "mode": "wait4",
+        "cpus": 1,
+        "sample": 8,
+        "phase": "after",
+        "elapsed_ns": 1453792
+      },
+      {
+        "mode": "wait4",
+        "cpus": 4,
+        "sample": 0,
+        "phase": "before",
+        "elapsed_ns": 174060833
+      },
+      {
+        "mode": "wait4",
+        "cpus": 4,
+        "sample": 0,
+        "phase": "after",
+        "elapsed_ns": 4135708
+      },
+      {
+        "mode": "wait4",
+        "cpus": 4,
+        "sample": 1,
+        "phase": "after",
+        "elapsed_ns": 3984125
+      },
+      {
+        "mode": "wait4",
+        "cpus": 4,
+        "sample": 1,
+        "phase": "before",
+        "elapsed_ns": 173266541
+      },
+      {
+        "mode": "wait4",
+        "cpus": 4,
+        "sample": 2,
+        "phase": "before",
+        "elapsed_ns": 171347042
+      },
+      {
+        "mode": "wait4",
+        "cpus": 4,
+        "sample": 2,
+        "phase": "after",
+        "elapsed_ns": 4214042
+      },
+      {
+        "mode": "wait4",
+        "cpus": 4,
+        "sample": 3,
+        "phase": "after",
+        "elapsed_ns": 4375084
+      },
+      {
+        "mode": "wait4",
+        "cpus": 4,
+        "sample": 3,
+        "phase": "before",
+        "elapsed_ns": 173527791
+      },
+      {
+        "mode": "wait4",
+        "cpus": 4,
+        "sample": 4,
+        "phase": "before",
+        "elapsed_ns": 169440500
+      },
+      {
+        "mode": "wait4",
+        "cpus": 4,
+        "sample": 4,
+        "phase": "after",
+        "elapsed_ns": 4302709
+      },
+      {
+        "mode": "wait4",
+        "cpus": 4,
+        "sample": 5,
+        "phase": "after",
+        "elapsed_ns": 4428750
+      },
+      {
+        "mode": "wait4",
+        "cpus": 4,
+        "sample": 5,
+        "phase": "before",
+        "elapsed_ns": 170421000
+      },
+      {
+        "mode": "wait4",
+        "cpus": 4,
+        "sample": 6,
+        "phase": "before",
+        "elapsed_ns": 172905250
+      },
+      {
+        "mode": "wait4",
+        "cpus": 4,
+        "sample": 6,
+        "phase": "after",
+        "elapsed_ns": 4091667
+      },
+      {
+        "mode": "wait4",
+        "cpus": 4,
+        "sample": 7,
+        "phase": "after",
+        "elapsed_ns": 4089125
+      },
+      {
+        "mode": "wait4",
+        "cpus": 4,
+        "sample": 7,
+        "phase": "before",
+        "elapsed_ns": 173611666
+      },
+      {
+        "mode": "wait4",
+        "cpus": 4,
+        "sample": 8,
+        "phase": "before",
+        "elapsed_ns": 172338375
+      },
+      {
+        "mode": "wait4",
+        "cpus": 4,
+        "sample": 8,
+        "phase": "after",
+        "elapsed_ns": 4217792
+      },
+      {
+        "mode": "waitid",
+        "cpus": 1,
+        "sample": 0,
+        "phase": "before",
+        "elapsed_ns": 1597750
+      },
+      {
+        "mode": "waitid",
+        "cpus": 1,
+        "sample": 0,
+        "phase": "after",
+        "elapsed_ns": 1726667
+      },
+      {
+        "mode": "waitid",
+        "cpus": 1,
+        "sample": 1,
+        "phase": "after",
+        "elapsed_ns": 1743125
+      },
+      {
+        "mode": "waitid",
+        "cpus": 1,
+        "sample": 1,
+        "phase": "before",
+        "elapsed_ns": 1630333
+      },
+      {
+        "mode": "waitid",
+        "cpus": 1,
+        "sample": 2,
+        "phase": "before",
+        "elapsed_ns": 1608833
+      },
+      {
+        "mode": "waitid",
+        "cpus": 1,
+        "sample": 2,
+        "phase": "after",
+        "elapsed_ns": 1691250
+      },
+      {
+        "mode": "waitid",
+        "cpus": 1,
+        "sample": 3,
+        "phase": "after",
+        "elapsed_ns": 1593125
+      },
+      {
+        "mode": "waitid",
+        "cpus": 1,
+        "sample": 3,
+        "phase": "before",
+        "elapsed_ns": 1567542
+      },
+      {
+        "mode": "waitid",
+        "cpus": 1,
+        "sample": 4,
+        "phase": "before",
+        "elapsed_ns": 1563500
+      },
+      {
+        "mode": "waitid",
+        "cpus": 1,
+        "sample": 4,
+        "phase": "after",
+        "elapsed_ns": 1564666
+      },
+      {
+        "mode": "waitid",
+        "cpus": 1,
+        "sample": 5,
+        "phase": "after",
+        "elapsed_ns": 1619208
+      },
+      {
+        "mode": "waitid",
+        "cpus": 1,
+        "sample": 5,
+        "phase": "before",
+        "elapsed_ns": 1569625
+      },
+      {
+        "mode": "waitid",
+        "cpus": 1,
+        "sample": 6,
+        "phase": "before",
+        "elapsed_ns": 1590667
+      },
+      {
+        "mode": "waitid",
+        "cpus": 1,
+        "sample": 6,
+        "phase": "after",
+        "elapsed_ns": 1602125
+      },
+      {
+        "mode": "waitid",
+        "cpus": 1,
+        "sample": 7,
+        "phase": "after",
+        "elapsed_ns": 1626458
+      },
+      {
+        "mode": "waitid",
+        "cpus": 1,
+        "sample": 7,
+        "phase": "before",
+        "elapsed_ns": 1579209
+      },
+      {
+        "mode": "waitid",
+        "cpus": 1,
+        "sample": 8,
+        "phase": "before",
+        "elapsed_ns": 1571750
+      },
+      {
+        "mode": "waitid",
+        "cpus": 1,
+        "sample": 8,
+        "phase": "after",
+        "elapsed_ns": 1619916
+      },
+      {
+        "mode": "waitid",
+        "cpus": 4,
+        "sample": 0,
+        "phase": "before",
+        "elapsed_ns": 173717291
+      },
+      {
+        "mode": "waitid",
+        "cpus": 4,
+        "sample": 0,
+        "phase": "after",
+        "elapsed_ns": 7215917
+      },
+      {
+        "mode": "waitid",
+        "cpus": 4,
+        "sample": 1,
+        "phase": "after",
+        "elapsed_ns": 4192167
+      },
+      {
+        "mode": "waitid",
+        "cpus": 4,
+        "sample": 1,
+        "phase": "before",
+        "elapsed_ns": 174024625
+      },
+      {
+        "mode": "waitid",
+        "cpus": 4,
+        "sample": 2,
+        "phase": "before",
+        "elapsed_ns": 171872333
+      },
+      {
+        "mode": "waitid",
+        "cpus": 4,
+        "sample": 2,
+        "phase": "after",
+        "elapsed_ns": 4082500
+      },
+      {
+        "mode": "waitid",
+        "cpus": 4,
+        "sample": 3,
+        "phase": "after",
+        "elapsed_ns": 4091583
+      },
+      {
+        "mode": "waitid",
+        "cpus": 4,
+        "sample": 3,
+        "phase": "before",
+        "elapsed_ns": 173464208
+      },
+      {
+        "mode": "waitid",
+        "cpus": 4,
+        "sample": 4,
+        "phase": "before",
+        "elapsed_ns": 170722750
+      },
+      {
+        "mode": "waitid",
+        "cpus": 4,
+        "sample": 4,
+        "phase": "after",
+        "elapsed_ns": 4189041
+      },
+      {
+        "mode": "waitid",
+        "cpus": 4,
+        "sample": 5,
+        "phase": "after",
+        "elapsed_ns": 4548584
+      },
+      {
+        "mode": "waitid",
+        "cpus": 4,
+        "sample": 5,
+        "phase": "before",
+        "elapsed_ns": 171535333
+      },
+      {
+        "mode": "waitid",
+        "cpus": 4,
+        "sample": 6,
+        "phase": "before",
+        "elapsed_ns": 171899459
+      },
+      {
+        "mode": "waitid",
+        "cpus": 4,
+        "sample": 6,
+        "phase": "after",
+        "elapsed_ns": 4484625
+      },
+      {
+        "mode": "waitid",
+        "cpus": 4,
+        "sample": 7,
+        "phase": "after",
+        "elapsed_ns": 4136959
+      },
+      {
+        "mode": "waitid",
+        "cpus": 4,
+        "sample": 7,
+        "phase": "before",
+        "elapsed_ns": 172977291
+      },
+      {
+        "mode": "waitid",
+        "cpus": 4,
+        "sample": 8,
+        "phase": "before",
+        "elapsed_ns": 172291125
+      },
+      {
+        "mode": "waitid",
+        "cpus": 4,
+        "sample": 8,
+        "phase": "after",
+        "elapsed_ns": 4409291
+      }
+    ]
+  },
+  "native_final_samples": [
+    {
+      "mode": "wait4",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1361752
+    },
+    {
+      "mode": "wait4",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1355668
+    },
+    {
+      "mode": "wait4",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1367543
+    },
+    {
+      "mode": "wait4",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1312876
+    },
+    {
+      "mode": "wait4",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1270335
+    },
+    {
+      "mode": "wait4",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1303376
+    },
+    {
+      "mode": "wait4",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1266876
+    },
+    {
+      "mode": "wait4",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1286751
+    },
+    {
+      "mode": "wait4",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1324627
+    },
+    {
+      "mode": "waitid",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1296334
+    },
+    {
+      "mode": "waitid",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1280210
+    },
+    {
+      "mode": "waitid",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1273251
+    },
+    {
+      "mode": "waitid",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1280167
+    },
+    {
+      "mode": "waitid",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1332585
+    },
+    {
+      "mode": "waitid",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1335459
+    },
+    {
+      "mode": "waitid",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1197834
+    },
+    {
+      "mode": "waitid",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1264793
+    },
+    {
+      "mode": "waitid",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1251543
+    }
+  ],
+  "native_preliminary_samples": [
+    {
+      "mode": "wait4",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 847375
+    },
+    {
+      "mode": "wait4",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1766751
+    },
+    {
+      "mode": "wait4",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 2028000
+    },
+    {
+      "mode": "wait4",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1887833
+    },
+    {
+      "mode": "wait4",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1430042
+    },
+    {
+      "mode": "wait4",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1918626
+    },
+    {
+      "mode": "wait4",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1905167
+    },
+    {
+      "mode": "wait4",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1661751
+    },
+    {
+      "mode": "wait4",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1787125
+    },
+    {
+      "mode": "waitid",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1855001
+    },
+    {
+      "mode": "waitid",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1925167
+    },
+    {
+      "mode": "waitid",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1954625
+    },
+    {
+      "mode": "waitid",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 2029084
+    },
+    {
+      "mode": "waitid",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1295251
+    },
+    {
+      "mode": "waitid",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1834000
+    },
+    {
+      "mode": "waitid",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 2031959
+    },
+    {
+      "mode": "waitid",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 2064959
+    },
+    {
+      "mode": "waitid",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1699418
+    },
+    {
+      "mode": "wait4",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1267834
+    },
+    {
+      "mode": "wait4",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1270751
+    },
+    {
+      "mode": "wait4",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1302834
+    },
+    {
+      "mode": "wait4",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1262876
+    },
+    {
+      "mode": "wait4",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1265376
+    },
+    {
+      "mode": "wait4",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1333126
+    },
+    {
+      "mode": "wait4",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1315002
+    },
+    {
+      "mode": "wait4",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1291585
+    },
+    {
+      "mode": "wait4",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1252251
+    },
+    {
+      "mode": "waitid",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1271293
+    },
+    {
+      "mode": "waitid",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1292126
+    },
+    {
+      "mode": "waitid",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1277626
+    },
+    {
+      "mode": "waitid",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1267627
+    },
+    {
+      "mode": "waitid",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1297210
+    },
+    {
+      "mode": "waitid",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1267876
+    },
+    {
+      "mode": "waitid",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1275626
+    },
+    {
+      "mode": "waitid",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1265168
+    },
+    {
+      "mode": "waitid",
+      "threads": 4,
+      "calls": 4000,
+      "elapsed_ns": 1262126
+    }
+  ],
+  "pilot_benchmarks": [
+    {
+      "binaries": {
+        "before": {
+          "path": "/Users/main/dev/trames/target/worker-lifecycle/before-mac-run",
+          "sha256": "5ee1f6cd8d3a165d6495119c71e0b5ca51055357622304b3635cef9db4416ae3"
+        },
+        "after": {
+          "path": "/Users/main/dev/trames-mac/target/release/Trames Dev.app/Contents/MacOS/trames-mac-run",
+          "sha256": "bf13e4388e2e4a6d9366b44ba09fb4abec077da598454f077e62b162c78ee116"
+        }
+      },
+      "fixture_sha256": "68e71d4650fa1f0e82f75f674d16dddbbaa75bef0435a9881c427c95e0294cf5",
+      "samples": [
+        {
+          "mode": "wait4",
+          "cpus": 1,
+          "sample": 0,
+          "phase": "before",
+          "elapsed_ns": 3473833
+        },
+        {
+          "mode": "wait4",
+          "cpus": 1,
+          "sample": 0,
+          "phase": "after",
+          "elapsed_ns": 3803750
+        },
+        {
+          "mode": "wait4",
+          "cpus": 1,
+          "sample": 1,
+          "phase": "after",
+          "elapsed_ns": 3309666
+        },
+        {
+          "mode": "wait4",
+          "cpus": 1,
+          "sample": 1,
+          "phase": "before",
+          "elapsed_ns": 2451375
+        },
+        {
+          "mode": "wait4",
+          "cpus": 1,
+          "sample": 2,
+          "phase": "before",
+          "elapsed_ns": 2120208
+        },
+        {
+          "mode": "wait4",
+          "cpus": 1,
+          "sample": 2,
+          "phase": "after",
+          "elapsed_ns": 1889875
+        },
+        {
+          "mode": "wait4",
+          "cpus": 1,
+          "sample": 3,
+          "phase": "after",
+          "elapsed_ns": 1674625
+        },
+        {
+          "mode": "wait4",
+          "cpus": 1,
+          "sample": 3,
+          "phase": "before",
+          "elapsed_ns": 1527750
+        },
+        {
+          "mode": "wait4",
+          "cpus": 1,
+          "sample": 4,
+          "phase": "before",
+          "elapsed_ns": 1487250
+        },
+        {
+          "mode": "wait4",
+          "cpus": 1,
+          "sample": 4,
+          "phase": "after",
+          "elapsed_ns": 1458167
+        },
+        {
+          "mode": "wait4",
+          "cpus": 1,
+          "sample": 5,
+          "phase": "after",
+          "elapsed_ns": 1470083
+        },
+        {
+          "mode": "wait4",
+          "cpus": 1,
+          "sample": 5,
+          "phase": "before",
+          "elapsed_ns": 1509375
+        },
+        {
+          "mode": "wait4",
+          "cpus": 1,
+          "sample": 6,
+          "phase": "before",
+          "elapsed_ns": 1496084
+        },
+        {
+          "mode": "wait4",
+          "cpus": 1,
+          "sample": 6,
+          "phase": "after",
+          "elapsed_ns": 1461167
+        },
+        {
+          "mode": "wait4",
+          "cpus": 1,
+          "sample": 7,
+          "phase": "after",
+          "elapsed_ns": 1491750
+        },
+        {
+          "mode": "wait4",
+          "cpus": 1,
+          "sample": 7,
+          "phase": "before",
+          "elapsed_ns": 1504958
+        },
+        {
+          "mode": "wait4",
+          "cpus": 1,
+          "sample": 8,
+          "phase": "before",
+          "elapsed_ns": 1483167
+        },
+        {
+          "mode": "wait4",
+          "cpus": 1,
+          "sample": 8,
+          "phase": "after",
+          "elapsed_ns": 1484292
+        },
+        {
+          "mode": "wait4",
+          "cpus": 4,
+          "sample": 0,
+          "phase": "before",
+          "elapsed_ns": 165863625
+        },
+        {
+          "mode": "wait4",
+          "cpus": 4,
+          "sample": 0,
+          "phase": "after",
+          "elapsed_ns": 4084750
+        },
+        {
+          "mode": "wait4",
+          "cpus": 4,
+          "sample": 1,
+          "phase": "after",
+          "elapsed_ns": 4178083
+        },
+        {
+          "mode": "wait4",
+          "cpus": 4,
+          "sample": 1,
+          "phase": "before",
+          "elapsed_ns": 169728000
+        },
+        {
+          "mode": "wait4",
+          "cpus": 4,
+          "sample": 2,
+          "phase": "before",
+          "elapsed_ns": 167426625
+        },
+        {
+          "mode": "wait4",
+          "cpus": 4,
+          "sample": 2,
+          "phase": "after",
+          "elapsed_ns": 4095375
+        },
+        {
+          "mode": "wait4",
+          "cpus": 4,
+          "sample": 3,
+          "phase": "after",
+          "elapsed_ns": 4230250
+        },
+        {
+          "mode": "wait4",
+          "cpus": 4,
+          "sample": 3,
+          "phase": "before",
+          "elapsed_ns": 167207333
+        },
+        {
+          "mode": "wait4",
+          "cpus": 4,
+          "sample": 4,
+          "phase": "before",
+          "elapsed_ns": 169195583
+        },
+        {
+          "mode": "wait4",
+          "cpus": 4,
+          "sample": 4,
+          "phase": "after",
+          "elapsed_ns": 4227917
+        },
+        {
+          "mode": "wait4",
+          "cpus": 4,
+          "sample": 5,
+          "phase": "after",
+          "elapsed_ns": 4154792
+        },
+        {
+          "mode": "wait4",
+          "cpus": 4,
+          "sample": 5,
+          "phase": "before",
+          "elapsed_ns": 167779334
+        },
+        {
+          "mode": "wait4",
+          "cpus": 4,
+          "sample": 6,
+          "phase": "before",
+          "elapsed_ns": 171035292
+        },
+        {
+          "mode": "wait4",
+          "cpus": 4,
+          "sample": 6,
+          "phase": "after",
+          "elapsed_ns": 4168625
+        },
+        {
+          "mode": "wait4",
+          "cpus": 4,
+          "sample": 7,
+          "phase": "after",
+          "elapsed_ns": 4084000
+        },
+        {
+          "mode": "wait4",
+          "cpus": 4,
+          "sample": 7,
+          "phase": "before",
+          "elapsed_ns": 167337083
+        },
+        {
+          "mode": "wait4",
+          "cpus": 4,
+          "sample": 8,
+          "phase": "before",
+          "elapsed_ns": 166121791
+        },
+        {
+          "mode": "wait4",
+          "cpus": 4,
+          "sample": 8,
+          "phase": "after",
+          "elapsed_ns": 3987542
+        },
+        {
+          "mode": "waitid",
+          "cpus": 1,
+          "sample": 0,
+          "phase": "before",
+          "elapsed_ns": 1571167
+        },
+        {
+          "mode": "waitid",
+          "cpus": 1,
+          "sample": 0,
+          "phase": "after",
+          "elapsed_ns": 1583625
+        },
+        {
+          "mode": "waitid",
+          "cpus": 1,
+          "sample": 1,
+          "phase": "after",
+          "elapsed_ns": 1663167
+        },
+        {
+          "mode": "waitid",
+          "cpus": 1,
+          "sample": 1,
+          "phase": "before",
+          "elapsed_ns": 1572583
+        },
+        {
+          "mode": "waitid",
+          "cpus": 1,
+          "sample": 2,
+          "phase": "before",
+          "elapsed_ns": 1619459
+        },
+        {
+          "mode": "waitid",
+          "cpus": 1,
+          "sample": 2,
+          "phase": "after",
+          "elapsed_ns": 1624333
+        },
+        {
+          "mode": "waitid",
+          "cpus": 1,
+          "sample": 3,
+          "phase": "after",
+          "elapsed_ns": 1603250
+        },
+        {
+          "mode": "waitid",
+          "cpus": 1,
+          "sample": 3,
+          "phase": "before",
+          "elapsed_ns": 1615666
+        },
+        {
+          "mode": "waitid",
+          "cpus": 1,
+          "sample": 4,
+          "phase": "before",
+          "elapsed_ns": 1647625
+        },
+        {
+          "mode": "waitid",
+          "cpus": 1,
+          "sample": 4,
+          "phase": "after",
+          "elapsed_ns": 1601125
+        },
+        {
+          "mode": "waitid",
+          "cpus": 1,
+          "sample": 5,
+          "phase": "after",
+          "elapsed_ns": 1640000
+        },
+        {
+          "mode": "waitid",
+          "cpus": 1,
+          "sample": 5,
+          "phase": "before",
+          "elapsed_ns": 1628250
+        },
+        {
+          "mode": "waitid",
+          "cpus": 1,
+          "sample": 6,
+          "phase": "before",
+          "elapsed_ns": 1606125
+        },
+        {
+          "mode": "waitid",
+          "cpus": 1,
+          "sample": 6,
+          "phase": "after",
+          "elapsed_ns": 1635084
+        },
+        {
+          "mode": "waitid",
+          "cpus": 1,
+          "sample": 7,
+          "phase": "after",
+          "elapsed_ns": 1572417
+        },
+        {
+          "mode": "waitid",
+          "cpus": 1,
+          "sample": 7,
+          "phase": "before",
+          "elapsed_ns": 1666625
+        },
+        {
+          "mode": "waitid",
+          "cpus": 1,
+          "sample": 8,
+          "phase": "before",
+          "elapsed_ns": 1559708
+        },
+        {
+          "mode": "waitid",
+          "cpus": 1,
+          "sample": 8,
+          "phase": "after",
+          "elapsed_ns": 1585542
+        },
+        {
+          "mode": "waitid",
+          "cpus": 4,
+          "sample": 0,
+          "phase": "before",
+          "elapsed_ns": 168847125
+        },
+        {
+          "mode": "waitid",
+          "cpus": 4,
+          "sample": 0,
+          "phase": "after",
+          "elapsed_ns": 4344291
+        },
+        {
+          "mode": "waitid",
+          "cpus": 4,
+          "sample": 1,
+          "phase": "after",
+          "elapsed_ns": 4018792
+        },
+        {
+          "mode": "waitid",
+          "cpus": 4,
+          "sample": 1,
+          "phase": "before",
+          "elapsed_ns": 180035667
+        },
+        {
+          "mode": "waitid",
+          "cpus": 4,
+          "sample": 2,
+          "phase": "before",
+          "elapsed_ns": 169792917
+        },
+        {
+          "mode": "waitid",
+          "cpus": 4,
+          "sample": 2,
+          "phase": "after",
+          "elapsed_ns": 4328541
+        },
+        {
+          "mode": "waitid",
+          "cpus": 4,
+          "sample": 3,
+          "phase": "after",
+          "elapsed_ns": 4346042
+        },
+        {
+          "mode": "waitid",
+          "cpus": 4,
+          "sample": 3,
+          "phase": "before",
+          "elapsed_ns": 169514875
+        },
+        {
+          "mode": "waitid",
+          "cpus": 4,
+          "sample": 4,
+          "phase": "before",
+          "elapsed_ns": 169249666
+        },
+        {
+          "mode": "waitid",
+          "cpus": 4,
+          "sample": 4,
+          "phase": "after",
+          "elapsed_ns": 4085042
+        },
+        {
+          "mode": "waitid",
+          "cpus": 4,
+          "sample": 5,
+          "phase": "after",
+          "elapsed_ns": 4246167
+        },
+        {
+          "mode": "waitid",
+          "cpus": 4,
+          "sample": 5,
+          "phase": "before",
+          "elapsed_ns": 168352833
+        },
+        {
+          "mode": "waitid",
+          "cpus": 4,
+          "sample": 6,
+          "phase": "before",
+          "elapsed_ns": 169441667
+        },
+        {
+          "mode": "waitid",
+          "cpus": 4,
+          "sample": 6,
+          "phase": "after",
+          "elapsed_ns": 4156792
+        },
+        {
+          "mode": "waitid",
+          "cpus": 4,
+          "sample": 7,
+          "phase": "after",
+          "elapsed_ns": 4260625
+        },
+        {
+          "mode": "waitid",
+          "cpus": 4,
+          "sample": 7,
+          "phase": "before",
+          "elapsed_ns": 169498208
+        },
+        {
+          "mode": "waitid",
+          "cpus": 4,
+          "sample": 8,
+          "phase": "before",
+          "elapsed_ns": 169280709
+        },
+        {
+          "mode": "waitid",
+          "cpus": 4,
+          "sample": 8,
+          "phase": "after",
+          "elapsed_ns": 4316708
+        }
+      ]
+    },
+    {
+      "binaries": {
+        "before": {
+          "path": "/Users/main/dev/trames/target/worker-lifecycle/before-mac-run",
+          "sha256": "5ee1f6cd8d3a165d6495119c71e0b5ca51055357622304b3635cef9db4416ae3"
+        },
+        "after": {
+          "path": "/Users/main/dev/trames-mac/target/release/Trames Dev.app/Contents/MacOS/trames-mac-run",
+          "sha256": "7c44e87854951ea2a867779b678b4f1021ccd39bdb01912e0bf85970fb17e372"
+        }
+      },
+      "fixture_sha256": "68e71d4650fa1f0e82f75f674d16dddbbaa75bef0435a9881c427c95e0294cf5",
+      "samples": [
+        {
+          "mode": "wait4",
+          "cpus": 1,
+          "sample": 0,
+          "phase": "before",
+          "elapsed_ns": 1663958
+        },
+        {
+          "mode": "wait4",
+          "cpus": 1,
+          "sample": 0,
+          "phase": "after",
+          "elapsed_ns": 2520209
+        },
+        {
+          "mode": "wait4",
+          "cpus": 1,
+          "sample": 1,
+          "phase": "after",
+          "elapsed_ns": 2094208
+        },
+        {
+          "mode": "wait4",
+          "cpus": 1,
+          "sample": 1,
+          "phase": "before",
+          "elapsed_ns": 1924417
+        },
+        {
+          "mode": "wait4",
+          "cpus": 1,
+          "sample": 2,
+          "phase": "before",
+          "elapsed_ns": 1777500
+        },
+        {
+          "mode": "wait4",
+          "cpus": 1,
+          "sample": 2,
+          "phase": "after",
+          "elapsed_ns": 1546875
+        },
+        {
+          "mode": "wait4",
+          "cpus": 1,
+          "sample": 3,
+          "phase": "after",
+          "elapsed_ns": 1468334
+        },
+        {
+          "mode": "wait4",
+          "cpus": 1,
+          "sample": 3,
+          "phase": "before",
+          "elapsed_ns": 1499792
+        },
+        {
+          "mode": "wait4",
+          "cpus": 1,
+          "sample": 4,
+          "phase": "before",
+          "elapsed_ns": 1476083
+        },
+        {
+          "mode": "wait4",
+          "cpus": 1,
+          "sample": 4,
+          "phase": "after",
+          "elapsed_ns": 1466667
+        },
+        {
+          "mode": "wait4",
+          "cpus": 1,
+          "sample": 5,
+          "phase": "after",
+          "elapsed_ns": 1471375
+        },
+        {
+          "mode": "wait4",
+          "cpus": 1,
+          "sample": 5,
+          "phase": "before",
+          "elapsed_ns": 1554125
+        },
+        {
+          "mode": "wait4",
+          "cpus": 1,
+          "sample": 6,
+          "phase": "before",
+          "elapsed_ns": 1511083
+        },
+        {
+          "mode": "wait4",
+          "cpus": 1,
+          "sample": 6,
+          "phase": "after",
+          "elapsed_ns": 1573208
+        },
+        {
+          "mode": "wait4",
+          "cpus": 1,
+          "sample": 7,
+          "phase": "after",
+          "elapsed_ns": 1546959
+        },
+        {
+          "mode": "wait4",
+          "cpus": 1,
+          "sample": 7,
+          "phase": "before",
+          "elapsed_ns": 1618750
+        },
+        {
+          "mode": "wait4",
+          "cpus": 1,
+          "sample": 8,
+          "phase": "before",
+          "elapsed_ns": 1632000
+        },
+        {
+          "mode": "wait4",
+          "cpus": 1,
+          "sample": 8,
+          "phase": "after",
+          "elapsed_ns": 1525083
+        },
+        {
+          "mode": "wait4",
+          "cpus": 4,
+          "sample": 0,
+          "phase": "before",
+          "elapsed_ns": 171499833
+        },
+        {
+          "mode": "wait4",
+          "cpus": 4,
+          "sample": 0,
+          "phase": "after",
+          "elapsed_ns": 4358250
+        },
+        {
+          "mode": "wait4",
+          "cpus": 4,
+          "sample": 1,
+          "phase": "after",
+          "elapsed_ns": 4291792
+        },
+        {
+          "mode": "wait4",
+          "cpus": 4,
+          "sample": 1,
+          "phase": "before",
+          "elapsed_ns": 172459958
+        },
+        {
+          "mode": "wait4",
+          "cpus": 4,
+          "sample": 2,
+          "phase": "before",
+          "elapsed_ns": 169715375
+        },
+        {
+          "mode": "wait4",
+          "cpus": 4,
+          "sample": 2,
+          "phase": "after",
+          "elapsed_ns": 4046583
+        },
+        {
+          "mode": "wait4",
+          "cpus": 4,
+          "sample": 3,
+          "phase": "after",
+          "elapsed_ns": 4015041
+        },
+        {
+          "mode": "wait4",
+          "cpus": 4,
+          "sample": 3,
+          "phase": "before",
+          "elapsed_ns": 171865625
+        },
+        {
+          "mode": "wait4",
+          "cpus": 4,
+          "sample": 4,
+          "phase": "before",
+          "elapsed_ns": 170923959
+        },
+        {
+          "mode": "wait4",
+          "cpus": 4,
+          "sample": 4,
+          "phase": "after",
+          "elapsed_ns": 4309458
+        },
+        {
+          "mode": "wait4",
+          "cpus": 4,
+          "sample": 5,
+          "phase": "after",
+          "elapsed_ns": 4022500
+        },
+        {
+          "mode": "wait4",
+          "cpus": 4,
+          "sample": 5,
+          "phase": "before",
+          "elapsed_ns": 172193417
+        },
+        {
+          "mode": "wait4",
+          "cpus": 4,
+          "sample": 6,
+          "phase": "before",
+          "elapsed_ns": 171850292
+        },
+        {
+          "mode": "wait4",
+          "cpus": 4,
+          "sample": 6,
+          "phase": "after",
+          "elapsed_ns": 4163834
+        },
+        {
+          "mode": "wait4",
+          "cpus": 4,
+          "sample": 7,
+          "phase": "after",
+          "elapsed_ns": 4175666
+        },
+        {
+          "mode": "wait4",
+          "cpus": 4,
+          "sample": 7,
+          "phase": "before",
+          "elapsed_ns": 171940250
+        },
+        {
+          "mode": "wait4",
+          "cpus": 4,
+          "sample": 8,
+          "phase": "before",
+          "elapsed_ns": 169718917
+        },
+        {
+          "mode": "wait4",
+          "cpus": 4,
+          "sample": 8,
+          "phase": "after",
+          "elapsed_ns": 4237292
+        },
+        {
+          "mode": "waitid",
+          "cpus": 1,
+          "sample": 0,
+          "phase": "before",
+          "elapsed_ns": 1672917
+        },
+        {
+          "mode": "waitid",
+          "cpus": 1,
+          "sample": 0,
+          "phase": "after",
+          "elapsed_ns": 1642167
+        },
+        {
+          "mode": "waitid",
+          "cpus": 1,
+          "sample": 1,
+          "phase": "after",
+          "elapsed_ns": 1607958
+        },
+        {
+          "mode": "waitid",
+          "cpus": 1,
+          "sample": 1,
+          "phase": "before",
+          "elapsed_ns": 1656291
+        },
+        {
+          "mode": "waitid",
+          "cpus": 1,
+          "sample": 2,
+          "phase": "before",
+          "elapsed_ns": 1564292
+        },
+        {
+          "mode": "waitid",
+          "cpus": 1,
+          "sample": 2,
+          "phase": "after",
+          "elapsed_ns": 1577833
+        },
+        {
+          "mode": "waitid",
+          "cpus": 1,
+          "sample": 3,
+          "phase": "after",
+          "elapsed_ns": 1573042
+        },
+        {
+          "mode": "waitid",
+          "cpus": 1,
+          "sample": 3,
+          "phase": "before",
+          "elapsed_ns": 1564917
+        },
+        {
+          "mode": "waitid",
+          "cpus": 1,
+          "sample": 4,
+          "phase": "before",
+          "elapsed_ns": 1609167
+        },
+        {
+          "mode": "waitid",
+          "cpus": 1,
+          "sample": 4,
+          "phase": "after",
+          "elapsed_ns": 1561625
+        },
+        {
+          "mode": "waitid",
+          "cpus": 1,
+          "sample": 5,
+          "phase": "after",
+          "elapsed_ns": 1584375
+        },
+        {
+          "mode": "waitid",
+          "cpus": 1,
+          "sample": 5,
+          "phase": "before",
+          "elapsed_ns": 1635125
+        },
+        {
+          "mode": "waitid",
+          "cpus": 1,
+          "sample": 6,
+          "phase": "before",
+          "elapsed_ns": 1564291
+        },
+        {
+          "mode": "waitid",
+          "cpus": 1,
+          "sample": 6,
+          "phase": "after",
+          "elapsed_ns": 1568750
+        },
+        {
+          "mode": "waitid",
+          "cpus": 1,
+          "sample": 7,
+          "phase": "after",
+          "elapsed_ns": 1628667
+        },
+        {
+          "mode": "waitid",
+          "cpus": 1,
+          "sample": 7,
+          "phase": "before",
+          "elapsed_ns": 1587708
+        },
+        {
+          "mode": "waitid",
+          "cpus": 1,
+          "sample": 8,
+          "phase": "before",
+          "elapsed_ns": 1582333
+        },
+        {
+          "mode": "waitid",
+          "cpus": 1,
+          "sample": 8,
+          "phase": "after",
+          "elapsed_ns": 1595291
+        },
+        {
+          "mode": "waitid",
+          "cpus": 4,
+          "sample": 0,
+          "phase": "before",
+          "elapsed_ns": 173180084
+        },
+        {
+          "mode": "waitid",
+          "cpus": 4,
+          "sample": 0,
+          "phase": "after",
+          "elapsed_ns": 4519083
+        },
+        {
+          "mode": "waitid",
+          "cpus": 4,
+          "sample": 1,
+          "phase": "after",
+          "elapsed_ns": 4411583
+        },
+        {
+          "mode": "waitid",
+          "cpus": 4,
+          "sample": 1,
+          "phase": "before",
+          "elapsed_ns": 172205875
+        },
+        {
+          "mode": "waitid",
+          "cpus": 4,
+          "sample": 2,
+          "phase": "before",
+          "elapsed_ns": 173380875
+        },
+        {
+          "mode": "waitid",
+          "cpus": 4,
+          "sample": 2,
+          "phase": "after",
+          "elapsed_ns": 4056333
+        },
+        {
+          "mode": "waitid",
+          "cpus": 4,
+          "sample": 3,
+          "phase": "after",
+          "elapsed_ns": 4313542
+        },
+        {
+          "mode": "waitid",
+          "cpus": 4,
+          "sample": 3,
+          "phase": "before",
+          "elapsed_ns": 173896291
+        },
+        {
+          "mode": "waitid",
+          "cpus": 4,
+          "sample": 4,
+          "phase": "before",
+          "elapsed_ns": 171903959
+        },
+        {
+          "mode": "waitid",
+          "cpus": 4,
+          "sample": 4,
+          "phase": "after",
+          "elapsed_ns": 4520708
+        },
+        {
+          "mode": "waitid",
+          "cpus": 4,
+          "sample": 5,
+          "phase": "after",
+          "elapsed_ns": 4383833
+        },
+        {
+          "mode": "waitid",
+          "cpus": 4,
+          "sample": 5,
+          "phase": "before",
+          "elapsed_ns": 173314625
+        },
+        {
+          "mode": "waitid",
+          "cpus": 4,
+          "sample": 6,
+          "phase": "before",
+          "elapsed_ns": 170928375
+        },
+        {
+          "mode": "waitid",
+          "cpus": 4,
+          "sample": 6,
+          "phase": "after",
+          "elapsed_ns": 4330667
+        },
+        {
+          "mode": "waitid",
+          "cpus": 4,
+          "sample": 7,
+          "phase": "after",
+          "elapsed_ns": 3966250
+        },
+        {
+          "mode": "waitid",
+          "cpus": 4,
+          "sample": 7,
+          "phase": "before",
+          "elapsed_ns": 171965959
+        },
+        {
+          "mode": "waitid",
+          "cpus": 4,
+          "sample": 8,
+          "phase": "before",
+          "elapsed_ns": 169428125
+        },
+        {
+          "mode": "waitid",
+          "cpus": 4,
+          "sample": 8,
+          "phase": "after",
+          "elapsed_ns": 4281083
+        }
+      ]
+    }
+  ],
+  "metrics": {
+    "before-wait4": {
+      "paths": {
+        "cohort_rounds": 3860,
+        "cohort_stop_us": 2778,
+        "service_caller_wait_us": 0,
+        "service_requests": 0,
+        "serviced_syscalls": 0,
+        "syscalls": 4077,
+        "vm_local_syscalls": 12,
+        "worker_direct_syscalls": 2,
+        "worker_fd_syscalls": 3,
+        "worker_file_syscalls": 0,
+        "worker_futex_waits": 9,
+        "worker_futex_wakes": 8,
+        "worker_gpu_calls": 0,
+        "worker_gpu_waits": 0,
+        "worker_poll_syscalls": 0,
+        "worker_socket_syscalls": 0,
+        "worker_syscalls": 44,
+        "worker_task_resumes": 7,
+        "worker_uring_syscalls": 0
+      },
+      "owner_returns": "[(260, 4001), (93, 4), (220, 4)]"
+    },
+    "before-waitid": {
+      "paths": {
+        "cohort_rounds": 3755,
+        "cohort_stop_us": 3415,
+        "service_caller_wait_us": 0,
+        "service_requests": 0,
+        "serviced_syscalls": 0,
+        "syscalls": 4077,
+        "vm_local_syscalls": 12,
+        "worker_direct_syscalls": 2,
+        "worker_fd_syscalls": 3,
+        "worker_file_syscalls": 0,
+        "worker_futex_waits": 9,
+        "worker_futex_wakes": 8,
+        "worker_gpu_calls": 0,
+        "worker_gpu_waits": 0,
+        "worker_poll_syscalls": 0,
+        "worker_socket_syscalls": 0,
+        "worker_syscalls": 44,
+        "worker_task_resumes": 7,
+        "worker_uring_syscalls": 0
+      },
+      "owner_returns": "[(95, 4000), (93, 4), (220, 4), (260, 1)]"
+    },
+    "after-wait4": {
+      "paths": {
+        "cohort_rounds": 9,
+        "cohort_stop_us": 6,
+        "service_caller_wait_us": 0,
+        "service_requests": 0,
+        "serviced_syscalls": 0,
+        "syscalls": 4079,
+        "vm_local_syscalls": 12,
+        "worker_direct_syscalls": 2,
+        "worker_fd_syscalls": 3,
+        "worker_file_syscalls": 0,
+        "worker_futex_waits": 12,
+        "worker_futex_wakes": 9,
+        "worker_gpu_calls": 0,
+        "worker_gpu_waits": 0,
+        "worker_poll_syscalls": 0,
+        "worker_socket_syscalls": 0,
+        "worker_syscalls": 4048,
+        "worker_task_resumes": 9,
+        "worker_uring_syscalls": 0
+      },
+      "owner_returns": "[(93, 4), (220, 4), (94, 1)]"
+    },
+    "after-waitid": {
+      "paths": {
+        "cohort_rounds": 9,
+        "cohort_stop_us": 41,
+        "service_caller_wait_us": 0,
+        "service_requests": 0,
+        "serviced_syscalls": 0,
+        "syscalls": 4076,
+        "vm_local_syscalls": 12,
+        "worker_direct_syscalls": 2,
+        "worker_fd_syscalls": 3,
+        "worker_file_syscalls": 0,
+        "worker_futex_waits": 10,
+        "worker_futex_wakes": 8,
+        "worker_gpu_calls": 0,
+        "worker_gpu_waits": 0,
+        "worker_poll_syscalls": 0,
+        "worker_socket_syscalls": 0,
+        "worker_syscalls": 4045,
+        "worker_task_resumes": 8,
+        "worker_uring_syscalls": 0
+      },
+      "owner_returns": "[(93, 4), (220, 4), (94, 1)]"
+    }
+  },
+  "acceptance": {
+    "binaries": {
+      "hvf": "946addf1197d6e34adfd5f02f2c0aa3cfe3656cd32aaf5415ed48d6a25750a90",
+      "interpreter": "f04240cf77ffdac7b6d8140ed4deefed8f2fb96d5fad9ab837bedb8015622ba0"
+    },
+    "fixture_sha256": "68e71d4650fa1f0e82f75f674d16dddbbaa75bef0435a9881c427c95e0294cf5",
+    "results": [
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "case": "compat",
+        "returncode": 0
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "case": "wait4",
+        "returncode": 0
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "case": "waitid",
+        "returncode": 0
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "case": "prlimit",
+        "returncode": 0
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "case": "compat",
+        "returncode": 0
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "case": "wait4",
+        "returncode": 0
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "case": "waitid",
+        "returncode": 0
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "case": "prlimit",
+        "returncode": 0
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "case": "compat",
+        "returncode": 0
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "case": "wait4",
+        "returncode": 0
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "case": "waitid",
+        "returncode": 0
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "case": "prlimit",
+        "returncode": 0
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 1,
+        "case": "compat",
+        "returncode": 0
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 1,
+        "case": "wait4",
+        "returncode": 0
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 1,
+        "case": "waitid",
+        "returncode": 0
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 1,
+        "case": "prlimit",
+        "returncode": 0
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 4,
+        "case": "compat",
+        "returncode": 0
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 4,
+        "case": "wait4",
+        "returncode": 0
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 4,
+        "case": "waitid",
+        "returncode": 0
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 4,
+        "case": "prlimit",
+        "returncode": 0
+      }
+    ]
+  },
+  "unit_tests": {
+    "apple_process": 296,
+    "arm_linux_process": 296,
+    "ignored_process": 3,
+    "kernel": 32,
+    "reused_kernel_reason": "The final handoff and projection fixes change only trames-session, not the already tested trames-kernel sources."
+  },
+  "strict_checks_and_ipad_device_target_compile": true,
+  "physical_ipad_execution_claimed": false,
+  "real_go_docker": {
+    "cpus": 12,
+    "go_gc_starts": 30,
+    "go_normal_async_preemption": true,
+    "docker_lifecycle_rounds": 8,
+    "public_tools_and_cached_alpine_only": true,
+    "business_environment_accessed": false,
+    "results": [
+      {
+        "case": "go-gc",
+        "returncode": 0,
+        "seconds": 2.5683273750000004
+      },
+      {
+        "case": "docker",
+        "returncode": 0,
+        "seconds": 76.934967584
+      }
+    ]
+  },
+  "found_and_fixed": [
+    "Cross-cohort wait adoption manufactured a generic I/O retry for a completed child wait; actual Docker exposed the panic. Typed child wait custody now excludes this duplicate retry.",
+    "Owner PID query projections were collected only at the next cohort admission. They are now collected before returned owner syscalls; the regression requires immediate getpgid ESRCH after source reaping.",
+    "Native Linux oracle corrected output-pointer checking and event-consumption semantics, including wait4/waitid rusage copy order."
+  ],
+  "remaining_boundaries": [
+    "Default stop/continue and termination delivery",
+    "Task and group exit cleanup, clear_tid and parent-death policy",
+    "Reparenting/namespace-init teardown and resource projection release",
+    "Epoch::finish still stops the cohort"
+  ],
+  "installed": [
+    {
+      "app": "Trames",
+      "version": "Trames 1.5.3 (stable) runtime d9c4a811faf316a51b1a8f33f055247943a18855",
+      "sha256": "4f40615213e731b2a4ef9d8c6a0e85c5c7bdf31ab0c60b0354b55113f2a6a55d"
+    },
+    {
+      "app": "Trames Dev",
+      "version": "Trames Dev 1.5.3 (dev) runtime decc86ef7ea3a81611ab1410046d2a3deb8b15d4",
+      "sha256": "946addf1197d6e34adfd5f02f2c0aa3cfe3656cd32aaf5415ed48d6a25750a90"
+    }
+  ],
+  "logs": [
+    {
+      "name": "apple-handoff-tests.log",
+      "path": "target/worker-lifecycle/apple-handoff-tests.log",
+      "sha256": "2c0b4285afa6513bd77ee2726b06b069e22e51ece38843b5c664c9ebc0d3a601"
+    },
+    {
+      "name": "apple-projection-tests.log",
+      "path": "target/worker-lifecycle/apple-projection-tests.log",
+      "sha256": "d4664520b1d5aa8afef8569f391c3ae2cbec942193d5aab38bd926e8d72a0e1f"
+    },
+    {
+      "name": "apple-tests.log",
+      "path": "target/worker-lifecycle/apple-tests.log",
+      "sha256": "fe20677c7fbd8ac8eaefbe330f376d90b5ee5ea76b815a826ca569ca54cf8f4f"
+    },
+    {
+      "name": "linux-handoff-tests.log",
+      "path": "target/worker-lifecycle/linux-handoff-tests.log",
+      "sha256": "68878d2f0427a58cb59c6017e44ef2b0440fd12561100a6bfffba6eda2ca842f"
+    },
+    {
+      "name": "linux-projection-tests.log",
+      "path": "target/worker-lifecycle/linux-projection-tests.log",
+      "sha256": "d41a107572c00560b8236e8ab5b46930d245819078a8a9748253194d01c0bea3"
+    },
+    {
+      "name": "apple-clippy-final.log",
+      "path": "target/worker-lifecycle/apple-clippy-final.log",
+      "sha256": "81bbccf8909df606e751857a7d76c50ebdb96241c4523ded3bf6b1c81ead91e5"
+    },
+    {
+      "name": "apple-clippy.log",
+      "path": "target/worker-lifecycle/apple-clippy.log",
+      "sha256": "d2192234c201a69d9fbe30042786f2c54e1604a7597c6ce0093b4e9504206b79"
+    },
+    {
+      "name": "apple-handoff-clippy.log",
+      "path": "target/worker-lifecycle/apple-handoff-clippy.log",
+      "sha256": "bfbcdab59e89d33500822431ee26266e9a7d791aea0af5b62279d4a889c5a5c8"
+    },
+    {
+      "name": "apple-projection-clippy.log",
+      "path": "target/worker-lifecycle/apple-projection-clippy.log",
+      "sha256": "972b9bd5af8da565f35e7cffb7e77a4c73c0ea40a30e77487d63251ed0afb860"
+    },
+    {
+      "name": "ipad-handoff-check.log",
+      "path": "target/worker-lifecycle/ipad-handoff-check.log",
+      "sha256": "9c8a1162c2dc91e698b75b020681e86c1580ab2fc0396f76b81436804889d99e"
+    },
+    {
+      "name": "ipad-projection-check.log",
+      "path": "target/worker-lifecycle/ipad-projection-check.log",
+      "sha256": "b81b0b4e792af456bc18793bfe41f21bb143caffdf0174e87d1d54112e86e5ce"
+    },
+    {
+      "name": "ipad-check.log",
+      "path": "target/worker-lifecycle/ipad-check.log",
+      "sha256": "a897d6a89f25b5bdcdb1c7820e828bd9b97492a3084cd6231883f6ebfc4fe729"
+    },
+    {
+      "name": "boundaries-ipad.log",
+      "path": "target/worker-lifecycle/boundaries-ipad.log",
+      "sha256": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651"
+    },
+    {
+      "name": "boundaries-mac.log",
+      "path": "target/worker-lifecycle/boundaries-mac.log",
+      "sha256": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651"
+    },
+    {
+      "name": "fmt.log",
+      "path": "target/worker-lifecycle/fmt.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "acceptance-final.log",
+      "path": "target/worker-lifecycle/acceptance-final.log",
+      "sha256": "1721e0836748fbb9b40eea8bdb8b627a4bdac5900351097e1a1107c4c5942759"
+    },
+    {
+      "name": "go-gc-integration.log",
+      "path": "target/worker-lifecycle/go-gc-integration.log",
+      "sha256": "e8dd5e3fae6fa8b3df1090acd43b111cb7b1c7e49b8c57ade35be6d498d7b52e"
+    },
+    {
+      "name": "docker-integration.log",
+      "path": "target/worker-lifecycle/docker-integration.log",
+      "sha256": "1f51807e1863dd70642108d948e64282110d59d2f9365e5974423b10ef8ee41e"
+    },
+    {
+      "name": "docker-failed-5954f86.log",
+      "path": "target/worker-lifecycle/docker-failed-5954f86.log",
+      "sha256": "f1888c55d7c5e10def332d6a0b37c8e583e4d419c1b8062a6cf6a88adef0dcae"
+    },
+    {
+      "name": "docker-timeout-726aa31.log",
+      "path": "target/worker-lifecycle/docker-timeout-726aa31.log",
+      "sha256": "e67309765bd77a9413a074ee2042b8ebe743d657e08b2123166750815a912bfa"
+    }
+  ]
+}
