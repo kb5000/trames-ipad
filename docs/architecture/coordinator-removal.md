@@ -2823,3 +2823,27 @@ includes three successful runs of the owner's unmodified repro in an isolated
 Debian clone and two additional recursive-read corrections. The shared
 [lock-order contract](../../runtime/docs/architecture/execution-backends.md#overlay-checkpoint-and-stat-lock-order-2026-11-04)
 describes the preserved checkpoint and resource ownership boundaries.
+
+
+## Thirty-sixth migration implemented — retained event waits — 2026-11-04
+
+Runtime `64177108fb431bcd746d2cd1280c306f97af8fc3` moves admitted pselect6, ppoll, epoll_pwait and epoll_pwait2, including temporary signal masks, onto calling workers. A single imported wait keeps original OFDs/sets or the original epoll object, timeout/deadline and mask through parking and cohort handoff. Existing execution slots and resource notifications handle waiting. No coordinator/resource thread or polling bus is added.
+
+Queued and arriving I/O signals interrupt on the source worker. The handler uses the temporary mask, ucontext saves the pre-wait mask and sigreturn restores it. EINTR remains nonrestartable for these waits under SA_RESTART. Actual unblocking synchronizes with the original signal inboxes; ordinary memory and unchanged/blocking-only masks gain no additional fence. Raw pselect6/ppoll remaining-time copyout follows native Linux best-effort behavior. Seccomp decides once before inputs and keeps that decision through parking or a typed owner fallback.
+
+Five counterbalanced unprofiled pairs, each worker running 500 checked write/wait/read iterations, give these four-worker longest-worker medians:
+
+| Wait family, 4 workers | Mac 1.5.1 | Current | Native macOS | Native ARM Linux, exact ELF | Speedup |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| pselect6, no mask | 59.25 ms | 3.32 ms | 2.39 ms | 0.39 ms | 17.82x |
+| ppoll, temporary mask | 59.06 ms | 3.10 ms | — | 0.52 ms | 19.06x |
+| epoll_pwait, temporary mask | 58.76 ms | 3.79 ms | — | 0.53 ms | 15.50x |
+| epoll_pwait2, temporary mask | 58.59 ms | 4.27 ms | — | 0.51 ms | 13.73x |
+
+Masked pselect6 at four workers is 59.15 → 3.29 ms (17.99x). Newly migrated two-worker paths improve 8.7–11.7x. Separate diagnostics reduce four-worker migrated-wait cohort rounds from 1,523–1,795 to 18–24, and retire all 2,000 waits on workers. Epoll setup retains four existing service requests outside the timed loop; counting only service RPCs would have missed the previous per-wait joins.
+
+Nine-pair rechecks with 5,000 loops confirm the pre-existing unmasked ppoll four-worker path is within 1.9% (28.36 → 28.92 ms), and unmasked epoll variants improve about 7% (37.14 → 34.74 and 36.81 → 34.46 ms). Longer single-worker tests remain about 2–4% slower, roughly 0.07–0.21 µs per write/wait/read iteration; no single-core speedup is claimed. The first intermediate implementation added avoidable epoll output buffers and a ready-poll Arc. Both were removed before integration. The record retains those timings rather than silently replacing them.
+
+Concentrated Apple/Linux acceptance passes 283 kernel and 229 ABI cases each, plus signal-kernel tests, strict affected clippy/format checks, paired project boundaries and the iPad device-target FFI check. The same static ARM64 fixture passes nine cases per run on native Linux, Mac HVF with 1/2/4 CPUs and the production interpreter with 1/4 CPUs. It covers raw timeout updates/read-only copyout, pending and arriving FASYNC signals and exact handler/sigreturn masks. Unit regressions also cover original epoll close/reuse and one-time ALLOW/ERRNO seccomp evaluation across parking. Unchanged release acceptance is reused; physical iPad and Firefox performance are not claimed.
+
+The [source-bound record](../validation/worker-event-waits-20261104.json) contains every sample, binary/source hashes, native references and separate diagnostics. The [shared event-wait contract](../../runtime/docs/architecture/execution-backends.md#retained-event-wait-subsystem-2026-11-04) and [remaining boundaries](../../runtime/docs/architecture/coordination-boundaries.md) retain tracing, excluded owner/dynamic FDs, unavailable source pumps, actual legacy signal/task effects, VM/layout and lifecycle work. Mac Dev is updated for this development batch; stable release 1.5.1 is kept separate.
