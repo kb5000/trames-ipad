@@ -1,0 +1,1169 @@
+{
+  "date": "2026-11-05",
+  "runtime_revision": "43ff470ec5cc79785d918067585df66e4ad4b9d9",
+  "baseline_runtime_revision": "3014e0a12f18ccc92569015d6a671f0cce5fa334",
+  "scope": "Original task address registration, Files lifetime, process lock retirement and io_uring cancellation resources. Actual exit/group-exit entry and process ownership remain joined.",
+  "source_files": [
+    {
+      "path": "runtime/crates/trames-execution/src/lib.rs",
+      "sha256": "e38057ee86fbbcb54fa7ea6a8bddb1c2e267ddbe9392810710da0f177b06ee8f"
+    },
+    {
+      "path": "runtime/crates/trames-kernel/src/signal/io.rs",
+      "sha256": "1e9198ebfcec276d7d6f5ee42582d3df0d56439314b32936f164788f0c0dff1a"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/direct.rs",
+      "sha256": "084c3db181e09b0d3abf7a185bcb830a42eb073c77c8b771a46c91ff4e286eb3"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/direct/uring.rs",
+      "sha256": "0e25dd7b5d5a0f33abf914deea94581a05b39e00fc1c3fa6dddfc42ccd85ceab"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/direct/uring/actor.rs",
+      "sha256": "64caa2fc643f56d5998ade7880aea8f25bd7202b708ca8f2795fc4ee22d8a4c1"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/direct/uring/subsystem_tests.rs",
+      "sha256": "a507fa84232f537d50cb1c081bb17e1e1d12f3add1d14616f2f94ddc2adf64b5"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/state.rs",
+      "sha256": "d32a2c02f4f41eeb1301b91cc3894dcd82b8fd2cb251f73dfb32b468404d3db4"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/uring.rs",
+      "sha256": "be8797817a97149c741d2bd44fe338d324059ca7fb87f167e5dbfeabdac6c486"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/process.rs",
+      "sha256": "0e7f4704dd1a6e4626cf1b5e63f2c1c6ab00715c26269167a6a75aec8cc4da4d"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/process_seccomp.rs",
+      "sha256": "781f92b65ed177995ad6065ec0d7201faf774eb96ecd45d82d7ddda52c6828b0"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/worker_syscalls.rs",
+      "sha256": "655dec6509d286b8fb1a526e3b3bf3aee23cc8d39e37583e218fdb348b1684b2"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/workers.rs",
+      "sha256": "4db9f7959206af70f061023ce394b7719190370c7b4d958d3d824bfb8c1d9ab1"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/cgroup.rs",
+      "sha256": "074aadca4b577b66bb9418c5d71bacfb8d6e848d784711fefee968063ba213a5"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/descriptor_factory.rs",
+      "sha256": "dafe598b686df4e244e6ed1d592cf6b73ec3fd7ac3927aa126a697bac483f5e3"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/direct_io.rs",
+      "sha256": "286ce632381bd6c123d48906ae215ccda99fe458ccb137051fdf091aac85aa24"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/events.rs",
+      "sha256": "f83845bbe1870cbba147f561f9a402a8f8a51be565703fc558d105ddd5765d25"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/fd_table.rs",
+      "sha256": "8e423f2f2309ce173b54149c30fc93cf2fa6a8df1b402749b3978fc2468b81ca"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/file_work.rs",
+      "sha256": "48cc42af0a35bf7d37ef5d4aec84b9599a68b0e7f74bb1ffdffd46e6ee0aa3f6"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/ipc/control.rs",
+      "sha256": "f9afe02c3c8ebd79c21863e3b31d9802b0192ee91e4f98f5c71b47e461a7d9a7"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/lib.rs",
+      "sha256": "ed86af37543c2885cdb7f2219ef88836994fed2fcfecc057638bea9075252b8b"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/locks.rs",
+      "sha256": "280be6c98c328e78e85415daaa4ff6cbb8fd200a863d058bb758fcdac294843b"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/network.rs",
+      "sha256": "b34497347201905282130f887cbe8af3e571bc9f93684c997e91766188c29c87"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/open_handle.rs",
+      "sha256": "fb0202319a8e3802e0e0542d5b57a60dc23e9657a4ca4bb4a43a1bc4fa99ec98"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/uring.rs",
+      "sha256": "f1822cf87851e05855d13758997c35e6bf057a757a0f546e04d0596164bd78f5"
+    },
+    {
+      "path": "runtime/docs/architecture/coordination-boundaries.md",
+      "sha256": "64c1a4e32b4e80613343cb3f486545407b367510e34215b212849040f45be0d1"
+    }
+  ],
+  "fixture": {
+    "source": "tests/fixtures/worker-task-resources.c",
+    "source_sha256": "6764e1fe82194abbf9e5b7277bb8488ff1a797c025fc5d74fbb6f9a9cd3b110f",
+    "elf_sha256": "7f363fd52558f6f993f8da6375e00d60abc35381e570f49c74ccccbf8d8b5018",
+    "builder": "scripts/build-worker-task-resources-fixture.sh",
+    "builder_sha256": "f94baf30dcb00f15214a7a00deb8b4995b5461a770f63fdc524c2928cbde44d6",
+    "compiler": "ARM Linux musl-gcc -static -O2 -Wall -Wextra -Werror"
+  },
+  "benchmark": {
+    "binaries": {
+      "before": {
+        "path": "/Users/main/dev/trames/target/worker-task-resources/before-mac-run",
+        "sha256": "414b7e218f64dd9285cac2809bc455942ac446cc60140b2e3a94856e43f0692e"
+      },
+      "after": {
+        "path": "/Users/main/dev/trames-mac/target/release/Trames Dev.app/Contents/MacOS/trames-mac-run",
+        "sha256": "8b7a7e751cf2e15ee8796c637e79881dd9de7dc4e8d6bc8a182fe41e4abf94b9"
+      }
+    },
+    "fixture_sha256": "7f363fd52558f6f993f8da6375e00d60abc35381e570f49c74ccccbf8d8b5018",
+    "samples": [
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "before",
+        "sample": 0,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 5516208,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "after",
+        "sample": 0,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 5538458,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "after",
+        "sample": 1,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 5454958,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "before",
+        "sample": 1,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 5548417,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "before",
+        "sample": 2,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 5527250,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "after",
+        "sample": 2,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 5548583,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "after",
+        "sample": 3,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 5503333,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "before",
+        "sample": 3,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 5653500,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "before",
+        "sample": 4,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 5554250,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "after",
+        "sample": 4,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 5518083,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "after",
+        "sample": 5,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 5517292,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "before",
+        "sample": 5,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 5506500,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "before",
+        "sample": 6,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 5464500,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "after",
+        "sample": 6,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 5555791,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "before",
+        "sample": 0,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 134895458,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "after",
+        "sample": 0,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1494583,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "after",
+        "sample": 1,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1468667,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "before",
+        "sample": 1,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 135131333,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "before",
+        "sample": 2,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 133702375,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "after",
+        "sample": 2,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1483334,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "after",
+        "sample": 3,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1474416,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "before",
+        "sample": 3,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 134630000,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "before",
+        "sample": 4,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 133611209,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "after",
+        "sample": 4,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1501625,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "after",
+        "sample": 5,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1491791,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "before",
+        "sample": 5,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 137631875,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "before",
+        "sample": 6,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 126773917,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "after",
+        "sample": 6,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1469875,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "before",
+        "sample": 0,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 134087958,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "after",
+        "sample": 0,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1515917,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "after",
+        "sample": 1,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1501792,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "before",
+        "sample": 1,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 131337792,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "before",
+        "sample": 2,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 132665875,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "after",
+        "sample": 2,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1657542,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "after",
+        "sample": 3,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1634458,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "before",
+        "sample": 3,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 132286416,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "before",
+        "sample": 4,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 132606583,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "after",
+        "sample": 4,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1482000,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "after",
+        "sample": 5,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1481416,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "before",
+        "sample": 5,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 131584084,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "before",
+        "sample": 6,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 134906542,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "after",
+        "sample": 6,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1534208,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 1,
+        "phase": "native",
+        "sample": 0,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 547710,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 1,
+        "phase": "native",
+        "sample": 1,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 547836,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 1,
+        "phase": "native",
+        "sample": 2,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 549211,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 1,
+        "phase": "native",
+        "sample": 3,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 545252,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 1,
+        "phase": "native",
+        "sample": 4,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 543127,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 1,
+        "phase": "native",
+        "sample": 5,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 541295,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 1,
+        "phase": "native",
+        "sample": 6,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 541669,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 4,
+        "phase": "native",
+        "sample": 0,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 286793,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 4,
+        "phase": "native",
+        "sample": 1,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 281460,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 4,
+        "phase": "native",
+        "sample": 2,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 299335,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 4,
+        "phase": "native",
+        "sample": 3,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 287460,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 4,
+        "phase": "native",
+        "sample": 4,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 284418,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 4,
+        "phase": "native",
+        "sample": 5,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 312043,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 4,
+        "phase": "native",
+        "sample": 6,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 290168,
+        "passed": true
+      }
+    ],
+    "summary": [
+      {
+        "cpus": 1,
+        "before_median_ns": 5527250,
+        "after_median_ns": 5518083,
+        "speedup": 1.0016612653343562,
+        "native_linux_median_ns": 545252
+      },
+      {
+        "cpus": 4,
+        "before_median_ns": 134630000,
+        "after_median_ns": 1483334,
+        "speedup": 90.7617569610081,
+        "native_linux_median_ns": 287460
+      },
+      {
+        "cpus": 12,
+        "before_median_ns": 132606583,
+        "after_median_ns": 1515917,
+        "speedup": 87.47615007945686,
+        "native_linux_median_ns": null
+      }
+    ],
+    "method": "Seven counterbalanced before/after pairs at each CPU count. Four already-ready threads each perform 1000 set_tid_address calls, restore their original clear_tid address and exit. Timed interval includes barrier release, calls and clear_tid/futex joins; excludes clone/setup and final stack unmap.",
+    "native_reference": "Same static musl ELF and unchanged native fixture samples on the existing six-vCPU ARM Linux Lima instance with one/four-CPU taskset affinity, not bare-metal Darwin. Native samples are reused after Trames-only changes.",
+    "claims": "Focused registration/control dependency latency only. No meaningful single-CPU gain and no whole-browser speedup claim. Performance binary uses the same runtime source before pin metadata changed; final signed pinned package passes independent acceptance."
+  },
+  "execution_metrics": {
+    "before": {
+      "execution": {
+        "cohort_rounds": 3780,
+        "cohort_stop_us": 3058,
+        "service_caller_wait_us": 23,
+        "service_requests": 3,
+        "serviced_syscalls": 3,
+        "syscalls": 4044,
+        "vm_local_syscalls": 3,
+        "worker_direct_syscalls": 0,
+        "worker_fd_syscalls": 0,
+        "worker_file_syscalls": 0,
+        "worker_futex_waits": 8,
+        "worker_futex_wakes": 8,
+        "worker_gpu_calls": 0,
+        "worker_gpu_waits": 0,
+        "worker_poll_syscalls": 0,
+        "worker_socket_syscalls": 0,
+        "worker_syscalls": 20,
+        "worker_task_resumes": 8,
+        "worker_uring_syscalls": 0
+      },
+      "returned_syscalls": "[(96, 4004), (93, 4), (220, 3)]"
+    },
+    "after": {
+      "execution": {
+        "cohort_rounds": 7,
+        "cohort_stop_us": 24,
+        "service_caller_wait_us": 22,
+        "service_requests": 3,
+        "serviced_syscalls": 3,
+        "syscalls": 4042,
+        "vm_local_syscalls": 3,
+        "worker_direct_syscalls": 0,
+        "worker_fd_syscalls": 0,
+        "worker_file_syscalls": 0,
+        "worker_futex_waits": 5,
+        "worker_futex_wakes": 8,
+        "worker_gpu_calls": 0,
+        "worker_gpu_waits": 0,
+        "worker_poll_syscalls": 0,
+        "worker_socket_syscalls": 0,
+        "worker_syscalls": 4022,
+        "worker_task_resumes": 7,
+        "worker_uring_syscalls": 0
+      },
+      "returned_syscalls": "[(93, 4), (220, 3)]"
+    }
+  },
+  "acceptance": {
+    "hvf_and_production_interpreter_and_legacy_cgroups": [
+      {
+        "case": "hvf-1",
+        "backend": "hvf",
+        "cpus": 1,
+        "returncode": 0,
+        "seconds": 0.15670166700000002
+      },
+      {
+        "case": "legacy-cgroups-1",
+        "backend": "hvf",
+        "cpus": 1,
+        "returncode": 0,
+        "seconds": 0.01747937500000002
+      },
+      {
+        "case": "legacy-cgroup-control-1",
+        "backend": "hvf",
+        "cpus": 1,
+        "returncode": 0,
+        "seconds": 0.34176037499999995
+      },
+      {
+        "case": "legacy-cgroup-pids-1",
+        "backend": "hvf",
+        "cpus": 1,
+        "returncode": 0,
+        "seconds": 0.026460417000000014
+      },
+      {
+        "case": "legacy-cgroup-bpf-1",
+        "backend": "hvf",
+        "cpus": 1,
+        "returncode": 0,
+        "seconds": 0.015595999999999943
+      },
+      {
+        "case": "hvf-4",
+        "backend": "hvf",
+        "cpus": 4,
+        "returncode": 0,
+        "seconds": 0.0122287499999999
+      },
+      {
+        "case": "legacy-cgroups-4",
+        "backend": "hvf",
+        "cpus": 4,
+        "returncode": 0,
+        "seconds": 0.014224416000000017
+      },
+      {
+        "case": "legacy-cgroup-control-4",
+        "backend": "hvf",
+        "cpus": 4,
+        "returncode": 0,
+        "seconds": 0.34825649999999997
+      },
+      {
+        "case": "legacy-cgroup-pids-4",
+        "backend": "hvf",
+        "cpus": 4,
+        "returncode": 0,
+        "seconds": 0.03346337500000007
+      },
+      {
+        "case": "legacy-cgroup-bpf-4",
+        "backend": "hvf",
+        "cpus": 4,
+        "returncode": 0,
+        "seconds": 0.014214541999999941
+      },
+      {
+        "case": "hvf-12",
+        "backend": "hvf",
+        "cpus": 12,
+        "returncode": 0,
+        "seconds": 0.011781833999999991
+      },
+      {
+        "case": "legacy-cgroups-12",
+        "backend": "hvf",
+        "cpus": 12,
+        "returncode": 0,
+        "seconds": 0.013636957999999977
+      },
+      {
+        "case": "legacy-cgroup-control-12",
+        "backend": "hvf",
+        "cpus": 12,
+        "returncode": 0,
+        "seconds": 0.34062737499999995
+      },
+      {
+        "case": "legacy-cgroup-pids-12",
+        "backend": "hvf",
+        "cpus": 12,
+        "returncode": 0,
+        "seconds": 0.026461000000000068
+      },
+      {
+        "case": "legacy-cgroup-bpf-12",
+        "backend": "hvf",
+        "cpus": 12,
+        "returncode": 0,
+        "seconds": 0.013894540999999982
+      },
+      {
+        "case": "interpreter-1",
+        "backend": "production-interpreter",
+        "cpus": 1,
+        "returncode": 0,
+        "seconds": 0.4822335419999999
+      },
+      {
+        "case": "interpreter-4",
+        "backend": "production-interpreter",
+        "cpus": 4,
+        "returncode": 0,
+        "seconds": 0.015656209000000088
+      }
+    ],
+    "pinned_package": [
+      {
+        "cpus": 1,
+        "returncode": 0,
+        "seconds": 0.01761700000000002
+      },
+      {
+        "cpus": 4,
+        "returncode": 0,
+        "seconds": 0.011541959000000018
+      },
+      {
+        "cpus": 12,
+        "returncode": 0,
+        "seconds": 0.00931725
+      }
+    ],
+    "physical_ipad_test": false,
+    "native_linux_affinity": [
+      1,
+      4
+    ]
+  },
+  "checks": [
+    {
+      "case": "apple-tests.log",
+      "returncode": 0,
+      "sha256": "563ce22e462bc311d996ebdb4df109172b36932bd1bf0ce68a6ba3e0efdd8ddf"
+    },
+    {
+      "case": "vfs-all-tests.log",
+      "returncode": 0,
+      "sha256": "2c1c83b3504d1a731e09efd3cc7405ea389ade5c651de144d47bbaf4a2a99133"
+    },
+    {
+      "case": "uring-registration-tests.log",
+      "returncode": 0,
+      "sha256": "72836a9d71e149cd188856eb5dc0fbb603c22c3a26fe14f78cdd55ee841fc8e6"
+    },
+    {
+      "case": "runtime-clippy.log",
+      "returncode": 0,
+      "sha256": "d3e142d562aecd3989a7561a1fd70adb253f50315cd0e44d02d18b4bbe10afe5"
+    },
+    {
+      "case": "linux-final-clippy.log",
+      "returncode": 0,
+      "sha256": "9e8ba46a17bd6c392f56d656b76d4d8277010ce3f525974b724fa7ca27ab0c6b"
+    },
+    {
+      "case": "apple-clippy.log",
+      "returncode": 0,
+      "sha256": "0c4fdf670d7b60fcaad36d7a576c171a4d4360ca15dc336b0bc55cc0426eca3e"
+    },
+    {
+      "case": "ipad-check.log",
+      "returncode": 0,
+      "sha256": "ca4490d02a4d3581a21c21ad3d215146be101317fd2acf956bf435254ccd16d6"
+    },
+    {
+      "case": "mac-clippy.log",
+      "returncode": 0,
+      "sha256": "2546eaa1f04d525d63f2552c954e5ba5d4e199cf4e1d775787775f34f3f97eee"
+    },
+    {
+      "case": "interpreter-build.log",
+      "returncode": 0,
+      "sha256": "a5c3b453a8046f1146479444a612e49f42a72b1f2d5f7212c7a30a0a84740bb5"
+    },
+    {
+      "case": "common-boundaries.log",
+      "returncode": 0,
+      "sha256": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651"
+    },
+    {
+      "case": "runtime-fmt.log",
+      "returncode": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "case": "ipad-pinned-boundaries.log",
+      "returncode": 0,
+      "sha256": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651"
+    },
+    {
+      "case": "mac-pinned-boundaries.log",
+      "returncode": 0,
+      "sha256": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651"
+    },
+    {
+      "case": "mac-pinned-build.log",
+      "returncode": 0,
+      "sha256": "df6a6941ad12259ef987605a5e2e5b949f93071088bab8c3cfb83c674e036afe"
+    },
+    {
+      "case": "dev-install.log",
+      "returncode": 0,
+      "sha256": "d81b37faaef60b5a1b635ce5a81a399a304e89d9aee6498d2d7eecf5f3f5bd41"
+    }
+  ],
+  "suites": {
+    "apple_arm64": {
+      "process": [
+        299,
+        3
+      ],
+      "kernel": [
+        40,
+        0
+      ],
+      "linux_abi_initial": [
+        235,
+        1
+      ],
+      "registered_file_followup": [
+        3,
+        0
+      ],
+      "vfs": [
+        477,
+        1
+      ],
+      "standalone_vfs_all_features": [
+        507,
+        1
+      ]
+    },
+    "native_arm_linux": {
+      "process": [
+        299,
+        3
+      ],
+      "kernel": [
+        40,
+        0
+      ],
+      "linux_abi_initial": [
+        235,
+        1
+      ],
+      "registered_file_followup": [
+        3,
+        0
+      ],
+      "vfs": [
+        477,
+        1
+      ],
+      "files_followup": [
+        22,
+        0
+      ]
+    },
+    "tuple_meaning": [
+      "passed",
+      "ignored"
+    ],
+    "reuse_note": "The registered-file followup adds one new case to the 235-case ABI result and reruns two unchanged registration cases. Final atomic API rename is semantics-preserving; final Files followup checks it. Documentation/pin metadata/test waiting refinements do not rerun unrelated acceptance."
+  },
+  "integration": [
+    {
+      "case": "go-gc",
+      "returncode": 0,
+      "seconds": 2.499630959
+    },
+    {
+      "case": "docker",
+      "returncode": 0,
+      "seconds": 75.906901917
+    }
+  ],
+  "integration_workload": {
+    "go_gc": "30 stock Debian Docker CLI starts, GOGC=1, normal asynchronous preemption",
+    "docker": "Eight isolated twelve-CPU start/health/exec/inspect/stop/remove cycles using public cached Alpine content",
+    "storage": "Private regression store; no business deployment/frontend operation"
+  },
+  "regressions": [
+    "Per-task Files retirement precedes owner projection collection; accepted OFDs survive and final reader observes EOF.",
+    "32 simultaneous task retirements produce one final close; cloning a capability does not create a task owner.",
+    "Reserved single/pair publication, late factories and cloned closed views cannot resurrect Files.",
+    "Excluded owner controls report an explicit destructor count.",
+    "Shared volatile OFD offset survives dup; lifetime sharing does not grant dynamic byte authority.",
+    "Owner/source cgroup read/write/seek use one f_pos; fixed registered dynamic files retain original identity after FD reuse.",
+    "Process lock release leaves peer process locks and live shared Files intact.",
+    "Source io_uring cancellation preserves another submitter and ignores a replacement FD.",
+    "Unmapped/read-only clear_tid registration, fork/exec identity and ALLOW/ERRNO filters preserve Linux state."
+  ],
+  "remaining_boundaries": [
+    "Epoch::finish and actual exit/group-exit still stop the cohort",
+    "Process graph, parent death/reparenting, namespace-init teardown and full CPU/mm/native ownership",
+    "Actual excluded epoll/namespace/proc/mount destructors and legacy owner-ledger collection",
+    "Robust-futex APIs/cleanup, tracing, vfork and accepted mapped-file/owner work"
+  ],
+  "execution": {
+    "new_service_thread": false,
+    "new_polling_bus": false,
+    "new_guest_memory_barrier": false,
+    "registration": "Original task relaxed atomic; no guest memory preflight",
+    "resource_retirement": "Existing Files/ring/process-lock object synchronization; callbacks after unlocking"
+  },
+  "installed": {
+    "dev": {
+      "version": "Trames Dev 1.5.3 (dev) runtime 43ff470ec5cc79785d918067585df66e4ad4b9d9",
+      "sha256": "b2d57002ed6750fd0aa3fb15f3e848cee551e0b85e3dde93d6360f8e995a789c"
+    },
+    "stable": {
+      "version": "Trames 1.5.3 (stable) runtime d9c4a811faf316a51b1a8f33f055247943a18855",
+      "sha256": "4f40615213e731b2a4ef9d8c6a0e85c5c7bdf31ab0c60b0354b55113f2a6a55d"
+    }
+  },
+  "log_hashes": {
+    "metrics-before.log": "d87a7635869bcd8dcf721d965bb60ca93aee06beeb1feb9be9a31b3a52853b10",
+    "metrics-after.log": "7c0bc627d34462ae9134984e768b2f4d49f5af68462b25d5991637ac14e3e7df",
+    "go-gc-integration.log": "e8dd5e3fae6fa8b3df1090acd43b111cb7b1c7e49b8c57ade35be6d498d7b52e",
+    "docker-integration.log": "9eb9c22426b07faca29ef9160748a16cdb09942b50be1cbce34fe208608f42da",
+    "installed-dev-compat.log": "57deb473acaf219170aa8e620049baac14384970d428fc2b3406883a9cbeaf56"
+  },
+  "native_log_hashes": {
+    "task-resources-native-tests.log": "26aa0284bbc3c016a6f8ae2a47519bf891566c319c82b5a1ba02ce6c577b77a5",
+    "task-resources-native-registration.log": "bbc345f112f4500db201d2a0fb374f2588913977814762e2bdb12e8747cf65d4",
+    "task-resources-native-files.log": "73ad5055656a6988e3add9aea6abd76c3e3b9e93613539032a6496396dc943c9",
+    "task-resources-native-compat-1.log": "f651c582da828e500dd2b1d3ef2a1cf07a572a3e1f79ec7788a2ac1bd2aea52d",
+    "task-resources-native-compat-4.log": "48d98f1e98e3a7287646189f70743ff65ac94e57a7847a70b1e1334ee23059ba"
+  }
+}

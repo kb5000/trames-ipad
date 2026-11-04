@@ -3184,3 +3184,73 @@ device policy. The final source passes 30 normal-preemption stock Go GC stress
 starts and eight isolated twelve-CPU Docker lifecycle rounds. No new physical
 iPad run is claimed. Unchanged CPU, graphics and other subsystem results are
 reused.
+
+
+## 43. Original task addresses, Files lifetime and cancellation (2026-11-05)
+
+`set_tid_address` now updates the original task's relaxed atomic address on its
+executing worker, including allowed/denied filter handling. It performs no guest
+memory access at registration. This fixes a pre-existing ABI error where a
+read-only address could fail to replace the registration, despite Linux accepting
+it. Fork/exec and owner exit share the same per-task state. A real musl thread
+fixture verifies read-only registration, later protection change and clear_tid
+wake, as well as a rejected registration preserving the birth address.
+
+Files lifetime no longer depends on owner Rc projections. Each real task owns a
+logical Files reference; its executor can retire that reference and final-close
+complete OFDs before owner collection. Accepted operations retain their originals.
+Late factories/publication and a cloned closed view cannot resurrect membership.
+POSIX process locks and io_uring cancellation expose the original resource
+capabilities, and existing owner cleanup uses the common algorithms. Cancellation
+preserves another submitter and never retargets a reused ring FD.
+
+Complete OFDs now share lifetime independently of whether their body is directly
+admitted. This includes stdio and volatile proc nodes. Actual excluded epoll,
+namespace, OOM/network proc and mount-watch controls remain explicit owner
+destructors, reported rather than hidden. Registered dynamic files still defer
+before body effects and keep their original identity across close/reuse. Owner
+and source cgroup/volatile reads and seeks also use one canonical OFD position;
+positioned writes do not change it.
+
+Seven counterbalanced pairs time four ready threads, each registering 1,000
+addresses, then restoring its clear_tid address and exiting:
+
+| CPUs | Previous HVF | New HVF | Relative speed | Native ARM Linux |
+| ---: | ---: | ---: | ---: | ---: |
+| 1 | 5.527 ms | 5.518 ms | 1.002x | 0.545 ms |
+| 4 | 134.630 ms | 1.483 ms | 90.762x | 0.287 ms |
+| 12 | 132.607 ms | 1.516 ms | 87.476x | — |
+
+Thread creation, initial barrier and final stack unmap are outside the interval;
+release, registration, clear_tid joins and thread exit are inside. Single-CPU
+scheduling shows no meaningful improvement. Native uses the same static musl ELF
+on the existing six-vCPU ARM Linux Lima instance with one/four-CPU affinity,
+not bare-metal Darwin. Unchanged native fixture samples are reused. This is a
+focused syscall/dependency measurement, not a Firefox or whole-system speedup.
+
+[Source-bound evidence](../validation/worker-task-resources-20261105.json) includes
+Apple and native ARM Linux process/kernel/ABI/VFS acceptance, standalone VFS
+features, strict affected checks, iPad device-target compile, production
+interpreter and HVF compatibility at one/four/twelve CPUs. The four existing
+cgroup fixtures cover all twelve HVF combinations. The isolated Go/Docker store
+is separate from business environments. Physical-iPad execution is not claimed.
+
+**Lifecycle migration remains open.** Actual exit/group-exit still joins, and
+full process relationships, robust futex, final mm/native ownership, owner control
+destructors, tracing and vfork still need their real dependencies removed.
+`Epoch::finish` still stops the cohort. The APIs in this batch are not reported
+as complete worker exit. The shared implementation supports both products;
+only Mac Dev is the installation target. Stable Trames 1.5.3 and the business
+Debian/Techo deployment remain unchanged by this development batch.
+
+The separate four-CPU diagnostic reduces cohort rounds **3,780 → 7** and
+returned set_tid_address calls **4,004 → 0**. Actual thread exits and fork still
+return at their structural boundary. Three service requests remain in both
+versions; this is not a zero-service whole-application claim. Recorded cohort
+stop time is 3,058 → 24 us, distinct from total elapsed syscall/scheduling time.
+
+Apple and native ARM Linux pass 299 process cases (three ignored), 40 kernel
+cases, 235 ABI cases (one ignored), then the added registered-proc-file regression
+on both platforms, and 477 VFS cases (one ignored). Standalone VFS all-features
+passes 507 cases (one ignored). These affected results are reused after metadata,
+documentation and test-only refinements; unrelated CPU/GPU acceptance is unchanged.
