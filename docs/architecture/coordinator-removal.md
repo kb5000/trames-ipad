@@ -2813,3 +2813,13 @@ Setup, thread creation, final verification, close and process startup/teardown a
 Affected Apple/Linux tests pass: kernel **281 each**, Linux ABI **228 each**, VFS **460 each**, with the existing ignored cases retained. Strict checks, shared boundaries and iPad device-target compilation pass. Mac product tests pass **20**, HVF unit checks **4**; real HVF executes all three fixture groups on **1/2/4 CPUs**, with memory and private backing. The production interpreter passes those groups on **1/4 CPUs**. Two existing virtual TCP tests use local larger debug stacks; no production stack changes. Physical iPad testing and unchanged CPU/GPU/media suites are reused or skipped as recorded.
 
 The [source-bound record](../validation/worker-stream-transfer-20261104.json) retains every timing sample, native references, separate diagnostics, hashes and the first implementation’s regression. The [shared transfer contract](../../runtime/docs/architecture/execution-backends.md#cross-resource-stream-transfer-2026-11-04) and [remaining-boundary inventory](../../runtime/docs/architecture/coordination-boundaries.md) describe mapped-file layout checkpoints, owner/dynamic exclusions, lifecycle and mask/control paths. tee/vmsplice remain unsupported; no new coordinator/service thread, polling bus, global algorithm lock, guest memory fence or unsafe block is added.
+
+
+Post-integration stability fix (2026-11-04): Debian Docker useradd exposed an
+overlay checkpoint/stat lock inversion. Immutable mount device identity and
+filesystem-before-inode directory/copy-up traversal remove that cycle without
+adding a coordinator or global lock. The [scoped audit and regression record](../validation/overlay-checkpoint-lock-order-20261104.json)
+includes three successful runs of the owner's unmodified repro in an isolated
+Debian clone and two additional recursive-read corrections. The shared
+[lock-order contract](../../runtime/docs/architecture/execution-backends.md#overlay-checkpoint-and-stat-lock-order-2026-11-04)
+describes the preserved checkpoint and resource ownership boundaries.

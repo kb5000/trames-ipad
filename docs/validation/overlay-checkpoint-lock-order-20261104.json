@@ -1,0 +1,162 @@
+{
+  "date": "2026-11-04",
+  "runtime_revision": "d828821b907f8a0d84df01eb934b778858ef873f",
+  "previous_runtime_revision": "7b850d2bb1954a0933a45708255e1f8adf1abe22",
+  "affected_stable_runtime": "a482e6f5fedc8922149b1b6314ad4c5ef91a5c63",
+  "sources": [
+    {
+      "path": "crates/trames-vfs/src/fs_data.rs",
+      "sha256": "2197727f2fb298df4faa9d44ea2618e663873199dc7c26ddafe28a089ed83eec"
+    },
+    {
+      "path": "crates/trames-vfs/src/lib.rs",
+      "sha256": "42991d93dea361c5c795221f9417eef111fa623011912ef2d0ef675572053b56"
+    },
+    {
+      "path": "crates/trames-vfs/src/mounts.rs",
+      "sha256": "3fbdbf09228f823417d2bcd7475b9971f2afc46c034f244dfb0ebcfc21ff03c8"
+    },
+    {
+      "path": "crates/trames-vfs/src/overlay.rs",
+      "sha256": "160249cb9bd70e49f9d57379de6913a04e9276669189de85e3d2669bc8ed534e"
+    },
+    {
+      "path": "docs/architecture/execution-backends.md",
+      "sha256": "2934057dbd36e78b07014d5b382f70cf1fc7ad198e53a851b673200fe532e76f"
+    }
+  ],
+  "symptom": "Docker useradd on Debian overlay can stall all guest execs",
+  "reproduction": {
+    "original_script_sha256": "71b3701209b5d56f617d12dd9ee063e9a1b244ec00610c330364c38932f75281",
+    "command": [
+      "docker",
+      "run",
+      "--rm",
+      "--network",
+      "none",
+      "python:3.12-slim",
+      "sh",
+      "-c",
+      "useradd -u 10001 -g 0 -M techo"
+    ],
+    "method": "Original unmodified shell script run three times on an APFS copy-on-write clone of the frozen Debian environment. Original manifest unchanged during cloning; source environment and project data untouched during development acceptance.",
+    "frozen_manifest_sha256": "66f8d7d444cf7cbc8feb5619e3c5b78e6451526a56ce1fc2c0bb08730f481109",
+    "candidate_note": "First candidate contains immutable device, separated directory stat and copy-up lock-order changes. Final two single-guard limit checks and test-only additions are accepted by final shared suites; final installed stable is rechecked separately.",
+    "runs": [
+      {
+        "label": "startup-probe-0",
+        "returncode": 0,
+        "seconds": 0.096740333,
+        "stdout": "DEBIAN_ALIVE\nactive\n",
+        "stderr": ""
+      },
+      {
+        "label": "original-useradd-0",
+        "returncode": 0,
+        "seconds": 9.24178175,
+        "stdout": "BEFORE_USERADD\nUSERADD_EXIT=0\n",
+        "stderr": ""
+      },
+      {
+        "label": "alive-after-0",
+        "returncode": 0,
+        "seconds": 0.023314415999999838,
+        "stdout": "DEBIAN_ALIVE\n",
+        "stderr": ""
+      },
+      {
+        "label": "original-useradd-1",
+        "returncode": 0,
+        "seconds": 12.349547709,
+        "stdout": "BEFORE_USERADD\nUSERADD_EXIT=0\n",
+        "stderr": ""
+      },
+      {
+        "label": "alive-after-1",
+        "returncode": 0,
+        "seconds": 0.02698170799999744,
+        "stdout": "DEBIAN_ALIVE\n",
+        "stderr": ""
+      },
+      {
+        "label": "original-useradd-2",
+        "returncode": 0,
+        "seconds": 9.556737792,
+        "stdout": "BEFORE_USERADD\nUSERADD_EXIT=0\n",
+        "stderr": ""
+      },
+      {
+        "label": "alive-after-2",
+        "returncode": 0,
+        "seconds": 0.028707459000003155,
+        "stdout": "DEBIAN_ALIVE\n",
+        "stderr": ""
+      }
+    ]
+  },
+  "cause": {
+    "reader": "FileEpoch prepare_open -> inode read -> stat_node_fields -> mount device -> filesystem read",
+    "writer": "rename_at -> filesystem write -> overlay checkpoint -> inode write",
+    "effect": "The reader is the kernel owner during cohort preparation, so its lock wait also blocks unrelated guest exec dispatch."
+  },
+  "audit": [
+    {
+      "path": "mounts.rs MountData::device",
+      "finding": "Filesystem lock under inode read during scalar stat",
+      "fix": "Retain immutable mount device identity; scalar stat has no namespace acquisition"
+    },
+    {
+      "path": "lib.rs directory stat",
+      "finding": "Directory link counting acquires filesystem under scalar inode guard, then re-enters lookup under namespace guard",
+      "fix": "Release scalar inode guard; count children in filesystem -> inode order; release guards before pseudo lookups"
+    },
+    {
+      "path": "overlay.rs copy_up",
+      "finding": "Merged inode write then upper filesystem read opposes upper checkpoint",
+      "fix": "Acquire upper filesystem before inode; drop filesystem before bulk copy/sync; retain original capacity policy with byte-account snapshot"
+    },
+    {
+      "path": "lib.rs import and hard-link limits",
+      "finding": "Two read acquisitions in the same expression can recursively wait behind a queued filesystem writer",
+      "fix": "Use one scoped read guard for each limit check"
+    },
+    {
+      "path": "chmod/times/xattr and rollback",
+      "finding": "Existing explicit inode drop precedes checkpoint; object metadata transactions retained",
+      "fix": "No change"
+    },
+    {
+      "path": "hostfs identity publication, reverse lookup and filesystem sync",
+      "finding": "Scopes already release inode guards before filesystem publication or take filesystem first",
+      "fix": "No change"
+    }
+  ],
+  "validation": {
+    "apple": {
+      "kernel_passed": 281,
+      "linux_abi_passed": 228,
+      "vfs_passed": 463,
+      "vfs_method": "462 passing final suite plus the separately passing final copy-up regression; production code unchanged for test-only addition"
+    },
+    "native_linux": {
+      "kernel_passed": 281,
+      "linux_abi_passed": 228,
+      "vfs_passed": 463,
+      "vfs_method": "Final VFS suite plus new copy-up regression; unchanged ABI/kernel results reused"
+    },
+    "regression_before": "Forced namespace writer correctly fails old device-lock path within the test deadline; forced guard is released and reader joined before assertion",
+    "regression_after": [
+      "file_epoch_stat_needs_no_overlay_namespace_lock",
+      "copy_up_does_not_pin_inode_while_waiting_for_upper_namespace",
+      "overlay_rename_checkpoint_and_directory_stat_share_one_lock_order"
+    ],
+    "strict_clippy": true,
+    "ipad_device_target_check": true,
+    "physical_ipad_tested": false
+  },
+  "limits": [
+    "Scoped VFS lock-order source audit, not proof of a globally acyclic runtime lock graph.",
+    "No new coordinator, service thread, global lock, try-lock polling or guest errno.",
+    "Original report/archive and project data are not redistributed; only derived technical findings and minimal reproduction results are recorded."
+  ]
+}
