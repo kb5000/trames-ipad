@@ -1,0 +1,1649 @@
+{
+  "date": "2026-11-04",
+  "stage": 38,
+  "status": "validated, canonical main integrated, paired pins, Mac Dev installed",
+  "runtime_revision": "2b388148c192b6c4511c528bde21b21ac6d03dcf",
+  "migration_revision": "40ff2f7dd37ceb251af2b28b09021d87b79882b4",
+  "baseline_runtime_revision": "2a5d554fba9c7bd6c17ef1e313828a15ecd95010",
+  "sources": [
+    {
+      "path": "runtime/crates/trames-kernel/src/signal/actions.rs",
+      "sha256": "a943ae0fb3871c0b39bf9117bfdf7f16aa1811106af64e56e1e88ffaa268db6a"
+    },
+    {
+      "path": "runtime/crates/trames-kernel/src/signal/control.rs",
+      "sha256": "1aea8b0fd43837eead85017737dbd06019764c48ed2f4bf22c3a52101b888159"
+    },
+    {
+      "path": "runtime/crates/trames-kernel/src/signal/fault.rs",
+      "sha256": "522b4e11780b0226d939677446b59c080115fb9304e060d8b6fff4b90138c69b"
+    },
+    {
+      "path": "runtime/crates/trames-kernel/src/signal/io.rs",
+      "sha256": "68452b56ce5125f9766764f8919ce007e4f8dd27f62f9171805e3e1cb2f1a1ca"
+    },
+    {
+      "path": "runtime/crates/trames-kernel/src/signal/io_guest.rs",
+      "sha256": "c35fb57134e9673dc5d1ac62d7a979d505ccf65457a07c163d89e8cc9e1d1397"
+    },
+    {
+      "path": "runtime/crates/trames-kernel/src/signal/mod.rs",
+      "sha256": "07845ccbb77bf08b37ed84bd5a1d238801fd890293d2b30416684949100399c7"
+    },
+    {
+      "path": "runtime/crates/trames-kernel/src/signal/reader.rs",
+      "sha256": "36881aad5c603e32d07bf15b0ead254c59c11d1838e6742f3a7fc1de02af02de"
+    },
+    {
+      "path": "runtime/crates/trames-kernel/src/signal/wait.rs",
+      "sha256": "6c299e5288793fe6a3248f06df5d0c9e9b6e0bfac10a984b75bce14b1d1dadd7"
+    },
+    {
+      "path": "runtime/crates/trames-kernel/tests/task-signals.rs",
+      "sha256": "686bad2cc74edd78116edb3b05a07e5a8a904b614597e27e3de8fdf848c04adf"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/direct.rs",
+      "sha256": "f4690d1fe48764a1330c3a3e4137e37e407a62348a05313ab66e5bc9c17606ec"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/direct/local_message.rs",
+      "sha256": "a3ce1c16bad61809acaa65cd3921098fdb48c6a78422456f663004ef31126329"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/direct/local_message/batch.rs",
+      "sha256": "ff4d8ce4d5840da299f07ac14e8f68af2e7e414429c217d14fb291aaa0d834b1"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/direct/signal_read.rs",
+      "sha256": "5a77f10ddf40fa032f7138d07860570fb5f4ab364077aa9c9a27d6d376b697dc"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/direct/uring.rs",
+      "sha256": "06d52bd6bc8017becb4b3f5739e60630f5050529f45c15907284a83e01a7dd98"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/direct/uring/owned_tests.rs",
+      "sha256": "4f1aa94134ada8189eaa5524720574badc83f379d08ea1fc4df803a999597068"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/uring/execute.rs",
+      "sha256": "d1857e46011911db4ccf836b196cf8603b7400d8f765b6ca4f41dc63f4ec452c"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/process.rs",
+      "sha256": "981771c01cac69ac1c8b173977c13ed658dcf21affaef082ca646a5448ab6cb5"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/process_events.rs",
+      "sha256": "8c1316fde05256926170fd407a058b297261630cfc73faf2f51892eb1c5f875c"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/process_pid.rs",
+      "sha256": "74be2145c66596d7686db19315c2ac5ae1d8f2ab1de7b827814b09598bc08fdc"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/process_seccomp.rs",
+      "sha256": "b9518f412ae765caa14f8cff98b1fcf4cc34e617b2af09258b36a8b03dd1de21"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/process_service.rs",
+      "sha256": "8b54739ea304de0ff950791051d8d47f7892657580b4334d10b6803150207386"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/process_signals.rs",
+      "sha256": "5dff360fef3bf43d2af88c7c18be76749dcc5fbe8649ba439827a202ecc6682c"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/process_socket_wait.rs",
+      "sha256": "a573fc1d1a5ebdf771bbd7ab9d5d701b3008781b715f39d6344e02a897aefda7"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/run_queue.rs",
+      "sha256": "9322adc621ff40046d4da2686e3b4ede6a9fd5831e6be5103e1622f7976eea95"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/worker_syscalls.rs",
+      "sha256": "fe15ae22c7ab9c25e77fa910465a355133230ffaea92ec1ec07ea4646d2e9bf1"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/workers.rs",
+      "sha256": "5e82f33cb51a91b1a3059f9f8f1a19e996e681cc8666d217d26f8f167e5bafc2"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/workers_uring_tests.rs",
+      "sha256": "9b5b9e6d88eef3319f9a73fc508ad9561c01d8ad67e02c4cdcdc432a1d955feb"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/direct_io.rs",
+      "sha256": "be4e909643c2b6f782f9cfa9aa1ad61e636382db3a1b98ba0ac837736e550ed7"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/epoll.rs",
+      "sha256": "fc0b5417be6b3ca8c271b659bb160f32e1c8ff7f12b66848817b9a6fa4d335e2"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/events.rs",
+      "sha256": "63dcc315f24411748fe17256af51c010ec41f2a3969825195fe0ac99a38c2b01"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/lib.rs",
+      "sha256": "84cc46496f8b56d6f47732388b58c729f242975164ae0a64d1261e4915bc1af8"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/signal_reader.rs",
+      "sha256": "204f43ad3b7f16d0ad96255c1bcc1ecf32bba93c0213d5efcbfe3ebb4a1a9143"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/uring.rs",
+      "sha256": "92514c7366656e41a7326380bc5159b4c099709af675eecafb115f2e7743e41b"
+    },
+    {
+      "path": "runtime/docs/architecture/coordination-boundaries.md",
+      "sha256": "f5fa81dfc3297b7b69d20526633d4a2f66417005303e4d6a82a324a15a4a2881"
+    },
+    {
+      "path": "runtime/docs/architecture/execution-backends.md",
+      "sha256": "75b993adc440cf3f5e24511a6e27494b7c881ad083bed980d7beeb14b9c2183f"
+    },
+    {
+      "path": "tests/fixtures/signal-control.c",
+      "sha256": "373a2c2b58a64645fbd624d2c36a21524ccd03c5608b9ba98b84296042b918b8"
+    },
+    {
+      "path": "tests/performance/signal-control.py",
+      "sha256": "d9c70825545c77bc89c5a0c33581b6c612cf87f8d92c692ceb49fe0ed6592f0b"
+    }
+  ],
+  "host": {
+    "cpu": "Apple M6",
+    "cpus": 12,
+    "physical_bytes": 25769803776,
+    "os": "macOS 27.0.1 (26A434)",
+    "verification": "sysctl and sw_vers on this host, 2026-11-04"
+  },
+  "validation": {
+    "apple_kernel": {
+      "passed": 287,
+      "ignored": 3
+    },
+    "signal_kernel": {
+      "passed": 17,
+      "api_tests": 2
+    },
+    "linux_abi": {
+      "apple_passed": 230,
+      "linux_passed": 230,
+      "ignored_each": 1
+    },
+    "vfs": {
+      "apple_passed": 493,
+      "linux_passed": 492,
+      "ignored_each": 1
+    },
+    "linux_kernel": "286 kernel / 16 signal-kernel passing results reused; final changed signal subset passes 29 kernel + 13 signal-kernel cases, including new suspend/overrun regressions. Unrelated passing cases were not rerun.",
+    "mac_product": {
+      "passed": 20,
+      "ignored": 1,
+      "hvf_unit_reuse": "Unchanged HVF unit source reuses 4 pass / 47 ignored from stage 37."
+    },
+    "static": "Affected all-target strict clippy, runtime format, paired boundaries and aarch64-apple-ios FFI check pass.",
+    "actual_backends": [
+      {
+        "backend": "hvf",
+        "case": "signalfd",
+        "cpus": 1,
+        "passed": 25,
+        "stdout_sha256": "29863385e5163af4acc09fb8cb5a780b749fc92dd7b289549c17e2fa79fb1be0",
+        "stderr_sha256": "3ff2f2f526ea4543f3be4a13b105603daeb7f30a748258aac3a9903bd1df8c91"
+      },
+      {
+        "backend": "hvf",
+        "case": "signalfd",
+        "cpus": 4,
+        "passed": 25,
+        "stdout_sha256": "29863385e5163af4acc09fb8cb5a780b749fc92dd7b289549c17e2fa79fb1be0",
+        "stderr_sha256": "391ce3f91d37b52a099975670cb390d3b1b2b5749003f0962f968448b8587794"
+      },
+      {
+        "backend": "hvf",
+        "case": "posix-timers",
+        "cpus": 1,
+        "passed": 5,
+        "stdout_sha256": "c27de0a071c8d52f4edc5c59e1c85aba1a668320a68b0822109683fc5586a255",
+        "stderr_sha256": "e33534bdaa9cee78a796156ee78ed363a1e0fd27039bc8aec6b0c80dd0d877d1"
+      },
+      {
+        "backend": "hvf",
+        "case": "posix-timers",
+        "cpus": 4,
+        "passed": 5,
+        "stdout_sha256": "c27de0a071c8d52f4edc5c59e1c85aba1a668320a68b0822109683fc5586a255",
+        "stderr_sha256": "015e4ab6e8b7e131be103657393f3f114aeb57eeef837ff7325849530f537728"
+      },
+      {
+        "backend": "interpreter",
+        "case": "signalfd",
+        "cpus": 1,
+        "passed": 25,
+        "stdout_sha256": "29863385e5163af4acc09fb8cb5a780b749fc92dd7b289549c17e2fa79fb1be0",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "backend": "interpreter",
+        "case": "signalfd",
+        "cpus": 4,
+        "passed": 25,
+        "stdout_sha256": "29863385e5163af4acc09fb8cb5a780b749fc92dd7b289549c17e2fa79fb1be0",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "backend": "interpreter",
+        "case": "posix-timers",
+        "cpus": 1,
+        "passed": 5,
+        "stdout_sha256": "c27de0a071c8d52f4edc5c59e1c85aba1a668320a68b0822109683fc5586a255",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "backend": "interpreter",
+        "case": "posix-timers",
+        "cpus": 4,
+        "passed": 5,
+        "stdout_sha256": "c27de0a071c8d52f4edc5c59e1c85aba1a668320a68b0822109683fc5586a255",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ]
+  },
+  "performance": {
+    "method": "Five counterbalanced before/after unprofiled pairs, 1000 iterations per worker; diagnostics separate. Nine longer single-worker pairs use 10000 iterations. Exact final pinned binary. Native ARM Linux runs the same static musl ELF in the pre-existing local reference VM, shut down before Mac timings. Native Darwin runs matching POSIX APIs where applicable.",
+    "kinds": {
+      "0": "pthread_sigmask query",
+      "1": "pthread_sigmask mutation",
+      "2": "sigaction query",
+      "3": "sigaction mutation",
+      "4": "pthread_kill(self) + sigwait",
+      "5": "pthread_kill(self) + signalfd read"
+    },
+    "summary": [
+      {
+        "kind": 0,
+        "workers": 1,
+        "median_ms": {
+          "before": 1.529667,
+          "after": 1.75975,
+          "native-macos": 0.109
+        },
+        "speedup": 0.8692524506321921,
+        "native_linux_ms": 0.134976
+      },
+      {
+        "kind": 0,
+        "workers": 2,
+        "median_ms": {
+          "before": 46.315833,
+          "after": 1.097666,
+          "native-macos": 0.16
+        },
+        "speedup": 42.19483249002884,
+        "native_linux_ms": 0.125785
+      },
+      {
+        "kind": 0,
+        "workers": 4,
+        "median_ms": {
+          "before": 113.59475,
+          "after": 1.3985,
+          "native-macos": 0.159
+        },
+        "speedup": 81.226135144798,
+        "native_linux_ms": 0.13907
+      },
+      {
+        "kind": 1,
+        "workers": 1,
+        "median_ms": {
+          "before": 1.405625,
+          "after": 1.395958,
+          "native-macos": 0.115
+        },
+        "speedup": 1.0069249934453615,
+        "native_linux_ms": 0.135101
+      },
+      {
+        "kind": 1,
+        "workers": 2,
+        "median_ms": {
+          "before": 45.569791,
+          "after": 1.138375,
+          "native-macos": 0.21
+        },
+        "speedup": 40.03056198528605,
+        "native_linux_ms": 0.183351
+      },
+      {
+        "kind": 1,
+        "workers": 4,
+        "median_ms": {
+          "before": 113.392083,
+          "after": 1.377375,
+          "native-macos": 0.617
+        },
+        "speedup": 82.32477212088212,
+        "native_linux_ms": 0.19133
+      },
+      {
+        "kind": 2,
+        "workers": 1,
+        "median_ms": {
+          "before": 1.512833,
+          "after": 1.525334,
+          "native-macos": 0.111
+        },
+        "speedup": 0.9918044179176496,
+        "native_linux_ms": 0.136563
+      },
+      {
+        "kind": 2,
+        "workers": 2,
+        "median_ms": {
+          "before": 1.179167,
+          "after": 1.215542,
+          "native-macos": 0.157
+        },
+        "speedup": 0.9700750776196957,
+        "native_linux_ms": 0.185941
+      },
+      {
+        "kind": 2,
+        "workers": 4,
+        "median_ms": {
+          "before": 1.515042,
+          "after": 1.455458,
+          "native-macos": 0.16
+        },
+        "speedup": 1.0409383163237964,
+        "native_linux_ms": 0.193503
+      },
+      {
+        "kind": 3,
+        "workers": 1,
+        "median_ms": {
+          "before": 1.417458,
+          "after": 1.455292,
+          "native-macos": 0.113
+        },
+        "speedup": 0.9740024682331794,
+        "native_linux_ms": 0.139279
+      },
+      {
+        "kind": 3,
+        "workers": 2,
+        "median_ms": {
+          "before": 45.436459,
+          "after": 1.510375,
+          "native-macos": 0.265
+        },
+        "speedup": 30.082899279980136,
+        "native_linux_ms": 0.23887
+      },
+      {
+        "kind": 3,
+        "workers": 4,
+        "median_ms": {
+          "before": 112.401291,
+          "after": 5.40625,
+          "native-macos": 0.73
+        },
+        "speedup": 20.790990242774566,
+        "native_linux_ms": 0.60762
+      },
+      {
+        "kind": 4,
+        "workers": 1,
+        "median_ms": {
+          "before": 5.986458,
+          "after": 6.045041,
+          "native-macos": 0.246
+        },
+        "speedup": 0.9903089160189318,
+        "native_linux_ms": 0.648268
+      },
+      {
+        "kind": 4,
+        "workers": 2,
+        "median_ms": {
+          "before": 180.272042,
+          "after": 5.026625,
+          "native-macos": null
+        },
+        "speedup": 35.863435605401236,
+        "native_linux_ms": 1.021487
+      },
+      {
+        "kind": 4,
+        "workers": 4,
+        "median_ms": {
+          "before": 454.580083,
+          "after": 5.846292,
+          "native-macos": null
+        },
+        "speedup": 77.75528198044162,
+        "native_linux_ms": 2.501707
+      },
+      {
+        "kind": 5,
+        "workers": 1,
+        "median_ms": {
+          "before": 6.205708,
+          "after": 6.268,
+          "native-macos": null
+        },
+        "speedup": 0.9900619017230377,
+        "native_linux_ms": 0.686199
+      },
+      {
+        "kind": 5,
+        "workers": 2,
+        "median_ms": {
+          "before": 181.814708,
+          "after": 5.232792,
+          "native-macos": null
+        },
+        "speedup": 34.745257980825535,
+        "native_linux_ms": 1.082855
+      },
+      {
+        "kind": 5,
+        "workers": 4,
+        "median_ms": {
+          "before": 456.327375,
+          "after": 6.072166,
+          "native-macos": null
+        },
+        "speedup": 75.15067522857576,
+        "native_linux_ms": 2.474177
+      }
+    ],
+    "long_solo": [
+      {
+        "kind": 0,
+        "workers": 1,
+        "median_ms": {
+          "before": 15.016583,
+          "after": 14.751833,
+          "native-macos": 1.009
+        },
+        "speedup": 1.0179469222570512
+      },
+      {
+        "kind": 1,
+        "workers": 1,
+        "median_ms": {
+          "before": 14.079459,
+          "after": 14.013708,
+          "native-macos": 1.104
+        },
+        "speedup": 1.004691905953799
+      },
+      {
+        "kind": 2,
+        "workers": 1,
+        "median_ms": {
+          "before": 15.15925,
+          "after": 14.932958,
+          "native-macos": 1.012
+        },
+        "speedup": 1.0151538630189678
+      },
+      {
+        "kind": 3,
+        "workers": 1,
+        "median_ms": {
+          "before": 14.462416,
+          "after": 14.503084,
+          "native-macos": 1.072
+        },
+        "speedup": 0.9971959067464548
+      },
+      {
+        "kind": 4,
+        "workers": 1,
+        "median_ms": {
+          "before": 59.627584,
+          "after": 59.164917,
+          "native-macos": 2.367
+        },
+        "speedup": 1.0078199551940552
+      },
+      {
+        "kind": 5,
+        "workers": 1,
+        "median_ms": {
+          "before": 61.185542,
+          "after": 61.077583,
+          "native-macos": null
+        },
+        "speedup": 1.0017675715818684
+      }
+    ],
+    "diagnostics": [
+      {
+        "kind": 0,
+        "workers": 1,
+        "label": "before",
+        "paths": {
+          "cohort_rounds": 0,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 1020,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 0,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "kind": 0,
+        "workers": 1,
+        "label": "after",
+        "paths": {
+          "cohort_rounds": 0,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 1020,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 0,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "kind": 0,
+        "workers": 2,
+        "label": "before",
+        "paths": {
+          "cohort_rounds": 1925,
+          "cohort_stop_us": 1750,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 2033,
+          "vm_local_syscalls": 1,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 3,
+          "worker_futex_wakes": 3,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 6,
+          "worker_task_resumes": 2,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "kind": 0,
+        "workers": 2,
+        "label": "after",
+        "paths": {
+          "cohort_rounds": 3,
+          "cohort_stop_us": 6,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 2032,
+          "vm_local_syscalls": 2,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 2,
+          "worker_futex_wakes": 3,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 2014,
+          "worker_task_resumes": 2,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "kind": 0,
+        "workers": 4,
+        "label": "before",
+        "paths": {
+          "cohort_rounds": 3637,
+          "cohort_stop_us": 4124,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 4064,
+          "vm_local_syscalls": 7,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 7,
+          "worker_futex_wakes": 7,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 16,
+          "worker_task_resumes": 4,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "kind": 0,
+        "workers": 4,
+        "label": "after",
+        "paths": {
+          "cohort_rounds": 7,
+          "cohort_stop_us": 23,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 4062,
+          "vm_local_syscalls": 7,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 6,
+          "worker_futex_wakes": 7,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 4034,
+          "worker_task_resumes": 5,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "kind": 1,
+        "workers": 1,
+        "label": "before",
+        "paths": {
+          "cohort_rounds": 0,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 1020,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 0,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "kind": 1,
+        "workers": 1,
+        "label": "after",
+        "paths": {
+          "cohort_rounds": 0,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 1020,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 0,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "kind": 1,
+        "workers": 2,
+        "label": "before",
+        "paths": {
+          "cohort_rounds": 1902,
+          "cohort_stop_us": 1972,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 2033,
+          "vm_local_syscalls": 3,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 3,
+          "worker_futex_wakes": 3,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 6,
+          "worker_task_resumes": 3,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "kind": 1,
+        "workers": 2,
+        "label": "after",
+        "paths": {
+          "cohort_rounds": 3,
+          "cohort_stop_us": 4,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 2034,
+          "vm_local_syscalls": 3,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 4,
+          "worker_futex_wakes": 3,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 2016,
+          "worker_task_resumes": 3,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "kind": 1,
+        "workers": 4,
+        "label": "before",
+        "paths": {
+          "cohort_rounds": 3603,
+          "cohort_stop_us": 3983,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 4063,
+          "vm_local_syscalls": 7,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 7,
+          "worker_futex_wakes": 7,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 16,
+          "worker_task_resumes": 7,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "kind": 1,
+        "workers": 4,
+        "label": "after",
+        "paths": {
+          "cohort_rounds": 7,
+          "cohort_stop_us": 32,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 4062,
+          "vm_local_syscalls": 7,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 6,
+          "worker_futex_wakes": 7,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 4034,
+          "worker_task_resumes": 5,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "kind": 2,
+        "workers": 1,
+        "label": "before",
+        "paths": {
+          "cohort_rounds": 0,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 1020,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 0,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "kind": 2,
+        "workers": 1,
+        "label": "after",
+        "paths": {
+          "cohort_rounds": 0,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 1020,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 0,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "kind": 2,
+        "workers": 2,
+        "label": "before",
+        "paths": {
+          "cohort_rounds": 10,
+          "cohort_stop_us": 42,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 2033,
+          "vm_local_syscalls": 2,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 3,
+          "worker_futex_wakes": 3,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 2006,
+          "worker_task_resumes": 2,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "kind": 2,
+        "workers": 2,
+        "label": "after",
+        "paths": {
+          "cohort_rounds": 3,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 2032,
+          "vm_local_syscalls": 2,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 2,
+          "worker_futex_wakes": 3,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 2014,
+          "worker_task_resumes": 2,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "kind": 2,
+        "workers": 4,
+        "label": "before",
+        "paths": {
+          "cohort_rounds": 23,
+          "cohort_stop_us": 195,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 4062,
+          "vm_local_syscalls": 6,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 6,
+          "worker_futex_wakes": 7,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 4015,
+          "worker_task_resumes": 4,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "kind": 2,
+        "workers": 4,
+        "label": "after",
+        "paths": {
+          "cohort_rounds": 7,
+          "cohort_stop_us": 51,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 4061,
+          "vm_local_syscalls": 7,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 5,
+          "worker_futex_wakes": 7,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 4033,
+          "worker_task_resumes": 5,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "kind": 3,
+        "workers": 1,
+        "label": "before",
+        "paths": {
+          "cohort_rounds": 0,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 1020,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 0,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "kind": 3,
+        "workers": 1,
+        "label": "after",
+        "paths": {
+          "cohort_rounds": 0,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 1020,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 0,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "kind": 3,
+        "workers": 2,
+        "label": "before",
+        "paths": {
+          "cohort_rounds": 1917,
+          "cohort_stop_us": 1809,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 2034,
+          "vm_local_syscalls": 2,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 4,
+          "worker_futex_wakes": 3,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 7,
+          "worker_task_resumes": 3,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "kind": 3,
+        "workers": 2,
+        "label": "after",
+        "paths": {
+          "cohort_rounds": 3,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 2033,
+          "vm_local_syscalls": 2,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 3,
+          "worker_futex_wakes": 3,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 2015,
+          "worker_task_resumes": 2,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "kind": 3,
+        "workers": 4,
+        "label": "before",
+        "paths": {
+          "cohort_rounds": 3622,
+          "cohort_stop_us": 4077,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 4063,
+          "vm_local_syscalls": 6,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 6,
+          "worker_futex_wakes": 7,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 15,
+          "worker_task_resumes": 7,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "kind": 3,
+        "workers": 4,
+        "label": "after",
+        "paths": {
+          "cohort_rounds": 7,
+          "cohort_stop_us": 38,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 4062,
+          "vm_local_syscalls": 8,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 6,
+          "worker_futex_wakes": 7,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 4034,
+          "worker_task_resumes": 6,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "kind": 4,
+        "workers": 1,
+        "label": "before",
+        "paths": {
+          "cohort_rounds": 0,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 4020,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 0,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "kind": 4,
+        "workers": 1,
+        "label": "after",
+        "paths": {
+          "cohort_rounds": 0,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 4020,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 0,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "kind": 4,
+        "workers": 2,
+        "label": "before",
+        "paths": {
+          "cohort_rounds": 7701,
+          "cohort_stop_us": 5294,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 8033,
+          "vm_local_syscalls": 1,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 3,
+          "worker_futex_wakes": 3,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 6,
+          "worker_task_resumes": 2,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "kind": 4,
+        "workers": 2,
+        "label": "after",
+        "paths": {
+          "cohort_rounds": 3,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 8034,
+          "vm_local_syscalls": 2,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 4,
+          "worker_futex_wakes": 3,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 8016,
+          "worker_task_resumes": 2,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "kind": 4,
+        "workers": 4,
+        "label": "before",
+        "paths": {
+          "cohort_rounds": 14511,
+          "cohort_stop_us": 14412,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 16064,
+          "vm_local_syscalls": 6,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 8,
+          "worker_futex_wakes": 7,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 17,
+          "worker_task_resumes": 6,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "kind": 4,
+        "workers": 4,
+        "label": "after",
+        "paths": {
+          "cohort_rounds": 7,
+          "cohort_stop_us": 29,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 16062,
+          "vm_local_syscalls": 7,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 6,
+          "worker_futex_wakes": 7,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 16034,
+          "worker_task_resumes": 5,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "kind": 5,
+        "workers": 1,
+        "label": "before",
+        "paths": {
+          "cohort_rounds": 0,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 4022,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 0,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "kind": 5,
+        "workers": 1,
+        "label": "after",
+        "paths": {
+          "cohort_rounds": 0,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 4022,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 0,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "kind": 5,
+        "workers": 2,
+        "label": "before",
+        "paths": {
+          "cohort_rounds": 7605,
+          "cohort_stop_us": 5973,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 8037,
+          "vm_local_syscalls": 3,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 4,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 3,
+          "worker_futex_wakes": 3,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 10,
+          "worker_task_resumes": 3,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "kind": 5,
+        "workers": 2,
+        "label": "after",
+        "paths": {
+          "cohort_rounds": 3,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 8036,
+          "vm_local_syscalls": 2,
+          "worker_direct_syscalls": 2000,
+          "worker_fd_syscalls": 4,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 2,
+          "worker_futex_wakes": 3,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 8018,
+          "worker_task_resumes": 2,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "kind": 5,
+        "workers": 4,
+        "label": "before",
+        "paths": {
+          "cohort_rounds": 14380,
+          "cohort_stop_us": 15454,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 16071,
+          "vm_local_syscalls": 8,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 8,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 6,
+          "worker_futex_wakes": 7,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 23,
+          "worker_task_resumes": 7,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "kind": 5,
+        "workers": 4,
+        "label": "after",
+        "paths": {
+          "cohort_rounds": 7,
+          "cohort_stop_us": 20,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 16072,
+          "vm_local_syscalls": 9,
+          "worker_direct_syscalls": 4000,
+          "worker_fd_syscalls": 8,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 8,
+          "worker_futex_wakes": 7,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 16044,
+          "worker_task_resumes": 7,
+          "worker_uring_syscalls": 0
+        }
+      }
+    ],
+    "artifacts": [
+      {
+        "path": "target/signals/perf-pinned/results.json",
+        "sha256": "3740becd513cdc8117952aa63edd5e14965bf0af1356266674a1b152a2044fb8"
+      },
+      {
+        "path": "target/signals/solo-long/results.json",
+        "sha256": "182c97a590df70dfa12c803836b14393bd8e5a96bf5bbf21996422e21cfdefaa"
+      },
+      {
+        "path": "target/local-ci/io/signals-native.jsonl",
+        "sha256": "93624f8b4637ded8e89a5bac6e16328d78b86680c9bd6dbe9c5c20573f7ebc83"
+      }
+    ],
+    "binaries": {
+      "before": "9dd28ebfc188a54de85ea35c51325d0bb7d612c67668b7c935372f982f4d2e46",
+      "after": "7ecf661e65d4ed869089be0444acae3faa053c7188f3ec4e0bda154e6f0e4a2e",
+      "native_macos": "123a665564b9a6770e0fad002eee5cff8c0185068e74250c75316138c7f60418",
+      "fixture": "27b7062c8ab4771127b8989655f814a37b98d2be682d4e088f4529d0206b1966"
+    },
+    "native_macos_exclusions": "Darwin has no signalfd. The native per-thread self-send/sigwait multiworker fixture did not complete on this host within its deadline, even with the whole process blocking the set; those Darwin cells are omitted rather than scored. The exact Linux ELF reference covers all worker counts."
+  },
+  "installation": {
+    "version": "Trames Dev 1.5.1 (dev) runtime 2b388148c192b6c4511c528bde21b21ac6d03dcf",
+    "dev_binary_sha256": "7ecf661e65d4ed869089be0444acae3faa053c7188f3ec4e0bda154e6f0e4a2e",
+    "stable_binary_sha256": "3b5cfa09531ec8680f1d06713d27c1fb89095f5e9752f012f66525597858f892",
+    "stable_binary_unchanged": true,
+    "stable_docker_health": "Trames Docker is running\n",
+    "ipad": "Shared runtime and device-target FFI compiled; no physical-device installation in this batch."
+  },
+  "remaining_dependencies": [
+    "STOP/CONT/default termination -> task/group run state -> parent wait/SIGCHLD -> clear_tid/robust-futex and accepted-operation cancellation -> final files/mm/native-context release -> reaping. This lifecycle chain is still owner-owned.",
+    "Seccomp TRAP/KILL and tracing; structural fork/exec, credentials, namespaces and excluded owner resources retain their real boundaries."
+  ],
+  "logs": [
+    {
+      "path": "target/signals/final-controls-tests.log",
+      "sha256": "9680ec35b5356cbbe5fd05ac3a9954e5e4050c67e361fea2dbce3e9bba72de86",
+      "results": [
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 287 passed; 0 failed; 3 ignored; 0 measured; 0 filtered out; finished in 1.14s",
+        "test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s"
+      ],
+      "completed": [
+        "test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s"
+      ]
+    },
+    {
+      "path": "target/signals/final-abi-vfs.log",
+      "sha256": "b35ea40f1c990aef1e452e1610ba1a6bc00a39d3c68c1ff2d05cae668ddccbde",
+      "results": [
+        "test result: ok. 230 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.81s",
+        "test result: ok. 493 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 2.47s"
+      ],
+      "completed": [
+        "test result: ok. 493 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 2.47s"
+      ]
+    },
+    {
+      "path": "target/signals/kernel-api-tests.log",
+      "sha256": "118cd6bfc855f15716f3a51017643c9df5166498b7bd256f9f24538a8c0bb315",
+      "results": [
+        "test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s",
+        "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+      ],
+      "completed": [
+        "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "target/signals/query-final-test.log",
+      "sha256": "213abd99240e9e1cc9477b6274dfa9c80b8418ec325b1064b4a312dc4f261fab",
+      "results": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 289 filtered out; finished in 0.01s"
+      ],
+      "completed": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 289 filtered out; finished in 0.01s"
+      ]
+    },
+    {
+      "path": "target/signals/uring-signal-test.log",
+      "sha256": "683fab28860c80080fdb612133f0467c7f26efb92e52b7076ec3ae997bf0b7ba",
+      "results": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 230 filtered out; finished in 0.01s"
+      ],
+      "completed": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 230 filtered out; finished in 0.01s"
+      ]
+    },
+    {
+      "path": "target/signals/clippy.log",
+      "sha256": "a079c0d00423824626d4bf804521514d2c5fdd701cafbba5ae28d9e9ef03a4df",
+      "results": [],
+      "completed": [
+        "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.78s"
+      ]
+    },
+    {
+      "path": "target/signals/format.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "results": [],
+      "completed": []
+    },
+    {
+      "path": "target/signals/ipad-check.log",
+      "sha256": "0c07a068f459fb661388c002e7fac3375444e982ee725f64b63e5490033c3591",
+      "results": [],
+      "completed": [
+        "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.83s"
+      ]
+    },
+    {
+      "path": "target/signals/mac-product-tests.log",
+      "sha256": "d30ec1565c53b9f0786295517d2bc8069e70b86acb136062f9ac8057733ca57a",
+      "results": [
+        "test result: ok. 20 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.01s"
+      ],
+      "completed": [
+        "test result: ok. 20 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.01s"
+      ]
+    },
+    {
+      "path": "target/signals/pinned-build.log",
+      "sha256": "dc984129eaa97f4c63da2943007f87a9ffdb7a798da4d133c9f6ee90209e8c48",
+      "results": [],
+      "completed": [
+        "target/release/Trames Dev.app: replacing existing signature"
+      ]
+    },
+    {
+      "path": "target/signals/interpreter-final-build.log",
+      "sha256": "0aba23aa27a815959f54eb8ed251a7f4f66954402f73bcd0828ca0eef70858a6",
+      "results": [],
+      "completed": [
+        "    Finished `release` profile [optimized] target(s) in 31.43s"
+      ]
+    },
+    {
+      "path": "target/local-ci/io/signals-linux-tests.log",
+      "sha256": "9ae921066a56eae5916651d59a91c360f2fe1a3530246b2f6cafe6b19f93d542",
+      "results": [
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 286 passed; 0 failed; 3 ignored; 0 measured; 0 filtered out; finished in 1.38s",
+        "test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s",
+        "test result: FAILED. 229 passed; 1 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.75s"
+      ]
+    },
+    {
+      "path": "target/local-ci/io/signals-linux-abi-vfs.log",
+      "sha256": "bff76ae744a120b336f42dd0a8213b79814d113173ff84a120c4b48e6dc18443",
+      "results": [
+        "test result: ok. 230 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.74s",
+        "test result: ok. 492 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 1.25s"
+      ]
+    },
+    {
+      "path": "target/local-ci/io/signals-linux-final-abi.log",
+      "sha256": "b0544134b335f924b955793188e068dc40958f3e3d2e20c9acd4bde285498f79",
+      "results": [
+        "test result: ok. 230 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.73s"
+      ]
+    },
+    {
+      "path": "target/local-ci/io/signals-linux-final-controls.log",
+      "sha256": "f148c6fca5e507522d9f35546efed9ade72aad80642f2559a9f49d4dbe7e4622",
+      "results": [
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 286 passed; 0 failed; 3 ignored; 0 measured; 0 filtered out; finished in 1.36s",
+        "test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "target/local-ci/io/signals-linux-signal-subset.log",
+      "sha256": "c58c3565fe09f47334083e62e33f6b807f2cfc3ec706f8fb163b169373871fe3",
+      "results": [
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 29 passed; 0 failed; 0 ignored; 0 measured; 261 filtered out; finished in 0.02s",
+        "test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.00s"
+      ]
+    }
+  ]
+}
