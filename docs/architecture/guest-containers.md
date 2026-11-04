@@ -292,8 +292,9 @@ magic 被兼容。不支持的挂载行为明确返回错误。
 
 ## 配额与尚缺的部分
 
-- 每个 guest 会话最多 128 个存活挂载对象，含 namespace 副本和被 FD/映射保留的
-  挂载；耗尽 ENOSPC，释放后可再创建。UTS 和 PID 谱系各有 128 个存活对象额度。
+- Each mount namespace has a 128-entry mount-table bound. Independent namespaces
+  do not share this quota; the shared weak resource index grows with actual live
+  mounts and prunes retired entries. UTS 和 PID 谱系各有 128 个存活对象额度。
   PID 最多嵌套 32 层，每会话最多 256 个任务；编号不循环复用，fork 前回收无引用映射。
 - tmpfs 独立于磁盘 manifest，默认 16 MiB / 1024 inode；`size` 可设到 64 MiB，
   按需分配，`nr_inodes` 可降低节点上限，`mode` 设置根目录权限。
@@ -354,3 +355,67 @@ cgroup/dumpable 批次见[成员生命周期与原版 crun 阻塞验证](../vali
 设备与启动路径批次见[设备、openat2 与原版运行时验证](../validation/guest-devices.md)。
 
 信号与原版容器生命周期批次见[signalfd/crun 验证](../validation/guest-signalfd.md)。
+
+## Concurrent runc bootstrap and mount-resource tracking (2026-11-04)
+
+Concurrent stock runc starts exposed an incorrect global resource quota. The
+shared `Vfs::mount_resources` list indexes mount identities across namespaces for
+lookup and retirement. It is not a namespace's mount table. Applying the same
+128-entry limit to this aggregate made independent containers exhaust each
+other's quota, including while `unshare(CLONE_NEWNS)` copied existing mounts.
+
+The reproducer captured `ENOSPC` from namespace creation in runc's nsexec stage 1.
+That child exited before forwarding the final init PID, so its parent reported
+the PID-pipe EOF from the supplied incident. This sequence matches the upstream
+[namespace bootstrap](https://github.com/opencontainers/runc/blob/v1.1.15/libcontainer/nsenter/nsexec.c)
+and [parent PID reader](https://github.com/opencontainers/runc/blob/v1.1.15/libcontainer/process_linux.go).
+It is mount metadata exhaustion, not a full root disk. The original incident
+record lacks the child's debug log, so the historical instance cannot be
+uniquely attributed; the same failure chain is reproducible independently.
+
+Runtime `ef714da7d48c4280a788c20a48b287ee17ee94d2` removes the aggregate quota.
+The existing per-namespace mount-table limit, retained FD/mapping identities,
+weak-entry retirement and structural namespace owner boundary remain. This fix
+adds no coordinator/service thread, polling, lock or ordinary file-I/O check.
+Unit tests retain more than 128 live mounts across sibling namespaces, check
+retirement, and preserve atomic failure/recovery at a single namespace's limit.
+
+The isolated acceptance uses Debian's stock runc `1.1.15+ds1-2+b4` and an Alpine
+`/bin/true` payload, with 32 empty tmpfs padding mounts and eight concurrent starts
+in each of three rounds. Padding increases namespace metadata pressure without
+reserving the advertised tmpfs capacity. Every run uses the same private test
+store and OCI configuration; production storage and application data are not
+used.
+
+| Runtime | CPUs | Starts | Failed | PID-pipe EOF failures |
+| --- | ---: | ---: | ---: | ---: |
+| Installed stable, `d828821` | 12 | 24 | 22 | 18 |
+| Previous Dev, `2b38814` | 12 | 24 | 21 | 18 |
+| Fixed runtime | 12 | 24 | 0 | 0 |
+| Fixed runtime | 4 | 24 | 0 | 0 |
+| Installed fixed Dev package | 12 | 24 | 0 | 0 |
+
+To repeat, prepare an isolated Debian rootfs with stock runc and its libraries,
+an Alpine rootfs at `/bundle/rootfs`, and run `runc spec` in `/bundle`. In the
+generated OCI configuration, set `process.terminal` to `false`, set
+`process.args` to `["/bin/true"]`, and remove `process.rlimits`. Import
+[`runc-concurrent-mounts.sh`](../../tests/fixtures/runc-concurrent-mounts.sh), then
+run it with `/bin/sh`, networking disabled, and four or twelve CPUs. Use a
+separate test storage directory. Failure output includes both the parent error
+and nsexec debug messages; the script exits nonzero if any start fails.
+
+Removing explicit OCI rlimits isolates a separate compatibility gap discovered
+in the initial baseline: cross-process `prlimit64` currently returns `ESRCH`.
+With the default `runc spec` nofile limit, that fails after the PID handshake.
+It is not fixed or counted as a successful case here. A future fix must publish
+process-limit authority consistently rather than add another coordinator RPC.
+
+Validation includes all Apple-host VFS tests (494 passed, one ignored), mount
+tests on Apple and Linux hosts (22 passed each), strict VFS Clippy, formatting,
+iPad FFI compilation, both product boundary checks and the installed Dev
+acceptance above. Unaffected CPU, signal, network and graphics checks reuse the
+previous validated sources. Both product runtime pins are updated; this is not
+a new physical-iPad validation. The stable bundle was not replaced or its
+environment restarted; existing service health was checked read-only.
+Source and evidence hashes are in the
+[validation record](../validation/runc-concurrent-mounts-20261104.json).

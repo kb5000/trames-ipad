@@ -1,0 +1,249 @@
+{
+  "date": "2026-11-04",
+  "status": "validated; shared runtime committed; paired product pins; Mac Dev installed",
+  "runtime_revision": "ef714da7d48c4280a788c20a48b287ee17ee94d2",
+  "baseline_dev_runtime_revision": "2b388148c192b6c4511c528bde21b21ac6d03dcf",
+  "baseline_stable_version": "Trames 1.5.1 (stable) runtime d828821b907f8a0d84df01eb934b778858ef873f",
+  "reported_symptom": "runc run failed: unable to start container process: can't get final child's PID from pipe: EOF",
+  "incident_inputs": [
+    {
+      "path": "/Users/main/dev/techo/experiments/association-v1-deployment/operation-issues.json",
+      "sha256": "1974c4c94ef838a7c9c0b52857cd8aeae29d74894154b812918fb5abbd1d9fbb"
+    },
+    {
+      "path": "/Users/main/dev/techo/experiments/association-v1-deployment/runc-pid-eof.txt",
+      "sha256": "948d70e65db2be178216a0c19553bc13f1eccb0c70877924242842f7cb42f56a"
+    }
+  ],
+  "attribution": {
+    "independent_same_failure_reproduced": true,
+    "historical_instance_uniquely_proven": false,
+    "reason": "The supplied incident has no nsexec child debug log. The isolated reproducer captures ENOSPC during nsexec-1 unshare, followed by the same parent PID-pipe EOF."
+  },
+  "cause": "A per-namespace 128-mount bound was incorrectly applied to the global weak mount-resource/retirement index shared across namespaces. Concurrent copies exhausted the aggregate before runc could forward the final init PID.",
+  "change": {
+    "removed": "Aggregate mount-resource quota",
+    "preserved": [
+      "Per-namespace 128-entry mount-table bound",
+      "Weak resource retirement",
+      "Existing structural namespace authority",
+      "FD/cwd/root/exec/mapping mount identities"
+    ],
+    "new_coordinator_or_service_thread": false,
+    "new_polling": false,
+    "new_locks_or_ordinary_io_checks": false
+  },
+  "sources": [
+    {
+      "path": "runtime/crates/trames-vfs/src/mounts.rs",
+      "sha256": "d577a5e51cf0dc697d595bcae1e7194b9269f19e931c3b85b49126036ff696bb"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/overlay.rs",
+      "sha256": "908436ea81f8fa12bf1fbb47cc8d19cc3f650700061b92d961f896ff64f3bb8d"
+    },
+    {
+      "path": "runtime/docs/architecture/coordination-boundaries.md",
+      "sha256": "18e2a563aedf009f42200ea57646b4481588b9e94f880228642a72c97d63a3e2"
+    },
+    {
+      "path": "tests/fixtures/runc-concurrent-mounts.sh",
+      "sha256": "e341dbb07f23e0a6beda3fc0cf60849bf4bb44e0b2d86bbf2035e35d80a762dd"
+    }
+  ],
+  "reproducer": {
+    "runc_version": "1.1.15+ds1",
+    "runc_commit": "1.1.15+ds1-2+b4",
+    "go_version": "go1.24.4",
+    "libseccomp_version": "2.6.0",
+    "runc_binary": {
+      "path": "target/runc-eof/rootfs/usr/bin/runc",
+      "sha256": "6a8bd8a019e7b10a8d30a9fa85656f795d5957ab7269e5579f438a065b753332"
+    },
+    "base_debian_archive": {
+      "path": "/Users/main/Library/Application Support/Trames/cache/2b70e040f7d132c8d366ee0223462552686510fb372ea5a83822973c30f19e36.tar.gz",
+      "sha256": "2b70e040f7d132c8d366ee0223462552686510fb372ea5a83822973c30f19e36"
+    },
+    "alpine_payload_archive": {
+      "path": "/Users/main/Library/Application Support/Trames/cache/821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe.tar.gz",
+      "sha256": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe"
+    },
+    "runc_library_bundle": {
+      "path": "target/runc-eof/runc-libs.tar",
+      "sha256": "b2beb24a24a6f69d27b46ee8bf05d8e777a699a28b2d3b22a194b18b5a8e3f59"
+    },
+    "oci_configuration": {
+      "path": "target/runc-eof/config.json",
+      "sha256": "8613a6d9851a938e41cb3660362c8fb7c815e551f97c4835cc57428a866706ac"
+    },
+    "oci_changes_from_runc_spec": {
+      "process.terminal": false,
+      "process.args": [
+        "/bin/true"
+      ],
+      "process.rlimits": "removed to isolate pre-PID namespace failure"
+    },
+    "executed_script": {
+      "path": "target/runc-eof/probe-pressure.sh",
+      "sha256": "e1236f3f4d2bb79c95b41f0cd811b903cba0cdf2c742d9fe9f4f2bb5c23c8dfa"
+    },
+    "fixture_matches_executed_script_after_comment_header": true,
+    "concurrency": 8,
+    "rounds": 3,
+    "extra_empty_tmpfs_mounts": 32,
+    "network": "off",
+    "timeout_seconds": 180,
+    "storage": "target/runc-eof/store; isolated from production stores",
+    "command_template": "trames-mac-run --storage /Users/main/dev/trames/target/runc-eof/store --cpus {4|12} --network off --timeout 180 --no-pty --no-windows --metrics /bin/sh /probe-pressure.sh",
+    "user_application_data_copied": false,
+    "paid_api_calls": false,
+    "counting": "One result per failed container block, not repeated parent/debug log lines."
+  },
+  "results": [
+    {
+      "label": "dev-before",
+      "cpus": 12,
+      "total": 24,
+      "failed": 21,
+      "pid_pipe_eof": 18,
+      "path": "target/runc-eof/pressure-before.log",
+      "sha256": "50d3bdb56173ac800aaacfb02049cf15a357ffad0bd27360191bb47881d09e87"
+    },
+    {
+      "label": "stable-before",
+      "cpus": 12,
+      "total": 24,
+      "failed": 22,
+      "pid_pipe_eof": 18,
+      "path": "target/runc-eof/pressure-stable.log",
+      "sha256": "6727ff4562e2efaa8dac3d111b7886a803b47d48caa8f809641a36b8aecd61b9"
+    },
+    {
+      "label": "fixed",
+      "cpus": 12,
+      "total": 24,
+      "failed": 0,
+      "pid_pipe_eof": 0,
+      "path": "target/runc-eof/pressure-after.log",
+      "sha256": "b4f34e769dae99967a3fe3af17a6d50ccd9a633ba772c94450278e82478b2932"
+    },
+    {
+      "label": "fixed",
+      "cpus": 4,
+      "total": 24,
+      "failed": 0,
+      "pid_pipe_eof": 0,
+      "path": "target/runc-eof/pressure-after-4cpu.log",
+      "sha256": "80d2bf3386838cdf2bc2b0e3a96bd68582630be1b7ec30b52092a8482bb5dc8d"
+    },
+    {
+      "label": "installed-fixed-dev",
+      "cpus": 12,
+      "total": 24,
+      "failed": 0,
+      "pid_pipe_eof": 0,
+      "path": "target/runc-eof/pressure-installed.log",
+      "sha256": "a3a11a50a79a50e780f1b80351ca208652fd27322156e4a77ea3a88df00da139"
+    }
+  ],
+  "checks": [
+    {
+      "check": "apple_vfs_all_features",
+      "result": "pass",
+      "passed": 494,
+      "ignored": 1,
+      "path": "target/runc-eof/vfs-tests.log",
+      "sha256": "a5fb542576774fe6398579ffbc8c908374b2a1f3bbf0606417a7064518d283bf"
+    },
+    {
+      "check": "apple_mounts",
+      "result": "pass",
+      "passed": 22,
+      "path": "target/runc-eof/mount-tests.log",
+      "sha256": "d5883b2c868c256a8ff18b7a6da85646029f69c6eeac04247910573090d1ef00"
+    },
+    {
+      "check": "linux_mounts",
+      "result": "pass",
+      "passed": 22,
+      "path": "target/local-ci/io/runc-mounts-linux-tests.log",
+      "sha256": "1756d355816d073aaa0e65ca1db8b49628cf91314732a2e038090da3da063648"
+    },
+    {
+      "check": "vfs_clippy_all_features_all_targets_deny_warnings",
+      "result": "pass",
+      "path": "target/runc-eof/clippy.log",
+      "sha256": "1fc97081df3b634d7256687c51e5ceacc592c4b31e6ecaba98deb5a659ac80bf"
+    },
+    {
+      "check": "runtime_format",
+      "result": "pass",
+      "path": "target/runc-eof/format.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "check": "ipad_ffi_aarch64_apple_ios",
+      "result": "pass",
+      "path": "target/runc-eof/ipad-check.log",
+      "sha256": "6c6d0d966e5db8595a1432b4329d0b48f690a69cb7716bc0ea790f337e263d8f"
+    },
+    {
+      "check": "mac_build_pinned_runtime",
+      "result": "pass",
+      "path": "target/runc-eof/pinned-build.log",
+      "sha256": "081bbab37ec6b45afc6bc17e4e30b04d7f34e5e2c91033c3e064c6db8ccaeb3f"
+    },
+    {
+      "check": "ipad_execution_boundaries",
+      "result": "pass",
+      "path": "target/runc-eof/ipad-boundaries.log",
+      "sha256": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651"
+    },
+    {
+      "check": "mac_execution_boundaries",
+      "result": "pass",
+      "path": "target/runc-eof/mac-boundaries.log",
+      "sha256": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651"
+    }
+  ],
+  "unaffected_validation": "Previous validated signal/ABI/kernel/CPU/network/graphics checks are reused; this change affects only mount-resource admission and a test-only boolean assertion.",
+  "adjacent_gap": {
+    "syscall": "prlimit64",
+    "case": "Applying an explicit OCI nofile limit to the runc init child",
+    "observed_errno": "ESRCH",
+    "failure_phase": "After successful PID handshake",
+    "fixed": false,
+    "note": "Default runc spec hits this independent gap. It is excluded explicitly rather than counted as a successful unmodified-spec run."
+  },
+  "installation": {
+    "dev_version": "Trames Dev 1.5.1 (dev) runtime ef714da7d48c4280a788c20a48b287ee17ee94d2",
+    "dev_binary_sha256": "190c6d470c2aa8766b4feffc63b3638883774f7a75a217c37f4596e39d2619d9",
+    "stable_binary_sha256_before": "3b5cfa09531ec8680f1d06713d27c1fb89095f5e9752f012f66525597858f892",
+    "stable_binary_sha256_after": "3b5cfa09531ec8680f1d06713d27c1fb89095f5e9752f012f66525597858f892",
+    "stable_restarted": false
+  },
+  "stable_services": {
+    "preview_healthy": true,
+    "docker_http_body_matches": true,
+    "restarted": false,
+    "checks": [
+      {
+        "path": "target/runc-eof/stable-services.txt",
+        "sha256": "3905016732df6610efec618a98e9415c9dd4589067500953a235fd0b198f7895"
+      },
+      {
+        "path": "target/runc-eof/stable-health.txt",
+        "sha256": "9a3c12c3196ac988f6bfb54e0abe5cde7157dd1cb9a7b611e653d8298a797db3"
+      }
+    ]
+  },
+  "ipad": {
+    "shared_runtime_pin": "ef714da7d48c4280a788c20a48b287ee17ee94d2",
+    "ffi_compile": "pass",
+    "physical_device_install_or_test": false
+  },
+  "upstream_sources": [
+    "https://github.com/opencontainers/runc/blob/v1.1.15/libcontainer/nsenter/nsexec.c",
+    "https://github.com/opencontainers/runc/blob/v1.1.15/libcontainer/process_linux.go"
+  ]
+}
