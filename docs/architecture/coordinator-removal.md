@@ -3116,3 +3116,71 @@ are explicit boundaries; a stop does not discard those operations to obtain
 an early acknowledgement. The common implementation is pinned by both products.
 Mac Dev is the installation target; the stable 1.5.3 binary/environment remains
 separate and unchanged by this development batch.
+
+## 42. Original cgroup hierarchy, freezer and notifications (2026-11-05)
+
+Cgroup paths, control files and membership now use one original shared resource
+graph. Source mkdir/open/metadata, read/write/readv/writev, pread/pwrite, seek,
+poll/epoll and inotify can use it without returning the cohort. OFDs keep inode
+identity through deletion, controller removal and pathname reuse. Operations
+use the current caller's PID namespace and credentials. A retained device
+factory follows actual membership changes instead of retaining its old cgroup.
+
+The freezer uses original task capabilities and existing executor wakes. Its
+request flag is separate from completed freeze: active guest execution and
+accepted uninterruptible operations must relinquish the affected task before
+`cgroup.events` reports frozen. Nested freeze, inherited freeze, migration,
+thaw and SIGKILL keep the original wait custody. The owner serial quantum and
+VM batch participate in the same execution lease. A regression also covers a
+non-leader exec that rekeys a lease before its completion.
+
+Population/frozen counters update at actual membership transitions; ordinary
+control reads do not rescan the task table. Event generations belong to the
+original control inode and wake existing epoll/inotify waiters after unlocking.
+Linux reference checks cover initial ERR/PRI, read acknowledgement, seek and
+retained deleted files. The real two-thread target fixture additionally checks
+both counters stop, ancestor/local freeze, migration, pids EAGAIN notification
+and killing a frozen thread group while an unrelated peer remains runnable.
+
+Seven counterbalanced pairs time 100 freeze/observe/thaw/resume rounds:
+
+| CPUs | Previous HVF | New HVF | Relative speed | Native ARM Linux |
+| ---: | ---: | ---: | ---: | ---: |
+| 1 | 1202.384 ms | 1202.507 ms | 1.000x | 598.979 ms |
+| 4 | 810.354 ms | 12.730 ms | 63.657x | 17.956 ms |
+| 12 | 810.356 ms | 12.981 ms | 62.426x | — |
+
+Both versions use the same pread-based observation and 50 us retry/resume sleep,
+because the old runtime rejects cgroup epoll registration. Separate functional
+acceptance exercises real epoll on the new runtime and Linux. The native
+reference is the existing six-vCPU ARM Linux Lima instance with one/four-CPU
+affinity, not bare-metal Darwin. Timers and scheduling affect these short
+measurements; the four-CPU result does not establish general superiority over
+native Linux. The unchanged one-CPU owner scheduling cost remains substantial.
+
+A separate four-CPU diagnostic reduces cohort rounds from 409 to 6. Returned
+write/pread syscalls drop from 404 to zero; service requests are zero before and
+after. Cohort stop time drops from about 811 ms to 5.9 ms. Remaining structural
+fork/open/exit returns stay visible. This is a cgroup workload result, not a
+Firefox or whole-system speedup claim.
+
+[Source-bound acceptance and measurements](../validation/worker-cgroup-20261105.json)
+and the [shared contract](../../runtime/docs/architecture/coordination-boundaries.md#shared-cgroup-hierarchy-freezer-and-control-events-2026-11-05)
+record the precise remaining boundaries. Structural fork/exec/exit, final
+Files/mm/native ownership and cancellation, clear_tid, reparenting, namespace
+topology and BPF installation still require their actual lifecycle authority.
+No coordinator/service thread, polling bus or ordinary-memory barrier is added.
+The shared implementation supports both products; the stable 1.5.3 environment
+is separate from this Dev batch.
+
+Apple ARM64 and native ARM Linux pass 298 process cases (three ignored), 40
+kernel cases, 233 ABI cases (one ignored) and 470 VFS cases (one ignored).
+The all-features standalone VFS suite, strict affected Clippy, project/fmt
+checks and iPad device-target FFI compilation pass. Real acceptance covers HVF
+at one/four/twelve CPUs and the production interpreter at one/four CPUs. The
+four existing cgroup fixtures also pass all twelve HVF combinations, including
+non-leader exec, namespaces, stopped/frozen signals, pids limits and live BPF
+device policy. The final source passes 30 normal-preemption stock Go GC stress
+starts and eight isolated twelve-CPU Docker lifecycle rounds. No new physical
+iPad run is claimed. Unchanged CPU, graphics and other subsystem results are
+reused.
