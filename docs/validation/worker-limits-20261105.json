@@ -1,0 +1,2910 @@
+{
+  "date": "2026-11-05",
+  "stage": 39,
+  "status": "validated; paired main runtime pins and final Mac Dev installed; stable deployment unchanged",
+  "runtime_revision": "f361bde2824f6b629a85e336774f8eceee3492e7",
+  "migration_revision": "33b00d53792348c5d6b0d005053eb7edc8c37835",
+  "previous_runtime": "d9c4a811faf316a51b1a8f33f055247943a18855",
+  "scope": [
+    "All supported getrlimit/setrlimit/prlimit64 queries and updates, including non-self PID/TID and errors",
+    "Original live FSIZE/CORE/NOFILE objects, thread sharing, fork copies and exec retention",
+    "Original FD allocation soft field and live file-size enforcement across fast, retained and native work",
+    "Source-side FSIZE signal completion and original io_uring submitter across fixed-file close and alternate pump"
+  ],
+  "execution_invariants": {
+    "new_service_thread": false,
+    "new_coordinator_rpc": false,
+    "polling_bus": false,
+    "ordinary_memory_fence": false,
+    "host_process_limits_changed": false
+  },
+  "sources": [
+    {
+      "path": "runtime/crates/trames-kernel/src/lib.rs",
+      "sha256": "93b7e637d66b2c4c432678b0fe34f8f24cc5ecb05a4a18341f21c95012abe213"
+    },
+    {
+      "path": "runtime/crates/trames-kernel/src/limits.rs",
+      "sha256": "252af2536e6ee26dcfc242c9d72f81c1f8e05f5e393e05049a233a51a9025ca6"
+    },
+    {
+      "path": "runtime/crates/trames-kernel/src/signal/io.rs",
+      "sha256": "57bae5fb565371970875bf8bb4a38f19e13a1691fea53698c1e64931508c74f2"
+    },
+    {
+      "path": "runtime/crates/trames-kernel/src/signal/reader.rs",
+      "sha256": "887283fe74a5b6b1fa93eede1a95b8d936aab09fe32480a9f2e235a08737a27e"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/direct.rs",
+      "sha256": "dde31a01cc10784a6c349de51db2367b364f67a34b6bd2f10bd01d077c960c1f"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/direct/file.rs",
+      "sha256": "9b1185f08f1056bc0638a4428b2420afcffa859ece58dd3f90a655158a57f081"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/direct/file_tests.rs",
+      "sha256": "4df1a262b625292a939fa233f5a7eac0cd530aee3466e6d8fc7e15a967095f81"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/direct/uring.rs",
+      "sha256": "b576a7210f71e36f132d2292b8ee0d2a86546b8b45eee3d3fee207c2faa75048"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/direct/uring/actor.rs",
+      "sha256": "9bc3bed7967f72bb90b4d56e948e42b7c93bbbdfb7a330f512d6c323d1d4bd54"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/direct/uring/actor_file.rs",
+      "sha256": "b79e76e1fdae2de8af17d7b3c742aa746dc414af99070bbf862742597ceaf13f"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/direct/uring/background.rs",
+      "sha256": "9ef82051dc77bd87100d9ed6a921de810f5be680c0548434fafe3184d1e417a8"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/direct/uring/subsystem_tests.rs",
+      "sha256": "7de4f95900c54092fc8770030f2729a2f10e3243ee13ffaf4c9d71f952f8f5ab"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/uring.rs",
+      "sha256": "2ce2f1397edd643e83b1f5302de03c0464a5a643f4485fe550bc540946eac2d1"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/process.rs",
+      "sha256": "0d72577fb18dc5a218f22c56dd1fb17a17b68e0b97048c8b13e0c3a436ca1852"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/process_compat.rs",
+      "sha256": "9bece1b775fc43a8ad8ab05eacb63cbbff6f2b3124a70266bc39eecb7bdb7bf5"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/process_file_io.rs",
+      "sha256": "a09abb8a75048688f5299eac916d797eb40a305f8ad634d492e3f808c5befdf9"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/process_seccomp.rs",
+      "sha256": "b064fbc028b25bb7db9d1a9885f855b288e3fbc770a6147d2cc46c49a240a413"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/process_service.rs",
+      "sha256": "b361bea81bf39021026e9449d57f554aaa76dced97bc2fce8c08c30b8231bf98"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/worker_syscalls.rs",
+      "sha256": "fe76925edc90f8275bde7f8fc17ec2fb41932e0489e979acc55ed806e909dfef"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/workers.rs",
+      "sha256": "3fc79ce96d0bec869bb0801fda47018806e47f9cba2751c2ab60fe840b040eaa"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/workers_uring_tests.rs",
+      "sha256": "031e08d58aaca7381e1dc7b470952111e1d50052f32835b36213f19b41e71fed"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/fd_table.rs",
+      "sha256": "d7815377663f7881d5becf5c0534c453b599894ea9eb887dee573aa12e6283bc"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/file_io.rs",
+      "sha256": "c57584647224351f664780a6f24e9cbedd43abb0528a48d8f7bd30e67e8e981d"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/file_work.rs",
+      "sha256": "3ff4dcefdc6400fdf654d354083a244e16097a8f4d78b99f5461daa3839ad21e"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/file_work_tests.rs",
+      "sha256": "a0a2ef51a32e5b453c486e247f08c3b53714276290e286e15f813365da65beaa"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/lib.rs",
+      "sha256": "38261cab25a500432c9a3f0c4d4c646c72e1fa85e108c0547c178f06c5332f3a"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/memfd.rs",
+      "sha256": "90fb52cecf9a495e5ccfe3c50b91c798b4156fd1f007b58868f8a1d1a3e4b005"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/path_queries.rs",
+      "sha256": "d211153f1087687ba5debffb0273f2a9f3947ebfd7b40114f7a55528f79576f7"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/resource_limits.rs",
+      "sha256": "e5a23e628c8dc703dcc31b4491201a2520e12f19ab53ee226168da425917fa85"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/signal_reader.rs",
+      "sha256": "6b67243fc2bd09f0a54a58d86daeffb2d3c423d1fedb42298017f1d9060d74b0"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/stream_transfer.rs",
+      "sha256": "deb5e3b8f32fd3b7226880b22be2be4ff8b6f0b30c4e956f28711615680bc958"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/uring.rs",
+      "sha256": "2432a17c3c9048e1fbfb5cf520328ab17f039a8148016e9ad6118baa8cb7e17d"
+    },
+    {
+      "path": "runtime/docs/architecture/coordination-boundaries.md",
+      "sha256": "075f1bf702622e243dfb835c44ff7efffeed2e11387b900ca051aa9de040f39a"
+    },
+    {
+      "path": "runtime/docs/architecture/execution-backends.md",
+      "sha256": "5218e13f2692b5fd1f2095942a771da657a652ac5c58a360efc73d5e64aef35f"
+    },
+    {
+      "path": "tests/fixtures/worker-limits.c",
+      "sha256": "abc73bc696299e82a3bada5598285c7b434555c34989564872debf9abedd01cb"
+    },
+    {
+      "path": "scripts/build-worker-limits-fixture.sh",
+      "sha256": "df1829b5826cc057e89aa51f5a98bb3cf7013ee5c15118cc3d49eab845641db2"
+    }
+  ],
+  "acceptance": {
+    "apple": {
+      "kernel_conformance": 293,
+      "kernel_conformance_ignored": 3,
+      "kernel_units": 21,
+      "linux_abi": 233,
+      "linux_abi_ignored": 1,
+      "vfs": 496,
+      "vfs_ignored": 1
+    },
+    "linux_arm64": {
+      "kernel_conformance": 293,
+      "kernel_conformance_ignored": 3,
+      "kernel_units": 21,
+      "linux_abi": 233,
+      "linux_abi_ignored": 1,
+      "vfs": 495,
+      "vfs_ignored": 1
+    },
+    "strict_affected_clippy": "pass",
+    "ipad_device_target_compile": "pass; physical-device execution not claimed",
+    "new_edge_cases": [
+      "Concurrent aliased old/new exchanges preserve complete pairs and live FD bound",
+      "Retained old limit cannot keep reaped PID alive or retarget reuse",
+      "Shared file authority binds caller live limit, including published descriptors",
+      "Retained file work honors a limit lowered after preparation",
+      "ALLOW and ERRNO limits use one BPF decision per call and zero owner returns",
+      "Inline and native file-size failure uses source signal without checkpoint",
+      "Closed fixed file and alternate io_uring pump keep original submitter signal",
+      "SIGXFSZ origin, ignored actions and retired task behavior",
+      "Host-authorized exec binds replacement VFS enforcement to inherited limits",
+      "FD table unshare/exec preserves process limit atomic while detaching membership",
+      "Solo clone and actual credential mutation publish original signal identity",
+      "Self TID query borrows original limits without directory refresh or authority copies"
+    ],
+    "vfs_reuse_scope": "Full pre-signal VFS acceptance retained; signal followup adds a capability lookup; later FD unshare change passes all eight matching Apple/Linux cases and live-limit/kernel/host-exec tests.",
+    "mac_product": "Eight local pre-build workflow steps pass at custody revision; product source unchanged in final borrowed-self optimization; final shared checks/builds and boundary checks pass."
+  },
+  "performance": {
+    "method": "Nine counterbalanced before/after pairs; same fixed-work static ARM64 ELF, 1000 limit calls per thread; file growth control uses 5000 writes per thread",
+    "rows": [
+      {
+        "mode": "query",
+        "cpus": 1,
+        "before_seconds": 0.001513583,
+        "after_seconds": 0.00150025,
+        "speedup": 1.0088871854690884,
+        "native_arm_linux_median_seconds": 0.000148335
+      },
+      {
+        "mode": "query",
+        "cpus": 4,
+        "before_seconds": 0.1519495,
+        "after_seconds": 0.001417208,
+        "speedup": 107.21750088907201,
+        "native_arm_linux_median_seconds": 0.000196418
+      },
+      {
+        "mode": "set",
+        "cpus": 1,
+        "before_seconds": 0.001417458,
+        "after_seconds": 0.001415833,
+        "speedup": 1.0011477342313677,
+        "native_arm_linux_median_seconds": 0.000152668
+      },
+      {
+        "mode": "set",
+        "cpus": 4,
+        "before_seconds": 0.1506295,
+        "after_seconds": 0.001466291,
+        "speedup": 102.72824425710859,
+        "native_arm_linux_median_seconds": 0.000517962
+      },
+      {
+        "mode": "target",
+        "cpus": 1,
+        "before_seconds": 0.001512584,
+        "after_seconds": 0.001506625,
+        "speedup": 1.0039551978760475,
+        "native_arm_linux_median_seconds": 0.000172459
+      },
+      {
+        "mode": "target",
+        "cpus": 4,
+        "before_seconds": 0.151398916,
+        "after_seconds": 0.001424958,
+        "speedup": 106.24798485288689,
+        "native_arm_linux_median_seconds": 0.000264169
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 1,
+        "before_seconds": 0.008096209,
+        "after_seconds": 0.008024792,
+        "speedup": 1.0088995453090872,
+        "native_arm_linux_median_seconds": null
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 4,
+        "before_seconds": 0.0098365,
+        "after_seconds": 0.008943791,
+        "speedup": 1.0998132671034018,
+        "native_arm_linux_median_seconds": null
+      }
+    ],
+    "samples": [
+      {
+        "mode": "query",
+        "cpus": 1,
+        "sample": 0,
+        "phase": "before",
+        "seconds": 0.001521417
+      },
+      {
+        "mode": "query",
+        "cpus": 1,
+        "sample": 0,
+        "phase": "after",
+        "seconds": 0.001513292
+      },
+      {
+        "mode": "query",
+        "cpus": 1,
+        "sample": 1,
+        "phase": "after",
+        "seconds": 0.001485084
+      },
+      {
+        "mode": "query",
+        "cpus": 1,
+        "sample": 1,
+        "phase": "before",
+        "seconds": 0.001513583
+      },
+      {
+        "mode": "query",
+        "cpus": 1,
+        "sample": 2,
+        "phase": "before",
+        "seconds": 0.001489709
+      },
+      {
+        "mode": "query",
+        "cpus": 1,
+        "sample": 2,
+        "phase": "after",
+        "seconds": 0.00151725
+      },
+      {
+        "mode": "query",
+        "cpus": 1,
+        "sample": 3,
+        "phase": "after",
+        "seconds": 0.001491375
+      },
+      {
+        "mode": "query",
+        "cpus": 1,
+        "sample": 3,
+        "phase": "before",
+        "seconds": 0.001520625
+      },
+      {
+        "mode": "query",
+        "cpus": 1,
+        "sample": 4,
+        "phase": "before",
+        "seconds": 0.001504208
+      },
+      {
+        "mode": "query",
+        "cpus": 1,
+        "sample": 4,
+        "phase": "after",
+        "seconds": 0.001495209
+      },
+      {
+        "mode": "query",
+        "cpus": 1,
+        "sample": 5,
+        "phase": "after",
+        "seconds": 0.001499917
+      },
+      {
+        "mode": "query",
+        "cpus": 1,
+        "sample": 5,
+        "phase": "before",
+        "seconds": 0.0015185
+      },
+      {
+        "mode": "query",
+        "cpus": 1,
+        "sample": 6,
+        "phase": "before",
+        "seconds": 0.001492083
+      },
+      {
+        "mode": "query",
+        "cpus": 1,
+        "sample": 6,
+        "phase": "after",
+        "seconds": 0.00150025
+      },
+      {
+        "mode": "query",
+        "cpus": 1,
+        "sample": 7,
+        "phase": "after",
+        "seconds": 0.001504125
+      },
+      {
+        "mode": "query",
+        "cpus": 1,
+        "sample": 7,
+        "phase": "before",
+        "seconds": 0.001548083
+      },
+      {
+        "mode": "query",
+        "cpus": 1,
+        "sample": 8,
+        "phase": "before",
+        "seconds": 0.001500375
+      },
+      {
+        "mode": "query",
+        "cpus": 1,
+        "sample": 8,
+        "phase": "after",
+        "seconds": 0.001536958
+      },
+      {
+        "mode": "query",
+        "cpus": 4,
+        "sample": 0,
+        "phase": "before",
+        "seconds": 0.148937042
+      },
+      {
+        "mode": "query",
+        "cpus": 4,
+        "sample": 0,
+        "phase": "after",
+        "seconds": 0.001472208
+      },
+      {
+        "mode": "query",
+        "cpus": 4,
+        "sample": 1,
+        "phase": "after",
+        "seconds": 0.001438834
+      },
+      {
+        "mode": "query",
+        "cpus": 4,
+        "sample": 1,
+        "phase": "before",
+        "seconds": 0.152627916
+      },
+      {
+        "mode": "query",
+        "cpus": 4,
+        "sample": 2,
+        "phase": "before",
+        "seconds": 0.152496917
+      },
+      {
+        "mode": "query",
+        "cpus": 4,
+        "sample": 2,
+        "phase": "after",
+        "seconds": 0.001493042
+      },
+      {
+        "mode": "query",
+        "cpus": 4,
+        "sample": 3,
+        "phase": "after",
+        "seconds": 0.001316833
+      },
+      {
+        "mode": "query",
+        "cpus": 4,
+        "sample": 3,
+        "phase": "before",
+        "seconds": 0.149613792
+      },
+      {
+        "mode": "query",
+        "cpus": 4,
+        "sample": 4,
+        "phase": "before",
+        "seconds": 0.149190833
+      },
+      {
+        "mode": "query",
+        "cpus": 4,
+        "sample": 4,
+        "phase": "after",
+        "seconds": 0.001417208
+      },
+      {
+        "mode": "query",
+        "cpus": 4,
+        "sample": 5,
+        "phase": "after",
+        "seconds": 0.001642541
+      },
+      {
+        "mode": "query",
+        "cpus": 4,
+        "sample": 5,
+        "phase": "before",
+        "seconds": 0.150576334
+      },
+      {
+        "mode": "query",
+        "cpus": 4,
+        "sample": 6,
+        "phase": "before",
+        "seconds": 0.15278725
+      },
+      {
+        "mode": "query",
+        "cpus": 4,
+        "sample": 6,
+        "phase": "after",
+        "seconds": 0.001356708
+      },
+      {
+        "mode": "query",
+        "cpus": 4,
+        "sample": 7,
+        "phase": "after",
+        "seconds": 0.001308291
+      },
+      {
+        "mode": "query",
+        "cpus": 4,
+        "sample": 7,
+        "phase": "before",
+        "seconds": 0.1519495
+      },
+      {
+        "mode": "query",
+        "cpus": 4,
+        "sample": 8,
+        "phase": "before",
+        "seconds": 0.1531415
+      },
+      {
+        "mode": "query",
+        "cpus": 4,
+        "sample": 8,
+        "phase": "after",
+        "seconds": 0.001351209
+      },
+      {
+        "mode": "set",
+        "cpus": 1,
+        "sample": 0,
+        "phase": "before",
+        "seconds": 0.0014265
+      },
+      {
+        "mode": "set",
+        "cpus": 1,
+        "sample": 0,
+        "phase": "after",
+        "seconds": 0.001478542
+      },
+      {
+        "mode": "set",
+        "cpus": 1,
+        "sample": 1,
+        "phase": "after",
+        "seconds": 0.00140925
+      },
+      {
+        "mode": "set",
+        "cpus": 1,
+        "sample": 1,
+        "phase": "before",
+        "seconds": 0.00146025
+      },
+      {
+        "mode": "set",
+        "cpus": 1,
+        "sample": 2,
+        "phase": "before",
+        "seconds": 0.001395292
+      },
+      {
+        "mode": "set",
+        "cpus": 1,
+        "sample": 2,
+        "phase": "after",
+        "seconds": 0.001409417
+      },
+      {
+        "mode": "set",
+        "cpus": 1,
+        "sample": 3,
+        "phase": "after",
+        "seconds": 0.001397042
+      },
+      {
+        "mode": "set",
+        "cpus": 1,
+        "sample": 3,
+        "phase": "before",
+        "seconds": 0.001409458
+      },
+      {
+        "mode": "set",
+        "cpus": 1,
+        "sample": 4,
+        "phase": "before",
+        "seconds": 0.001417458
+      },
+      {
+        "mode": "set",
+        "cpus": 1,
+        "sample": 4,
+        "phase": "after",
+        "seconds": 0.00143025
+      },
+      {
+        "mode": "set",
+        "cpus": 1,
+        "sample": 5,
+        "phase": "after",
+        "seconds": 0.001556084
+      },
+      {
+        "mode": "set",
+        "cpus": 1,
+        "sample": 5,
+        "phase": "before",
+        "seconds": 0.001480291
+      },
+      {
+        "mode": "set",
+        "cpus": 1,
+        "sample": 6,
+        "phase": "before",
+        "seconds": 0.001414959
+      },
+      {
+        "mode": "set",
+        "cpus": 1,
+        "sample": 6,
+        "phase": "after",
+        "seconds": 0.001415833
+      },
+      {
+        "mode": "set",
+        "cpus": 1,
+        "sample": 7,
+        "phase": "after",
+        "seconds": 0.001397333
+      },
+      {
+        "mode": "set",
+        "cpus": 1,
+        "sample": 7,
+        "phase": "before",
+        "seconds": 0.001458459
+      },
+      {
+        "mode": "set",
+        "cpus": 1,
+        "sample": 8,
+        "phase": "before",
+        "seconds": 0.001412917
+      },
+      {
+        "mode": "set",
+        "cpus": 1,
+        "sample": 8,
+        "phase": "after",
+        "seconds": 0.001430667
+      },
+      {
+        "mode": "set",
+        "cpus": 4,
+        "sample": 0,
+        "phase": "before",
+        "seconds": 0.1507285
+      },
+      {
+        "mode": "set",
+        "cpus": 4,
+        "sample": 0,
+        "phase": "after",
+        "seconds": 0.001441
+      },
+      {
+        "mode": "set",
+        "cpus": 4,
+        "sample": 1,
+        "phase": "after",
+        "seconds": 0.001443167
+      },
+      {
+        "mode": "set",
+        "cpus": 4,
+        "sample": 1,
+        "phase": "before",
+        "seconds": 0.151272625
+      },
+      {
+        "mode": "set",
+        "cpus": 4,
+        "sample": 2,
+        "phase": "before",
+        "seconds": 0.150743375
+      },
+      {
+        "mode": "set",
+        "cpus": 4,
+        "sample": 2,
+        "phase": "after",
+        "seconds": 0.001486125
+      },
+      {
+        "mode": "set",
+        "cpus": 4,
+        "sample": 3,
+        "phase": "after",
+        "seconds": 0.001466291
+      },
+      {
+        "mode": "set",
+        "cpus": 4,
+        "sample": 3,
+        "phase": "before",
+        "seconds": 0.148786917
+      },
+      {
+        "mode": "set",
+        "cpus": 4,
+        "sample": 4,
+        "phase": "before",
+        "seconds": 0.151592875
+      },
+      {
+        "mode": "set",
+        "cpus": 4,
+        "sample": 4,
+        "phase": "after",
+        "seconds": 0.001368334
+      },
+      {
+        "mode": "set",
+        "cpus": 4,
+        "sample": 5,
+        "phase": "after",
+        "seconds": 0.00144525
+      },
+      {
+        "mode": "set",
+        "cpus": 4,
+        "sample": 5,
+        "phase": "before",
+        "seconds": 0.149276834
+      },
+      {
+        "mode": "set",
+        "cpus": 4,
+        "sample": 6,
+        "phase": "before",
+        "seconds": 0.14965075
+      },
+      {
+        "mode": "set",
+        "cpus": 4,
+        "sample": 6,
+        "phase": "after",
+        "seconds": 0.001486791
+      },
+      {
+        "mode": "set",
+        "cpus": 4,
+        "sample": 7,
+        "phase": "after",
+        "seconds": 0.001607916
+      },
+      {
+        "mode": "set",
+        "cpus": 4,
+        "sample": 7,
+        "phase": "before",
+        "seconds": 0.1506295
+      },
+      {
+        "mode": "set",
+        "cpus": 4,
+        "sample": 8,
+        "phase": "before",
+        "seconds": 0.15023325
+      },
+      {
+        "mode": "set",
+        "cpus": 4,
+        "sample": 8,
+        "phase": "after",
+        "seconds": 0.001494958
+      },
+      {
+        "mode": "target",
+        "cpus": 1,
+        "sample": 0,
+        "phase": "before",
+        "seconds": 0.00167775
+      },
+      {
+        "mode": "target",
+        "cpus": 1,
+        "sample": 0,
+        "phase": "after",
+        "seconds": 0.001541875
+      },
+      {
+        "mode": "target",
+        "cpus": 1,
+        "sample": 1,
+        "phase": "after",
+        "seconds": 0.001480917
+      },
+      {
+        "mode": "target",
+        "cpus": 1,
+        "sample": 1,
+        "phase": "before",
+        "seconds": 0.001508333
+      },
+      {
+        "mode": "target",
+        "cpus": 1,
+        "sample": 2,
+        "phase": "before",
+        "seconds": 0.001509542
+      },
+      {
+        "mode": "target",
+        "cpus": 1,
+        "sample": 2,
+        "phase": "after",
+        "seconds": 0.001485541
+      },
+      {
+        "mode": "target",
+        "cpus": 1,
+        "sample": 3,
+        "phase": "after",
+        "seconds": 0.001488459
+      },
+      {
+        "mode": "target",
+        "cpus": 1,
+        "sample": 3,
+        "phase": "before",
+        "seconds": 0.001513625
+      },
+      {
+        "mode": "target",
+        "cpus": 1,
+        "sample": 4,
+        "phase": "before",
+        "seconds": 0.001512584
+      },
+      {
+        "mode": "target",
+        "cpus": 1,
+        "sample": 4,
+        "phase": "after",
+        "seconds": 0.001783834
+      },
+      {
+        "mode": "target",
+        "cpus": 1,
+        "sample": 5,
+        "phase": "after",
+        "seconds": 0.001623917
+      },
+      {
+        "mode": "target",
+        "cpus": 1,
+        "sample": 5,
+        "phase": "before",
+        "seconds": 0.001543291
+      },
+      {
+        "mode": "target",
+        "cpus": 1,
+        "sample": 6,
+        "phase": "before",
+        "seconds": 0.001491416
+      },
+      {
+        "mode": "target",
+        "cpus": 1,
+        "sample": 6,
+        "phase": "after",
+        "seconds": 0.001506625
+      },
+      {
+        "mode": "target",
+        "cpus": 1,
+        "sample": 7,
+        "phase": "after",
+        "seconds": 0.0014765
+      },
+      {
+        "mode": "target",
+        "cpus": 1,
+        "sample": 7,
+        "phase": "before",
+        "seconds": 0.001488375
+      },
+      {
+        "mode": "target",
+        "cpus": 1,
+        "sample": 8,
+        "phase": "before",
+        "seconds": 0.001522834
+      },
+      {
+        "mode": "target",
+        "cpus": 1,
+        "sample": 8,
+        "phase": "after",
+        "seconds": 0.001537459
+      },
+      {
+        "mode": "target",
+        "cpus": 4,
+        "sample": 0,
+        "phase": "before",
+        "seconds": 0.150526209
+      },
+      {
+        "mode": "target",
+        "cpus": 4,
+        "sample": 0,
+        "phase": "after",
+        "seconds": 0.001447125
+      },
+      {
+        "mode": "target",
+        "cpus": 4,
+        "sample": 1,
+        "phase": "after",
+        "seconds": 0.001460916
+      },
+      {
+        "mode": "target",
+        "cpus": 4,
+        "sample": 1,
+        "phase": "before",
+        "seconds": 0.155460208
+      },
+      {
+        "mode": "target",
+        "cpus": 4,
+        "sample": 2,
+        "phase": "before",
+        "seconds": 0.150996083
+      },
+      {
+        "mode": "target",
+        "cpus": 4,
+        "sample": 2,
+        "phase": "after",
+        "seconds": 0.001424958
+      },
+      {
+        "mode": "target",
+        "cpus": 4,
+        "sample": 3,
+        "phase": "after",
+        "seconds": 0.001403166
+      },
+      {
+        "mode": "target",
+        "cpus": 4,
+        "sample": 3,
+        "phase": "before",
+        "seconds": 0.15293775
+      },
+      {
+        "mode": "target",
+        "cpus": 4,
+        "sample": 4,
+        "phase": "before",
+        "seconds": 0.152567292
+      },
+      {
+        "mode": "target",
+        "cpus": 4,
+        "sample": 4,
+        "phase": "after",
+        "seconds": 0.001351209
+      },
+      {
+        "mode": "target",
+        "cpus": 4,
+        "sample": 5,
+        "phase": "after",
+        "seconds": 0.001496667
+      },
+      {
+        "mode": "target",
+        "cpus": 4,
+        "sample": 5,
+        "phase": "before",
+        "seconds": 0.151398916
+      },
+      {
+        "mode": "target",
+        "cpus": 4,
+        "sample": 6,
+        "phase": "before",
+        "seconds": 0.152914
+      },
+      {
+        "mode": "target",
+        "cpus": 4,
+        "sample": 6,
+        "phase": "after",
+        "seconds": 0.001381
+      },
+      {
+        "mode": "target",
+        "cpus": 4,
+        "sample": 7,
+        "phase": "after",
+        "seconds": 0.001375916
+      },
+      {
+        "mode": "target",
+        "cpus": 4,
+        "sample": 7,
+        "phase": "before",
+        "seconds": 0.151290708
+      },
+      {
+        "mode": "target",
+        "cpus": 4,
+        "sample": 8,
+        "phase": "before",
+        "seconds": 0.15092075
+      },
+      {
+        "mode": "target",
+        "cpus": 4,
+        "sample": 8,
+        "phase": "after",
+        "seconds": 0.00143375
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 1,
+        "sample": 0,
+        "phase": "before",
+        "seconds": 0.008391083
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 1,
+        "sample": 0,
+        "phase": "after",
+        "seconds": 0.008105083
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 1,
+        "sample": 1,
+        "phase": "after",
+        "seconds": 0.007984291
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 1,
+        "sample": 1,
+        "phase": "before",
+        "seconds": 0.007933917
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 1,
+        "sample": 2,
+        "phase": "before",
+        "seconds": 0.008040292
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 1,
+        "sample": 2,
+        "phase": "after",
+        "seconds": 0.008042667
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 1,
+        "sample": 3,
+        "phase": "after",
+        "seconds": 0.007984834
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 1,
+        "sample": 3,
+        "phase": "before",
+        "seconds": 0.008042
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 1,
+        "sample": 4,
+        "phase": "before",
+        "seconds": 0.008040292
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 1,
+        "sample": 4,
+        "phase": "after",
+        "seconds": 0.008089541
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 1,
+        "sample": 5,
+        "phase": "after",
+        "seconds": 0.008024792
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 1,
+        "sample": 5,
+        "phase": "before",
+        "seconds": 0.008096209
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 1,
+        "sample": 6,
+        "phase": "before",
+        "seconds": 0.008103791
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 1,
+        "sample": 6,
+        "phase": "after",
+        "seconds": 0.007906583
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 1,
+        "sample": 7,
+        "phase": "after",
+        "seconds": 0.007905333
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 1,
+        "sample": 7,
+        "phase": "before",
+        "seconds": 0.008285041
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 1,
+        "sample": 8,
+        "phase": "before",
+        "seconds": 0.008197292
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 1,
+        "sample": 8,
+        "phase": "after",
+        "seconds": 0.008152125
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 4,
+        "sample": 0,
+        "phase": "before",
+        "seconds": 0.010518667
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 4,
+        "sample": 0,
+        "phase": "after",
+        "seconds": 0.011000291
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 4,
+        "sample": 1,
+        "phase": "after",
+        "seconds": 0.0087795
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 4,
+        "sample": 1,
+        "phase": "before",
+        "seconds": 0.009909334
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 4,
+        "sample": 2,
+        "phase": "before",
+        "seconds": 0.01017175
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 4,
+        "sample": 2,
+        "phase": "after",
+        "seconds": 0.008618875
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 4,
+        "sample": 3,
+        "phase": "after",
+        "seconds": 0.008599208
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 4,
+        "sample": 3,
+        "phase": "before",
+        "seconds": 0.010360541
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 4,
+        "sample": 4,
+        "phase": "before",
+        "seconds": 0.008485
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 4,
+        "sample": 4,
+        "phase": "after",
+        "seconds": 0.008866375
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 4,
+        "sample": 5,
+        "phase": "after",
+        "seconds": 0.010561375
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 4,
+        "sample": 5,
+        "phase": "before",
+        "seconds": 0.009816041
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 4,
+        "sample": 6,
+        "phase": "before",
+        "seconds": 0.008738042
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 4,
+        "sample": 6,
+        "phase": "after",
+        "seconds": 0.008977333
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 4,
+        "sample": 7,
+        "phase": "after",
+        "seconds": 0.008943791
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 4,
+        "sample": 7,
+        "phase": "before",
+        "seconds": 0.0098365
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 4,
+        "sample": 8,
+        "phase": "before",
+        "seconds": 0.008327625
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 4,
+        "sample": 8,
+        "phase": "after",
+        "seconds": 0.009755916
+      }
+    ],
+    "timing_binaries": {
+      "before": {
+        "path": "/Users/main/Applications/Trames.app/Contents/MacOS/trames-mac-run",
+        "sha256": "4f40615213e731b2a4ef9d8c6a0e85c5c7bdf31ab0c60b0354b55113f2a6a55d"
+      },
+      "after": {
+        "path": "/Users/main/dev/trames-mac/target/release/Trames Dev.app/Contents/MacOS/trames-mac-run",
+        "sha256": "5ee1f6cd8d3a165d6495119c71e0b5ca51055357622304b3635cef9db4416ae3"
+      }
+    },
+    "timing_fixture": {
+      "path": "target/local-ci/io/worker-limits-siginfo",
+      "sha256": "c881fba8c2881caaaa00b71b63a4d96db217486b8110851ebf4ab8025207b0b1"
+    },
+    "timing_fixture_source": {
+      "path": "tests/fixtures/worker-limits.c",
+      "sha256": "abc73bc696299e82a3bada5598285c7b434555c34989564872debf9abedd01cb"
+    },
+    "timing_source_note": "Final pinned f361bde build and the same enhanced static ELF used by native Linux. Full final samples replace pilot timings; the pilot is retained separately.",
+    "native_reference": "Same ELF on native ARM Linux in the existing local 6-vCPU Lima instance; not bare-metal Darwin. Instance stopped before Mac counterbalanced runs.",
+    "diagnostics": {
+      "before_cohort_rounds": 3700,
+      "after_cohort_rounds": 7,
+      "before_limit_owner_returns": 4000,
+      "after_limit_owner_returns": 0,
+      "service_requests_before": 0,
+      "service_requests_after": 0
+    },
+    "whole_application_speedup_claimed": false
+  },
+  "previous_behavior_correction": {
+    "old_stable": "A previously opened thread file could ignore another thread lowering FSIZE; original compatibility fixture failed its expected short write",
+    "new_shared_kernel": "Enhanced native-siginfo compatibility fixture passes final HVF at 1/4/12 CPUs and interpreter at 1/4 CPUs. Partial write then SIGXFSZ has SI_USER and original tgid/ruid; no pwrite or resource-limit owner return remains."
+  },
+  "rechecks": {
+    "worker_test": "CPU allowance can expire before both fixed loops finish; test resumes the same tasks until completed, with no owner syscall",
+    "transfer_test": "Join both concurrent host attempts before retrying a parked input reservation; production transfer algorithm unchanged",
+    "reused_unaffected_results": true,
+    "single_cpu_target_query": "A 3.4% slower pilot exposed unnecessary self-TID directory refresh; final borrowed path removes it. Final nine-pair single-worker medians are within 0.9% of baseline.",
+    "solo_signal_origin": "Initial signal followup passed multiple CPUs but solo task metadata was not published at clone. Publication moved to actual clone/credential custody, and final siginfo checks pass both executors."
+  },
+  "remaining_boundaries": [
+    "Actual default termination/stop and parent wait/SIGCHLD/clear_tid/robust cleanup and reaping",
+    "Credential/affinity/structural namespace mutations",
+    "VM/pin and mapped-file layout checkpoints",
+    "Actual tracing and seccomp TRAP/KILL effects",
+    "Legacy standalone embedding without published source task-signal capability"
+  ],
+  "logs": [
+    {
+      "path": "target/worker-limits/kernel-apple.log",
+      "sha256": "4383cce4c6ee306647736c009841bc53d0483469f8821d4781cba9e3550f580c"
+    },
+    {
+      "path": "target/worker-limits/worker-calls-apple.log",
+      "sha256": "86d0fa15899127c39ebe170c181430ac4ef77a5e9e3654c4f6dd3d7fe89acb21"
+    },
+    {
+      "path": "target/worker-limits/vfs-linux-abi-apple.log",
+      "sha256": "e182e8dd2077143e1ba640e8e0be38fa854ef62b25b703d42faeb8d9ec7f8afe"
+    },
+    {
+      "path": "target/worker-limits/transfer-apple.log",
+      "sha256": "db5e1e9674d3aa8f4ab75185c89a6f4df153c7f07e73e576c1b5740f7c45b0ba"
+    },
+    {
+      "path": "target/worker-limits/kernel-clippy.log",
+      "sha256": "b4df34795fc5b5b22e792a6b98a5a05f00c3060671e5b0782c2d57425f7bb533"
+    },
+    {
+      "path": "target/worker-limits/vfs-abi-clippy.log",
+      "sha256": "1a054a8629cf697b45e17f07d80857244db0fd2b2593785bb0ebea72f53286d9"
+    },
+    {
+      "path": "target/worker-limits/ipad-check.log",
+      "sha256": "07cc2ba754e701cbcc4936c3fd1ea0f51e0a9f00c4c224252b340933d6934787"
+    },
+    {
+      "path": "target/worker-limits/benchmark-summary.log",
+      "sha256": "8f28c0cdc36449c5f688f3e21a02a6903358b74d0d58af0303a0b1347bd34aa8"
+    },
+    {
+      "path": "target/worker-limits/samples.jsonl",
+      "sha256": "9ca8e0007a48d6169bf73c897b27873f8ade6f405a5706636c81ce1fe8c95c39"
+    },
+    {
+      "path": "target/worker-limits/benchmark-result.json",
+      "sha256": "42f952970ef1116ba63b4c9e401f7558db81875449ac3a85dab98d353a6637bb"
+    },
+    {
+      "path": "target/worker-limits/timing-fixture.c",
+      "sha256": "e999d82de956f60fcc4ff3a6b0bc03edeb69111dfebb2f954aba924ad4125d76"
+    },
+    {
+      "path": "target/worker-limits/baseline-compat.log",
+      "sha256": "caeaae6d7650e6243b0bea76f9870b130a5adb4f3b2f58208a9f48eb8d3217a4"
+    },
+    {
+      "path": "target/worker-limits/dev-compat-1.log",
+      "sha256": "adf40faa932ee65973596869f2584f64bc79591a822c4068e31722a0017ded68"
+    },
+    {
+      "path": "target/worker-limits/dev-compat-4.log",
+      "sha256": "adf40faa932ee65973596869f2584f64bc79591a822c4068e31722a0017ded68"
+    },
+    {
+      "path": "target/worker-limits/metrics-before.log",
+      "sha256": "ac0836068b313578cdde0ad9785b7099ac367ba9bbbce7a3da67c6cf20ad6a7c"
+    },
+    {
+      "path": "target/worker-limits/metrics-after.log",
+      "sha256": "42d68dd254bfe26a7fb8f24dc1f379d5bd2b646c6dfc751f3b3e1a0b7a54777d"
+    },
+    {
+      "path": "target/worker-limits/metrics-set-after.log",
+      "sha256": "139338a391852fd6939fda6f01cc09fe3df8bf870189fcefad08a5b907f4b35e"
+    },
+    {
+      "path": "target/worker-limits/metrics-target-after.log",
+      "sha256": "aee866ebf239bee91c166ed0e1c51e78e4d33fb38cfd6535259491ba0492d2a7"
+    },
+    {
+      "path": "target/worker-limits/interpreter-results.json",
+      "sha256": "c8fc1bff9325fa6871fcf58a2c60b0488b6d0cd311e023912340bae26eaacf52"
+    },
+    {
+      "path": "target/worker-limits/final-kernel-apple.log",
+      "sha256": "7a47f3bb6fac94ada39954f0d96aafc2468d9c5fc43cc01e0cdc4eb0421f08b2"
+    },
+    {
+      "path": "target/worker-limits/file-signals-apple.log",
+      "sha256": "f038a6de13f939ddf1bb5c6994f213d314edda955364fdf2912fec48194f0bf9"
+    },
+    {
+      "path": "target/worker-limits/file-signals-clippy.log",
+      "sha256": "d00fce7a587b27ee92ce7aa7f2f8b6123f2b7ed2a66a0722a998b95c7756475d"
+    },
+    {
+      "path": "target/worker-limits/final-ipad-check.log",
+      "sha256": "47690c773f89913176699025fd817cc1e2125d3aed89c42f1cd61b6b5c1a4c1f"
+    },
+    {
+      "path": "target/local-ci/io/worker-limits-final-kernel-linux.log",
+      "sha256": "4e94edede1a17e0941c6976b4b46b8f3b0c856328f2ba183abed31b2ec727900"
+    },
+    {
+      "path": "target/local-ci/io/worker-limits-final-abi-linux.log",
+      "sha256": "c59a92648fcf0b128c7acfe4277dcbdc9bf5e72d99292e8839d7df701600d133"
+    },
+    {
+      "path": "target/local-ci/io/worker-limits-vfs-abi-linux.log",
+      "sha256": "4bf63bdb227e921f2aa70af00f56c5dcc338c8521ee6c9639e5f1089f3bb95ed"
+    },
+    {
+      "path": "target/local-ci/io/worker-limits-transfer-linux.log",
+      "sha256": "220a96a832f4b8123db5ba7a8f68f5157b04678ff3a6026d06007bfe779170ae"
+    },
+    {
+      "path": "target/local-ci/io/worker-limits-native-samples.jsonl",
+      "sha256": "4f323c71634cf6f80067ac52e820d0126625a6cd5dc8da0a635cbdfd163f0945"
+    },
+    {
+      "path": "target/local-ci/io/worker-limits-native-siginfo.log",
+      "sha256": "c9070670a4f93d8f9b72b1b56276292c0c6c9ee81583db9065e1d36ad1f32fd7"
+    },
+    {
+      "path": "target/worker-limits/pinned-acceptance.json",
+      "sha256": "af58f859e28e823d5e14b4af99d8765dab41d9579013962097280b57ef520468"
+    },
+    {
+      "path": "target/worker-limits/installed-final.json",
+      "sha256": "7aae1074f60892cc734858d91c0787187c264ed492eaf819aaa9d3f5efcdf2b6"
+    },
+    {
+      "path": "target/worker-limits/final-benchmark-summary.log",
+      "sha256": "c3ba2c2579c913f15203f172318532e49a5d9c9864bc48024a167678b9abc5a7"
+    },
+    {
+      "path": "target/worker-limits/verified-benchmark-summary.log",
+      "sha256": "52734d6afd2260df5174c31d4fc7771525b1d4cb2265d5b95aec4fce4904bf04"
+    },
+    {
+      "path": "target/worker-limits/verified-perf/benchmark-result.json",
+      "sha256": "fd40488f7a7df5cac06a1a7219af889247d50b0780b9e97dd21d64fbe15363d8"
+    },
+    {
+      "path": "target/worker-limits/verified-perf/samples.jsonl",
+      "sha256": "b76cfcfce3332e605698291145c4f05ed533161019953530a0deeca181a9f4ee"
+    },
+    {
+      "path": "target/worker-limits/credential-origin-apple.log",
+      "sha256": "78d99cb55bbed1af6232e51c325a585a973038543ce382ad613b9dd10b8d688f"
+    },
+    {
+      "path": "target/worker-limits/unshare-vfs-apple.log",
+      "sha256": "3da76ba9a570f861a98463b8e71fe7a36c5c102d673489bfde5847a893bb567d"
+    },
+    {
+      "path": "target/worker-limits/session-clippy.log",
+      "sha256": "75e6fdc06a663eec6619e02bcd84e948d2c344ac8262bff0c2476c42f801d9ec"
+    },
+    {
+      "path": "target/worker-limits/final-core-clippy.log",
+      "sha256": "c2ca3cf1f6adb5644ad85e48583fedad4a82fb91a54f2e718c200ac133be452f"
+    },
+    {
+      "path": "target/worker-limits/borrowed-limit-kernel-apple.log",
+      "sha256": "729580c8518d580a2813c38834b9ea58b7d1d78469d4a85b1283cd2a4538d6f5"
+    },
+    {
+      "path": "target/worker-limits/borrowed-limit-clippy.log",
+      "sha256": "1f233d55c15a5f7e517f92fc7270bb7b09684ed2af59ff63ba58e4f70e45b2a3"
+    },
+    {
+      "path": "target/worker-limits/borrowed-ipad-check.log",
+      "sha256": "20d841b91a9f79b9aaf573cea5098139e5ae26617ede145347e93d3c48339b27"
+    },
+    {
+      "path": "target/worker-limits/mac-ci-custody/summary.json",
+      "sha256": "412c9eb511205f6a5026eb475bedbc89128bedc970adc39785fdc0e0281ebace"
+    },
+    {
+      "path": "target/worker-limits/build-borrowed-dev.log",
+      "sha256": "4c2a36687a5d6a74007765b55050b15d8bdb178db46c50bd3b22e5398e2ec30c"
+    },
+    {
+      "path": "target/worker-limits/build-borrowed-interpreter.log",
+      "sha256": "a5f3d68be83e379aceb25065383eda8084d2528075b3cffbd9131c8e3affbdda"
+    },
+    {
+      "path": "target/worker-limits/pinned-hvf-compat-4.log",
+      "sha256": "a38b46589bc66a02b659c99a6bd34a3ab76c133ffefcc0b48d5af8f469ac1202"
+    },
+    {
+      "path": "target/worker-limits/pinned-fmt.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "target/worker-limits/pinned-hvf-set-4.log",
+      "sha256": "074c3e483f585de68301dd342e7c289aefaae96bb3f03f867c1449ec77df56fe"
+    },
+    {
+      "path": "target/worker-limits/pinned-interpreter-target-4.log",
+      "sha256": "24b132173bb2b4fceb4010bfe82c7922069cee3beb225e996b27d9d8bcd46de3"
+    },
+    {
+      "path": "target/worker-limits/pinned-hvf-compat-1.log",
+      "sha256": "82282467ddc5dacc24d3dc48ea8f813cf22112e3647a74149d9cb61d1c6b6bd0"
+    },
+    {
+      "path": "target/worker-limits/pinned-interpreter-compat-4.log",
+      "sha256": "833730aeb8b12614f5b3c78d85c22a3a828824ee9206572cb131ab25b8c806ac"
+    },
+    {
+      "path": "target/worker-limits/pinned-interpreter-set-4.log",
+      "sha256": "c2b082f64b4128354052a783b9b439a093c1493564ba99a7018e0942f6bee5c5"
+    },
+    {
+      "path": "target/worker-limits/pinned-hvf-query-4.log",
+      "sha256": "fa27ba4739d8bdee387b551ae7482934ebf0280f739431f8fc0f276ee30509cc"
+    },
+    {
+      "path": "target/worker-limits/pinned-interpreter-compat-1.log",
+      "sha256": "331a2a963e70b73eab0de506019095ed5d6584c96e0741a7ad6c919ec4a45520"
+    },
+    {
+      "path": "target/worker-limits/pinned-hvf-target-4.log",
+      "sha256": "61ef57c54642ce0c0ae82e35d89cc1feca6e5202a9d9b237070c74d20e94a609"
+    },
+    {
+      "path": "target/worker-limits/pinned-ipad-check.log",
+      "sha256": "e345c199c00fe2a2305356a075141f022a36514f630a3d7ef92c01254cd26fbb"
+    },
+    {
+      "path": "target/worker-limits/pinned-interpreter-prlimit-1.log",
+      "sha256": "215500f433ba731a23e857cb0f9e9722da1ddcc1fd7fbef4a2f366baa9a30b6e"
+    },
+    {
+      "path": "target/worker-limits/pinned-hvf-compat-12.log",
+      "sha256": "b86e4cf867109614e50060cd1f30f2dde294afae255f41c45bb3cdadc6d39dd8"
+    },
+    {
+      "path": "target/worker-limits/pinned-hvf-prlimit-12.log",
+      "sha256": "b5d861d2db25b781038feafd7bd425e61237dde5f3dcc93c1843e8ba9292a266"
+    },
+    {
+      "path": "target/worker-limits/pinned-interpreter-query-4.log",
+      "sha256": "5f41caa347e2b984c0623f2ae4f04ffeeae18649ed3593f14f28c40976dcf983"
+    },
+    {
+      "path": "target/worker-limits/pinned-interpreter-prlimit-4.log",
+      "sha256": "78fc7a93cb948efb4926be5f372cc5d1378452715a848eec26568388461d4e1d"
+    },
+    {
+      "path": "target/worker-limits/pinned-hvf-prlimit-4.log",
+      "sha256": "9fe513a89ac6223f5be25670c2330c226dfa8d45130e98aa3276068a37dd626e"
+    },
+    {
+      "path": "target/worker-limits/pinned-hvf-prlimit-1.log",
+      "sha256": "c51ae6f46b82f3efa4aba0518d83c22217e3d4d95cedfe812050646178513e46"
+    },
+    {
+      "path": "target/local-ci/io/worker-limits-custody-kernel-linux.log",
+      "sha256": "285c566f1b5d085ff8dfbea12a567f3e32be858784dc336e2df0518cf09992d2"
+    },
+    {
+      "path": "target/local-ci/io/worker-limits-custody-abi-linux.log",
+      "sha256": "1e7f1be3427817a83dec93eeff33018e77a5c55671b84757ab73ea57ad977233"
+    },
+    {
+      "path": "target/local-ci/io/worker-limits-unshare-linux.log",
+      "sha256": "2eebc8bb6ff98d6ba69de0e055a24de66e156e020932d78ebed506b8c28f9cba"
+    },
+    {
+      "path": "target/local-ci/io/worker-limits-borrowed-compat-linux.log",
+      "sha256": "821dc781984afb16e437dd24c917fda47c2706d4d06fcd8584734de66fd2bc9f"
+    },
+    {
+      "path": "target/local-ci/io/worker-limits-borrowed-kernel-linux.log",
+      "sha256": "8c554b07fa71667a58f8a924bef3e249f928f19418b64be550cc5bd2b930f93b"
+    },
+    {
+      "path": "target/local-ci/io/worker-limits-native-final-samples.jsonl",
+      "sha256": "6e0d51e3437fdafec5b6d52a063cea51059bffe9a2c8ed5b4e3b2d3c21cc6dd4"
+    },
+    {
+      "path": "target/worker-limits/final-go-gc-integration.log",
+      "sha256": "e8dd5e3fae6fa8b3df1090acd43b111cb7b1c7e49b8c57ade35be6d498d7b52e"
+    },
+    {
+      "path": "target/worker-limits/final-docker-integration.log",
+      "sha256": "684f6812ba2e104d3744d7afe75153afe30a9982594ccd0118dabd6b4f84ec7e"
+    },
+    {
+      "path": "target/worker-limits/final-go-docker-integration.json",
+      "sha256": "17e461ba4216a4f4a587bb1faa3ece178ee700bcb80d37dcfb7f41b8cc920132"
+    },
+    {
+      "path": "target/worker-limits/final-verified-fmt.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "pilot_performance": {
+    "method": "Nine counterbalanced before/after pairs; same fixed-work static ARM64 ELF, 1000 limit calls per thread; file growth control uses 5000 writes per thread",
+    "rows": [
+      {
+        "mode": "query",
+        "cpus": 1,
+        "before_seconds": 0.001501291,
+        "after_seconds": 0.0014965,
+        "speedup": 1.0032014700968928,
+        "native_arm_linux_median_seconds": 0.000149666
+      },
+      {
+        "mode": "query",
+        "cpus": 4,
+        "before_seconds": 0.150590042,
+        "after_seconds": 0.001531542,
+        "speedup": 98.3257671026978,
+        "native_arm_linux_median_seconds": 0.000189541
+      },
+      {
+        "mode": "set",
+        "cpus": 1,
+        "before_seconds": 0.001414459,
+        "after_seconds": 0.001410458,
+        "speedup": 1.002836667238585,
+        "native_arm_linux_median_seconds": 0.000153041
+      },
+      {
+        "mode": "set",
+        "cpus": 4,
+        "before_seconds": 0.149381417,
+        "after_seconds": 0.001514375,
+        "speedup": 98.64228939331406,
+        "native_arm_linux_median_seconds": 0.000528666
+      },
+      {
+        "mode": "target",
+        "cpus": 1,
+        "before_seconds": 0.001521042,
+        "after_seconds": 0.001538583,
+        "speedup": 0.9885992500892055,
+        "native_arm_linux_median_seconds": 0.000168833
+      },
+      {
+        "mode": "target",
+        "cpus": 4,
+        "before_seconds": 0.150311,
+        "after_seconds": 0.001374667,
+        "speedup": 109.34357193414841,
+        "native_arm_linux_median_seconds": 0.000264624
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 1,
+        "before_seconds": 0.008040959,
+        "after_seconds": 0.008009916,
+        "speedup": 1.0038755712294611,
+        "native_arm_linux_median_seconds": null
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 4,
+        "before_seconds": 0.009261959,
+        "after_seconds": 0.00920075,
+        "speedup": 1.0066526098415889,
+        "native_arm_linux_median_seconds": null
+      }
+    ],
+    "samples": [
+      {
+        "mode": "query",
+        "cpus": 1,
+        "sample": 0,
+        "phase": "before",
+        "seconds": 0.001952417
+      },
+      {
+        "mode": "query",
+        "cpus": 1,
+        "sample": 0,
+        "phase": "after",
+        "seconds": 0.001666541
+      },
+      {
+        "mode": "query",
+        "cpus": 1,
+        "sample": 1,
+        "phase": "after",
+        "seconds": 0.00149625
+      },
+      {
+        "mode": "query",
+        "cpus": 1,
+        "sample": 1,
+        "phase": "before",
+        "seconds": 0.001501291
+      },
+      {
+        "mode": "query",
+        "cpus": 1,
+        "sample": 2,
+        "phase": "before",
+        "seconds": 0.001505125
+      },
+      {
+        "mode": "query",
+        "cpus": 1,
+        "sample": 2,
+        "phase": "after",
+        "seconds": 0.001497458
+      },
+      {
+        "mode": "query",
+        "cpus": 1,
+        "sample": 3,
+        "phase": "after",
+        "seconds": 0.001486584
+      },
+      {
+        "mode": "query",
+        "cpus": 1,
+        "sample": 3,
+        "phase": "before",
+        "seconds": 0.001483916
+      },
+      {
+        "mode": "query",
+        "cpus": 1,
+        "sample": 4,
+        "phase": "before",
+        "seconds": 0.001544292
+      },
+      {
+        "mode": "query",
+        "cpus": 1,
+        "sample": 4,
+        "phase": "after",
+        "seconds": 0.001493417
+      },
+      {
+        "mode": "query",
+        "cpus": 1,
+        "sample": 5,
+        "phase": "after",
+        "seconds": 0.001480291
+      },
+      {
+        "mode": "query",
+        "cpus": 1,
+        "sample": 5,
+        "phase": "before",
+        "seconds": 0.001496917
+      },
+      {
+        "mode": "query",
+        "cpus": 1,
+        "sample": 6,
+        "phase": "before",
+        "seconds": 0.001496167
+      },
+      {
+        "mode": "query",
+        "cpus": 1,
+        "sample": 6,
+        "phase": "after",
+        "seconds": 0.0014965
+      },
+      {
+        "mode": "query",
+        "cpus": 1,
+        "sample": 7,
+        "phase": "after",
+        "seconds": 0.001500125
+      },
+      {
+        "mode": "query",
+        "cpus": 1,
+        "sample": 7,
+        "phase": "before",
+        "seconds": 0.001495625
+      },
+      {
+        "mode": "query",
+        "cpus": 1,
+        "sample": 8,
+        "phase": "before",
+        "seconds": 0.001559583
+      },
+      {
+        "mode": "query",
+        "cpus": 1,
+        "sample": 8,
+        "phase": "after",
+        "seconds": 0.001672917
+      },
+      {
+        "mode": "query",
+        "cpus": 4,
+        "sample": 0,
+        "phase": "before",
+        "seconds": 0.151969792
+      },
+      {
+        "mode": "query",
+        "cpus": 4,
+        "sample": 0,
+        "phase": "after",
+        "seconds": 0.001497084
+      },
+      {
+        "mode": "query",
+        "cpus": 4,
+        "sample": 1,
+        "phase": "after",
+        "seconds": 0.00160225
+      },
+      {
+        "mode": "query",
+        "cpus": 4,
+        "sample": 1,
+        "phase": "before",
+        "seconds": 0.149584292
+      },
+      {
+        "mode": "query",
+        "cpus": 4,
+        "sample": 2,
+        "phase": "before",
+        "seconds": 0.150255292
+      },
+      {
+        "mode": "query",
+        "cpus": 4,
+        "sample": 2,
+        "phase": "after",
+        "seconds": 0.001441875
+      },
+      {
+        "mode": "query",
+        "cpus": 4,
+        "sample": 3,
+        "phase": "after",
+        "seconds": 0.001761209
+      },
+      {
+        "mode": "query",
+        "cpus": 4,
+        "sample": 3,
+        "phase": "before",
+        "seconds": 0.150590042
+      },
+      {
+        "mode": "query",
+        "cpus": 4,
+        "sample": 4,
+        "phase": "before",
+        "seconds": 0.157927417
+      },
+      {
+        "mode": "query",
+        "cpus": 4,
+        "sample": 4,
+        "phase": "after",
+        "seconds": 0.001535
+      },
+      {
+        "mode": "query",
+        "cpus": 4,
+        "sample": 5,
+        "phase": "after",
+        "seconds": 0.001663916
+      },
+      {
+        "mode": "query",
+        "cpus": 4,
+        "sample": 5,
+        "phase": "before",
+        "seconds": 0.144042584
+      },
+      {
+        "mode": "query",
+        "cpus": 4,
+        "sample": 6,
+        "phase": "before",
+        "seconds": 0.151382792
+      },
+      {
+        "mode": "query",
+        "cpus": 4,
+        "sample": 6,
+        "phase": "after",
+        "seconds": 0.001345875
+      },
+      {
+        "mode": "query",
+        "cpus": 4,
+        "sample": 7,
+        "phase": "after",
+        "seconds": 0.001430708
+      },
+      {
+        "mode": "query",
+        "cpus": 4,
+        "sample": 7,
+        "phase": "before",
+        "seconds": 0.148939625
+      },
+      {
+        "mode": "query",
+        "cpus": 4,
+        "sample": 8,
+        "phase": "before",
+        "seconds": 0.151364042
+      },
+      {
+        "mode": "query",
+        "cpus": 4,
+        "sample": 8,
+        "phase": "after",
+        "seconds": 0.001531542
+      },
+      {
+        "mode": "set",
+        "cpus": 1,
+        "sample": 0,
+        "phase": "before",
+        "seconds": 0.001461208
+      },
+      {
+        "mode": "set",
+        "cpus": 1,
+        "sample": 0,
+        "phase": "after",
+        "seconds": 0.001402542
+      },
+      {
+        "mode": "set",
+        "cpus": 1,
+        "sample": 1,
+        "phase": "after",
+        "seconds": 0.001412917
+      },
+      {
+        "mode": "set",
+        "cpus": 1,
+        "sample": 1,
+        "phase": "before",
+        "seconds": 0.001412167
+      },
+      {
+        "mode": "set",
+        "cpus": 1,
+        "sample": 2,
+        "phase": "before",
+        "seconds": 0.001471
+      },
+      {
+        "mode": "set",
+        "cpus": 1,
+        "sample": 2,
+        "phase": "after",
+        "seconds": 0.001406125
+      },
+      {
+        "mode": "set",
+        "cpus": 1,
+        "sample": 3,
+        "phase": "after",
+        "seconds": 0.001478875
+      },
+      {
+        "mode": "set",
+        "cpus": 1,
+        "sample": 3,
+        "phase": "before",
+        "seconds": 0.001395166
+      },
+      {
+        "mode": "set",
+        "cpus": 1,
+        "sample": 4,
+        "phase": "before",
+        "seconds": 0.001414459
+      },
+      {
+        "mode": "set",
+        "cpus": 1,
+        "sample": 4,
+        "phase": "after",
+        "seconds": 0.001404333
+      },
+      {
+        "mode": "set",
+        "cpus": 1,
+        "sample": 5,
+        "phase": "after",
+        "seconds": 0.001410458
+      },
+      {
+        "mode": "set",
+        "cpus": 1,
+        "sample": 5,
+        "phase": "before",
+        "seconds": 0.001408125
+      },
+      {
+        "mode": "set",
+        "cpus": 1,
+        "sample": 6,
+        "phase": "before",
+        "seconds": 0.001422959
+      },
+      {
+        "mode": "set",
+        "cpus": 1,
+        "sample": 6,
+        "phase": "after",
+        "seconds": 0.001524583
+      },
+      {
+        "mode": "set",
+        "cpus": 1,
+        "sample": 7,
+        "phase": "after",
+        "seconds": 0.001415416
+      },
+      {
+        "mode": "set",
+        "cpus": 1,
+        "sample": 7,
+        "phase": "before",
+        "seconds": 0.001413333
+      },
+      {
+        "mode": "set",
+        "cpus": 1,
+        "sample": 8,
+        "phase": "before",
+        "seconds": 0.001415083
+      },
+      {
+        "mode": "set",
+        "cpus": 1,
+        "sample": 8,
+        "phase": "after",
+        "seconds": 0.00138975
+      },
+      {
+        "mode": "set",
+        "cpus": 4,
+        "sample": 0,
+        "phase": "before",
+        "seconds": 0.148300542
+      },
+      {
+        "mode": "set",
+        "cpus": 4,
+        "sample": 0,
+        "phase": "after",
+        "seconds": 0.001530083
+      },
+      {
+        "mode": "set",
+        "cpus": 4,
+        "sample": 1,
+        "phase": "after",
+        "seconds": 0.001552458
+      },
+      {
+        "mode": "set",
+        "cpus": 4,
+        "sample": 1,
+        "phase": "before",
+        "seconds": 0.150452166
+      },
+      {
+        "mode": "set",
+        "cpus": 4,
+        "sample": 2,
+        "phase": "before",
+        "seconds": 0.148834291
+      },
+      {
+        "mode": "set",
+        "cpus": 4,
+        "sample": 2,
+        "phase": "after",
+        "seconds": 0.001392916
+      },
+      {
+        "mode": "set",
+        "cpus": 4,
+        "sample": 3,
+        "phase": "after",
+        "seconds": 0.001634916
+      },
+      {
+        "mode": "set",
+        "cpus": 4,
+        "sample": 3,
+        "phase": "before",
+        "seconds": 0.148983875
+      },
+      {
+        "mode": "set",
+        "cpus": 4,
+        "sample": 4,
+        "phase": "before",
+        "seconds": 0.150745
+      },
+      {
+        "mode": "set",
+        "cpus": 4,
+        "sample": 4,
+        "phase": "after",
+        "seconds": 0.001514375
+      },
+      {
+        "mode": "set",
+        "cpus": 4,
+        "sample": 5,
+        "phase": "after",
+        "seconds": 0.001510125
+      },
+      {
+        "mode": "set",
+        "cpus": 4,
+        "sample": 5,
+        "phase": "before",
+        "seconds": 0.15157375
+      },
+      {
+        "mode": "set",
+        "cpus": 4,
+        "sample": 6,
+        "phase": "before",
+        "seconds": 0.149381417
+      },
+      {
+        "mode": "set",
+        "cpus": 4,
+        "sample": 6,
+        "phase": "after",
+        "seconds": 0.001421292
+      },
+      {
+        "mode": "set",
+        "cpus": 4,
+        "sample": 7,
+        "phase": "after",
+        "seconds": 0.001599792
+      },
+      {
+        "mode": "set",
+        "cpus": 4,
+        "sample": 7,
+        "phase": "before",
+        "seconds": 0.14781175
+      },
+      {
+        "mode": "set",
+        "cpus": 4,
+        "sample": 8,
+        "phase": "before",
+        "seconds": 0.150975167
+      },
+      {
+        "mode": "set",
+        "cpus": 4,
+        "sample": 8,
+        "phase": "after",
+        "seconds": 0.001420166
+      },
+      {
+        "mode": "target",
+        "cpus": 1,
+        "sample": 0,
+        "phase": "before",
+        "seconds": 0.001510666
+      },
+      {
+        "mode": "target",
+        "cpus": 1,
+        "sample": 0,
+        "phase": "after",
+        "seconds": 0.00155125
+      },
+      {
+        "mode": "target",
+        "cpus": 1,
+        "sample": 1,
+        "phase": "after",
+        "seconds": 0.001558042
+      },
+      {
+        "mode": "target",
+        "cpus": 1,
+        "sample": 1,
+        "phase": "before",
+        "seconds": 0.001563666
+      },
+      {
+        "mode": "target",
+        "cpus": 1,
+        "sample": 2,
+        "phase": "before",
+        "seconds": 0.001582292
+      },
+      {
+        "mode": "target",
+        "cpus": 1,
+        "sample": 2,
+        "phase": "after",
+        "seconds": 0.001584917
+      },
+      {
+        "mode": "target",
+        "cpus": 1,
+        "sample": 3,
+        "phase": "after",
+        "seconds": 0.001510875
+      },
+      {
+        "mode": "target",
+        "cpus": 1,
+        "sample": 3,
+        "phase": "before",
+        "seconds": 0.001500709
+      },
+      {
+        "mode": "target",
+        "cpus": 1,
+        "sample": 4,
+        "phase": "before",
+        "seconds": 0.001529166
+      },
+      {
+        "mode": "target",
+        "cpus": 1,
+        "sample": 4,
+        "phase": "after",
+        "seconds": 0.001531375
+      },
+      {
+        "mode": "target",
+        "cpus": 1,
+        "sample": 5,
+        "phase": "after",
+        "seconds": 0.001538583
+      },
+      {
+        "mode": "target",
+        "cpus": 1,
+        "sample": 5,
+        "phase": "before",
+        "seconds": 0.001521042
+      },
+      {
+        "mode": "target",
+        "cpus": 1,
+        "sample": 6,
+        "phase": "before",
+        "seconds": 0.001569417
+      },
+      {
+        "mode": "target",
+        "cpus": 1,
+        "sample": 6,
+        "phase": "after",
+        "seconds": 0.001594834
+      },
+      {
+        "mode": "target",
+        "cpus": 1,
+        "sample": 7,
+        "phase": "after",
+        "seconds": 0.001531417
+      },
+      {
+        "mode": "target",
+        "cpus": 1,
+        "sample": 7,
+        "phase": "before",
+        "seconds": 0.001504959
+      },
+      {
+        "mode": "target",
+        "cpus": 1,
+        "sample": 8,
+        "phase": "before",
+        "seconds": 0.001497625
+      },
+      {
+        "mode": "target",
+        "cpus": 1,
+        "sample": 8,
+        "phase": "after",
+        "seconds": 0.00150675
+      },
+      {
+        "mode": "target",
+        "cpus": 4,
+        "sample": 0,
+        "phase": "before",
+        "seconds": 0.149551917
+      },
+      {
+        "mode": "target",
+        "cpus": 4,
+        "sample": 0,
+        "phase": "after",
+        "seconds": 0.00132275
+      },
+      {
+        "mode": "target",
+        "cpus": 4,
+        "sample": 1,
+        "phase": "after",
+        "seconds": 0.001374667
+      },
+      {
+        "mode": "target",
+        "cpus": 4,
+        "sample": 1,
+        "phase": "before",
+        "seconds": 0.149789083
+      },
+      {
+        "mode": "target",
+        "cpus": 4,
+        "sample": 2,
+        "phase": "before",
+        "seconds": 0.152041167
+      },
+      {
+        "mode": "target",
+        "cpus": 4,
+        "sample": 2,
+        "phase": "after",
+        "seconds": 0.001419125
+      },
+      {
+        "mode": "target",
+        "cpus": 4,
+        "sample": 3,
+        "phase": "after",
+        "seconds": 0.001351083
+      },
+      {
+        "mode": "target",
+        "cpus": 4,
+        "sample": 3,
+        "phase": "before",
+        "seconds": 0.152876375
+      },
+      {
+        "mode": "target",
+        "cpus": 4,
+        "sample": 4,
+        "phase": "before",
+        "seconds": 0.149803916
+      },
+      {
+        "mode": "target",
+        "cpus": 4,
+        "sample": 4,
+        "phase": "after",
+        "seconds": 0.001664666
+      },
+      {
+        "mode": "target",
+        "cpus": 4,
+        "sample": 5,
+        "phase": "after",
+        "seconds": 0.00161825
+      },
+      {
+        "mode": "target",
+        "cpus": 4,
+        "sample": 5,
+        "phase": "before",
+        "seconds": 0.150311
+      },
+      {
+        "mode": "target",
+        "cpus": 4,
+        "sample": 6,
+        "phase": "before",
+        "seconds": 0.151470041
+      },
+      {
+        "mode": "target",
+        "cpus": 4,
+        "sample": 6,
+        "phase": "after",
+        "seconds": 0.001341041
+      },
+      {
+        "mode": "target",
+        "cpus": 4,
+        "sample": 7,
+        "phase": "after",
+        "seconds": 0.001535792
+      },
+      {
+        "mode": "target",
+        "cpus": 4,
+        "sample": 7,
+        "phase": "before",
+        "seconds": 0.150369
+      },
+      {
+        "mode": "target",
+        "cpus": 4,
+        "sample": 8,
+        "phase": "before",
+        "seconds": 0.1500685
+      },
+      {
+        "mode": "target",
+        "cpus": 4,
+        "sample": 8,
+        "phase": "after",
+        "seconds": 0.001308666
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 1,
+        "sample": 0,
+        "phase": "before",
+        "seconds": 0.008098709
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 1,
+        "sample": 0,
+        "phase": "after",
+        "seconds": 0.008009916
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 1,
+        "sample": 1,
+        "phase": "after",
+        "seconds": 0.008173666
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 1,
+        "sample": 1,
+        "phase": "before",
+        "seconds": 0.008107791
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 1,
+        "sample": 2,
+        "phase": "before",
+        "seconds": 0.008044584
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 1,
+        "sample": 2,
+        "phase": "after",
+        "seconds": 0.00799425
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 1,
+        "sample": 3,
+        "phase": "after",
+        "seconds": 0.008122792
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 1,
+        "sample": 3,
+        "phase": "before",
+        "seconds": 0.008010458
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 1,
+        "sample": 4,
+        "phase": "before",
+        "seconds": 0.008001
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 1,
+        "sample": 4,
+        "phase": "after",
+        "seconds": 0.008179167
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 1,
+        "sample": 5,
+        "phase": "after",
+        "seconds": 0.008422
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 1,
+        "sample": 5,
+        "phase": "before",
+        "seconds": 0.00808675
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 1,
+        "sample": 6,
+        "phase": "before",
+        "seconds": 0.007871083
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 1,
+        "sample": 6,
+        "phase": "after",
+        "seconds": 0.008006625
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 1,
+        "sample": 7,
+        "phase": "after",
+        "seconds": 0.007863833
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 1,
+        "sample": 7,
+        "phase": "before",
+        "seconds": 0.008040959
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 1,
+        "sample": 8,
+        "phase": "before",
+        "seconds": 0.007941125
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 1,
+        "sample": 8,
+        "phase": "after",
+        "seconds": 0.007909416
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 4,
+        "sample": 0,
+        "phase": "before",
+        "seconds": 0.009020667
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 4,
+        "sample": 0,
+        "phase": "after",
+        "seconds": 0.008876417
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 4,
+        "sample": 1,
+        "phase": "after",
+        "seconds": 0.009582
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 4,
+        "sample": 1,
+        "phase": "before",
+        "seconds": 0.010250625
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 4,
+        "sample": 2,
+        "phase": "before",
+        "seconds": 0.009236958
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 4,
+        "sample": 2,
+        "phase": "after",
+        "seconds": 0.008862375
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 4,
+        "sample": 3,
+        "phase": "after",
+        "seconds": 0.009429458
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 4,
+        "sample": 3,
+        "phase": "before",
+        "seconds": 0.010013542
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 4,
+        "sample": 4,
+        "phase": "before",
+        "seconds": 0.010740834
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 4,
+        "sample": 4,
+        "phase": "after",
+        "seconds": 0.011255375
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 4,
+        "sample": 5,
+        "phase": "after",
+        "seconds": 0.009182125
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 4,
+        "sample": 5,
+        "phase": "before",
+        "seconds": 0.00903375
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 4,
+        "sample": 6,
+        "phase": "before",
+        "seconds": 0.011764
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 4,
+        "sample": 6,
+        "phase": "after",
+        "seconds": 0.01093625
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 4,
+        "sample": 7,
+        "phase": "after",
+        "seconds": 0.00916675
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 4,
+        "sample": 7,
+        "phase": "before",
+        "seconds": 0.009004708
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 4,
+        "sample": 8,
+        "phase": "before",
+        "seconds": 0.009261959
+      },
+      {
+        "mode": "file-grow",
+        "cpus": 4,
+        "sample": 8,
+        "phase": "after",
+        "seconds": 0.00920075
+      }
+    ],
+    "timing_binaries": {
+      "before": {
+        "path": "/Users/main/Applications/Trames.app/Contents/MacOS/trames-mac-run",
+        "sha256": "4f40615213e731b2a4ef9d8c6a0e85c5c7bdf31ab0c60b0354b55113f2a6a55d"
+      },
+      "after": {
+        "path": "/Users/main/dev/trames-mac/target/release/Trames Dev.app/Contents/MacOS/trames-mac-run",
+        "sha256": "fc477954a1e26e3f82ee6778b64cb6f4131ce387c7916a8453b949b4ae0beb88"
+      }
+    },
+    "timing_fixture": {
+      "path": "target/local-ci/io/worker-limits",
+      "sha256": "4c8a017cc8d921ab576c34df4a1a1e435767fb925e2f6b1528c69d2b40b58ebe"
+    },
+    "timing_fixture_source": {
+      "path": "target/worker-limits/timing-fixture.c",
+      "sha256": "e999d82de956f60fcc4ff3a6b0bc03edeb69111dfebb2f954aba924ad4125d76"
+    },
+    "timing_source_note": "Measurements preceded siginfo/error-completion followup; timed query/set/target and ordinary growth code is unchanged. Enhanced final fixture adds siginfo checks only to compatibility mode. Final pinned results are recorded separately.",
+    "native_reference": "Same ELF on native ARM Linux in the existing local 6-vCPU Lima instance; not bare-metal Darwin. Instance stopped before Mac counterbalanced runs.",
+    "diagnostics": {
+      "before_cohort_rounds": 3700,
+      "after_cohort_rounds": 7,
+      "before_limit_owner_returns": 4000,
+      "after_limit_owner_returns": 0,
+      "service_requests_before": 0,
+      "service_requests_after": 0
+    },
+    "whole_application_speedup_claimed": false
+  },
+  "followup_revisions": [
+    "98f709e10fee14fc596c27bf3cebbfb4d5c35b3d",
+    "43210f92a2e49a0f956598e6fd396164e058a457",
+    "f361bde2824f6b629a85e336774f8eceee3492e7"
+  ],
+  "pinned_acceptance": {
+    "runtime_revision": "f361bde2824f6b629a85e336774f8eceee3492e7",
+    "version": "Trames Dev 1.5.3 (dev) runtime f361bde2824f6b629a85e336774f8eceee3492e7",
+    "hvf_sha256": "5ee1f6cd8d3a165d6495119c71e0b5ca51055357622304b3635cef9db4416ae3",
+    "interpreter_sha256": "c4f6517d481a067ba2df9a8b1bc10bab5f1d662188282ee4ebc5c48e1c7f6ac4",
+    "fixture_sha256": "c881fba8c2881caaaa00b71b63a4d96db217486b8110851ebf4ab8025207b0b1",
+    "results": [
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "case": "compat",
+        "returncode": 0,
+        "cohort_return_syscalls": [
+          "trames mac cohort-return syscalls: []"
+        ]
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "case": "prlimit",
+        "returncode": 0,
+        "cohort_return_syscalls": [
+          "trames mac cohort-return syscalls: []"
+        ]
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "case": "compat",
+        "returncode": 0,
+        "cohort_return_syscalls": [
+          "trames mac cohort-return syscalls: [(93, 1), (260, 1)]"
+        ]
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "case": "prlimit",
+        "returncode": 0,
+        "cohort_return_syscalls": [
+          "trames mac cohort-return syscalls: [(93, 1), (96, 1), (220, 1), (260, 1)]"
+        ]
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "case": "query",
+        "returncode": 0,
+        "cohort_return_syscalls": [
+          "trames mac cohort-return syscalls: [(93, 4), (220, 3), (215, 1)]"
+        ]
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "case": "set",
+        "returncode": 0,
+        "cohort_return_syscalls": [
+          "trames mac cohort-return syscalls: [(93, 4), (220, 3), (215, 1)]"
+        ]
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "case": "target",
+        "returncode": 0,
+        "cohort_return_syscalls": [
+          "trames mac cohort-return syscalls: [(93, 4), (220, 3)]"
+        ]
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "case": "compat",
+        "returncode": 0,
+        "cohort_return_syscalls": [
+          "trames mac cohort-return syscalls: [(93, 1), (260, 1)]"
+        ]
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "case": "prlimit",
+        "returncode": 0,
+        "cohort_return_syscalls": [
+          "trames mac cohort-return syscalls: [(93, 1), (96, 1), (220, 1), (260, 1)]"
+        ]
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 1,
+        "case": "compat",
+        "returncode": 0,
+        "cohort_return_syscalls": []
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 1,
+        "case": "prlimit",
+        "returncode": 0,
+        "cohort_return_syscalls": []
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 4,
+        "case": "compat",
+        "returncode": 0,
+        "cohort_return_syscalls": []
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 4,
+        "case": "prlimit",
+        "returncode": 0,
+        "cohort_return_syscalls": []
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 4,
+        "case": "query",
+        "returncode": 0,
+        "cohort_return_syscalls": []
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 4,
+        "case": "set",
+        "returncode": 0,
+        "cohort_return_syscalls": []
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 4,
+        "case": "target",
+        "returncode": 0,
+        "cohort_return_syscalls": []
+      }
+    ]
+  },
+  "installed_bundles": [
+    {
+      "app": "Trames",
+      "version": "Trames 1.5.3 (stable) runtime d9c4a811faf316a51b1a8f33f055247943a18855",
+      "sha256": "4f40615213e731b2a4ef9d8c6a0e85c5c7bdf31ab0c60b0354b55113f2a6a55d"
+    },
+    {
+      "app": "Trames Dev",
+      "version": "Trames Dev 1.5.3 (dev) runtime f361bde2824f6b629a85e336774f8eceee3492e7",
+      "sha256": "5ee1f6cd8d3a165d6495119c71e0b5ca51055357622304b3635cef9db4416ae3"
+    }
+  ],
+  "real_go_docker_acceptance": {
+    "runtime_revision": "f361bde2824f6b629a85e336774f8eceee3492e7",
+    "cpus": 12,
+    "go_gc_runs": 30,
+    "go_normal_async_preemption": true,
+    "docker_lifecycle_rounds": 8,
+    "public_tools_and_alpine_only": true,
+    "application_data_used": false,
+    "results": [
+      {
+        "case": "go-gc",
+        "returncode": 0,
+        "seconds": 2.5110734999999997
+      },
+      {
+        "case": "docker",
+        "returncode": 0,
+        "seconds": 78.29965716699999
+      }
+    ]
+  }
+}

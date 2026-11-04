@@ -2914,3 +2914,64 @@ ordinary-memory fence or Go preemption workaround. Deterministic tests retain
 owner clones across interruption and exit; normal-preemption stock Go stress and
 eight isolated Docker lifecycle cycles pass. The existing lifecycle boundaries
 remain unchanged. [Source-bound evidence](../validation/reader-runtime-20261104.json).
+
+
+## Thirty-ninth migration — shared resource-limit subsystem — 2026-11-05
+
+Runtime `f361bde2824f6b629a85e336774f8eceee3492e7` retains migration commit
+`33b00d5` and closes its file-size error completion boundary. All supported
+getrlimit/setrlimit/prlimit64 calls, including non-self PID/TID targets and
+ordinary errors, use original shared process limits on source workers. Thread
+clones share them; forks copy them and exec retains them. Host-authorized exec
+binds its replacement VFS, while FD unshare keeps the process soft-limit atomic. Credentials, PID
+membership and weak task presence keep their original identity and custody.
+A retained limit cannot keep a reaped PID visible or retarget reuse.
+
+The actual FD soft atomic and live file-size atomic enforce updates. Original
+OFD metadata remains shared, with the caller's limit bound separately. Both fast
+file capabilities and accepted/native work observe reductions. The old stable
+binary fails a real threaded short-write case after a limit reduction; the new
+shared implementation passes. Inline/native error completion and io_uring
+accepted contexts route SIGXFSZ to the original task, including a closed fixed
+file and pumping from another context. AIO already uses its source channel.
+Ignored dispositions and retired targets are respected. Solo clone and actual
+credential changes publish signal identity at their custody boundary. Caught signals retain
+source handler/sigreturn; default task termination still has its real boundary.
+
+Nine counterbalanced pairs measure the longest thread body, with 1,000 calls per
+thread. Times below are four-thread medians. Linux is the same static ARM64 ELF
+on the local native ARM Linux reference instance, not bare-metal Darwin.
+
+| Work | Old HVF | New HVF | Native ARM Linux | Improvement |
+| --- | ---: | ---: | ---: | ---: |
+| getrlimit | 151.95 ms | 1.42 ms | 0.196 ms | 107.22x |
+| setrlimit | 150.63 ms | 1.47 ms | 0.518 ms | 102.73x |
+| Cross-thread prlimit64 query | 151.40 ms | 1.42 ms | 0.264 ms | 106.25x |
+
+Final single-worker medians are within 0.9% of the old binary. A slower pilot
+self-TID query exposed unnecessary full-directory publication; it now borrows
+the original object without authority copies or repeated translation. Ordinary
+file-growth controls show no regression; all pilot and final samples are retained. The diagnostics are separate from timing: 4,000 limit owner returns
+fall to zero and cohort rounds fall from 3,700 to 7. Both sides have zero service
+requests, so RPC counts alone would miss the change. This is a subsystem result,
+not a Firefox or whole-system speedup claim.
+
+Apple and ARM Linux pass 293 process/kernel-conformance cases, 21 kernel unit
+cases and 233 ABI cases; the existing affected VFS results are reused (496 Apple,
+495 Linux, one ignored each). Strict checks and the iPad FFI target compile pass.
+Targeted rechecks correct CPU-allowance assumptions and join both concurrent
+transfer attempts before retry; no production transfer algorithm changes.
+
+[Source-bound evidence and all samples](../validation/worker-limits-20261105.json)
+· [Shared contract](../../runtime/docs/architecture/execution-backends.md#worker-owned-process-resource-limits-2026-11-05)
+· [Remaining boundaries](../../runtime/docs/architecture/coordination-boundaries.md).
+The connected lifecycle, credentials, namespaces and VM checkpoints remain
+explicit. This batch adds no service/coordinator thread, polling bus, global
+algorithm lock or ordinary-memory fence.
+
+The final pinned Dev binary additionally passes 30 normal-preemption stock Go
+GC stress starts and eight isolated Docker start/health/exec/inspect/stop/remove
+cycles at twelve CPUs. Public Debian tools and Alpine content are used; no
+application data, frontend activation or paid model requests are involved.
+Mac Dev is installed. The physical iPad execution is not claimed; its shared
+runtime pin and device-target compile are verified.
