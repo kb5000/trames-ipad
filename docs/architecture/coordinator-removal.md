@@ -2783,3 +2783,33 @@ and [architecture-wide inventory](../../runtime/docs/architecture/coordination-b
 separate owner services, full cohort joins, affected-domain checkpoints, resource
 waits and local fallbacks. This closes the current implementation round; remaining
 boundaries are recorded without starting another subsystem migration.
+
+
+## Thirty-fifth migration implemented — cross-resource stream transfer — 2026-11-04
+
+Runtime `7b850d2bb1954a0933a45708255e1f8adf1abe22` moves the admitted sendfile/splice subsystem onto calling workers: regular files, pipes, Unix streams and TCP retain their original OFD pairs, one imported ABI and the original resource readiness. Memory operations run directly; native file jobs reuse the existing bounded disk pool. Pipe prefix/capacity reservations protect the original resources without holding their mutex over I/O or a parked task. Backpressure releases only the caller’s execution slot.
+
+The same algorithm serves joined execution. Immediately completing calls borrow the original VFS; only retained/native work allocates an island. The existing short native read/write policy applies below 16 KiB, preserving queued inode work and synchronous output. Bulk completion wakes the original execution target and parks on notification rather than fixed polling sleeps. Captured signals distinguish resource waits from accepted in-flight disk I/O, including EINTR and SA_RESTART.
+
+Five counterbalanced unprofiled pairs, each worker performing 500 checked 4-KiB transfers, give these four-worker longest-worker medians:
+
+| Backing / route, 4 workers | Release 1.5.0 | Current | Native macOS | Native ARM Linux, exact ELF | Speedup |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| memory / pipe-pipe | 77.58 ms | 5.07 ms | 3.59 ms | 1.04 ms | 15.31x |
+| memory / file-pipe | 124.69 ms | 2.96 ms | 2.33 ms | 0.33 ms | 42.07x |
+| memory / file-unix | 55.79 ms | 3.38 ms | 1.99 ms | 0.92 ms | 16.53x |
+| memory / socket-pipe | 77.55 ms | 5.05 ms | 2.90 ms | 1.15 ms | 15.35x |
+| private / pipe-pipe | 110.91 ms | 11.95 ms | 3.59 ms | 1.04 ms | 9.28x |
+| private / file-pipe | 141.22 ms | 54.30 ms | 2.33 ms | 0.33 ms | 2.60x |
+| private / file-unix | 80.64 ms | 29.33 ms | 1.99 ms | 0.92 ms | 2.75x |
+| private / socket-pipe | 104.37 ms | 10.68 ms | 2.90 ms | 1.15 ms | 9.78x |
+
+Single-worker memory results are 1.01–1.09x and three private-file/pipe routes are 1.04–1.23x. The private socket/pipe case initially measured 12.82 → 14.04 ms; an additional nine counterbalanced pairs measured 13.38 → 13.13 ms. Both sets remain in the record; no stable speedup is claimed for that case. The rejected first implementation increased private single-worker file/pipe latency to roughly 1.5 seconds by allocating retained state and sleeping for each small transfer. Removing those mechanisms restored the short-call path before integration.
+
+Separate diagnostics reduce four-worker memory cohort rounds from 1,385–3,769 to 18, and two-worker rounds from 872–1,917 to 8–9. Service requests are zero before and after: the previous transfers joined cohorts without service RPCs. Lifecycle/scheduling and actual mapped-file layout work still exist; this is not an entirely coordinator-free application claim.
+
+Setup, thread creation, final verification, close and process startup/teardown are outside the worker timer. All compilation finishes and the native Linux test machine stops before Mac timing. Darwin uses native sendfile for file/socket and checked read/write for pipe routes; Linux runs the identical ELF on ext4. Different API, backing and durability policies prevent generally native-speed or pure coordinator-overhead claims.
+
+Affected Apple/Linux tests pass: kernel **281 each**, Linux ABI **228 each**, VFS **460 each**, with the existing ignored cases retained. Strict checks, shared boundaries and iPad device-target compilation pass. Mac product tests pass **20**, HVF unit checks **4**; real HVF executes all three fixture groups on **1/2/4 CPUs**, with memory and private backing. The production interpreter passes those groups on **1/4 CPUs**. Two existing virtual TCP tests use local larger debug stacks; no production stack changes. Physical iPad testing and unchanged CPU/GPU/media suites are reused or skipped as recorded.
+
+The [source-bound record](../validation/worker-stream-transfer-20261104.json) retains every timing sample, native references, separate diagnostics, hashes and the first implementation’s regression. The [shared transfer contract](../../runtime/docs/architecture/execution-backends.md#cross-resource-stream-transfer-2026-11-04) and [remaining-boundary inventory](../../runtime/docs/architecture/coordination-boundaries.md) describe mapped-file layout checkpoints, owner/dynamic exclusions, lifecycle and mask/control paths. tee/vmsplice remain unsupported; no new coordinator/service thread, polling bus, global algorithm lock, guest memory fence or unsafe block is added.
