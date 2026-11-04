@@ -404,11 +404,11 @@ run it with `/bin/sh`, networking disabled, and four or twelve CPUs. Use a
 separate test storage directory. Failure output includes both the parent error
 and nsexec debug messages; the script exits nonzero if any start fails.
 
-Removing explicit OCI rlimits isolates a separate compatibility gap discovered
-in the initial baseline: cross-process `prlimit64` currently returns `ESRCH`.
-With the default `runc spec` nofile limit, that fails after the PID handshake.
-It is not fixed or counted as a successful case here. A future fix must publish
-process-limit authority consistently rather than add another coordinator RPC.
+Removing explicit OCI rlimits isolated a separate compatibility gap in that
+initial baseline: cross-process `prlimit64` returned `ESRCH`. With the default
+`runc spec` nofile limit, that failed after the PID handshake. The table above
+does not count this configuration as a successful case. It is resolved by the
+follow-up below.
 
 Validation includes all Apple-host VFS tests (494 passed, one ignored), mount
 tests on Apple and Linux hosts (22 passed each), strict VFS Clippy, formatting,
@@ -419,3 +419,39 @@ a new physical-iPad validation. The stable bundle was not replaced or its
 environment restarted; existing service health was checked read-only.
 Source and evidence hashes are in the
 [validation record](../validation/runc-concurrent-mounts-20261104.json).
+
+### Cross-process prlimit follow-up and Mac 1.5.2
+
+Runtime `c973060c485df0ab88352fe35e8ee9cce07646a3` resolves `prlimit64`'s target
+PID/TID in the caller's namespace and uses the caller's memory and credentials
+with the target's existing process-owned limits. Thread-group members share
+limit changes and the FD allocator's atomic soft limit; forks retain independent
+copies. Cross-process permissions check all real/effective/saved target UID/GID
+values against the caller's real IDs, or CAP_SYS_RESOURCE. Raising a hard limit
+uses the caller's capability. No host process limit is touched. These rules
+follow the [Linux resource-limit API](https://man7.org/linux/man-pages/man2/getrlimit.2.html).
+
+The fix preserves the existing joined resource-policy mutation boundary. It
+does not introduce a coordinator RPC, service thread, lock, polling or ordinary
+I/O check, and is not a claim that resource-limit policy has moved onto workers.
+Existing caller-memory preflight and overlapping new/old argument handling are
+preserved.
+
+The same runc pressure test now also passes with the generated default
+`RLIMIT_NOFILE` soft/hard limits of 1024: 24 starts each under Dev at 4/12 CPUs
+and the final stable binary at 12 CPUs, with no failures. A real static-musl
+[probe](../../tests/fixtures/prlimit.c) additionally verifies parent-to-child
+and parent-to-thread updates, both threads observing the limits, actual EMFILE
+enforcement, an unchanged caller, and ESRCH after reaping. It fails on the old
+Dev runtime and passes under native ARM Linux, HVF at 1/4/12 CPUs and the shared
+CPU interpreter at 1/4 CPUs.
+
+The 1.5.2 stable release combines both container fixes with the retained event
+wait, POSIX/real interval timer and signal migrations since 1.5.1. All Apple and
+Linux kernel-conformance tests pass (290 passed, three ignored per host), along
+with 17 kernel unit tests per host. Mac workflow checks, product tests, native
+task stream, independent stable/dev installs, structured exec/multiple shells,
+strict shared checks and iPad FFI compilation pass. Unchanged VFS/ABI, graphics
+and network evidence from the preceding validated migrations is reused.
+Detailed source hashes and commands are in the
+[follow-up validation record](../validation/prlimit-release-1.5.2-20261104.json).

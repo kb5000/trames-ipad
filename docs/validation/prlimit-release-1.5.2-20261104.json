@@ -1,0 +1,377 @@
+{
+  "date": "2026-11-04",
+  "product_version": "1.5.2",
+  "status": "validated; Mac stable/dev 1.5.2 installed and packages verified",
+  "runtime_revision": "c973060c485df0ab88352fe35e8ee9cce07646a3",
+  "mount_fix_revision": "ef714da7d48c4280a788c20a48b287ee17ee94d2",
+  "previous_stable_runtime": "d828821b907f8a0d84df01eb934b778858ef873f",
+  "changes": [
+    "Resolve namespace-visible target PID/TID in prlimit64",
+    "Keep caller credentials/memory separate from target process limits",
+    "Share limits across target thread group and preserve fork copies",
+    "Use caller CAP_SYS_RESOURCE for cross-process authority and hard-limit raises"
+  ],
+  "execution_boundary": {
+    "kind": "Existing joined resource-policy mutation",
+    "new_coordinator_rpc": false,
+    "new_service_thread": false,
+    "new_global_lock_or_polling": false,
+    "worker_local_rlimit_claim": false,
+    "host_process_limits_changed": false
+  },
+  "sources": [
+    {
+      "path": "runtime/crates/trames-session/src/process.rs",
+      "sha256": "615c9794389d275e5b3daca6163b2bd535d281764173bde9864eeb6c95a643e5"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/process_compat.rs",
+      "sha256": "f4c26bbb55fda5db1c01b68c2c7b930b8ae4744c98c13accb7589e8c7ed71036"
+    },
+    {
+      "path": "runtime/docs/architecture/coordination-boundaries.md",
+      "sha256": "f81aca17ca3184a8ec52d38ec14a43d24461e807a5b9386a6c72da1c5a90bbc1"
+    },
+    {
+      "path": "tests/fixtures/prlimit.c",
+      "sha256": "dc5cf9179762e39b393d404ed85db82c157e969fd749b99b7203c6054bfe7deb"
+    }
+  ],
+  "kernel_results": {
+    "apple": {
+      "conformance_passed": 290,
+      "conformance_ignored": 3,
+      "kernel_lib_passed": 17
+    },
+    "linux_arm64": {
+      "conformance_passed": 290,
+      "conformance_ignored": 3,
+      "kernel_lib_passed": 17
+    }
+  },
+  "new_unit_cases": [
+    "prlimit_targets_child_thread_limits_and_keeps_caller_memory_separate",
+    "prlimit_checks_target_ids_and_callers_resource_capability",
+    "prlimit_resolves_nested_pids_and_accepts_the_calling_thread_id"
+  ],
+  "real_probe": {
+    "source": "tests/fixtures/prlimit.c",
+    "static_musl_binary": {
+      "path": "target/local-ci/io/prlimit",
+      "sha256": "dbdff1af09f5fc47f020029583dbb933b74dbc5bcf19506a4cc143dccfc1dd80"
+    },
+    "native_arm_linux": "pass",
+    "hvf_and_interpreter": [
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "returncode": 0,
+        "seconds": 0.008015791000000001,
+        "pass": true,
+        "path": "target/prlimit-release/prlimit-hvf-1.log",
+        "sha256": "a56f109dffb4955e2c0f4da46e724fe39eed3f4047054630219a97b010f9c03d"
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "returncode": 0,
+        "seconds": 0.006789875000000001,
+        "pass": true,
+        "path": "target/prlimit-release/prlimit-hvf-4.log",
+        "sha256": "a56f109dffb4955e2c0f4da46e724fe39eed3f4047054630219a97b010f9c03d"
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "returncode": 0,
+        "seconds": 0.006508875000000001,
+        "pass": true,
+        "path": "target/prlimit-release/prlimit-hvf-12.log",
+        "sha256": "a56f109dffb4955e2c0f4da46e724fe39eed3f4047054630219a97b010f9c03d"
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 1,
+        "returncode": 0,
+        "seconds": 0.5515103330000001,
+        "pass": true,
+        "path": "target/prlimit-release/prlimit-interpreter-1.log",
+        "sha256": "263647236accc3cc0ec7ed79cae73ddb6255cff5d9f124cd34aeb277fed93157"
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 4,
+        "returncode": 0,
+        "seconds": 0.0065731250000000685,
+        "pass": true,
+        "path": "target/prlimit-release/prlimit-interpreter-4.log",
+        "sha256": "263647236accc3cc0ec7ed79cae73ddb6255cff5d9f124cd34aeb277fed93157"
+      }
+    ],
+    "baseline": {
+      "runtime": "ef714da7d48c4280a788c20a48b287ee17ee94d2",
+      "result": "fails with ESRCH on parent-to-thread prlimit as expected",
+      "path": "target/prlimit-release/prlimit-baseline.log",
+      "sha256": "f03f4c35cb0c986145db2bc73393b879196e6aea41c3049d42c31a5309e2225a"
+    },
+    "coverage": [
+      "Parent-to-child FSIZE and parent-to-TID NOFILE updates",
+      "Target leader and thread see same limits",
+      "Actual EMFILE enforcement in target worker",
+      "Caller limits unchanged",
+      "ESRCH after child reaping"
+    ]
+  },
+  "runc_default_limits": {
+    "version": "1.1.15+ds1-2+b4",
+    "probe": "tests/fixtures/runc-concurrent-mounts.sh",
+    "rounds": 3,
+    "concurrency": 8,
+    "empty_tmpfs_padding_mounts": 32,
+    "network": "off",
+    "private_storage": "target/runc-eof/store",
+    "configuration": {
+      "path": "target/prlimit-release/config-default-limits.json",
+      "sha256": "f6b4c60f321f744aa6cbac661eaaced2ed934a23552ef4f5baa830729a6ebaf8"
+    },
+    "bootstrap_script": {
+      "path": "target/prlimit-release/probe-default-limits.sh",
+      "sha256": "655fdab5a1055d5ee09870baff7350c589e963b6b2f3da6722d89e2fd37443d0"
+    },
+    "results": [
+      {
+        "channel": "dev",
+        "cpus": 12,
+        "total": 24,
+        "failed": 0,
+        "pid_pipe_eof": 0,
+        "rlimit_nofile": [
+          1024,
+          1024
+        ],
+        "path": "target/prlimit-release/runc-default-12cpu.log",
+        "sha256": "595904c0b5316df17c7eb3354cea0680cff0ed8b11aa0ee9fbdcf257634234ab"
+      },
+      {
+        "channel": "dev",
+        "cpus": 4,
+        "total": 24,
+        "failed": 0,
+        "pid_pipe_eof": 0,
+        "rlimit_nofile": [
+          1024,
+          1024
+        ],
+        "path": "target/prlimit-release/runc-default-4cpu.log",
+        "sha256": "9c12ff096e8a8591ff4d9b9c1e5abd1141ad5892970a58a6ff358a0cd5d2affc"
+      },
+      {
+        "channel": "stable",
+        "cpus": 12,
+        "total": 24,
+        "failed": 0,
+        "pid_pipe_eof": 0,
+        "rlimit_nofile": [
+          1024,
+          1024
+        ],
+        "path": "target/prlimit-release/runc-stable-12cpu.log",
+        "sha256": "60240e064b3f56e5d8f60561a4051628e5569da9791dd32be8ee52a3519e9461"
+      }
+    ],
+    "total_starts": 72,
+    "failed": 0,
+    "note": "Generated runc spec with noninteractive /bin/true payload, including default explicit RLIMIT_NOFILE 1024/1024. Tests do not copy application data or run paid API workflows."
+  },
+  "checks": [
+    {
+      "check": "apple_kernel",
+      "result": "pass",
+      "path": "target/prlimit-release/kernel-tests.log",
+      "sha256": "8948494a10f5845fc9f091162b625aaa96fd659b309abbdf68118ea3d2989cc2"
+    },
+    {
+      "check": "linux_kernel",
+      "result": "pass",
+      "path": "target/local-ci/io/prlimit-linux-kernel-tests.log",
+      "sha256": "a592dc2ffe8a89c288378a51f2673b32107e946605b2e995e33542ca889f3f36"
+    },
+    {
+      "check": "shared_clippy",
+      "result": "pass",
+      "path": "target/prlimit-release/kernel-clippy.log",
+      "sha256": "b68eb9c2843f3e39b74ee7ca3346bbe3c0d7a20fcaefc6fc75b8faa511714bd0"
+    },
+    {
+      "check": "runtime_format",
+      "result": "pass",
+      "path": "target/prlimit-release/runtime-format.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "check": "ipad_ffi",
+      "result": "pass",
+      "path": "target/prlimit-release/ipad-check.log",
+      "sha256": "e5560ac39591ed8118ed181bc1b9bf4cd8e77b9d6b274fea99549f0f76a36281"
+    },
+    {
+      "check": "ipad_execution_boundaries",
+      "result": "pass",
+      "path": "target/prlimit-release/ipad-boundaries.log",
+      "sha256": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651"
+    },
+    {
+      "check": "native_linux_probe",
+      "result": "pass",
+      "path": "target/local-ci/io/prlimit-native.log",
+      "sha256": "263647236accc3cc0ec7ed79cae73ddb6255cff5d9f124cd34aeb277fed93157"
+    },
+    {
+      "check": "mac_cli_exec",
+      "result": "pass",
+      "path": "target/prlimit-release/exec.log",
+      "sha256": "d70d065480e192e32649dbd74b910c4d800c9f4087e113ad444f5a8617afb041"
+    },
+    {
+      "check": "mac_channels",
+      "result": "pass",
+      "path": "target/prlimit-release/channels.log",
+      "sha256": "fd6489aa55824301e471ebbc8cbc1acf74e8d31672be11c23c2362c4eb00a5c6"
+    },
+    {
+      "check": "dev_build",
+      "result": "pass",
+      "path": "target/prlimit-release/build-dev.log",
+      "sha256": "51a9ec5a25e21d337d51a2c9b382307c93b34d6d5ddcd4616d42755a86e43933"
+    },
+    {
+      "check": "stable_build",
+      "result": "pass",
+      "path": "target/prlimit-release/build-stable.log",
+      "sha256": "e3261b16b22a2dcf7f2bf83daeec03ec1e803db78dab968f0da5377560f4f601"
+    }
+  ],
+  "mac_workflow": {
+    "workflow": ".github/workflows/macos.yml",
+    "job": "build",
+    "steps_1_through_8": "all passed using repository local CI runner",
+    "source_bound_summary": {
+      "path": "target/prlimit-release/mac-ci/summary.json",
+      "sha256": "89ade88da9754d1a5f99be517e2f8fd52c825dcf97a74277c90e1ace908d0231"
+    },
+    "step_9": "same Dev build command passed; see dev_build",
+    "step_10": "same stable build command passed; see stable_build",
+    "steps_11_and_12": "pass; same package commands with unchanged corresponding native-driver source archive added",
+    "completion": "All 12 workflow shell steps passed locally; first 8 through the repository runner, builds/packages through the identical commands with an additional source-archive argument."
+  },
+  "reused_unchanged_validation": [
+    "VFS Apple 494 passed, one ignored; mount tests Apple/Linux 22 each at ef714da",
+    "Linux ABI and resource-level I/O/timer/signal acceptance from the preceding validated migrations",
+    "Unchanged CPU, native graphics, video and network code checks"
+  ],
+  "installation": {
+    "stable": {
+      "version": "Trames 1.5.2 (stable) runtime c973060c485df0ab88352fe35e8ee9cce07646a3",
+      "binary_sha256": "20d484d027ab3b0fc957133f1b07a79f4d3d62235531ee653409770825a2e976",
+      "icon_sha256": "0c756a6656a6d16f2b1d83a0ba71fa45ec646a2f74525d6d5e6163589c7c8686",
+      "codesign_verify": "pass"
+    },
+    "dev": {
+      "version": "Trames Dev 1.5.2 (dev) runtime c973060c485df0ab88352fe35e8ee9cce07646a3",
+      "binary_sha256": "030b80ca8219658500d2197cf4e9b4b47e8675236decc5d8957318cdf2f7a2b7",
+      "icon_sha256": "0c756a6656a6d16f2b1d83a0ba71fa45ec646a2f74525d6d5e6163589c7c8686",
+      "codesign_verify": "pass"
+    },
+    "existing_environments_restarted": false
+  },
+  "service_health": {
+    "before": [
+      {
+        "path": "target/prlimit-release/stable-before-version.txt",
+        "sha256": "b27917cccaee1829b04fc4c8550af28b68fee40748d7f7ff519a45ca001d4459"
+      },
+      {
+        "path": "target/prlimit-release/stable-before-services.txt",
+        "sha256": "0a203234a8df27d145568a8f37985297fd9467f7a2eedf6a846d8f78c34f6f85"
+      },
+      {
+        "path": "target/prlimit-release/stable-before-health.txt",
+        "sha256": "9a3c12c3196ac988f6bfb54e0abe5cde7157dd1cb9a7b611e653d8298a797db3"
+      }
+    ],
+    "after": [
+      {
+        "path": "target/prlimit-release/stable-after-services.txt",
+        "sha256": "0a203234a8df27d145568a8f37985297fd9467f7a2eedf6a846d8f78c34f6f85"
+      },
+      {
+        "path": "target/prlimit-release/stable-after-health.txt",
+        "sha256": "9a3c12c3196ac988f6bfb54e0abe5cde7157dd1cb9a7b611e653d8298a797db3"
+      }
+    ],
+    "production_store_modified_by_reproducer": false,
+    "environments_restarted": false,
+    "note": "Existing Debian/Techo and separate Docker service remain running on the old mapped runtime. Restart the environment at a suitable time to load 1.5.2."
+  },
+  "ipad": {
+    "paired_runtime_pin": "c973060c485df0ab88352fe35e8ee9cce07646a3",
+    "device_target_compile": "pass",
+    "physical_device_release_or_install": false
+  },
+  "distribution": {
+    "channels": [
+      "stable",
+      "dev"
+    ],
+    "architecture": "arm64",
+    "signing": "local ad-hoc; unnotarized as previously selected",
+    "native_corresponding_sources": {
+      "path": "target/release-20261101/Trames-native-driver-sources.tar.gz",
+      "sha256": "b59f133ac4d113c18c31f4f8764f25289493e5c279a92c545ac5ba5e5bd818a5"
+    },
+    "artifacts": [
+      {
+        "path": "target/release-1.5.2/Trames-1.5.2-mac-arm64-unnotarized.zip",
+        "size": 26603859,
+        "sha256": "94cc326ec659e3485cddc35b353693733b49bd281389f1468c9d0a5faa8606b0",
+        "build": {
+          "version": "1.5.2",
+          "product_revision": "ec4c174030dfcf604506e8fab320e11a8d2d98bf",
+          "runtime_revision": "c973060c485df0ab88352fe35e8ee9cce07646a3",
+          "development": true,
+          "channel": "stable",
+          "notarized": false,
+          "architecture": "arm64"
+        },
+        "zip_integrity": "pass",
+        "member_checksums": "pass",
+        "installed_binary_and_logo_match": true
+      },
+      {
+        "path": "target/release-1.5.2/Trames-Dev-1.5.2-mac-arm64-unnotarized.zip",
+        "size": 26604655,
+        "sha256": "9b4cb8ca070c6f9fed19e8e3d6522d37c0fec1d264d6ded51da7dd9f1398d78e",
+        "build": {
+          "version": "1.5.2",
+          "product_revision": "ec4c174030dfcf604506e8fab320e11a8d2d98bf",
+          "runtime_revision": "c973060c485df0ab88352fe35e8ee9cce07646a3",
+          "development": true,
+          "channel": "dev",
+          "notarized": false,
+          "architecture": "arm64"
+        },
+        "zip_integrity": "pass",
+        "member_checksums": "pass",
+        "installed_binary_and_logo_match": true
+      }
+    ]
+  },
+  "references": [
+    "https://man7.org/linux/man-pages/man2/getrlimit.2.html",
+    "docs/validation/runc-concurrent-mounts-20261104.json",
+    "docs/validation/worker-event-waits-20261104.json",
+    "docs/validation/worker-posix-timers-20261104.json",
+    "docs/validation/worker-signals-20261104.json"
+  ],
+  "product_revision": "ec4c174030dfcf604506e8fab320e11a8d2d98bf"
+}
