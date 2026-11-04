@@ -1,0 +1,815 @@
+{
+  "date": "2026-11-05",
+  "runtime_revision": "a005aeacab7c133ac47bd47b46cdb8c6697252dc",
+  "baseline_runtime_revision": "decc86ef7ea3a81611ab1410046d2a3deb8b15d4",
+  "fixture": {
+    "source": "tests/fixtures/worker-job-control.c",
+    "source_sha256": "fdab025dc0dfde60513702acf1a37c380d9845c5dc1327af035753709887291a",
+    "elf_sha256": "650c860c66bd00a56b8dcc5fe427dabd8637964f90edc4b705714c23222c90ad",
+    "compiler": "ARM Linux musl-gcc -static -O2 -Wall -Wextra -Werror -pthread"
+  },
+  "method": {
+    "workload": "Two-thread child group, parent controller and unrelated spinning peer. Each round sends STOP, waits WUNTRACED, sends CONT and waits WCONTINUED. Compatibility alternates STOP/TSTP/TTIN/TTOU and checks both child counters remain unchanged during a 2 ms stopped interval.",
+    "samples_per_phase_per_cpu": 7,
+    "ordering": "counterbalanced before/after pairs",
+    "native_reference": "Existing local ARM Linux Lima instance, 6 virtual CPUs. taskset affinity 1 and 4 CPUs. Not bare-metal Darwin.",
+    "claims": "Subsystem latency only; no whole-browser or whole-system speedup claim. One-CPU owner scheduling remains unchanged. Native results are substantially faster."
+  },
+  "binaries": {
+    "before": {
+      "path": "/Users/main/dev/trames/target/worker-job-control/before-mac-run",
+      "sha256": "946addf1197d6e34adfd5f02f2c0aa3cfe3656cd32aaf5415ed48d6a25750a90"
+    },
+    "after": {
+      "path": "/Users/main/dev/trames-mac/target/release/Trames Dev.app/Contents/MacOS/trames-mac-run",
+      "sha256": "3af2ce89ae46c2945ff9a188ac70d83bab3309f18b03d9a295f8a0cb8127469d"
+    }
+  },
+  "summary": [
+    {
+      "cpus": 1,
+      "rounds": 100,
+      "before_median_ns": 1734901542,
+      "after_median_ns": 1735042333,
+      "speedup": 0.9999188544294729,
+      "native_arm_linux_median_ns": 3306253
+    },
+    {
+      "cpus": 4,
+      "rounds": 100,
+      "before_median_ns": 404772958,
+      "after_median_ns": 68187000,
+      "speedup": 5.9362188980304165,
+      "native_arm_linux_median_ns": 2959539
+    },
+    {
+      "cpus": 12,
+      "rounds": 100,
+      "before_median_ns": 404725708,
+      "after_median_ns": 64167250,
+      "speedup": 6.3073562915661805,
+      "native_arm_linux_median_ns": null
+    }
+  ],
+  "samples": [
+    {
+      "cpus": 1,
+      "sample": 0,
+      "phase": "before",
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 1735452125
+    },
+    {
+      "cpus": 1,
+      "sample": 0,
+      "phase": "after",
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 1735074917
+    },
+    {
+      "cpus": 1,
+      "sample": 1,
+      "phase": "after",
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 1734968625
+    },
+    {
+      "cpus": 1,
+      "sample": 1,
+      "phase": "before",
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 1734774917
+    },
+    {
+      "cpus": 1,
+      "sample": 2,
+      "phase": "before",
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 1734901542
+    },
+    {
+      "cpus": 1,
+      "sample": 2,
+      "phase": "after",
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 1735288750
+    },
+    {
+      "cpus": 1,
+      "sample": 3,
+      "phase": "after",
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 1735042333
+    },
+    {
+      "cpus": 1,
+      "sample": 3,
+      "phase": "before",
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 1734848042
+    },
+    {
+      "cpus": 1,
+      "sample": 4,
+      "phase": "before",
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 1735988458
+    },
+    {
+      "cpus": 1,
+      "sample": 4,
+      "phase": "after",
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 1735055708
+    },
+    {
+      "cpus": 1,
+      "sample": 5,
+      "phase": "after",
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 1734966833
+    },
+    {
+      "cpus": 1,
+      "sample": 5,
+      "phase": "before",
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 1734900250
+    },
+    {
+      "cpus": 1,
+      "sample": 6,
+      "phase": "before",
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 1735062875
+    },
+    {
+      "cpus": 1,
+      "sample": 6,
+      "phase": "after",
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 1735013417
+    },
+    {
+      "cpus": 4,
+      "sample": 0,
+      "phase": "before",
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 404694875
+    },
+    {
+      "cpus": 4,
+      "sample": 0,
+      "phase": "after",
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 60151625
+    },
+    {
+      "cpus": 4,
+      "sample": 1,
+      "phase": "after",
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 64156000
+    },
+    {
+      "cpus": 4,
+      "sample": 1,
+      "phase": "before",
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 404774750
+    },
+    {
+      "cpus": 4,
+      "sample": 2,
+      "phase": "before",
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 404679834
+    },
+    {
+      "cpus": 4,
+      "sample": 2,
+      "phase": "after",
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 64289125
+    },
+    {
+      "cpus": 4,
+      "sample": 3,
+      "phase": "after",
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 69674458
+    },
+    {
+      "cpus": 4,
+      "sample": 3,
+      "phase": "before",
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 404773834
+    },
+    {
+      "cpus": 4,
+      "sample": 4,
+      "phase": "before",
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 406211000
+    },
+    {
+      "cpus": 4,
+      "sample": 4,
+      "phase": "after",
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 80164333
+    },
+    {
+      "cpus": 4,
+      "sample": 5,
+      "phase": "after",
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 72183542
+    },
+    {
+      "cpus": 4,
+      "sample": 5,
+      "phase": "before",
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 404772958
+    },
+    {
+      "cpus": 4,
+      "sample": 6,
+      "phase": "before",
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 404740291
+    },
+    {
+      "cpus": 4,
+      "sample": 6,
+      "phase": "after",
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 68187000
+    },
+    {
+      "cpus": 12,
+      "sample": 0,
+      "phase": "before",
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 405057666
+    },
+    {
+      "cpus": 12,
+      "sample": 0,
+      "phase": "after",
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 64167250
+    },
+    {
+      "cpus": 12,
+      "sample": 1,
+      "phase": "after",
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 62182500
+    },
+    {
+      "cpus": 12,
+      "sample": 1,
+      "phase": "before",
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 405753125
+    },
+    {
+      "cpus": 12,
+      "sample": 2,
+      "phase": "before",
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 404676000
+    },
+    {
+      "cpus": 12,
+      "sample": 2,
+      "phase": "after",
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 70199875
+    },
+    {
+      "cpus": 12,
+      "sample": 3,
+      "phase": "after",
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 68223458
+    },
+    {
+      "cpus": 12,
+      "sample": 3,
+      "phase": "before",
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 404725708
+    },
+    {
+      "cpus": 12,
+      "sample": 4,
+      "phase": "before",
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 404837709
+    },
+    {
+      "cpus": 12,
+      "sample": 4,
+      "phase": "after",
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 54078875
+    },
+    {
+      "cpus": 12,
+      "sample": 5,
+      "phase": "after",
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 70421292
+    },
+    {
+      "cpus": 12,
+      "sample": 5,
+      "phase": "before",
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 404669167
+    },
+    {
+      "cpus": 12,
+      "sample": 6,
+      "phase": "before",
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 404651667
+    },
+    {
+      "cpus": 12,
+      "sample": 6,
+      "phase": "after",
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 56262666
+    }
+  ],
+  "native_samples": [
+    {
+      "cpus": 1,
+      "sample": 0,
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 3301795
+    },
+    {
+      "cpus": 1,
+      "sample": 1,
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 3300628
+    },
+    {
+      "cpus": 1,
+      "sample": 2,
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 3295628
+    },
+    {
+      "cpus": 1,
+      "sample": 3,
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 3309669
+    },
+    {
+      "cpus": 1,
+      "sample": 4,
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 3317211
+    },
+    {
+      "cpus": 1,
+      "sample": 5,
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 3325503
+    },
+    {
+      "cpus": 1,
+      "sample": 6,
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 3306253
+    },
+    {
+      "cpus": 4,
+      "sample": 0,
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 2561951
+    },
+    {
+      "cpus": 4,
+      "sample": 1,
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 3030374
+    },
+    {
+      "cpus": 4,
+      "sample": 2,
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 3080833
+    },
+    {
+      "cpus": 4,
+      "sample": 3,
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 2482492
+    },
+    {
+      "cpus": 4,
+      "sample": 4,
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 3043124
+    },
+    {
+      "cpus": 4,
+      "sample": 5,
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 2959539
+    },
+    {
+      "cpus": 4,
+      "sample": 6,
+      "mode": "loops",
+      "cont_policy": 0,
+      "rounds": 100,
+      "elapsed_ns": 2520576
+    }
+  ],
+  "acceptance": {
+    "hvf": [
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "mode": 0,
+        "returncode": 0
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "mode": 1,
+        "returncode": 0
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "mode": 2,
+        "returncode": 0
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "mode": 0,
+        "returncode": 0
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "mode": 1,
+        "returncode": 0
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "mode": 2,
+        "returncode": 0
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "mode": 0,
+        "returncode": 0
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "mode": 1,
+        "returncode": 0
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "mode": 2,
+        "returncode": 0
+      }
+    ],
+    "interpreter": [
+      {
+        "backend": "interpreter",
+        "cpus": 1,
+        "mode": 0,
+        "returncode": 0
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 1,
+        "mode": 1,
+        "returncode": 0
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 1,
+        "mode": 2,
+        "returncode": 0
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 4,
+        "mode": 0,
+        "returncode": 0
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 4,
+        "mode": 1,
+        "returncode": 0
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 4,
+        "mode": 2,
+        "returncode": 0
+      }
+    ],
+    "native_linux": [
+      {
+        "mode": "compat",
+        "cont_policy": 0,
+        "rounds": 8,
+        "elapsed_ns": 19559614
+      },
+      {
+        "mode": "compat",
+        "cont_policy": 1,
+        "rounds": 8,
+        "elapsed_ns": 18687797
+      },
+      {
+        "mode": "compat",
+        "cont_policy": 2,
+        "rounds": 8,
+        "elapsed_ns": 17662256
+      }
+    ],
+    "physical_ipad_run": false
+  },
+  "integration": [
+    {
+      "case": "go-gc",
+      "returncode": 0,
+      "seconds": 3.133986917
+    },
+    {
+      "case": "docker",
+      "returncode": 0,
+      "seconds": 81.400429209
+    }
+  ],
+  "integration_workload": {
+    "go_gc": "30 stock Docker CLI starts with GOGC=1 and normal asynchronous preemption",
+    "docker": "8 isolated start/health/exec/inspect/stop/remove cycles at 12 CPUs",
+    "data": "Private regression store, public Debian tools and cached Alpine image. No business deployment or frontend activation."
+  },
+  "checks": {
+    "apple-tests-final.log": {
+      "sha256": "0e85e2f0e17a2b4a1710532558ee1bfde1db5209a7c0c006f4321c3ef9c900cc",
+      "passed": true,
+      "process_cases": 297,
+      "kernel_cases": 40,
+      "ignored_cases": 3
+    },
+    "linux-tests-final.log": {
+      "sha256": "4fa2296978c053cf711aa9f998814efbb4119f2069e56f446b40a00b0924d15a",
+      "passed": true,
+      "process_cases": 297,
+      "kernel_cases": 40,
+      "ignored_cases": 3
+    },
+    "apple-clippy-final.log": {
+      "sha256": "d2422fd78b194c4d83bd8d1be910d530b1daae5c9860e7920a74eee81fa792d5",
+      "passed": true
+    },
+    "ipad-final-check.log": {
+      "sha256": "04b0cb666f621a2aa89d120571ae73e11fcb519f0215dc477abe7fccdc783e3d",
+      "passed": true
+    },
+    "fmt.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "passed": true
+    },
+    "runtime-fmt.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "passed": true
+    },
+    "ipad-boundaries.log": {
+      "sha256": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651",
+      "passed": true
+    },
+    "mac-boundaries.log": {
+      "sha256": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651",
+      "passed": true
+    }
+  },
+  "real_regression_fixed": {
+    "symptom": "After first successful group stop/continue, later thread-directed TSTP remained pending forever on a parked member. Tracing could hide the race.",
+    "cause": "A STOP wake remained fired when the task parked; subsequent CONT and catchable-stop wakes were coalesced into the old notification.",
+    "fix": "Rearm the original task signal under the run-queue mutex before final level-state checks at parking/custody boundaries. No new wake transport or polling thread.",
+    "regression": "Four consecutive stop/wait/continue/wait cycles with one and four executor slots; zero owner requests."
+  },
+  "remaining_boundaries": [
+    "Default termination and Epoch::finish still stop the cohort",
+    "Actual exit/group-exit cleanup, clear_tid, robust-futex cleanup and final CPU/Memory/VFS/native release",
+    "Structural fork/exec/reparenting, namespace-init teardown and security-policy changes",
+    "Tracing, original excluded owner resources, vfork and accepted mapped-file/legacy-owner work retain actual dependencies"
+  ],
+  "stable_install": {
+    "version": "1.5.3",
+    "binary_sha256": "4f40615213e731b2a4ef9d8c6a0e85c5c7bdf31ab0c60b0354b55113f2a6a55d",
+    "changed_by_this_batch": false
+  },
+  "log_hashes": {
+    "metrics-before.log": "aeb25cd3f15fa52827af93f8afead8ff166cdcc9ef33473ed11747b684458736",
+    "metrics-after.log": "4a87bcafc4553c762f584b423d4817457bcb932344f14faf6725f64c219a0147",
+    "go-gc-integration.log": "e8dd5e3fae6fa8b3df1090acd43b111cb7b1c7e49b8c57ade35be6d498d7b52e",
+    "docker-integration.log": "772dfda0f04590b592c46335242a5269465e0277c923bfbe87da52de28c42d0b",
+    "native-compat.log": "e3e7e7a4bf42267400464bfcfb565f519db24e9c321b188eca7424d69cbdb7d0",
+    "native-benchmark.log": "2dc18eafebe2f155b4191fc2d890f54f9687582e6e1a52b0bc8a99eb8cd5dc24"
+  },
+  "execution_metrics": {
+    "before": {
+      "metrics": {
+        "cohort_rounds": 205,
+        "cohort_stop_us": 398863,
+        "service_caller_wait_us": 0,
+        "service_requests": 0,
+        "serviced_syscalls": 0,
+        "syscalls": 443,
+        "vm_local_syscalls": 3,
+        "worker_direct_syscalls": 0,
+        "worker_fd_syscalls": 0,
+        "worker_file_syscalls": 0,
+        "worker_futex_waits": 4,
+        "worker_futex_wakes": 1,
+        "worker_gpu_calls": 0,
+        "worker_gpu_waits": 0,
+        "worker_poll_syscalls": 0,
+        "worker_socket_syscalls": 0,
+        "worker_syscalls": 224,
+        "worker_task_resumes": 1,
+        "worker_uring_syscalls": 0
+      },
+      "cohort_return_syscalls": "[(129, 67), (130, 67), (131, 66), (94, 2), (220, 2), (93, 1), (154, 1)]"
+    },
+    "after": {
+      "metrics": {
+        "cohort_rounds": 6,
+        "cohort_stop_us": 2019,
+        "service_caller_wait_us": 0,
+        "service_requests": 0,
+        "serviced_syscalls": 0,
+        "syscalls": 443,
+        "vm_local_syscalls": 3,
+        "worker_direct_syscalls": 0,
+        "worker_fd_syscalls": 0,
+        "worker_file_syscalls": 0,
+        "worker_futex_waits": 104,
+        "worker_futex_wakes": 1,
+        "worker_gpu_calls": 0,
+        "worker_gpu_waits": 0,
+        "worker_poll_syscalls": 0,
+        "worker_socket_syscalls": 0,
+        "worker_syscalls": 424,
+        "worker_task_resumes": 296,
+        "worker_uring_syscalls": 0
+      },
+      "cohort_return_syscalls": "[(94, 2), (220, 2), (93, 1), (154, 1)]"
+    }
+  },
+  "final_dev_install": {
+    "runtime_revision": "a005aeacab7c133ac47bd47b46cdb8c6697252dc",
+    "binary_sha256": "284bc30e312ef3ef0dc719a2a6c2d594895329e4404162986e4aa50259defcb1",
+    "metadata_only_pin_rebuild": true,
+    "measured_runtime_source_unchanged": true,
+    "signed_bundle_verified": true,
+    "pinned_smoke": {
+      "cpus": 12,
+      "modes": [
+        0,
+        1,
+        2
+      ],
+      "rounds_per_mode": 8,
+      "passed": true
+    },
+    "source_tree": "b90e486e7e6071e8659c8fcb1a93234141fc0f3a"
+  }
+}

@@ -3048,3 +3048,71 @@ twelve CPUs. The successful eight-round run contains no temporary event tracing.
 Mac Dev is installed from this paired runtime pin; the stable binary hash is
 unchanged. Failed pilot logs, both custody fixes and every timing sample remain
 in the source-bound evidence.
+
+## 41. Original thread-group STOP/CONT and wake custody (2026-11-05)
+
+STOP/CONT now runs on the source executors over one original shared thread-group
+control object. It replaces owner-private stopped/saved-state wrappers with a
+stop overlay over the original ready, futex, sleep, child/signal and I/O/GPU
+waits. Generation clears opposing pending signals under the group lock;
+callbacks execute after unlocking. Guest send APIs, timers, resource/FASYNC
+signals and parent-death generation use the same path. Masked or ignored CONT
+still resumes the group. Same-session permissions and orphaned job-control
+groups retain Linux behavior.
+
+An assignment holds a group execution lease. STOP interrupts only this group's
+active CPUs; WUNTRACED/SIGCHLD waits for every live member and accepted
+uninterruptible operation. An owner VM execution batch also participates, so it
+cannot acknowledge stopped and then execute guest instructions. Pending KILL
+suppresses a late stop acknowledgement. Original waits retain operands, OFDs,
+subscriptions, deadlines and eventual results without replaying accepted work.
+Stopped user poll/socket/signal deadlines do not keep executors busy.
+
+Real multi-round acceptance exposed a lost wake hidden by syscall tracing:
+a STOP notification remained fired when a stopped job parked, so later CONT
+and thread-directed TSTP notifications coalesced into that old wake. The queue
+now rearms the original task signal under its existing mutex before checking
+level state and parking. Four consecutive stop/wait/continue/wait cycles pass
+with one and four execution slots and zero owner requests. This uses the
+existing queue and notification, with no new control thread or polling bus.
+
+Seven counterbalanced pairs measure 100 STOP/wait/CONT/wait rounds with a
+two-thread target group, parent controller and unrelated spinning peer:
+
+| CPUs | Previous HVF | New HVF | Relative speed | Native ARM Linux |
+| ---: | ---: | ---: | ---: | ---: |
+| 1 | 1734.902 ms | 1735.042 ms | 1.000x | 3.306 ms |
+| 4 | 404.773 ms | 68.187 ms | 5.936x | 2.960 ms |
+| 12 | 404.726 ms | 64.167 ms | 6.307x | — |
+
+The single-CPU owner scheduling path is unchanged; this is not a claim that it
+approaches native latency. Native measurements use the existing ARM Linux Lima
+instance with one/four-CPU taskset affinity, not bare-metal Darwin. Multi-CPU
+latency also remains substantially above native. This is a job-control result,
+not an extrapolation to Firefox or all workloads.
+
+A separate four-CPU diagnostic reduces cohort rounds from 205 to 6 and signal
+syscall returns from 200 to zero. Cohort stop time drops from 398.863 ms to
+2.019 ms; both paths have zero service requests. Fork, setpgid and actual exits
+still appear as the expected structural returns. The final normal build has no
+temporary lifecycle tracing.
+
+[Source-bound measurements and acceptance](../validation/worker-job-control-20261105.json)
+include 297 process cases and 40 kernel cases on both Apple and ARM Linux
+(three unchanged ignored process cases), strict affected checks, project/fmt
+checks and the iPad device-target compile. Real compatibility passes HVF at
+one/four/twelve CPUs and the production interpreter at one/four CPUs, each with
+ignored, blocked and caught SIGCONT. Native reference compatibility passes all
+three dispositions. The clean Mac binary also passes 30 normal-preemption Go
+GC stress starts and eight isolated twelve-CPU Docker lifecycle rounds.
+Physical-iPad execution is not claimed. Unchanged CPU/ABI/VFS/graphics results
+are reused rather than rerunning unrelated suites.
+
+**Lifecycle removal remains open.** `Epoch::finish`, default termination,
+exit/group-exit cleanup, clear_tid/robust-futex cleanup, final resource release,
+structural fork/exec/reparenting and namespace-init teardown still retain their
+actual dependencies. Tracing, vfork and accepted mapped-file/legacy-owner work
+are explicit boundaries; a stop does not discard those operations to obtain
+an early acknowledgement. The common implementation is pinned by both products.
+Mac Dev is the installation target; the stable 1.5.3 binary/environment remains
+separate and unchanged by this development batch.
