@@ -2847,3 +2847,26 @@ Nine-pair rechecks with 5,000 loops confirm the pre-existing unmasked ppoll four
 Concentrated Apple/Linux acceptance passes 283 kernel and 229 ABI cases each, plus signal-kernel tests, strict affected clippy/format checks, paired project boundaries and the iPad device-target FFI check. The same static ARM64 fixture passes nine cases per run on native Linux, Mac HVF with 1/2/4 CPUs and the production interpreter with 1/4 CPUs. It covers raw timeout updates/read-only copyout, pending and arriving FASYNC signals and exact handler/sigreturn masks. Unit regressions also cover original epoll close/reuse and one-time ALLOW/ERRNO seccomp evaluation across parking. Unchanged release acceptance is reused; physical iPad and Firefox performance are not claimed.
 
 The [source-bound record](../validation/worker-event-waits-20261104.json) contains every sample, binary/source hashes, native references and separate diagnostics. The [shared event-wait contract](../../runtime/docs/architecture/execution-backends.md#retained-event-wait-subsystem-2026-11-04) and [remaining boundaries](../../runtime/docs/architecture/coordination-boundaries.md) retain tracing, excluded owner/dynamic FDs, unavailable source pumps, actual legacy signal/task effects, VM/layout and lifecycle work. Mac Dev is updated for this development batch; stable release 1.5.1 is kept separate.
+
+
+## Thirty-seventh migration implemented — POSIX and real interval timers — 2026-11-04
+
+Runtime `2a5d554fba9c7bd6c17ef1e313828a15ecd95010` moves all seven previously supported timer APIs—timer_create/gettime/getoverrun/settime/delete and getitimer/setitimer—onto calling workers. The common Mac/iPad implementation owns original timer objects and signal-target incarnations. Queries lock only their object after namespace lookup; creation/deletion protect the timer namespace. A short shared deadline-index transaction publishes expiry hints. Existing executors process bounded due batches outside the execution-queue mutex; an expiry alone no longer joins the whole cohort.
+
+SIGEV_NONE installs no asynchronous target/deadline: queries calculate its current periodic phase lazily and overrun remains zero. Ordinary joined short timer controls also keep the CPU quantum. Native Linux comparison corrected the prior timer_settime flag rejection and preserves ITIMER_REAL across exec while deleting POSIX timers. Fork inherits neither; final process exit cleans up the remaining objects.
+
+Five counterbalanced unprofiled pairs, 500 iterations per worker, give these four-worker longest-worker medians. The baseline is the previous Mac Dev/runtime `6417710`, including the event-wait migration:
+
+| Timer operation, 4 workers | Previous Dev | Current | Native macOS | Native ARM Linux, exact ELF | Speedup |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| POSIX gettime, SIGEV_NONE | 56.72 ms | 0.91 ms | — | 0.11 ms | 62.16x |
+| POSIX settime, SIGEV_NONE | 56.21 ms | 0.91 ms | — | 0.13 ms | 61.63x |
+| POSIX create/delete, SIGEV_NONE | 111.59 ms | 1.68 ms | — | 0.80 ms | 66.30x |
+| getitimer, ITIMER_REAL | 56.70 ms | 0.93 ms | 0.15 ms | 0.51 ms | 60.93x |
+| POSIX settime, SIGEV_THREAD_ID | 56.12 ms | 1.11 ms | — | 0.21 ms | 50.51x |
+
+Separate diagnostics reduce four-worker cohort rounds from 1,810–3,628 to 18–20. Service requests are zero on both sides: prior timer calls joined cohorts without RPCs. Nine-pair single-worker rechecks with 5,000 iterations improve 1.10–1.15x. The existing no-timer ppoll path is within 1% on one/four workers. These results isolate API/index costs; the notified settime case resets future deadlines, rather than claiming a native interrupt-latency or whole-Firefox score.
+
+Concentrated Apple/Linux acceptance passes 285 kernel and 15 signal/timer-kernel cases each; the unchanged Linux ABI suite reuses its 229 passing cases each. The same final static ARM64 fixture passes five cases on native Linux, Mac HVF with 1/2/4 CPUs and the production interpreter with 1/4 CPUs: relative/absolute clocks, ownership/deletion, lazy notification-free periods, payload/overrun, exact thread targets, masked waits and fork/exec. Existing libc SIGEV_THREAD callbacks and all 25 signalfd workflows additionally pass HVF on one/four CPUs. A source-worker regression completes create/arm, expiry, caught handler/sigreturn and delete on one existing slot with zero service requests; seven API cases check one-time ALLOW/ERRNO seccomp. Strict affected clippy, format, paired boundaries, Mac product tests and iPad device-target FFI compilation pass. Physical iPad/Firefox acceptance is not claimed.
+
+The [source-bound validation record](../validation/worker-posix-timers-20261104.json) retains full timings, native references, binary/source hashes and separate diagnostics. The [shared timer contract](../../runtime/docs/architecture/execution-backends.md#shared-posix-and-real-interval-timers-2026-11-04) and [remaining-boundary inventory](../../runtime/docs/architecture/coordination-boundaries.md) preserve real lifecycle/default signal effects, legacy owner waits and unsupported CPU-clock timers. No new timer/coordinator/service thread, polling bus, ordinary-memory fence, unsafe block or global algorithm lock is added.
