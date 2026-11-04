@@ -1,0 +1,135 @@
+{
+  "date": "2026-11-04",
+  "product": "Trames iPad",
+  "version": "1.5.2",
+  "build": "48",
+  "status": "stable and Dev built, signed, installed and launched on the paired physical iPad",
+  "runtime_revision": "c973060c485df0ab88352fe35e8ee9cce07646a3",
+  "model": "iPad Air 11-inch (M3)",
+  "configuration": {
+    "stable": "Release",
+    "dev": "Debug"
+  },
+  "source_files": [
+    {
+      "path": "apps/ios/project.yml",
+      "sha256": "546f79156218d95d4ac649a2641b6e73c575b4983b5f9dd54074c9b7982d6d3a"
+    },
+    {
+      "path": "runtime-version.json",
+      "sha256": "43b71ef79bbac0615f58c0deb7f833cd040e74c5641223a1ef96f51ea4bd9ea2"
+    }
+  ],
+  "native_build": {
+    "rust_static_library_sha256": "07439e905440e5eb02fabac1f31aa39b8392e3db2d4ec1cd4eb441feb3575753",
+    "moltenvk_library_sha256": "2b629b4c9049dcf9c778a13717c62cfcb82245437030122ce8ca3d1edf1c1d02",
+    "static_linkage": "verified; no libtrames_ffi.dylib dependency",
+    "fixed_shared_cargo_cache": true,
+    "existing_native_driver_cache_verified_and_reused": true,
+    "build_log": {
+      "path": "target/ipad-update-1.5.2/native-build.log",
+      "sha256": "6a207d4fc7deff93b013338fd98fc5794fb45af313fb15562b9dd7741ceae1b5"
+    }
+  },
+  "guest_components": {
+    "unchanged": true,
+    "manifest_hashes_verified": [
+      "musl libc",
+      "Vulkan ICD",
+      "EGL",
+      "native Xwayland"
+    ],
+    "reused_validated_products": true
+  },
+  "checks": [
+    {
+      "channel": "stable",
+      "version": "1.5.2",
+      "build": "48",
+      "previous_version": "1.5.0",
+      "previous_build": "47",
+      "original_bundle_and_group_preserved": true,
+      "device_install": "pass",
+      "device_launch": "pass",
+      "process_present_after_both_launches": true,
+      "file_provider_signature_group_and_profile_match": true,
+      "logs": [
+        {
+          "path": "target/ipad-update-1.5.2/install-stable.log",
+          "sha256": "ffc50f74cec147aa1dac82d06298fc0f96dc7827d40a95e4d973c3cc854bfb7b"
+        },
+        {
+          "path": "target/ipad-update-1.5.2/launch-stable.log",
+          "sha256": "4047830ce46819b78480390d440159c74b845229ff0c3d88a8b459810d583bed"
+        }
+      ]
+    },
+    {
+      "channel": "dev",
+      "version": "1.5.2",
+      "build": "48",
+      "previous_version": "1.5.0",
+      "previous_build": "47",
+      "original_bundle_and_group_preserved": true,
+      "device_install": "pass",
+      "device_launch": "pass",
+      "process_present_after_both_launches": true,
+      "file_provider_signature_group_and_profile_match": true,
+      "logs": [
+        {
+          "path": "target/ipad-update-1.5.2/install-dev.log",
+          "sha256": "2a12ddafe9918c1a4f9f15666e5e879d139de849b46f7197209bb3b0e37dab1c"
+        },
+        {
+          "path": "target/ipad-update-1.5.2/launch-dev.log",
+          "sha256": "56a5a25a1f5756b6c609d7c1e59da61b8a23ade0836745741f3932aff9296c66"
+        }
+      ]
+    }
+  ],
+  "xcode_build_logs": [
+    {
+      "path": "target/ipad-update-1.5.2/xcode-stable.log",
+      "sha256": "1928fb21f2c723783b9335bd6ab9f8ad15f62cfb23ad8739c40d862d99b81751"
+    },
+    {
+      "path": "target/ipad-update-1.5.2/xcode-dev.log",
+      "sha256": "b5a3ef3cf9b8e52c515730e87030dbc29c8e10c0e0a9666f59d89a77e3424049"
+    }
+  ],
+  "swift_dependencies": {
+    "existing_revision_pins_unchanged": true,
+    "canonical_package_resolved_restored_after_xcode_resolution": true
+  },
+  "channels_isolated": true,
+  "uninstall_performed": false,
+  "data_reset_or_rootfs_replacement": false,
+  "signed_archives": [
+    {
+      "channel": "dev",
+      "path": "target/release-1.5.2/Trames-1.5.2-ipad-dev-device-signed.ipa",
+      "sha256": "3ef81c6bf42278ac4099a381fa8df84315e87776d7d6235791513ecec15e2dbf",
+      "size": 132044658,
+      "all_signed_resources_preserved": true,
+      "distribution": "local device-specific signed archive; not published"
+    },
+    {
+      "channel": "stable",
+      "path": "target/release-1.5.2/Trames-1.5.2-ipad-device-signed.ipa",
+      "sha256": "2087e41ae56746f9cb520dcedae7573819c191cbefaab331ebcca40ac6e03d03",
+      "size": 128915663,
+      "all_signed_resources_preserved": true,
+      "distribution": "local device-specific signed archive; not published"
+    }
+  ],
+  "device_specific_signing_details": "Kept only in ignored local build records; not published.",
+  "validation_scope": "This follow-up verifies device build, signing, matching app/File Provider identity, in-place install and startup. It does not claim a fresh physical-device Firefox, PiP, container or performance acceptance run.",
+  "reused_runtime_validation": [
+    "docs/validation/prlimit-release-1.5.2-20261104.json",
+    "docs/validation/runc-concurrent-mounts-20261104.json",
+    "docs/validation/worker-event-waits-20261104.json",
+    "docs/validation/worker-posix-timers-20261104.json",
+    "docs/validation/worker-signals-20261104.json"
+  ],
+  "final_foreground_channel": "stable"
+}
