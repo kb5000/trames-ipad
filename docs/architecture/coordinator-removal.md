@@ -1,12 +1,14 @@
 # Coordinator dependency audit
 
-## Current status — 2026-11-03
+## Current status — 2026-11-05
 
-The latest completed batch is [namespace, metadata and fs_struct](#thirty-fourth-migration-implemented--namespace-and-metadata-subsystem--2026-11-03).
-Ordinary directory mutations now join file I/O, io_uring, Unix transport, ancillary
-graphs and native device controls on original shared resources. Mac HVF and the
-iPad interpreter use the same implementation. Further migration stops after this
-batch at the owner's request; the architecture still has owner dependencies.
+The latest batch is [original process families](#45-original-process-families-and-parent-completion-2026-11-05).
+Original child waits, signal control, cgroup resources and non-last thread exits
+already execute on their source workers. Parent/subreaper queries now use the
+actual process-family object; adoption and completion notifications share its
+original graph. Mac HVF and the iPad interpreter share this implementation.
+Final process/mm/native teardown still needs its actual dependency migration.
+Stable 1.5.3 and the running business environment remain separate from Dev.
 
 The [consolidated runtime audit](../../runtime/docs/architecture/coordination-boundaries.md)
 is the current source inventory, including actual admission and fallback gates.
@@ -15,7 +17,7 @@ stage; they do not override this current inventory.
 
 | Remaining boundary | Scope / examples |
 | --- | --- |
-| Joined task and control work | Process creation/exec/exit/wait, signal effects, security policy, mount/unshare/setns, dynamic proc/sys and excluded owner controls; the current cohort returns its Views |
+| Joined task and control work | Process creation/exec, last-member/group/default-fatal exit, final mm/native cleanup, security policy, mount/unshare/setns, dynamic proc/sys and actual excluded owner controls; the current cohort returns its Views. Ordinary waits, caught signals, job control and non-last thread exit have source paths. |
 | Residual compatibility service | Some actual FD/network kinds, old epoll creation and eligible stream paths still use in-cohort owner service; peer CPUs can continue unless admission refuses |
 | VM/backing publication | Structural mappings, pins and mapped-file resize quiesce affected mm/backing users; exceptional admission/control conditions can require a broader join |
 | Mixed resource waits and transfers | Masked/owner poll, actual owner SCM_RIGHTS controls, unsupported ring resources and file-to-pipe/socket transfer retain explicit owner boundaries |
@@ -3345,3 +3347,68 @@ A separate four-CPU short-case diagnostic has **6 → 4** cohort rounds and
 including startup work; remaining returns include clone and console ioctl.
 Measured stop time is 147 us versus below the timer's 1 us reporting resolution,
 not a claim that synchronization costs are literally zero.
+
+
+## 45. Original process families and parent completion (2026-11-05)
+
+Parent IDs and subreaper state now belong to the original shared Family. A
+thread's short prctl/getppid entry does not consult the coordinator or replay
+cached parentage. Fork starts a new subreaper state; threads share the original.
+Original structural relationships decide adoption, namespace-init victims,
+parent wait membership and parent signal targeting. Adoption of a zombie also
+uses the actual new parent's disposition and can retire its PID immediately.
+The owner no longer runs a second parent/subreaper/reparenting algorithm.
+
+The full namespace fixture found an exec handover bug: a nonleader survivor had
+new presence but the same PID/group/UID, so publication skipped its old family
+record and pruning erased the wait relationship. Registration now tracks the
+original presence identity and keeps live family membership through handover.
+A deterministic regression fails without the fix and passes with it. No extra
+retry, polling loop or all-CPU stop substitutes for the missing relationship.
+
+The final process boundary is still owned: CPU/VFS/mm/native teardown and actual
+namespace-victim projection collection have not moved to source workers. This
+batch supplies their actual shared dependency APIs. Last-member/group/default
+fatal exit, robust futex, final mm/native ownership and actual owner control
+resources remain open. New tests cover adoption, ignored/NOCLDWAIT zombies,
+leader-thread death, PID reuse, namespace boundaries and nonleader exec.
+
+[Source-bound acceptance and measurements](../validation/worker-family-20261105.json)
+· [Shared boundary contract](../../runtime/docs/architecture/coordination-boundaries.md#original-process-families-and-completion-notifications-2026-11-05).
+
+
+Seven counterbalanced pairs use four already-ready threads, each performing a
+subreaper set, checked subreaper get and getppid per round. The timed interval
+includes barrier release and thread joins; clone/setup and final stack unmap are
+outside it. Native runs the exact ELF in the six-vCPU ARM Linux Lima reference,
+with one/four-CPU affinity; it is not a bare-metal Darwin comparison.
+
+| Rounds/thread | CPUs | Previous HVF | New HVF | Relative speed | Native ARM Linux |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 1 | 1 | 80.083 us | 81.500 us | 0.983x | 17.664 us |
+| 1 | 4 | 521.250 us | 133.500 us | 3.904x | 27.662 us |
+| 1 | 12 | 606.750 us | 156.084 us | 3.887x | — |
+| 1,000 | 1 | 16.750 ms | 16.719 ms | 1.002x | 1.866 ms |
+| 1,000 | 4 | 272.096 ms | 3.704 ms | 73.466x | 0.962 ms |
+| 1,000 | 12 | 259.220 ms | 3.757 ms | 69.000x | — |
+
+The long-case diagnostic changes **6,858 to 4** cohort rounds and **8,004 to
+zero** returned prctl entries. Both versions still have three service requests,
+including startup work. Remaining returned entries include clone and console
+ioctl. The single-CPU path shows no meaningful improvement. This deliberately
+stresses these control APIs; it does not estimate browser or Docker throughput.
+
+Apple and native ARM Linux pass **302** process cases (three ignored) and **52**
+kernel cases. Strict affected checks, formatting and the physical-iPad FFI target
+compile pass. A new physical-iPad execution test is not claimed. Initial cross-
+executor acceptance includes all four cgroup fixtures, filtering, clear_tid,
+parent death and 100 interpreter/100 HVF namespace repetitions. After the final
+namespace full-group cleanup correction, another 50 namespace runs span HVF
+one/four/twelve CPUs and interpreter one/four CPUs. Thirty normal-preemption Go
+GC starts and eight isolated twelve-CPU Docker lifecycle rounds also pass.
+
+Namespace shutdown now retains each original leader through full-group cleanup,
+including an already exited leader with live peers. Its regression fails against
+the per-thread projection loop and passes with the full original-group path.
+The native full namespace fixture's preexisting negative ioprio expectation
+difference remains recorded in stage 44; no native full-fixture pass is claimed.

@@ -1,0 +1,3664 @@
+{
+  "schema": 1,
+  "date": "2026-11-05",
+  "scope": "Original process-family graph and source parent/subreaper calls; final CPU/mm/native cleanup remains owned",
+  "runtime_revision": "464b8ed091feda2ee5231290920cc54898b86490",
+  "baseline_runtime_revision": "2378b6959991c91c6815031d146f64ab11545a52",
+  "source_files": {
+    "crates/trames-kernel/src/children.rs": "92d5f1a29ea02706910d1d36917031f4ed1aa519bac160b52d8e22e6d019a240",
+    "crates/trames-kernel/src/family.rs": "e37c011066e675b22c9dd1262dc9b679ce4592a5cbc8bda12a2a50a8eb06098a",
+    "crates/trames-kernel/src/lib.rs": "4987aca6ee1c63ff8086c3d68dc9d192a7d6508df84ad5fc461d70fc47794ba5",
+    "crates/trames-kernel/src/signal/io.rs": "3ebbd0b9bac175dcd0b4c43b9dfae464772fc5535a95971f08b72f506492b314",
+    "crates/trames-kernel/src/task.rs": "1eee5d63aa763e4fcff67dfc61ed69467d5b0f775e407fabb2a5fa99a3b111e1",
+    "crates/trames-kernel/src/task_control.rs": "3144ff7879e91c850d45a0e2ff4d61d89156a6119e893c648d48c022cfb59248",
+    "crates/trames-session/src/process.rs": "078a8a69320cfac33f65e999840405a45c4ad8695f8a5d0f44e38d3c45a2e071",
+    "crates/trames-session/src/process_compat.rs": "a7ca967787dea3648820fb4bc858eff39da78a4a0471db12c584ff3fce9a0b4b",
+    "crates/trames-session/src/process_pid.rs": "4f231c462803628c386f06b9c1e394b4f6e7fcc83070335c1cd816d35706d067",
+    "crates/trames-session/src/process_seccomp.rs": "e2641f957d597ba1adf4359a760a56050dfc4fc567da7a531f89b34f4eaad9d4",
+    "crates/trames-session/src/process_service.rs": "d1ffa40561887e443fa19ec8e9b800d879dba90eda9cbbd0a56d59d3ef248bd2",
+    "crates/trames-session/src/process_socket_wait.rs": "6c8bbc3d8ed540805edd140c902f61c1fae2738d9d0cdd12e6353477c808f560",
+    "crates/trames-session/src/worker_syscalls.rs": "1a103cab9b166ae2f97f6d7e7280d81c3042dd5ae2d249f31789b5a24727fb6e",
+    "docs/architecture/coordination-boundaries.md": "4efdc33cd2bbddd96b4fa8480cd618440e769aef6a4fc3a2c82a9708083e4773"
+  },
+  "fixture": {
+    "source": "tests/fixtures/worker-process-family.c",
+    "source_sha256": "72841a31bb1fc23ea6b86e68930947d3b9b7ebf337467e6caea0cd7ac073df62",
+    "elf_sha256": "00e65759eef86a3a7795c4233cd7e7c50150dd262aed526246c6f73737f06e35",
+    "build": "Native ARM Linux musl-gcc -O2 -Wall -Wextra -Werror -static -pthread; same ELF used by native, HVF and interpreter"
+  },
+  "changes": [
+    "Threads share actual Family parent/subreaper scalars; forks start fresh. Original getppid and PR_SET/GET_CHILD_SUBREAPER obey existing filter decisions on source workers.",
+    "One original Families graph decides adoption and PID-namespace victim identities; original child wait membership and parent signal group move together.",
+    "Final status and adopted-zombie notification/automatic reaping use original Child, parent dispositions and PID presence. A surviving parent peer supplies disposition after leader exit.",
+    "Nonleader exec refreshes original presence without deleting the still-live family or losing original descendants.",
+    "Namespace victim cleanup retains the original leader through whole-group exit, including a zombie leader with live peers; no per-victim full ProcessMap scan decides identity."
+  ],
+  "execution": {
+    "new_service_thread": false,
+    "new_polling_bus": false,
+    "new_guest_memory_barrier": false,
+    "new_native_permission_policy": false,
+    "scalar_ordering": "Relaxed original family atomics",
+    "structural_sync": "Original family graph and existing object locks; readiness and signal callbacks follow resource locks"
+  },
+  "regressions": [
+    {
+      "case": "nonleader exec presence replacement",
+      "fails_without_fix_log_sha256": "c5ed1a377be8c1c6c3fdf3618b8548ce883384eff55803675209480e6bf276d4",
+      "green": "family::tests::nonleader_exec_replaces_presence_without_losing_original_family_or_children"
+    },
+    {
+      "case": "namespace full-group cleanup with live/zombie leaders",
+      "fails_without_fix_log_sha256": "f67576c2a6e19e28a05d9e50bb158a79156c1035449dc93e41ef2ab7efd40706",
+      "green": "process::pid_namespace::tests::namespace_shutdown_retires_complete_original_groups_even_after_leader_exit"
+    }
+  ],
+  "validation": {
+    "platforms": {
+      "apple": {
+        "process_passed": 302,
+        "process_ignored": 3,
+        "kernel_passed": 52,
+        "log_sha256": "6cc6f7599517cc8ee959f31716abbfde387ac831270f0f690bb2616cd185ef67"
+      },
+      "native_arm_linux": {
+        "process_passed": 302,
+        "process_ignored": 3,
+        "kernel_passed": 52,
+        "log_sha256": "abaaa234f7d8a7aec69bf637d9e2abf980d0adef639bb2a92631ce9a42f8af2f"
+      }
+    },
+    "strict_affected_clippy": true,
+    "affected_formatting": true,
+    "ipad_ffi_target": "aarch64-apple-ios compile passed; no new physical-device execution claimed",
+    "initial_cross_executor_cases": [
+      {
+        "case": "hvf-final-pdeathsig-1",
+        "backend": "hvf",
+        "cpus": 1,
+        "returncode": 0,
+        "seconds": 0.19188899999999998
+      },
+      {
+        "case": "hvf-final-pid-namespaces-1",
+        "backend": "hvf",
+        "cpus": 1,
+        "returncode": 0,
+        "seconds": 0.041573250000000006
+      },
+      {
+        "case": "hvf-final-family-1",
+        "backend": "hvf",
+        "cpus": 1,
+        "returncode": 0,
+        "seconds": 0.024405500000000024
+      },
+      {
+        "case": "hvf-final-resources-1",
+        "backend": "hvf",
+        "cpus": 1,
+        "returncode": 0,
+        "seconds": 0.012256500000000004
+      },
+      {
+        "case": "hvf-final-cgroups-1",
+        "backend": "hvf",
+        "cpus": 1,
+        "returncode": 0,
+        "seconds": 0.012189833999999955
+      },
+      {
+        "case": "hvf-final-cgroup-control-1",
+        "backend": "hvf",
+        "cpus": 1,
+        "returncode": 0,
+        "seconds": 0.375401958
+      },
+      {
+        "case": "hvf-final-cgroup-pids-1",
+        "backend": "hvf",
+        "cpus": 1,
+        "returncode": 0,
+        "seconds": 0.048191167000000035
+      },
+      {
+        "case": "hvf-final-cgroup-bpf-1",
+        "backend": "hvf",
+        "cpus": 1,
+        "returncode": 0,
+        "seconds": 0.026045291999999942
+      },
+      {
+        "case": "hvf-final-pdeathsig-4",
+        "backend": "hvf",
+        "cpus": 4,
+        "returncode": 0,
+        "seconds": 0.024845000000000006
+      },
+      {
+        "case": "hvf-final-pid-namespaces-4",
+        "backend": "hvf",
+        "cpus": 4,
+        "returncode": 0,
+        "seconds": 0.041268792
+      },
+      {
+        "case": "hvf-final-family-4",
+        "backend": "hvf",
+        "cpus": 4,
+        "returncode": 0,
+        "seconds": 0.011794500000000041
+      },
+      {
+        "case": "hvf-final-resources-4",
+        "backend": "hvf",
+        "cpus": 4,
+        "returncode": 0,
+        "seconds": 0.011740917000000017
+      },
+      {
+        "case": "hvf-final-cgroups-4",
+        "backend": "hvf",
+        "cpus": 4,
+        "returncode": 0,
+        "seconds": 0.02166099999999993
+      },
+      {
+        "case": "hvf-final-cgroup-control-4",
+        "backend": "hvf",
+        "cpus": 4,
+        "returncode": 0,
+        "seconds": 0.3735062909999999
+      },
+      {
+        "case": "hvf-final-cgroup-pids-4",
+        "backend": "hvf",
+        "cpus": 4,
+        "returncode": 0,
+        "seconds": 0.021511124999999964
+      },
+      {
+        "case": "hvf-final-cgroup-bpf-4",
+        "backend": "hvf",
+        "cpus": 4,
+        "returncode": 0,
+        "seconds": 0.012145958000000068
+      },
+      {
+        "case": "hvf-final-pdeathsig-12",
+        "backend": "hvf",
+        "cpus": 12,
+        "returncode": 0,
+        "seconds": 0.012215124999999993
+      },
+      {
+        "case": "hvf-final-pid-namespaces-12",
+        "backend": "hvf",
+        "cpus": 12,
+        "returncode": 0,
+        "seconds": 0.044584791999999984
+      },
+      {
+        "case": "hvf-final-family-12",
+        "backend": "hvf",
+        "cpus": 12,
+        "returncode": 0,
+        "seconds": 0.011790041000000029
+      },
+      {
+        "case": "hvf-final-resources-12",
+        "backend": "hvf",
+        "cpus": 12,
+        "returncode": 0,
+        "seconds": 0.011730666000000056
+      },
+      {
+        "case": "hvf-final-cgroups-12",
+        "backend": "hvf",
+        "cpus": 12,
+        "returncode": 0,
+        "seconds": 0.021902958999999944
+      },
+      {
+        "case": "hvf-final-cgroup-control-12",
+        "backend": "hvf",
+        "cpus": 12,
+        "returncode": 0,
+        "seconds": 0.402640291
+      },
+      {
+        "case": "hvf-final-cgroup-pids-12",
+        "backend": "hvf",
+        "cpus": 12,
+        "returncode": 0,
+        "seconds": 0.04875945799999992
+      },
+      {
+        "case": "hvf-final-cgroup-bpf-12",
+        "backend": "hvf",
+        "cpus": 12,
+        "returncode": 0,
+        "seconds": 0.012010332999999873
+      },
+      {
+        "case": "interpreter-final-pdeathsig-1",
+        "backend": "interpreter",
+        "cpus": 1,
+        "returncode": 0,
+        "seconds": 0.527198083
+      },
+      {
+        "case": "interpreter-final-pid-namespaces-1",
+        "backend": "interpreter",
+        "cpus": 1,
+        "returncode": 0,
+        "seconds": 0.04359275000000018
+      },
+      {
+        "case": "interpreter-final-family-1",
+        "backend": "interpreter",
+        "cpus": 1,
+        "returncode": 0,
+        "seconds": 0.011921915999999921
+      },
+      {
+        "case": "interpreter-final-resources-1",
+        "backend": "interpreter",
+        "cpus": 1,
+        "returncode": 0,
+        "seconds": 0.012078999999999951
+      },
+      {
+        "case": "interpreter-final-pdeathsig-4",
+        "backend": "interpreter",
+        "cpus": 4,
+        "returncode": 0,
+        "seconds": 0.01203537499999996
+      },
+      {
+        "case": "interpreter-final-pid-namespaces-4",
+        "backend": "interpreter",
+        "cpus": 4,
+        "returncode": 0,
+        "seconds": 0.03889795900000026
+      },
+      {
+        "case": "interpreter-final-family-4",
+        "backend": "interpreter",
+        "cpus": 4,
+        "returncode": 0,
+        "seconds": 0.012184916999999906
+      },
+      {
+        "case": "interpreter-final-resources-4",
+        "backend": "interpreter",
+        "cpus": 4,
+        "returncode": 0,
+        "seconds": 0.010414916999999857
+      },
+      {
+        "case": "clean-interpreter-pid-stress-0",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.024066916999999854
+      },
+      {
+        "case": "clean-interpreter-pid-stress-1",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.041864249999999714
+      },
+      {
+        "case": "clean-interpreter-pid-stress-2",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.045456167000000214
+      },
+      {
+        "case": "clean-interpreter-pid-stress-3",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04444354199999978
+      },
+      {
+        "case": "clean-interpreter-pid-stress-4",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04542745799999981
+      },
+      {
+        "case": "clean-interpreter-pid-stress-5",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.042662666999999654
+      },
+      {
+        "case": "clean-interpreter-pid-stress-6",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.040737667000000144
+      },
+      {
+        "case": "clean-interpreter-pid-stress-7",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.038792083000000144
+      },
+      {
+        "case": "clean-interpreter-pid-stress-8",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.039599416999999804
+      },
+      {
+        "case": "clean-interpreter-pid-stress-9",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04276170800000001
+      },
+      {
+        "case": "clean-interpreter-pid-stress-10",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04373249999999995
+      },
+      {
+        "case": "clean-interpreter-pid-stress-11",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.03874983300000023
+      },
+      {
+        "case": "clean-interpreter-pid-stress-12",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04638729099999983
+      },
+      {
+        "case": "clean-interpreter-pid-stress-13",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04272058300000037
+      },
+      {
+        "case": "clean-interpreter-pid-stress-14",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.045404
+      },
+      {
+        "case": "clean-interpreter-pid-stress-15",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.044814917000000065
+      },
+      {
+        "case": "clean-interpreter-pid-stress-16",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04579991700000008
+      },
+      {
+        "case": "clean-interpreter-pid-stress-17",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04652362500000029
+      },
+      {
+        "case": "clean-interpreter-pid-stress-18",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04847966700000006
+      },
+      {
+        "case": "clean-interpreter-pid-stress-19",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04223175000000001
+      },
+      {
+        "case": "clean-interpreter-pid-stress-20",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04093954199999983
+      },
+      {
+        "case": "clean-interpreter-pid-stress-21",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04092474999999984
+      },
+      {
+        "case": "clean-interpreter-pid-stress-22",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.042807417000000125
+      },
+      {
+        "case": "clean-interpreter-pid-stress-23",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.046714915999999995
+      },
+      {
+        "case": "clean-interpreter-pid-stress-24",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04562233299999985
+      },
+      {
+        "case": "clean-interpreter-pid-stress-25",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04492316599999979
+      },
+      {
+        "case": "clean-interpreter-pid-stress-26",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.042258291
+      },
+      {
+        "case": "clean-interpreter-pid-stress-27",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.041073292000000095
+      },
+      {
+        "case": "clean-interpreter-pid-stress-28",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04478170799999992
+      },
+      {
+        "case": "clean-interpreter-pid-stress-29",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.044626374999999996
+      },
+      {
+        "case": "clean-interpreter-pid-stress-30",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.042002541000000004
+      },
+      {
+        "case": "clean-interpreter-pid-stress-31",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04372208300000002
+      },
+      {
+        "case": "clean-interpreter-pid-stress-32",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04698050000000009
+      },
+      {
+        "case": "clean-interpreter-pid-stress-33",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04361483299999991
+      },
+      {
+        "case": "clean-interpreter-pid-stress-34",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.0454085829999995
+      },
+      {
+        "case": "clean-interpreter-pid-stress-35",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.042818834000000194
+      },
+      {
+        "case": "clean-interpreter-pid-stress-36",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04658645900000025
+      },
+      {
+        "case": "clean-interpreter-pid-stress-37",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04824141700000073
+      },
+      {
+        "case": "clean-interpreter-pid-stress-38",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04511712499999998
+      },
+      {
+        "case": "clean-interpreter-pid-stress-39",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04104358300000044
+      },
+      {
+        "case": "clean-interpreter-pid-stress-40",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04651470900000021
+      },
+      {
+        "case": "clean-interpreter-pid-stress-41",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04378004099999977
+      },
+      {
+        "case": "clean-interpreter-pid-stress-42",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04836937500000005
+      },
+      {
+        "case": "clean-interpreter-pid-stress-43",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.042091500000000615
+      },
+      {
+        "case": "clean-interpreter-pid-stress-44",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04106249999999978
+      },
+      {
+        "case": "clean-interpreter-pid-stress-45",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04349991699999922
+      },
+      {
+        "case": "clean-interpreter-pid-stress-46",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04531137499999982
+      },
+      {
+        "case": "clean-interpreter-pid-stress-47",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04513479199999981
+      },
+      {
+        "case": "clean-interpreter-pid-stress-48",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04811204100000044
+      },
+      {
+        "case": "clean-interpreter-pid-stress-49",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04563420900000015
+      },
+      {
+        "case": "clean-interpreter-pid-stress-50",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04622279200000001
+      },
+      {
+        "case": "clean-interpreter-pid-stress-51",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04172466699999955
+      },
+      {
+        "case": "clean-interpreter-pid-stress-52",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04197291699999983
+      },
+      {
+        "case": "clean-interpreter-pid-stress-53",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.03981183299999991
+      },
+      {
+        "case": "clean-interpreter-pid-stress-54",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.0487196670000003
+      },
+      {
+        "case": "clean-interpreter-pid-stress-55",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.044232542000000485
+      },
+      {
+        "case": "clean-interpreter-pid-stress-56",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04296808399999996
+      },
+      {
+        "case": "clean-interpreter-pid-stress-57",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.040973542000000585
+      },
+      {
+        "case": "clean-interpreter-pid-stress-58",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04092004199999977
+      },
+      {
+        "case": "clean-interpreter-pid-stress-59",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.041218666999999876
+      },
+      {
+        "case": "clean-interpreter-pid-stress-60",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.03784999999999972
+      },
+      {
+        "case": "clean-interpreter-pid-stress-61",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04436129199999961
+      },
+      {
+        "case": "clean-interpreter-pid-stress-62",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04601516700000019
+      },
+      {
+        "case": "clean-interpreter-pid-stress-63",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04703529200000034
+      },
+      {
+        "case": "clean-interpreter-pid-stress-64",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.045734333000000404
+      },
+      {
+        "case": "clean-interpreter-pid-stress-65",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.046817917000000264
+      },
+      {
+        "case": "clean-interpreter-pid-stress-66",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.044583124999999946
+      },
+      {
+        "case": "clean-interpreter-pid-stress-67",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.040916959000000475
+      },
+      {
+        "case": "clean-interpreter-pid-stress-68",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04083099999999984
+      },
+      {
+        "case": "clean-interpreter-pid-stress-69",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.0482566250000005
+      },
+      {
+        "case": "clean-interpreter-pid-stress-70",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04213762500000051
+      },
+      {
+        "case": "clean-interpreter-pid-stress-71",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.0409015419999994
+      },
+      {
+        "case": "clean-interpreter-pid-stress-72",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.041074000000000055
+      },
+      {
+        "case": "clean-interpreter-pid-stress-73",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04105962499999993
+      },
+      {
+        "case": "clean-interpreter-pid-stress-74",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04643529199999996
+      },
+      {
+        "case": "clean-interpreter-pid-stress-75",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04365466600000012
+      },
+      {
+        "case": "clean-interpreter-pid-stress-76",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04392124999999947
+      },
+      {
+        "case": "clean-interpreter-pid-stress-77",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.043804417000000484
+      },
+      {
+        "case": "clean-interpreter-pid-stress-78",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.048208958000000024
+      },
+      {
+        "case": "clean-interpreter-pid-stress-79",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.0447495
+      },
+      {
+        "case": "clean-interpreter-pid-stress-80",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04075854099999976
+      },
+      {
+        "case": "clean-interpreter-pid-stress-81",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04094495899999995
+      },
+      {
+        "case": "clean-interpreter-pid-stress-82",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04105912500000031
+      },
+      {
+        "case": "clean-interpreter-pid-stress-83",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04078520799999996
+      },
+      {
+        "case": "clean-interpreter-pid-stress-84",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.02379875000000009
+      },
+      {
+        "case": "clean-interpreter-pid-stress-85",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04619512500000056
+      },
+      {
+        "case": "clean-interpreter-pid-stress-86",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04423820899999953
+      },
+      {
+        "case": "clean-interpreter-pid-stress-87",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04103125000000052
+      },
+      {
+        "case": "clean-interpreter-pid-stress-88",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04688458299999976
+      },
+      {
+        "case": "clean-interpreter-pid-stress-89",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.046080791999999704
+      },
+      {
+        "case": "clean-interpreter-pid-stress-90",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.0453543750000005
+      },
+      {
+        "case": "clean-interpreter-pid-stress-91",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.041966999999999643
+      },
+      {
+        "case": "clean-interpreter-pid-stress-92",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.048104166999999975
+      },
+      {
+        "case": "clean-interpreter-pid-stress-93",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.041994959000000165
+      },
+      {
+        "case": "clean-interpreter-pid-stress-94",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.048215166999999504
+      },
+      {
+        "case": "clean-interpreter-pid-stress-95",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.043900625000000026
+      },
+      {
+        "case": "clean-interpreter-pid-stress-96",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.046231208000000024
+      },
+      {
+        "case": "clean-interpreter-pid-stress-97",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.0465935420000001
+      },
+      {
+        "case": "clean-interpreter-pid-stress-98",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.0396416670000006
+      },
+      {
+        "case": "clean-interpreter-pid-stress-99",
+        "backend": "interpreter",
+        "cpus": 4,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.03761770799999997
+      },
+      {
+        "case": "clean-hvf-pid-stress-0",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04054283400000003
+      },
+      {
+        "case": "clean-hvf-pid-stress-1",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04806549999999987
+      },
+      {
+        "case": "clean-hvf-pid-stress-2",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.041714291999999986
+      },
+      {
+        "case": "clean-hvf-pid-stress-3",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04085600000000067
+      },
+      {
+        "case": "clean-hvf-pid-stress-4",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04095445899999994
+      },
+      {
+        "case": "clean-hvf-pid-stress-5",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04102408299999993
+      },
+      {
+        "case": "clean-hvf-pid-stress-6",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04085408300000015
+      },
+      {
+        "case": "clean-hvf-pid-stress-7",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04106491699999992
+      },
+      {
+        "case": "clean-hvf-pid-stress-8",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04140583299999978
+      },
+      {
+        "case": "clean-hvf-pid-stress-9",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.044530583000000235
+      },
+      {
+        "case": "clean-hvf-pid-stress-10",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.037346666999999556
+      },
+      {
+        "case": "clean-hvf-pid-stress-11",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.0431772920000002
+      },
+      {
+        "case": "clean-hvf-pid-stress-12",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04564670800000048
+      },
+      {
+        "case": "clean-hvf-pid-stress-13",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04527508400000002
+      },
+      {
+        "case": "clean-hvf-pid-stress-14",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04582879100000081
+      },
+      {
+        "case": "clean-hvf-pid-stress-15",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.0440994580000007
+      },
+      {
+        "case": "clean-hvf-pid-stress-16",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.040880125000000156
+      },
+      {
+        "case": "clean-hvf-pid-stress-17",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.046594500000000316
+      },
+      {
+        "case": "clean-hvf-pid-stress-18",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04244679200000068
+      },
+      {
+        "case": "clean-hvf-pid-stress-19",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04099795900000025
+      },
+      {
+        "case": "clean-hvf-pid-stress-20",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04098112500000006
+      },
+      {
+        "case": "clean-hvf-pid-stress-21",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04347075
+      },
+      {
+        "case": "clean-hvf-pid-stress-22",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04567862499999986
+      },
+      {
+        "case": "clean-hvf-pid-stress-23",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04213833300000047
+      },
+      {
+        "case": "clean-hvf-pid-stress-24",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.0409428329999999
+      },
+      {
+        "case": "clean-hvf-pid-stress-25",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.041095959000001514
+      },
+      {
+        "case": "clean-hvf-pid-stress-26",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.039311500000000166
+      },
+      {
+        "case": "clean-hvf-pid-stress-27",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.046134165999999865
+      },
+      {
+        "case": "clean-hvf-pid-stress-28",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.03930975000000103
+      },
+      {
+        "case": "clean-hvf-pid-stress-29",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.03963591700000002
+      },
+      {
+        "case": "clean-hvf-pid-stress-30",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04528550000000031
+      },
+      {
+        "case": "clean-hvf-pid-stress-31",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04660220799999948
+      },
+      {
+        "case": "clean-hvf-pid-stress-32",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.046748125000000584
+      },
+      {
+        "case": "clean-hvf-pid-stress-33",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04402999999999935
+      },
+      {
+        "case": "clean-hvf-pid-stress-34",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.03847629100000027
+      },
+      {
+        "case": "clean-hvf-pid-stress-35",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04101641599999972
+      },
+      {
+        "case": "clean-hvf-pid-stress-36",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04347987499999917
+      },
+      {
+        "case": "clean-hvf-pid-stress-37",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.045744874999998686
+      },
+      {
+        "case": "clean-hvf-pid-stress-38",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04796966700000027
+      },
+      {
+        "case": "clean-hvf-pid-stress-39",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04493316699999994
+      },
+      {
+        "case": "clean-hvf-pid-stress-40",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.046160333999999636
+      },
+      {
+        "case": "clean-hvf-pid-stress-41",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04267179200000015
+      },
+      {
+        "case": "clean-hvf-pid-stress-42",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.046496249999998795
+      },
+      {
+        "case": "clean-hvf-pid-stress-43",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04217308399999986
+      },
+      {
+        "case": "clean-hvf-pid-stress-44",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.0405373339999997
+      },
+      {
+        "case": "clean-hvf-pid-stress-45",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04253487500000119
+      },
+      {
+        "case": "clean-hvf-pid-stress-46",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04754758400000014
+      },
+      {
+        "case": "clean-hvf-pid-stress-47",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.040973000000001036
+      },
+      {
+        "case": "clean-hvf-pid-stress-48",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04409529199999973
+      },
+      {
+        "case": "clean-hvf-pid-stress-49",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04662441700000031
+      },
+      {
+        "case": "clean-hvf-pid-stress-50",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04203545799999908
+      },
+      {
+        "case": "clean-hvf-pid-stress-51",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.046726415999998494
+      },
+      {
+        "case": "clean-hvf-pid-stress-52",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04349545899999896
+      },
+      {
+        "case": "clean-hvf-pid-stress-53",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04636687500000036
+      },
+      {
+        "case": "clean-hvf-pid-stress-54",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04377666700000127
+      },
+      {
+        "case": "clean-hvf-pid-stress-55",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04070333399999981
+      },
+      {
+        "case": "clean-hvf-pid-stress-56",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04084037500000015
+      },
+      {
+        "case": "clean-hvf-pid-stress-57",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04100620899999896
+      },
+      {
+        "case": "clean-hvf-pid-stress-58",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04092620800000013
+      },
+      {
+        "case": "clean-hvf-pid-stress-59",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04389908299999945
+      },
+      {
+        "case": "clean-hvf-pid-stress-60",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04459454200000046
+      },
+      {
+        "case": "clean-hvf-pid-stress-61",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04094025000000023
+      },
+      {
+        "case": "clean-hvf-pid-stress-62",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04608945900000094
+      },
+      {
+        "case": "clean-hvf-pid-stress-63",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04565833300000044
+      },
+      {
+        "case": "clean-hvf-pid-stress-64",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.03935883299999965
+      },
+      {
+        "case": "clean-hvf-pid-stress-65",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04089420799999921
+      },
+      {
+        "case": "clean-hvf-pid-stress-66",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.0439952090000002
+      },
+      {
+        "case": "clean-hvf-pid-stress-67",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04770158300000027
+      },
+      {
+        "case": "clean-hvf-pid-stress-68",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.041150291000001005
+      },
+      {
+        "case": "clean-hvf-pid-stress-69",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04642800000000058
+      },
+      {
+        "case": "clean-hvf-pid-stress-70",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04531929199999851
+      },
+      {
+        "case": "clean-hvf-pid-stress-71",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.0463016249999999
+      },
+      {
+        "case": "clean-hvf-pid-stress-72",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.041759875000000335
+      },
+      {
+        "case": "clean-hvf-pid-stress-73",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.040956250000000693
+      },
+      {
+        "case": "clean-hvf-pid-stress-74",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04389333399999984
+      },
+      {
+        "case": "clean-hvf-pid-stress-75",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.045529082999999915
+      },
+      {
+        "case": "clean-hvf-pid-stress-76",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04143750000000068
+      },
+      {
+        "case": "clean-hvf-pid-stress-77",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04080566700000077
+      },
+      {
+        "case": "clean-hvf-pid-stress-78",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04687633400000024
+      },
+      {
+        "case": "clean-hvf-pid-stress-79",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04305662500000018
+      },
+      {
+        "case": "clean-hvf-pid-stress-80",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04803537499999955
+      },
+      {
+        "case": "clean-hvf-pid-stress-81",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04182687499999993
+      },
+      {
+        "case": "clean-hvf-pid-stress-82",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.0408666670000013
+      },
+      {
+        "case": "clean-hvf-pid-stress-83",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04073449999999923
+      },
+      {
+        "case": "clean-hvf-pid-stress-84",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04079312500000043
+      },
+      {
+        "case": "clean-hvf-pid-stress-85",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.040841874999999916
+      },
+      {
+        "case": "clean-hvf-pid-stress-86",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04083554199999995
+      },
+      {
+        "case": "clean-hvf-pid-stress-87",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.043252708000000695
+      },
+      {
+        "case": "clean-hvf-pid-stress-88",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04092591700000092
+      },
+      {
+        "case": "clean-hvf-pid-stress-89",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04670841599999953
+      },
+      {
+        "case": "clean-hvf-pid-stress-90",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04433237499999976
+      },
+      {
+        "case": "clean-hvf-pid-stress-91",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.043008125000000064
+      },
+      {
+        "case": "clean-hvf-pid-stress-92",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04201970799999977
+      },
+      {
+        "case": "clean-hvf-pid-stress-93",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.042696749999999284
+      },
+      {
+        "case": "clean-hvf-pid-stress-94",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.040623166000001376
+      },
+      {
+        "case": "clean-hvf-pid-stress-95",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04382979199999859
+      },
+      {
+        "case": "clean-hvf-pid-stress-96",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.03826508399999895
+      },
+      {
+        "case": "clean-hvf-pid-stress-97",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04340258400000074
+      },
+      {
+        "case": "clean-hvf-pid-stress-98",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.04509804100000103
+      },
+      {
+        "case": "clean-hvf-pid-stress-99",
+        "backend": "hvf",
+        "cpus": 12,
+        "stress": true,
+        "returncode": 0,
+        "seconds": 0.036521707999998654
+      }
+    ],
+    "after_final_namespace_cleanup": [
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "sample": 0,
+        "returncode": 0,
+        "seconds": 0.206213708
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "sample": 1,
+        "returncode": 0,
+        "seconds": 0.045650667000000006
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "sample": 2,
+        "returncode": 0,
+        "seconds": 0.04276595799999999
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "sample": 3,
+        "returncode": 0,
+        "seconds": 0.04580541699999996
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "sample": 4,
+        "returncode": 0,
+        "seconds": 0.04470570899999998
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "sample": 5,
+        "returncode": 0,
+        "seconds": 0.045570416
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "sample": 6,
+        "returncode": 0,
+        "seconds": 0.04476729099999999
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "sample": 7,
+        "returncode": 0,
+        "seconds": 0.04476074999999996
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "sample": 8,
+        "returncode": 0,
+        "seconds": 0.04837591600000002
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "sample": 9,
+        "returncode": 0,
+        "seconds": 0.048894042000000026
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "sample": 0,
+        "returncode": 0,
+        "seconds": 0.04367437500000004
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "sample": 1,
+        "returncode": 0,
+        "seconds": 0.041796666999999954
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "sample": 2,
+        "returncode": 0,
+        "seconds": 0.04148241599999991
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "sample": 3,
+        "returncode": 0,
+        "seconds": 0.04463391700000008
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "sample": 4,
+        "returncode": 0,
+        "seconds": 0.046069499999999985
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "sample": 5,
+        "returncode": 0,
+        "seconds": 0.042657999999999974
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "sample": 6,
+        "returncode": 0,
+        "seconds": 0.044176582999999936
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "sample": 7,
+        "returncode": 0,
+        "seconds": 0.03913975000000003
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "sample": 8,
+        "returncode": 0,
+        "seconds": 0.04165612499999993
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "sample": 9,
+        "returncode": 0,
+        "seconds": 0.04167033299999989
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "sample": 0,
+        "returncode": 0,
+        "seconds": 0.041596999999999884
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "sample": 1,
+        "returncode": 0,
+        "seconds": 0.03904691699999985
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "sample": 2,
+        "returncode": 0,
+        "seconds": 0.04589420799999999
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "sample": 3,
+        "returncode": 0,
+        "seconds": 0.04630400000000012
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "sample": 4,
+        "returncode": 0,
+        "seconds": 0.04370712500000007
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "sample": 5,
+        "returncode": 0,
+        "seconds": 0.041694958000000115
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "sample": 6,
+        "returncode": 0,
+        "seconds": 0.04167641599999983
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "sample": 7,
+        "returncode": 0,
+        "seconds": 0.04460900000000012
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "sample": 8,
+        "returncode": 0,
+        "seconds": 0.04604441700000006
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "sample": 9,
+        "returncode": 0,
+        "seconds": 0.042679750000000016
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 1,
+        "sample": 0,
+        "returncode": 0,
+        "seconds": 0.5393833749999999
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 1,
+        "sample": 1,
+        "returncode": 0,
+        "seconds": 0.04000491699999964
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 1,
+        "sample": 2,
+        "returncode": 0,
+        "seconds": 0.04567741699999983
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 1,
+        "sample": 3,
+        "returncode": 0,
+        "seconds": 0.05003720900000008
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 1,
+        "sample": 4,
+        "returncode": 0,
+        "seconds": 0.04878999999999989
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 1,
+        "sample": 5,
+        "returncode": 0,
+        "seconds": 0.04274874999999989
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 1,
+        "sample": 6,
+        "returncode": 0,
+        "seconds": 0.04163950000000005
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 1,
+        "sample": 7,
+        "returncode": 0,
+        "seconds": 0.024959749999999836
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 1,
+        "sample": 8,
+        "returncode": 0,
+        "seconds": 0.022692291999999892
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 1,
+        "sample": 9,
+        "returncode": 0,
+        "seconds": 0.02356520799999995
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 4,
+        "sample": 0,
+        "returncode": 0,
+        "seconds": 0.04522700000000013
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 4,
+        "sample": 1,
+        "returncode": 0,
+        "seconds": 0.04176220800000019
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 4,
+        "sample": 2,
+        "returncode": 0,
+        "seconds": 0.043837166999999955
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 4,
+        "sample": 3,
+        "returncode": 0,
+        "seconds": 0.046775082999999995
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 4,
+        "sample": 4,
+        "returncode": 0,
+        "seconds": 0.042727249999999994
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 4,
+        "sample": 5,
+        "returncode": 0,
+        "seconds": 0.04162474999999999
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 4,
+        "sample": 6,
+        "returncode": 0,
+        "seconds": 0.04418487500000001
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 4,
+        "sample": 7,
+        "returncode": 0,
+        "seconds": 0.046486584000000164
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 4,
+        "sample": 8,
+        "returncode": 0,
+        "seconds": 0.042640416999999875
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 4,
+        "sample": 9,
+        "returncode": 0,
+        "seconds": 0.04164279099999968
+      }
+    ],
+    "integration": [
+      {
+        "case": "go-gc",
+        "returncode": 0,
+        "seconds": 2.4815645419999997
+      },
+      {
+        "case": "docker",
+        "returncode": 0,
+        "seconds": 75.71372050000001
+      }
+    ],
+    "go_gc_starts": 30,
+    "normal_go_async_preemption": true,
+    "isolated_docker_lifecycle_rounds": 8,
+    "pinned_binary": {
+      "version": "Trames Dev 1.5.3 (dev) runtime 464b8ed091feda2ee5231290920cc54898b86490",
+      "cases": [
+        {
+          "case": "worker-process-family",
+          "cpus": 1,
+          "returncode": 0,
+          "seconds": 0.01965362499999998
+        },
+        {
+          "case": "thread-exit-pid-namespaces",
+          "cpus": 1,
+          "returncode": 0,
+          "seconds": 0.024948833000000004
+        },
+        {
+          "case": "worker-process-family",
+          "cpus": 4,
+          "returncode": 0,
+          "seconds": 0.010122708000000008
+        },
+        {
+          "case": "thread-exit-pid-namespaces",
+          "cpus": 4,
+          "returncode": 0,
+          "seconds": 0.026855291999999975
+        },
+        {
+          "case": "worker-process-family",
+          "cpus": 12,
+          "returncode": 0,
+          "seconds": 0.00899266600000001
+        },
+        {
+          "case": "thread-exit-pid-namespaces",
+          "cpus": 12,
+          "returncode": 0,
+          "seconds": 0.02430320900000002
+        }
+      ]
+    },
+    "unchanged_results_reused": "Prior VFS/ABI/CPU/GPU acceptance; no unrelated full-suite rerun"
+  },
+  "initial_test_observation": {
+    "case": "workers::tests::log_readers_park_and_resume_on_one_slot_without_services_or_svc_replay",
+    "observed": "One initial run counted 4 rather than 6 instructions in a timing-sensitive cohort; unchanged test passes in all later final Apple/native affected suites. No fix to this test or production log path is claimed.",
+    "log_sha256": "6cef012c886d4a490346801ea79967b3e387faaa234f65813bc320869c2546f9"
+  },
+  "native_namespace_oracle": "The complete original native PID fixture has the preexisting negative ioprio EINVAL/ESRCH expectation difference recorded in worker-thread-exit-20261105.json. No assertion weakened or complete native namespace pass claimed. The unchanged native parent-death fixture and new exact-ELF family acceptance pass.",
+  "benchmark": {
+    "binaries": {
+      "before": {
+        "path": "/Users/main/dev/trames/target/worker-family/before-mac-run",
+        "sha256": "4eb5fbf896a11c1405c9d74a7fc371298f1dc7366fc4a885f4af83a97ad15bf0"
+      },
+      "after": {
+        "path": "/Users/main/dev/trames-mac/target/release/Trames Dev.app/Contents/MacOS/trames-mac-run",
+        "sha256": "53101581e96042f26b1944e028ac5d456373168149dd5f7b4f842778d5c15e7b"
+      }
+    },
+    "fixture_sha256": "00e65759eef86a3a7795c4233cd7e7c50150dd262aed526246c6f73737f06e35",
+    "samples": [
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "before",
+        "sample": 0,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 85750,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "after",
+        "sample": 0,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 89208,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "after",
+        "sample": 1,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 75875,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "before",
+        "sample": 1,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 79292,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "before",
+        "sample": 2,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 154708,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "after",
+        "sample": 2,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 82125,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "after",
+        "sample": 3,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 82959,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "before",
+        "sample": 3,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 80083,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "before",
+        "sample": 4,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 87792,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "after",
+        "sample": 4,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 81500,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "after",
+        "sample": 5,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 74042,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "before",
+        "sample": 5,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 77458,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "before",
+        "sample": 6,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 69959,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "after",
+        "sample": 6,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 78375,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "before",
+        "sample": 0,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 489375,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "after",
+        "sample": 0,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 121417,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "after",
+        "sample": 1,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 122875,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "before",
+        "sample": 1,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 645417,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "before",
+        "sample": 2,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 521250,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "after",
+        "sample": 2,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 157000,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "after",
+        "sample": 3,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 154916,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "before",
+        "sample": 3,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 501292,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "before",
+        "sample": 4,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 456792,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "after",
+        "sample": 4,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 146917,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "after",
+        "sample": 5,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 133500,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "before",
+        "sample": 5,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 567042,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "before",
+        "sample": 6,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 559292,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "after",
+        "sample": 6,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 126125,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "before",
+        "sample": 0,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 587625,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "after",
+        "sample": 0,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 130292,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "after",
+        "sample": 1,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 139334,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "before",
+        "sample": 1,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 606750,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "before",
+        "sample": 2,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 644541,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "after",
+        "sample": 2,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 149958,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "after",
+        "sample": 3,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 222792,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "before",
+        "sample": 3,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 626750,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "before",
+        "sample": 4,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 610000,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "after",
+        "sample": 4,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 173250,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "after",
+        "sample": 5,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 203583,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "before",
+        "sample": 5,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 580959,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "before",
+        "sample": 6,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 506792,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "after",
+        "sample": 6,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 156084,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "before",
+        "sample": 0,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 17023583,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "after",
+        "sample": 0,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 16515791,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "after",
+        "sample": 1,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 16866958,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "before",
+        "sample": 1,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 17020458,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "before",
+        "sample": 2,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 16630417,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "after",
+        "sample": 2,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 16718959,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "after",
+        "sample": 3,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 16671875,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "before",
+        "sample": 3,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 16530667,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "before",
+        "sample": 4,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 16750292,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "after",
+        "sample": 4,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 16790959,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "after",
+        "sample": 5,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 16422583,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "before",
+        "sample": 5,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 16561500,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "before",
+        "sample": 6,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 16934833,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "after",
+        "sample": 6,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 16927334,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "before",
+        "sample": 0,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 272593083,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "after",
+        "sample": 0,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 3650125,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "after",
+        "sample": 1,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 3831709,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "before",
+        "sample": 1,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 272096166,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "before",
+        "sample": 2,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 270049292,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "after",
+        "sample": 2,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 3759417,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "after",
+        "sample": 3,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 3664750,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "before",
+        "sample": 3,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 269589791,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "before",
+        "sample": 4,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 272999084,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "after",
+        "sample": 4,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 3693458,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "after",
+        "sample": 5,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 3703709,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "before",
+        "sample": 5,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 270434875,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "before",
+        "sample": 6,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 275178625,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "after",
+        "sample": 6,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 3777875,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "before",
+        "sample": 0,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 261684250,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "after",
+        "sample": 0,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 3621834,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "after",
+        "sample": 1,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 3797292,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "before",
+        "sample": 1,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 263100042,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "before",
+        "sample": 2,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 258797459,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "after",
+        "sample": 2,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 3764209,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "after",
+        "sample": 3,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 3727541,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "before",
+        "sample": 3,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 258431083,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "before",
+        "sample": 4,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 257480042,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "after",
+        "sample": 4,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 3697333,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "after",
+        "sample": 5,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 3756834,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "before",
+        "sample": 5,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 260380209,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "before",
+        "sample": 6,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 259220250,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "after",
+        "sample": 6,
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 3778417,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 1,
+        "sample": 0,
+        "phase": "native",
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 22371,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 1,
+        "sample": 1,
+        "phase": "native",
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 17664,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 1,
+        "sample": 2,
+        "phase": "native",
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 23121,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 1,
+        "sample": 3,
+        "phase": "native",
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 18455,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 1,
+        "sample": 4,
+        "phase": "native",
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 15539,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 1,
+        "sample": 5,
+        "phase": "native",
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 14290,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 1,
+        "sample": 6,
+        "phase": "native",
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 15331,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 1,
+        "sample": 0,
+        "phase": "native",
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1809083,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 1,
+        "sample": 1,
+        "phase": "native",
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1840161,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 1,
+        "sample": 2,
+        "phase": "native",
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 2132447,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 1,
+        "sample": 3,
+        "phase": "native",
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1866240,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 1,
+        "sample": 4,
+        "phase": "native",
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1922231,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 1,
+        "sample": 5,
+        "phase": "native",
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1922481,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 1,
+        "sample": 6,
+        "phase": "native",
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1812581,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 4,
+        "sample": 0,
+        "phase": "native",
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 36869,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 4,
+        "sample": 1,
+        "phase": "native",
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 38619,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 4,
+        "sample": 2,
+        "phase": "native",
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 27953,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 4,
+        "sample": 3,
+        "phase": "native",
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 25412,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 4,
+        "sample": 4,
+        "phase": "native",
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 23288,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 4,
+        "sample": 5,
+        "phase": "native",
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 23454,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 4,
+        "sample": 6,
+        "phase": "native",
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 27662,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 4,
+        "sample": 0,
+        "phase": "native",
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1061245,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 4,
+        "sample": 1,
+        "phase": "native",
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 969968,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 4,
+        "sample": 2,
+        "phase": "native",
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 577240,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 4,
+        "sample": 3,
+        "phase": "native",
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 961677,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 4,
+        "sample": 4,
+        "phase": "native",
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 960053,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 4,
+        "sample": 5,
+        "phase": "native",
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 603861,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 4,
+        "sample": 6,
+        "phase": "native",
+        "case": "worker-process-family",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1003171,
+        "passed": true
+      }
+    ],
+    "summary": [
+      {
+        "rounds_per_thread": 1,
+        "cpus": 1,
+        "before_median_ns": 80083,
+        "after_median_ns": 81500,
+        "speedup": 0.9826134969325153,
+        "native_linux_median_ns": 17664
+      },
+      {
+        "rounds_per_thread": 1,
+        "cpus": 4,
+        "before_median_ns": 521250,
+        "after_median_ns": 133500,
+        "speedup": 3.904494382022472,
+        "native_linux_median_ns": 27662
+      },
+      {
+        "rounds_per_thread": 1,
+        "cpus": 12,
+        "before_median_ns": 606750,
+        "after_median_ns": 156084,
+        "speedup": 3.8873298992850005,
+        "native_linux_median_ns": null
+      },
+      {
+        "rounds_per_thread": 1000,
+        "cpus": 1,
+        "before_median_ns": 16750292,
+        "after_median_ns": 16718959,
+        "speedup": 1.0018740999364852,
+        "native_linux_median_ns": 1866240
+      },
+      {
+        "rounds_per_thread": 1000,
+        "cpus": 4,
+        "before_median_ns": 272096166,
+        "after_median_ns": 3703709,
+        "speedup": 73.46585976382053,
+        "native_linux_median_ns": 961677
+      },
+      {
+        "rounds_per_thread": 1000,
+        "cpus": 12,
+        "before_median_ns": 259220250,
+        "after_median_ns": 3756834,
+        "speedup": 68.99965502867575,
+        "native_linux_median_ns": null
+      }
+    ],
+    "samples_per_cell": 7,
+    "ordering": "Counterbalanced before/after; all builds and Linux reference VM stopped during HVF collection",
+    "interval": "Four already-ready threads; each round performs subreaper set/get and getppid; barrier release, faulting output check and joins inside; clone/setup/final stack unmap outside",
+    "native_reference": "Exact static ELF in existing six-vCPU ARM Linux Lima instance, one/four CPU affinity; not bare-metal Darwin",
+    "limits": "Focused control-call latency/throughput; no browser or Docker application speedup implied; single-CPU path shows no meaningful improvement",
+    "four_cpu_diagnostic": {
+      "rounds_per_thread": 1000,
+      "cohort_rounds_before": 6858,
+      "cohort_rounds_after": 4,
+      "returned_prctl_before": 8004,
+      "returned_prctl_after": 0,
+      "service_requests_before": 3,
+      "service_requests_after": 3
+    },
+    "pinned_build_note": "Performance uses final production source with prior metadata pin; final pin-only rebuild independently passes six cases and is installed. Code source is identical."
+  },
+  "remaining_boundaries": [
+    "Final last-member/group/default-fatal exit is still an actual owned lifecycle entry",
+    "Final CPU/VFS/mm/native-context custody and namespace-victim projection collection",
+    "Robust-futex support/cleanup and actual owner epoll/namespace/proc/mount destructors",
+    "Tracing/vfork, accepted owner/mapped-file work and legacy ancillary custody"
+  ],
+  "installed": {
+    "stable": {
+      "version": "Trames 1.5.3 (stable) runtime d9c4a811faf316a51b1a8f33f055247943a18855",
+      "binary_sha256": "4f40615213e731b2a4ef9d8c6a0e85c5c7bdf31ab0c60b0354b55113f2a6a55d"
+    },
+    "dev": {
+      "version": "Trames Dev 1.5.3 (dev) runtime 464b8ed091feda2ee5231290920cc54898b86490",
+      "binary_sha256": "d74b416f2b7ac3345e151db87aa3df2a9d4fdc6bd5f01515f641f8fa7a6e549c"
+    },
+    "stable_unchanged": true
+  },
+  "stable_or_business_restart": false,
+  "techo_frontend_activated": false,
+  "log_hashes": {
+    "apple-tests.log": "6cc6f7599517cc8ee959f31716abbfde387ac831270f0f690bb2616cd185ef67",
+    "runtime-clippy.log": "adf0cf17eae3e3f3add34fcaad4085b06b6d2b90a799cc9a00c37807867a92d6",
+    "product-clippy.log": "d08389789bcab316885a11331fcb91e47ce00ce0498509dbe1261883b815087d",
+    "ipad-check.log": "96f4d74f916f0b5600a9dd68dbf8943ddd4ab570dfb8d5c5b9f17243c5239154",
+    "resource-tests.log": "7019661b6e2470ed7bf0327084d191d2dc5dbe8f1a6b905b54726ae8c0b2c1d8",
+    "exec-presence-red.log": "c5ed1a377be8c1c6c3fdf3618b8548ce883384eff55803675209480e6bf276d4",
+    "namespace-group-red.log": "f67576c2a6e19e28a05d9e50bb158a79156c1035449dc93e41ef2ab7efd40706",
+    "acceptance-summary.log": "24e09c14933608d505e30a15b1dae29a949288e19a27a67864503377e783ffde",
+    "postfix-summary.log": "47041fde3f8ce131c8ee8e30f5299662a1dbcb61260002ff752d658af47b60a1",
+    "metrics-1000-before.log": "b4884727b0032620078fd316a0923a33f8cfcc8b5a0365b500d99ee21a74cfd2",
+    "metrics-1000-after.log": "dbe8e23aa7278156cd1468c5871e9f11f5a347c8955b36d5a774146d63516135",
+    "go-gc-integration.log": "e8dd5e3fae6fa8b3df1090acd43b111cb7b1c7e49b8c57ade35be6d498d7b52e",
+    "docker-integration.log": "708e43b24fd651f7453f0565384b8b38581354a00483c1d03cb303835c0a15d7",
+    "pinned-build.log": "fdeef56ef3e9998595bf8f353cce6d0840d286322002c52d54d1cadccfce02bc",
+    "install-dev.log": "d81b37faaef60b5a1b635ce5a81a399a304e89d9aee6498d2d7eecf5f3f5bd41"
+  }
+}
