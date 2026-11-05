@@ -2526,7 +2526,8 @@
     "These are scheduling-control loops, not Firefox, Geekbench or general application speedups. Longest-worker loop and whole-process wall are separate measurements.",
     "Existing stable/desktop services remained active. Native ARM Linux is an exact-ELF contextual reference in the six-vCPU local CI environment; macOS has no equivalent Linux affinity syscall ABI.",
     "The former cold-CPU prototype timed out because owner-only slot startup remained. Source-started slots fix that dependency; the preserved timeout log is not a before/after performance sample.",
-    "An initial test build omitted the static Vulkan library flag; the matched baseline passed, and the final exact measured/installed binary passed GPU/video with the reused verified archive."
+    "An initial test build omitted the static Vulkan library flag; the matched baseline passed, and the final exact measured/installed binary passed GPU/video with the reused verified archive.",
+    "Self-update timing reapplies the allowed full mask, SCHED_OTHER/zero parameter and nice 7; it is not a continuous CPU-migration timing. Actual migration and cold-slot behavior are validated separately."
   ],
   "final_dev_package": {
     "installed": true,

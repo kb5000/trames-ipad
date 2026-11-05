@@ -67,6 +67,9 @@ or whole-application speedup follows from the table.
 | Cross-thread queries | 195.21 ms | 2.37 ms | 82.3x | 0.165 ms |
 
 These medians measure the longest worker's loop, excluding thread setup/join.
+The update loop reapplies the full allowed mask, SCHED_OTHER/zero parameter and
+nice 7; it does not continuously migrate a thread. Actual migration and cold
+slots are covered by the separate compatibility acceptance.
 Including complete startup and teardown, twelve-CPU process medians change
 201.41 → 13.62 ms, 197.63 → 14.45 ms, and 203.73 → 13.35 ms respectively.
 Native Linux uses the exact static ELF in the existing six-vCPU local ARM64 CI
