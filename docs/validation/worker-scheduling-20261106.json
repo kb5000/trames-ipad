@@ -1,0 +1,2564 @@
+{
+  "schema": 1,
+  "date": "2026-11-06",
+  "runtime_revision": "e6d700c3147a4fb5a2a772dfcbb28eb636ac53fc",
+  "baseline_runtime_revision": "a116d834318d59ea51f3de119fc7e20ed44c58d8",
+  "scope": "Complete implemented scheduling controls: original task attributes, cross-task/group/UID selection and permissions, migration completion, direct on-demand CPU-pool startup, original identity through fork/exec/exit and source seccomp. No second subsystem migration.",
+  "source_files": {
+    "crates/trames-kernel/src/completion.rs": "550028f82b9b7636fb3d8c9194f99bc3d3703eee0ba281834920769880146d4c",
+    "crates/trames-kernel/src/lib.rs": "2d8158df55c5bace3c037664248539354a8468ae9b2d03c90ba29f04407abdd2",
+    "crates/trames-kernel/src/scheduling.rs": "2ab7a7c3867ad2cb63e4c88798d7a92e62171007c6e82794b222dba0e35d4838",
+    "crates/trames-kernel/src/signal/io.rs": "3a5c2d8c7562ff1b9831070798809cc96d4537469562890ec0d78454a2678cfe",
+    "crates/trames-kernel/src/signal/io_scheduling.rs": "7333abc86ae1985d9cf7180a16016c2e4836442fbdf8dd08a700b5dec1e43482",
+    "crates/trames-kernel/src/signal/mod.rs": "50ae616d8fbc3be7a0ba0cfb1db2a647575a661627e74d1ba183ed6e7b95b158",
+    "crates/trames-kernel/src/task_control.rs": "84b236526b17ada470d90ba705e4476463c9a05a48731f17124d74e4e228134f",
+    "crates/trames-kernel/src/vfork.rs": "f39b94b8ff81e03ac2cb6142f297e16121bba3b26b4c759cdeb400e750373e5d",
+    "crates/trames-session/src/process.rs": "841146dce588393b4b0374119fba3a2fcc9da181943c1385980d0bd9d8fc5df7",
+    "crates/trames-session/src/process_caps.rs": "deff1a4e38b3ec6aa656ee88fe572a7c9f0239ae1915181ed9b10f3d90f97798",
+    "crates/trames-session/src/process_dispatch.rs": "3201982e716ed4c0252fa167f4ce19cd3c78293b15456ae643fe4e0d698cd968",
+    "crates/trames-session/src/process_events.rs": "7b87ff2ca70195006deb70a9a8709732322ac350d9695cfdafcd94916e735a1a",
+    "crates/trames-session/src/process_exec.rs": "34f01b34ee79bebc3ed2db2750b512cdd82a503d0a73d1403c271d4962774014",
+    "crates/trames-session/src/process_exit.rs": "2b7e5974cc5b783a205ec49f86d62ee4c314a85af84944323a19a8d3a0eaaf80",
+    "crates/trames-session/src/process_scheduling.rs": "9d41eaf014e9e8bcb8abe0643166008bce7e20eee2094c300e03dbf4a9a17f9f",
+    "crates/trames-session/src/process_seccomp.rs": "3fd715e369b96eae75b5f2de2c55ee7f0bc9c4f4970f2925f83ce8de7cf878ed",
+    "crates/trames-session/src/process_service.rs": "97b8c917e4496bb7bd15c5288482dbe28031885a15e2d4b8cf708362fff76e71",
+    "crates/trames-session/src/process_socket_wait.rs": "e5dd366e5a48c0515fa5bafd2233bf5f029c1fa4194ff581cfde88b7106ee0be",
+    "crates/trames-session/src/process_vm.rs": "1a845009290fe1c06248a9f7dbcf569ff5a2d9918facdb505e2f075416f276f1",
+    "crates/trames-session/src/run_queue.rs": "2a64cabe105d1330f1c523449d6370dc93975ce218550ab8fdaae60464aef6ea",
+    "crates/trames-session/src/worker_syscalls.rs": "c670104cd5f5c29baad26aa8ad4b12210a772e6c01458b65d91f6f9c0f27df3c",
+    "crates/trames-session/src/workers.rs": "83f239d0bdfd14a7491781f92be0f1db449dce1470464b5681c5d326e8f3a14c",
+    "crates/trames-session/src/workers_uring_tests.rs": "cac8e7cc5abc972a15e185d0fad2abf289f1fa02e95ebf8d441e1ce5efb8a8ea"
+  },
+  "fixture_source_sha256": "5908c548d8c0ec9ccb3015d32ff19145bf73d5127a45745dafd54e72128e30c2",
+  "guest_elf_sha256": "4fca41e4ccec9efa50b12c675cc2f69bb87a1130ec29b459cc6f43e2af960a12",
+  "baseline_and_candidate": {
+    "before": {
+      "version": "Trames Dev 1.5.3 (dev) runtime a116d834318d59ea51f3de119fc7e20ed44c58d8",
+      "sha256": "169c2dda603cf5cdc0b855358ff20d2e8de26a549ff617131a71ed29de61fffa"
+    },
+    "after": {
+      "version": "Trames Dev 1.5.3 (dev) runtime e6d700c3147a4fb5a2a772dfcbb28eb636ac53fc",
+      "sha256": "47eb6e30f317d1305e4a33e2fea8f5fe3976f8b70428a00ae929232dca7cb17d"
+    }
+  },
+  "candidate_static_moltenvk_sha256": "538c5a1f3f73dbcf1bdb91d80353ea9b6997d4724769227eb373569af6eec77d",
+  "build_configuration": "Mac release Dev with TRAMES_MOLTENVK_STATIC_DIR pointing to the existing verified macOS arm64 archive, Xcode/SDK 27.2. No driver or guest library sources changed.",
+  "concurrency": [
+    "Original IoTask atomics own affinity/nice/policy; self queries avoid the PID index. Existing PID directory provides original cross-task/group/UID identities.",
+    "The same group-control lock serializes actual mask publication and execution entry. Only an original running target must depart before accepted migration completion; caller waits return the execution slot.",
+    "Original completion events retain pending migrations across rekey/exit and cohort handoff; callbacks run after resource locks. No numeric PID relookup or syscall replay.",
+    "The queue can start a required cold original executor through the shared CPU pool. Per-slot startup/control locks do not cover guest execution; no service thread, polling bus or eager all-CPU startup is added.",
+    "Birth, process-group/session mutation, credentials and exec publish authority at actual write boundaries. Ordinary owner queries do not rebuild every task projection.",
+    "Ordinary fields use relaxed atomics; completion has actual release/acquire synchronization. No new guest memory fences, algorithm-wide/native locks, unsafe impls or host scheduling changes."
+  ],
+  "checks": {
+    "apple": {
+      "process_passed": 324,
+      "process_ignored": 3,
+      "kernel_passed": 65,
+      "strict_affected_checks": true
+    },
+    "native_arm_linux": {
+      "process_passed": 324,
+      "process_ignored": 3,
+      "kernel_passed": 65,
+      "strict_affected_checks": true
+    },
+    "unchanged_kernel_checks_reused_after_session_only_changes": true,
+    "mac_product_passed": 20,
+    "mac_hvf_nonhardware_passed": 4,
+    "signed_hvf_hardware_passed": 47,
+    "signed_pressure_passed": 1,
+    "ipad_device_compile_target": "aarch64-apple-ios",
+    "ipad_simulator_compile_target": "aarch64-apple-ios-sim",
+    "ipad_compile_passed": true,
+    "physical_ipad_run": false,
+    "both_product_boundaries": true,
+    "unchanged_memory_vfs_and_guest_driver_results_reused": true,
+    "go_gc_rounds": 30,
+    "isolated_docker_rounds": 8,
+    "native_gpu_lifecycles": 20,
+    "native_video_lifecycles": 2000,
+    "local_ci_before_publish": true
+  },
+  "functional_acceptance": {
+    "elf_sha256": "4fca41e4ccec9efa50b12c675cc2f69bb87a1130ec29b459cc6f43e2af960a12",
+    "mac_sha256": "47eb6e30f317d1305e4a33e2fea8f5fe3976f8b70428a00ae929232dca7cb17d",
+    "interpreter_sha256": "3d0a33e9f18cf84ec96903b938f104ffffba1720e651b937ed234d3d7e297f04",
+    "cases": [
+      {
+        "case": "hvf-1-compat",
+        "exit": 0,
+        "seconds": 0.024664417,
+        "paths": {
+          "cohort_rounds": 0,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 274,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 0,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "case": "hvf-1-query",
+        "exit": 0,
+        "seconds": 0.024025249999999998,
+        "paths": {
+          "cohort_rounds": 0,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 2116,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 0,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "case": "hvf-1-update",
+        "exit": 0,
+        "seconds": 0.02411533299999999,
+        "paths": {
+          "cohort_rounds": 0,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 2116,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 0,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "case": "hvf-1-target",
+        "exit": 0,
+        "seconds": 0.02353116700000002,
+        "paths": {
+          "cohort_rounds": 0,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 2116,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 0,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "case": "hvf-1-compat-filtered",
+        "exit": 0,
+        "seconds": 0.011997749999999974,
+        "paths": {
+          "cohort_rounds": 0,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 276,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 0,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "case": "hvf-1-query-filtered",
+        "exit": 0,
+        "seconds": 0.024034250000000035,
+        "paths": {
+          "cohort_rounds": 0,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 2118,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 0,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "case": "hvf-1-update-filtered",
+        "exit": 0,
+        "seconds": 0.020919083000000005,
+        "paths": {
+          "cohort_rounds": 0,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 2118,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 0,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "case": "hvf-1-target-filtered",
+        "exit": 0,
+        "seconds": 0.024049209000000016,
+        "paths": {
+          "cohort_rounds": 0,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 2118,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 0,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "case": "hvf-2-compat",
+        "exit": 0,
+        "seconds": 0.024096415999999954,
+        "paths": {
+          "cohort_rounds": 1,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 386,
+          "vm_local_syscalls": 10,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 46,
+          "worker_futex_wakes": 13,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 355,
+          "worker_task_resumes": 12,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "case": "hvf-2-query",
+        "exit": 0,
+        "seconds": 0.020272541000000033,
+        "paths": {
+          "cohort_rounds": 1,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 2110,
+          "vm_local_syscalls": 10,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 8,
+          "worker_futex_wakes": 12,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 2087,
+          "worker_task_resumes": 8,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "case": "hvf-2-update",
+        "exit": 0,
+        "seconds": 0.024006415999999975,
+        "paths": {
+          "cohort_rounds": 1,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 2111,
+          "vm_local_syscalls": 10,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 8,
+          "worker_futex_wakes": 12,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 2088,
+          "worker_task_resumes": 8,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "case": "hvf-2-target",
+        "exit": 0,
+        "seconds": 0.02288204100000002,
+        "paths": {
+          "cohort_rounds": 1,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 2111,
+          "vm_local_syscalls": 10,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 8,
+          "worker_futex_wakes": 12,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 2088,
+          "worker_task_resumes": 8,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "case": "hvf-2-compat-filtered",
+        "exit": 0,
+        "seconds": 0.02405741699999997,
+        "paths": {
+          "cohort_rounds": 1,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 353,
+          "vm_local_syscalls": 10,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 44,
+          "worker_futex_wakes": 13,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 320,
+          "worker_task_resumes": 10,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "case": "hvf-2-query-filtered",
+        "exit": 0,
+        "seconds": 0.02430312499999998,
+        "paths": {
+          "cohort_rounds": 1,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 2114,
+          "vm_local_syscalls": 10,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 9,
+          "worker_futex_wakes": 12,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 2089,
+          "worker_task_resumes": 9,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "case": "hvf-2-update-filtered",
+        "exit": 0,
+        "seconds": 0.024168624999999944,
+        "paths": {
+          "cohort_rounds": 1,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 2112,
+          "vm_local_syscalls": 10,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 8,
+          "worker_futex_wakes": 12,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 2087,
+          "worker_task_resumes": 8,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "case": "hvf-2-target-filtered",
+        "exit": 0,
+        "seconds": 0.023479125000000045,
+        "paths": {
+          "cohort_rounds": 1,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 2113,
+          "vm_local_syscalls": 10,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 9,
+          "worker_futex_wakes": 12,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 2088,
+          "worker_task_resumes": 9,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "case": "hvf-4-compat",
+        "exit": 0,
+        "seconds": 0.02258812499999996,
+        "paths": {
+          "cohort_rounds": 1,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 500,
+          "vm_local_syscalls": 10,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 44,
+          "worker_futex_wakes": 14,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 469,
+          "worker_task_resumes": 10,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "case": "hvf-4-query",
+        "exit": 0,
+        "seconds": 0.02323474999999997,
+        "paths": {
+          "cohort_rounds": 1,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 2111,
+          "vm_local_syscalls": 10,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 9,
+          "worker_futex_wakes": 12,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 2088,
+          "worker_task_resumes": 9,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "case": "hvf-4-update",
+        "exit": 0,
+        "seconds": 0.022417624999999997,
+        "paths": {
+          "cohort_rounds": 1,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 2112,
+          "vm_local_syscalls": 10,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 9,
+          "worker_futex_wakes": 12,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 2089,
+          "worker_task_resumes": 9,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "case": "hvf-4-target",
+        "exit": 0,
+        "seconds": 0.02393212499999997,
+        "paths": {
+          "cohort_rounds": 1,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 2112,
+          "vm_local_syscalls": 10,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 9,
+          "worker_futex_wakes": 12,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 2089,
+          "worker_task_resumes": 9,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "case": "hvf-4-compat-filtered",
+        "exit": 0,
+        "seconds": 0.023973083000000006,
+        "paths": {
+          "cohort_rounds": 1,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 528,
+          "vm_local_syscalls": 10,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 45,
+          "worker_futex_wakes": 13,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 495,
+          "worker_task_resumes": 11,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "case": "hvf-4-query-filtered",
+        "exit": 0,
+        "seconds": 0.02104687499999991,
+        "paths": {
+          "cohort_rounds": 1,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 2113,
+          "vm_local_syscalls": 10,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 8,
+          "worker_futex_wakes": 12,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 2088,
+          "worker_task_resumes": 8,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "case": "hvf-4-update-filtered",
+        "exit": 0,
+        "seconds": 0.024070082999999798,
+        "paths": {
+          "cohort_rounds": 1,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 2117,
+          "vm_local_syscalls": 10,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 12,
+          "worker_futex_wakes": 12,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 2092,
+          "worker_task_resumes": 12,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "case": "hvf-4-target-filtered",
+        "exit": 0,
+        "seconds": 0.022435874999999994,
+        "paths": {
+          "cohort_rounds": 1,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 2113,
+          "vm_local_syscalls": 10,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 9,
+          "worker_futex_wakes": 12,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 2088,
+          "worker_task_resumes": 9,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "case": "hvf-12-compat",
+        "exit": 0,
+        "seconds": 0.0242171659999999,
+        "paths": {
+          "cohort_rounds": 1,
+          "cohort_stop_us": 3,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 576,
+          "vm_local_syscalls": 10,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 47,
+          "worker_futex_wakes": 13,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 545,
+          "worker_task_resumes": 13,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "case": "hvf-12-query",
+        "exit": 0,
+        "seconds": 0.023370375000000054,
+        "paths": {
+          "cohort_rounds": 1,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 2112,
+          "vm_local_syscalls": 10,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 9,
+          "worker_futex_wakes": 12,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 2089,
+          "worker_task_resumes": 9,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "case": "hvf-12-update",
+        "exit": 0,
+        "seconds": 0.02402733300000004,
+        "paths": {
+          "cohort_rounds": 1,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 2113,
+          "vm_local_syscalls": 10,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 10,
+          "worker_futex_wakes": 12,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 2090,
+          "worker_task_resumes": 10,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "case": "hvf-12-target",
+        "exit": 0,
+        "seconds": 0.022174584000000053,
+        "paths": {
+          "cohort_rounds": 1,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 2112,
+          "vm_local_syscalls": 10,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 10,
+          "worker_futex_wakes": 12,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 2089,
+          "worker_task_resumes": 10,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "case": "hvf-12-compat-filtered",
+        "exit": 0,
+        "seconds": 0.02098358400000011,
+        "paths": {
+          "cohort_rounds": 1,
+          "cohort_stop_us": 4,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 457,
+          "vm_local_syscalls": 10,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 45,
+          "worker_futex_wakes": 13,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 424,
+          "worker_task_resumes": 11,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "case": "hvf-12-query-filtered",
+        "exit": 0,
+        "seconds": 0.02404200000000012,
+        "paths": {
+          "cohort_rounds": 1,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 2112,
+          "vm_local_syscalls": 10,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 8,
+          "worker_futex_wakes": 12,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 2087,
+          "worker_task_resumes": 8,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "case": "hvf-12-update-filtered",
+        "exit": 0,
+        "seconds": 0.024081291999999976,
+        "paths": {
+          "cohort_rounds": 1,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 2113,
+          "vm_local_syscalls": 10,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 9,
+          "worker_futex_wakes": 12,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 2088,
+          "worker_task_resumes": 9,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "case": "hvf-12-target-filtered",
+        "exit": 0,
+        "seconds": 0.02244249999999992,
+        "paths": {
+          "cohort_rounds": 1,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 2115,
+          "vm_local_syscalls": 10,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 11,
+          "worker_futex_wakes": 12,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 2090,
+          "worker_task_resumes": 11,
+          "worker_uring_syscalls": 0
+        }
+      },
+      {
+        "case": "interpreter-1-compat",
+        "exit": 0,
+        "seconds": 0.6352425839999998
+      },
+      {
+        "case": "interpreter-1-query",
+        "exit": 0,
+        "seconds": 0.048549041999999876
+      },
+      {
+        "case": "interpreter-1-update",
+        "exit": 0,
+        "seconds": 0.04749120799999984
+      },
+      {
+        "case": "interpreter-1-target",
+        "exit": 0,
+        "seconds": 0.04835675000000039
+      },
+      {
+        "case": "interpreter-1-compat-filtered",
+        "exit": 0,
+        "seconds": 0.012136625000000123
+      },
+      {
+        "case": "interpreter-1-query-filtered",
+        "exit": 0,
+        "seconds": 0.04498495900000021
+      },
+      {
+        "case": "interpreter-1-update-filtered",
+        "exit": 0,
+        "seconds": 0.037047083000000036
+      },
+      {
+        "case": "interpreter-1-target-filtered",
+        "exit": 0,
+        "seconds": 0.04837387500000023
+      },
+      {
+        "case": "interpreter-2-compat",
+        "exit": 0,
+        "seconds": 0.024463708999999945
+      },
+      {
+        "case": "interpreter-2-query",
+        "exit": 0,
+        "seconds": 0.02443699999999982
+      },
+      {
+        "case": "interpreter-2-update",
+        "exit": 0,
+        "seconds": 0.021336875000000255
+      },
+      {
+        "case": "interpreter-2-target",
+        "exit": 0,
+        "seconds": 0.024246458999999998
+      },
+      {
+        "case": "interpreter-2-compat-filtered",
+        "exit": 0,
+        "seconds": 0.02353204199999981
+      },
+      {
+        "case": "interpreter-2-query-filtered",
+        "exit": 0,
+        "seconds": 0.02307024999999996
+      },
+      {
+        "case": "interpreter-2-update-filtered",
+        "exit": 0,
+        "seconds": 0.024310874999999843
+      },
+      {
+        "case": "interpreter-2-target-filtered",
+        "exit": 0,
+        "seconds": 0.024318000000000062
+      },
+      {
+        "case": "interpreter-4-compat",
+        "exit": 0,
+        "seconds": 0.02207045799999996
+      },
+      {
+        "case": "interpreter-4-query",
+        "exit": 0,
+        "seconds": 0.024487999999999843
+      },
+      {
+        "case": "interpreter-4-update",
+        "exit": 0,
+        "seconds": 0.02128741699999992
+      },
+      {
+        "case": "interpreter-4-target",
+        "exit": 0,
+        "seconds": 0.02438341700000013
+      },
+      {
+        "case": "interpreter-4-compat-filtered",
+        "exit": 0,
+        "seconds": 0.02458295899999996
+      },
+      {
+        "case": "interpreter-4-query-filtered",
+        "exit": 0,
+        "seconds": 0.02396854199999998
+      },
+      {
+        "case": "interpreter-4-update-filtered",
+        "exit": 0,
+        "seconds": 0.02428054200000007
+      },
+      {
+        "case": "interpreter-4-target-filtered",
+        "exit": 0,
+        "seconds": 0.02467037499999991
+      }
+    ]
+  },
+  "regression_smoke": [
+    {
+      "case": "native-gpu",
+      "exit": 0,
+      "seconds": 0.074589
+    },
+    {
+      "case": "native-video",
+      "exit": 0,
+      "seconds": 0.022852499999999998
+    },
+    {
+      "case": "go-gc",
+      "exit": 0,
+      "seconds": 2.572647459
+    },
+    {
+      "case": "docker",
+      "exit": 0,
+      "seconds": 77.169035125
+    }
+  ],
+  "performance_summary": [
+    {
+      "cpus": 4,
+      "mode": "query",
+      "name": "Self queries",
+      "before_median_ms": 159.100834,
+      "before_process_median_ms": 168.32720899999998,
+      "after_median_ms": 2.131959,
+      "after_process_median_ms": 13.778167000000007,
+      "speedup": 74.62659178717789,
+      "process_speedup": 12.216952298516913,
+      "native_linux_median_ms": 0.152206
+    },
+    {
+      "cpus": 4,
+      "mode": "update",
+      "name": "Self updates",
+      "before_median_ms": 157.905083,
+      "before_process_median_ms": 165.43741600000007,
+      "after_median_ms": 2.119292,
+      "after_process_median_ms": 13.431042000000115,
+      "speedup": 74.50841271518978,
+      "process_speedup": 12.317541408924091,
+      "native_linux_median_ms": 0.374702
+    },
+    {
+      "cpus": 4,
+      "mode": "target",
+      "name": "Cross-thread queries",
+      "before_median_ms": 159.42100000000002,
+      "before_process_median_ms": 168.18633300000042,
+      "after_median_ms": 2.380584,
+      "after_process_median_ms": 13.661667000000044,
+      "speedup": 66.96718116226944,
+      "process_speedup": 12.310820707311917,
+      "native_linux_median_ms": 0.164831
+    },
+    {
+      "cpus": 12,
+      "mode": "query",
+      "name": "Self queries",
+      "before_median_ms": 194.13825,
+      "before_process_median_ms": 201.40620799999988,
+      "after_median_ms": 2.1195839999999997,
+      "after_process_median_ms": 13.61941600000005,
+      "speedup": 91.59261911771368,
+      "process_speedup": 14.788167715855007,
+      "native_linux_median_ms": 0.152206
+    },
+    {
+      "cpus": 12,
+      "mode": "update",
+      "name": "Self updates",
+      "before_median_ms": 189.990917,
+      "before_process_median_ms": 197.62787500000024,
+      "after_median_ms": 2.139458,
+      "after_process_median_ms": 14.452832999999998,
+      "speedup": 88.80329363792139,
+      "process_speedup": 13.673988691352088,
+      "native_linux_median_ms": 0.374702
+    },
+    {
+      "cpus": 12,
+      "mode": "target",
+      "name": "Cross-thread queries",
+      "before_median_ms": 195.21154199999998,
+      "before_process_median_ms": 203.72604099999947,
+      "after_median_ms": 2.372542,
+      "after_process_median_ms": 13.350083000000623,
+      "speedup": 82.27948841369297,
+      "process_speedup": 15.260282726331361,
+      "native_linux_median_ms": 0.164831
+    }
+  ],
+  "benchmark": {
+    "schema": 1,
+    "date": "2026-11-06",
+    "runtime_revision": "e6d700c3147a4fb5a2a772dfcbb28eb636ac53fc",
+    "before_runtime_revision": "a116d834318d59ea51f3de119fc7e20ed44c58d8",
+    "power_before": {
+      "thermal_state": 0,
+      "low_power": false
+    },
+    "power_after": {
+      "thermal_state": 0,
+      "low_power": false
+    },
+    "start_unix": 1793905513.744653,
+    "end_unix": 1793905523.23871,
+    "binaries": {
+      "before": {
+        "version": "Trames Dev 1.5.3 (dev) runtime a116d834318d59ea51f3de119fc7e20ed44c58d8",
+        "sha256": "169c2dda603cf5cdc0b855358ff20d2e8de26a549ff617131a71ed29de61fffa"
+      },
+      "after": {
+        "version": "Trames Dev 1.5.3 (dev) runtime e6d700c3147a4fb5a2a772dfcbb28eb636ac53fc",
+        "sha256": "47eb6e30f317d1305e4a33e2fea8f5fe3976f8b70428a00ae929232dca7cb17d"
+      }
+    },
+    "elf_sha256": "4fca41e4ccec9efa50b12c675cc2f69bb87a1130ec29b459cc6f43e2af960a12",
+    "samples": [
+      {
+        "phase": "before",
+        "cpus": 4,
+        "process_seconds": 0.16735070800000001,
+        "mode": "query",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.158361333,
+        "sample": 0
+      },
+      {
+        "phase": "after",
+        "cpus": 4,
+        "process_seconds": 0.01339404199999994,
+        "mode": "query",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.0021495,
+        "sample": 0
+      },
+      {
+        "phase": "after",
+        "cpus": 4,
+        "process_seconds": 0.013778167000000008,
+        "mode": "query",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.002241666,
+        "sample": 1
+      },
+      {
+        "phase": "before",
+        "cpus": 4,
+        "process_seconds": 0.1691339999999999,
+        "mode": "query",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.161391041,
+        "sample": 1
+      },
+      {
+        "phase": "before",
+        "cpus": 4,
+        "process_seconds": 0.16832720899999998,
+        "mode": "query",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.159100834,
+        "sample": 2
+      },
+      {
+        "phase": "after",
+        "cpus": 4,
+        "process_seconds": 0.013441333000000055,
+        "mode": "query",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.002131959,
+        "sample": 2
+      },
+      {
+        "phase": "after",
+        "cpus": 4,
+        "process_seconds": 0.013876082999999984,
+        "mode": "query",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.002123542,
+        "sample": 3
+      },
+      {
+        "phase": "before",
+        "cpus": 4,
+        "process_seconds": 0.16855750000000003,
+        "mode": "query",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.161014916,
+        "sample": 3
+      },
+      {
+        "phase": "before",
+        "cpus": 4,
+        "process_seconds": 0.15289075000000008,
+        "mode": "query",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.145002417,
+        "sample": 4
+      },
+      {
+        "phase": "after",
+        "cpus": 4,
+        "process_seconds": 0.01533075000000017,
+        "mode": "query",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.002104917,
+        "sample": 4
+      },
+      {
+        "phase": "before",
+        "cpus": 4,
+        "process_seconds": 0.16543741600000006,
+        "mode": "update",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.157654333,
+        "sample": 0
+      },
+      {
+        "phase": "after",
+        "cpus": 4,
+        "process_seconds": 0.014832833000000267,
+        "mode": "update",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.002260875,
+        "sample": 0
+      },
+      {
+        "phase": "after",
+        "cpus": 4,
+        "process_seconds": 0.013405749999999994,
+        "mode": "update",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.002119292,
+        "sample": 1
+      },
+      {
+        "phase": "before",
+        "cpus": 4,
+        "process_seconds": 0.16403104099999988,
+        "mode": "update",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.155516375,
+        "sample": 1
+      },
+      {
+        "phase": "before",
+        "cpus": 4,
+        "process_seconds": 0.16740358300000002,
+        "mode": "update",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.159310833,
+        "sample": 2
+      },
+      {
+        "phase": "after",
+        "cpus": 4,
+        "process_seconds": 0.013431042000000115,
+        "mode": "update",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.002094541,
+        "sample": 2
+      },
+      {
+        "phase": "after",
+        "cpus": 4,
+        "process_seconds": 0.0146980000000001,
+        "mode": "update",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.002119583,
+        "sample": 3
+      },
+      {
+        "phase": "before",
+        "cpus": 4,
+        "process_seconds": 0.165432166,
+        "mode": "update",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.157905083,
+        "sample": 3
+      },
+      {
+        "phase": "before",
+        "cpus": 4,
+        "process_seconds": 0.1666825000000003,
+        "mode": "update",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.158729291,
+        "sample": 4
+      },
+      {
+        "phase": "after",
+        "cpus": 4,
+        "process_seconds": 0.012882666999999959,
+        "mode": "update",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.001661833,
+        "sample": 4
+      },
+      {
+        "phase": "before",
+        "cpus": 4,
+        "process_seconds": 0.16936554199999998,
+        "mode": "target",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.161505,
+        "sample": 0
+      },
+      {
+        "phase": "after",
+        "cpus": 4,
+        "process_seconds": 0.013661667000000044,
+        "mode": "target",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.002474,
+        "sample": 0
+      },
+      {
+        "phase": "after",
+        "cpus": 4,
+        "process_seconds": 0.013228417000000103,
+        "mode": "target",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.002380584,
+        "sample": 1
+      },
+      {
+        "phase": "before",
+        "cpus": 4,
+        "process_seconds": 0.16755283300000023,
+        "mode": "target",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.159421,
+        "sample": 1
+      },
+      {
+        "phase": "before",
+        "cpus": 4,
+        "process_seconds": 0.1656274579999999,
+        "mode": "target",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.157827083,
+        "sample": 2
+      },
+      {
+        "phase": "after",
+        "cpus": 4,
+        "process_seconds": 0.01389104200000002,
+        "mode": "target",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.002417041,
+        "sample": 2
+      },
+      {
+        "phase": "after",
+        "cpus": 4,
+        "process_seconds": 0.013217707999999995,
+        "mode": "target",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.0023315,
+        "sample": 3
+      },
+      {
+        "phase": "before",
+        "cpus": 4,
+        "process_seconds": 0.1685953750000002,
+        "mode": "target",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.160667417,
+        "sample": 3
+      },
+      {
+        "phase": "before",
+        "cpus": 4,
+        "process_seconds": 0.1681863330000004,
+        "mode": "target",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.158841959,
+        "sample": 4
+      },
+      {
+        "phase": "after",
+        "cpus": 4,
+        "process_seconds": 0.014607666999999935,
+        "mode": "target",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.002318208,
+        "sample": 4
+      },
+      {
+        "phase": "before",
+        "cpus": 12,
+        "process_seconds": 0.20260441699999987,
+        "mode": "query",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.195459125,
+        "sample": 0
+      },
+      {
+        "phase": "after",
+        "cpus": 12,
+        "process_seconds": 0.015089249999999943,
+        "mode": "query",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.002197,
+        "sample": 0
+      },
+      {
+        "phase": "after",
+        "cpus": 12,
+        "process_seconds": 0.013314792000000075,
+        "mode": "query",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.001689166,
+        "sample": 1
+      },
+      {
+        "phase": "before",
+        "cpus": 12,
+        "process_seconds": 0.19957775000000044,
+        "mode": "query",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.191859,
+        "sample": 1
+      },
+      {
+        "phase": "before",
+        "cpus": 12,
+        "process_seconds": 0.20383929100000042,
+        "mode": "query",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.195963334,
+        "sample": 2
+      },
+      {
+        "phase": "after",
+        "cpus": 12,
+        "process_seconds": 0.014891792000000237,
+        "mode": "query",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.002238042,
+        "sample": 2
+      },
+      {
+        "phase": "after",
+        "cpus": 12,
+        "process_seconds": 0.012981958000000127,
+        "mode": "query",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.002119584,
+        "sample": 3
+      },
+      {
+        "phase": "before",
+        "cpus": 12,
+        "process_seconds": 0.20140620799999986,
+        "mode": "query",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.19413825,
+        "sample": 3
+      },
+      {
+        "phase": "before",
+        "cpus": 12,
+        "process_seconds": 0.19823458399999971,
+        "mode": "query",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.190599167,
+        "sample": 4
+      },
+      {
+        "phase": "after",
+        "cpus": 12,
+        "process_seconds": 0.01361941600000005,
+        "mode": "query",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.0016925,
+        "sample": 4
+      },
+      {
+        "phase": "before",
+        "cpus": 12,
+        "process_seconds": 0.19778312499999995,
+        "mode": "update",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.190540208,
+        "sample": 0
+      },
+      {
+        "phase": "after",
+        "cpus": 12,
+        "process_seconds": 0.013815165999999657,
+        "mode": "update",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.002153417,
+        "sample": 0
+      },
+      {
+        "phase": "after",
+        "cpus": 12,
+        "process_seconds": 0.014829208000000094,
+        "mode": "update",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.002139458,
+        "sample": 1
+      },
+      {
+        "phase": "before",
+        "cpus": 12,
+        "process_seconds": 0.18586041699999978,
+        "mode": "update",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.178512416,
+        "sample": 1
+      },
+      {
+        "phase": "before",
+        "cpus": 12,
+        "process_seconds": 0.20190395800000083,
+        "mode": "update",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.193864916,
+        "sample": 2
+      },
+      {
+        "phase": "after",
+        "cpus": 12,
+        "process_seconds": 0.015317499999999207,
+        "mode": "update",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.002189667,
+        "sample": 2
+      },
+      {
+        "phase": "after",
+        "cpus": 12,
+        "process_seconds": 0.014452832999999998,
+        "mode": "update",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.002131416,
+        "sample": 3
+      },
+      {
+        "phase": "before",
+        "cpus": 12,
+        "process_seconds": 0.19762787500000023,
+        "mode": "update",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.189990917,
+        "sample": 3
+      },
+      {
+        "phase": "before",
+        "cpus": 12,
+        "process_seconds": 0.1951354590000003,
+        "mode": "update",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.187361625,
+        "sample": 4
+      },
+      {
+        "phase": "after",
+        "cpus": 12,
+        "process_seconds": 0.012872541000000126,
+        "mode": "update",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.001726792,
+        "sample": 4
+      },
+      {
+        "phase": "before",
+        "cpus": 12,
+        "process_seconds": 0.18991074999999924,
+        "mode": "target",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.182235042,
+        "sample": 0
+      },
+      {
+        "phase": "after",
+        "cpus": 12,
+        "process_seconds": 0.013739665999999318,
+        "mode": "target",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.002393,
+        "sample": 0
+      },
+      {
+        "phase": "after",
+        "cpus": 12,
+        "process_seconds": 0.012690082999998964,
+        "mode": "target",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.001797083,
+        "sample": 1
+      },
+      {
+        "phase": "before",
+        "cpus": 12,
+        "process_seconds": 0.20372604099999947,
+        "mode": "target",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.195211542,
+        "sample": 1
+      },
+      {
+        "phase": "before",
+        "cpus": 12,
+        "process_seconds": 0.20428695799999907,
+        "mode": "target",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.196209875,
+        "sample": 2
+      },
+      {
+        "phase": "after",
+        "cpus": 12,
+        "process_seconds": 0.01378554199999904,
+        "mode": "target",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.002425291,
+        "sample": 2
+      },
+      {
+        "phase": "after",
+        "cpus": 12,
+        "process_seconds": 0.013184458999999649,
+        "mode": "target",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.002323416,
+        "sample": 3
+      },
+      {
+        "phase": "before",
+        "cpus": 12,
+        "process_seconds": 0.2056546250000011,
+        "mode": "target",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.197493959,
+        "sample": 3
+      },
+      {
+        "phase": "before",
+        "cpus": 12,
+        "process_seconds": 0.2020422909999997,
+        "mode": "target",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.194408,
+        "sample": 4
+      },
+      {
+        "phase": "after",
+        "cpus": 12,
+        "process_seconds": 0.013350083000000623,
+        "mode": "target",
+        "threads": 4,
+        "loops": 256,
+        "calls": 4096,
+        "seconds": 0.002372542,
+        "sample": 4
+      }
+    ],
+    "diagnostics": [
+      {
+        "phase": "before",
+        "cpus": 4,
+        "mode": "query",
+        "paths": {
+          "cohort_rounds": 4024,
+          "cohort_stop_us": 2764,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 4158,
+          "vm_local_syscalls": 10,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 8,
+          "worker_futex_wakes": 12,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 39,
+          "worker_task_resumes": 7,
+          "worker_uring_syscalls": 0
+        },
+        "cohort_return_syscalls": [
+          [
+            120,
+            1024
+          ],
+          [
+            121,
+            1024
+          ],
+          [
+            123,
+            1024
+          ],
+          [
+            141,
+            1024
+          ],
+          [
+            29,
+            1
+          ]
+        ]
+      },
+      {
+        "phase": "after",
+        "cpus": 4,
+        "mode": "query",
+        "paths": {
+          "cohort_rounds": 1,
+          "cohort_stop_us": 3,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 4159,
+          "vm_local_syscalls": 10,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 9,
+          "worker_futex_wakes": 12,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 4136,
+          "worker_task_resumes": 9,
+          "worker_uring_syscalls": 0
+        },
+        "cohort_return_syscalls": [
+          [
+            29,
+            1
+          ]
+        ]
+      },
+      {
+        "phase": "before",
+        "cpus": 4,
+        "mode": "update",
+        "paths": {
+          "cohort_rounds": 3917,
+          "cohort_stop_us": 3183,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 4158,
+          "vm_local_syscalls": 10,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 8,
+          "worker_futex_wakes": 12,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 39,
+          "worker_task_resumes": 7,
+          "worker_uring_syscalls": 0
+        },
+        "cohort_return_syscalls": [
+          [
+            118,
+            1024
+          ],
+          [
+            119,
+            1024
+          ],
+          [
+            122,
+            1024
+          ],
+          [
+            140,
+            1024
+          ],
+          [
+            29,
+            1
+          ]
+        ]
+      },
+      {
+        "phase": "after",
+        "cpus": 4,
+        "mode": "update",
+        "paths": {
+          "cohort_rounds": 1,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 4158,
+          "vm_local_syscalls": 10,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 8,
+          "worker_futex_wakes": 12,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 4135,
+          "worker_task_resumes": 8,
+          "worker_uring_syscalls": 0
+        },
+        "cohort_return_syscalls": [
+          [
+            29,
+            1
+          ]
+        ]
+      },
+      {
+        "phase": "before",
+        "cpus": 4,
+        "mode": "target",
+        "paths": {
+          "cohort_rounds": 3970,
+          "cohort_stop_us": 3153,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 4158,
+          "vm_local_syscalls": 10,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 8,
+          "worker_futex_wakes": 12,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 39,
+          "worker_task_resumes": 7,
+          "worker_uring_syscalls": 0
+        },
+        "cohort_return_syscalls": [
+          [
+            120,
+            1024
+          ],
+          [
+            121,
+            1024
+          ],
+          [
+            123,
+            1024
+          ],
+          [
+            141,
+            1024
+          ],
+          [
+            29,
+            1
+          ]
+        ]
+      },
+      {
+        "phase": "after",
+        "cpus": 4,
+        "mode": "target",
+        "paths": {
+          "cohort_rounds": 1,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 4162,
+          "vm_local_syscalls": 10,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 10,
+          "worker_futex_wakes": 12,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 4139,
+          "worker_task_resumes": 10,
+          "worker_uring_syscalls": 0
+        },
+        "cohort_return_syscalls": [
+          [
+            29,
+            1
+          ]
+        ]
+      },
+      {
+        "phase": "before",
+        "cpus": 12,
+        "mode": "query",
+        "paths": {
+          "cohort_rounds": 3936,
+          "cohort_stop_us": 13112,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 4161,
+          "vm_local_syscalls": 10,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 11,
+          "worker_futex_wakes": 12,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 42,
+          "worker_task_resumes": 10,
+          "worker_uring_syscalls": 0
+        },
+        "cohort_return_syscalls": [
+          [
+            120,
+            1024
+          ],
+          [
+            121,
+            1024
+          ],
+          [
+            123,
+            1024
+          ],
+          [
+            141,
+            1024
+          ],
+          [
+            29,
+            1
+          ]
+        ]
+      },
+      {
+        "phase": "after",
+        "cpus": 12,
+        "mode": "query",
+        "paths": {
+          "cohort_rounds": 1,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 4159,
+          "vm_local_syscalls": 10,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 9,
+          "worker_futex_wakes": 12,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 4136,
+          "worker_task_resumes": 9,
+          "worker_uring_syscalls": 0
+        },
+        "cohort_return_syscalls": [
+          [
+            29,
+            1
+          ]
+        ]
+      },
+      {
+        "phase": "before",
+        "cpus": 12,
+        "mode": "update",
+        "paths": {
+          "cohort_rounds": 3816,
+          "cohort_stop_us": 12792,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 4159,
+          "vm_local_syscalls": 10,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 8,
+          "worker_futex_wakes": 12,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 40,
+          "worker_task_resumes": 7,
+          "worker_uring_syscalls": 0
+        },
+        "cohort_return_syscalls": [
+          [
+            118,
+            1024
+          ],
+          [
+            119,
+            1024
+          ],
+          [
+            122,
+            1024
+          ],
+          [
+            140,
+            1024
+          ],
+          [
+            29,
+            1
+          ]
+        ]
+      },
+      {
+        "phase": "after",
+        "cpus": 12,
+        "mode": "update",
+        "paths": {
+          "cohort_rounds": 1,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 4160,
+          "vm_local_syscalls": 10,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 9,
+          "worker_futex_wakes": 12,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 4137,
+          "worker_task_resumes": 9,
+          "worker_uring_syscalls": 0
+        },
+        "cohort_return_syscalls": [
+          [
+            29,
+            1
+          ]
+        ]
+      },
+      {
+        "phase": "before",
+        "cpus": 12,
+        "mode": "target",
+        "paths": {
+          "cohort_rounds": 3791,
+          "cohort_stop_us": 12615,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 4158,
+          "vm_local_syscalls": 10,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 8,
+          "worker_futex_wakes": 12,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 39,
+          "worker_task_resumes": 7,
+          "worker_uring_syscalls": 0
+        },
+        "cohort_return_syscalls": [
+          [
+            120,
+            1024
+          ],
+          [
+            121,
+            1024
+          ],
+          [
+            123,
+            1024
+          ],
+          [
+            141,
+            1024
+          ],
+          [
+            29,
+            1
+          ]
+        ]
+      },
+      {
+        "phase": "after",
+        "cpus": 12,
+        "mode": "target",
+        "paths": {
+          "cohort_rounds": 1,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 4159,
+          "vm_local_syscalls": 10,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 9,
+          "worker_futex_wakes": 12,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 4136,
+          "worker_task_resumes": 9,
+          "worker_uring_syscalls": 0
+        },
+        "cohort_return_syscalls": [
+          [
+            29,
+            1
+          ]
+        ]
+      }
+    ],
+    "native_linux": {
+      "logical_cpus": 6,
+      "model": "Native ARM64 Linux ABI in the existing local VZ CI environment, not a macOS-native affinity API.",
+      "elf_sha256": "4fca41e4ccec9efa50b12c675cc2f69bb87a1130ec29b459cc6f43e2af960a12",
+      "samples": [
+        {
+          "sample": 0,
+          "process_seconds": 0.002120836999893072,
+          "mode": "query",
+          "threads": 4,
+          "loops": 256,
+          "calls": 4096,
+          "seconds": 0.000152206
+        },
+        {
+          "sample": 1,
+          "process_seconds": 0.0006530710002152773,
+          "mode": "query",
+          "threads": 4,
+          "loops": 256,
+          "calls": 4096,
+          "seconds": 0.000153331
+        },
+        {
+          "sample": 2,
+          "process_seconds": 0.0019773399999394314,
+          "mode": "query",
+          "threads": 4,
+          "loops": 256,
+          "calls": 4096,
+          "seconds": 0.000151289
+        },
+        {
+          "sample": 3,
+          "process_seconds": 0.0007989860000634508,
+          "mode": "query",
+          "threads": 4,
+          "loops": 256,
+          "calls": 4096,
+          "seconds": 0.000145205
+        },
+        {
+          "sample": 4,
+          "process_seconds": 0.0016679699997439457,
+          "mode": "query",
+          "threads": 4,
+          "loops": 256,
+          "calls": 4096,
+          "seconds": 0.000150164
+        },
+        {
+          "sample": 5,
+          "process_seconds": 0.0020610460001080355,
+          "mode": "query",
+          "threads": 4,
+          "loops": 256,
+          "calls": 4096,
+          "seconds": 0.000153539
+        },
+        {
+          "sample": 6,
+          "process_seconds": 0.0019746309999391087,
+          "mode": "query",
+          "threads": 4,
+          "loops": 256,
+          "calls": 4096,
+          "seconds": 0.000154789
+        },
+        {
+          "sample": 0,
+          "process_seconds": 0.0020354640000732616,
+          "mode": "update",
+          "threads": 4,
+          "loops": 256,
+          "calls": 4096,
+          "seconds": 0.000430159
+        },
+        {
+          "sample": 1,
+          "process_seconds": 0.0022806260003562784,
+          "mode": "update",
+          "threads": 4,
+          "loops": 256,
+          "calls": 4096,
+          "seconds": 0.000405409
+        },
+        {
+          "sample": 2,
+          "process_seconds": 0.0008522759999323171,
+          "mode": "update",
+          "threads": 4,
+          "loops": 256,
+          "calls": 4096,
+          "seconds": 0.000374702
+        },
+        {
+          "sample": 3,
+          "process_seconds": 0.002155419999780861,
+          "mode": "update",
+          "threads": 4,
+          "loops": 256,
+          "calls": 4096,
+          "seconds": 0.00036841
+        },
+        {
+          "sample": 4,
+          "process_seconds": 0.0021787939999740047,
+          "mode": "update",
+          "threads": 4,
+          "loops": 256,
+          "calls": 4096,
+          "seconds": 0.000374577
+        },
+        {
+          "sample": 5,
+          "process_seconds": 0.002333873999759817,
+          "mode": "update",
+          "threads": 4,
+          "loops": 256,
+          "calls": 4096,
+          "seconds": 0.000374784
+        },
+        {
+          "sample": 6,
+          "process_seconds": 0.0019827559999612276,
+          "mode": "update",
+          "threads": 4,
+          "loops": 256,
+          "calls": 4096,
+          "seconds": 0.00036791
+        },
+        {
+          "sample": 0,
+          "process_seconds": 0.002105712000229687,
+          "mode": "target",
+          "threads": 4,
+          "loops": 256,
+          "calls": 4096,
+          "seconds": 0.000162331
+        },
+        {
+          "sample": 1,
+          "process_seconds": 0.001779842999894754,
+          "mode": "target",
+          "threads": 4,
+          "loops": 256,
+          "calls": 4096,
+          "seconds": 0.000164289
+        },
+        {
+          "sample": 2,
+          "process_seconds": 0.0021912100000918144,
+          "mode": "target",
+          "threads": 4,
+          "loops": 256,
+          "calls": 4096,
+          "seconds": 0.00016083
+        },
+        {
+          "sample": 3,
+          "process_seconds": 0.001982713999950647,
+          "mode": "target",
+          "threads": 4,
+          "loops": 256,
+          "calls": 4096,
+          "seconds": 0.000164831
+        },
+        {
+          "sample": 4,
+          "process_seconds": 0.002088878999984445,
+          "mode": "target",
+          "threads": 4,
+          "loops": 256,
+          "calls": 4096,
+          "seconds": 0.000166372
+        },
+        {
+          "sample": 5,
+          "process_seconds": 0.0020075889997315244,
+          "mode": "target",
+          "threads": 4,
+          "loops": 256,
+          "calls": 4096,
+          "seconds": 0.000167539
+        },
+        {
+          "sample": 6,
+          "process_seconds": 0.001966005999747722,
+          "mode": "target",
+          "threads": 4,
+          "loops": 256,
+          "calls": 4096,
+          "seconds": 0.000174664
+        }
+      ]
+    },
+    "method": "Four threads x 256 loops x four scheduling calls. Two warmups per mode/binary/CPU count, five counterbalanced unprofiled pairs. Longest worker duration excludes pthread setup/join; host process wall is also retained. Metrics run separately. Existing desktop/stable sessions remain; all builds, tests and local Linux CI ended before these Mac timings. No samplers, tracing or window capture. Native Linux uses the exact static ELF in the six-vCPU local CI environment and is contextual; macOS has no equivalent Linux affinity syscall ABI."
+  },
+  "background_before_benchmark": {
+    "stable_and_desktop_services_preserved": true,
+    "pre_run_existing_stable_sessions_cpu_percent": [
+      27.2,
+      15.8
+    ],
+    "pre_run_background_media_service_cpu_percent": 90.8,
+    "local_ci_stopped": true,
+    "all_agent_builds_and_tests_finished": true,
+    "note": "One instantaneous pre-run snapshot, not whole-run utilization accounting; system process names and PIDs are retained only in ignored local evidence."
+  },
+  "remaining_boundaries": [
+    "Traced calls and actual seccomp signal/termination effects keep their owner task-policy boundary.",
+    "sched_rr_get_interval and sched_setattr/getattr remain ENOSYS, now completed on continuous workers; realtime/deadline policies are not newly implemented.",
+    "Single-CPU/solo execution retains its coordinated caller path; it has no additional syscall RPC.",
+    "Dynamic proc/sys and special paths, namespace/credential administration, structural VM publication, legacy nonmember adoption, embedding control and generic unhandled dispatch remain as listed in the shared inventory.",
+    "Only the final control ioctl remains in these whole-session diagnostics. Zero service requests alone does not prove coordinator removal: baseline service requests were already zero."
+  ],
+  "measurement_limits": [
+    "These are scheduling-control loops, not Firefox, Geekbench or general application speedups. Longest-worker loop and whole-process wall are separate measurements.",
+    "Existing stable/desktop services remained active. Native ARM Linux is an exact-ELF contextual reference in the six-vCPU local CI environment; macOS has no equivalent Linux affinity syscall ABI.",
+    "The former cold-CPU prototype timed out because owner-only slot startup remained. Source-started slots fix that dependency; the preserved timeout log is not a before/after performance sample.",
+    "An initial test build omitted the static Vulkan library flag; the matched baseline passed, and the final exact measured/installed binary passed GPU/video with the reused verified archive."
+  ],
+  "final_dev_package": {
+    "installed": true,
+    "version": "Trames Dev 1.5.3 (dev) runtime e6d700c3147a4fb5a2a772dfcbb28eb636ac53fc",
+    "sha256": "47eb6e30f317d1305e4a33e2fea8f5fe3976f8b70428a00ae929232dca7cb17d",
+    "paired_runtime_pin": "e6d700c3147a4fb5a2a772dfcbb28eb636ac53fc",
+    "installed_12_cpu_smoke_passed": true,
+    "installed_smoke_execution_paths": {
+      "cohort_rounds": 1,
+      "cohort_stop_us": 0,
+      "service_caller_wait_us": 0,
+      "service_requests": 0,
+      "serviced_syscalls": 0,
+      "syscalls": 594,
+      "vm_local_syscalls": 10,
+      "worker_direct_syscalls": 0,
+      "worker_fd_syscalls": 0,
+      "worker_file_syscalls": 0,
+      "worker_futex_waits": 47,
+      "worker_futex_wakes": 14,
+      "worker_gpu_calls": 0,
+      "worker_gpu_waits": 0,
+      "worker_poll_syscalls": 0,
+      "worker_socket_syscalls": 0,
+      "worker_syscalls": 563,
+      "worker_task_resumes": 13,
+      "worker_uring_syscalls": 0
+    }
+  },
+  "stable": {
+    "changed": false,
+    "runner_sha256": "4f40615213e731b2a4ef9d8c6a0e85c5c7bdf31ab0c60b0354b55113f2a6a55d",
+    "business_sessions_restarted": false
+  }
+}

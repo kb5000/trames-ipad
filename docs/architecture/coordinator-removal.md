@@ -2,12 +2,13 @@
 
 ## Current status — 2026-11-06
 
-Audited executable-code baseline: `a116d834318d59ea51f3de119fc7e20ed44c58d8`.
-The latest code batch remains [stage 51, exec replacement](#51-exec-image-replacement-with-creator-mm-custody--2026-11-05).
-This refresh changes documentation and paired pins only; it does not rebuild or
-change installed applications, and reuses the existing validation. Mac and iPad
-share the implementation. The installed Mac Dev uses the audited code; stable
-1.5.3 and business environments are unchanged.
+Audited executable-code baseline: `e6d700c3147a4fb5a2a772dfcbb28eb636ac53fc`.
+The latest code batch is [stage 52, original scheduling and on-demand CPU slots](#52-original-scheduling-and-on-demand-cpu-slots--2026-11-06).
+The implemented scheduling subsystem now uses source workers and original task
+resources, including cross-thread controls, actual migration completion and cold
+CPU activation. Mac and iPad share this implementation. The measured Mac Dev is
+installed; stable 1.5.3 and business environments are unchanged. Both iPad targets
+compile; physical iPad acceptance remains skipped as previously chosen.
 
 **The coordinator still exists, but ordinary admitted resource work no longer
 has to execute there.** Fork/clone/exec have removed the whole-cohort dependency,
@@ -20,12 +21,13 @@ are not a completion percentage.
 | --- | --- | --- |
 | Admitted file/path/FD, Unix/TCP I/O and cross-resource transfer | Calling worker and original shared objects | Excluded paths/descriptors/controls and layout changes still have explicit escalation |
 | Futexes, clocks/timers, admitted event/child/signal waits and caught signals | Source execution; blocking returns the CPU slot | Legacy nonmember wake/adoption, unsupported wait resources and actual task-policy effects remain |
+| Scheduling attributes and CPU affinity | Original task atomics, original PID/group/UID authority and task-scoped completion on the caller | Tracing and actual task-policy effects retain their boundary; unsupported features keep their errno. Required original CPU slots start directly from the live queue |
 | Exit/group/default-fatal termination, STOP/CONT and vfork release | Source resources and original group/family notifications | CPU/statistics and cold Rc projections return asynchronously to the owner; cold shared-mm cleanup may need that mm's byte checkpoint |
 | fork/clone/vfork and execve/execveat | Only creator-mm actors quiesce; unrelated mms continue | The original owner still constructs/commits the task, VFS and image graph; this is not source-thread independent |
 | Mapping topology, pins and mapped-file layout | Affected mm/backing checkpoint; additive private-anonymous mmap has in-cohort publication | Owner publication remains; real excluded backing/lifetime/policy cases can require a full return |
 | Residual FD/network compatibility | Owner service inside a live cohort, where admitted | Caller waits while peers continue; refusal before effects falls back to joined handling |
 | Native libc/GPU/video/audio | Normal bodies and resource waits use calling/shared-resource paths | Exceptional mapping import, unstable entry and actual native lifecycle checks remain; AppKit affinity, device/disk pools and local fallback are not extra coordinators |
-| Dynamic proc/sys and owner administration | Still joined | Dynamic process/executable/FD views, special paths, mount/unshare/setns, credentials/capabilities and owner affinity/priority/scheduling queries or mutations |
+| Dynamic proc/sys and owner administration | Still joined | Dynamic process/executable/FD views, special paths, mount/unshare/setns, credentials/capabilities |
 | Tracing/security and mixed owner resources | Actual joined task/control boundary | Installation/TSYNC, policy signal/termination effects, excluded SCM_RIGHTS/ring resources and missing source pumps remain. Pure custody-policy errors complete on continuous workers before quiescence |
 | Host lifecycle and generic dispatch fallback | Still joined when the actual event/exit requires it | Host exec creation/group control, terminal lifecycle, pause/cancel, transfer/timezone/writeback, supervision/admin/pressure/deadline/shutdown; any SVC/HLT/fault not completed, parked, serviced or scoped on the worker still reaches the generic joined fallback |
 
@@ -36,34 +38,53 @@ the owner; ordinary epoch-member migration, parking, wakeup and child/replacemen
 admission already use the live execution queue. Single-CPU/solo execution retains
 its coordinated caller path, which does not by itself imply an extra RPC.
 
-The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/08ea4dbb039a055675af4ff42c5d83e803d446e0/docs/architecture/coordination-boundaries.md)
+The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/e6d700c3147a4fb5a2a772dfcbb28eb636ac53fc/docs/architecture/coordination-boundaries.md)
 records scopes, actual admission gates and source locations. Earlier sections
 below are historical records and do not override this inventory.
 
 ### What the latest measurements prove
 
-These are existing 2026-11-05, 12-CPU, 32-operation fixture results; this refresh
-adds no new profile. Service requests are zero in both versions for these cases:
+Stage 52 uses four threads × 256 loops × four scheduling calls (4,096 calls).
+Five unprofiled before/after pairs alternate order, after two warmups per
+configuration. Separate diagnostic runs show:
 
-| Workload | Before full-cohort rounds | Current full-cohort rounds | Actual remaining joined exits |
-| --- | ---: | ---: | --- |
-| execve | 33 | 1 | Final control ioctl; all 32 exec returns disappeared |
-| Nonleader exec | 33 | 1 | Final control ioctl; all 32 exec returns disappeared |
-| execveat with executable FD open | 65 | 33 | 32 openat calls on `/proc/self/exe`, plus final control ioctl; all 32 execveat returns disappeared |
+| Workload, 12 CPUs | Previous cohort rounds | Current cohort rounds | Scheduling calls returned to owner |
+| --- | ---: | ---: | ---: |
+| Self queries | 3,936 | 1 | 4,096 → 0 |
+| Self updates | 3,816 | 1 | 4,096 → 0 |
+| Cross-thread queries | 3,791 | 1 | 4,096 → 0 |
 
-The ordinary exec workload's scoped checkpoint groups increase from 2 to 34:
-work changed scope rather than disappearing. Therefore `service_requests=0`,
-fewer full returns or fewer host threads do not prove an owner-free runtime.
-Inspect communication/wait, resource processing, scoped quiescence and full-stop
-costs separately. [Stage 51 evidence](../validation/exec-custody-20261105.json)
-contains raw samples and the full check scope; it is not a whole-Firefox or
-all-server-workload frequency measurement.
+Both revisions already have zero Service requests. The change removes all
+4,096 scheduling owner returns, not merely a service counter. The current whole
+session still has its final control ioctl. Migration/resource waits and initial
+guest admission are distinct from a full-cohort return; no completion percentage
+or whole-application speedup follows from the table.
 
-The next priority supported by this evidence is the **dynamic process/resource
-view and path-resolution subsystem**, followed by owner task/namespace metadata
-and real compatibility admissions. A special-case executable pathname whitelist
-would leave the underlying dependency in place. No new subsystem implementation
-is included in this documentation refresh.
+| Workload, 12 CPUs | Previous loop | Current loop | Speedup | Native ARM Linux reference |
+| --- | ---: | ---: | ---: | ---: |
+| Self queries | 194.14 ms | 2.12 ms | 91.6x | 0.152 ms |
+| Self updates | 189.99 ms | 2.14 ms | 88.8x | 0.375 ms |
+| Cross-thread queries | 195.21 ms | 2.37 ms | 82.3x | 0.165 ms |
+
+These medians measure the longest worker's loop, excluding thread setup/join.
+Including complete startup and teardown, twelve-CPU process medians change
+201.41 → 13.62 ms, 197.63 → 14.45 ms, and 203.73 → 13.35 ms respectively.
+Native Linux uses the exact static ELF in the existing six-vCPU local ARM64 CI
+environment. It is a contextual ABI reference, not a macOS-native affinity API
+or isolated HVF cost. Existing stable/desktop services remain active; all agent
+builds, tests and the local CI instance ended before Mac timing. Thermal state
+was nominal and low-power mode off before/after. Metrics are collected separately.
+
+[Stage 52 evidence](../validation/worker-scheduling-20261106.json) preserves all
+60 samples, whole-process timings, original source/binary identities, 12 diagnostic
+runs, 21 native reference samples and actual validation coverage. Earlier exec
+results remain in [stage 51](../validation/exec-custody-20261105.json); `/proc/self/exe`
+open still has its dynamic-view dependency.
+
+The next priority remains the **dynamic process/resource view and path-resolution
+subsystem**, then remaining namespace administration and actual compatibility
+admissions. The general worker-dispatch fallback remains reachable. This round
+does not add an executable-path whitelist or begin a second subsystem migration.
 
 ## Twenty-second migration implemented — worker Unix namespace controls and waits — 2026-11-03
 
@@ -3811,3 +3832,46 @@ To reproduce the fixture, compile `tests/fixtures/worker-exec.c` with
 executable and run `worker-exec MODE 32`, choosing plain, at, thread or failed; use the same binary
 and warmup/order for both runtime versions. The Darwin conditional fixture can
 be compiled with `clang -O2 -pthread`; its `at` mode is not a Darwin reference.
+
+
+## 52. Original scheduling and on-demand CPU slots — 2026-11-06
+
+Runtime `e6d700c3147a4fb5a2a772dfcbb28eb636ac53fc` removes the implemented scheduling subsystem's owner
+dependency as one batch. Affinity, nice and policy belong to each original IoTask;
+queries and updates use the same ABI from the owner and source workers. Cross-task,
+process-group and UID operations preserve original identities, namespaces,
+permissions/capabilities and partial-update errors. Fork inherits values into an
+independent task; exec keeps its actual original task. Credentials and structural
+group/session changes publish at their real write boundary, so ordinary queries
+do not rebuild every task's metadata.
+
+An accepted mask change waits only for its original target's running lease to
+depart. The caller releases its execution slot, retains completion across a
+cohort handoff and resumes on existing readiness. Reaping/rekeying cannot redirect
+that operation to a reused PID. Self migration and callbacks share the existing
+group/queue synchronization, with no guest data barriers or algorithm/native locks.
+
+The original CPU pool also had to change: previously only owner VM admission could
+start a cold execution slot. Real twelve-CPU acceptance caught a thread remaining
+ready after being pinned to CPU 11. Shared per-slot startup authority now lets the
+live queue start that needed original executor directly. Startup/control locks do
+not cover execution. Unneeded slots stay unstarted; no coordinator/service thread,
+polling bus or eager all-CPU allocation is introduced. Actual startup failure,
+cancel, return collection and teardown include these dynamic slots.
+
+The complete validated matrix contains 56 HVF/interpreter runs (1/2/4/12 CPUs,
+raw/ALLOW-filtered calls, cross-thread control, actual migration, fork/exec),
+324 process cases plus 65 kernel cases on Apple and native ARM Linux, strict
+checks, both iPad compile targets, 47 signed HVF cases and one pressure case.
+Final exact-package regression also passes 30 Go-GC rounds, eight isolated Docker
+rounds, 20 native GPU lifecycles and 2,000 video lifecycles. Existing unchanged
+memory/VFS/driver acceptance is reused. No physical iPad or Firefox/Geekbench
+performance claim is made by these scheduling fixtures.
+
+The existing unimplemented RR interval and sched-attribute calls keep ENOSYS on
+the source; realtime/deadline functionality is not newly advertised. Traced
+calls and actual security lifecycle effects keep their original boundary.
+Dynamic proc, namespace/credential administration, structural memory publication,
+legacy nonmember scheduling and generic unhandled SVC/HLT dispatch remain listed
+above. See the [shared contract](https://github.com/kb5000/trames-runtime/blob/e6d700c3147a4fb5a2a772dfcbb28eb636ac53fc/docs/architecture/coordination-boundaries.md#original-task-scheduling-and-on-demand-execution-slots--2026-11-06)
+and [filtered evidence](../validation/worker-scheduling-20261106.json).
