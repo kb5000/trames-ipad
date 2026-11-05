@@ -3254,3 +3254,94 @@ cases, 235 ABI cases (one ignored), then the added registered-proc-file regressi
 on both platforms, and 477 VFS cases (one ignored). Standalone VFS all-features
 passes 507 cases (one ignored). These affected results are reused after metadata,
 documentation and test-only refinements; unrelated CPU/GPU acceptance is unchanged.
+
+
+## 44. Source individual thread exit and original parent-thread relationships (2026-11-05)
+
+Individual exit(93) now completes on its calling worker when another original
+group member is alive and its Files contain complete shared descriptions. The
+group arbitrates this transition; concurrent exits leave one last member for
+actual process cleanup. Cancellation, cgroup membership, clear_tid/futex and
+Files retirement use their original resources. Non-leader presence disappears
+from shared PID queries before owner projection collection. A leader keeps its
+waitable process identity and live-group signal target.
+
+Parent-thread links and death-signal registration now belong to one original
+shared graph/task object. Source PR_SET/GET_PDEATHSIG obeys existing ALLOW/ERRNO
+filter handling. Retirement updates actual children, not a process-wide scan;
+callbacks follow the graph transaction. Exec keeps the actual surviving thread,
+including its future TID. Childless retirement skips unused survivor selection.
+Owner group exit/exec also retire all original task identities and preserve
+parent-death/cancellation work that the older group-drop path omitted.
+
+A source exit drops its View and returns its CPU without ending the cohort or
+making a service request. Cold remaining projections are collected only after
+Views return, before processing another owner syscall or the final group exit.
+This is not a claim that all final CPU/mm/native resources already retire on the
+source. Actual excluded owner controls defer before effects, and actual legacy
+futex adoption keeps its existing boundary.
+
+The removal exposed a real lost notification: the final exiting View of an mm
+could leave a pending mapping checkpoint asleep. This was captured with all
+workers waiting, the requester held and its futex already woken. The queue now
+publishes the original domain's VmReady event. A deterministic regression fails
+without that one notification and passes with it while keeping peers running.
+The final code has no diagnostic environment switch or extra retry/polling path.
+
+Final clean acceptance includes 200 interpreter and 100 twelve-CPU HVF runs of
+the complete PID-namespace fixture with profiling disabled. All pass after the
+fix. Additional acceptance covers parent death, fork/exec, credentials,
+subreaper, namespace teardown, clear_tid, filtering and all four cgroup fixtures.
+The common code passes the physical-iPad FFI target compile; new physical-iPad
+execution is not claimed. Stable 1.5.3 and business environments stay separate.
+
+[Source-bound measurements and acceptance](../validation/worker-thread-exit-20261105.json)
+and the [shared boundary contract](../../runtime/docs/architecture/coordination-boundaries.md#source-individual-thread-exit-and-original-parent-thread-links-2026-11-05)
+record the precise limits. The last member, exit_group/default fatal exit,
+full reparenting/namespace-init policy, robust futex, final mm/native ownership,
+tracing/vfork and actual owner control graphs remain open. The goal remains active.
+
+
+Seven counterbalanced pairs use four already-ready threads. The short case
+performs one address registration, restores clear_tid and exits each thread:
+
+| CPUs | Previous HVF | New HVF | Relative speed | Native ARM Linux |
+| ---: | ---: | ---: | ---: | ---: |
+| 1 | 43.084 us | 43.417 us | 0.992x | 12.543 us |
+| 4 | 264.417 us | 133.292 us | 1.984x | 31.460 us |
+| 12 | 296.750 us | 153.000 us | 1.940x | — |
+
+The 1,000-registration control case changes from **1.476 to 1.318 ms** at four
+CPUs and **1.529 to 1.313 ms** at twelve CPUs; the single-CPU **5.495/5.511 ms**
+results show no meaningful gain. Removing unused childless survivor selection
+also removes the initial roughly 4 us single-CPU regression: the final short
+single-CPU result is **43.084/43.417 us**, with no meaningful improvement claimed.
+
+The interval includes barrier release, registration, clear_tid joins and thread
+exit. Clone/setup and final stack unmap are outside it; remaining cold owner
+projection collection is not claimed as included before join. Native uses the
+exact ELF on the existing six-vCPU ARM Linux Lima instance with one/four-CPU
+affinity, not bare-metal Darwin. The unchanged native 1,000-registration samples
+are reused; the short case has seven fresh native samples per affinity. These
+are focused join/exit latency results, not Firefox or whole-application scores.
+
+Apple and native ARM Linux pass **301** process cases (three ignored) and **46**
+kernel cases. The final source passes strict checks and iPad compilation. The
+unchanged VFS/ABI/CPU/GPU results are reused. Thirty stock Go GC-stress starts and
+eight isolated twelve-CPU Docker lifecycle rounds pass with normal preemption.
+The final childless optimization skips only unused relationship selection;
+integration results are reused after that semantic-preserving change.
+
+The unmodified native PID-namespace fixture does not fully pass: its existing
+negative ioprio_get assertion expects EINVAL, whereas the native probe returns
+ESRCH. That difference predates this migration and is retained in the evidence;
+no assertion is weakened or silently counted as native success. The unmodified
+native parent-death program and exact thread benchmark both pass. Trames passes
+the complete namespace fixture, including the 300 final unprofiled stress runs.
+
+
+A separate four-CPU short-case diagnostic has **6 → 4** cohort rounds and
+**4 → 0** returned exit(93) calls. Three service requests remain in both versions,
+including startup work; remaining returns include clone and console ioctl.
+Measured stop time is 147 us versus below the timer's 1 us reporting resolution,
+not a claim that synchronization costs are literally zero.

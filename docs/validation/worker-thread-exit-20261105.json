@@ -1,0 +1,1896 @@
+{
+  "date": "2026-11-05",
+  "runtime_revision": "2378b6959991c91c6815031d146f64ab11545a52",
+  "baseline_runtime_revision": "43ff470ec5cc79785d918067585df66e4ad4b9d9",
+  "scope": "Individual non-last group member exit(93), original parent-thread relationships and death-signal registration, original resource retirement, mm quiescence notification and PID/signal visibility. Final process/group cleanup remains open.",
+  "source_files": [
+    {
+      "path": "runtime/crates/trames-kernel/src/lib.rs",
+      "sha256": "bb1ea4329bdd5a26664261d108ba06dd7e241b759343ecdb552c2b1eda0c69ab"
+    },
+    {
+      "path": "runtime/crates/trames-kernel/src/signal/io.rs",
+      "sha256": "6243058488b94289b22640379ee3637b7f5af3981881a51a77fa27d852e20326"
+    },
+    {
+      "path": "runtime/crates/trames-kernel/src/signal/io_guest.rs",
+      "sha256": "c5fb05ad321a0fd73cb2c8630d05ff8a71cef8cbe6d53d96b8ff7d7816360735"
+    },
+    {
+      "path": "runtime/crates/trames-kernel/src/task_control.rs",
+      "sha256": "817633842869b5199036e3727d34f3fa761b5d2e6f5bd1a65e2dff0c6be82349"
+    },
+    {
+      "path": "runtime/crates/trames-kernel/src/task_parent.rs",
+      "sha256": "71c338514c6aa3376d3cf2e22cbba64eb758140e098773989ab756e335c0a27b"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/process.rs",
+      "sha256": "60b3a994d1f0e02c52609e34db18d9e15e5d8d3fa8711a199b50064527da0738"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/process_pid.rs",
+      "sha256": "97eeaad503c7f36a98429708de052e029a79576d8d3a23c0136a249dca2009e2"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/process_seccomp.rs",
+      "sha256": "8210a54feaee6a5ed43cc7d0586725dc1b4228a7af008418f2ae20a44415d2c5"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/process_service.rs",
+      "sha256": "e30c02feb89df6602659bd091b4bc8d80b2e80a516a301bcca7137e8cdb8a37b"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/run_queue.rs",
+      "sha256": "cf5f0d4ae2e1b5b9e87898229e4f14770738623051a6a2fee6fdbef2083d6c35"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/run_queue/domains.rs",
+      "sha256": "e6a09d21b40832364003da94793d4ad1012529d99c9ce26c443ecdfbc1c4c1a0"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/worker_syscalls.rs",
+      "sha256": "9dd5aabe299ab19aa1637e22f4fc5b5bf3c59e65f44f91e1c9016f365665e1b8"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/workers.rs",
+      "sha256": "ed46382d2a493579530b0f5e139d44c40bded4a922dbb8d3657d9897935245c8"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/workers_uring_tests.rs",
+      "sha256": "3cdc5df70363d3ebb69177f75114c7820895ac7a017281e26c624a7ac5380e85"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/fd_table.rs",
+      "sha256": "c86d721183cc9c16de6d384e16a581fd11bd27b1e124e61e13c3f7941c9d7037"
+    },
+    {
+      "path": "runtime/docs/architecture/coordination-boundaries.md",
+      "sha256": "27b98ab5dccce88eb44b7f535b9443555e1941de07235275eb3c9b4bbbe8d8de"
+    }
+  ],
+  "fixtures": [
+    {
+      "source": "tests/fixtures/worker-task-resources.c",
+      "source_sha256": "6764e1fe82194abbf9e5b7277bb8488ff1a797c025fc5d74fbb6f9a9cd3b110f",
+      "elf_sha256": "7f363fd52558f6f993f8da6375e00d60abc35381e570f49c74ccccbf8d8b5018"
+    },
+    {
+      "source": "tests/fixtures/pdeathsig.c",
+      "source_sha256": "eb99a46c9dd810428ec23ee8d810b56ff38a8955ac60173d0edcb1bab1df92a8",
+      "elf_sha256": "2f21b2ab66d67441a7e362557e1c30231f524279f08d8456879169a8e1d965fb"
+    },
+    {
+      "source": "tests/fixtures/pid-namespaces.c",
+      "source_sha256": "ec20488afd61de514022b80e06d4ead24ff7f6f337e34076a0b265853156d9f0",
+      "elf_sha256": "c450e3060f8c2e9858b6af55a2167b1297fa3d09d8892b58b43cdea4b26014cb"
+    }
+  ],
+  "benchmark": {
+    "binaries": {
+      "before": {
+        "path": "/Users/main/dev/trames/target/worker-thread-exit/before-mac-run",
+        "sha256": "b2d57002ed6750fd0aa3fb15f3e848cee551e0b85e3dde93d6360f8e995a789c"
+      },
+      "after": {
+        "path": "/Users/main/dev/trames-mac/target/release/Trames Dev.app/Contents/MacOS/trames-mac-run",
+        "sha256": "066455c9c593ccbabcf6757aff4a5d92e9f06ebbad79c181c1cceb56fcbb32bd"
+      }
+    },
+    "fixture_sha256": "7f363fd52558f6f993f8da6375e00d60abc35381e570f49c74ccccbf8d8b5018",
+    "samples": [
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "before",
+        "sample": 0,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 44250,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "after",
+        "sample": 0,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 46958,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "after",
+        "sample": 1,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 42292,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "before",
+        "sample": 1,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 45084,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "before",
+        "sample": 2,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 40958,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "after",
+        "sample": 2,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 43084,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "after",
+        "sample": 3,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 41417,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "before",
+        "sample": 3,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 46208,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "before",
+        "sample": 4,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 41041,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "after",
+        "sample": 4,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 44375,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "after",
+        "sample": 5,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 43417,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "before",
+        "sample": 5,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 42792,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "before",
+        "sample": 6,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 43084,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "after",
+        "sample": 6,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 44125,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "before",
+        "sample": 0,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 264417,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "after",
+        "sample": 0,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 119958,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "after",
+        "sample": 1,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 153458,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "before",
+        "sample": 1,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 252709,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "before",
+        "sample": 2,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 285291,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "after",
+        "sample": 2,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 161250,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "after",
+        "sample": 3,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 121583,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "before",
+        "sample": 3,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 271625,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "before",
+        "sample": 4,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 274125,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "after",
+        "sample": 4,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 117000,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "after",
+        "sample": 5,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 133292,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "before",
+        "sample": 5,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 144208,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "before",
+        "sample": 6,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 257583,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "after",
+        "sample": 6,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 164041,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "before",
+        "sample": 0,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 315958,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "after",
+        "sample": 0,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 130208,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "after",
+        "sample": 1,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 153000,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "before",
+        "sample": 1,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 318208,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "before",
+        "sample": 2,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 265708,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "after",
+        "sample": 2,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 164209,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "after",
+        "sample": 3,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 143584,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "before",
+        "sample": 3,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 282833,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "before",
+        "sample": 4,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 296750,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "after",
+        "sample": 4,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 142541,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "after",
+        "sample": 5,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 203416,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "before",
+        "sample": 5,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 345208,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "before",
+        "sample": 6,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 290209,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "after",
+        "sample": 6,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 154459,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "before",
+        "sample": 0,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 5494792,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "after",
+        "sample": 0,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 5642042,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "after",
+        "sample": 1,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 5527542,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "before",
+        "sample": 1,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 5570125,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "before",
+        "sample": 2,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 5479375,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "after",
+        "sample": 2,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 5498625,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "after",
+        "sample": 3,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 5483917,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "before",
+        "sample": 3,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 5478334,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "before",
+        "sample": 4,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 5633708,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "after",
+        "sample": 4,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 5432792,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "after",
+        "sample": 5,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 5510875,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "before",
+        "sample": 5,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 5461333,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "before",
+        "sample": 6,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 5559958,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "phase": "after",
+        "sample": 6,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 5537750,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "before",
+        "sample": 0,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1473709,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "after",
+        "sample": 0,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1390000,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "after",
+        "sample": 1,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1317667,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "before",
+        "sample": 1,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1503209,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "before",
+        "sample": 2,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1477166,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "after",
+        "sample": 2,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1333709,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "after",
+        "sample": 3,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1372250,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "before",
+        "sample": 3,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1446083,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "before",
+        "sample": 4,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1501500,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "after",
+        "sample": 4,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1273125,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "after",
+        "sample": 5,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1287084,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "before",
+        "sample": 5,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1441625,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "before",
+        "sample": 6,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1475792,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 4,
+        "phase": "after",
+        "sample": 6,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1306417,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "before",
+        "sample": 0,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1567875,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "after",
+        "sample": 0,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1314542,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "after",
+        "sample": 1,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1286042,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "before",
+        "sample": 1,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1510625,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "before",
+        "sample": 2,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1529333,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "after",
+        "sample": 2,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1360792,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "after",
+        "sample": 3,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1313417,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "before",
+        "sample": 3,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1500084,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "before",
+        "sample": 4,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1533250,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "after",
+        "sample": 4,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1323916,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "after",
+        "sample": 5,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1308750,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "before",
+        "sample": 5,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1464208,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "before",
+        "sample": 6,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1546709,
+        "passed": true
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "phase": "after",
+        "sample": 6,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 1303500,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 1,
+        "phase": "native",
+        "sample": 0,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 547710,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 1,
+        "phase": "native",
+        "sample": 1,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 547836,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 1,
+        "phase": "native",
+        "sample": 2,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 549211,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 1,
+        "phase": "native",
+        "sample": 3,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 545252,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 1,
+        "phase": "native",
+        "sample": 4,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 543127,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 1,
+        "phase": "native",
+        "sample": 5,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 541295,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 1,
+        "phase": "native",
+        "sample": 6,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 541669,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 4,
+        "phase": "native",
+        "sample": 0,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 286793,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 4,
+        "phase": "native",
+        "sample": 1,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 281460,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 4,
+        "phase": "native",
+        "sample": 2,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 299335,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 4,
+        "phase": "native",
+        "sample": 3,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 287460,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 4,
+        "phase": "native",
+        "sample": 4,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 284418,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 4,
+        "phase": "native",
+        "sample": 5,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 312043,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 4,
+        "phase": "native",
+        "sample": 6,
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1000,
+        "elapsed_ns": 290168,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 1,
+        "sample": 0,
+        "phase": "native",
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 22668,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 1,
+        "sample": 1,
+        "phase": "native",
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 14209,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 1,
+        "sample": 2,
+        "phase": "native",
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 12043,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 1,
+        "sample": 3,
+        "phase": "native",
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 11792,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 1,
+        "sample": 4,
+        "phase": "native",
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 11626,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 1,
+        "sample": 5,
+        "phase": "native",
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 12543,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 1,
+        "sample": 6,
+        "phase": "native",
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 14501,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 4,
+        "sample": 0,
+        "phase": "native",
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 41961,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 4,
+        "sample": 1,
+        "phase": "native",
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 27168,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 4,
+        "sample": 2,
+        "phase": "native",
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 38878,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 4,
+        "sample": 3,
+        "phase": "native",
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 26085,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 4,
+        "sample": 4,
+        "phase": "native",
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 33752,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 4,
+        "sample": 5,
+        "phase": "native",
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 29335,
+        "passed": true
+      },
+      {
+        "backend": "native-linux",
+        "cpus": 4,
+        "sample": 6,
+        "phase": "native",
+        "case": "worker-task-resources",
+        "threads": 4,
+        "rounds": 1,
+        "elapsed_ns": 31460,
+        "passed": true
+      }
+    ],
+    "summary": [
+      {
+        "rounds_per_thread": 1,
+        "cpus": 1,
+        "before_median_ns": 43084,
+        "after_median_ns": 43417,
+        "speedup": 0.9923301932422783,
+        "native_linux_median_ns": 12543
+      },
+      {
+        "rounds_per_thread": 1,
+        "cpus": 4,
+        "before_median_ns": 264417,
+        "after_median_ns": 133292,
+        "speedup": 1.9837424601626503,
+        "native_linux_median_ns": 31460
+      },
+      {
+        "rounds_per_thread": 1,
+        "cpus": 12,
+        "before_median_ns": 296750,
+        "after_median_ns": 153000,
+        "speedup": 1.9395424836601307,
+        "native_linux_median_ns": null
+      },
+      {
+        "rounds_per_thread": 1000,
+        "cpus": 1,
+        "before_median_ns": 5494792,
+        "after_median_ns": 5510875,
+        "speedup": 0.9970815886769342,
+        "native_linux_median_ns": 545252
+      },
+      {
+        "rounds_per_thread": 1000,
+        "cpus": 4,
+        "before_median_ns": 1475792,
+        "after_median_ns": 1317667,
+        "speedup": 1.1200037642287468,
+        "native_linux_median_ns": 287460
+      },
+      {
+        "rounds_per_thread": 1000,
+        "cpus": 12,
+        "before_median_ns": 1529333,
+        "after_median_ns": 1313417,
+        "speedup": 1.1643925729604536,
+        "native_linux_median_ns": null
+      }
+    ],
+    "method": "Seven counterbalanced before/after pairs for each CPU count and rounds value. Four already-ready threads register addresses, restore their clear_tid address and exit. Interval includes release and clear_tid joins, excludes clone/setup and final stack unmap. Remaining owner projection collection is not claimed as completed before joins.",
+    "native_reference": "Exact static musl ELF on existing ARM Linux Lima instance, six vCPUs, one/four-CPU affinity. Not bare-metal Darwin. Seven fresh samples per affinity for the short case; unchanged 1000-round native samples reused from the previous task-resource batch after verifying ELF SHA256.",
+    "claims": "Focused join/exit latency only. No meaningful single-CPU gain. No whole-browser speedup claim. Performance build uses the same runtime source before pin metadata changed; final signed pinned package accepted independently.",
+    "single_cpu_followup": "An initial roughly 4 us short-case regression prompted removal of unused survivor selection/process scans for childless exits. Final short medians are 43084/43417 ns."
+  },
+  "execution_metrics": {
+    "1-before": {
+      "execution": {
+        "cohort_rounds": 6,
+        "cohort_stop_us": 147,
+        "service_caller_wait_us": 23,
+        "service_requests": 3,
+        "serviced_syscalls": 3,
+        "syscalls": 47,
+        "vm_local_syscalls": 3,
+        "worker_direct_syscalls": 0,
+        "worker_fd_syscalls": 0,
+        "worker_file_syscalls": 0,
+        "worker_futex_waits": 6,
+        "worker_futex_wakes": 8,
+        "worker_gpu_calls": 0,
+        "worker_gpu_waits": 0,
+        "worker_poll_syscalls": 0,
+        "worker_socket_syscalls": 0,
+        "worker_syscalls": 27,
+        "worker_task_resumes": 7,
+        "worker_uring_syscalls": 0
+      },
+      "returned_syscalls": "[(93, 4), (220, 3)]"
+    },
+    "1-after": {
+      "execution": {
+        "cohort_rounds": 4,
+        "cohort_stop_us": 0,
+        "service_caller_wait_us": 27,
+        "service_requests": 3,
+        "serviced_syscalls": 3,
+        "syscalls": 47,
+        "vm_local_syscalls": 7,
+        "worker_direct_syscalls": 0,
+        "worker_fd_syscalls": 0,
+        "worker_file_syscalls": 0,
+        "worker_futex_waits": 7,
+        "worker_futex_wakes": 12,
+        "worker_gpu_calls": 0,
+        "worker_gpu_waits": 0,
+        "worker_poll_syscalls": 0,
+        "worker_socket_syscalls": 0,
+        "worker_syscalls": 31,
+        "worker_task_resumes": 10,
+        "worker_uring_syscalls": 0
+      },
+      "returned_syscalls": "[(220, 3), (29, 1)]"
+    },
+    "1000-before": {
+      "execution": {
+        "cohort_rounds": 7,
+        "cohort_stop_us": 33,
+        "service_caller_wait_us": 18,
+        "service_requests": 3,
+        "serviced_syscalls": 3,
+        "syscalls": 4042,
+        "vm_local_syscalls": 3,
+        "worker_direct_syscalls": 0,
+        "worker_fd_syscalls": 0,
+        "worker_file_syscalls": 0,
+        "worker_futex_waits": 6,
+        "worker_futex_wakes": 8,
+        "worker_gpu_calls": 0,
+        "worker_gpu_waits": 0,
+        "worker_poll_syscalls": 0,
+        "worker_socket_syscalls": 0,
+        "worker_syscalls": 4022,
+        "worker_task_resumes": 7,
+        "worker_uring_syscalls": 0
+      },
+      "returned_syscalls": "[(93, 4), (220, 3)]"
+    },
+    "1000-after": {
+      "execution": {
+        "cohort_rounds": 4,
+        "cohort_stop_us": 0,
+        "service_caller_wait_us": 21,
+        "service_requests": 3,
+        "serviced_syscalls": 3,
+        "syscalls": 4042,
+        "vm_local_syscalls": 7,
+        "worker_direct_syscalls": 0,
+        "worker_fd_syscalls": 0,
+        "worker_file_syscalls": 0,
+        "worker_futex_waits": 5,
+        "worker_futex_wakes": 12,
+        "worker_gpu_calls": 0,
+        "worker_gpu_waits": 0,
+        "worker_poll_syscalls": 0,
+        "worker_socket_syscalls": 0,
+        "worker_syscalls": 4026,
+        "worker_task_resumes": 8,
+        "worker_uring_syscalls": 0
+      },
+      "returned_syscalls": "[(220, 3), (29, 1)]"
+    }
+  },
+  "acceptance": {
+    "functional": [
+      {
+        "case": "hvf-final-pdeathsig-1",
+        "backend": "hvf",
+        "cpus": 1,
+        "returncode": 0,
+        "seconds": 0.15181662499999998
+      },
+      {
+        "case": "hvf-final-pid-namespaces-1",
+        "backend": "hvf",
+        "cpus": 1,
+        "returncode": 0,
+        "seconds": 0.023958124999999997
+      },
+      {
+        "case": "hvf-final-resources-1",
+        "backend": "hvf",
+        "cpus": 1,
+        "returncode": 0,
+        "seconds": 0.012177791999999993
+      },
+      {
+        "case": "hvf-final-cgroups-1",
+        "backend": "hvf",
+        "cpus": 1,
+        "returncode": 0,
+        "seconds": 0.011818708000000011
+      },
+      {
+        "case": "hvf-final-cgroup-control-1",
+        "backend": "hvf",
+        "cpus": 1,
+        "returncode": 0,
+        "seconds": 0.367070875
+      },
+      {
+        "case": "hvf-final-cgroup-pids-1",
+        "backend": "hvf",
+        "cpus": 1,
+        "returncode": 0,
+        "seconds": 0.046485290999999984
+      },
+      {
+        "case": "hvf-final-cgroup-bpf-1",
+        "backend": "hvf",
+        "cpus": 1,
+        "returncode": 0,
+        "seconds": 0.02575991600000005
+      },
+      {
+        "case": "hvf-final-pdeathsig-4",
+        "backend": "hvf",
+        "cpus": 4,
+        "returncode": 0,
+        "seconds": 0.025026542000000096
+      },
+      {
+        "case": "hvf-final-pid-namespaces-4",
+        "backend": "hvf",
+        "cpus": 4,
+        "returncode": 0,
+        "seconds": 0.041356958000000055
+      },
+      {
+        "case": "hvf-final-resources-4",
+        "backend": "hvf",
+        "cpus": 4,
+        "returncode": 0,
+        "seconds": 0.02300087500000003
+      },
+      {
+        "case": "hvf-final-cgroups-4",
+        "backend": "hvf",
+        "cpus": 4,
+        "returncode": 0,
+        "seconds": 0.02081912500000005
+      },
+      {
+        "case": "hvf-final-cgroup-control-4",
+        "backend": "hvf",
+        "cpus": 4,
+        "returncode": 0,
+        "seconds": 0.37011483300000003
+      },
+      {
+        "case": "hvf-final-cgroup-pids-4",
+        "backend": "hvf",
+        "cpus": 4,
+        "returncode": 0,
+        "seconds": 0.024692332999999955
+      },
+      {
+        "case": "hvf-final-cgroup-bpf-4",
+        "backend": "hvf",
+        "cpus": 4,
+        "returncode": 0,
+        "seconds": 0.012294625000000003
+      },
+      {
+        "case": "hvf-final-pdeathsig-12",
+        "backend": "hvf",
+        "cpus": 12,
+        "returncode": 0,
+        "seconds": 0.012677916999999983
+      },
+      {
+        "case": "hvf-final-pid-namespaces-12",
+        "backend": "hvf",
+        "cpus": 12,
+        "returncode": 0,
+        "seconds": 0.041759917000000035
+      },
+      {
+        "case": "hvf-final-resources-12",
+        "backend": "hvf",
+        "cpus": 12,
+        "returncode": 0,
+        "seconds": 0.012496209000000036
+      },
+      {
+        "case": "hvf-final-cgroups-12",
+        "backend": "hvf",
+        "cpus": 12,
+        "returncode": 0,
+        "seconds": 0.022448374999999965
+      },
+      {
+        "case": "hvf-final-cgroup-control-12",
+        "backend": "hvf",
+        "cpus": 12,
+        "returncode": 0,
+        "seconds": 0.375671458
+      },
+      {
+        "case": "hvf-final-cgroup-pids-12",
+        "backend": "hvf",
+        "cpus": 12,
+        "returncode": 0,
+        "seconds": 0.09004716699999982
+      },
+      {
+        "case": "hvf-final-cgroup-bpf-12",
+        "backend": "hvf",
+        "cpus": 12,
+        "returncode": 0,
+        "seconds": 0.029056542000000185
+      },
+      {
+        "case": "interpreter-final-pdeathsig-1",
+        "backend": "interpreter",
+        "cpus": 1,
+        "returncode": 0,
+        "seconds": 0.811236375
+      },
+      {
+        "case": "interpreter-final-pid-namespaces-1",
+        "backend": "interpreter",
+        "cpus": 1,
+        "returncode": 0,
+        "seconds": 0.04033441599999987
+      },
+      {
+        "case": "interpreter-final-resources-1",
+        "backend": "interpreter",
+        "cpus": 1,
+        "returncode": 0,
+        "seconds": 0.02188208299999994
+      },
+      {
+        "case": "interpreter-final-pdeathsig-4",
+        "backend": "interpreter",
+        "cpus": 4,
+        "returncode": 0,
+        "seconds": 0.012892916000000199
+      },
+      {
+        "case": "interpreter-final-pid-namespaces-4",
+        "backend": "interpreter",
+        "cpus": 4,
+        "returncode": 0,
+        "seconds": 0.04388116699999989
+      },
+      {
+        "case": "interpreter-final-resources-4",
+        "backend": "interpreter",
+        "cpus": 4,
+        "returncode": 0,
+        "seconds": 0.011769750000000023
+      }
+    ],
+    "clean_unprofiled_namespace_stress": {
+      "interpreter": {
+        "rounds": 200,
+        "failures": 0
+      },
+      "hvf": {
+        "rounds": 100,
+        "failures": 0
+      }
+    },
+    "all_run_records_sha256": "cbfe461f9c8260e6ad096a38b340a55dced17b854183c894d99007756260fd66",
+    "pinned_package": [
+      {
+        "cpus": 1,
+        "returncode": 0,
+        "seconds": 0.013727666999999999
+      },
+      {
+        "cpus": 4,
+        "returncode": 0,
+        "seconds": 0.010891791999999983
+      },
+      {
+        "cpus": 12,
+        "returncode": 0,
+        "seconds": 0.010764458000000005
+      }
+    ],
+    "physical_ipad_test": false
+  },
+  "suites": {
+    "apple_arm64": {
+      "process": [
+        301,
+        3
+      ],
+      "kernel": [
+        46,
+        0
+      ]
+    },
+    "native_arm_linux": {
+      "process": [
+        301,
+        3
+      ],
+      "kernel": [
+        46,
+        0
+      ]
+    },
+    "tuple_meaning": [
+      "passed",
+      "ignored"
+    ],
+    "reuse_note": "Native full affected results precede only the final pure childless-survivor-selection optimization and private helper cleanup. Apple affected tests, final clean functional/stress binaries and strict checks cover that optimization. Unchanged VFS/ABI/CPU/GPU results are reused; integration is reused after that semantic-preserving optimization."
+  },
+  "checks": [
+    {
+      "case": "apple-tests-final.log",
+      "returncode": 0,
+      "sha256": "69cecd202db96b5f3a5cc7a1803b3b8cb5ec031657accd6bb2228b6b25f163cf"
+    },
+    {
+      "case": "apple-final-clippy.log",
+      "returncode": 0,
+      "sha256": "47f7c8dcd0adc061e466d6d6b6be0e950d1e8be5e640e4b58896bcdecd1dc355"
+    },
+    {
+      "case": "runtime-final-clippy.log",
+      "returncode": 0,
+      "sha256": "571178b7550d5adb2d282ffceda8de495850e84e8ebbe4e15281db3a3d285ccd"
+    },
+    {
+      "case": "ipad-final-check.log",
+      "returncode": 0,
+      "sha256": "2cbfa2769fd9d264b7b736ab9628ccc9d3a31f8db51ccedca9a1222f6afb8104"
+    },
+    {
+      "case": "mac-clippy.log",
+      "returncode": 0,
+      "sha256": "90644cc4b1be697ac608cef24b1c281ca263c938a7c902d8c317dae3feea5180"
+    },
+    {
+      "case": "mm-exit-wake.log",
+      "returncode": 0,
+      "sha256": "9b0def799317ae7874c5c0282fed655fdceae765844f2c84546d35f40015e16c"
+    },
+    {
+      "case": "filtered-parentage.log",
+      "returncode": 0,
+      "sha256": "61201e3dbbb71fbaf0e30395943ac873be2389e6a02b8a14c3d40e7f2a2602d7"
+    },
+    {
+      "case": "exit-boundaries.log",
+      "returncode": 0,
+      "sha256": "2349e57e3302df230637b0ed28b247fc74f32c94396e8bc7e310c0b634e278ea"
+    },
+    {
+      "case": "runtime-fmt.log",
+      "returncode": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "case": "common-boundaries.log",
+      "returncode": 0,
+      "sha256": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651"
+    },
+    {
+      "case": "ipad-pinned-boundaries.log",
+      "returncode": 0,
+      "sha256": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651"
+    },
+    {
+      "case": "mac-pinned-boundaries.log",
+      "returncode": 0,
+      "sha256": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651"
+    },
+    {
+      "case": "mac-pinned-build.log",
+      "returncode": 0,
+      "sha256": "9812dc12e5fdaf6a7330475202d5952a9f9f7893da41c4ecbd2119148692202d"
+    },
+    {
+      "case": "dev-install.log",
+      "returncode": 0,
+      "sha256": "d81b37faaef60b5a1b635ce5a81a399a304e89d9aee6498d2d7eecf5f3f5bd41"
+    },
+    {
+      "case": "installed-dev-compat.log",
+      "returncode": 0,
+      "sha256": "b7fa87cf3ee58107ca610f856848307ffa0fa29393a0acd32b0709264e99abb3"
+    }
+  ],
+  "integration": [
+    {
+      "case": "go-gc",
+      "returncode": 0,
+      "seconds": 2.490112292
+    },
+    {
+      "case": "docker",
+      "returncode": 0,
+      "seconds": 76.388310625
+    }
+  ],
+  "integration_workload": {
+    "go_gc": "30 stock Debian Docker CLI starts, GOGC=1, normal asynchronous preemption",
+    "docker": "Eight isolated twelve-CPU start/health/exec/inspect/stop/remove cycles with public cached Alpine content",
+    "storage": "Private regression store; no business deployment/frontend operation"
+  },
+  "regressions": [
+    "Source individual exit releases original Files, clear_tid and cgroup membership without stopping live peers or requesting a service.",
+    "Sixteen simultaneous exitters keep exactly one last live group member.",
+    "Owner controls defer before effects; actual legacy futex adoption requests its existing boundary after accepted cleanup.",
+    "clear_tid wakes one waiter and ignores its user write fault.",
+    "Original parent-thread links survive non-leader exec/future TID publication, explicit reparenting, repeated retirement and numeric TID reuse.",
+    "Filtered parent-death registration ALLOW/ERRNO operates on original task state without a checkpoint.",
+    "Non-leader presence retires before owner projection collection; leader presence and live process signal routing remain.",
+    "Owner group exit/exec mark removed original tasks dead and preserve parent-death and io_uring cancellation."
+  ],
+  "lost_mm_notification": {
+    "description": "An exiting peer returned the final active View while another task held an mm checkpoint, but Epoch::finish omitted VmReady because it previously always stopped the cohort. Captured queue had finished source thread 4, parked root 1, held requester 2 and a woken requester futex.",
+    "fix": "Publish original domains.notify_ready after returning the final View; no all-cohort stop/retry/poll workaround.",
+    "red_without_fix_sha256": "c6efb29aa6e2a270eb7f37dd6a1a4487e2f8507c2db7bf6456ddb463c3a43789",
+    "green_sha256": "9b0def799317ae7874c5c0282fed655fdceae765844f2c84546d35f40015e16c",
+    "diagnostic_sha256": "e6172c4a9361771fad2dcef93aa41758e7ca331d004dc0e18b387699ad5a0ffc",
+    "final_unprofiled_stress": {
+      "interpreter": {
+        "rounds": 200,
+        "failures": 0
+      },
+      "hvf": {
+        "rounds": 100,
+        "failures": 0
+      }
+    },
+    "temporary_diagnostic_code_removed": true
+  },
+  "native_namespace_oracle_difference": {
+    "unmodified_fixture_complete": false,
+    "failure": "Existing negative ioprio_get assertion expects EINVAL; native syscall probe returns ESRCH. Fixture was stopped after the resulting wait. No assertion weakened.",
+    "probe": "result=-1 errno=3",
+    "fixture_failure_log_sha256": "55fa7d74dffe4ee9b9194a277302afbf468920632587cfe36d2440bd51108f85",
+    "native_parent_death_fixture_passed": true,
+    "native_parent_death_log_sha256": "e32ce3fcf9e3811725c861a294a829436acf81c874bf95e61c299a8e5bb62dff"
+  },
+  "remaining_boundaries": [
+    "Last group member, exit_group and default fatal termination still require actual group/process cleanup",
+    "Full reparenting/subreaper and namespace-init teardown, robust-futex support and final mm/native ownership",
+    "Actual owner epoll/namespace/proc/mount destructors, legacy ancillary reaping, tracing/vfork and accepted owner/mapped-file work",
+    "Other non-source completions still stop their execution cohort; source exit does not imply all lifecycle migration is complete"
+  ],
+  "execution": {
+    "new_service_thread": false,
+    "new_polling_bus": false,
+    "new_guest_memory_barrier": false,
+    "relationship_synchronization": "Original parent graph transaction only for structural changes; scalar registration is relaxed atomic. Ordinary capture and childless exit do not select a survivor.",
+    "callbacks": "After original resource locks are released"
+  },
+  "installed": {
+    "dev": {
+      "version": "Trames Dev 1.5.3 (dev) runtime 2378b6959991c91c6815031d146f64ab11545a52",
+      "sha256": "4eb5fbf896a11c1405c9d74a7fc371298f1dc7366fc4a885f4af83a97ad15bf0"
+    },
+    "stable": {
+      "version": "Trames 1.5.3 (stable) runtime d9c4a811faf316a51b1a8f33f055247943a18855",
+      "sha256": "4f40615213e731b2a4ef9d8c6a0e85c5c7bdf31ab0c60b0354b55113f2a6a55d"
+    }
+  },
+  "log_hashes": {
+    "go-gc-integration.log": "e8dd5e3fae6fa8b3df1090acd43b111cb7b1c7e49b8c57ade35be6d498d7b52e",
+    "docker-integration.log": "5abc5f8644dcb01b035ba92b609d6a24244ef7cd56d95d0b06b994144969790a",
+    "acceptance-final-summary.log": "56f3c9405f97293a6fdc89e4673734cd904d649fa905326a42c2fc63ee3d5a97"
+  },
+  "native_affected_test_log_sha256": "671134af1a2e0f6f2a5e81ee682977bf3e7d7693e19c310eaa75c732e32541aa"
+}
