@@ -1,0 +1,2543 @@
+{
+  "schema": 1,
+  "date": "2026-11-05",
+  "runtime_revision": "27b3eba9e6423345e1381f3318f5da08aeee19d8",
+  "baseline_runtime_revision": "c05a7e915a91344597efb34373fea8b427e013a0",
+  "scope": "All currently accepted fork/clone/vfork combinations: creator-mm custody, live queue admission/retirement, original family/namespace/cgroup birth transaction, retained guarded fork storage and live record-lock PID translation.",
+  "source_files": {
+    "crates/trames-kernel/src/family.rs": "d74e8de0e5e8e7c594ecc270f5da91122f07df121ec75d350765915358486bad",
+    "crates/trames-kernel/src/task_control.rs": "68401576b4e68add216b60e749f31274737baabe861740375a3c9e70d66acdcf",
+    "crates/trames-memory/src/lib.rs": "c87b319c51541a8c62039ac6b21af0b0c1ea425aa85f6695cd4e4e969e5ad0c0",
+    "crates/trames-memory/src/parallel/retirement.rs": "2b6de0c4b5da9b1603d7e3846998c045a2e16ee815a578939a81f617ae043de1",
+    "crates/trames-session/src/process.rs": "f5d140d8254a0b1e15adf94591c033c1e235ad02e1425fdcbca7d25c1d422cfa",
+    "crates/trames-session/src/process_dispatch.rs": "c9e1e8e7116884f4c79ca3c9dbda95adf618ba1d728c09aa950382cfe8710f86",
+    "crates/trames-session/src/process_vm.rs": "3bba71747f439575ea83bd5c68b1f4c0fc33c62dc7463c61d6f8e217012e4b3b",
+    "crates/trames-session/src/run_queue.rs": "657a3f39f549e5acdc360ad46c279104ba360188f65d3a8ec17f4dd77b90dee0",
+    "crates/trames-session/src/run_queue/domains.rs": "4ae6df84af84fa1ffe1737ed924683e852ff250f4f08f5b501bd7419c3aeb6ed",
+    "crates/trames-session/src/worker_syscalls.rs": "82c448fb0a3678677b3b640e82df935afdbccd64e6a7e3f1e0eb1179d7b9e4c8",
+    "crates/trames-session/src/workers.rs": "7918277c78b75f4a04a451893146f5ff34b878aaed0b08d9c85714696aa76739",
+    "crates/trames-vfs/src/cgroup.rs": "4ac4c78372f0e879677aa193793f4d4649026322a88dc596963739558a34f6f4",
+    "crates/trames-vfs/src/lib.rs": "3ee6e17e01426ca54a2aa53eaaf96e72462b28420577b2b43e065ee2e7f825a8",
+    "crates/trames-vfs/src/locks.rs": "6012a42065fb54a463a98bcd16c921e9ff4d8e83772b1eb1d66c90493fbf9c7a",
+    "crates/trames-vfs/src/pid_namespace.rs": "aa47e1f02048432423c972576d29b498f931e34435b5bb594d11de1cba6ec67f",
+    "docs/architecture/coordination-boundaries.md": "e05581c3d8ba8262ae50f2557e78b825e720b8255817d7ec289dd20646b1ff72",
+    "docs/architecture/region-memory.md": "64167bd11579517e3ab14862c5e4a26b34adf2bd9c2d769413587a08c11ce3d7"
+  },
+  "integrated_patch_sha256": "7b954526ce5a3da4899ab440d05b941c287dd11d6b5d8c9e53786b6bfeee010e",
+  "concurrency": {
+    "new_service_thread": false,
+    "new_polling_bus": false,
+    "new_unsafe": false,
+    "new_guest_byte_barrier": false,
+    "rc_graph_transfer_to_worker": false,
+    "construction": "Original Rc owner performs scoped construction while creator-mm actors return. Unrelated address spaces keep running. Existing shared resources retain object locks; original workers accept newborn jobs."
+  },
+  "remaining_boundaries": [
+    "Task/VFS Rc construction still occurs on its existing owner at creator-mm custody",
+    "Exec, tracing, non-ALLOW policy and namespace administration retain joined entry",
+    "Mixed true mapping requests keep backing closure and external-borrow boundary",
+    "Actual excluded backing/native/supervision controls retain their explicit boundaries; solo caller path remains"
+  ],
+  "checks": {
+    "apple": {
+      "process_passed": 318,
+      "process_ignored": 3,
+      "kernel_passed": 58,
+      "memory_passed": 162,
+      "memory_ignored": 1,
+      "vfs_all_features_passed": 510,
+      "vfs_ignored": 1
+    },
+    "native_arm_linux": {
+      "process_passed": 318,
+      "process_ignored": 3,
+      "kernel_passed": 58,
+      "memory_passed": 162,
+      "memory_ignored": 1,
+      "vfs_all_features_passed": 509,
+      "vfs_ignored": 1
+    },
+    "strict_affected_checks": true,
+    "ipad_target_compilation": true,
+    "physical_ipad_run": false,
+    "hvf_and_interpreter_lifecycle_cases": 25,
+    "gpu_video_teardown_cases": 2,
+    "go_gc_rounds": 30,
+    "isolated_docker_rounds": 8,
+    "h264_vulkan_import": true
+  },
+  "functional_acceptance": [
+    {
+      "case": "final-hvf-1-vfork",
+      "returncode": 0,
+      "seconds": 0.08447258299999999
+    },
+    {
+      "case": "final-hvf-1-completion",
+      "returncode": 0,
+      "seconds": 0.040908416
+    },
+    {
+      "case": "final-hvf-1-resources",
+      "returncode": 0,
+      "seconds": 0.012131417000000005
+    },
+    {
+      "case": "final-hvf-1-pdeathsig",
+      "returncode": 0,
+      "seconds": 0.012068833000000001
+    },
+    {
+      "case": "final-hvf-1-pid-namespaces",
+      "returncode": 0,
+      "seconds": 0.040853500000000015
+    },
+    {
+      "case": "final-hvf-4-vfork",
+      "returncode": 0,
+      "seconds": 0.022672499999999984
+    },
+    {
+      "case": "final-hvf-4-completion",
+      "returncode": 0,
+      "seconds": 0.04070129199999997
+    },
+    {
+      "case": "final-hvf-4-resources",
+      "returncode": 0,
+      "seconds": 0.012183667000000009
+    },
+    {
+      "case": "final-hvf-4-pdeathsig",
+      "returncode": 0,
+      "seconds": 0.02355133399999998
+    },
+    {
+      "case": "final-hvf-4-pid-namespaces",
+      "returncode": 0,
+      "seconds": 0.042813917000000035
+    },
+    {
+      "case": "final-hvf-12-vfork",
+      "returncode": 0,
+      "seconds": 0.012631583000000002
+    },
+    {
+      "case": "final-hvf-12-completion",
+      "returncode": 0,
+      "seconds": 0.04832404200000001
+    },
+    {
+      "case": "final-hvf-12-resources",
+      "returncode": 0,
+      "seconds": 0.01233179099999998
+    },
+    {
+      "case": "final-hvf-12-pdeathsig",
+      "returncode": 0,
+      "seconds": 0.012318332999999959
+    },
+    {
+      "case": "final-hvf-12-pid-namespaces",
+      "returncode": 0,
+      "seconds": 0.04605245799999996
+    },
+    {
+      "case": "final-interpreter-1-vfork",
+      "returncode": 0,
+      "seconds": 0.6519278329999999
+    },
+    {
+      "case": "final-interpreter-1-completion",
+      "returncode": 0,
+      "seconds": 0.019834250000000164
+    },
+    {
+      "case": "final-interpreter-1-resources",
+      "returncode": 0,
+      "seconds": 0.012280292000000026
+    },
+    {
+      "case": "final-interpreter-1-pdeathsig",
+      "returncode": 0,
+      "seconds": 0.012328499999999964
+    },
+    {
+      "case": "final-interpreter-1-pid-namespaces",
+      "returncode": 0,
+      "seconds": 0.023148334000000048
+    },
+    {
+      "case": "final-interpreter-4-vfork",
+      "returncode": 0,
+      "seconds": 0.012016542000000019
+    },
+    {
+      "case": "final-interpreter-4-completion",
+      "returncode": 0,
+      "seconds": 0.023143458999999922
+    },
+    {
+      "case": "final-interpreter-4-resources",
+      "returncode": 0,
+      "seconds": 0.012668457999999827
+    },
+    {
+      "case": "final-interpreter-4-pdeathsig",
+      "returncode": 0,
+      "seconds": 0.011580166999999975
+    },
+    {
+      "case": "final-interpreter-4-pid-namespaces",
+      "returncode": 0,
+      "seconds": 0.04698479199999994
+    },
+    {
+      "case": "final-gpu",
+      "returncode": 0,
+      "seconds": 0.523924375
+    },
+    {
+      "case": "final-video",
+      "returncode": 0,
+      "seconds": 0.02168029199999988
+    },
+    {
+      "case": "final-go-gc",
+      "returncode": 0,
+      "seconds": 2.6698284579999996
+    },
+    {
+      "case": "final-docker",
+      "returncode": 0,
+      "seconds": 76.25007391700001
+    },
+    {
+      "case": "final-vaapi",
+      "returncode": 0,
+      "seconds": 1.9916293329999917
+    }
+  ],
+  "performance_medians_ms": [
+    {
+      "cpus": 1,
+      "before": 15.517292,
+      "after": 15.086208,
+      "elapsed_change_percent": -2.778087826149045
+    },
+    {
+      "cpus": 4,
+      "before": 30.890208,
+      "after": 30.262041,
+      "elapsed_change_percent": -2.033547329950003
+    },
+    {
+      "cpus": 12,
+      "before": 31.091166,
+      "after": 29.972541,
+      "elapsed_change_percent": -3.5978869367588207
+    }
+  ],
+  "benchmark": {
+    "schema": 1,
+    "scope": "128 two-thread groups: fork/clone, leader exit, final-thread exit and parent wait, alternating ordinary files and private epoll controls. Two untimed warmups per binary/CPU count, then seven counterbalanced pairs per CPU count. Includes structural fork/mm work; not a general CPU or Firefox benchmark. Vfork uses the same prior fixture. Local Linux test instance was stopped and no build ran during timings.",
+    "baseline_revision": "c05a7e915a91344597efb34373fea8b427e013a0",
+    "candidate_uncommitted": true,
+    "binaries": {
+      "before": {
+        "path": "/Users/main/dev/trames/target/task-creation/before-mac-run",
+        "sha256": "0ec44437330594b4f331de72d8495851e0cd5963944f6fca9e4d7cdeba287771"
+      },
+      "after": {
+        "path": "/Users/main/dev/trames/target/task-creation/mac-child-first-run",
+        "sha256": "0696799672c9b8f2b2598fd1c3d77606e201ff09c995e1e5ae07287527c3d930"
+      }
+    },
+    "fixture_sha256": "9138832f44247388de6b45e812aa2ecc59b1d3c0ca4f2b59c13859de3af9c5a2",
+    "vfork_fixture_sha256": "cf6fe684777c148e4ef4282f0dd73efe98b074d255f81d7ad49437d4b3c3b89c",
+    "native_arm_linux": {
+      "reused_unchanged_fixture_result": true,
+      "source_log": "/Users/main/dev/trames/target/thread-retirement/native-linux.log",
+      "sha256": "68229c0a3d942a7f423d1bf26085f3ec64759ce47426172890ae05164998a6c9",
+      "samples": [
+        {
+          "case": "worker-thread-completion",
+          "groups": 128,
+          "elapsed_ns": 7712065,
+          "passed": true
+        },
+        {
+          "case": "worker-thread-completion",
+          "groups": 128,
+          "elapsed_ns": 7484897,
+          "passed": true
+        },
+        {
+          "case": "worker-thread-completion",
+          "groups": 128,
+          "elapsed_ns": 8321654,
+          "passed": true
+        },
+        {
+          "case": "worker-thread-completion",
+          "groups": 128,
+          "elapsed_ns": 7429813,
+          "passed": true
+        },
+        {
+          "case": "worker-thread-completion",
+          "groups": 128,
+          "elapsed_ns": 7619731,
+          "passed": true
+        },
+        {
+          "case": "worker-thread-completion",
+          "groups": 128,
+          "elapsed_ns": 7660940,
+          "passed": true
+        },
+        {
+          "case": "worker-thread-completion",
+          "groups": 128,
+          "elapsed_ns": 8000109,
+          "passed": true
+        }
+      ]
+    },
+    "samples": [
+      {
+        "cpus": 1,
+        "phase": "before",
+        "sample": 0,
+        "wall_seconds": 0.02197287499999999,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 15517292,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "after",
+        "sample": 0,
+        "wall_seconds": 0.02130766699999999,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 14880292,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "after",
+        "sample": 1,
+        "wall_seconds": 0.021629125,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 15811584,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "before",
+        "sample": 1,
+        "wall_seconds": 0.02157916600000001,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 15176583,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "before",
+        "sample": 2,
+        "wall_seconds": 0.02173562500000001,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 15080458,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "after",
+        "sample": 2,
+        "wall_seconds": 0.021520791999999983,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 15611667,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "after",
+        "sample": 3,
+        "wall_seconds": 0.021028167000000014,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 14947833,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "before",
+        "sample": 3,
+        "wall_seconds": 0.02295154199999999,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 16122416,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "before",
+        "sample": 4,
+        "wall_seconds": 0.02209433300000002,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 15711666,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "after",
+        "sample": 4,
+        "wall_seconds": 0.02135941600000002,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 15144667,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "after",
+        "sample": 5,
+        "wall_seconds": 0.02161708299999998,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 15086208,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "before",
+        "sample": 5,
+        "wall_seconds": 0.022189125000000032,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 16097917,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "before",
+        "sample": 6,
+        "wall_seconds": 0.02215575000000003,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 15467417,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "after",
+        "sample": 6,
+        "wall_seconds": 0.02198979099999998,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 15021250,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "before",
+        "sample": 0,
+        "wall_seconds": 0.03771062499999989,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30813125,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "after",
+        "sample": 0,
+        "wall_seconds": 0.038064125000000004,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30878000,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "after",
+        "sample": 1,
+        "wall_seconds": 0.03722170799999991,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30262041,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "before",
+        "sample": 1,
+        "wall_seconds": 0.03862858300000016,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31071542,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "before",
+        "sample": 2,
+        "wall_seconds": 0.036874041000000135,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30323292,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "after",
+        "sample": 2,
+        "wall_seconds": 0.03641229200000007,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29731958,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "after",
+        "sample": 3,
+        "wall_seconds": 0.03751733300000004,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30669166,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "before",
+        "sample": 3,
+        "wall_seconds": 0.037725624999999985,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30932958,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "before",
+        "sample": 4,
+        "wall_seconds": 0.03755887499999999,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30890208,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "after",
+        "sample": 4,
+        "wall_seconds": 0.03644858299999987,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29537417,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "after",
+        "sample": 5,
+        "wall_seconds": 0.037311042000000016,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30289708,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "before",
+        "sample": 5,
+        "wall_seconds": 0.03889237500000009,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31646667,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "before",
+        "sample": 6,
+        "wall_seconds": 0.03749095899999988,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30688083,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "after",
+        "sample": 6,
+        "wall_seconds": 0.03686266699999985,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29953166,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "before",
+        "sample": 0,
+        "wall_seconds": 0.038424707999999974,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31608958,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "after",
+        "sample": 0,
+        "wall_seconds": 0.03794604200000018,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30814833,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "after",
+        "sample": 1,
+        "wall_seconds": 0.03666033300000038,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29193750,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "before",
+        "sample": 1,
+        "wall_seconds": 0.039292915999999956,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31507084,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "before",
+        "sample": 2,
+        "wall_seconds": 0.03907095800000038,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 32297125,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "after",
+        "sample": 2,
+        "wall_seconds": 0.037228750000000144,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30309750,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "after",
+        "sample": 3,
+        "wall_seconds": 0.036910957999999994,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30206375,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "before",
+        "sample": 3,
+        "wall_seconds": 0.03750133400000033,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30942459,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "before",
+        "sample": 4,
+        "wall_seconds": 0.03741966699999999,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30597875,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "after",
+        "sample": 4,
+        "wall_seconds": 0.03754112499999973,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29972541,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "after",
+        "sample": 5,
+        "wall_seconds": 0.03689854199999987,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29733667,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "before",
+        "sample": 5,
+        "wall_seconds": 0.037853541999999685,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31091166,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "before",
+        "sample": 6,
+        "wall_seconds": 0.038049375000000385,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30995167,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "after",
+        "sample": 6,
+        "wall_seconds": 0.03606325000000021,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29338708,
+        "passed": true
+      }
+    ],
+    "vfork_samples": [
+      {
+        "cpus": 1,
+        "sample": 0,
+        "phase": "before",
+        "wall_seconds": 0.05498408300000002,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 2027770,
+        "owner_mean_ns": 4028348,
+        "plain_max_ns": 2051375,
+        "owner_max_ns": 4035083,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "sample": 0,
+        "phase": "after",
+        "wall_seconds": 0.05558654200000007,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 2024744,
+        "owner_mean_ns": 4026963,
+        "plain_max_ns": 2058209,
+        "owner_max_ns": 4037000,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "sample": 1,
+        "phase": "after",
+        "wall_seconds": 0.055323750000000005,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 2025677,
+        "owner_mean_ns": 4026776,
+        "plain_max_ns": 2064709,
+        "owner_max_ns": 4041000,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "sample": 1,
+        "phase": "before",
+        "wall_seconds": 0.05543720900000004,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 2026598,
+        "owner_mean_ns": 4031187,
+        "plain_max_ns": 2054958,
+        "owner_max_ns": 4036958,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "sample": 2,
+        "phase": "before",
+        "wall_seconds": 0.0555320829999999,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 2024135,
+        "owner_mean_ns": 4029088,
+        "plain_max_ns": 2049500,
+        "owner_max_ns": 4035292,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "sample": 2,
+        "phase": "after",
+        "wall_seconds": 0.05561929200000004,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 2026255,
+        "owner_mean_ns": 4028604,
+        "plain_max_ns": 2066000,
+        "owner_max_ns": 4038750,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "sample": 3,
+        "phase": "after",
+        "wall_seconds": 0.05497829100000007,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 2029276,
+        "owner_mean_ns": 4026041,
+        "plain_max_ns": 2055708,
+        "owner_max_ns": 4034625,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "sample": 3,
+        "phase": "before",
+        "wall_seconds": 0.05587454199999997,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 2025531,
+        "owner_mean_ns": 4030854,
+        "plain_max_ns": 2056542,
+        "owner_max_ns": 4045667,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "sample": 4,
+        "phase": "before",
+        "wall_seconds": 0.055936333000000005,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 2025765,
+        "owner_mean_ns": 4026864,
+        "plain_max_ns": 2060959,
+        "owner_max_ns": 4040125,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "sample": 4,
+        "phase": "after",
+        "wall_seconds": 0.05518341699999996,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 2029458,
+        "owner_mean_ns": 4030109,
+        "plain_max_ns": 2054625,
+        "owner_max_ns": 4039500,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "sample": 5,
+        "phase": "after",
+        "wall_seconds": 0.055276667,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 2024510,
+        "owner_mean_ns": 4027453,
+        "plain_max_ns": 2048792,
+        "owner_max_ns": 4032208,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "sample": 5,
+        "phase": "before",
+        "wall_seconds": 0.055502082999999924,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 2025901,
+        "owner_mean_ns": 4026697,
+        "plain_max_ns": 2056250,
+        "owner_max_ns": 4037000,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "sample": 6,
+        "phase": "before",
+        "wall_seconds": 0.055321667000000074,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 2033442,
+        "owner_mean_ns": 4039568,
+        "plain_max_ns": 2050375,
+        "owner_max_ns": 4081292,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "sample": 6,
+        "phase": "after",
+        "wall_seconds": 0.055197790999999885,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 2025479,
+        "owner_mean_ns": 4028051,
+        "plain_max_ns": 2058583,
+        "owner_max_ns": 4038083,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "sample": 0,
+        "phase": "before",
+        "wall_seconds": 0.009529082999999883,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 124771,
+        "owner_mean_ns": 103328,
+        "plain_max_ns": 395584,
+        "owner_max_ns": 139167,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "sample": 0,
+        "phase": "after",
+        "wall_seconds": 0.008399666999999944,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 90796,
+        "owner_mean_ns": 103849,
+        "plain_max_ns": 248500,
+        "owner_max_ns": 138792,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "sample": 1,
+        "phase": "after",
+        "wall_seconds": 0.009020167000000079,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 116057,
+        "owner_mean_ns": 98859,
+        "plain_max_ns": 301250,
+        "owner_max_ns": 129291,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "sample": 1,
+        "phase": "before",
+        "wall_seconds": 0.009241374999999996,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 137833,
+        "owner_mean_ns": 115338,
+        "plain_max_ns": 419500,
+        "owner_max_ns": 149833,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "sample": 2,
+        "phase": "before",
+        "wall_seconds": 0.008524959000000054,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 121395,
+        "owner_mean_ns": 104515,
+        "plain_max_ns": 361541,
+        "owner_max_ns": 125750,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "sample": 2,
+        "phase": "after",
+        "wall_seconds": 0.007927041000000079,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 112468,
+        "owner_mean_ns": 101546,
+        "plain_max_ns": 247375,
+        "owner_max_ns": 151250,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "sample": 3,
+        "phase": "after",
+        "wall_seconds": 0.008993541999999799,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 102854,
+        "owner_mean_ns": 94609,
+        "plain_max_ns": 318375,
+        "owner_max_ns": 107542,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "sample": 3,
+        "phase": "before",
+        "wall_seconds": 0.008745082999999987,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 127786,
+        "owner_mean_ns": 105890,
+        "plain_max_ns": 390459,
+        "owner_max_ns": 150250,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "sample": 4,
+        "phase": "before",
+        "wall_seconds": 0.008464083000000011,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 141088,
+        "owner_mean_ns": 107166,
+        "plain_max_ns": 451542,
+        "owner_max_ns": 126542,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "sample": 4,
+        "phase": "after",
+        "wall_seconds": 0.008432666000000033,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 115989,
+        "owner_mean_ns": 99583,
+        "plain_max_ns": 385667,
+        "owner_max_ns": 142917,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "sample": 5,
+        "phase": "after",
+        "wall_seconds": 0.009049542000000077,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 99291,
+        "owner_mean_ns": 100953,
+        "plain_max_ns": 278500,
+        "owner_max_ns": 127666,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "sample": 5,
+        "phase": "before",
+        "wall_seconds": 0.009019207999999779,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 130781,
+        "owner_mean_ns": 118724,
+        "plain_max_ns": 355334,
+        "owner_max_ns": 153542,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "sample": 6,
+        "phase": "before",
+        "wall_seconds": 0.008594417000000298,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 127598,
+        "owner_mean_ns": 114276,
+        "plain_max_ns": 376458,
+        "owner_max_ns": 148417,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "sample": 6,
+        "phase": "after",
+        "wall_seconds": 0.008681083000000367,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 100411,
+        "owner_mean_ns": 99880,
+        "plain_max_ns": 293000,
+        "owner_max_ns": 110250,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "sample": 0,
+        "phase": "before",
+        "wall_seconds": 0.009553583000000199,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 136244,
+        "owner_mean_ns": 121703,
+        "plain_max_ns": 390208,
+        "owner_max_ns": 163666,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "sample": 0,
+        "phase": "after",
+        "wall_seconds": 0.00866195900000033,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 103317,
+        "owner_mean_ns": 98750,
+        "plain_max_ns": 272542,
+        "owner_max_ns": 117292,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "sample": 1,
+        "phase": "after",
+        "wall_seconds": 0.009224582999999953,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 105203,
+        "owner_mean_ns": 107463,
+        "plain_max_ns": 317792,
+        "owner_max_ns": 141459,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "sample": 1,
+        "phase": "before",
+        "wall_seconds": 0.00867262499999999,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 129031,
+        "owner_mean_ns": 106020,
+        "plain_max_ns": 390458,
+        "owner_max_ns": 141584,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "sample": 2,
+        "phase": "before",
+        "wall_seconds": 0.008663625000000064,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 124807,
+        "owner_mean_ns": 99015,
+        "plain_max_ns": 366958,
+        "owner_max_ns": 135167,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "sample": 2,
+        "phase": "after",
+        "wall_seconds": 0.008475958000000006,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 123458,
+        "owner_mean_ns": 117046,
+        "plain_max_ns": 335125,
+        "owner_max_ns": 147458,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "sample": 3,
+        "phase": "after",
+        "wall_seconds": 0.008673666999999607,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 91500,
+        "owner_mean_ns": 98422,
+        "plain_max_ns": 244833,
+        "owner_max_ns": 112584,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "sample": 3,
+        "phase": "before",
+        "wall_seconds": 0.00874920800000023,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 134198,
+        "owner_mean_ns": 108468,
+        "plain_max_ns": 408958,
+        "owner_max_ns": 132000,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "sample": 4,
+        "phase": "before",
+        "wall_seconds": 0.008584291000000022,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 124333,
+        "owner_mean_ns": 101161,
+        "plain_max_ns": 367250,
+        "owner_max_ns": 124459,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "sample": 4,
+        "phase": "after",
+        "wall_seconds": 0.00903287499999994,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 103724,
+        "owner_mean_ns": 107156,
+        "plain_max_ns": 324042,
+        "owner_max_ns": 157125,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "sample": 5,
+        "phase": "after",
+        "wall_seconds": 0.008627166999999769,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 92510,
+        "owner_mean_ns": 92479,
+        "plain_max_ns": 253583,
+        "owner_max_ns": 119250,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "sample": 5,
+        "phase": "before",
+        "wall_seconds": 0.008568750000000236,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 126984,
+        "owner_mean_ns": 102650,
+        "plain_max_ns": 383167,
+        "owner_max_ns": 126666,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "sample": 6,
+        "phase": "before",
+        "wall_seconds": 0.00858150000000002,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 131562,
+        "owner_mean_ns": 101979,
+        "plain_max_ns": 404750,
+        "owner_max_ns": 133583,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "sample": 6,
+        "phase": "after",
+        "wall_seconds": 0.009396999999999878,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 118229,
+        "owner_mean_ns": 114948,
+        "plain_max_ns": 317000,
+        "owner_max_ns": 152042,
+        "passed": true
+      }
+    ]
+  },
+  "candidate_metadata_note": "The measured isolated binary embeds the old c05a7e9 runtime label because pins were unchanged before committing. Its tested source files match runtime_revision exactly; the final Dev package is rebuilt with the committed pin.",
+  "twelve_cpu_metrics": {
+    "before": {
+      "metrics": {
+        "syscalls": 1988,
+        "context_switches": 839,
+        "hardware_mapped_bytes": 65536,
+        "guest_resident_bytes": 65536,
+        "vm_checkpoint_groups": 0,
+        "vm_checkpoint_spaces": 0,
+        "backing_domain_checks": 0,
+        "backing_page_checks": 0,
+        "parallel_memory_us": 897,
+        "instruction_count": null
+      },
+      "execution_paths": {
+        "cohort_rounds": 256,
+        "cohort_stop_us": 82,
+        "service_caller_wait_us": 674,
+        "service_requests": 192,
+        "serviced_syscalls": 192,
+        "syscalls": 1988,
+        "vm_local_syscalls": 128,
+        "worker_direct_syscalls": 0,
+        "worker_fd_syscalls": 0,
+        "worker_file_syscalls": 0,
+        "worker_futex_waits": 128,
+        "worker_futex_wakes": 128,
+        "worker_gpu_calls": 0,
+        "worker_gpu_waits": 0,
+        "worker_poll_syscalls": 0,
+        "worker_socket_syscalls": 0,
+        "worker_syscalls": 1534,
+        "worker_task_resumes": 320,
+        "worker_uring_syscalls": 0
+      }
+    },
+    "after": {
+      "metrics": {
+        "syscalls": 1988,
+        "context_switches": 838,
+        "hardware_mapped_bytes": 65536,
+        "guest_resident_bytes": 65536,
+        "vm_checkpoint_groups": 255,
+        "vm_checkpoint_spaces": 255,
+        "backing_domain_checks": 0,
+        "backing_page_checks": 0,
+        "parallel_memory_us": 2464,
+        "instruction_count": null
+      },
+      "execution_paths": {
+        "cohort_rounds": 1,
+        "cohort_stop_us": 0,
+        "service_caller_wait_us": 628,
+        "service_requests": 192,
+        "serviced_syscalls": 192,
+        "syscalls": 1988,
+        "vm_local_syscalls": 128,
+        "worker_direct_syscalls": 0,
+        "worker_fd_syscalls": 0,
+        "worker_file_syscalls": 0,
+        "worker_futex_waits": 128,
+        "worker_futex_wakes": 128,
+        "worker_gpu_calls": 0,
+        "worker_gpu_waits": 0,
+        "worker_poll_syscalls": 0,
+        "worker_socket_syscalls": 0,
+        "worker_syscalls": 1534,
+        "worker_task_resumes": 320,
+        "worker_uring_syscalls": 0
+      }
+    }
+  },
+  "hvf_diagnostic_comparison": {
+    "before": {
+      "diagnostic_only_not_timing": true,
+      "threads": [
+        {
+          "thread": "trames-cpu-0",
+          "at_ms": 1793885787327,
+          "wall_ns": [
+            5260998,
+            5441775,
+            4461493,
+            0,
+            6872,
+            0,
+            68755,
+            0,
+            0
+          ],
+          "cpu_ns": [
+            5205863,
+            5425576,
+            4449787,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "calls": [
+            1083,
+            1724,
+            641,
+            0,
+            192,
+            0,
+            510,
+            0,
+            0
+          ],
+          "counts": [
+            129,
+            127,
+            126,
+            1289,
+            641,
+            0,
+            129,
+            11,
+            0,
+            510,
+            131,
+            648,
+            381,
+            130,
+            130,
+            126,
+            384,
+            0,
+            0,
+            0,
+            1,
+            1
+          ],
+          "vcpu_exec_ns": 2189583,
+          "vcpu_exec_errors": 0,
+          "registers": [
+            1724,
+            0,
+            0,
+            1724,
+            129,
+            129,
+            0,
+            641,
+            1083,
+            641,
+            0
+          ],
+          "svc": [
+            [
+              20,
+              64
+            ],
+            [
+              93,
+              128
+            ],
+            [
+              96,
+              127
+            ],
+            [
+              135,
+              256
+            ],
+            [
+              178,
+              254
+            ],
+            [
+              220,
+              126
+            ],
+            [
+              222,
+              127
+            ],
+            [
+              260,
+              1
+            ]
+          ],
+          "mprotect": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "thread": "trames-cpu-1",
+          "at_ms": 1793885787328,
+          "wall_ns": [
+            5427217,
+            3932623,
+            7200374,
+            0,
+            42,
+            0,
+            333,
+            0,
+            0
+          ],
+          "cpu_ns": [
+            5324329,
+            3928002,
+            7115382,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "calls": [
+            517,
+            904,
+            387,
+            0,
+            1,
+            0,
+            2,
+            0,
+            0
+          ],
+          "counts": [
+            255,
+            2,
+            1136,
+            1417,
+            387,
+            0,
+            255,
+            12,
+            252,
+            2,
+            385,
+            1030,
+            4,
+            127,
+            256,
+            2,
+            0,
+            0,
+            0,
+            0,
+            128,
+            0
+          ],
+          "vcpu_exec_ns": 1619458,
+          "vcpu_exec_errors": 0,
+          "registers": [
+            904,
+            0,
+            0,
+            904,
+            255,
+            255,
+            0,
+            387,
+            517,
+            387,
+            0
+          ],
+          "svc": [
+            [
+              93,
+              128
+            ],
+            [
+              96,
+              1
+            ],
+            [
+              135,
+              256
+            ],
+            [
+              178,
+              2
+            ],
+            [
+              220,
+              2
+            ],
+            [
+              222,
+              1
+            ],
+            [
+              260,
+              127
+            ]
+          ],
+          "mprotect": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "thread": "trames-cpu-2",
+          "at_ms": 1793885787329,
+          "wall_ns": [
+            197737,
+            869966,
+            78124,
+            0,
+            42,
+            0,
+            375,
+            0,
+            0
+          ],
+          "cpu_ns": [
+            197176,
+            857757,
+            78207,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "calls": [
+            382,
+            386,
+            4,
+            0,
+            1,
+            0,
+            1,
+            0,
+            0
+          ],
+          "counts": [
+            128,
+            0,
+            1143,
+            12,
+            4,
+            0,
+            1,
+            12,
+            254,
+            1,
+            3,
+            8,
+            1,
+            0,
+            3,
+            0,
+            1,
+            0,
+            0,
+            0,
+            128,
+            0
+          ],
+          "vcpu_exec_ns": 350625,
+          "vcpu_exec_errors": 0,
+          "registers": [
+            386,
+            0,
+            0,
+            386,
+            1,
+            1,
+            0,
+            4,
+            382,
+            4,
+            0
+          ],
+          "svc": [
+            [
+              29,
+              1
+            ],
+            [
+              135,
+              254
+            ],
+            [
+              220,
+              127
+            ]
+          ],
+          "mprotect": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "thread": "main",
+          "at_ms": 1793885787329,
+          "wall_ns": [
+            74709,
+            105167,
+            176208,
+            0,
+            709,
+            6000,
+            10876,
+            0,
+            0
+          ],
+          "cpu_ns": [
+            73710,
+            105291,
+            176541,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "calls": [
+            6,
+            19,
+            13,
+            0,
+            3,
+            1,
+            11,
+            0,
+            0
+          ],
+          "counts": [
+            2,
+            0,
+            11,
+            15,
+            13,
+            3,
+            1,
+            12,
+            3,
+            11,
+            2,
+            2,
+            3,
+            5,
+            5,
+            0,
+            11,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "vcpu_exec_ns": 33000,
+          "vcpu_exec_errors": 0,
+          "registers": [
+            19,
+            0,
+            0,
+            19,
+            2,
+            2,
+            0,
+            13,
+            6,
+            13,
+            0
+          ],
+          "svc": [
+            [
+              66,
+              1
+            ],
+            [
+              94,
+              1
+            ],
+            [
+              96,
+              1
+            ],
+            [
+              135,
+              2
+            ],
+            [
+              220,
+              1
+            ]
+          ],
+          "mprotect": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "retired_pages": 3,
+      "worker_migrations": 257
+    },
+    "current": {
+      "diagnostic_only_not_timing": true,
+      "threads": [
+        {
+          "thread": "trames-cpu-0",
+          "at_ms": 1793885787798,
+          "wall_ns": [
+            7763558,
+            6129939,
+            11455086,
+            0,
+            7170,
+            587704,
+            54373,
+            0,
+            0
+          ],
+          "cpu_ns": [
+            7419736,
+            6017871,
+            9882167,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "calls": [
+            899,
+            1659,
+            760,
+            0,
+            214,
+            42,
+            386,
+            0,
+            0
+          ],
+          "counts": [
+            252,
+            1,
+            1144,
+            1758,
+            760,
+            381,
+            249,
+            12,
+            254,
+            386,
+            374,
+            998,
+            130,
+            379,
+            251,
+            1,
+            385,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "vcpu_exec_ns": 2461500,
+          "vcpu_exec_errors": 0,
+          "registers": [
+            1659,
+            0,
+            0,
+            1659,
+            376,
+            376,
+            0,
+            760,
+            899,
+            760,
+            0
+          ],
+          "svc": [
+            [
+              20,
+              1
+            ],
+            [
+              29,
+              1
+            ],
+            [
+              93,
+              125
+            ],
+            [
+              96,
+              1
+            ],
+            [
+              135,
+              512
+            ],
+            [
+              178,
+              2
+            ],
+            [
+              220,
+              128
+            ],
+            [
+              222,
+              1
+            ],
+            [
+              260,
+              128
+            ]
+          ],
+          "mprotect": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "thread": "trames-cpu-1",
+          "at_ms": 1793885787799,
+          "wall_ns": [
+            9046349,
+            5128290,
+            5935505,
+            0,
+            4963,
+            0,
+            12333,
+            0,
+            0
+          ],
+          "cpu_ns": [
+            7925249,
+            5092668,
+            5798970,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "calls": [
+            1083,
+            1468,
+            385,
+            0,
+            127,
+            0,
+            127,
+            0,
+            0
+          ],
+          "counts": [
+            127,
+            127,
+            127,
+            1278,
+            385,
+            0,
+            127,
+            12,
+            0,
+            127,
+            258,
+            893,
+            254,
+            0,
+            131,
+            127,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "vcpu_exec_ns": 2036625,
+          "vcpu_exec_errors": 0,
+          "registers": [
+            1468,
+            0,
+            0,
+            1468,
+            127,
+            127,
+            0,
+            385,
+            1083,
+            385,
+            0
+          ],
+          "svc": [
+            [
+              20,
+              63
+            ],
+            [
+              93,
+              131
+            ],
+            [
+              96,
+              127
+            ],
+            [
+              135,
+              254
+            ],
+            [
+              178,
+              254
+            ],
+            [
+              220,
+              127
+            ],
+            [
+              222,
+              127
+            ]
+          ],
+          "mprotect": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "thread": "main",
+          "at_ms": 1793885787800,
+          "wall_ns": [
+            50041,
+            92000,
+            127164,
+            0,
+            291,
+            4166,
+            7708,
+            98833,
+            70503
+          ],
+          "cpu_ns": [
+            49458,
+            92170,
+            127502,
+            0,
+            0,
+            0,
+            0,
+            97043,
+            70416
+          ],
+          "calls": [
+            6,
+            19,
+            13,
+            0,
+            3,
+            1,
+            11,
+            42,
+            42
+          ],
+          "counts": [
+            2,
+            0,
+            11,
+            15,
+            13,
+            3,
+            1,
+            12,
+            3,
+            11,
+            2,
+            2,
+            3,
+            5,
+            5,
+            0,
+            11,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "vcpu_exec_ns": 32791,
+          "vcpu_exec_errors": 0,
+          "registers": [
+            19,
+            0,
+            0,
+            19,
+            2,
+            2,
+            0,
+            13,
+            6,
+            13,
+            0
+          ],
+          "svc": [
+            [
+              66,
+              1
+            ],
+            [
+              94,
+              1
+            ],
+            [
+              96,
+              1
+            ],
+            [
+              135,
+              2
+            ],
+            [
+              220,
+              1
+            ]
+          ],
+          "mprotect": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "retired_pages": 384,
+      "worker_migrations": 0
+    },
+    "child-first": {
+      "diagnostic_only_not_timing": true,
+      "threads": [
+        {
+          "thread": "trames-cpu-0",
+          "at_ms": 1793885904477,
+          "wall_ns": [
+            6047717,
+            5149690,
+            6855334,
+            0,
+            1873,
+            0,
+            20493,
+            0,
+            0
+          ],
+          "cpu_ns": [
+            5874454,
+            5076381,
+            6686996,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "calls": [
+            977,
+            1425,
+            448,
+            0,
+            59,
+            0,
+            155,
+            0,
+            0
+          ],
+          "counts": [
+            217,
+            38,
+            884,
+            1317,
+            448,
+            0,
+            211,
+            12,
+            188,
+            155,
+            293,
+            869,
+            116,
+            123,
+            209,
+            38,
+            117,
+            0,
+            0,
+            0,
+            1,
+            1
+          ],
+          "vcpu_exec_ns": 2003375,
+          "vcpu_exec_errors": 0,
+          "registers": [
+            1425,
+            0,
+            0,
+            1425,
+            211,
+            211,
+            0,
+            448,
+            977,
+            448,
+            0
+          ],
+          "svc": [
+            [
+              20,
+              19
+            ],
+            [
+              93,
+              124
+            ],
+            [
+              96,
+              38
+            ],
+            [
+              98,
+              1
+            ],
+            [
+              135,
+              454
+            ],
+            [
+              178,
+              76
+            ],
+            [
+              220,
+              132
+            ],
+            [
+              222,
+              38
+            ],
+            [
+              260,
+              95
+            ]
+          ],
+          "mprotect": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "thread": "trames-cpu-1",
+          "at_ms": 1793885904478,
+          "wall_ns": [
+            6075294,
+            5239219,
+            5679833,
+            0,
+            4837,
+            0,
+            55028,
+            0,
+            0
+          ],
+          "cpu_ns": [
+            5916313,
+            5212361,
+            5537785,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "calls": [
+            1007,
+            1573,
+            566,
+            0,
+            134,
+            0,
+            358,
+            0,
+            0
+          ],
+          "counts": [
+            160,
+            90,
+            387,
+            1320,
+            566,
+            0,
+            158,
+            12,
+            66,
+            358,
+            208,
+            754,
+            271,
+            124,
+            171,
+            90,
+            268,
+            0,
+            0,
+            0,
+            2,
+            0
+          ],
+          "vcpu_exec_ns": 2063000,
+          "vcpu_exec_errors": 0,
+          "registers": [
+            1573,
+            0,
+            0,
+            1573,
+            158,
+            158,
+            0,
+            566,
+            1007,
+            566,
+            0
+          ],
+          "svc": [
+            [
+              20,
+              45
+            ],
+            [
+              29,
+              1
+            ],
+            [
+              93,
+              132
+            ],
+            [
+              96,
+              90
+            ],
+            [
+              98,
+              1
+            ],
+            [
+              135,
+              312
+            ],
+            [
+              178,
+              180
+            ],
+            [
+              220,
+              123
+            ],
+            [
+              222,
+              90
+            ],
+            [
+              260,
+              33
+            ]
+          ],
+          "mprotect": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "thread": "main",
+          "at_ms": 1793885904479,
+          "wall_ns": [
+            52793,
+            91042,
+            131208,
+            0,
+            459,
+            5666,
+            9291,
+            0,
+            0
+          ],
+          "cpu_ns": [
+            52083,
+            91085,
+            131417,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "calls": [
+            6,
+            19,
+            13,
+            0,
+            3,
+            1,
+            11,
+            0,
+            0
+          ],
+          "counts": [
+            2,
+            0,
+            11,
+            15,
+            13,
+            3,
+            1,
+            12,
+            3,
+            11,
+            2,
+            2,
+            3,
+            5,
+            5,
+            0,
+            11,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "vcpu_exec_ns": 29875,
+          "vcpu_exec_errors": 0,
+          "registers": [
+            19,
+            0,
+            0,
+            19,
+            2,
+            2,
+            0,
+            13,
+            6,
+            13,
+            0
+          ],
+          "svc": [
+            [
+              66,
+              1
+            ],
+            [
+              94,
+              1
+            ],
+            [
+              96,
+              1
+            ],
+            [
+              135,
+              2
+            ],
+            [
+              220,
+              1
+            ]
+          ],
+          "mprotect": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "retired_pages": 3,
+      "worker_migrations": 3
+    }
+  },
+  "negative_controls": {
+    "retained_fork_journal": "Restoring unconditional parent snapshot invalidation loses a late backing write: 7 instead of 9; patched test passes.",
+    "parked_cpu_reservation": "Restoring a parked task initial CPU reservation times out while an unrelated peer occupies that CPU; patched test resumes on another executor."
+  },
+  "stable": {
+    "updated": false,
+    "binary_sha256": "4f40615213e731b2a4ef9d8c6a0e85c5c7bdf31ab0c60b0354b55113f2a6a55d"
+  },
+  "final_dev_package": {
+    "installed": true,
+    "sha256": "231fc9d4a050dcc9b94f6fb9075b753d4a9e4d5d8ec1dee31cbb0d4959f4a1b9",
+    "version": "Trames Dev 1.5.3 (dev) runtime 27b3eba9e6423345e1381f3318f5da08aeee19d8",
+    "paired_pin_check": true,
+    "pinned_completion_and_vfork_smoke": true,
+    "installed_completion_smoke": true,
+    "performance_results_reused_from_identical_source": true
+  }
+}
