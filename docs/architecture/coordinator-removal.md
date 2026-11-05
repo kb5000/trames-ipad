@@ -2,14 +2,14 @@
 
 ## Current status — 2026-11-05
 
-The latest batch is [original thread-group exit completion](#47-original-thread-group-exit-completion-2026-11-05).
-Original child waits, signal/cgroup controls, non-last thread exits and parent/
-subreaper queries already have source paths. GPU/video/audio roots now follow
-actual mm references; native completion retires pending work without an owner
-poll. Group membership now covers resource/View cleanup, and returning source
-exits no longer replay original resource retirement. Mac and iPad share this implementation. Final process/CPU/Memory custody
-and actual owner controls remain open. Stable 1.5.3 and business environments
-remain separate from Dev.
+The latest batch is [original vfork release and cold projection completion](#48-original-vfork-release-and-cold-projection-completion--2026-11-05).
+Original vfork wait/release, child waits, signal/cgroup controls, non-last exit
+and parent/subreaper queries now have source paths. Opaque owner FD kinds no
+longer refuse a non-last exit; private Rc projections are collected on their
+existing owner while peer CPUs continue. Original namespace dependencies now
+order parent/host completion. Final CPU/Memory custody and last/group/default-
+fatal entry remain open. Mac and iPad share this implementation. Stable 1.5.3
+and business environments remain separate from Dev.
 
 The [consolidated runtime audit](../../runtime/docs/architecture/coordination-boundaries.md)
 is the current source inventory, including actual admission and fallback gates.
@@ -18,7 +18,7 @@ stage; they do not override this current inventory.
 
 | Remaining boundary | Scope / examples |
 | --- | --- |
-| Joined task and control work | Process creation/exec, last-member/group/default-fatal exit, final mm/native cleanup, security policy, mount/unshare/setns, dynamic proc/sys and actual excluded owner controls; the current cohort returns its Views. Ordinary waits, caught signals, job control and non-last thread exit have source paths. |
+| Joined task and control work | Process creation/exec, last-member/group/default-fatal exit, final mm/native cleanup, security policy, mount/unshare/setns, dynamic proc/sys and operations on actual excluded owner controls; the current cohort returns its Views. Ordinary waits, caught signals, job control and non-last thread exit have source paths. |
 | Residual compatibility service | Some actual FD/network kinds, old epoll creation and eligible stream paths still use in-cohort owner service; peer CPUs can continue unless admission refuses |
 | VM/backing publication | Structural mappings, pins and mapped-file resize quiesce affected mm/backing users; exceptional admission/control conditions can require a broader join |
 | Mixed resource waits and transfers | Masked/owner poll, actual owner SCM_RIGHTS controls, unsupported ring resources and file-to-pipe/socket transfer retain explicit owner boundaries |
@@ -3533,3 +3533,81 @@ controls. No service thread, polling bus or extra source admission gate is added
 The [machine-readable evidence](../validation/thread-retirement-20261105.json)
 records exact revisions, source/binary hashes, controls and samples. Only Dev is
 installed; stable 1.5.3 and business services retain their previous binary.
+
+## 48. Original vfork release and cold projection completion — 2026-11-05
+
+Runtime `7b91b6dc664606ef4c046f218df7fe5001052073` follows the original vfork child through mm release.
+Its parent parks on actual readiness in the existing queue. Source exit drops
+its View and publishes release directly; it does not await an occupied owner,
+unrelated child peer or numeric-PID scan. A sole runnable producer now admits
+its actual waiting parent. Owner exit/exec finish the same object once. Pending
+vfork preserves STOP custody, and ring CQ progress cannot replace its clone
+return value. Linux ties this to
+[mm_release](https://github.com/torvalds/linux/blob/v6.18/kernel/fork.c), before full FD/process destruction.
+
+Non-last source exit now accepts Files containing opaque owner controls. The
+caller retires original logical descriptors; an event on the existing completion
+channel collects private Rc controls and returned Memory wrappers on their owner
+without stopping peer CPUs. Original Group cleanup membership finishes after
+that collection. CPU/metrics still return once at cohort drain. Weak original
+mm roots are saved only when a wrapper actually retires; they retain no RAM and
+preserve backing publication through an undispatched CLONE_VM owner.
+
+Original Families now publish status and optional host completion after their
+actual namespace victim dependencies. A nested init still records those victims
+when its ancestor already marked the namespace dead. This removes cleanup-order
+assumptions, not the current joined execution of namespace shutdown.
+
+Four bounded negative controls cover direct release with an occupied owner,
+ancestor-dead namespace dependencies, missing real backing publication and the
+sole-runnable vfork admission. All fail when the corresponding mechanism is
+removed. Cold-control tests retain actual source captures while checking the
+private Rc destructor. No new service thread, polling bus, guest-memory fence,
+unsafe or source refusal gate is introduced.
+
+Final Apple and native ARM Linux process suites pass **314 checks** each (three
+ignored). Unchanged validated code retains 56 kernel, 159 memory, 507 Apple VFS
+and 506 Linux VFS passes; platform/hostfs counts are explicit in the evidence.
+Strict affected Rust checks and iPad device-target FFI compilation pass. The
+final paired binaries pass 25 lifecycle cases (HVF 1/4/12 CPUs and shared
+interpreter 1/4), native GPU/video, real H.264/Vulkan transfer, 30 Go GC starts
+and eight isolated 12-CPU Docker rounds. No physical iPad run is claimed.
+
+The unmodified previous Dev times out at the fixture's two-second guard on four
+and twelve CPUs: the vfork parent cannot release the still-spinning child peer.
+The new candidate completes, including a unique old epoll control. Seven final
+samples (eight rounds per sample) give these median per-return means:
+
+| CPUs | Ordinary Files | Unique owner epoll control |
+| --- | ---: | ---: |
+| 1 | 2025.9 µs | 4028.7 µs |
+| 4 | 124.2 µs | 97.0 µs |
+| 12 | 121.0 µs | 96.8 µs |
+
+Native ARM Linux's same ELF reference is about 39 µs / 37 µs in the existing
+6-CPU/8-GB test instance. This is not native macOS Linux-syscall equivalence or
+a finite speedup ratio against a timed-out old run. The one-CPU coordinated
+path remains about 2/4 ms, essentially unchanged from the old Dev.
+
+Ordinary thread churn is **not faster**. Seven counterbalanced pairs for 128
+two-thread groups include fork/clone, exit and final parent wait:
+
+| CPUs | Previous Dev | Final Dev | Change in elapsed time |
+| --- | ---: | ---: | ---: |
+| 1 | 15.558 ms | 15.983 ms | +2.7% |
+| 4 | 29.126 ms | 31.220 ms | +7.2% |
+| 12 | 29.806 ms | 31.618 ms | +6.1% |
+
+The added asynchronous cleanup and remaining final CPU/mm work still have a
+cost. A stopped-cohort notification guard showed no consistent benefit and was
+removed. Lazy weak roots only changed the first candidate by about 1%; no broad
+CPU/Firefox gain is claimed. Timings exclude builds and the Linux instance.
+
+The full goal remains open: final CPU/Memory custody, last/group/default-fatal
+entry, source namespace victim termination, robust futex and excluded control
+operations need their connected migration. The next step is completion custody,
+not another service thread or a new source-admission workaround.
+
+[Exact revisions, sources, controls and samples](../validation/source-completion-20261105.json).
+Only Dev is installed after acceptance. Stable 1.5.3 and business services keep
+their original binary; no Techo frontend is activated.

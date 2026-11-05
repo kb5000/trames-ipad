@@ -1,0 +1,2063 @@
+{
+  "schema": 1,
+  "date": "2026-11-05",
+  "runtime_revision": "7b91b6dc664606ef4c046f218df7fe5001052073",
+  "source_completion_revision": "4c39a924eb5f1c656aced31dd5feb018f4d61ac7",
+  "baseline_runtime_revision": "004ab49f8629af1259056249252b76519d4df334",
+  "scope": "Original vfork release and source parent wait, non-last exit with opaque owner controls, asynchronous cold projection collection, original weak mm publication roots and namespace completion dependency ordering. Last/group/default-fatal entry and final CPU/mm custody remain joined.",
+  "source_files": {
+    "crates/trames-kernel/src/family.rs": "be9fd53615da2651f6f6797f5eb7273e806fded2c1d9bbfc7d8e3e2978154584",
+    "crates/trames-kernel/src/lib.rs": "2778b3a712f9a11bf292bfac21fbd8ae8d98bdae7968226814bf9f9e91cd9628",
+    "crates/trames-kernel/src/vfork.rs": "f617692f596d4fa5b8da4d2743ad3613c95848f52cb824a59e21c1556d77b139",
+    "crates/trames-memory/src/lib.rs": "beb10ca40a78d203a6a78e29064a2a45b4e6c302009fcfc80feba298135bb439",
+    "crates/trames-memory/src/parallel.rs": "9e36a985204e722e99b3f7088c662e9d002d469a5bfecb070bef781c11885401",
+    "crates/trames-session/src/process.rs": "79735f0ff5539f1295210fb326532775f68839ef1a56418477ee0e966d243e52",
+    "crates/trames-session/src/process_events.rs": "d101c4139fee72b4f0eca28c8141d76b1df84fc33cdb11b7614295016bd73828",
+    "crates/trames-session/src/process_seccomp.rs": "a74df32b3e795ceab216c51af9d3f13edeabc1118a839ff99dd76f4e3a7d741f",
+    "crates/trames-session/src/process_service.rs": "386cfed773f6ec118f8a8b6c863cb480805b07bd71bdbc1f4bcce605e4858aac",
+    "crates/trames-session/src/process_vm.rs": "216ead0829c854cc5bff26628cbaabca86af8e5858193b0aab12903e5291535b",
+    "crates/trames-session/src/run_queue.rs": "c3730ed5fe2f782bdcc71f8479eb8a04c693d28faca970bfadeab123bd60a161",
+    "crates/trames-session/src/worker_syscalls.rs": "ba5139a98aec426f4ca92b2ee6dcc43142cd24eddb8a15a30df46e22b9f11399",
+    "crates/trames-session/src/workers.rs": "04ef23e2799a8140823e0d90762b6aa0e6d681584ec05e9aef314a2ccb99dd5a",
+    "crates/trames-session/src/workers_uring_tests.rs": "b30f8a6c5e970f79c91c740196ffcb6a3f16057271b729962a08a1cc58093fa9",
+    "crates/trames-vfs/src/fd_table.rs": "ab3123ffd81d3b045d0feafd02dac7f17c1cb710ddcca1da488b3de8175502d1",
+    "crates/trames-vfs/src/lib.rs": "9bb81260e079c0355481046994f1fa1b2e0605300f92781cc8bf5a9e9c5a6869",
+    "docs/architecture/coordination-boundaries.md": "9b44825e727242a3672331bf001e4ce5bf2ceffd62a5ab1353dde0b16bf8f5ad"
+  },
+  "fixture_sources": {
+    "tests/fixtures/worker-vfork-release.c": "2e3069f02e474fb5403934fafbaee28807b2664cae6b143e96d424e1868626c6",
+    "scripts/build-worker-vfork-release-fixture.sh": "98cdd79b352e681045c87455ca2273e0cff40319f606e88bdaaaa55231c5cb32"
+  },
+  "changes": [
+    "The actual vfork child publishes its original release after dropping its CPU View, independently of an occupied owner or unrelated peer CPU. Owner exit/exec finish the same object once.",
+    "A sole runnable original vfork child admits its actual waiting parent by release-object identity; no unrelated runnable task is required. Pending release preserves stop custody and background ring CQ progress does not complete the wait.",
+    "Opaque owner FD kinds no longer refuse an otherwise admitted non-last exit. Logical Files retirement stays on the source; private Rc controls and the Memory wrapper are collected asynchronously on their existing owner.",
+    "Original group cleanup membership finishes after cold projection collection. Full Done CPU/metrics still return at cohort drain.",
+    "Weak original Memory roots are captured only for actual returned exits. They preserve legacy backing writes when all dispatched wrappers are gone but an undispatched task owns the same mm. No strong keeper retains RAM.",
+    "Original Families record status and optional host completion, and release namespace-init dependents only after their original victim families complete, even following ancestor namespace death."
+  ],
+  "concurrency": {
+    "new_service_thread": false,
+    "new_owner_syscall_rpc": false,
+    "new_polling_bus": false,
+    "new_refusal_gate": false,
+    "new_unsafe": false,
+    "new_ordinary_guest_barrier": false,
+    "synchronization": "Original per-group and family graph mutexes; original execution queue and coalesced completion event. Release/acquire only for the actual vfork child/parent completion. Private Rc and weak mm roots stay on their original owner."
+  },
+  "mechanism_controls": [
+    {
+      "case": "Occupied owner, live peer CPU, actual vfork producer exits",
+      "red": "Disabling direct source release leaves parent unreadable until owner resumes; bounded harness releases resources before failing.",
+      "log_sha256": "d7f34a33852e9755c0a37535e3431bd9d05c7c38ac3496e3199d149d6001c02f"
+    },
+    {
+      "case": "Nested namespace init following ancestor death",
+      "red": "Old ancestor-dead short circuit omits its actual descendant dependency.",
+      "log_sha256": "327cdd0292a0a177bd17326abc5380d8017f4aee10f9c8d0c1f7d62d2b7d01a9"
+    },
+    {
+      "case": "Real backing with only undispatched shared-mm owner remaining",
+      "red": "Omitting retired-root publication leaves backing at 0 instead of guest write 99.",
+      "log_sha256": "687303474185344ca632d8eef7ae8e33c778524240a0f60059fe65ebec529606"
+    },
+    {
+      "case": "Sole runnable original vfork producer",
+      "red": "Removing original release-object admission refuses dispatch and fails the full queue regression.",
+      "log_sha256": "a75a8f27a3133756a3f955b69d56c18c914498580a4a9a3c8d052c20e5cb50a0"
+    }
+  ],
+  "checks": {
+    "apple_process": {
+      "passed": 314,
+      "ignored": 3,
+      "revision": "7b91b6dc664606ef4c046f218df7fe5001052073"
+    },
+    "native_arm_linux_process": {
+      "passed": 314,
+      "ignored": 3,
+      "revision": "7b91b6dc664606ef4c046f218df7fe5001052073"
+    },
+    "shared_kernel": {
+      "passed": 56,
+      "validated_revision": "4c39a924eb5f1c656aced31dd5feb018f4d61ac7",
+      "reuse": "Kernel files unchanged in final revision."
+    },
+    "memory": {
+      "passed": 159,
+      "ignored": 1,
+      "reuse": "Memory files unchanged after full Apple/Linux validation at source-completion revision."
+    },
+    "apple_vfs_all_features": {
+      "passed": 507,
+      "ignored": 1,
+      "reuse": "VFS files unchanged after full source-completion validation."
+    },
+    "native_arm_linux_vfs_all_features": {
+      "passed": 506,
+      "ignored": 1,
+      "reuse": "Platform-specific count; VFS files unchanged in final revision."
+    },
+    "strict_product_clippy": true,
+    "strict_runtime_session_library_clippy": true,
+    "ipad_device_target_ffi_check": true,
+    "physical_ipad_run": false,
+    "native_reference": "Existing 6 CPU/8GB ARM Linux test instance. It is stopped during Mac timing and is not a product Linux-kernel VM.",
+    "go_gc_starts": 30,
+    "docker_rounds": 8,
+    "acceptance_cases": [
+      {
+        "case": "final-hvf-1-vfork",
+        "returncode": 0,
+        "seconds": 0.08305979099999927
+      },
+      {
+        "case": "final-hvf-1-completion",
+        "returncode": 0,
+        "seconds": 0.023105292000000333
+      },
+      {
+        "case": "final-hvf-1-resources",
+        "returncode": 0,
+        "seconds": 0.009773208000000366
+      },
+      {
+        "case": "final-hvf-1-pdeathsig",
+        "returncode": 0,
+        "seconds": 0.011179540999999737
+      },
+      {
+        "case": "final-hvf-1-pid-namespaces",
+        "returncode": 0,
+        "seconds": 0.021800665999999858
+      },
+      {
+        "case": "final-hvf-4-vfork",
+        "returncode": 0,
+        "seconds": 0.011835790999999318
+      },
+      {
+        "case": "final-hvf-4-completion",
+        "returncode": 0,
+        "seconds": 0.023026167000000264
+      },
+      {
+        "case": "final-hvf-4-resources",
+        "returncode": 0,
+        "seconds": 0.011607416999999565
+      },
+      {
+        "case": "final-hvf-4-pdeathsig",
+        "returncode": 0,
+        "seconds": 0.011079083000000267
+      },
+      {
+        "case": "final-hvf-4-pid-namespaces",
+        "returncode": 0,
+        "seconds": 0.04152566699999927
+      },
+      {
+        "case": "final-hvf-12-vfork",
+        "returncode": 0,
+        "seconds": 0.011903666999999452
+      },
+      {
+        "case": "final-hvf-12-completion",
+        "returncode": 0,
+        "seconds": 0.04010962499999948
+      },
+      {
+        "case": "final-hvf-12-resources",
+        "returncode": 0,
+        "seconds": 0.011587582999999846
+      },
+      {
+        "case": "final-hvf-12-pdeathsig",
+        "returncode": 0,
+        "seconds": 0.008733166000000736
+      },
+      {
+        "case": "final-hvf-12-pid-namespaces",
+        "returncode": 0,
+        "seconds": 0.04484645800000031
+      },
+      {
+        "case": "final-interpreter-1-vfork",
+        "returncode": 0,
+        "seconds": 0.5334147080000005
+      },
+      {
+        "case": "final-interpreter-1-completion",
+        "returncode": 0,
+        "seconds": 0.02277295800000001
+      },
+      {
+        "case": "final-interpreter-1-resources",
+        "returncode": 0,
+        "seconds": 0.012786667000000307
+      },
+      {
+        "case": "final-interpreter-1-pdeathsig",
+        "returncode": 0,
+        "seconds": 0.01142441599999966
+      },
+      {
+        "case": "final-interpreter-1-pid-namespaces",
+        "returncode": 0,
+        "seconds": 0.02304475000000039
+      },
+      {
+        "case": "final-interpreter-4-vfork",
+        "returncode": 0,
+        "seconds": 0.012485209000000275
+      },
+      {
+        "case": "final-interpreter-4-completion",
+        "returncode": 0,
+        "seconds": 0.023991666999999772
+      },
+      {
+        "case": "final-interpreter-4-resources",
+        "returncode": 0,
+        "seconds": 0.011686415999999866
+      },
+      {
+        "case": "final-interpreter-4-pdeathsig",
+        "returncode": 0,
+        "seconds": 0.010593500000000589
+      },
+      {
+        "case": "final-interpreter-4-pid-namespaces",
+        "returncode": 0,
+        "seconds": 0.043803709000000524
+      },
+      {
+        "case": "final-gpu",
+        "returncode": 0,
+        "seconds": 0.047460375
+      },
+      {
+        "case": "final-video",
+        "returncode": 0,
+        "seconds": 0.022189292000000194
+      },
+      {
+        "case": "final-go-gc",
+        "returncode": 0,
+        "seconds": 2.5109976670000007
+      },
+      {
+        "case": "final-docker",
+        "returncode": 0,
+        "seconds": 76.635771834
+      },
+      {
+        "case": "final-vaapi",
+        "returncode": 0,
+        "seconds": 2.0184305420000044
+      }
+    ]
+  },
+  "thread_completion_benchmark": {
+    "scope": "128 two-thread groups: fork, clone, leader exit, final thread exit and parent wait. Half retain ordinary files and half actual owner epoll controls. Both threads exit zero in bench mode so old and new binaries perform identical valid work. Seven counterbalanced pairs per CPU count. No test Linux instance/build was running during timings. Includes joined fork/mm/last-exit work; not a Firefox or general CPU benchmark. Final pinned Mac development binary. Native ARM Linux reference ran the same ELF in the existing 6 CPU/8GB hardware-backed Linux test instance, not native macOS.",
+    "runtime_revision": "7b91b6dc664606ef4c046f218df7fe5001052073",
+    "binaries": {
+      "before": {
+        "path": "/Users/main/dev/trames/target/source-completion/before-mac-run",
+        "sha256": "c9066516f06232fe9db4ad28fb9b7050740f9035ebc06056d43ee53784eb6e28"
+      },
+      "after": {
+        "path": "/Users/main/dev/trames-mac/target/release/Trames Dev.app/Contents/MacOS/trames-mac-run",
+        "sha256": "0dcde67d59a5cf2cc6575d72ae8e34a9f48e427f9429096283f91f0c2ccb3bc3"
+      }
+    },
+    "fixture_sha256": "9138832f44247388de6b45e812aa2ecc59b1d3c0ca4f2b59c13859de3af9c5a2",
+    "native_arm_linux": [
+      {
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 7712065,
+        "passed": true
+      },
+      {
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 7484897,
+        "passed": true
+      },
+      {
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 8321654,
+        "passed": true
+      },
+      {
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 7429813,
+        "passed": true
+      },
+      {
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 7619731,
+        "passed": true
+      },
+      {
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 7660940,
+        "passed": true
+      },
+      {
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 8000109,
+        "passed": true
+      }
+    ],
+    "samples": [
+      {
+        "cpus": 1,
+        "phase": "before",
+        "sample": 0,
+        "wall_seconds": 0.037569915999999995,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 15558208,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "after",
+        "sample": 0,
+        "wall_seconds": 0.167098042,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 22723542,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "after",
+        "sample": 1,
+        "wall_seconds": 0.02345433300000002,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 16322708,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "before",
+        "sample": 1,
+        "wall_seconds": 0.021454291999999986,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 15154083,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "before",
+        "sample": 2,
+        "wall_seconds": 0.02052395899999998,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 14532667,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "after",
+        "sample": 2,
+        "wall_seconds": 0.02063141700000004,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 14807000,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "after",
+        "sample": 3,
+        "wall_seconds": 0.02214662500000003,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 15983458,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "before",
+        "sample": 3,
+        "wall_seconds": 0.02258300000000002,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 16307125,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "before",
+        "sample": 4,
+        "wall_seconds": 0.02405908299999998,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 17169834,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "after",
+        "sample": 4,
+        "wall_seconds": 0.026664791999999993,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 18394167,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "after",
+        "sample": 5,
+        "wall_seconds": 0.021962667000000047,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 15410167,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "before",
+        "sample": 5,
+        "wall_seconds": 0.021666375000000015,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 15514542,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "before",
+        "sample": 6,
+        "wall_seconds": 0.02194191599999995,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 15692584,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "after",
+        "sample": 6,
+        "wall_seconds": 0.021238332999999998,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 15127625,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "before",
+        "sample": 0,
+        "wall_seconds": 0.036782250000000016,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30239667,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "after",
+        "sample": 0,
+        "wall_seconds": 0.038212000000000024,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31133250,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "after",
+        "sample": 1,
+        "wall_seconds": 0.03825754199999998,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31126208,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "before",
+        "sample": 1,
+        "wall_seconds": 0.035393791999999924,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 28688500,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "before",
+        "sample": 2,
+        "wall_seconds": 0.03572670899999997,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29061209,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "after",
+        "sample": 2,
+        "wall_seconds": 0.038195791000000034,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31219500,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "after",
+        "sample": 3,
+        "wall_seconds": 0.03819874999999995,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31598125,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "before",
+        "sample": 3,
+        "wall_seconds": 0.03618979199999994,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29710791,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "before",
+        "sample": 4,
+        "wall_seconds": 0.035147708,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 28676792,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "after",
+        "sample": 4,
+        "wall_seconds": 0.0375229170000001,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30476500,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "after",
+        "sample": 5,
+        "wall_seconds": 0.039301250000000065,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31985375,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "before",
+        "sample": 5,
+        "wall_seconds": 0.03611620800000004,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29125792,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "before",
+        "sample": 6,
+        "wall_seconds": 0.03712479199999996,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30002208,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "after",
+        "sample": 6,
+        "wall_seconds": 0.038530541999999945,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31290125,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "before",
+        "sample": 0,
+        "wall_seconds": 0.03771712499999991,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30639208,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "after",
+        "sample": 0,
+        "wall_seconds": 0.038530541999999945,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31125792,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "after",
+        "sample": 1,
+        "wall_seconds": 0.042020500000000016,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 34376000,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "before",
+        "sample": 1,
+        "wall_seconds": 0.037557416999999926,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29869792,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "before",
+        "sample": 2,
+        "wall_seconds": 0.037179207999999964,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30058500,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "after",
+        "sample": 2,
+        "wall_seconds": 0.03795104199999999,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31111125,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "after",
+        "sample": 3,
+        "wall_seconds": 0.038164833000000176,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31372917,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "before",
+        "sample": 3,
+        "wall_seconds": 0.03622166699999996,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29384916,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "before",
+        "sample": 4,
+        "wall_seconds": 0.03698050000000008,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29806375,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "after",
+        "sample": 4,
+        "wall_seconds": 0.03940941700000011,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31618000,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "after",
+        "sample": 5,
+        "wall_seconds": 0.039856000000000114,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 32304334,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "before",
+        "sample": 5,
+        "wall_seconds": 0.037196125000000135,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29257875,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "before",
+        "sample": 6,
+        "wall_seconds": 0.03540412500000012,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 28681875,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "after",
+        "sample": 6,
+        "wall_seconds": 0.03906900000000002,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31630542,
+        "passed": true
+      }
+    ]
+  },
+  "vfork_benchmark": {
+    "scope": "Actual vfork child exits while another thread in its group spins; parent release must not await that thread or the whole cohort. Plain and unique legacy epoll controls, eight rounds each, seven after samples; seven counterbalanced baseline pairs for one CPU. Baseline multicore hits the explicit two-second fixture deadline, not a completed latency. No Linux instance or build runs during timing. Native Linux reference is the existing ARM hardware-backed 6 CPU/8GB test instance, not native macOS.",
+    "runtime_revision": "7b91b6dc664606ef4c046f218df7fe5001052073",
+    "fixture_sha256": "cf6fe684777c148e4ef4282f0dd73efe98b074d255f81d7ad49437d4b3c3b89c",
+    "source_sha256": "2e3069f02e474fb5403934fafbaee28807b2664cae6b143e96d424e1868626c6",
+    "native_arm_linux": [
+      {
+        "case": "worker-vfork-release",
+        "rounds": 16,
+        "plain_mean_ns": 39228,
+        "owner_mean_ns": 37017,
+        "plain_max_ns": 90872,
+        "owner_max_ns": 73665,
+        "passed": true
+      }
+    ],
+    "samples": [
+      {
+        "cpus": 1,
+        "sample": 0,
+        "phase": "before",
+        "returncode": 0,
+        "wall_seconds": 0.05628537500000008,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 2024979,
+        "owner_mean_ns": 4030265,
+        "plain_max_ns": 2056750,
+        "owner_max_ns": 4044000,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "sample": 0,
+        "phase": "after",
+        "returncode": 0,
+        "wall_seconds": 0.05553862499999984,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 2026255,
+        "owner_mean_ns": 4028125,
+        "plain_max_ns": 2052917,
+        "owner_max_ns": 4034750,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "sample": 1,
+        "phase": "after",
+        "returncode": 0,
+        "wall_seconds": 0.05776766700000002,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 2025333,
+        "owner_mean_ns": 4028677,
+        "plain_max_ns": 2049292,
+        "owner_max_ns": 4041084,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "sample": 1,
+        "phase": "before",
+        "returncode": 0,
+        "wall_seconds": 0.05583137500000013,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 2025286,
+        "owner_mean_ns": 4028619,
+        "plain_max_ns": 2051167,
+        "owner_max_ns": 4039875,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "sample": 2,
+        "phase": "before",
+        "returncode": 0,
+        "wall_seconds": 0.05525633299999999,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 2024526,
+        "owner_mean_ns": 4032041,
+        "plain_max_ns": 2043000,
+        "owner_max_ns": 4048750,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "sample": 2,
+        "phase": "after",
+        "returncode": 0,
+        "wall_seconds": 0.055395375000000024,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 2025927,
+        "owner_mean_ns": 4029901,
+        "plain_max_ns": 2053333,
+        "owner_max_ns": 4041292,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "sample": 3,
+        "phase": "after",
+        "returncode": 0,
+        "wall_seconds": 0.05608412499999993,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 2029297,
+        "owner_mean_ns": 4027119,
+        "plain_max_ns": 2093750,
+        "owner_max_ns": 4038708,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "sample": 3,
+        "phase": "before",
+        "returncode": 0,
+        "wall_seconds": 0.05535816600000021,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 2025276,
+        "owner_mean_ns": 4028343,
+        "plain_max_ns": 2050250,
+        "owner_max_ns": 4044958,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "sample": 4,
+        "phase": "before",
+        "returncode": 0,
+        "wall_seconds": 0.054802125000000146,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 2022609,
+        "owner_mean_ns": 4026505,
+        "plain_max_ns": 2040709,
+        "owner_max_ns": 4041292,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "sample": 4,
+        "phase": "after",
+        "returncode": 0,
+        "wall_seconds": 0.05568029199999991,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 2024958,
+        "owner_mean_ns": 4027578,
+        "plain_max_ns": 2053458,
+        "owner_max_ns": 4036709,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "sample": 5,
+        "phase": "after",
+        "returncode": 0,
+        "wall_seconds": 0.05508999999999986,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 2025120,
+        "owner_mean_ns": 4028682,
+        "plain_max_ns": 2046459,
+        "owner_max_ns": 4045792,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "sample": 5,
+        "phase": "before",
+        "returncode": 0,
+        "wall_seconds": 0.05519883400000003,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 2023015,
+        "owner_mean_ns": 4024604,
+        "plain_max_ns": 2047667,
+        "owner_max_ns": 4033375,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "sample": 6,
+        "phase": "before",
+        "returncode": 0,
+        "wall_seconds": 0.055859583999999796,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 2025604,
+        "owner_mean_ns": 4027510,
+        "plain_max_ns": 2050625,
+        "owner_max_ns": 4032625,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "sample": 6,
+        "phase": "after",
+        "returncode": 0,
+        "wall_seconds": 0.05527237499999993,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 2027958,
+        "owner_mean_ns": 4030020,
+        "plain_max_ns": 2052709,
+        "owner_max_ns": 4055458,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "sample": 0,
+        "phase": "before",
+        "returncode": 1,
+        "wall_seconds": 2.007135083
+      },
+      {
+        "cpus": 4,
+        "sample": 0,
+        "phase": "after",
+        "returncode": 0,
+        "wall_seconds": 0.009377458000000338,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 137385,
+        "owner_mean_ns": 103854,
+        "plain_max_ns": 493250,
+        "owner_max_ns": 143000,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "sample": 1,
+        "phase": "after",
+        "returncode": 0,
+        "wall_seconds": 0.008424250000000022,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 134416,
+        "owner_mean_ns": 106317,
+        "plain_max_ns": 478917,
+        "owner_max_ns": 128250,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "sample": 2,
+        "phase": "after",
+        "returncode": 0,
+        "wall_seconds": 0.0088775830000003,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 120218,
+        "owner_mean_ns": 92807,
+        "plain_max_ns": 390000,
+        "owner_max_ns": 114459,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "sample": 3,
+        "phase": "after",
+        "returncode": 0,
+        "wall_seconds": 0.007969749999999998,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 120630,
+        "owner_mean_ns": 99963,
+        "plain_max_ns": 378083,
+        "owner_max_ns": 118708,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "sample": 4,
+        "phase": "after",
+        "returncode": 0,
+        "wall_seconds": 0.0077544170000001245,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 113099,
+        "owner_mean_ns": 96995,
+        "plain_max_ns": 328833,
+        "owner_max_ns": 128708,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "sample": 5,
+        "phase": "after",
+        "returncode": 0,
+        "wall_seconds": 0.0076884579999996205,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 126010,
+        "owner_mean_ns": 92807,
+        "plain_max_ns": 393750,
+        "owner_max_ns": 139625,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "sample": 6,
+        "phase": "after",
+        "returncode": 0,
+        "wall_seconds": 0.008438084000000678,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 124229,
+        "owner_mean_ns": 92473,
+        "plain_max_ns": 438917,
+        "owner_max_ns": 125000,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "sample": 0,
+        "phase": "before",
+        "returncode": 1,
+        "wall_seconds": 2.0063619169999996
+      },
+      {
+        "cpus": 12,
+        "sample": 0,
+        "phase": "after",
+        "returncode": 0,
+        "wall_seconds": 0.009236041000000306,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 129046,
+        "owner_mean_ns": 96812,
+        "plain_max_ns": 418958,
+        "owner_max_ns": 126791,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "sample": 1,
+        "phase": "after",
+        "returncode": 0,
+        "wall_seconds": 0.008176124999999423,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 128119,
+        "owner_mean_ns": 108562,
+        "plain_max_ns": 363500,
+        "owner_max_ns": 144250,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "sample": 2,
+        "phase": "after",
+        "returncode": 0,
+        "wall_seconds": 0.007979167000000231,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 121422,
+        "owner_mean_ns": 107036,
+        "plain_max_ns": 392209,
+        "owner_max_ns": 137500,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "sample": 3,
+        "phase": "after",
+        "returncode": 0,
+        "wall_seconds": 0.00813691600000066,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 118401,
+        "owner_mean_ns": 100359,
+        "plain_max_ns": 362250,
+        "owner_max_ns": 126583,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "sample": 4,
+        "phase": "after",
+        "returncode": 0,
+        "wall_seconds": 0.007648708000000504,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 121020,
+        "owner_mean_ns": 88104,
+        "plain_max_ns": 366375,
+        "owner_max_ns": 131541,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "sample": 5,
+        "phase": "after",
+        "returncode": 0,
+        "wall_seconds": 0.007595374999999294,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 115578,
+        "owner_mean_ns": 88083,
+        "plain_max_ns": 375375,
+        "owner_max_ns": 127791,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "sample": 6,
+        "phase": "after",
+        "returncode": 0,
+        "wall_seconds": 0.007933250000000669,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 113323,
+        "owner_mean_ns": 83885,
+        "plain_max_ns": 342041,
+        "owner_max_ns": 94583,
+        "passed": true
+      }
+    ]
+  },
+  "experiments": {
+    "stopped_cohort_guard": "Seven counterbalanced pairs showed no consistent benefit; experiment was removed, with a backup retained in ignored scratch.",
+    "lazy_roots": "Seven pairs against first source-completion candidate showed about 1% multicore change; do not claim a broad speedup. Final stock-baseline comparison below remains slower for ordinary thread churn.",
+    "stopped_samples": [
+      {
+        "cpus": 1,
+        "phase": "before",
+        "sample": 0,
+        "wall_seconds": 0.554523,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30842792,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "after",
+        "sample": 0,
+        "wall_seconds": 0.14614675,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29719333,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "after",
+        "sample": 1,
+        "wall_seconds": 0.027167166999999992,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 18803792,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "before",
+        "sample": 1,
+        "wall_seconds": 0.021391790999999993,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 14912667,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "before",
+        "sample": 2,
+        "wall_seconds": 0.021400666999999984,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 15323625,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "after",
+        "sample": 2,
+        "wall_seconds": 0.02152420799999999,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 15179334,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "after",
+        "sample": 3,
+        "wall_seconds": 0.021404583000000033,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 14973791,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "before",
+        "sample": 3,
+        "wall_seconds": 0.021575208999999984,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 15823166,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "before",
+        "sample": 4,
+        "wall_seconds": 0.02317195900000002,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 16084166,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "after",
+        "sample": 4,
+        "wall_seconds": 0.023199416999999944,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 15907209,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "after",
+        "sample": 5,
+        "wall_seconds": 0.02221612499999992,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 15585583,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "before",
+        "sample": 5,
+        "wall_seconds": 0.023107416999999963,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 16125333,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "before",
+        "sample": 6,
+        "wall_seconds": 0.02180475000000004,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 15229375,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "after",
+        "sample": 6,
+        "wall_seconds": 0.023082125000000064,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 15956584,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "before",
+        "sample": 0,
+        "wall_seconds": 0.03838087499999998,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31518583,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "after",
+        "sample": 0,
+        "wall_seconds": 0.038683374999999964,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31763333,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "after",
+        "sample": 1,
+        "wall_seconds": 0.03885045900000006,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31104375,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "before",
+        "sample": 1,
+        "wall_seconds": 0.04313266700000007,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 35600709,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "before",
+        "sample": 2,
+        "wall_seconds": 0.038478916999999946,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31064208,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "after",
+        "sample": 2,
+        "wall_seconds": 0.039295417000000166,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31884375,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "after",
+        "sample": 3,
+        "wall_seconds": 0.04002283399999995,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 32716833,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "before",
+        "sample": 3,
+        "wall_seconds": 0.0393254999999999,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31944042,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "before",
+        "sample": 4,
+        "wall_seconds": 0.038743042000000116,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31365667,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "after",
+        "sample": 4,
+        "wall_seconds": 0.03909858300000013,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31593000,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "after",
+        "sample": 5,
+        "wall_seconds": 0.03949595800000005,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 32055917,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "before",
+        "sample": 5,
+        "wall_seconds": 0.03821091700000001,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30962542,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "before",
+        "sample": 6,
+        "wall_seconds": 0.03881166699999983,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31903500,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "after",
+        "sample": 6,
+        "wall_seconds": 0.03905758299999995,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31543416,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "before",
+        "sample": 0,
+        "wall_seconds": 0.03962154100000004,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 32127791,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "after",
+        "sample": 0,
+        "wall_seconds": 0.038579750000000024,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31814458,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "after",
+        "sample": 1,
+        "wall_seconds": 0.038823834,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 32005083,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "before",
+        "sample": 1,
+        "wall_seconds": 0.03830083399999995,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31564584,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "before",
+        "sample": 2,
+        "wall_seconds": 0.03931379199999996,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 32314125,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "after",
+        "sample": 2,
+        "wall_seconds": 0.038454291999999946,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30945708,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "after",
+        "sample": 3,
+        "wall_seconds": 0.037358916999999936,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30636125,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "before",
+        "sample": 3,
+        "wall_seconds": 0.038410666999999954,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31414250,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "before",
+        "sample": 4,
+        "wall_seconds": 0.03875187499999999,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31946042,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "after",
+        "sample": 4,
+        "wall_seconds": 0.03766516699999989,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30814709,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "after",
+        "sample": 5,
+        "wall_seconds": 0.03865179200000002,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31874292,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "before",
+        "sample": 5,
+        "wall_seconds": 0.03772279199999984,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31294334,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "before",
+        "sample": 6,
+        "wall_seconds": 0.038158500000000206,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31142667,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "after",
+        "sample": 6,
+        "wall_seconds": 0.03816604200000029,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30900208,
+        "passed": true
+      }
+    ],
+    "lazy_samples": [
+      {
+        "cpus": 1,
+        "phase": "before",
+        "sample": 0,
+        "wall_seconds": 0.023855583,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 16468000,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "after",
+        "sample": 0,
+        "wall_seconds": 0.167030167,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 22243958,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "after",
+        "sample": 1,
+        "wall_seconds": 0.02323408299999999,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 16340375,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "before",
+        "sample": 1,
+        "wall_seconds": 0.021343499999999987,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 15162166,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "before",
+        "sample": 2,
+        "wall_seconds": 0.02135837500000004,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 15504375,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "after",
+        "sample": 2,
+        "wall_seconds": 0.02159479200000003,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 15278041,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "after",
+        "sample": 3,
+        "wall_seconds": 0.021448083000000007,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 14811125,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "before",
+        "sample": 3,
+        "wall_seconds": 0.021660917000000002,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 15816875,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "before",
+        "sample": 4,
+        "wall_seconds": 0.021176417000000003,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 15016083,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "after",
+        "sample": 4,
+        "wall_seconds": 0.02162133300000002,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 15094417,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "after",
+        "sample": 5,
+        "wall_seconds": 0.020992334,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 14995583,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "before",
+        "sample": 5,
+        "wall_seconds": 0.021231749999999994,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 15065334,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "before",
+        "sample": 6,
+        "wall_seconds": 0.021598583999999976,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 15214250,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "after",
+        "sample": 6,
+        "wall_seconds": 0.02162920800000001,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 15267041,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "before",
+        "sample": 0,
+        "wall_seconds": 0.038249332999999996,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31973750,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "after",
+        "sample": 0,
+        "wall_seconds": 0.03817595900000004,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31347250,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "after",
+        "sample": 1,
+        "wall_seconds": 0.037504333,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30801375,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "before",
+        "sample": 1,
+        "wall_seconds": 0.03715316700000004,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30730583,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "before",
+        "sample": 2,
+        "wall_seconds": 0.037209458999999945,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30725916,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "after",
+        "sample": 2,
+        "wall_seconds": 0.03755204199999995,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30463292,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "after",
+        "sample": 3,
+        "wall_seconds": 0.03817175000000006,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30483209,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "before",
+        "sample": 3,
+        "wall_seconds": 0.03835333299999999,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31448708,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "before",
+        "sample": 4,
+        "wall_seconds": 0.037865708,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31401875,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "after",
+        "sample": 4,
+        "wall_seconds": 0.037164874999999986,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29989291,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "after",
+        "sample": 5,
+        "wall_seconds": 0.03729199999999999,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30585417,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "before",
+        "sample": 5,
+        "wall_seconds": 0.03695037499999998,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30367958,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "before",
+        "sample": 6,
+        "wall_seconds": 0.03748374999999993,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30961708,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "after",
+        "sample": 6,
+        "wall_seconds": 0.03945349999999992,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 32100125,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "before",
+        "sample": 0,
+        "wall_seconds": 0.038341999999999876,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30879708,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "after",
+        "sample": 0,
+        "wall_seconds": 0.03818524999999995,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30784041,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "after",
+        "sample": 1,
+        "wall_seconds": 0.03878866600000008,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31849542,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "before",
+        "sample": 1,
+        "wall_seconds": 0.044397250000000055,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 37834083,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "before",
+        "sample": 2,
+        "wall_seconds": 0.040892417000000014,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 32226333,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "after",
+        "sample": 2,
+        "wall_seconds": 0.039207208000000104,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31733667,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "after",
+        "sample": 3,
+        "wall_seconds": 0.038744209000000085,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31765125,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "before",
+        "sample": 3,
+        "wall_seconds": 0.03802841700000004,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31302917,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "before",
+        "sample": 4,
+        "wall_seconds": 0.039148249999999996,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31995875,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "after",
+        "sample": 4,
+        "wall_seconds": 0.0388655830000002,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31526417,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "after",
+        "sample": 5,
+        "wall_seconds": 0.038786833000000076,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31454042,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "before",
+        "sample": 5,
+        "wall_seconds": 0.03935662499999992,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31892166,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "before",
+        "sample": 6,
+        "wall_seconds": 0.03839650000000017,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31687875,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "after",
+        "sample": 6,
+        "wall_seconds": 0.038535333000000005,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31568542,
+        "passed": true
+      }
+    ]
+  },
+  "log_sha256": {
+    "apple-final-process-tests.log": "9cf6c4bd3d9b76144f052e51c3f01213414cbfe250eb36e07b33fa4af96c6745",
+    "apple-tests.log": "d0c98fdcfccd6c0b1ac123693ae738c45ce03e61b6093a378edd3a46e4ccac84",
+    "vfs-all-features.log": "6ae380f1349ab1c0fb8fa4a08b7908b6050ab0b43973a338495633bff817a588",
+    "product-clippy-final.log": "1983a10bbf62a22c9e540f5d7ca8a35fa4fbe6df4743251c9168de00a7d078d3",
+    "runtime-clippy-final.log": "cce01a96c6edbc1e981ab3f8ae0c1fe5f6a9aee476e07e8c0f91bae4496ae207",
+    "ipad-check-final.log": "a69906530d913f9efe64dd18313a52274b859fcc01d287e8c9fe318f4f0c1f0f",
+    "source-vfork-red.log": "d7f34a33852e9755c0a37535e3431bd9d05c7c38ac3496e3199d149d6001c02f",
+    "ancestor-shutdown-red.log": "327cdd0292a0a177bd17326abc5380d8017f4aee10f9c8d0c1f7d62d2b7d01a9",
+    "missing-retired-root-red.log": "687303474185344ca632d8eef7ae8e33c778524240a0f60059fe65ebec529606",
+    "missing-vfork-admission-red.log": "a75a8f27a3133756a3f955b69d56c18c914498580a4a9a3c8d052c20e5cb50a0",
+    "final-go-gc.log": "e8dd5e3fae6fa8b3df1090acd43b111cb7b1c7e49b8c57ade35be6d498d7b52e",
+    "final-docker.log": "6083cb2744fc3f1b693edd1447738efb948f793f7c98079a9d7a7a5cd0a32087",
+    "final-vaapi.log": "a63da8bdc5a689227e428938b745af0dcb00fa1c35da708dba16bad8626a9dfd",
+    "stopped-cohort-benchmark.log": "247b6e1b1cdbb613b638ff772c29614a7ac6eb9ef8d58a0d514922070d83356d",
+    "lazy-roots-benchmark.log": "91501fdb2aebe8b680a6bf3a8578eca780c402346b548c9aef075521f744c09d"
+  },
+  "native_linux_log_sha256": "36f63cd52162926bf487933a5db20e5a262d21fae4e7ed7a21fb9584cf06d1bf",
+  "stable": {
+    "version": "1.5.3",
+    "runtime_revision": "d9c4a811faf316a51b1a8f33f055247943a18855",
+    "binary_sha256": "4f40615213e731b2a4ef9d8c6a0e85c5c7bdf31ab0c60b0354b55113f2a6a55d",
+    "modified": false,
+    "business_restart": false,
+    "techo_frontend_activation": false
+  },
+  "remaining": [
+    "Final Done CPU/metrics adoption and last shared Memory graph/backing publication still use joined cohort completion.",
+    "Last-member exit(93), exit_group(94), default-fatal cleanup and source namespace victim termination remain connected work.",
+    "Structural clone/exec, robust futex support and actual excluded control operations retain their boundaries."
+  ],
+  "references": [
+    "https://github.com/torvalds/linux/blob/v6.18/kernel/fork.c",
+    "https://github.com/torvalds/linux/blob/v6.18/kernel/pid_namespace.c"
+  ],
+  "installed_dev": {
+    "version": "1.5.3",
+    "runtime_revision": "7b91b6dc664606ef4c046f218df7fe5001052073",
+    "binary_sha256": "0dcde67d59a5cf2cc6575d72ae8e34a9f48e427f9429096283f91f0c2ccb3bc3",
+    "candidate_matches": true,
+    "install_log_sha256": "d81b37faaef60b5a1b635ce5a81a399a304e89d9aee6498d2d7eecf5f3f5bd41"
+  },
+  "paired_interpreter": {
+    "path": "/Users/main/dev/trames-mac/target/release/trames-run",
+    "sha256": "66cc8af447ee6eee0374945104f6416fd8dcbcbe50581245769dcc4bffca3d4a",
+    "runtime_revision": "7b91b6dc664606ef4c046f218df7fe5001052073",
+    "coverage": "The same interpreter used by iPad; 1/4 CPU static ELF acceptance, no physical iPad run."
+  }
+}
