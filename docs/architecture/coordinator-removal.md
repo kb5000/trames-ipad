@@ -1,32 +1,69 @@
 # Coordinator dependency audit
 
-## Current status — 2026-11-05
+## Current status — 2026-11-06
 
-The latest batch is [exec image replacement with creator-mm custody](#51-exec-image-replacement-with-creator-mm-custody--2026-11-05).
-Fork/clone/vfork and exec no longer return every worker View. The original Rc
-owner still constructs/replaces tasks during creator-mm custody, while unrelated
-mms continue. Source exit, parent completion and asynchronous cold cleanup retain
-their original resources. Mac and iPad share the implementation; only Dev is
-updated, with stable 1.5.3 and business environments kept separate.
+Audited executable-code baseline: `a116d834318d59ea51f3de119fc7e20ed44c58d8`.
+The latest code batch remains [stage 51, exec replacement](#51-exec-image-replacement-with-creator-mm-custody--2026-11-05).
+This refresh changes documentation and paired pins only; it does not rebuild or
+change installed applications, and reuses the existing validation. Mac and iPad
+share the implementation. The installed Mac Dev uses the audited code; stable
+1.5.3 and business environments are unchanged.
 
-The [consolidated runtime audit](../../runtime/docs/architecture/coordination-boundaries.md)
-is the current source inventory, including actual admission and fallback gates.
-Earlier sections below record the boundary and goal status at each historical
-stage; they do not override this current inventory.
+**The coordinator still exists, but ordinary admitted resource work no longer
+has to execute there.** Fork/clone/exec have removed the whole-cohort dependency,
+while retaining original-owner construction at creator-mm custody. A scoped
+handoff, a one-caller compatibility service, asynchronous collection and a full
+cohort return are different costs. Counts of migrations, tables or source files
+are not a completion percentage.
 
-| Remaining boundary | Scope / examples |
-| --- | --- |
-| Joined task and control work | Tracing/security actions with lifecycle effects, mount/unshare/setns, dynamic proc/sys, actual excluded owner controls and legacy unadmitted waiter adoption; the current cohort returns its Views. Ordinary waits, caught signals, job control and individual/group/default-fatal exit have source paths. Creation and exec retain scoped owner construction at creator-mm custody; cold cleanup retains asynchronous owner-local projection work. |
-| Residual compatibility service | Some actual FD/network kinds, old epoll creation and eligible stream paths still use in-cohort owner service; peer CPUs can continue unless admission refuses |
-| VM/backing publication | Structural mappings, pins and mapped-file resize quiesce affected mm/backing users; exceptional admission/control conditions can require a broader join |
-| Mixed resource waits and transfers | Masked/owner poll, actual owner SCM_RIGHTS controls, unsupported ring resources and file-to-pipe/socket transfer retain explicit owner boundaries |
-| Native and embedding lifecycle | Exceptional native/GPU mapping checkpoints, unfinished context teardown, pause/cancel, transfer/timezone, terminal lifecycle and actual supervision/administration events |
-| Local fallbacks | Native libc to guest body, DirectFile to full FileWork, and HVF mapping delta to coarse comparison do not by themselves imply coordinator RPC; single-CPU/solo execution retains the coordinated caller path |
+| Area | Current execution | Remaining boundary |
+| --- | --- | --- |
+| Admitted file/path/FD, Unix/TCP I/O and cross-resource transfer | Calling worker and original shared objects | Excluded paths/descriptors/controls and layout changes still have explicit escalation |
+| Futexes, clocks/timers, admitted event/child/signal waits and caught signals | Source execution; blocking returns the CPU slot | Legacy nonmember wake/adoption, unsupported wait resources and actual task-policy effects remain |
+| Exit/group/default-fatal termination, STOP/CONT and vfork release | Source resources and original group/family notifications | CPU/statistics and cold Rc projections return asynchronously to the owner; cold shared-mm cleanup may need that mm's byte checkpoint |
+| fork/clone/vfork and execve/execveat | Only creator-mm actors quiesce; unrelated mms continue | The original owner still constructs/commits the task, VFS and image graph; this is not source-thread independent |
+| Mapping topology, pins and mapped-file layout | Affected mm/backing checkpoint; additive private-anonymous mmap has in-cohort publication | Owner publication remains; real excluded backing/lifetime/policy cases can require a full return |
+| Residual FD/network compatibility | Owner service inside a live cohort, where admitted | Caller waits while peers continue; refusal before effects falls back to joined handling |
+| Native libc/GPU/video/audio | Normal bodies and resource waits use calling/shared-resource paths | Exceptional mapping import, unstable entry and actual native lifecycle checks remain; AppKit affinity, device/disk pools and local fallback are not extra coordinators |
+| Dynamic proc/sys and owner administration | Still joined | Dynamic process/executable/FD views, special paths, mount/unshare/setns, credentials/capabilities and owner affinity/priority/scheduling queries or mutations |
+| Tracing/security and mixed owner resources | Actual joined task/control boundary | Installation/TSYNC, policy signal/termination effects, excluded SCM_RIGHTS/ring resources and missing source pumps remain. Pure custody-policy errors complete on continuous workers before quiescence |
+| Host lifecycle and generic dispatch fallback | Still joined when the actual event/exit requires it | Host exec creation/group control, terminal lifecycle, pause/cancel, transfer/timezone/writeback, supervision/admin/pressure/deadline/shutdown; any SVC/HLT/fault not completed, parked, serviced or scoped on the worker still reaches the generic joined fallback |
 
-Neither zero Service events nor fewer host threads proves owner independence.
-Read worker completions, service waits, cohort stop/dispatch, affected-mm groups
-and actual resource work together. UI-thread affinity is a separate requirement;
-ordinary Wayland bytes and presentation are not owner syscall RPCs.
+The last row is an important coverage gap: the remaining owner work is **not
+limited to a fixed set of rare controls**. The final worker-dispatch fallback is
+still reachable. Initial admission and legacy/control rescheduling also involve
+the owner; ordinary epoch-member migration, parking, wakeup and child/replacement
+admission already use the live execution queue. Single-CPU/solo execution retains
+its coordinated caller path, which does not by itself imply an extra RPC.
+
+The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/08ea4dbb039a055675af4ff42c5d83e803d446e0/docs/architecture/coordination-boundaries.md)
+records scopes, actual admission gates and source locations. Earlier sections
+below are historical records and do not override this inventory.
+
+### What the latest measurements prove
+
+These are existing 2026-11-05, 12-CPU, 32-operation fixture results; this refresh
+adds no new profile. Service requests are zero in both versions for these cases:
+
+| Workload | Before full-cohort rounds | Current full-cohort rounds | Actual remaining joined exits |
+| --- | ---: | ---: | --- |
+| execve | 33 | 1 | Final control ioctl; all 32 exec returns disappeared |
+| Nonleader exec | 33 | 1 | Final control ioctl; all 32 exec returns disappeared |
+| execveat with executable FD open | 65 | 33 | 32 openat calls on `/proc/self/exe`, plus final control ioctl; all 32 execveat returns disappeared |
+
+The ordinary exec workload's scoped checkpoint groups increase from 2 to 34:
+work changed scope rather than disappearing. Therefore `service_requests=0`,
+fewer full returns or fewer host threads do not prove an owner-free runtime.
+Inspect communication/wait, resource processing, scoped quiescence and full-stop
+costs separately. [Stage 51 evidence](../validation/exec-custody-20261105.json)
+contains raw samples and the full check scope; it is not a whole-Firefox or
+all-server-workload frequency measurement.
+
+The next priority supported by this evidence is the **dynamic process/resource
+view and path-resolution subsystem**, followed by owner task/namespace metadata
+and real compatibility admissions. A special-case executable pathname whitelist
+would leave the underlying dependency in place. No new subsystem implementation
+is included in this documentation refresh.
 
 ## Twenty-second migration implemented — worker Unix namespace controls and waits — 2026-11-03
 
