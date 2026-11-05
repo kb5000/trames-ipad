@@ -2,14 +2,13 @@
 
 ## Current status — 2026-11-05
 
-The latest batch is [original vfork release and cold projection completion](#48-original-vfork-release-and-cold-projection-completion--2026-11-05).
-Original vfork wait/release, child waits, signal/cgroup controls, non-last exit
-and parent/subreaper queries now have source paths. Opaque owner FD kinds no
-longer refuse a non-last exit; private Rc projections are collected on their
-existing owner while peer CPUs continue. Original namespace dependencies now
-order parent/host completion. Final CPU/Memory custody and last/group/default-
-fatal entry remain open. Mac and iPad share this implementation. Stable 1.5.3
-and business environments remain separate from Dev.
+The latest batch is [source process exit and CPU/mm return](#49-source-process-exit-and-cpumm-return--2026-11-05).
+Ordinary individual/group/default-fatal exit and namespace-init victim cleanup
+now use original source resources. Full returned CPUs and cold Rc projections
+are collected while unrelated CPUs continue; a cold peer sharing a live mm needs
+only that mm's byte checkpoint. Parent completion is independent of external mm
+borrows. Mac and iPad share the implementation. Stable 1.5.3 and business
+environments remain separate from Dev.
 
 The [consolidated runtime audit](../../runtime/docs/architecture/coordination-boundaries.md)
 is the current source inventory, including actual admission and fallback gates.
@@ -18,7 +17,7 @@ stage; they do not override this current inventory.
 
 | Remaining boundary | Scope / examples |
 | --- | --- |
-| Joined task and control work | Process creation/exec, last-member/group/default-fatal exit, final mm/native cleanup, security policy, mount/unshare/setns, dynamic proc/sys and operations on actual excluded owner controls; the current cohort returns its Views. Ordinary waits, caught signals, job control and non-last thread exit have source paths. |
+| Joined task and control work | Process creation/exec, tracing/non-ALLOW security policy, mount/unshare/setns, dynamic proc/sys, actual excluded owner controls and legacy unadmitted waiter adoption; the current cohort returns its Views. Ordinary waits, caught signals, job control and individual/group/default-fatal exit have source paths. Cold cleanup retains asynchronous owner-local projection work. |
 | Residual compatibility service | Some actual FD/network kinds, old epoll creation and eligible stream paths still use in-cohort owner service; peer CPUs can continue unless admission refuses |
 | VM/backing publication | Structural mappings, pins and mapped-file resize quiesce affected mm/backing users; exceptional admission/control conditions can require a broader join |
 | Mixed resource waits and transfers | Masked/owner poll, actual owner SCM_RIGHTS controls, unsupported ring resources and file-to-pipe/socket transfer retain explicit owner boundaries |
@@ -3611,3 +3610,29 @@ not another service thread or a new source-admission workaround.
 [Exact revisions, sources, controls and samples](../validation/source-completion-20261105.json).
 Only Dev is installed after acceptance. Stable 1.5.3 and business services keep
 their original binary; no Techo frontend is activated.
+
+## 49. Source process exit and CPU/mm return — 2026-11-05
+
+The final member, exit_group, default-fatal signal and synchronous fatal fault
+now use original group/resources rather than forcing a whole-cohort return.
+Actual namespace-init victim groups use the same termination path. Running and
+parked peers return their own resources; cold peers are completed on their actual
+owner. Source completion returns the full CPU and metrics immediately, allowing
+parent wait to finish within the same cohort while unrelated CPUs continue.
+
+Owner-local Rc destruction remains asynchronous work on the existing owner.
+A cold peer sharing an executing mm uses a byte-only checkpoint of that mm and
+restores its unchanged snapshot. An external guarded borrow keeps physical mm
+custody after logical exit, independently of parent notification and PID reuse.
+Dirty metadata remains available for its later writes. No new service thread,
+polling bus, syscall RPC, ordinary guest barrier or unsafe block is added.
+
+The remaining joined lifecycle work is structural creation/exec, explicit tracing
+and non-ALLOW task policy, actual excluded owner controls, and legacy unadmitted
+waiter adoption. This batch does not add robust-futex owner-death support.
+
+[Validation and measured samples](../validation/process-completion-20261105.json)
+record the passing checks and unchanged short-process throughput. Scheduling
+switches fall by 23% at 12 CPUs, but structural clone/fork replaces the removed
+exit stops and cohort rounds remain unchanged. Multicore vfork latency rises
+slightly; no general speedup is claimed.

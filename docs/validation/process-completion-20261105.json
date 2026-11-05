@@ -1,0 +1,1594 @@
+{
+  "schema": 1,
+  "date": "2026-11-05",
+  "runtime_revision": "c05a7e915a91344597efb34373fea8b427e013a0",
+  "baseline_runtime_revision": "7b91b6dc664606ef4c046f218df7fe5001052073",
+  "scope": "Source individual/final/group/default-fatal exit, original namespace victim termination, full CPU/metrics return during the cohort, original resource and cold projection completion, byte-only same-mm cleanup, external guarded memory retirement independent of guest completion.",
+  "source_files": {
+    "Cargo.lock": "c32b8c6aae20c2598b8bea9d9389ccc7abbabed86a646dd1b308964342bd7263",
+    "crates/trames-kernel/src/signal/io.rs": "c0cee6e40d949714dc130280fdf592fc060e1ef103f933eadfbad9daf1e56a83",
+    "crates/trames-kernel/src/task_control.rs": "459cd396318e802525cc34a9e6db1c8c4dff65e94f3b2dc947cdb3e00d562a3e",
+    "crates/trames-linux/src/direct.rs": "021508ba9f8c92f672d1aeeb42d3613f00a107a2f307bc3c01ff2fbea4333a72",
+    "crates/trames-memory/Cargo.toml": "8cbc8a20ece7f8488bcbcd063723044465b3ba7a459403c611cfd9398832f0d3",
+    "crates/trames-memory/src/lib.rs": "8857e0d94eca817f3f9c0af65d4bb538232677fa5586459d95da33c28a23482e",
+    "crates/trames-memory/src/parallel.rs": "ff8643840b8f8258cd7bef98157ac18448c0f38abd4adb4e1a5edde9d2b17f63",
+    "crates/trames-memory/src/parallel/retirement.rs": "190896450cdde75c087189abc4cbe2527a3d1557c8abe58aad8d024b1f412218",
+    "crates/trames-session/src/process.rs": "02f6b1ff354edb774094b3414fac9e0eb7985ca0d8fc8fe16c413c2528fcdd6d",
+    "crates/trames-session/src/process_exit.rs": "ab68f1bf8d8fc5beb8af899be74136bb8a62e4151c08ef8be63a6dbaaa2f8fdb",
+    "crates/trames-session/src/process_seccomp.rs": "250af03800037cf1edda31783b1e4391ba482ed88edc9c7568966a5842d0a73c",
+    "crates/trames-session/src/process_service.rs": "2b89291ea359cf8664174be754079589bfb65c14974b54d8cdf02839917a9863",
+    "crates/trames-session/src/process_vm.rs": "ae28fb7db291b787c91be3dbac40e0b1ed63a3c835449a258f99383b10ec4171",
+    "crates/trames-session/src/run_queue.rs": "f4de44b4c0dae095c885a876dc1f8a40126b48b07a01e82cad43db89f55cd7e6",
+    "crates/trames-session/src/run_queue/domains.rs": "f31ea7f13a7bb11d7957cf890a6011f6f31346788d9097d8dccf50f1114ece27",
+    "crates/trames-session/src/worker_syscalls.rs": "691d06b1dbf469a76c2ba09b1e0450f0be19d442d6d5ea8041a8189f711565d5",
+    "crates/trames-session/src/workers.rs": "72b368266fa4d7fc6546f3885abae44709802550590a732e327fdd22d9a8c0d9",
+    "crates/trames-session/src/workers_uring_tests.rs": "5d9a2c5fadddf8841a80aaae2520b32f81990a36816960220c49b63d8fb5975a",
+    "crates/trames-vfs/src/locks.rs": "8e3be9ebabe04edcd40db08c0ad526aaf5f4da29a258baa7badda3941f23b3a1",
+    "docs/architecture/coordination-boundaries.md": "e40c0bdfffbe43b68aca7db277e29533dbdb2a125fd6c8945810495e86acc49d"
+  },
+  "authorization": {
+    "reviewed_patch_sha256": "706dc6a79fb3718c3bee484aa0a1a9f189df3e187d710fb0f5252ea255736f6c",
+    "integrated_runtime_patch_sha256": "ae6ab3410744ebe19b9549143f7d7afdad25795a6597992564c88234e276f947",
+    "same_scope_corrections_authorized": true,
+    "stable_update_authorized": false
+  },
+  "concurrency": {
+    "new_service_thread": false,
+    "new_owner_syscall_rpc": false,
+    "new_polling_bus": false,
+    "new_unsafe": false,
+    "new_ordinary_guest_barrier": false,
+    "mechanisms": "Original per-group resource locks and scalar terminal request; existing executor kicks/readiness and completion queue. Actual View count publishes lazy last-borrow readiness. Cold same-mm cleanup quiesces private execution actors, reuses unchanged guarded snapshot and clears their exclusive reservations; no mapping rebuild/backing closure. Owner-local Rc destruction remains asynchronous on its original owner."
+  },
+  "checks": {
+    "apple_process": {
+      "passed": 316,
+      "ignored": 3,
+      "execution": "315-case full affected suite plus the separately added external-mm/PID-reuse test; unchanged passing cases reused."
+    },
+    "apple_kernel": {
+      "passed": 56
+    },
+    "apple_memory": {
+      "passed": 160,
+      "ignored": 1
+    },
+    "apple_vfs_all_features": {
+      "passed": 507,
+      "ignored": 1
+    },
+    "native_arm_linux_process": {
+      "passed": 316,
+      "ignored": 3
+    },
+    "native_arm_linux_kernel": {
+      "passed": 56
+    },
+    "native_arm_linux_memory": {
+      "passed": 160,
+      "ignored": 1
+    },
+    "native_arm_linux_vfs": {
+      "passed": 506,
+      "ignored": 1
+    },
+    "strict_core_and_session": true,
+    "ipad_target_compile": true,
+    "physical_ipad_run": false,
+    "hvf_and_interpreter_lifecycle_cases": 25,
+    "native_gpu_and_video_cases": 2,
+    "go_gc_starts": 30,
+    "isolated_docker_rounds": 8,
+    "h264_native_sharing": true
+  },
+  "mechanism_regressions": [
+    {
+      "case": "Nine full-queue termination modes with an unrelated CPU still busy",
+      "assertions": "Parent consumes child status within the same epoch; no 93/94 cohort return. Includes ordinary/final/group exits, running/sleeping/cold/traced peers, default TERM, default synchronous SEGV and surviving CLONE_VM clear_tid visibility."
+    },
+    {
+      "case": "External physical mm borrow held across wait/reap/PID reuse",
+      "assertions": "Guest family completion does not wait for external borrow. Original mm remains retained, accepts late guarded writes, and drops through original readiness without touching the new task."
+    },
+    {
+      "case": "Late dirty bit while legacy provider publishes a different frame",
+      "assertions": "Retired publication preserves the dirty-word journal until the last borrowed generation returns.",
+      "negative_control": "Disabling journal retention reproduces backing byte 0 instead of 9; isolated source restored automatically.",
+      "log_sha256": "af640fd3da46f01ef717643dfb064f0cacd8a89fca87a1eb08e0f6f539a7ed6c"
+    }
+  ],
+  "functional_cases": [
+    {
+      "case": "final-hvf-1-vfork",
+      "returncode": 0,
+      "seconds": 0.19699941699999998
+    },
+    {
+      "case": "final-hvf-1-completion",
+      "returncode": 0,
+      "seconds": 0.023118541999999992
+    },
+    {
+      "case": "final-hvf-1-resources",
+      "returncode": 0,
+      "seconds": 0.011408124999999991
+    },
+    {
+      "case": "final-hvf-1-pdeathsig",
+      "returncode": 0,
+      "seconds": 0.011496417000000009
+    },
+    {
+      "case": "final-hvf-1-pid-namespaces",
+      "returncode": 0,
+      "seconds": 0.023966125000000005
+    },
+    {
+      "case": "final-hvf-4-vfork",
+      "returncode": 0,
+      "seconds": 0.011698457999999967
+    },
+    {
+      "case": "final-hvf-4-completion",
+      "returncode": 0,
+      "seconds": 0.023902541
+    },
+    {
+      "case": "final-hvf-4-resources",
+      "returncode": 0,
+      "seconds": 0.009943584000000005
+    },
+    {
+      "case": "final-hvf-4-pdeathsig",
+      "returncode": 0,
+      "seconds": 0.011784375000000014
+    },
+    {
+      "case": "final-hvf-4-pid-namespaces",
+      "returncode": 0,
+      "seconds": 0.037541959000000014
+    },
+    {
+      "case": "final-hvf-12-vfork",
+      "returncode": 0,
+      "seconds": 0.011845374999999991
+    },
+    {
+      "case": "final-hvf-12-completion",
+      "returncode": 0,
+      "seconds": 0.045059040999999966
+    },
+    {
+      "case": "final-hvf-12-resources",
+      "returncode": 0,
+      "seconds": 0.012021292000000017
+    },
+    {
+      "case": "final-hvf-12-pdeathsig",
+      "returncode": 0,
+      "seconds": 0.009465166999999997
+    },
+    {
+      "case": "final-hvf-12-pid-namespaces",
+      "returncode": 0,
+      "seconds": 0.03725766600000002
+    },
+    {
+      "case": "final-interpreter-1-vfork",
+      "returncode": 0,
+      "seconds": 1.6974529580000002
+    },
+    {
+      "case": "final-interpreter-1-completion",
+      "returncode": 0,
+      "seconds": 0.024680125000000164
+    },
+    {
+      "case": "final-interpreter-1-resources",
+      "returncode": 0,
+      "seconds": 0.011872916999999816
+    },
+    {
+      "case": "final-interpreter-1-pdeathsig",
+      "returncode": 0,
+      "seconds": 0.01220037499999993
+    },
+    {
+      "case": "final-interpreter-1-pid-namespaces",
+      "returncode": 0,
+      "seconds": 0.02411637500000019
+    },
+    {
+      "case": "final-interpreter-4-vfork",
+      "returncode": 0,
+      "seconds": 0.012490582999999944
+    },
+    {
+      "case": "final-interpreter-4-completion",
+      "returncode": 0,
+      "seconds": 0.02314429200000001
+    },
+    {
+      "case": "final-interpreter-4-resources",
+      "returncode": 0,
+      "seconds": 0.011054334000000221
+    },
+    {
+      "case": "final-interpreter-4-pdeathsig",
+      "returncode": 0,
+      "seconds": 0.009488333000000182
+    },
+    {
+      "case": "final-interpreter-4-pid-namespaces",
+      "returncode": 0,
+      "seconds": 0.0453825000000001
+    },
+    {
+      "case": "final-gpu",
+      "returncode": 0,
+      "seconds": 0.04114254199999978
+    },
+    {
+      "case": "final-video",
+      "returncode": 0,
+      "seconds": 0.011952583000000239
+    },
+    {
+      "case": "final-go-gc",
+      "returncode": 0,
+      "seconds": 2.562727292
+    },
+    {
+      "case": "final-docker",
+      "returncode": 0,
+      "seconds": 75.74409466700001
+    },
+    {
+      "case": "final-vaapi",
+      "returncode": 0,
+      "seconds": 1.9366967499999959
+    }
+  ],
+  "benchmark": {
+    "schema": 1,
+    "scope": "128 two-thread groups: fork/clone, leader exit, final-thread exit and parent wait, alternating ordinary files and private epoll controls. Seven counterbalanced pairs per CPU count. Includes structural fork/mm work; not a general CPU or Firefox benchmark. Vfork uses the same prior fixture. Local Linux test instance was stopped and no build ran during timings.",
+    "baseline_revision": "7b91b6dc664606ef4c046f218df7fe5001052073",
+    "candidate_uncommitted": true,
+    "binaries": {
+      "before": {
+        "path": "/Users/main/dev/trames/target/process-completion/before-mac-run",
+        "sha256": "0dcde67d59a5cf2cc6575d72ae8e34a9f48e427f9429096283f91f0c2ccb3bc3"
+      },
+      "after": {
+        "path": "/Users/main/dev/trames-mac/target/release/Trames Dev.app/Contents/MacOS/trames-mac-run",
+        "sha256": "071d0d1cd2a29c9b1e7ec89aede08fca92437675f61fb91c7dcbde946a6d889a"
+      }
+    },
+    "fixture_sha256": "9138832f44247388de6b45e812aa2ecc59b1d3c0ca4f2b59c13859de3af9c5a2",
+    "vfork_fixture_sha256": "cf6fe684777c148e4ef4282f0dd73efe98b074d255f81d7ad49437d4b3c3b89c",
+    "native_arm_linux": {
+      "reused_unchanged_fixture_result": true,
+      "source_log": "/Users/main/dev/trames/target/thread-retirement/native-linux.log",
+      "sha256": "68229c0a3d942a7f423d1bf26085f3ec64759ce47426172890ae05164998a6c9",
+      "samples": [
+        {
+          "case": "worker-thread-completion",
+          "groups": 128,
+          "elapsed_ns": 7712065,
+          "passed": true
+        },
+        {
+          "case": "worker-thread-completion",
+          "groups": 128,
+          "elapsed_ns": 7484897,
+          "passed": true
+        },
+        {
+          "case": "worker-thread-completion",
+          "groups": 128,
+          "elapsed_ns": 8321654,
+          "passed": true
+        },
+        {
+          "case": "worker-thread-completion",
+          "groups": 128,
+          "elapsed_ns": 7429813,
+          "passed": true
+        },
+        {
+          "case": "worker-thread-completion",
+          "groups": 128,
+          "elapsed_ns": 7619731,
+          "passed": true
+        },
+        {
+          "case": "worker-thread-completion",
+          "groups": 128,
+          "elapsed_ns": 7660940,
+          "passed": true
+        },
+        {
+          "case": "worker-thread-completion",
+          "groups": 128,
+          "elapsed_ns": 8000109,
+          "passed": true
+        }
+      ]
+    },
+    "samples": [
+      {
+        "cpus": 1,
+        "phase": "before",
+        "sample": 0,
+        "wall_seconds": 0.043508082999999996,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 15168584,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "after",
+        "sample": 0,
+        "wall_seconds": 0.021183624999999998,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 15059834,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "after",
+        "sample": 1,
+        "wall_seconds": 0.021730209,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 14965084,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "before",
+        "sample": 1,
+        "wall_seconds": 0.020708333999999995,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 14977000,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "before",
+        "sample": 2,
+        "wall_seconds": 0.021388917000000007,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 15178583,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "after",
+        "sample": 2,
+        "wall_seconds": 0.021565791,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 15342625,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "after",
+        "sample": 3,
+        "wall_seconds": 0.021326082999999996,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 14974916,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "before",
+        "sample": 3,
+        "wall_seconds": 0.020782958000000018,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 14780709,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "before",
+        "sample": 4,
+        "wall_seconds": 0.020556166999999986,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 14755875,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "after",
+        "sample": 4,
+        "wall_seconds": 0.020745583000000012,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 14908875,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "after",
+        "sample": 5,
+        "wall_seconds": 0.021907290999999995,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 15189541,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "before",
+        "sample": 5,
+        "wall_seconds": 0.02051666699999999,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 14519917,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "before",
+        "sample": 6,
+        "wall_seconds": 0.02046037500000003,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 14907625,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "after",
+        "sample": 6,
+        "wall_seconds": 0.021565583,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 15115958,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "before",
+        "sample": 0,
+        "wall_seconds": 0.038249833000000066,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31564083,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "after",
+        "sample": 0,
+        "wall_seconds": 0.03660579099999994,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30330500,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "after",
+        "sample": 1,
+        "wall_seconds": 0.036262959000000095,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29767667,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "before",
+        "sample": 1,
+        "wall_seconds": 0.03648887500000009,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29972458,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "before",
+        "sample": 2,
+        "wall_seconds": 0.03641254100000002,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30081833,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "after",
+        "sample": 2,
+        "wall_seconds": 0.03718899999999992,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30352500,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "after",
+        "sample": 3,
+        "wall_seconds": 0.03682995899999986,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30153166,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "before",
+        "sample": 3,
+        "wall_seconds": 0.0367794589999999,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30299542,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "before",
+        "sample": 4,
+        "wall_seconds": 0.036863083000000074,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30420417,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "after",
+        "sample": 4,
+        "wall_seconds": 0.036449374999999895,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29995750,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "after",
+        "sample": 5,
+        "wall_seconds": 0.036461832999999944,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29954125,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "before",
+        "sample": 5,
+        "wall_seconds": 0.03701654100000007,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30488917,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "before",
+        "sample": 6,
+        "wall_seconds": 0.035995250000000034,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29812500,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "after",
+        "sample": 6,
+        "wall_seconds": 0.03697050000000002,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30106583,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "before",
+        "sample": 0,
+        "wall_seconds": 0.036422207999999845,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30085542,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "after",
+        "sample": 0,
+        "wall_seconds": 0.036239916999999844,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29668125,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "after",
+        "sample": 1,
+        "wall_seconds": 0.03663016699999999,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30067084,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "before",
+        "sample": 1,
+        "wall_seconds": 0.03677162499999986,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29912208,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "before",
+        "sample": 2,
+        "wall_seconds": 0.035860541999999995,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29923500,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "after",
+        "sample": 2,
+        "wall_seconds": 0.03698387500000022,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30211375,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "after",
+        "sample": 3,
+        "wall_seconds": 0.037411749999999966,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30897416,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "before",
+        "sample": 3,
+        "wall_seconds": 0.0363673750000002,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30248375,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "before",
+        "sample": 4,
+        "wall_seconds": 0.03621666700000015,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30112208,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "after",
+        "sample": 4,
+        "wall_seconds": 0.03636787500000027,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29986625,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "after",
+        "sample": 5,
+        "wall_seconds": 0.03613425000000037,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29646000,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "before",
+        "sample": 5,
+        "wall_seconds": 0.03626941600000011,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30161500,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "before",
+        "sample": 6,
+        "wall_seconds": 0.03597620800000012,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29986208,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "after",
+        "sample": 6,
+        "wall_seconds": 0.03782279200000005,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31120833,
+        "passed": true
+      }
+    ],
+    "vfork_samples": [
+      {
+        "cpus": 1,
+        "sample": 0,
+        "phase": "before",
+        "wall_seconds": 0.055028790999999966,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 2026671,
+        "owner_mean_ns": 4031370,
+        "plain_max_ns": 2051333,
+        "owner_max_ns": 4059500,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "sample": 0,
+        "phase": "after",
+        "wall_seconds": 0.05533633400000004,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 2023869,
+        "owner_mean_ns": 4026573,
+        "plain_max_ns": 2049375,
+        "owner_max_ns": 4037875,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "sample": 1,
+        "phase": "after",
+        "wall_seconds": 0.05521879099999999,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 2024484,
+        "owner_mean_ns": 4029828,
+        "plain_max_ns": 2052375,
+        "owner_max_ns": 4041708,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "sample": 1,
+        "phase": "before",
+        "wall_seconds": 0.05508670900000001,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 2025333,
+        "owner_mean_ns": 4029151,
+        "plain_max_ns": 2060041,
+        "owner_max_ns": 4050542,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "sample": 2,
+        "phase": "before",
+        "wall_seconds": 0.05513720799999999,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 2023916,
+        "owner_mean_ns": 4027713,
+        "plain_max_ns": 2043666,
+        "owner_max_ns": 4034542,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "sample": 2,
+        "phase": "after",
+        "wall_seconds": 0.05562166700000004,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 2024994,
+        "owner_mean_ns": 4026843,
+        "plain_max_ns": 2059125,
+        "owner_max_ns": 4045875,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "sample": 3,
+        "phase": "after",
+        "wall_seconds": 0.055210582999999924,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 2024218,
+        "owner_mean_ns": 4027968,
+        "plain_max_ns": 2043000,
+        "owner_max_ns": 4037708,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "sample": 3,
+        "phase": "before",
+        "wall_seconds": 0.05526470800000005,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 2024541,
+        "owner_mean_ns": 4028552,
+        "plain_max_ns": 2051959,
+        "owner_max_ns": 4047292,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "sample": 4,
+        "phase": "before",
+        "wall_seconds": 0.054710459000000045,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 2024687,
+        "owner_mean_ns": 4025890,
+        "plain_max_ns": 2054875,
+        "owner_max_ns": 4034209,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "sample": 4,
+        "phase": "after",
+        "wall_seconds": 0.05555533300000004,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 2025583,
+        "owner_mean_ns": 4027421,
+        "plain_max_ns": 2050875,
+        "owner_max_ns": 4035958,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "sample": 5,
+        "phase": "after",
+        "wall_seconds": 0.055027125000000066,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 2026474,
+        "owner_mean_ns": 4026958,
+        "plain_max_ns": 2047209,
+        "owner_max_ns": 4039833,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "sample": 5,
+        "phase": "before",
+        "wall_seconds": 0.05533870800000007,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 2025104,
+        "owner_mean_ns": 4027036,
+        "plain_max_ns": 2050792,
+        "owner_max_ns": 4042125,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "sample": 6,
+        "phase": "before",
+        "wall_seconds": 0.05508429100000001,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 2024843,
+        "owner_mean_ns": 4029979,
+        "plain_max_ns": 2054875,
+        "owner_max_ns": 4049958,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "sample": 6,
+        "phase": "after",
+        "wall_seconds": 0.055155500000000135,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 2024275,
+        "owner_mean_ns": 4027635,
+        "plain_max_ns": 2056000,
+        "owner_max_ns": 4036958,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "sample": 0,
+        "phase": "before",
+        "wall_seconds": 0.008560582999999955,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 132791,
+        "owner_mean_ns": 95239,
+        "plain_max_ns": 413542,
+        "owner_max_ns": 117792,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "sample": 0,
+        "phase": "after",
+        "wall_seconds": 0.009538833999999996,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 143380,
+        "owner_mean_ns": 115281,
+        "plain_max_ns": 408291,
+        "owner_max_ns": 145708,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "sample": 1,
+        "phase": "after",
+        "wall_seconds": 0.009455417000000077,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 150739,
+        "owner_mean_ns": 99463,
+        "plain_max_ns": 544750,
+        "owner_max_ns": 127959,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "sample": 1,
+        "phase": "before",
+        "wall_seconds": 0.008857416999999979,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 129031,
+        "owner_mean_ns": 99390,
+        "plain_max_ns": 433625,
+        "owner_max_ns": 135791,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "sample": 2,
+        "phase": "before",
+        "wall_seconds": 0.007784166999999842,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 130015,
+        "owner_mean_ns": 90010,
+        "plain_max_ns": 443333,
+        "owner_max_ns": 119250,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "sample": 2,
+        "phase": "after",
+        "wall_seconds": 0.009280624999999931,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 138812,
+        "owner_mean_ns": 96671,
+        "plain_max_ns": 415542,
+        "owner_max_ns": 113500,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "sample": 3,
+        "phase": "after",
+        "wall_seconds": 0.009019208,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 137474,
+        "owner_mean_ns": 107947,
+        "plain_max_ns": 359875,
+        "owner_max_ns": 123000,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "sample": 3,
+        "phase": "before",
+        "wall_seconds": 0.007845541999999872,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 116536,
+        "owner_mean_ns": 93708,
+        "plain_max_ns": 381542,
+        "owner_max_ns": 108875,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "sample": 4,
+        "phase": "before",
+        "wall_seconds": 0.008339666999999995,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 133911,
+        "owner_mean_ns": 94765,
+        "plain_max_ns": 480083,
+        "owner_max_ns": 112958,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "sample": 4,
+        "phase": "after",
+        "wall_seconds": 0.009231792000000016,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 131744,
+        "owner_mean_ns": 102546,
+        "plain_max_ns": 396792,
+        "owner_max_ns": 131875,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "sample": 5,
+        "phase": "after",
+        "wall_seconds": 0.008646874999999943,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 134120,
+        "owner_mean_ns": 102463,
+        "plain_max_ns": 384500,
+        "owner_max_ns": 136166,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "sample": 5,
+        "phase": "before",
+        "wall_seconds": 0.008005416999999904,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 117250,
+        "owner_mean_ns": 90937,
+        "plain_max_ns": 370834,
+        "owner_max_ns": 119666,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "sample": 6,
+        "phase": "before",
+        "wall_seconds": 0.007879709000000013,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 117020,
+        "owner_mean_ns": 95494,
+        "plain_max_ns": 381208,
+        "owner_max_ns": 112750,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "sample": 6,
+        "phase": "after",
+        "wall_seconds": 0.009252459000000046,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 131843,
+        "owner_mean_ns": 102890,
+        "plain_max_ns": 385875,
+        "owner_max_ns": 119458,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "sample": 0,
+        "phase": "before",
+        "wall_seconds": 0.008826125000000129,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 117833,
+        "owner_mean_ns": 88609,
+        "plain_max_ns": 404584,
+        "owner_max_ns": 123291,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "sample": 0,
+        "phase": "after",
+        "wall_seconds": 0.009375874999999922,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 128208,
+        "owner_mean_ns": 104984,
+        "plain_max_ns": 393250,
+        "owner_max_ns": 130708,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "sample": 1,
+        "phase": "after",
+        "wall_seconds": 0.008603125000000045,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 127364,
+        "owner_mean_ns": 106729,
+        "plain_max_ns": 315667,
+        "owner_max_ns": 123292,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "sample": 1,
+        "phase": "before",
+        "wall_seconds": 0.00793025000000025,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 115796,
+        "owner_mean_ns": 87406,
+        "plain_max_ns": 365792,
+        "owner_max_ns": 105083,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "sample": 2,
+        "phase": "before",
+        "wall_seconds": 0.008384207999999838,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 130536,
+        "owner_mean_ns": 104276,
+        "plain_max_ns": 361875,
+        "owner_max_ns": 139458,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "sample": 2,
+        "phase": "after",
+        "wall_seconds": 0.009290334000000122,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 133911,
+        "owner_mean_ns": 108369,
+        "plain_max_ns": 392417,
+        "owner_max_ns": 146291,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "sample": 3,
+        "phase": "after",
+        "wall_seconds": 0.008298374999999858,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 126218,
+        "owner_mean_ns": 98385,
+        "plain_max_ns": 358375,
+        "owner_max_ns": 121875,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "sample": 3,
+        "phase": "before",
+        "wall_seconds": 0.009504374999999676,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 119729,
+        "owner_mean_ns": 95255,
+        "plain_max_ns": 380834,
+        "owner_max_ns": 124500,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "sample": 4,
+        "phase": "before",
+        "wall_seconds": 0.00854274999999971,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 120801,
+        "owner_mean_ns": 115536,
+        "plain_max_ns": 389167,
+        "owner_max_ns": 250750,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "sample": 4,
+        "phase": "after",
+        "wall_seconds": 0.008775833000000066,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 125447,
+        "owner_mean_ns": 106828,
+        "plain_max_ns": 380833,
+        "owner_max_ns": 156083,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "sample": 5,
+        "phase": "after",
+        "wall_seconds": 0.008624541999999735,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 131770,
+        "owner_mean_ns": 93489,
+        "plain_max_ns": 417000,
+        "owner_max_ns": 125333,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "sample": 5,
+        "phase": "before",
+        "wall_seconds": 0.008193250000000152,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 127250,
+        "owner_mean_ns": 91895,
+        "plain_max_ns": 483417,
+        "owner_max_ns": 127125,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "sample": 6,
+        "phase": "before",
+        "wall_seconds": 0.00821883300000037,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 116328,
+        "owner_mean_ns": 86927,
+        "plain_max_ns": 392417,
+        "owner_max_ns": 117375,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "sample": 6,
+        "phase": "after",
+        "wall_seconds": 0.008611166000000114,
+        "case": "worker-vfork-release",
+        "rounds": 8,
+        "plain_mean_ns": 137046,
+        "owner_mean_ns": 108208,
+        "plain_max_ns": 437625,
+        "owner_max_ns": 124000,
+        "passed": true
+      }
+    ]
+  },
+  "benchmark_medians": [
+    {
+      "cpus": 1,
+      "before_ms": 14.907625,
+      "after_ms": 15.059834,
+      "change_percent": 1.0210144137647648
+    },
+    {
+      "cpus": 4,
+      "before_ms": 30.299542,
+      "after_ms": 30.106583,
+      "change_percent": -0.6368380089705639
+    },
+    {
+      "cpus": 12,
+      "before_ms": 30.085542,
+      "after_ms": 30.067084,
+      "change_percent": -0.0613517283484466
+    }
+  ],
+  "metrics": {
+    "1": {
+      "before": {
+        "execution paths": {
+          "cohort_rounds": 0,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 2564,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 0,
+          "worker_uring_syscalls": 0
+        },
+        "metrics": {
+          "syscalls": 2564,
+          "context_switches": 1988,
+          "hardware_mapped_bytes": 65536,
+          "guest_resident_bytes": 65536,
+          "vm_checkpoint_groups": 0,
+          "vm_checkpoint_spaces": 0,
+          "backing_domain_checks": 0,
+          "backing_page_checks": 0,
+          "parallel_memory_us": 0,
+          "instruction_count": null
+        },
+        "cohort_return_syscalls": "[]"
+      },
+      "after": {
+        "execution paths": {
+          "cohort_rounds": 0,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 2564,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 0,
+          "worker_uring_syscalls": 0
+        },
+        "metrics": {
+          "syscalls": 2564,
+          "context_switches": 1988,
+          "hardware_mapped_bytes": 65536,
+          "guest_resident_bytes": 65536,
+          "vm_checkpoint_groups": 0,
+          "vm_checkpoint_spaces": 0,
+          "backing_domain_checks": 0,
+          "backing_page_checks": 0,
+          "parallel_memory_us": 0,
+          "instruction_count": null
+        },
+        "cohort_return_syscalls": "[]"
+      }
+    },
+    "4": {
+      "before": {
+        "execution paths": {
+          "cohort_rounds": 256,
+          "cohort_stop_us": 32,
+          "service_caller_wait_us": 795,
+          "service_requests": 192,
+          "serviced_syscalls": 192,
+          "syscalls": 2116,
+          "vm_local_syscalls": 128,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 128,
+          "worker_futex_wakes": 128,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 1152,
+          "worker_task_resumes": 192,
+          "worker_uring_syscalls": 0
+        },
+        "metrics": {
+          "syscalls": 2116,
+          "context_switches": 1092,
+          "hardware_mapped_bytes": 65536,
+          "guest_resident_bytes": 65536,
+          "vm_checkpoint_groups": 0,
+          "vm_checkpoint_spaces": 0,
+          "backing_domain_checks": 0,
+          "backing_page_checks": 0,
+          "parallel_memory_us": 882,
+          "instruction_count": null
+        },
+        "cohort_return_syscalls": "[(93, 128), (220, 128)]"
+      },
+      "after": {
+        "execution paths": {
+          "cohort_rounds": 256,
+          "cohort_stop_us": 55,
+          "service_caller_wait_us": 582,
+          "service_requests": 192,
+          "serviced_syscalls": 192,
+          "syscalls": 1988,
+          "vm_local_syscalls": 128,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 128,
+          "worker_futex_wakes": 128,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 1534,
+          "worker_task_resumes": 320,
+          "worker_uring_syscalls": 0
+        },
+        "metrics": {
+          "syscalls": 1988,
+          "context_switches": 838,
+          "hardware_mapped_bytes": 65536,
+          "guest_resident_bytes": 65536,
+          "vm_checkpoint_groups": 0,
+          "vm_checkpoint_spaces": 0,
+          "backing_domain_checks": 0,
+          "backing_page_checks": 0,
+          "parallel_memory_us": 818,
+          "instruction_count": null
+        },
+        "cohort_return_syscalls": "[(220, 255), (29, 1)]"
+      }
+    },
+    "12": {
+      "before": {
+        "execution paths": {
+          "cohort_rounds": 256,
+          "cohort_stop_us": 51,
+          "service_caller_wait_us": 753,
+          "service_requests": 192,
+          "serviced_syscalls": 192,
+          "syscalls": 2116,
+          "vm_local_syscalls": 128,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 128,
+          "worker_futex_wakes": 128,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 1152,
+          "worker_task_resumes": 192,
+          "worker_uring_syscalls": 0
+        },
+        "metrics": {
+          "syscalls": 2116,
+          "context_switches": 1092,
+          "hardware_mapped_bytes": 65536,
+          "guest_resident_bytes": 65536,
+          "vm_checkpoint_groups": 0,
+          "vm_checkpoint_spaces": 0,
+          "backing_domain_checks": 0,
+          "backing_page_checks": 0,
+          "parallel_memory_us": 866,
+          "instruction_count": null
+        },
+        "cohort_return_syscalls": "[(93, 128), (220, 128)]"
+      },
+      "after": {
+        "execution paths": {
+          "cohort_rounds": 256,
+          "cohort_stop_us": 49,
+          "service_caller_wait_us": 617,
+          "service_requests": 192,
+          "serviced_syscalls": 192,
+          "syscalls": 1989,
+          "vm_local_syscalls": 128,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 129,
+          "worker_futex_wakes": 128,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 1535,
+          "worker_task_resumes": 321,
+          "worker_uring_syscalls": 0
+        },
+        "metrics": {
+          "syscalls": 1989,
+          "context_switches": 840,
+          "hardware_mapped_bytes": 65536,
+          "guest_resident_bytes": 65536,
+          "vm_checkpoint_groups": 0,
+          "vm_checkpoint_spaces": 0,
+          "backing_domain_checks": 0,
+          "backing_page_checks": 0,
+          "parallel_memory_us": 840,
+          "instruction_count": null
+        },
+        "cohort_return_syscalls": "[(220, 255), (29, 1)]"
+      }
+    }
+  },
+  "benchmark_interpretation": "No material 128-group throughput gain: structural fork/clone still joins the cohort, replacing the removed exit stops. 12-CPU scheduling switches fall from 1092 to 840, but cohort rounds remain 256. Multicore vfork return means increase by about 8\u201315 microseconds; source liveness does not imply lower latency. Measurements use the candidate before only source-comment/revision-pin changes; final installed binary is identified separately. Native Linux reference reuses unchanged ELF results; it is not native macOS equivalence.",
+  "installed": {
+    "runtime_revision": "c05a7e915a91344597efb34373fea8b427e013a0",
+    "installed_dev": {
+      "path": "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+      "sha256": "0ec44437330594b4f331de72d8495851e0cd5963944f6fca9e4d7cdeba287771",
+      "version": "Trames Dev 1.5.3 (dev) runtime c05a7e915a91344597efb34373fea8b427e013a0"
+    },
+    "stable": {
+      "path": "/Users/main/Applications/Trames.app/Contents/MacOS/trames-mac-run",
+      "sha256": "4f40615213e731b2a4ef9d8c6a0e85c5c7bdf31ab0c60b0354b55113f2a6a55d",
+      "unchanged": true
+    },
+    "business_environment_restarted": false,
+    "physical_ipad_test": false
+  },
+  "pinned_package": {
+    "runtime_revision": "c05a7e915a91344597efb34373fea8b427e013a0",
+    "binary_sha256": "0ec44437330594b4f331de72d8495851e0cd5963944f6fca9e4d7cdeba287771",
+    "checks": [
+      {
+        "case": "version",
+        "returncode": 0
+      },
+      {
+        "case": "completion",
+        "returncode": 0
+      },
+      {
+        "case": "vfork",
+        "returncode": 0
+      }
+    ]
+  },
+  "remaining_boundaries": [
+    "Structural clone/fork/vfork creation and exec/execveat",
+    "Tracing and non-ALLOW seccomp task-policy effects",
+    "Actual excluded owner controls and legacy unadmitted waiter adoption",
+    "Structural mapping/backing changes and exceptional native checkpoints",
+    "Owner-local Rc destruction through asynchronous completion; robust-futex owner-death support is not added"
+  ],
+  "logs_sha256": {
+    "shadow-tests.log": "d680b9b4eca76c5693f0777772d21adb17974ee1e8ad9b9ccaa2f8a25e1bc1d3",
+    "mm-retirement.log": "7ec4082bc8c8c030076a481f3f483bc3e0a0612884f495f5c2f18e156cc68edc",
+    "source-completion-matrix.log": "707e67731c2b7081e3cd3cdfa706fb4915e85ce8eb26836c9d3e74abe03cba5e",
+    "dirty-journal-negative.log": "af640fd3da46f01ef717643dfb064f0cacd8a89fca87a1eb08e0f6f539a7ed6c",
+    "clippy-core.log": "ecf028f663d5590dc198bceea2507218483cb8fba40c486c8dadc94a96c496cd",
+    "clippy-session.log": "18d657673823e3947123ed3e61fecba2e386f156c4bbbc0a57ceb8fc0a5a07eb",
+    "vfs-tests.log": "f26d9bd31e0e99bb58c935f3216a57fb90147f8089ca79f907476b2f62c02769",
+    "ipad-check.log": "896c056a5f7099e765caa70b7ff0b3bd9c70c092f512fb080ab41b4fa2236b66",
+    "mac-final-build.log": "8ff6bc135c6306c82da1f686121460f5af0bc24b03e4aae5c78746942f226d8d",
+    "cli-build.log": "63a45f818116328d3e11559643bb754fc6067fdd015c4edea4ad00f686f1bc61",
+    "functional-acceptance.log": "5f6bd6c818517a9041d6e03d888e42db388b938e2e9070b11137950d9405bc62",
+    "pinned-version.log": "d76dd5be5a5ec1e43930356c9032f0246f981b8d88fa9bb2dca40ae9d0b83ec2",
+    "pinned-completion.log": "f8bc7ec6629cfcb7c2d1ed994dcb2f90f5943588252231a6de76b50dd2ec163b",
+    "pinned-vfork.log": "c41d136bbf2bb5e4f028734fbfcdf930f8fcd90c761d4973e3d8d347f65c9e8c"
+  },
+  "native_linux_logs_sha256": {
+    "process-exit-linux-tests.log": "c49de244a55628f930d4c33d195ad1e0f05a354987c16234a24980317a75db88",
+    "process-exit-linux-vfs.log": "36abb8f5fdf22699908ee817c3718b6c69d5ab518f073d0acc0d52592070731c"
+  }
+}
