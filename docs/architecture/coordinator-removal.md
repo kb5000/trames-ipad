@@ -2,13 +2,13 @@
 
 ## Current status — 2026-11-05
 
-The latest batch is [original process families](#45-original-process-families-and-parent-completion-2026-11-05).
-Original child waits, signal control, cgroup resources and non-last thread exits
-already execute on their source workers. Parent/subreaper queries now use the
-actual process-family object; adoption and completion notifications share its
-original graph. Mac HVF and the iPad interpreter share this implementation.
-Final process/mm/native teardown still needs its actual dependency migration.
-Stable 1.5.3 and the running business environment remain separate from Dev.
+The latest batch is [original native mm ownership and completion retirement](#46-original-native-mm-ownership-and-completion-retirement-2026-11-05).
+Original child waits, signal/cgroup controls, non-last thread exits and parent/
+subreaper queries already have source paths. GPU/video/audio roots now follow
+actual mm references; native completion retires pending work without an owner
+poll. Mac and iPad share this implementation. Final process/CPU/Memory custody
+and actual owner controls remain open. Stable 1.5.3 and business environments
+remain separate from Dev.
 
 The [consolidated runtime audit](../../runtime/docs/architecture/coordination-boundaries.md)
 is the current source inventory, including actual admission and fallback gates.
@@ -3412,3 +3412,66 @@ including an already exited leader with live peers. Its regression fails against
 the per-thread projection loop and passes with the full original-group path.
 The native full namespace fixture's preexisting negative ioprio expectation
 difference remains recorded in stage 44; no native full-fixture pass is claimed.
+
+## 46. Original native mm ownership and completion retirement (2026-11-05)
+
+GPU, video and audio roots now follow the actual shared address space. Real
+CLONE_VM tasks count once each; worker snapshots retain a capability, not another
+live task. Fork isolates native contexts, exec replaces the original mm reference,
+and source/owner exits retire the same reference once. Weak context caches keep
+ordinary lookups out of the mm membership mutex. Captured source native bodies
+keep their existing context/stream leases and gain no new lock or permission test.
+
+The Kernel's three native lifetime maps, native-liveness ProcessMap scans and
+abandoned-GPU drive-loop poll are removed. Pending compilation and final GPU work
+retain their original context until existing completion events arrive. Busy
+context callbacks return to their existing unlock notification, rather than
+blocking a driver callback or headless work. The event handshake rearms repeated
+signals and publishes its own context unlock; it creates no service thread, bus,
+guest-memory fence or new unsafe declaration.
+
+Two guarded regressions distinguish this from moving an owner request: a headless
+program finishes while a different native context is locked, and final release
+returns while two native jobs remain gated. Restoring owner polling or disabling
+completion retirement makes the corresponding test fail. Additional cases cover
+actual fork/CLONE_VM composition, stale source exit capabilities, concurrent last
+reference release, accepted native leases and destructor reentry after unlocking.
+
+The last process/group entry and final CPU/Memory custody remain open. Actual
+native idle/destruction remains its original algorithm; non-notifying GPU
+backends and native audio/decoder stop APIs retain their real driver behavior.
+There is no claim that the full exit chain has become source-only.
+
+[Source-bound acceptance and regression controls](../validation/native-space-20261105.json)
+· [Shared boundary contract](../../runtime/docs/architecture/coordination-boundaries.md#original-native-address-space-lifetime-and-completion-retirement-2026-11-05).
+
+
+Apple and native ARM Linux each pass **309** process cases (three ignored) and
+**61** Vulkan and **15** shared-resource cases; audio unit coverage also passes. Strict affected
+checks, formatting and the physical-iPad FFI target compile pass. Fresh acceptance
+runs real GPU/device and video controls on one/four/twelve HVF CPUs, parent death,
+fork/exec, namespace teardown and clear_tid on both executors. Hardware H.264,
+export-before-sync, fork/SCM_RIGHTS and native Vulkan plane pixel comparison pass.
+Thirty normal-preemption Go GC starts and eight isolated twelve-CPU Docker
+lifecycle rounds pass. No new physical-iPad or real microphone test is claimed.
+
+Seven counterbalanced pairs retain the existing control workload and a concurrent
+CPU peer. These measure ordinary throughput as a regression control; pending-
+compilation exit is proved by gated regressions rather than represented as a GPU
+throughput improvement. All builds and the native Linux test VM are stopped
+before timing. The native macOS reference uses the unchanged native control
+artifact from stage 31 with seven fresh samples. Native Linux has no comparable
+GPU in this local instance; video surface metadata has no equivalent native API.
+
+| Workload | CPUs | Previous | Current | Native macOS |
+| --- | ---: | ---: | ---: | ---: |
+| 20 GPU device cycles | 1 | 25.048 ms | 25.096 ms | 12.689 ms |
+| 20 GPU device cycles | 4 | 13.236 ms | 13.246 ms | 12.689 ms |
+| 20 GPU device cycles | 12 | 13.370 ms | 13.368 ms | 12.689 ms |
+| 2,000 video surface pairs | 1 | 255.573 ms | 255.549 ms | — |
+| 2,000 video surface pairs | 4 | 4.012 ms | 3.984 ms | — |
+| 2,000 video surface pairs | 12 | 4.048 ms | 4.000 ms | — |
+
+Ordinary throughput is essentially unchanged. The mechanism removes blocking
+owner polling and slow-job lifetime coupling, rather than claiming faster GPU
+driver execution. Existing CPU/ABI/VFS acceptance is reused where unchanged.

@@ -1,0 +1,1417 @@
+{
+  "schema": 1,
+  "date": "2026-11-05",
+  "runtime_revision": "28c941b294e336c26d19cdbbf3add839583adb25",
+  "baseline_runtime_revision": "464b8ed091feda2ee5231290920cc54898b86490",
+  "scope": "Original per-mm native GPU/video/audio roots and completion-owned canceled/final GPU work; final task/CPU/Memory entry remains owned",
+  "source_files": {
+    "crates/trames-audio/src/lib.rs": "02dd8b0b5ca16930a681bab32c8cba10df8b7bf279f0f7dc34b0b7f22715114b",
+    "crates/trames-session/src/lib.rs": "12b0b4171ff359c69e9705ef4c1ff50e1e4de1bf069ac9bf5bb5ae9c26c487b5",
+    "crates/trames-session/src/process.rs": "fd36417f9cc8e7b355dcfda39fd5a1ffd312ec697971a182079fbb2009a83057",
+    "crates/trames-session/src/process_seccomp.rs": "27c8bade24e5de003f20c1fa224c05c9f531186a7d6d64487046226c5f584200",
+    "crates/trames-session/src/process_service.rs": "92606d6219959b141f103a22b09f5f6135c8754a723097655983bc26004bdbe6",
+    "crates/trames-session/src/space.rs": "0d05c8785cc6854ceb34c1e3fac985c35d134fe3d7b65956ad10c2c38730f587",
+    "crates/trames-session/src/worker_syscalls.rs": "54d322d938996c64a81ee20466fe2cfb80ef6358385eff85f4dc0a011fe78230",
+    "crates/trames-session/src/workers.rs": "aaca66677316fc8e4af917165149de7eb37b2629698ececb7522e01782332d30",
+    "crates/trames-session/src/workers_uring_tests.rs": "1a5329adbddc4c799cd9b044b0ae0ab88bec6a16f7225818d61185ebc2027142",
+    "crates/trames-shared/src/readiness.rs": "2c02f62f674ffae29963e47bb0e9653da3776b2f3081a598f416022b873d4ba2",
+    "crates/trames-video/src/lib.rs": "38d06ed7baccdb70f8e13909369d8fee9db239eb76e20aeb824f92e61dbdef71",
+    "crates/trames-vulkan/src/backend.rs": "eef4f522983b49399d6982858e8793a9cfe1bd64f5da8c432c0beaad58e6388b",
+    "crates/trames-vulkan/src/backend/completion.rs": "a61c4ccd0be514c6ba30e57601a868d9d4f509b513faa0173528c34b90c43bb4",
+    "crates/trames-vulkan/src/context.rs": "5195d19990f739e0c1a03ba90ba068e392cc129324438f5140e5dc4995a9862d",
+    "crates/trames-vulkan/src/context/retirement.rs": "e3db7edf3992cdc6a0132c1d654c47411b7ff83e46142a0f2195adc4150148b6",
+    "crates/trames-vulkan/src/lib.rs": "1fa01244885be08155ec2e9eaa86cd53b2be36c8527e099c5fc8dcc1cd9b8171",
+    "docs/architecture/coordination-boundaries.md": "4f2ae5e130ff8a4b2d9a83e7827fa61b216807a5129397e23c0a9b9b23de738c"
+  },
+  "changes": [
+    "Actual CLONE_VM tasks acquire one native mm reference; captured/cloned capabilities retain the same task. Source and owner exit use the same idempotent retirement.",
+    "Fork isolates native spaces; successful exec replaces its task reference without discarding other real shared-mm users; failed exec preserves it.",
+    "Final native roots are taken under mm membership synchronization and dropped after unlocking. Accepted native leases keep their original resources. Weak caches avoid mm membership locks on initialized lookups.",
+    "Kernel native lifetime maps, ProcessMap native-liveness scans and owner drive-loop abandoned GPU polling are removed. Group exit/exec abandon removed threads original GPU jobs.",
+    "Existing native completion/availability notifications retain and retire pending GPU graphs. Busy callbacks return rather than block. Actual notifications are coalesced/rearmed; reaper unlock wakes normal callers while excluding its own listener.",
+    "An unlock also handles completion already consumed by another native caller, avoiding a retained cycle without depending on another completion event."
+  ],
+  "concurrency": {
+    "new_resource_or_service_thread": false,
+    "new_polling_bus": false,
+    "new_production_unsafe": false,
+    "new_ordinary_guest_memory_barrier": false,
+    "new_native_permission_model": false,
+    "ordinary_native_locking": "Source calls keep captured original context/stream leases; initialized cache hits bypass mm membership mutex. Existing private Vulkan graph mutex is retained.",
+    "notification_sync": "Release/acquire only for actual callback notification state; task reference scalars use relaxed atomics. Contention returns until actual unlock, not a busy retry.",
+    "lifetime_safety": "Existing OwnedBackend isolated Rc envelope remains under its original mutex. Callbacks retain no guest View or page borrow. Temporary native graph keepalive is broken after both resource locks release."
+  },
+  "mechanism_regressions": [
+    {
+      "case": "Final mm release while two real native task workers remain gated",
+      "green": "backend::completion::retirement_tests::final_mm_release_returns_before_two_native_jobs_and_each_completion_releases_its_graph",
+      "red": "Disabling Context retirement causes the test to wait for unfinished native work; harness releases both gates before failing.",
+      "red_log_sha256": "75fa0db9e5664c3cee8b50865f6bcf78cdea549b306aaa50973f7a949a0f7775"
+    },
+    {
+      "case": "Unrelated headless process while another native context lease is held",
+      "green": "process::tests::unrelated_headless_execution_does_not_wait_for_a_busy_native_address_space",
+      "red": "Reintroducing the old owner polling mechanism on current original contexts prevents the headless program from finishing before lease release; this is an injected old mechanism, not an unmodified published binary.",
+      "red_log_sha256": "60446a123c9b377b4ddbf9f2c31df0530a459a2e5d5abe77dccb83ed038b89f0"
+    },
+    {
+      "case": "Busy context callbacks and repeated completion/unlock races",
+      "green": "30 guarded races; callback returns while leased, then original unlock/completion retires graph without owner polling"
+    },
+    {
+      "case": "Another native caller consumed completion before unlock",
+      "green": "Task completion observed through original task readiness without aggregate delivery; subsequent native unlock releases the graph"
+    },
+    {
+      "case": "Real source exit and stale capability",
+      "green": "Existing worker exit matrix now checks original native root retirement before owner projection collection, including excluded controls and legacy wait behavior"
+    },
+    {
+      "case": "Mm members, accepted leases and original cache",
+      "green": "Concurrent original owners release once; late capabilities cannot recreate resources; destructor reentry occurs unlocked; normal cache hit completes while membership mutex is held"
+    }
+  ],
+  "validation": {
+    "platforms": {
+      "apple": {
+        "process_passed": 309,
+        "process_ignored": 3,
+        "vulkan_passed": 61,
+        "shared_passed": 15,
+        "audio_unit_passed": 1,
+        "log_sha256": "d9b189d607755e1cbb30035fe2975d5a3eabc5b743632e78d724a9533456327a"
+      },
+      "native_arm_linux": {
+        "process_passed": 309,
+        "process_ignored": 3,
+        "vulkan_passed": 61,
+        "shared_passed": 15,
+        "audio_unit_passed": 1,
+        "log_sha256": "dd3c77e7a1e3f60a627e37cd611e026a55b78d3937f1da92ed80d3de1c9ef270"
+      }
+    },
+    "strict_affected_clippy": true,
+    "affected_formatting": true,
+    "ipad_ffi": "aarch64-apple-ios compile passed; no physical iPad execution claimed",
+    "initial_cross_executor_cases": [
+      {
+        "case": "hvf-gpu-1",
+        "returncode": 0,
+        "seconds": 0.609124792
+      },
+      {
+        "case": "hvf-video-1",
+        "returncode": 0,
+        "seconds": 0.31869770799999997
+      },
+      {
+        "case": "hvf-pdeathsig-1",
+        "returncode": 0,
+        "seconds": 0.011421750000000008
+      },
+      {
+        "case": "hvf-pid-namespaces-1",
+        "returncode": 0,
+        "seconds": 0.023789791999999976
+      },
+      {
+        "case": "hvf-resources-1",
+        "returncode": 0,
+        "seconds": 0.011402208999999996
+      },
+      {
+        "case": "hvf-gpu-4",
+        "returncode": 0,
+        "seconds": 0.046630290999999935
+      },
+      {
+        "case": "hvf-video-4",
+        "returncode": 0,
+        "seconds": 0.021527083000000058
+      },
+      {
+        "case": "hvf-pdeathsig-4",
+        "returncode": 0,
+        "seconds": 0.011850625000000115
+      },
+      {
+        "case": "hvf-pid-namespaces-4",
+        "returncode": 0,
+        "seconds": 0.04242116700000009
+      },
+      {
+        "case": "hvf-resources-4",
+        "returncode": 0,
+        "seconds": 0.011801541000000082
+      },
+      {
+        "case": "hvf-gpu-12",
+        "returncode": 0,
+        "seconds": 0.047375583
+      },
+      {
+        "case": "hvf-video-12",
+        "returncode": 0,
+        "seconds": 0.011974417000000015
+      },
+      {
+        "case": "hvf-pdeathsig-12",
+        "returncode": 0,
+        "seconds": 0.011020999999999948
+      },
+      {
+        "case": "hvf-pid-namespaces-12",
+        "returncode": 0,
+        "seconds": 0.042945749999999894
+      },
+      {
+        "case": "hvf-resources-12",
+        "returncode": 0,
+        "seconds": 0.01180150000000002
+      },
+      {
+        "case": "interpreter-pdeathsig-1",
+        "returncode": 0,
+        "seconds": 0.744888625
+      },
+      {
+        "case": "interpreter-pid-namespaces-1",
+        "returncode": 0,
+        "seconds": 0.049662500000000165
+      },
+      {
+        "case": "interpreter-resources-1",
+        "returncode": 0,
+        "seconds": 0.013672374999999626
+      },
+      {
+        "case": "interpreter-pdeathsig-4",
+        "returncode": 0,
+        "seconds": 0.012857958000000114
+      },
+      {
+        "case": "interpreter-pid-namespaces-4",
+        "returncode": 0,
+        "seconds": 0.046353458000000014
+      },
+      {
+        "case": "interpreter-resources-4",
+        "returncode": 0,
+        "seconds": 0.01214979199999977
+      },
+      {
+        "case": "vaapi-native",
+        "returncode": 0,
+        "seconds": 1.9073553750000003
+      }
+    ],
+    "after_final_notification_correction": [
+      {
+        "mode": "gpu",
+        "cpus": 1,
+        "returncode": 0,
+        "seconds": 0.20045733300000002
+      },
+      {
+        "mode": "video",
+        "cpus": 1,
+        "returncode": 0,
+        "seconds": 0.262805541
+      },
+      {
+        "mode": "gpu",
+        "cpus": 4,
+        "returncode": 0,
+        "seconds": 0.030785957999999947
+      },
+      {
+        "mode": "video",
+        "cpus": 4,
+        "returncode": 0,
+        "seconds": 0.011566625000000053
+      },
+      {
+        "mode": "gpu",
+        "cpus": 12,
+        "returncode": 0,
+        "seconds": 0.03138883299999995
+      },
+      {
+        "mode": "video",
+        "cpus": 12,
+        "returncode": 0,
+        "seconds": 0.01073533399999993
+      }
+    ],
+    "final_h264_interoperation": {
+      "passed": true,
+      "returncode": 0,
+      "sha256": {
+        "check": "92bf81dcd8eddb46c827e9ab004045839f6409da11d6acd28a71248824e68118",
+        "ld-musl-aarch64.so.1": "42fb025bc758b76e60e7b3b0fcdcfab93b6ba1694b363244c2e8e6f51847e28c",
+        "libEGL.so.1": "567feb56db01fb475f2a114182d746ae56be6a615be9ae4c373f196168ba6e4c",
+        "libGLESv2.so.2": "1be4cbcf9ccb483a0135f5af76644f6fd7aa894ca4b39dac09857176b1d4dce7",
+        "libLLVM.so.20.1": "1a80aa18733cd9579b43a61a5848c6d05a0c84fa6cfeffb464cb9aa1a817971a",
+        "libSPIRV-Tools.so": "9978afd1907cdcf857ad6e875547921eef9dba63582cf2b5b7361a374b6e6cbd",
+        "libSvtAv1Enc.so.2": "332b429da9ef607f2a73f4f7feb450f38f700db22d74e37c910f8f16a9cccc29",
+        "libX11-xcb.so.1": "ebdb66a7bd5e2eba10663b395cfea22b656f5ca86dcef605b1142c9ed0aa8ec4",
+        "libX11.so.6": "adba92fc1c990fddba0fceaa249c6d0c7a24908ab8ac9e5cba7daede9c6a6dd1",
+        "libXau.so.6": "541039f77baf79bff82c859dbecb41d046fe1c13b172392160312cc2d39f5a52",
+        "libXdmcp.so.6": "f79259348abadc0b32ae61fef7032ac7afcd3c1319b0095c190bdc1394c483ad",
+        "libXext.so.6": "9ebd0896513279794d5ba6f86566581a0683c1e49e79d74e2efc2fa958457c88",
+        "libXfixes.so.3": "2da0ee289779003ce4381806d47f207398b3cd04996b7d8d5ed60c833f8296a4",
+        "libaom.so.3": "3229f3e3478583fab36252376569534605e2d75efd0c2236426dd4f8c3a96ab5",
+        "libavcodec.so.60": "f2df65ffb1d8a9a3d4656d89cdbe7bf112abea442844cb07effd32b003b9671b",
+        "libavformat.so.60": "79ed2ccaaac785cd4fd7c12a5ca42fc2fbad1a670d26074d1d9b698aeb323fae",
+        "libavutil.so.58": "fddc6b53fa004fabc701c99ae6208bf7da7e12e4bf4ad525583f5143c3d91e6a",
+        "libbluray.so.2": "c0487392906e183f9f004582fee0b0448586d92512e16c534db4fbc830d14f81",
+        "libbrotlicommon.so.1": "abdf1f7c44fabb16ca538c8650290f4cdc0727884f12c3bd713d8a16dc5a805f",
+        "libbrotlidec.so.1": "ea9b5fe7e7ec9943a4331bee7d5b41fdface6a8e2398101821dc51e98a1c1c9c",
+        "libbrotlienc.so.1": "d927d06c4a9a49f32cf7765f9b56526e24fa2361152fe2754d49075a77d40872",
+        "libbsd.so.0": "6304e54559e94174d59cd30f3f2876f6269f329bf7034952f94573ac49038d02",
+        "libbz2.so.1": "c1360c1241bc5dff6ad1d62b1b39f848afefb202e9f439504db8cda684789a10",
+        "libcjson.so.1": "911fdbdec7222a1e9e094720c08383110ff8496c5a9115ced76e935988db11de",
+        "libcrypto.so.3": "911da5b5135cec3a520d294e56aefae5d753c9e1ed45aeabe8093d3ba986c284",
+        "libdav1d.so.7": "df05a1a20eba22e1286268df46a1c57b46b9a9dc725da42ef6f309871f2dc85e",
+        "libdrm.so.2": "a6f7b31feec2b1a28b0e88827c215bd7828db0fe7b86e44ae1a9558fff1b3ebd",
+        "libdrm_amdgpu.so.1": "32e262eaae832f29deebce8aee6bf563fc901f1a337d280300c2637f137dc2cd",
+        "libelf.so.1": "ba5fcfee734c258c3ba5b666e6967bca47ba2ca63c6373cf439a617794c089bb",
+        "libexpat.so.1": "51237d47a0a25c1a938398d26a21ba9e708ac647aebc5d38ddf5366a9a20f6f2",
+        "libffi.so.8": "9e9631cbbd1e9f1de646dccbfe6357dabb085c07bf4eb0b870dba887a1f11053",
+        "libgallium-25.1.9.so": "f968e6d3c009d9e0722a6a8463fea3199205745b1aacd8089dc5bb300bc34cc9",
+        "libgbm.so.1": "b2016afc92ff8681136e06f96d6b976d6a93f968299c5e4746786eb79aacbbf6",
+        "libgcc_s.so.1": "2d945d6ce360769b41fbffc652c2440014bbd69416f13fe206fbac19d32c9431",
+        "libgomp.so.1": "1ede7ee7f575f2f7cd32768930769d993d0283d7a87ca7b7d19d791570a14320",
+        "libhwy.so.1": "53e2c5498884009e08c0a9e88ce42b18a88448000cf152812dc23e7310735a7b",
+        "libjxl.so.0.10": "dd33445d24d6f86f382b21b993cb110545e475c9335258677cc5422cc20a96b6",
+        "libjxl_cms.so.0.10": "49710a3fe4e2bb5888f14b78d3056d18ae356575797d602817b2525262248b30",
+        "libjxl_threads.so.0.10": "ba65831dc3d61c73d0f769863cff43f2d494b41c9d021ef42e0a3a1bb82d950d",
+        "liblcms2.so.2": "11b958c675995a6c938f16c59fc7e0f66d87bbcc8fe68ddae1e6e203ca533341",
+        "liblzma.so.5": "684bf2cbc78ba9e8956818b02a07cc0c1f6ef1738bb0d6b2bf59a72d5aff0b94",
+        "libmbedcrypto.so.16": "fd5166802ef82dd9d8ff4b52f2de980eecec5180c3df7fbfb8a705015dc85423",
+        "libmd.so.0": "e6555b271864e03a0229410b971d4e62541775fef7b846ff64f162450043bc85",
+        "libmp3lame.so.0": "c959e807473ea8089b56c59553f6ca5e2bde773c8d17cf5f76b6fc7d648e2833",
+        "libmpg123.so.0": "ed51ff9212b8100d17ba865dcb102b1b39faeefae356c16c4152973bb285026d",
+        "libnuma.so.1": "7e31fa618ef75a625aaf0a8edc2edca6c3e3241186077c04798558295f68e185",
+        "libogg.so.0": "808f73b5a3d25f3f272a19056bdcb807e9d03c6afbc14bbb28e36ead2327141f",
+        "libopenmpt.so.0": "d6ace66b0ca780ab8a1abedd15fb43d854f08c69d3d094e0ee5750ce535cd39d",
+        "libopus.so.0": "0ba25c946e712e546b0cf7ab01ada3cd3bade90a77af06234bd37eea623efaa8",
+        "librav1e.so.0.7": "2c26f3731641f15119b431d7efe8550ebeb244422f32757963bc24ffc01688fe",
+        "librist.so.4": "ff2ff5744df4b147d9daeb8ec5994b6d3e445b03f87280967de9220b0484c4ce",
+        "libsharpyuv.so.0": "babcef2376deb66dadcb31bc153e52972089c2251b421f3ced4bd4058d12e35c",
+        "libsodium.so.26": "61cc35a08a847227e3848ecd6d4bf03af08e6a7c5930022e3bf8fa996caa361c",
+        "libsoxr.so.0": "ac339f92c877d6974c804abb2b3f3bee31bc6b73c5fe8b66460b1a7ef377ee1e",
+        "libsrt.so.1.5": "71554b9b3c375b0d203f4e7e07eefde9b5d58fb0fd35a302bfe4386f4bebeb42",
+        "libssh.so.4": "56e3d672a7024a7db54b6cfb532302b0d75eaafaa2977a920433a3fa4cc87681",
+        "libssl.so.3": "c2c68f2588b1c919d716d6bd998da35541e5f8ff415ad657f52ac4e8f61c929d",
+        "libstdc++.so.6": "85f2cd6db79578ab58be4d12b7df7482ebc003a37496c7544956d9157f8a2b3f",
+        "libswresample.so.4": "8ce4ed0f13f88610b18232b71d17589acbb2cecf66bc35ed1dc1d62d17a11911",
+        "libtheoradec.so.1": "beb0cc60bc5872b0a4a7b5b25f023f4fd8640a5a44b0d49789b6838a263c551b",
+        "libtheoraenc.so.1": "ccb7c4ef7fdcf1b71538d32e254d9d1f85328b47d3c852c09912b22dab534d74",
+        "libtrames_vulkan_icd.so": "ab472cf4f8ade5d0bab47a9242c13e7e50f67d087df0a9db05a15c0715552ebd",
+        "libva-drm.so.2": "69e5c0eb63e86480724652b0d65030d83b8aae96b146f860e167a84df0228d6d",
+        "libva-x11.so.2": "93a8502e9c3ef6c175bee89ad1d54c1e88b5797860b2848a967381d6c581605b",
+        "libva.so.2": "20cbb8bc83c93c72bdacdfcc183e4a3c4893956ae030e2026c3046af5cafb00f",
+        "libvdpau.so.1": "9867fb1be0b64c4fff51134be3575728fa2a1224b0da987c7f0b20e4e974afd2",
+        "libvorbis.so.0": "d2242b199a96ddb9c5541691d4b9d1048fefedf8a5754a7767eae4a0b545814c",
+        "libvorbisenc.so.2": "4999017c8b1093ff111fda21c9b97a69c4d7bf4e4eee521d09fc38d2ec42cd41",
+        "libvorbisfile.so.3": "3cd96432a3c0351230c65bfba5d50bedf210342a336a6157efb3bb51a148a6c8",
+        "libvpx.so.9": "46a42e812232b67e0118f82fde41938331eb473c03fb536c16fe42233d1dcc83",
+        "libvulkan.so.1": "382419ec9f138dd2a980fc988482a72b643c32901599b568a27fe7742946c752",
+        "libwayland-client.so.0": "b1a0f560b02802dcdac26811fcd726638590ae3af369d1367c1c3a1c1dc3c596",
+        "libwayland-server.so.0": "95e137b859ed8d98d76c38f6c7c90fbc899b43777bcee7f983ac0170051f9d65",
+        "libwebp.so.7": "adb7048aa7f7a63d7bf0ba2806a1d905a5a3d0aaa84790b36e515cd7ad8efdde",
+        "libwebpmux.so.3": "c8ea34468c5c5c2746b31cb671ea4a7fa419a0b461e9123d94ac112b855ce474",
+        "libx264.so.164": "87e40f7e90e125d4b7bc09a466679b8aa77f525606728a2e6609d26b3f0e7b14",
+        "libx265.so.209": "a59214787bbda5fd8caa96e34b98b3deced9d9ddf121a1b2b12ba6a7c883a0a6",
+        "libxcb-dri3.so.0": "719d3b552d4fa9a449e304792c2105bfb3dc9b06af834dbdc015f8295d904529",
+        "libxcb-present.so.0": "dbb4e4bc054f4d8c76829fb3e26fd28b0837e00a959782d0b85c21612a0e4c65",
+        "libxcb-randr.so.0": "9e8ea50bf477819df945d4320be1d90640840c582727b083ca7d9e308d50641c",
+        "libxcb-shm.so.0": "c81ab82b5c307c8b8e584b111d692c8e33297b29e493f2f6e26aa56c61d5f86d",
+        "libxcb-sync.so.1": "5e4c699c715e42c7f782f4e60886457e8fae0b238ffe5fadbe0405ca0a5eea98",
+        "libxcb-xfixes.so.0": "e4da99d415cc7b633b09083b1c8440c547e0940ee45694319c0da7677727beff",
+        "libxcb.so.1": "37b5950b0a216608ed5f9eb3e3c8244c6839aa7920901ee4ee2c663bc9ddfe4a",
+        "libxml2.so.2": "8f0ef3b255a82fa577bd59b102c8742accf4ee4847655c11297797d8b2295b7c",
+        "libxshmfence.so.1": "8d7b7132936a3c09ff1a3a84426bb7b2577e70cc43b694d4a63e41eacd1b69fd",
+        "libxvidcore.so.4": "3e690dd98fe8c2dfd6e38aa99560b32aa173d4d66f718d8b0259aa115566c1b1",
+        "libz.so.1": "1dfd2166dd6124fbd4cbba54ea3d5b2de60e308c252de39d1369e71d301ddea4",
+        "libzmq.so.5": "6d23680f3d55707b9eee7fcd98398d70e1ae84931c899a6416fb7b03b8820d41",
+        "libzstd.so.1": "0261e625d796007a4688f12b5bea20ca8af9d6767d645286501245a0f0187699",
+        "sample.h264": "9d0ac0fb2a9f3f51ac4d42b4d5980bf478e416ef1000a5dfd7fb6616eaaafb52",
+        "trames_drv_video.so": "406c3c1b304fbafb6cb9a325af22642641f5481d9e8e459d6d5c872dc0fbdc10"
+      },
+      "scope": "hardware H.264; export before sync; fork/SCM_RIGHTS; native GPU plane pixels",
+      "frontend": "Vulkan",
+      "denied_sysinfo": false
+    },
+    "pinned_binary": {
+      "version": "Trames Dev 1.5.3 (dev) runtime 28c941b294e336c26d19cdbbf3add839583adb25",
+      "cases": [
+        {
+          "mode": "gpu",
+          "cpus": 1,
+          "returncode": 0,
+          "seconds": 0.06590625
+        },
+        {
+          "mode": "video",
+          "cpus": 1,
+          "returncode": 0,
+          "seconds": 0.015081209000000012
+        },
+        {
+          "mode": "gpu",
+          "cpus": 4,
+          "returncode": 0,
+          "seconds": 0.03265908299999998
+        },
+        {
+          "mode": "video",
+          "cpus": 4,
+          "returncode": 0,
+          "seconds": 0.00781291700000003
+        },
+        {
+          "mode": "gpu",
+          "cpus": 12,
+          "returncode": 0,
+          "seconds": 0.03148795799999998
+        },
+        {
+          "mode": "video",
+          "cpus": 12,
+          "returncode": 0,
+          "seconds": 0.007679125000000009
+        }
+      ]
+    },
+    "integration": [
+      {
+        "case": "go-gc",
+        "returncode": 0,
+        "seconds": 2.469788708
+      },
+      {
+        "case": "docker",
+        "returncode": 0,
+        "seconds": 75.63832925000001
+      }
+    ],
+    "normal_go_async_preemption": true,
+    "go_gc_starts": 30,
+    "isolated_docker_lifecycle_rounds": 8,
+    "audio_io_limit": "No new real microphone/CoreAudio I/O test. Owner requested virtual verification; current audio unit and generic original-resource lifetime tests pass. Original native audio/decoder stop APIs are unchanged.",
+    "reuse": "Unchanged CPU/ABI/VFS acceptance is reused. Go/Docker results precede the final GPU-only notification correction, whose path these headless programs do not enter."
+  },
+  "benchmark": {
+    "binaries": {
+      "before": {
+        "path": "/Users/main/dev/trames/target/native-space/before-mac-run",
+        "sha256": "d74b416f2b7ac3345e151db87aa3df2a9d4fdc6bd5f01515f641f8fa7a6e549c"
+      },
+      "after": {
+        "path": "/Users/main/dev/trames-mac/target/release/Trames Dev.app/Contents/MacOS/trames-mac-run",
+        "sha256": "5820925f532de10fdd9350c0970a82910f2f945f2843c9bbcbb08055a1b7f411"
+      },
+      "native-macos": {
+        "path": "/Users/main/dev/trames/target/native-devices-bench-macos",
+        "sha256": "423df793c825a86711b2e25dd3c1cfd6829069e4deddd424eda62c736022ac4f"
+      }
+    },
+    "fixture_sha256": "c5ec636ddd01b095e697e381dc0d6c7c32dff6070893c3e8f10075b84cad1176",
+    "scope": "Unchanged real native GPU create/destroy and video metadata calls with a CPU peer. This is a throughput regression control, not a benchmark of pending-compilation exit latency.",
+    "samples": [
+      {
+        "phase": "before",
+        "cpus": 1,
+        "sample": 0,
+        "wall_seconds": 1.0834080419999998,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.025429125,
+        "peer_calls": 33621
+      },
+      {
+        "phase": "after",
+        "cpus": 1,
+        "sample": 0,
+        "wall_seconds": 0.053593082999999986,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.033289917,
+        "peer_calls": 36566
+      },
+      {
+        "phase": "after",
+        "cpus": 1,
+        "sample": 1,
+        "wall_seconds": 0.04550824999999992,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.025039291,
+        "peer_calls": 30834
+      },
+      {
+        "phase": "before",
+        "cpus": 1,
+        "sample": 1,
+        "wall_seconds": 0.04700191599999992,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.02755425,
+        "peer_calls": 36215
+      },
+      {
+        "phase": "before",
+        "cpus": 1,
+        "sample": 2,
+        "wall_seconds": 0.040804083000000047,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.02499875,
+        "peer_calls": 31595
+      },
+      {
+        "phase": "after",
+        "cpus": 1,
+        "sample": 2,
+        "wall_seconds": 0.043824166999999914,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.025096292,
+        "peer_calls": 31478
+      },
+      {
+        "phase": "after",
+        "cpus": 1,
+        "sample": 3,
+        "wall_seconds": 0.04549979199999998,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.025073542,
+        "peer_calls": 32121
+      },
+      {
+        "phase": "before",
+        "cpus": 1,
+        "sample": 3,
+        "wall_seconds": 0.04182283299999989,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.025171875,
+        "peer_calls": 31326
+      },
+      {
+        "phase": "before",
+        "cpus": 1,
+        "sample": 4,
+        "wall_seconds": 0.04193729199999985,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.024972583,
+        "peer_calls": 31896
+      },
+      {
+        "phase": "after",
+        "cpus": 1,
+        "sample": 4,
+        "wall_seconds": 0.043360833000000154,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.024722917,
+        "peer_calls": 31577
+      },
+      {
+        "phase": "after",
+        "cpus": 1,
+        "sample": 5,
+        "wall_seconds": 0.04396362499999995,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.025167542,
+        "peer_calls": 32001
+      },
+      {
+        "phase": "before",
+        "cpus": 1,
+        "sample": 5,
+        "wall_seconds": 0.04134079199999996,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.025047583,
+        "peer_calls": 32029
+      },
+      {
+        "phase": "before",
+        "cpus": 1,
+        "sample": 6,
+        "wall_seconds": 0.041504666999999884,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.024824209,
+        "peer_calls": 31999
+      },
+      {
+        "phase": "after",
+        "cpus": 1,
+        "sample": 6,
+        "wall_seconds": 0.04451324999999984,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.025111292,
+        "peer_calls": 31465
+      },
+      {
+        "phase": "before",
+        "cpus": 4,
+        "sample": 0,
+        "wall_seconds": 0.028361542000000073,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.013236167,
+        "peer_calls": 44832
+      },
+      {
+        "phase": "after",
+        "cpus": 4,
+        "sample": 0,
+        "wall_seconds": 0.03234075000000014,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.01292425,
+        "peer_calls": 49964
+      },
+      {
+        "phase": "after",
+        "cpus": 4,
+        "sample": 1,
+        "wall_seconds": 0.030987791999999903,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.013094292,
+        "peer_calls": 49419
+      },
+      {
+        "phase": "before",
+        "cpus": 4,
+        "sample": 1,
+        "wall_seconds": 0.028763582999999926,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.0132175,
+        "peer_calls": 45713
+      },
+      {
+        "phase": "before",
+        "cpus": 4,
+        "sample": 2,
+        "wall_seconds": 0.028652915999999973,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.012921709,
+        "peer_calls": 45790
+      },
+      {
+        "phase": "after",
+        "cpus": 4,
+        "sample": 2,
+        "wall_seconds": 0.030678874999999994,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.013246416,
+        "peer_calls": 49649
+      },
+      {
+        "phase": "after",
+        "cpus": 4,
+        "sample": 3,
+        "wall_seconds": 0.030752042000000035,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.013855375,
+        "peer_calls": 49583
+      },
+      {
+        "phase": "before",
+        "cpus": 4,
+        "sample": 3,
+        "wall_seconds": 0.029254749999999996,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.013990209,
+        "peer_calls": 46288
+      },
+      {
+        "phase": "before",
+        "cpus": 4,
+        "sample": 4,
+        "wall_seconds": 0.02882895800000007,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.013857625,
+        "peer_calls": 45978
+      },
+      {
+        "phase": "after",
+        "cpus": 4,
+        "sample": 4,
+        "wall_seconds": 0.03064870800000019,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.013707458,
+        "peer_calls": 48602
+      },
+      {
+        "phase": "after",
+        "cpus": 4,
+        "sample": 5,
+        "wall_seconds": 0.03056391700000005,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.013273917,
+        "peer_calls": 49640
+      },
+      {
+        "phase": "before",
+        "cpus": 4,
+        "sample": 5,
+        "wall_seconds": 0.028242249999999913,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.012953875,
+        "peer_calls": 44800
+      },
+      {
+        "phase": "before",
+        "cpus": 4,
+        "sample": 6,
+        "wall_seconds": 0.028544541000000034,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.013282125,
+        "peer_calls": 45546
+      },
+      {
+        "phase": "after",
+        "cpus": 4,
+        "sample": 6,
+        "wall_seconds": 0.03130733299999999,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.012821333,
+        "peer_calls": 50737
+      },
+      {
+        "phase": "before",
+        "cpus": 12,
+        "sample": 0,
+        "wall_seconds": 0.02896845800000003,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.013369791,
+        "peer_calls": 46221
+      },
+      {
+        "phase": "after",
+        "cpus": 12,
+        "sample": 0,
+        "wall_seconds": 0.03083658300000014,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.013579542,
+        "peer_calls": 49734
+      },
+      {
+        "phase": "after",
+        "cpus": 12,
+        "sample": 1,
+        "wall_seconds": 0.03032545899999972,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.013367917,
+        "peer_calls": 48690
+      },
+      {
+        "phase": "before",
+        "cpus": 12,
+        "sample": 1,
+        "wall_seconds": 0.02877520800000033,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.01395325,
+        "peer_calls": 46105
+      },
+      {
+        "phase": "before",
+        "cpus": 12,
+        "sample": 2,
+        "wall_seconds": 0.028006958000000193,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.013302791,
+        "peer_calls": 44567
+      },
+      {
+        "phase": "after",
+        "cpus": 12,
+        "sample": 2,
+        "wall_seconds": 0.030300416999999857,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.013300167,
+        "peer_calls": 48855
+      },
+      {
+        "phase": "after",
+        "cpus": 12,
+        "sample": 3,
+        "wall_seconds": 0.03062837500000004,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.013138709,
+        "peer_calls": 48970
+      },
+      {
+        "phase": "before",
+        "cpus": 12,
+        "sample": 3,
+        "wall_seconds": 0.02860358300000021,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.012984959,
+        "peer_calls": 45198
+      },
+      {
+        "phase": "before",
+        "cpus": 12,
+        "sample": 4,
+        "wall_seconds": 0.028573750000000064,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.013085167,
+        "peer_calls": 45518
+      },
+      {
+        "phase": "after",
+        "cpus": 12,
+        "sample": 4,
+        "wall_seconds": 0.030822333000000146,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.013269917,
+        "peer_calls": 49702
+      },
+      {
+        "phase": "after",
+        "cpus": 12,
+        "sample": 5,
+        "wall_seconds": 0.032482916000000195,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.014828084,
+        "peer_calls": 52199
+      },
+      {
+        "phase": "before",
+        "cpus": 12,
+        "sample": 5,
+        "wall_seconds": 0.029131458000000165,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.013739,
+        "peer_calls": 45988
+      },
+      {
+        "phase": "before",
+        "cpus": 12,
+        "sample": 6,
+        "wall_seconds": 0.028605082999999976,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.013881583,
+        "peer_calls": 45627
+      },
+      {
+        "phase": "after",
+        "cpus": 12,
+        "sample": 6,
+        "wall_seconds": 0.031297165999999876,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.013883792,
+        "peer_calls": 50379
+      },
+      {
+        "phase": "native-macos",
+        "cpus": null,
+        "sample": 0,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.012386,
+        "peer_calls": 56482
+      },
+      {
+        "phase": "native-macos",
+        "cpus": null,
+        "sample": 1,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.012031,
+        "peer_calls": 52049
+      },
+      {
+        "phase": "native-macos",
+        "cpus": null,
+        "sample": 2,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.012084,
+        "peer_calls": 51439
+      },
+      {
+        "phase": "native-macos",
+        "cpus": null,
+        "sample": 3,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.012689,
+        "peer_calls": 53362
+      },
+      {
+        "phase": "native-macos",
+        "cpus": null,
+        "sample": 4,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.013464,
+        "peer_calls": 54594
+      },
+      {
+        "phase": "native-macos",
+        "cpus": null,
+        "sample": 5,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.012751,
+        "peer_calls": 53118
+      },
+      {
+        "phase": "native-macos",
+        "cpus": null,
+        "sample": 6,
+        "mode": "gpu",
+        "operations": 20,
+        "seconds": 0.012969,
+        "peer_calls": 52083
+      },
+      {
+        "phase": "before",
+        "cpus": 1,
+        "sample": 0,
+        "wall_seconds": 0.26247529199999997,
+        "mode": "video",
+        "operations": 2000,
+        "seconds": 0.255668333,
+        "peer_calls": 569433
+      },
+      {
+        "phase": "after",
+        "cpus": 1,
+        "sample": 0,
+        "wall_seconds": 0.2625155829999999,
+        "mode": "video",
+        "operations": 2000,
+        "seconds": 0.25551475,
+        "peer_calls": 569406
+      },
+      {
+        "phase": "after",
+        "cpus": 1,
+        "sample": 1,
+        "wall_seconds": 0.2630656250000003,
+        "mode": "video",
+        "operations": 2000,
+        "seconds": 0.255629875,
+        "peer_calls": 568633
+      },
+      {
+        "phase": "before",
+        "cpus": 1,
+        "sample": 1,
+        "wall_seconds": 0.26231454099999985,
+        "mode": "video",
+        "operations": 2000,
+        "seconds": 0.255558792,
+        "peer_calls": 568678
+      },
+      {
+        "phase": "before",
+        "cpus": 1,
+        "sample": 2,
+        "wall_seconds": 0.2622058340000004,
+        "mode": "video",
+        "operations": 2000,
+        "seconds": 0.255552,
+        "peer_calls": 569682
+      },
+      {
+        "phase": "after",
+        "cpus": 1,
+        "sample": 2,
+        "wall_seconds": 0.2625442920000003,
+        "mode": "video",
+        "operations": 2000,
+        "seconds": 0.255586875,
+        "peer_calls": 569887
+      },
+      {
+        "phase": "after",
+        "cpus": 1,
+        "sample": 3,
+        "wall_seconds": 0.2630559579999998,
+        "mode": "video",
+        "operations": 2000,
+        "seconds": 0.25585375,
+        "peer_calls": 559716
+      },
+      {
+        "phase": "before",
+        "cpus": 1,
+        "sample": 3,
+        "wall_seconds": 0.26234787500000056,
+        "mode": "video",
+        "operations": 2000,
+        "seconds": 0.25561,
+        "peer_calls": 567462
+      },
+      {
+        "phase": "before",
+        "cpus": 1,
+        "sample": 4,
+        "wall_seconds": 0.262632333,
+        "mode": "video",
+        "operations": 2000,
+        "seconds": 0.255657583,
+        "peer_calls": 570563
+      },
+      {
+        "phase": "after",
+        "cpus": 1,
+        "sample": 4,
+        "wall_seconds": 0.2625742080000002,
+        "mode": "video",
+        "operations": 2000,
+        "seconds": 0.255472584,
+        "peer_calls": 572062
+      },
+      {
+        "phase": "after",
+        "cpus": 1,
+        "sample": 5,
+        "wall_seconds": 0.2627305,
+        "mode": "video",
+        "operations": 2000,
+        "seconds": 0.255549292,
+        "peer_calls": 569498
+      },
+      {
+        "phase": "before",
+        "cpus": 1,
+        "sample": 5,
+        "wall_seconds": 0.26244916699999976,
+        "mode": "video",
+        "operations": 2000,
+        "seconds": 0.255526625,
+        "peer_calls": 573324
+      },
+      {
+        "phase": "before",
+        "cpus": 1,
+        "sample": 6,
+        "wall_seconds": 0.26215674999999994,
+        "mode": "video",
+        "operations": 2000,
+        "seconds": 0.25557325,
+        "peer_calls": 573239
+      },
+      {
+        "phase": "after",
+        "cpus": 1,
+        "sample": 6,
+        "wall_seconds": 0.26230204199999996,
+        "mode": "video",
+        "operations": 2000,
+        "seconds": 0.255500542,
+        "peer_calls": 572874
+      },
+      {
+        "phase": "before",
+        "cpus": 4,
+        "sample": 0,
+        "wall_seconds": 0.010504500000000583,
+        "mode": "video",
+        "operations": 2000,
+        "seconds": 0.003981208,
+        "peer_calls": 8964
+      },
+      {
+        "phase": "after",
+        "cpus": 4,
+        "sample": 0,
+        "wall_seconds": 0.010463917000000045,
+        "mode": "video",
+        "operations": 2000,
+        "seconds": 0.003998291,
+        "peer_calls": 8864
+      },
+      {
+        "phase": "after",
+        "cpus": 4,
+        "sample": 1,
+        "wall_seconds": 0.010474584000000675,
+        "mode": "video",
+        "operations": 2000,
+        "seconds": 0.004010875,
+        "peer_calls": 8822
+      },
+      {
+        "phase": "before",
+        "cpus": 4,
+        "sample": 1,
+        "wall_seconds": 0.009886332999999858,
+        "mode": "video",
+        "operations": 2000,
+        "seconds": 0.004020709,
+        "peer_calls": 8746
+      },
+      {
+        "phase": "before",
+        "cpus": 4,
+        "sample": 2,
+        "wall_seconds": 0.009629415999999225,
+        "mode": "video",
+        "operations": 2000,
+        "seconds": 0.004112917,
+        "peer_calls": 8840
+      },
+      {
+        "phase": "after",
+        "cpus": 4,
+        "sample": 2,
+        "wall_seconds": 0.010765499999999761,
+        "mode": "video",
+        "operations": 2000,
+        "seconds": 0.003974666,
+        "peer_calls": 8998
+      },
+      {
+        "phase": "after",
+        "cpus": 4,
+        "sample": 3,
+        "wall_seconds": 0.009813665999999444,
+        "mode": "video",
+        "operations": 2000,
+        "seconds": 0.003947083,
+        "peer_calls": 8828
+      },
+      {
+        "phase": "before",
+        "cpus": 4,
+        "sample": 3,
+        "wall_seconds": 0.00981758300000024,
+        "mode": "video",
+        "operations": 2000,
+        "seconds": 0.004016417,
+        "peer_calls": 8910
+      },
+      {
+        "phase": "before",
+        "cpus": 4,
+        "sample": 4,
+        "wall_seconds": 0.009840415999999408,
+        "mode": "video",
+        "operations": 2000,
+        "seconds": 0.00401225,
+        "peer_calls": 8682
+      },
+      {
+        "phase": "after",
+        "cpus": 4,
+        "sample": 4,
+        "wall_seconds": 0.00989566700000033,
+        "mode": "video",
+        "operations": 2000,
+        "seconds": 0.00402,
+        "peer_calls": 8946
+      },
+      {
+        "phase": "after",
+        "cpus": 4,
+        "sample": 5,
+        "wall_seconds": 0.009476207999999708,
+        "mode": "video",
+        "operations": 2000,
+        "seconds": 0.003983833,
+        "peer_calls": 8907
+      },
+      {
+        "phase": "before",
+        "cpus": 4,
+        "sample": 5,
+        "wall_seconds": 0.009838250000000492,
+        "mode": "video",
+        "operations": 2000,
+        "seconds": 0.003912916,
+        "peer_calls": 8758
+      },
+      {
+        "phase": "before",
+        "cpus": 4,
+        "sample": 6,
+        "wall_seconds": 0.009975542000000281,
+        "mode": "video",
+        "operations": 2000,
+        "seconds": 0.003931667,
+        "peer_calls": 8811
+      },
+      {
+        "phase": "after",
+        "cpus": 4,
+        "sample": 6,
+        "wall_seconds": 0.009714792000000472,
+        "mode": "video",
+        "operations": 2000,
+        "seconds": 0.003967958,
+        "peer_calls": 8867
+      },
+      {
+        "phase": "before",
+        "cpus": 12,
+        "sample": 0,
+        "wall_seconds": 0.009644999999999904,
+        "mode": "video",
+        "operations": 2000,
+        "seconds": 0.004202666,
+        "peer_calls": 9051
+      },
+      {
+        "phase": "after",
+        "cpus": 12,
+        "sample": 0,
+        "wall_seconds": 0.010542916999999541,
+        "mode": "video",
+        "operations": 2000,
+        "seconds": 0.003970417,
+        "peer_calls": 8865
+      },
+      {
+        "phase": "after",
+        "cpus": 12,
+        "sample": 1,
+        "wall_seconds": 0.009911875000000236,
+        "mode": "video",
+        "operations": 2000,
+        "seconds": 0.003984541,
+        "peer_calls": 8972
+      },
+      {
+        "phase": "before",
+        "cpus": 12,
+        "sample": 1,
+        "wall_seconds": 0.009582124999999664,
+        "mode": "video",
+        "operations": 2000,
+        "seconds": 0.0040485,
+        "peer_calls": 9057
+      },
+      {
+        "phase": "before",
+        "cpus": 12,
+        "sample": 2,
+        "wall_seconds": 0.009782916999999891,
+        "mode": "video",
+        "operations": 2000,
+        "seconds": 0.004028291,
+        "peer_calls": 8817
+      },
+      {
+        "phase": "after",
+        "cpus": 12,
+        "sample": 2,
+        "wall_seconds": 0.009858166999999973,
+        "mode": "video",
+        "operations": 2000,
+        "seconds": 0.004031917,
+        "peer_calls": 8898
+      },
+      {
+        "phase": "after",
+        "cpus": 12,
+        "sample": 3,
+        "wall_seconds": 0.009763667000000531,
+        "mode": "video",
+        "operations": 2000,
+        "seconds": 0.0040535,
+        "peer_calls": 8966
+      },
+      {
+        "phase": "before",
+        "cpus": 12,
+        "sample": 3,
+        "wall_seconds": 0.009960208999999942,
+        "mode": "video",
+        "operations": 2000,
+        "seconds": 0.004171,
+        "peer_calls": 8960
+      },
+      {
+        "phase": "before",
+        "cpus": 12,
+        "sample": 4,
+        "wall_seconds": 0.010527333999999833,
+        "mode": "video",
+        "operations": 2000,
+        "seconds": 0.003964458,
+        "peer_calls": 8869
+      },
+      {
+        "phase": "after",
+        "cpus": 12,
+        "sample": 4,
+        "wall_seconds": 0.009824583999999525,
+        "mode": "video",
+        "operations": 2000,
+        "seconds": 0.004000458,
+        "peer_calls": 8941
+      },
+      {
+        "phase": "after",
+        "cpus": 12,
+        "sample": 5,
+        "wall_seconds": 0.009818625000000303,
+        "mode": "video",
+        "operations": 2000,
+        "seconds": 0.004078,
+        "peer_calls": 8887
+      },
+      {
+        "phase": "before",
+        "cpus": 12,
+        "sample": 5,
+        "wall_seconds": 0.010477499999999473,
+        "mode": "video",
+        "operations": 2000,
+        "seconds": 0.004396125,
+        "peer_calls": 9089
+      },
+      {
+        "phase": "before",
+        "cpus": 12,
+        "sample": 6,
+        "wall_seconds": 0.01079508299999965,
+        "mode": "video",
+        "operations": 2000,
+        "seconds": 0.003969209,
+        "peer_calls": 8906
+      },
+      {
+        "phase": "after",
+        "cpus": 12,
+        "sample": 6,
+        "wall_seconds": 0.010385832999999955,
+        "mode": "video",
+        "operations": 2000,
+        "seconds": 0.003934917,
+        "peer_calls": 8915
+      }
+    ],
+    "summary": [
+      {
+        "mode": "gpu",
+        "cpus": 1,
+        "before_median_seconds": 0.025047583,
+        "after_median_seconds": 0.025096292,
+        "speedup": 0.998059115665374,
+        "native_macos_median_seconds": 0.012689
+      },
+      {
+        "mode": "gpu",
+        "cpus": 4,
+        "before_median_seconds": 0.013236167,
+        "after_median_seconds": 0.013246416,
+        "speedup": 0.9992262812824239,
+        "native_macos_median_seconds": 0.012689
+      },
+      {
+        "mode": "gpu",
+        "cpus": 12,
+        "before_median_seconds": 0.013369791,
+        "after_median_seconds": 0.013367917,
+        "speedup": 1.0001401863880515,
+        "native_macos_median_seconds": 0.012689
+      },
+      {
+        "mode": "video",
+        "cpus": 1,
+        "before_median_seconds": 0.25557325,
+        "after_median_seconds": 0.255549292,
+        "speedup": 1.0000937509934482,
+        "native_macos_median_seconds": null
+      },
+      {
+        "mode": "video",
+        "cpus": 4,
+        "before_median_seconds": 0.00401225,
+        "after_median_seconds": 0.003983833,
+        "speedup": 1.0071330801266016,
+        "native_macos_median_seconds": null
+      },
+      {
+        "mode": "video",
+        "cpus": 12,
+        "before_median_seconds": 0.0040485,
+        "after_median_seconds": 0.004000458,
+        "speedup": 1.0120091249551926,
+        "native_macos_median_seconds": null
+      }
+    ],
+    "counterbalanced_pairs_per_cell": 7,
+    "native_reference": "Unchanged stage-31 native macOS Vulkan control artifact hash verified; seven fresh native samples. No comparable GPU in native ARM Linux Lima; video surface metadata has no equivalent native API.",
+    "interpretation": "Ordinary throughput is essentially unchanged; no browser or GPU-driver throughput speedup claimed. Gated regressions prove removal of pending-work/owner-poll blocking.",
+    "source_note": "Throughput control samples precede the final unlock-notification correction, which only affects contexts with actual canceled/pending retirement. Final source independently passes device/H264 and concurrency acceptance. Samples are not relabeled as timings of the pinned installed binary."
+  },
+  "remaining_boundaries": [
+    "Last/member group/default-fatal task entry remains an owned lifecycle entry",
+    "Final CPU/Memory projections, mm mapping custody and robust-futex support still need connected migration",
+    "Actual owner epoll/namespace/proc/mount controls, tracing/vfork and accepted owner/mapped-file custody",
+    "Original native idle/destruction retained; GPU backend without native fence notifications and audio/decoder stop keep actual driver behavior"
+  ],
+  "installed": {
+    "stable": {
+      "version": "Trames 1.5.3 (stable) runtime d9c4a811faf316a51b1a8f33f055247943a18855",
+      "binary_sha256": "4f40615213e731b2a4ef9d8c6a0e85c5c7bdf31ab0c60b0354b55113f2a6a55d"
+    },
+    "dev": {
+      "version": "Trames Dev 1.5.3 (dev) runtime 28c941b294e336c26d19cdbbf3add839583adb25",
+      "binary_sha256": "57e03f88d3f19db79c89d8aba8517fdac4b00aefe7615e842abeca8a9162848f"
+    },
+    "stable_unchanged": true
+  },
+  "stable_or_business_restart": false,
+  "techo_frontend_activated": false,
+  "log_hashes": {
+    "apple-final.log": "d9b189d607755e1cbb30035fe2975d5a3eabc5b743632e78d724a9533456327a",
+    "runtime-clippy.log": "70ff03c7b0511d933c35a9ecd1c83a0460f80a90e80d1081ccfbd6b9ab7e1791",
+    "product-clippy.log": "236305f15e22c0ef44bafae5a592d174885875ab5576cbad21dc2b17cb6727f5",
+    "ipad-check.log": "58314e156b7d28814b799692bb51a1407b1b08887d7546a99afcb3d5ca6105f3",
+    "native-retirement-red.log": "75fa0db9e5664c3cee8b50865f6bcf78cdea549b306aaa50973f7a949a0f7775",
+    "owner-poll-red.log": "60446a123c9b377b4ddbf9f2c31df0530a459a2e5d5abe77dccb83ed038b89f0",
+    "mac-final-build.log": "4ed5a4741400738d39b4d7186a76128138c3be98e582ccd3d3f98d1db38985ab",
+    "pinned-build.log": "cebc1e8561f65f00f369a0548aa2d72f19e134fd70c775d8e537c96c524d9c31",
+    "acceptance-summary.log": "0263d64209df916bdf4ad623f1cd21b5f23472de99ef39bedede23c2002d6d7d",
+    "vaapi-final.log": "ed390ee4244b5377534f79d8bec98650df69460bf1fae668d01287b4e232d558",
+    "go-gc-integration.log": "e8dd5e3fae6fa8b3df1090acd43b111cb7b1c7e49b8c57ade35be6d498d7b52e",
+    "docker-integration.log": "cd779cf00263ec1de8303c30c70fff1333038a545539504cc139fdd097964434",
+    "install-dev.log": "d81b37faaef60b5a1b635ce5a81a399a304e89d9aee6498d2d7eecf5f3f5bd41"
+  }
+}
