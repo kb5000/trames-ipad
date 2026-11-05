@@ -2,11 +2,12 @@
 
 ## Current status — 2026-11-05
 
-The latest batch is [original native mm ownership and completion retirement](#46-original-native-mm-ownership-and-completion-retirement-2026-11-05).
+The latest batch is [original thread-group exit completion](#47-original-thread-group-exit-completion-2026-11-05).
 Original child waits, signal/cgroup controls, non-last thread exits and parent/
 subreaper queries already have source paths. GPU/video/audio roots now follow
 actual mm references; native completion retires pending work without an owner
-poll. Mac and iPad share this implementation. Final process/CPU/Memory custody
+poll. Group membership now covers resource/View cleanup, and returning source
+exits no longer replay original resource retirement. Mac and iPad share this implementation. Final process/CPU/Memory custody
 and actual owner controls remain open. Stable 1.5.3 and business environments
 remain separate from Dev.
 
@@ -3475,3 +3476,60 @@ GPU in this local instance; video surface metadata has no equivalent native API.
 Ordinary throughput is essentially unchanged. The mechanism removes blocking
 owner polling and slow-job lifetime coupling, rather than claiming faster GPU
 driver execution. Existing CPU/ABI/VFS acceptance is reused where unchanged.
+
+## 47. Original thread-group exit completion — 2026-11-05
+
+The original group distinguishes stop-executing from cleanup-complete. Source
+non-last exits retain membership through original resource retirement and their
+final guest View; owner exits use the same completion phases. The last ordinary
+begin-exit fixes status, while an earlier explicit group exit fixes it once.
+Member completion order cannot change that status. Original liveness is maintained
+under the existing group lock, replacing whole-ProcessMap checks for group final
+status, family publication and process-lock release.
+
+This exposed two projection hazards: late stop/hold updates could re-register a
+dead original member, and a structural refresh could mistake an owner-held caller
+absent from ProcessMap for a completed group. Both now use original lifetime. A
+real Linux program also demonstrates the old incorrect leader status (11) versus
+the actual last-thread status (37). See Linux's
+[synchronize_group_exit and wait implementation](https://github.com/torvalds/linux/blob/v6.18/kernel/exit.c).
+
+Source CPU return now collects only local scheduling, Memory and VFS projections,
+without repeating original native/FD retirement, uring cancellation, clear_tid or
+parent-death effects. Original ancillary-rights and detached-mount projection GC
+is preserved; owner retirement collects it once. Occupying the original native
+context cannot block source projection collection. Injecting legacy native
+cleanup makes that guarded regression fail, and omitting directory projection GC
+makes the actual detached-submount case fail.
+
+Apple validation: **311 process**, **55 shared kernel**, **507 VFS with hostfs**
+checks pass, with three process and one VFS test intentionally ignored. Native
+ARM Linux passes the complete group semantic batch plus the final collector's
+three affected regressions. The final binary passes 20 lifecycle cases over HVF
+1/4/12 and interpreter 1/4, native GPU/video controls, hardware H.264 interoperation,
+30 Go GC starts with normal async preemption, and eight isolated Docker cycles.
+Strict affected Clippy, formatting and iPad-device-target compilation pass. No
+physical iPad or new microphone test is claimed.
+
+Seven counterbalanced pairs use the same ELF for 128 two-thread groups, each with
+fork, clone, leader exit, final exit and parent wait. Half retain an actual owner
+epoll control; benchmark mode exits both threads with zero so the old binary does
+identical valid work. Builds and the Linux instance are stopped during Mac timing.
+The native ARM Linux reference is the same ELF in the existing 6-CPU/8-GB test
+instance, rather than a native macOS syscall equivalent.
+
+| Workload | CPUs | Previous Dev | Current Dev | Native ARM Linux (6 CPUs) |
+| --- | ---: | ---: | ---: | ---: |
+| 128 two-thread groups | 1 | 16.704 ms | 16.472 ms | 7.661 ms |
+| 128 two-thread groups | 4 | 29.559 ms | 29.732 ms | 7.661 ms |
+| 128 two-thread groups | 12 | 29.212 ms | 29.275 ms | 7.661 ms |
+
+This is a lifecycle regression control, not a general CPU or Firefox speedup.
+Final last-member/group/default-fatal **entry remains joined**. The next connected
+work includes final CPU/Memory custody, original vfork release, namespace-init
+victims and their completion ordering, robust futex support and actual owner
+controls. No service thread, polling bus or extra source admission gate is added.
+
+The [machine-readable evidence](../validation/thread-retirement-20261105.json)
+records exact revisions, source/binary hashes, controls and samples. Only Dev is
+installed; stable 1.5.3 and business services retain their previous binary.

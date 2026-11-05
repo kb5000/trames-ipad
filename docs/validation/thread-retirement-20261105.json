@@ -1,0 +1,712 @@
+{
+  "schema": 1,
+  "date": "2026-11-05",
+  "runtime_revision": "004ab49f8629af1259056249252b76519d4df334",
+  "semantic_base_revision": "b1a2ae84b91862c825b13e772a65c71b91c3bc61",
+  "baseline_runtime_revision": "28c941b294e336c26d19cdbbf3add839583adb25",
+  "scope": "Original thread-group stop/cleanup phases, final exit status, original group liveness for process locks and family completion, and collection without replaying accepted source exit. Source last/group/default-fatal entry remains joined.",
+  "source_files": {
+    "crates/trames-kernel/src/signal/io.rs": "ecfd1c8b695a17998fe3a6a883ffa883080105f79f1a7cf6b41c8a87293ed77f",
+    "crates/trames-kernel/src/task_control.rs": "d305fe0a4c6d22a3ead22dec9c65288a78bc62ba025defef2bd0cb7606abe41c",
+    "crates/trames-kernel/src/task_parent.rs": "56b8b77f4534ab3a2291d751a6fcc05ea22fb8aad58112e345d91dda446fa4f9",
+    "crates/trames-session/src/process.rs": "a40cb1660f2442f94b984d4fbad93422282074534c34eb73e11fbc14d39d588a",
+    "crates/trames-session/src/worker_syscalls.rs": "0d1cc221bb7f711fa33b8bb8193ca5c0437ac0c84ccf70aaae033b32fdb22700",
+    "crates/trames-session/src/workers.rs": "0f34aec9a047d9e38fef983df2db0a809a56a743df5352086e7e4d300168fea9",
+    "crates/trames-vfs/src/lib.rs": "f43fac6e6fde5b7d444ff0aba510e7ad1512eb899b5dbabec0e9217ba2d68842",
+    "crates/trames-vfs/src/path_queries/directory_tests.rs": "4c5fda53d3e473dbd234fb8b1e1c677a3d85fe3674831d6df7501f966392ef9a",
+    "docs/architecture/coordination-boundaries.md": "61396f20a8e26e19e91243ffe3f2f2f8dad47e12eeec244ed537bb1b08d0f012"
+  },
+  "changes": [
+    "Original Group tracks live members and retiring members separately under its existing mutex. Source membership finishes after dropping the retained guest View.",
+    "The last ordinary begin-exit fixes the final status; an earlier group exit fixes it once. Cleanup finish order cannot overwrite it.",
+    "Late owner stop/hold publication cannot recreate a retired task. Member identity survives nonleader exec rekeying.",
+    "Final status, family/host completion and process-lock release consult original group state instead of ProcessMap liveness scans.",
+    "Source CPU collection does not re-run uring cancellation, parent-death, clear_tid, OFD/native retirement or native-job abandonment.",
+    "Cold descriptor projections still collect original ancillary-rights and detached-mount records. Ordinary owner retirement uses that collector once."
+  ],
+  "concurrency": {
+    "new_service_thread": false,
+    "new_owner_rpc": false,
+    "new_polling_bus": false,
+    "new_admission_gate": false,
+    "new_unsafe": false,
+    "new_ordinary_guest_barrier": false,
+    "synchronization": "Existing per-group mutex covers member identity, live/retiring counts and final status. Notifications follow unlock. No process-wide native body lock is added."
+  },
+  "mechanism_controls": [
+    {
+      "case": "Unmodified previously installed Dev, actual Linux ELF",
+      "red": "Parent receives leader status 11 instead of final thread status 37",
+      "log_sha256": "e161ddda55163980f21051b9dd1eb939e4fd8c6b16840af3158a98d6d3111ff5"
+    },
+    {
+      "case": "Structural refresh while an original live caller is temporarily held outside ProcessMap",
+      "red": "Old ProcessMap completion publishes status 11 prematurely",
+      "log_sha256": "5472b724984cf0c99e521a173145d56c20e86be0704ddef25fb65da9b8015172"
+    },
+    {
+      "case": "Source CPU collection with original native context leased elsewhere",
+      "red": "Injecting legacy native cancellation blocks until the harness releases the lease, then fails. This is a targeted old-behavior control, not an unmodified baseline build.",
+      "log_sha256": "1364fc7201af4a1e96a0ed874b36e0999ae01b92e7575678dfe7a95aa60e996b"
+    },
+    {
+      "case": "Original worker-opened directory on a detached submount",
+      "red": "Omitting projection-only mount collection leaves the original detached tree retained",
+      "log_sha256": "98fcf5bf2400374f6f1504327726af13f946fe33e16c6c4c05b84a627678b53a"
+    }
+  ],
+  "validation": {
+    "apple_process_passed": 311,
+    "apple_process_ignored": 3,
+    "apple_shared_kernel_passed": 55,
+    "apple_vfs_default_passed": 477,
+    "apple_vfs_all_features_passed": 507,
+    "apple_vfs_all_features_ignored": 1,
+    "native_arm_linux_full_semantic_base": {
+      "runtime": "b1a2ae84b91862c825b13e772a65c71b91c3bc61",
+      "process_passed": 311,
+      "process_ignored": 3,
+      "shared_kernel_passed": 55,
+      "log_sha256": "53958ffac34646efe9bc9f1f1e3b86085d6c844c35c804bbdbb5c3b3ae1f1c56"
+    },
+    "native_arm_linux_final_collector": "The changed directory/mount case and both source-exit mechanism regressions pass on the final collector. The full semantic-base results are reused for unchanged group semantics.",
+    "native_arm_linux_final_logs": {
+      "thread-retirement-collector-vfs.log": "677b91d31372c37adec89d3547e47394c1e284fb9c74329c034f6fd5889e33a3",
+      "thread-retirement-collector-exit.log": "42a4ba0b92b4a7a611982eea218455b5069552af185e6a8375c90618f1dd9a3a"
+    },
+    "ipad_ffi": "aarch64-apple-ios compile passed; no new physical-device run claimed",
+    "strict_affected_clippy": true,
+    "affected_formatting": true,
+    "pinned_binary_cases": [
+      {
+        "case": "final-hvf-1-completion",
+        "returncode": 0,
+        "seconds": 0.020674917000000015
+      },
+      {
+        "case": "final-hvf-1-resources",
+        "returncode": 0,
+        "seconds": 0.010271083999999986
+      },
+      {
+        "case": "final-hvf-1-pdeathsig",
+        "returncode": 0,
+        "seconds": 0.010361791000000009
+      },
+      {
+        "case": "final-hvf-1-pid-namespaces",
+        "returncode": 0,
+        "seconds": 0.022367000000000026
+      },
+      {
+        "case": "final-hvf-4-completion",
+        "returncode": 0,
+        "seconds": 0.04123395899999993
+      },
+      {
+        "case": "final-hvf-4-resources",
+        "returncode": 0,
+        "seconds": 0.011033875000000082
+      },
+      {
+        "case": "final-hvf-4-pdeathsig",
+        "returncode": 0,
+        "seconds": 0.011793582999999996
+      },
+      {
+        "case": "final-hvf-4-pid-namespaces",
+        "returncode": 0,
+        "seconds": 0.045422875000000085
+      },
+      {
+        "case": "final-hvf-12-completion",
+        "returncode": 0,
+        "seconds": 0.023890624999999943
+      },
+      {
+        "case": "final-hvf-12-resources",
+        "returncode": 0,
+        "seconds": 0.011962499999999876
+      },
+      {
+        "case": "final-hvf-12-pdeathsig",
+        "returncode": 0,
+        "seconds": 0.011229166000000124
+      },
+      {
+        "case": "final-hvf-12-pid-namespaces",
+        "returncode": 0,
+        "seconds": 0.04703708299999998
+      },
+      {
+        "case": "final-interpreter-1-completion",
+        "returncode": 0,
+        "seconds": 0.5285310830000001
+      },
+      {
+        "case": "final-interpreter-1-resources",
+        "returncode": 0,
+        "seconds": 0.02328700000000028
+      },
+      {
+        "case": "final-interpreter-1-pdeathsig",
+        "returncode": 0,
+        "seconds": 0.013613459000000105
+      },
+      {
+        "case": "final-interpreter-1-pid-namespaces",
+        "returncode": 0,
+        "seconds": 0.0419583750000001
+      },
+      {
+        "case": "final-interpreter-4-completion",
+        "returncode": 0,
+        "seconds": 0.04529837499999978
+      },
+      {
+        "case": "final-interpreter-4-resources",
+        "returncode": 0,
+        "seconds": 0.0114280830000002
+      },
+      {
+        "case": "final-interpreter-4-pdeathsig",
+        "returncode": 0,
+        "seconds": 0.01184270800000009
+      },
+      {
+        "case": "final-interpreter-4-pid-namespaces",
+        "returncode": 0,
+        "seconds": 0.04572120799999979
+      },
+      {
+        "case": "final-gpu",
+        "returncode": 0,
+        "seconds": 0.04636054199999995
+      },
+      {
+        "case": "final-video",
+        "returncode": 0,
+        "seconds": 0.011986374999999772
+      },
+      {
+        "case": "final-go-gc",
+        "returncode": 0,
+        "seconds": 2.576708084
+      },
+      {
+        "case": "final-docker",
+        "returncode": 0,
+        "seconds": 76.850306292
+      },
+      {
+        "case": "final-vaapi",
+        "returncode": 0,
+        "seconds": 2.033282
+      }
+    ],
+    "go_gc_starts": 30,
+    "go_async_preemption": "Normal, enabled",
+    "isolated_docker_lifecycle_rounds": 8,
+    "real_media": "Hardware H.264, export-before-sync, fork/SCM_RIGHTS and Vulkan Y/UV pixel checks pass.",
+    "reused": "Unchanged CPU, network, audio and GPU algorithms use prior acceptance; no unrelated full graphics or microphone acceptance repeated."
+  },
+  "performance": {
+    "scope": "128 two-thread groups: fork, clone, leader exit, final thread exit and parent wait. Half retain ordinary files and half actual owner epoll controls. Both threads exit zero in bench mode so old and new binaries perform identical valid work. Seven counterbalanced pairs per CPU count. No test Linux instance/build was running during timings. Includes joined fork/mm/last-exit work; not a Firefox or general CPU benchmark. Final pinned Mac development binary. Native ARM Linux reference ran the same ELF in the existing 6 CPU/8GB hardware-backed Linux test instance, not native macOS.",
+    "runtime_revision": "004ab49f8629af1259056249252b76519d4df334",
+    "binaries": {
+      "before": {
+        "path": "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+        "sha256": "57e03f88d3f19db79c89d8aba8517fdac4b00aefe7615e842abeca8a9162848f"
+      },
+      "after": {
+        "path": "/Users/main/dev/trames-mac/target/release/Trames Dev.app/Contents/MacOS/trames-mac-run",
+        "sha256": "c9066516f06232fe9db4ad28fb9b7050740f9035ebc06056d43ee53784eb6e28"
+      }
+    },
+    "fixture_sha256": "9138832f44247388de6b45e812aa2ecc59b1d3c0ca4f2b59c13859de3af9c5a2",
+    "native_arm_linux": [
+      {
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 7712065,
+        "passed": true
+      },
+      {
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 7484897,
+        "passed": true
+      },
+      {
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 8321654,
+        "passed": true
+      },
+      {
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 7429813,
+        "passed": true
+      },
+      {
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 7619731,
+        "passed": true
+      },
+      {
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 7660940,
+        "passed": true
+      },
+      {
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 8000109,
+        "passed": true
+      }
+    ],
+    "samples": [
+      {
+        "cpus": 1,
+        "phase": "before",
+        "sample": 0,
+        "wall_seconds": 0.038945957999999996,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 17437000,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "after",
+        "sample": 0,
+        "wall_seconds": 0.171033583,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 22900167,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "after",
+        "sample": 1,
+        "wall_seconds": 0.024792124999999998,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 16931334,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "before",
+        "sample": 1,
+        "wall_seconds": 0.023037792,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 16254292,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "before",
+        "sample": 2,
+        "wall_seconds": 0.023202624999999977,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 16704375,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "after",
+        "sample": 2,
+        "wall_seconds": 0.023249916999999953,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 16498917,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "after",
+        "sample": 3,
+        "wall_seconds": 0.022631750000000006,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 15988791,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "before",
+        "sample": 3,
+        "wall_seconds": 0.02327533300000001,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 16351833,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "before",
+        "sample": 4,
+        "wall_seconds": 0.022922708000000014,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 16498708,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "after",
+        "sample": 4,
+        "wall_seconds": 0.02353083300000003,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 16442167,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "after",
+        "sample": 5,
+        "wall_seconds": 0.023171374999999994,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 16021459,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "before",
+        "sample": 5,
+        "wall_seconds": 0.024846999999999952,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 17290500,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "before",
+        "sample": 6,
+        "wall_seconds": 0.023360332999999955,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 16843083,
+        "passed": true
+      },
+      {
+        "cpus": 1,
+        "phase": "after",
+        "sample": 6,
+        "wall_seconds": 0.023412750000000038,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 16471708,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "before",
+        "sample": 0,
+        "wall_seconds": 0.039262917000000064,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 31631333,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "after",
+        "sample": 0,
+        "wall_seconds": 0.037165041000000065,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29732375,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "after",
+        "sample": 1,
+        "wall_seconds": 0.03757341699999994,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30010417,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "before",
+        "sample": 1,
+        "wall_seconds": 0.03702487499999996,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29590000,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "before",
+        "sample": 2,
+        "wall_seconds": 0.03786383299999996,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30400583,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "after",
+        "sample": 2,
+        "wall_seconds": 0.03685337500000008,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29336167,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "after",
+        "sample": 3,
+        "wall_seconds": 0.03854020899999999,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29912500,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "before",
+        "sample": 3,
+        "wall_seconds": 0.03713658399999997,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29376584,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "before",
+        "sample": 4,
+        "wall_seconds": 0.03670008300000005,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29402500,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "after",
+        "sample": 4,
+        "wall_seconds": 0.03749445799999995,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29623042,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "after",
+        "sample": 5,
+        "wall_seconds": 0.038188584000000025,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 30204541,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "before",
+        "sample": 5,
+        "wall_seconds": 0.03658574999999997,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29275833,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "before",
+        "sample": 6,
+        "wall_seconds": 0.036298875000000064,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29558792,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "phase": "after",
+        "sample": 6,
+        "wall_seconds": 0.03614600000000001,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29149584,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "before",
+        "sample": 0,
+        "wall_seconds": 0.03585120900000005,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29127417,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "after",
+        "sample": 0,
+        "wall_seconds": 0.03613483399999984,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29000292,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "after",
+        "sample": 1,
+        "wall_seconds": 0.03584779199999999,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 28960083,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "before",
+        "sample": 1,
+        "wall_seconds": 0.036000041999999954,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29193208,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "before",
+        "sample": 2,
+        "wall_seconds": 0.036305709000000075,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29483292,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "after",
+        "sample": 2,
+        "wall_seconds": 0.036493832999999976,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29284417,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "after",
+        "sample": 3,
+        "wall_seconds": 0.03687024999999999,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29909667,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "before",
+        "sample": 3,
+        "wall_seconds": 0.03632649999999993,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29247291,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "before",
+        "sample": 4,
+        "wall_seconds": 0.03582870799999993,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29211958,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "after",
+        "sample": 4,
+        "wall_seconds": 0.03635491599999985,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29274833,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "after",
+        "sample": 5,
+        "wall_seconds": 0.03627695800000019,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29330458,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "before",
+        "sample": 5,
+        "wall_seconds": 0.03587812499999998,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 28999417,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "before",
+        "sample": 6,
+        "wall_seconds": 0.036051834000000005,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 29343791,
+        "passed": true
+      },
+      {
+        "cpus": 12,
+        "phase": "after",
+        "sample": 6,
+        "wall_seconds": 0.035743791999999885,
+        "case": "worker-thread-completion",
+        "groups": 128,
+        "elapsed_ns": 28956917,
+        "passed": true
+      }
+    ],
+    "native_reference_limit": "Collected separately on native ARM Linux in the existing 6 CPU/8GB test instance; not counterbalanced against native macOS syscall behavior."
+  },
+  "installed": {
+    "dev_version": "Trames Dev 1.5.3 (dev) runtime 004ab49f8629af1259056249252b76519d4df334",
+    "dev_sha256": "c9066516f06232fe9db4ad28fb9b7050740f9035ebc06056d43ee53784eb6e28",
+    "stable_version": "Trames 1.5.3 (stable) runtime d9c4a811faf316a51b1a8f33f055247943a18855",
+    "stable_sha256": "4f40615213e731b2a4ef9d8c6a0e85c5c7bdf31ab0c60b0354b55113f2a6a55d"
+  },
+  "stable_or_business_restart": false,
+  "techo_frontend_activated": false,
+  "remaining": [
+    "Source last-member, group and default-fatal entry still join the cohort.",
+    "Final CPU/Memory custody and original vfork release need connected migration.",
+    "Namespace-init shutdown victims and completion ordering, robust futex support, and actual owner controls remain open."
+  ],
+  "fixture_sources": {
+    "tests/fixtures/worker-thread-completion.c": "f4227c56c0b03a99584d1d29f70a2dfb269d943e0aede707e5c303e17c2a8cd6",
+    "scripts/build-worker-thread-completion-fixture.sh": "b7a3864042316fed7a3278e346d24f711f2fb2279afc97c5696dcb9f0a88b7c1"
+  }
+}
