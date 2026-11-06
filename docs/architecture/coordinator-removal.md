@@ -2,13 +2,13 @@
 
 ## Current status — 2026-11-06
 
-Audited executable-code baseline: `e6d700c3147a4fb5a2a772dfcbb28eb636ac53fc`.
-The latest code batch is [stage 52, original scheduling and on-demand CPU slots](#52-original-scheduling-and-on-demand-cpu-slots--2026-11-06).
-The implemented scheduling subsystem now uses source workers and original task
-resources, including cross-thread controls, actual migration completion and cold
-CPU activation. Mac and iPad share this implementation. The measured Mac Dev is
-installed; stable 1.5.3 and business environments are unchanged. Both iPad targets
-compile; physical iPad acceptance remains skipped as previously chosen.
+Audited executable-code baseline: `b26b2ad732663e6aedb665a3e3bc61b676b9746e`.
+The latest code batch is [stage 53, original proc/sys views and namespace descriptors](#53-original-procsys-views-and-namespace-descriptors--2026-11-06).
+Dynamic process/resource queries, proc files and their pathname/FD consumers now
+use original shared resources. Mac and iPad share this implementation; Mac adds
+only the live host-memory accounting callback. Mac Dev is installed and its
+12-CPU smoke passes. Stable 1.5.3 and business environments are unchanged. Both iPad targets compile; physical iPad acceptance
+remains skipped as previously chosen.
 
 **The coordinator still exists, but ordinary admitted resource work no longer
 has to execute there.** Fork/clone/exec have removed the whole-cohort dependency,
@@ -27,7 +27,8 @@ are not a completion percentage.
 | Mapping topology, pins and mapped-file layout | Affected mm/backing checkpoint; additive private-anonymous mmap has in-cohort publication | Owner publication remains; real excluded backing/lifetime/policy cases can require a full return |
 | Residual FD/network compatibility | Owner service inside a live cohort, where admitted | Caller waits while peers continue; refusal before effects falls back to joined handling |
 | Native libc/GPU/video/audio | Normal bodies and resource waits use calling/shared-resource paths | Exceptional mapping import, unstable entry and actual native lifecycle checks remain; AppKit affinity, device/disk pools and local fallback are not extra coordinators |
-| Dynamic proc/sys and owner administration | Still joined | Dynamic process/executable/FD views, special paths, mount/unshare/setns, credentials/capabilities |
+| Dynamic proc/sys and proc pathname/FD consumers | Calling worker and original PID/mm/Files/fs/namespace resources | First cross-mm byte export and mapping invalidation use only the original mm admission boundary; legacy providers retain their explicit fallback |
+| Namespace and credential administration | Still joined for actual mutations | Mount/unshare/setns and credentials/capabilities; complete shared namespace descriptors do not imply worker-side task membership mutation |
 | Tracing/security and mixed owner resources | Actual joined task/control boundary | Installation/TSYNC, policy signal/termination effects, excluded SCM_RIGHTS/ring resources and missing source pumps remain. Pure custody-policy errors complete on continuous workers before quiescence |
 | Host lifecycle and generic dispatch fallback | Still joined when the actual event/exit requires it | Host exec creation/group control, terminal lifecycle, pause/cancel, transfer/timezone/writeback, supervision/admin/pressure/deadline/shutdown; any SVC/HLT/fault not completed, parked, serviced or scoped on the worker still reaches the generic joined fallback |
 
@@ -38,56 +39,41 @@ the owner; ordinary epoch-member migration, parking, wakeup and child/replacemen
 admission already use the live execution queue. Single-CPU/solo execution retains
 its coordinated caller path, which does not by itself imply an extra RPC.
 
-The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/e6d700c3147a4fb5a2a772dfcbb28eb636ac53fc/docs/architecture/coordination-boundaries.md)
+The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/b26b2ad732663e6aedb665a3e3bc61b676b9746e/docs/architecture/coordination-boundaries.md)
 records scopes, actual admission gates and source locations. Earlier sections
 below are historical records and do not override this inventory.
 
 ### What the latest measurements prove
 
-Stage 52 uses four threads × 256 loops × four scheduling calls (4,096 calls).
-Five unprofiled before/after pairs alternate order, after two warmups per
-configuration. Separate diagnostic runs show:
+Stage 53 uses one thread per configured CPU, each repeating 256 checked proc
+sequences: directory-relative status open/pread/fstat/close, cwd stat and exe
+readlink. Seven unprofiled before/after pairs alternate order. The measured loop
+excludes thread setup/join; it is a proc workload, not Firefox or Geekbench.
 
-| Workload, 12 CPUs | Previous cohort rounds | Current cohort rounds | Scheduling calls returned to owner |
+| CPUs / threads | Previous loop | Current loop | Speedup |
 | --- | ---: | ---: | ---: |
-| Self queries | 3,936 | 1 | 4,096 → 0 |
-| Self updates | 3,816 | 1 | 4,096 → 0 |
-| Cross-thread queries | 3,791 | 1 | 4,096 → 0 |
+| 1 | 14.406 ms | 12.260 ms | 1.18x |
+| 2 | 91.238 ms | 20.433 ms | 4.47x |
+| 4 | 198.567 ms | 35.355 ms | 5.62x |
+| 12 | 1,419.269 ms | 95.475 ms | 14.87x |
 
-Both revisions already have zero Service requests. The change removes all
-4,096 scheduling owner returns, not merely a service counter. The current whole
-session still has its final control ioctl. Migration/resource waits and initial
-guest admission are distinct from a full-cohort return; no completion percentage
-or whole-application speedup follows from the table.
+Separate diagnostic compatibility runs have zero service requests and zero proc
+syscalls returned with the whole cohort. Multicore sessions retain one final
+console ioctl return. Cross-mm first-read admission remains a scoped mapping
+operation and is reported separately; zero services does not mean zero owner work.
+The serial driver also uses the common live provider, without the old duplicate
+path-discovery walk and full-process snapshot. The initial candidate regressed
+single-core time until both duplicate paths were removed.
 
-| Workload, 12 CPUs | Previous loop | Current loop | Speedup | Native ARM Linux reference |
-| --- | ---: | ---: | ---: | ---: |
-| Self queries | 194.14 ms | 2.12 ms | 91.6x | 0.152 ms |
-| Self updates | 189.99 ms | 2.14 ms | 88.8x | 0.375 ms |
-| Cross-thread queries | 195.21 ms | 2.37 ms | 82.3x | 0.165 ms |
+The [stage 53 evidence](../validation/worker-proc-20261106.json) records exact
+source and binary hashes, all timing samples, the native ARM Linux ABI reference,
+and validation/reuse boundaries. Previous scheduling results remain in
+[stage 52](../validation/worker-scheduling-20261106.json). No whole-application
+speedup, full Linux compatibility or global coordinator completion is claimed.
 
-These medians measure the longest worker's loop, excluding thread setup/join.
-The update loop reapplies the full allowed mask, SCHED_OTHER/zero parameter and
-nice 7; it does not continuously migrate a thread. Actual migration and cold
-slots are covered by the separate compatibility acceptance.
-Including complete startup and teardown, twelve-CPU process medians change
-201.41 → 13.62 ms, 197.63 → 14.45 ms, and 203.73 → 13.35 ms respectively.
-Native Linux uses the exact static ELF in the existing six-vCPU local ARM64 CI
-environment. It is a contextual ABI reference, not a macOS-native affinity API
-or isolated HVF cost. Existing stable/desktop services remain active; all agent
-builds, tests and the local CI instance ended before Mac timing. Thermal state
-was nominal and low-power mode off before/after. Metrics are collected separately.
-
-[Stage 52 evidence](../validation/worker-scheduling-20261106.json) preserves all
-60 samples, whole-process timings, original source/binary identities, 12 diagnostic
-runs, 21 native reference samples and actual validation coverage. Earlier exec
-results remain in [stage 51](../validation/exec-custody-20261105.json); `/proc/self/exe`
-open still has its dynamic-view dependency.
-
-The next priority remains the **dynamic process/resource view and path-resolution
-subsystem**, then remaining namespace administration and actual compatibility
-admissions. The general worker-dispatch fallback remains reachable. This round
-does not add an executable-path whitelist or begin a second subsystem migration.
+Next candidates are structural namespace/credential administration and the
+remaining actual owner-control graphs. The generic worker-dispatch fallback,
+tracing/security effects and structural memory publication remain reachable.
 
 ## Twenty-second migration implemented — worker Unix namespace controls and waits — 2026-11-03
 
@@ -3878,3 +3864,41 @@ Dynamic proc, namespace/credential administration, structural memory publication
 legacy nonmember scheduling and generic unhandled SVC/HLT dispatch remain listed
 above. See the [shared contract](https://github.com/kb5000/trames-runtime/blob/e6d700c3147a4fb5a2a772dfcbb28eb636ac53fc/docs/architecture/coordination-boundaries.md#original-task-scheduling-and-on-demand-execution-slots--2026-11-06)
 and [filtered evidence](../validation/worker-scheduling-20261106.json).
+
+## 53. Original proc/sys views and namespace descriptors — 2026-11-06
+
+Runtime `b26b2ad732663e6aedb665a3e3bc61b676b9746e` moves the dynamic process/resource view subsystem as
+one batch, including pathname lookup, opened directories, magic links, ordinary
+reopen, stat/getdents/readlink, dynamic bytes, control files, namespace descriptors
+and asynchronous read consumers. A weak original PID binding survives nonleader
+exec without retaining the task's Files table. Maps/environ keep the opened mm;
+cmdline follows that PID's current mm; auxv keeps saved original bytes. Live image
+bytes use the same guest memory model, including modified argv and setproctitle.
+
+The original mount namespace graph is now shared. Worker-opened nsfs descriptors,
+SCM_RIGHTS and bind aliases retain real setns authority, including mounts added
+after opening. Metadata projections do not keep overlay layers or unrelated
+mount uses alive. Self/older namespace binds fail and unshare omits namespace-bind
+subtrees, matching the native Linux reference and avoiding ownership cycles.
+Mount, unshare and setns task administration themselves retain their owner entry.
+
+Remote cmdline/environ reads park on their own original page dependencies. Only
+the target mm quiesces for first export or actual mapping changes; unrelated mms
+continue. External execution Views wait on the original idle notification. The
+same FileWork lifetime reaches scalar/vector reads and io_uring fixed descriptors,
+registered buffers and retries. Last-mm retirement revokes virtual read authority
+and releases pins. No new coordinator/resource thread or normal-byte barrier is
+introduced. Mac host-managed residency uses its actual host callback.
+
+Real acceptance found two integration omissions and fixed them in this batch:
+solo/traced directory-relative queries still used a stale joined snapshot; and
+worker O_TRUNC opens of sysctl/OOM/cgroup controls attempted regular-file truncate.
+The latter broke runc's ping_group_range setup and is covered by control-open and
+real Docker lifecycle regression. The ordinary owner/source paths now agree.
+
+The shared implementation retains inherited compatibility limits for deleted
+path-name history and anonymous endpoint O_PATH/pipe reopening. Those are not
+reported as coordinator migrations. Legacy synthetic providers, unavailable host
+accounting, tracing/policy effects, actual owner-only control graphs and general
+unhandled dispatch still have explicit fallbacks. See the
+[shared contract](https://github.com/kb5000/trames-runtime/blob/b26b2ad732663e6aedb665a3e3bc61b676b9746e/docs/architecture/coordination-boundaries.md#original-procsys-resources-and-complete-namespace-descriptors--2026-11-06).

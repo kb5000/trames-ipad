@@ -1,0 +1,1207 @@
+{
+  "schema": 1,
+  "date": "2026-11-06",
+  "runtime_revision": "b26b2ad732663e6aedb665a3e3bc61b676b9746e",
+  "baseline_runtime_revision": "e6d700c3147a4fb5a2a772dfcbb28eb636ac53fc",
+  "scope": "Dynamic proc/sys views, original PID/mm/Files/fs/namespace authority, common pathname/OFD consumers, live image-byte waits and io_uring dependencies. Structural namespace administration remains separate.",
+  "source_files": {
+    "crates/trames-kernel/src/lib.rs": "6f6373fc49cab38ffb7a337045e9b877dcbc43d92e1581a47af0712c0e4fd892",
+    "crates/trames-kernel/src/signal/io.rs": "373bd2ce5652bd439bc40149d2325f32f2d5de14610084b8f4f256354f30cb9f",
+    "crates/trames-kernel/src/signal/io_proc.rs": "bda0a56f467d8b1ffe7175a3bc370f3edddca54da977b28299bcfb5d8dcd0194",
+    "crates/trames-linux/src/direct/file.rs": "6c299d91803799716830824d6c669adb549889475a2f4d6b335e9208f4d6002b",
+    "crates/trames-linux/src/direct/local_message.rs": "33cde32e96beb7693f004f3acb57f6fb845799c52a9c86f2d08922c30634931c",
+    "crates/trames-linux/src/direct/uring/actor.rs": "8d304cd04547cc0bd7343641d3a076e37d00596dee7730e57c5ed4c72ad74b89",
+    "crates/trames-linux/src/direct/uring/actor_file.rs": "a3f838d62e66a30689ad1e3655434383c614a7c631220df0158ef86bfab9609a",
+    "crates/trames-linux/src/direct/uring/owned_tests.rs": "0898c2ae983d3032701611213190e9766029806ff81fddc8804ff210aa05cd5c",
+    "crates/trames-linux/src/direct/uring/subsystem_tests.rs": "7b7af042aea854ed8d341925529fc6ec1e74915c2ddd75003fce02bf41ade037",
+    "crates/trames-linux/src/direct/uring/wait.rs": "ee5c378b5a863eb7b27d9dfd3cf674409a912ee33259e113cc2102451e9907e2",
+    "crates/trames-linux/src/image.rs": "a4f009a04ce6705841a141531a0927540676e1177729b8a9c691531eaef47fe6",
+    "crates/trames-linux/src/lib.rs": "143ca8cfc54b572fe6f0d217f5faa08561962ac81343bd0b6c2f77808d8fdb7f",
+    "crates/trames-linux/src/state.rs": "b2d9474bd8acce3e1984539411061d7c2c4c042f96eb5464bc7da2c149876927",
+    "crates/trames-memory/src/anonymous.rs": "f053b53099ee04286b5d46097d8daf02fad061a4f272663b9b7552bd7a9e9a9b",
+    "crates/trames-memory/src/backing.rs": "2b7731dce96564fa14be55926acac16e6ead5b20fa9c111e4a6c988516563b45",
+    "crates/trames-memory/src/cpu_memory.rs": "b1b1865a8e7230cc8275fe7fe24b9a6c03bd23336efbb09e3a73f0a872e6b6f2",
+    "crates/trames-memory/src/lib.rs": "6b17b940a9ace030373fefbf3b2124f74bd295dd931ec172fb3f9ecabc7783e1",
+    "crates/trames-memory/src/parallel.rs": "0964f81bb1f8420dae70585603c2a4a43d43a7091a1e31fe8dd2a31a1c6f8a10",
+    "crates/trames-memory/src/parallel/anonymous.rs": "356257bfc44b9d8d6be05a83055033e32ee32a8c576a4360bb77175ab2b2eeea",
+    "crates/trames-memory/src/pinned.rs": "34ad7567088b0d5324397dd64294f0bc671c48930ce61495bc16bd34b07a23e6",
+    "crates/trames-memory/src/read_export.rs": "44d34fa7b475dab870c62ed34a8b80cda1349fb10256c017590f6641bfacf119",
+    "crates/trames-memory/src/report.rs": "e381ca8e7366d8e3a6e46ca285bfef81ff4f844d7696dbe949d144ac1b21744a",
+    "crates/trames-memory/src/residency.rs": "3d486c5e2a96efb0e4058113a607897496362f517eda1d43844d8ce30082bb1c",
+    "crates/trames-net/src/root_routing_tests.rs": "2a2218912efcf4d7381ba49ae3aac76e2a1673c500fc0ea02198bfc96f1d5332",
+    "crates/trames-session/src/lib.rs": "732a675b8bbe9834ea03dcbeab58267d7adfd5be16733aa6848f2d0542c67ad5",
+    "crates/trames-session/src/proc_views.rs": "e957d7a6047d8c8c688b47487f7be3324d88496d624cf7f3f6af2c10d06cf520",
+    "crates/trames-session/src/process.rs": "6058ce6ef95faa4f3b2d1363089e3123f5bc00ed10d7d94d232d357ba3a4c2bc",
+    "crates/trames-session/src/process_exec.rs": "b2ff0d9b97fa221ce6c8d73babdb254b8d84200d4288bf5708ee6f9278c8ddef",
+    "crates/trames-session/src/process_exit.rs": "728461eeb50f4e54c5f0d336620d774f0e5dfcc29dcb4b0feea326c438d3cd38",
+    "crates/trames-session/src/process_proc.rs": "de1626171b797a4e9b238b36c0e5c548d6130bb68c897bbab62a933ec4222110",
+    "crates/trames-session/src/process_service.rs": "5c5b6bc8b89b15b7a8f1cc8d0a1a79539e3cbba336a0ce2678d1e0a03e8147f2",
+    "crates/trames-session/src/process_vm.rs": "43937125a6f74d68cae85a9ae19ec99d8103631531d0530059873c98d41d3d45",
+    "crates/trames-session/src/run_queue.rs": "fb63f136c6dc827850714e11b8b25a5c9d6c20e27781fa6a7e0bfc6c96e71f9b",
+    "crates/trames-session/src/run_queue/domains.rs": "8dff4a1aae09ad0d4ab575725444c9d47b2dac12a40a15e9a66b7a1efc432b3f",
+    "crates/trames-session/src/workers.rs": "0040d3ccaea0142b598a5030e78281935df934d52ed82362122ce628cc369737",
+    "crates/trames-vfs/src/cgroup.rs": "70e4939325337e6b37a53ecab6e8bd335768fd0e7c2f7e75282fde4bdf9c7dd4",
+    "crates/trames-vfs/src/credentials.rs": "9ed8b43780f9ec18f6ede0ae2d282bfc5a44afeee163e8eb65783d5091414271",
+    "crates/trames-vfs/src/descriptor_factory.rs": "e708a3b6430f5f586cc26d81d4fcbf6a6d1b37ed7aef895be6519e75911e5910",
+    "crates/trames-vfs/src/direct_io.rs": "a3b95d76af27efc83408dc47bb4f21b1d07a47e7f819a0b14310c75a73866f2b",
+    "crates/trames-vfs/src/events.rs": "10f766a1ce70298a276d29aaba43669014fea13adc3414ec418c5b4dd96b9906",
+    "crates/trames-vfs/src/executable.rs": "c3357d6d297d02c4432fc643d2cc9ab3d787a1bfd617fa99d1be731afe7c6626",
+    "crates/trames-vfs/src/fd_table.rs": "3a28d2ba14a532e46f4ee814eec822dd05c5371152455cc074038cbe1bb42800",
+    "crates/trames-vfs/src/file_work.rs": "fa9354e186ef92b81b41dd89437711c6bbd66e730f562c760f555ed7532f5fc6",
+    "crates/trames-vfs/src/fs_context.rs": "8ba0ea4bc3a27a7b9e082eb277479a282b5f85d6867109b10108787aa514e5b8",
+    "crates/trames-vfs/src/fs_data.rs": "0881fe155e904b4e27c1801ff5972f69cb702acb6b141dddcf9c71010cce6690",
+    "crates/trames-vfs/src/hostfs.rs": "c165df61f21fdd265f784bb3d6e79eb60f7df2eb572baf86538f78266d734efa",
+    "crates/trames-vfs/src/inotify.rs": "74987d34a747298fa4d838e1f109c408039378b9df8c17b503c6509c0dd48b31",
+    "crates/trames-vfs/src/ipc.rs": "fbb68356e60d4e8c1b79f832f9709cf312b887fe8dce34a67c31e8e4518a23c4",
+    "crates/trames-vfs/src/ipc/native.rs": "a6953f0e68f17248036c82d818b224a2c388e546acb7811c1c02326a02cbda9f",
+    "crates/trames-vfs/src/ipc/shared_graph_tests.rs": "b4b46d906359e7ed2cedf2ba6f6d3a66070e06e23bdf20e33ae35d1b37df8e7d",
+    "crates/trames-vfs/src/ipc/shared_rights.rs": "3020e7194ae3a6797f037285ec6db2930fae98f7e3df9b04cf6d9b9967a02497",
+    "crates/trames-vfs/src/lib.rs": "1490c28127123c096a11bc2463dd587e4546fa48caf00f464a9f102efd5717be",
+    "crates/trames-vfs/src/linux_namespace.rs": "6445ebb6156544249d0314453c7f397fab8a4c97c4392de2fb55d4cd14ad9f40",
+    "crates/trames-vfs/src/mapped.rs": "c2bff7c662319426c1b13d5b7ea02f88cf3fa5ed0a1826f0334232c206e2fc9d",
+    "crates/trames-vfs/src/memfd.rs": "e5f9c2528a04d3b061c2dfd4062aa6d4a29a364fcd2005b42632bd0f3e7935d8",
+    "crates/trames-vfs/src/mounts.rs": "b01578b2896c19e1718b77472c1dba25030957827860784c9d2c15404d67daef",
+    "crates/trames-vfs/src/mounts/watch.rs": "f83d580ce27245e6212660d8022cfb4cc349666062b7d446661527959fb58fe7",
+    "crates/trames-vfs/src/namespace.rs": "3da543439323203a0fd5f340fb80dc59600b414ceb0e8f6bde38eb5bbb654169",
+    "crates/trames-vfs/src/namespace_work.rs": "9d7bcf21be5d1e716b0d03e226d2b0acaf3e6b5c2a31b8105df1953c6155b232",
+    "crates/trames-vfs/src/native_images.rs": "5b15c26c9767ce4c27d82f24c70e29271d9dd4c56880dc9314af3276bf273812",
+    "crates/trames-vfs/src/network.rs": "d09fec42da187c600b64de325bc3e990a2616817686d51d534e4d0cca637bcd4",
+    "crates/trames-vfs/src/open_handle.rs": "028a1a7489fc41c7dab6ac77baf84dafc8e99a6943db8cf48fde945b0138394f",
+    "crates/trames-vfs/src/overlay.rs": "2ced4707c5c8cf1a5588e4efaa65e8cac239f6ffe706de5c88bb43dec4dc738a",
+    "crates/trames-vfs/src/path_queries.rs": "47069dfc4de404f806ade26d0d649dcf31ed839971519a42394621fedf103475",
+    "crates/trames-vfs/src/proc_file.rs": "43163cd49af7218e0313063099cf29f0f3b8582f53d196b04f1df05f53f2dcb4",
+    "crates/trames-vfs/src/proc_image.rs": "77433fdb42a189818041bf840e828664d3ca2997341d836050ec8ae1b62befcc",
+    "crates/trames-vfs/src/proc_source.rs": "5e9893785cb57073a35c6529f1ee8333f9ad0249fe1205545aaa95fc67f05cec",
+    "crates/trames-vfs/src/pseudo.rs": "32b5da719c73e67d647f5231a44a67ac168b7e6cdfc7aada01221717316d5176",
+    "crates/trames-vfs/src/pty.rs": "5e92f708386f5532915f096db6e5240976f4e97f41b8ee359c07656771ef1df7",
+    "crates/trames-vfs/src/shared_control_tests.rs": "c45ca3f3659f77f97593ff89b47512f3ea48c0c649f400d887af3eb75192dee6",
+    "crates/trames-vfs/src/stream_transfer.rs": "5fd223178a59867f500c236d602f2bde071d7865de37541140b8f2a7ba78c127",
+    "docs/architecture/coordination-boundaries.md": "1aaa66e0787727327e5d1d1435370856ee69a32e033da1b48a8c407c310fb7e4"
+  },
+  "fixture_source_sha256": "1c60e1e41a9292356ef489f88f50c925e9feda88912f7c6a9cce600a39081c45",
+  "benchmark": {
+    "runners": {
+      "before": "47eb6e30f317d1305e4a33e2fea8f5fe3976f8b70428a00ae929232dca7cb17d",
+      "after": "317c7e759c5006e0b3751c199d3115f4b91ff13240ef63d8015565443e55053e"
+    },
+    "fixture_sha256": "1257b72f9707a29eefb744977c2c783b0df0977baf84d107c03fa939a57b2bb6",
+    "samples": [
+      {
+        "cpus": 1,
+        "sample": 0,
+        "phase": "before",
+        "mode": "loops",
+        "threads": 1,
+        "loops": 256,
+        "elapsed_ns": 14374292
+      },
+      {
+        "cpus": 1,
+        "sample": 0,
+        "phase": "after",
+        "mode": "loops",
+        "threads": 1,
+        "loops": 256,
+        "elapsed_ns": 12104084
+      },
+      {
+        "cpus": 1,
+        "sample": 1,
+        "phase": "after",
+        "mode": "loops",
+        "threads": 1,
+        "loops": 256,
+        "elapsed_ns": 12487542
+      },
+      {
+        "cpus": 1,
+        "sample": 1,
+        "phase": "before",
+        "mode": "loops",
+        "threads": 1,
+        "loops": 256,
+        "elapsed_ns": 14574250
+      },
+      {
+        "cpus": 1,
+        "sample": 2,
+        "phase": "before",
+        "mode": "loops",
+        "threads": 1,
+        "loops": 256,
+        "elapsed_ns": 14467333
+      },
+      {
+        "cpus": 1,
+        "sample": 2,
+        "phase": "after",
+        "mode": "loops",
+        "threads": 1,
+        "loops": 256,
+        "elapsed_ns": 12058167
+      },
+      {
+        "cpus": 1,
+        "sample": 3,
+        "phase": "after",
+        "mode": "loops",
+        "threads": 1,
+        "loops": 256,
+        "elapsed_ns": 12420291
+      },
+      {
+        "cpus": 1,
+        "sample": 3,
+        "phase": "before",
+        "mode": "loops",
+        "threads": 1,
+        "loops": 256,
+        "elapsed_ns": 14424833
+      },
+      {
+        "cpus": 1,
+        "sample": 4,
+        "phase": "before",
+        "mode": "loops",
+        "threads": 1,
+        "loops": 256,
+        "elapsed_ns": 14250417
+      },
+      {
+        "cpus": 1,
+        "sample": 4,
+        "phase": "after",
+        "mode": "loops",
+        "threads": 1,
+        "loops": 256,
+        "elapsed_ns": 12260125
+      },
+      {
+        "cpus": 1,
+        "sample": 5,
+        "phase": "after",
+        "mode": "loops",
+        "threads": 1,
+        "loops": 256,
+        "elapsed_ns": 12567208
+      },
+      {
+        "cpus": 1,
+        "sample": 5,
+        "phase": "before",
+        "mode": "loops",
+        "threads": 1,
+        "loops": 256,
+        "elapsed_ns": 14405708
+      },
+      {
+        "cpus": 1,
+        "sample": 6,
+        "phase": "before",
+        "mode": "loops",
+        "threads": 1,
+        "loops": 256,
+        "elapsed_ns": 14236458
+      },
+      {
+        "cpus": 1,
+        "sample": 6,
+        "phase": "after",
+        "mode": "loops",
+        "threads": 1,
+        "loops": 256,
+        "elapsed_ns": 11774083
+      },
+      {
+        "cpus": 2,
+        "sample": 0,
+        "phase": "before",
+        "mode": "loops",
+        "threads": 2,
+        "loops": 256,
+        "elapsed_ns": 92361542
+      },
+      {
+        "cpus": 2,
+        "sample": 0,
+        "phase": "after",
+        "mode": "loops",
+        "threads": 2,
+        "loops": 256,
+        "elapsed_ns": 21748667
+      },
+      {
+        "cpus": 2,
+        "sample": 1,
+        "phase": "after",
+        "mode": "loops",
+        "threads": 2,
+        "loops": 256,
+        "elapsed_ns": 21152417
+      },
+      {
+        "cpus": 2,
+        "sample": 1,
+        "phase": "before",
+        "mode": "loops",
+        "threads": 2,
+        "loops": 256,
+        "elapsed_ns": 94821375
+      },
+      {
+        "cpus": 2,
+        "sample": 2,
+        "phase": "before",
+        "mode": "loops",
+        "threads": 2,
+        "loops": 256,
+        "elapsed_ns": 94655625
+      },
+      {
+        "cpus": 2,
+        "sample": 2,
+        "phase": "after",
+        "mode": "loops",
+        "threads": 2,
+        "loops": 256,
+        "elapsed_ns": 19816375
+      },
+      {
+        "cpus": 2,
+        "sample": 3,
+        "phase": "after",
+        "mode": "loops",
+        "threads": 2,
+        "loops": 256,
+        "elapsed_ns": 20432708
+      },
+      {
+        "cpus": 2,
+        "sample": 3,
+        "phase": "before",
+        "mode": "loops",
+        "threads": 2,
+        "loops": 256,
+        "elapsed_ns": 91238042
+      },
+      {
+        "cpus": 2,
+        "sample": 4,
+        "phase": "before",
+        "mode": "loops",
+        "threads": 2,
+        "loops": 256,
+        "elapsed_ns": 88219000
+      },
+      {
+        "cpus": 2,
+        "sample": 4,
+        "phase": "after",
+        "mode": "loops",
+        "threads": 2,
+        "loops": 256,
+        "elapsed_ns": 21229416
+      },
+      {
+        "cpus": 2,
+        "sample": 5,
+        "phase": "after",
+        "mode": "loops",
+        "threads": 2,
+        "loops": 256,
+        "elapsed_ns": 20060292
+      },
+      {
+        "cpus": 2,
+        "sample": 5,
+        "phase": "before",
+        "mode": "loops",
+        "threads": 2,
+        "loops": 256,
+        "elapsed_ns": 87277833
+      },
+      {
+        "cpus": 2,
+        "sample": 6,
+        "phase": "before",
+        "mode": "loops",
+        "threads": 2,
+        "loops": 256,
+        "elapsed_ns": 89295500
+      },
+      {
+        "cpus": 2,
+        "sample": 6,
+        "phase": "after",
+        "mode": "loops",
+        "threads": 2,
+        "loops": 256,
+        "elapsed_ns": 20185167
+      },
+      {
+        "cpus": 4,
+        "sample": 0,
+        "phase": "before",
+        "mode": "loops",
+        "threads": 4,
+        "loops": 256,
+        "elapsed_ns": 223277084
+      },
+      {
+        "cpus": 4,
+        "sample": 0,
+        "phase": "after",
+        "mode": "loops",
+        "threads": 4,
+        "loops": 256,
+        "elapsed_ns": 35484417
+      },
+      {
+        "cpus": 4,
+        "sample": 1,
+        "phase": "after",
+        "mode": "loops",
+        "threads": 4,
+        "loops": 256,
+        "elapsed_ns": 35488666
+      },
+      {
+        "cpus": 4,
+        "sample": 1,
+        "phase": "before",
+        "mode": "loops",
+        "threads": 4,
+        "loops": 256,
+        "elapsed_ns": 208781917
+      },
+      {
+        "cpus": 4,
+        "sample": 2,
+        "phase": "before",
+        "mode": "loops",
+        "threads": 4,
+        "loops": 256,
+        "elapsed_ns": 198746875
+      },
+      {
+        "cpus": 4,
+        "sample": 2,
+        "phase": "after",
+        "mode": "loops",
+        "threads": 4,
+        "loops": 256,
+        "elapsed_ns": 35132959
+      },
+      {
+        "cpus": 4,
+        "sample": 3,
+        "phase": "after",
+        "mode": "loops",
+        "threads": 4,
+        "loops": 256,
+        "elapsed_ns": 35343291
+      },
+      {
+        "cpus": 4,
+        "sample": 3,
+        "phase": "before",
+        "mode": "loops",
+        "threads": 4,
+        "loops": 256,
+        "elapsed_ns": 197819708
+      },
+      {
+        "cpus": 4,
+        "sample": 4,
+        "phase": "before",
+        "mode": "loops",
+        "threads": 4,
+        "loops": 256,
+        "elapsed_ns": 196784667
+      },
+      {
+        "cpus": 4,
+        "sample": 4,
+        "phase": "after",
+        "mode": "loops",
+        "threads": 4,
+        "loops": 256,
+        "elapsed_ns": 35355458
+      },
+      {
+        "cpus": 4,
+        "sample": 5,
+        "phase": "after",
+        "mode": "loops",
+        "threads": 4,
+        "loops": 256,
+        "elapsed_ns": 35458083
+      },
+      {
+        "cpus": 4,
+        "sample": 5,
+        "phase": "before",
+        "mode": "loops",
+        "threads": 4,
+        "loops": 256,
+        "elapsed_ns": 198031458
+      },
+      {
+        "cpus": 4,
+        "sample": 6,
+        "phase": "before",
+        "mode": "loops",
+        "threads": 4,
+        "loops": 256,
+        "elapsed_ns": 198567125
+      },
+      {
+        "cpus": 4,
+        "sample": 6,
+        "phase": "after",
+        "mode": "loops",
+        "threads": 4,
+        "loops": 256,
+        "elapsed_ns": 34938208
+      },
+      {
+        "cpus": 12,
+        "sample": 0,
+        "phase": "before",
+        "mode": "loops",
+        "threads": 12,
+        "loops": 256,
+        "elapsed_ns": 1428889166
+      },
+      {
+        "cpus": 12,
+        "sample": 0,
+        "phase": "after",
+        "mode": "loops",
+        "threads": 12,
+        "loops": 256,
+        "elapsed_ns": 95474708
+      },
+      {
+        "cpus": 12,
+        "sample": 1,
+        "phase": "after",
+        "mode": "loops",
+        "threads": 12,
+        "loops": 256,
+        "elapsed_ns": 89602042
+      },
+      {
+        "cpus": 12,
+        "sample": 1,
+        "phase": "before",
+        "mode": "loops",
+        "threads": 12,
+        "loops": 256,
+        "elapsed_ns": 1406578334
+      },
+      {
+        "cpus": 12,
+        "sample": 2,
+        "phase": "before",
+        "mode": "loops",
+        "threads": 12,
+        "loops": 256,
+        "elapsed_ns": 1419268750
+      },
+      {
+        "cpus": 12,
+        "sample": 2,
+        "phase": "after",
+        "mode": "loops",
+        "threads": 12,
+        "loops": 256,
+        "elapsed_ns": 117296709
+      },
+      {
+        "cpus": 12,
+        "sample": 3,
+        "phase": "after",
+        "mode": "loops",
+        "threads": 12,
+        "loops": 256,
+        "elapsed_ns": 91755709
+      },
+      {
+        "cpus": 12,
+        "sample": 3,
+        "phase": "before",
+        "mode": "loops",
+        "threads": 12,
+        "loops": 256,
+        "elapsed_ns": 1403465250
+      },
+      {
+        "cpus": 12,
+        "sample": 4,
+        "phase": "before",
+        "mode": "loops",
+        "threads": 12,
+        "loops": 256,
+        "elapsed_ns": 1434743917
+      },
+      {
+        "cpus": 12,
+        "sample": 4,
+        "phase": "after",
+        "mode": "loops",
+        "threads": 12,
+        "loops": 256,
+        "elapsed_ns": 117354959
+      },
+      {
+        "cpus": 12,
+        "sample": 5,
+        "phase": "after",
+        "mode": "loops",
+        "threads": 12,
+        "loops": 256,
+        "elapsed_ns": 108933125
+      },
+      {
+        "cpus": 12,
+        "sample": 5,
+        "phase": "before",
+        "mode": "loops",
+        "threads": 12,
+        "loops": 256,
+        "elapsed_ns": 1420957583
+      },
+      {
+        "cpus": 12,
+        "sample": 6,
+        "phase": "before",
+        "mode": "loops",
+        "threads": 12,
+        "loops": 256,
+        "elapsed_ns": 1413543709
+      },
+      {
+        "cpus": 12,
+        "sample": 6,
+        "phase": "after",
+        "mode": "loops",
+        "threads": 12,
+        "loops": 256,
+        "elapsed_ns": 93394750
+      }
+    ]
+  },
+  "medians": [
+    {
+      "cpus": 1,
+      "before_ms": 14.405708,
+      "after_ms": 12.260125,
+      "speedup": 1.1750049856751053
+    },
+    {
+      "cpus": 2,
+      "before_ms": 91.238042,
+      "after_ms": 20.432708,
+      "speedup": 4.465293685007391
+    },
+    {
+      "cpus": 4,
+      "before_ms": 198.567125,
+      "after_ms": 35.355458,
+      "speedup": 5.616307530226309
+    },
+    {
+      "cpus": 12,
+      "before_ms": 1419.26875,
+      "after_ms": 95.474708,
+      "speedup": 14.865389795169628
+    }
+  ],
+  "measurement_scope": "Longest worker loop, one thread per configured CPU, 256 loops each of status open/pread/fstat/close plus cwd stat and exe readlink. Seven alternating unprofiled pairs; setup/join excluded. Exact packaged candidate measured after all agent workloads and the local CI VM stopped; existing desktop/business services remain. No Firefox or Geekbench performance claim.",
+  "acceptance": {
+    "hvf": {
+      "backend": "hvf",
+      "fixture_sha256": "1257b72f9707a29eefb744977c2c783b0df0977baf84d107c03fa939a57b2bb6",
+      "cases": [
+        {
+          "cpus": 1,
+          "filtered": false,
+          "returncode": 0
+        },
+        {
+          "cpus": 1,
+          "filtered": true,
+          "returncode": 0
+        },
+        {
+          "cpus": 2,
+          "filtered": false,
+          "returncode": 0
+        },
+        {
+          "cpus": 2,
+          "filtered": true,
+          "returncode": 0
+        },
+        {
+          "cpus": 4,
+          "filtered": false,
+          "returncode": 0
+        },
+        {
+          "cpus": 4,
+          "filtered": true,
+          "returncode": 0
+        },
+        {
+          "cpus": 12,
+          "filtered": false,
+          "returncode": 0
+        },
+        {
+          "cpus": 12,
+          "filtered": true,
+          "returncode": 0
+        }
+      ],
+      "runner_sha256": "c63e7e6faa8489acd746d61a34a795a1d066f9d3fd3cdb547a3405552ce68d20"
+    },
+    "interpreter": {
+      "backend": "interpreter",
+      "fixture_sha256": "1257b72f9707a29eefb744977c2c783b0df0977baf84d107c03fa939a57b2bb6",
+      "cases": [
+        {
+          "cpus": 1,
+          "filtered": false,
+          "returncode": 0
+        },
+        {
+          "cpus": 1,
+          "filtered": true,
+          "returncode": 0
+        },
+        {
+          "cpus": 2,
+          "filtered": false,
+          "returncode": 0
+        },
+        {
+          "cpus": 2,
+          "filtered": true,
+          "returncode": 0
+        },
+        {
+          "cpus": 4,
+          "filtered": false,
+          "returncode": 0
+        },
+        {
+          "cpus": 4,
+          "filtered": true,
+          "returncode": 0
+        },
+        {
+          "cpus": 12,
+          "filtered": false,
+          "returncode": 0
+        },
+        {
+          "cpus": 12,
+          "filtered": true,
+          "returncode": 0
+        }
+      ],
+      "runner_sha256": "b59119b674d73e394bcc1330c38a81dbfde8e247f41e3086e5f50ff8fafa08d3"
+    },
+    "native_linux": {
+      "backend": "native",
+      "fixture_sha256": "1257b72f9707a29eefb744977c2c783b0df0977baf84d107c03fa939a57b2bb6",
+      "cases": [
+        {
+          "cpus": 1,
+          "filtered": false,
+          "returncode": 0
+        },
+        {
+          "cpus": 1,
+          "filtered": true,
+          "returncode": 0
+        },
+        {
+          "cpus": 2,
+          "filtered": false,
+          "returncode": 0
+        },
+        {
+          "cpus": 2,
+          "filtered": true,
+          "returncode": 0
+        },
+        {
+          "cpus": 4,
+          "filtered": false,
+          "returncode": 0
+        },
+        {
+          "cpus": 4,
+          "filtered": true,
+          "returncode": 0
+        },
+        {
+          "cpus": 12,
+          "filtered": false,
+          "returncode": 0
+        },
+        {
+          "cpus": 12,
+          "filtered": true,
+          "returncode": 0
+        }
+      ]
+    },
+    "packaged_hvf": {
+      "backend": "hvf",
+      "fixture_sha256": "1257b72f9707a29eefb744977c2c783b0df0977baf84d107c03fa939a57b2bb6",
+      "cases": [
+        {
+          "cpus": 1,
+          "filtered": false,
+          "returncode": 0
+        },
+        {
+          "cpus": 1,
+          "filtered": true,
+          "returncode": 0
+        },
+        {
+          "cpus": 12,
+          "filtered": false,
+          "returncode": 0
+        },
+        {
+          "cpus": 12,
+          "filtered": true,
+          "returncode": 0
+        }
+      ],
+      "runner_sha256": "317c7e759c5006e0b3751c199d3115f4b91ff13240ef63d8015565443e55053e"
+    }
+  },
+  "execution_paths": [
+    {
+      "case": "final-hvf/1-filtered",
+      "paths": {
+        "cohort_rounds": 0,
+        "cohort_stop_us": 0,
+        "service_caller_wait_us": 0,
+        "service_requests": 0,
+        "serviced_syscalls": 0,
+        "syscalls": 310,
+        "vm_local_syscalls": 0,
+        "worker_direct_syscalls": 0,
+        "worker_fd_syscalls": 0,
+        "worker_file_syscalls": 0,
+        "worker_futex_waits": 0,
+        "worker_futex_wakes": 0,
+        "worker_gpu_calls": 0,
+        "worker_gpu_waits": 0,
+        "worker_poll_syscalls": 0,
+        "worker_socket_syscalls": 0,
+        "worker_syscalls": 0,
+        "worker_task_resumes": 0,
+        "worker_uring_syscalls": 0
+      },
+      "whole_cohort_returns": "[]"
+    },
+    {
+      "case": "final-hvf/1-raw",
+      "paths": {
+        "cohort_rounds": 0,
+        "cohort_stop_us": 0,
+        "service_caller_wait_us": 0,
+        "service_requests": 0,
+        "serviced_syscalls": 0,
+        "syscalls": 308,
+        "vm_local_syscalls": 0,
+        "worker_direct_syscalls": 0,
+        "worker_fd_syscalls": 0,
+        "worker_file_syscalls": 0,
+        "worker_futex_waits": 0,
+        "worker_futex_wakes": 0,
+        "worker_gpu_calls": 0,
+        "worker_gpu_waits": 0,
+        "worker_poll_syscalls": 0,
+        "worker_socket_syscalls": 0,
+        "worker_syscalls": 0,
+        "worker_task_resumes": 0,
+        "worker_uring_syscalls": 0
+      },
+      "whole_cohort_returns": "[]"
+    },
+    {
+      "case": "final-hvf/12-filtered",
+      "paths": {
+        "cohort_rounds": 1,
+        "cohort_stop_us": 0,
+        "service_caller_wait_us": 0,
+        "service_requests": 0,
+        "serviced_syscalls": 0,
+        "syscalls": 2588,
+        "vm_local_syscalls": 36,
+        "worker_direct_syscalls": 1940,
+        "worker_fd_syscalls": 406,
+        "worker_file_syscalls": 1936,
+        "worker_futex_waits": 30,
+        "worker_futex_wakes": 28,
+        "worker_gpu_calls": 0,
+        "worker_gpu_waits": 0,
+        "worker_poll_syscalls": 0,
+        "worker_socket_syscalls": 0,
+        "worker_syscalls": 2471,
+        "worker_task_resumes": 33,
+        "worker_uring_syscalls": 0
+      },
+      "whole_cohort_returns": "[(29, 1)]"
+    },
+    {
+      "case": "final-hvf/12-raw",
+      "paths": {
+        "cohort_rounds": 1,
+        "cohort_stop_us": 0,
+        "service_caller_wait_us": 0,
+        "service_requests": 0,
+        "serviced_syscalls": 0,
+        "syscalls": 2585,
+        "vm_local_syscalls": 36,
+        "worker_direct_syscalls": 1940,
+        "worker_fd_syscalls": 406,
+        "worker_file_syscalls": 1936,
+        "worker_futex_waits": 28,
+        "worker_futex_wakes": 28,
+        "worker_gpu_calls": 0,
+        "worker_gpu_waits": 0,
+        "worker_poll_syscalls": 0,
+        "worker_socket_syscalls": 0,
+        "worker_syscalls": 2470,
+        "worker_task_resumes": 32,
+        "worker_uring_syscalls": 0
+      },
+      "whole_cohort_returns": "[(29, 1)]"
+    },
+    {
+      "case": "final-hvf/2-filtered",
+      "paths": {
+        "cohort_rounds": 1,
+        "cohort_stop_us": 0,
+        "service_caller_wait_us": 0,
+        "service_requests": 0,
+        "serviced_syscalls": 0,
+        "syscalls": 514,
+        "vm_local_syscalls": 6,
+        "worker_direct_syscalls": 330,
+        "worker_fd_syscalls": 76,
+        "worker_file_syscalls": 326,
+        "worker_futex_waits": 6,
+        "worker_futex_wakes": 8,
+        "worker_gpu_calls": 0,
+        "worker_gpu_waits": 0,
+        "worker_poll_syscalls": 0,
+        "worker_socket_syscalls": 0,
+        "worker_syscalls": 437,
+        "worker_task_resumes": 10,
+        "worker_uring_syscalls": 0
+      },
+      "whole_cohort_returns": "[(29, 1)]"
+    },
+    {
+      "case": "final-hvf/2-raw",
+      "paths": {
+        "cohort_rounds": 1,
+        "cohort_stop_us": 0,
+        "service_caller_wait_us": 0,
+        "service_requests": 0,
+        "serviced_syscalls": 0,
+        "syscalls": 512,
+        "vm_local_syscalls": 6,
+        "worker_direct_syscalls": 330,
+        "worker_fd_syscalls": 76,
+        "worker_file_syscalls": 326,
+        "worker_futex_waits": 6,
+        "worker_futex_wakes": 8,
+        "worker_gpu_calls": 0,
+        "worker_gpu_waits": 0,
+        "worker_poll_syscalls": 0,
+        "worker_socket_syscalls": 0,
+        "worker_syscalls": 437,
+        "worker_task_resumes": 10,
+        "worker_uring_syscalls": 0
+      },
+      "whole_cohort_returns": "[(29, 1)]"
+    },
+    {
+      "case": "final-hvf/4-filtered",
+      "paths": {
+        "cohort_rounds": 1,
+        "cohort_stop_us": 0,
+        "service_caller_wait_us": 0,
+        "service_requests": 0,
+        "serviced_syscalls": 0,
+        "syscalls": 928,
+        "vm_local_syscalls": 12,
+        "worker_direct_syscalls": 652,
+        "worker_fd_syscalls": 142,
+        "worker_file_syscalls": 648,
+        "worker_futex_waits": 9,
+        "worker_futex_wakes": 12,
+        "worker_gpu_calls": 0,
+        "worker_gpu_waits": 0,
+        "worker_poll_syscalls": 0,
+        "worker_socket_syscalls": 0,
+        "worker_syscalls": 843,
+        "worker_task_resumes": 13,
+        "worker_uring_syscalls": 0
+      },
+      "whole_cohort_returns": "[(29, 1)]"
+    },
+    {
+      "case": "final-hvf/4-raw",
+      "paths": {
+        "cohort_rounds": 1,
+        "cohort_stop_us": 0,
+        "service_caller_wait_us": 0,
+        "service_requests": 0,
+        "serviced_syscalls": 0,
+        "syscalls": 928,
+        "vm_local_syscalls": 12,
+        "worker_direct_syscalls": 652,
+        "worker_fd_syscalls": 142,
+        "worker_file_syscalls": 648,
+        "worker_futex_waits": 12,
+        "worker_futex_wakes": 12,
+        "worker_gpu_calls": 0,
+        "worker_gpu_waits": 0,
+        "worker_poll_syscalls": 0,
+        "worker_socket_syscalls": 0,
+        "worker_syscalls": 845,
+        "worker_task_resumes": 15,
+        "worker_uring_syscalls": 0
+      },
+      "whole_cohort_returns": "[(29, 1)]"
+    },
+    {
+      "case": "package-smoke/1-filtered",
+      "paths": {
+        "cohort_rounds": 0,
+        "cohort_stop_us": 0,
+        "service_caller_wait_us": 0,
+        "service_requests": 0,
+        "serviced_syscalls": 0,
+        "syscalls": 310,
+        "vm_local_syscalls": 0,
+        "worker_direct_syscalls": 0,
+        "worker_fd_syscalls": 0,
+        "worker_file_syscalls": 0,
+        "worker_futex_waits": 0,
+        "worker_futex_wakes": 0,
+        "worker_gpu_calls": 0,
+        "worker_gpu_waits": 0,
+        "worker_poll_syscalls": 0,
+        "worker_socket_syscalls": 0,
+        "worker_syscalls": 0,
+        "worker_task_resumes": 0,
+        "worker_uring_syscalls": 0
+      },
+      "whole_cohort_returns": "[]"
+    },
+    {
+      "case": "package-smoke/1-raw",
+      "paths": {
+        "cohort_rounds": 0,
+        "cohort_stop_us": 0,
+        "service_caller_wait_us": 0,
+        "service_requests": 0,
+        "serviced_syscalls": 0,
+        "syscalls": 308,
+        "vm_local_syscalls": 0,
+        "worker_direct_syscalls": 0,
+        "worker_fd_syscalls": 0,
+        "worker_file_syscalls": 0,
+        "worker_futex_waits": 0,
+        "worker_futex_wakes": 0,
+        "worker_gpu_calls": 0,
+        "worker_gpu_waits": 0,
+        "worker_poll_syscalls": 0,
+        "worker_socket_syscalls": 0,
+        "worker_syscalls": 0,
+        "worker_task_resumes": 0,
+        "worker_uring_syscalls": 0
+      },
+      "whole_cohort_returns": "[]"
+    },
+    {
+      "case": "package-smoke/12-filtered",
+      "paths": {
+        "cohort_rounds": 1,
+        "cohort_stop_us": 0,
+        "service_caller_wait_us": 0,
+        "service_requests": 0,
+        "serviced_syscalls": 0,
+        "syscalls": 2592,
+        "vm_local_syscalls": 36,
+        "worker_direct_syscalls": 1940,
+        "worker_fd_syscalls": 406,
+        "worker_file_syscalls": 1936,
+        "worker_futex_waits": 32,
+        "worker_futex_wakes": 28,
+        "worker_gpu_calls": 0,
+        "worker_gpu_waits": 0,
+        "worker_poll_syscalls": 0,
+        "worker_socket_syscalls": 0,
+        "worker_syscalls": 2475,
+        "worker_task_resumes": 35,
+        "worker_uring_syscalls": 0
+      },
+      "whole_cohort_returns": "[(29, 1)]"
+    },
+    {
+      "case": "package-smoke/12-raw",
+      "paths": {
+        "cohort_rounds": 1,
+        "cohort_stop_us": 0,
+        "service_caller_wait_us": 0,
+        "service_requests": 0,
+        "serviced_syscalls": 0,
+        "syscalls": 2586,
+        "vm_local_syscalls": 36,
+        "worker_direct_syscalls": 1940,
+        "worker_fd_syscalls": 406,
+        "worker_file_syscalls": 1936,
+        "worker_futex_waits": 30,
+        "worker_futex_wakes": 28,
+        "worker_gpu_calls": 0,
+        "worker_gpu_waits": 0,
+        "worker_poll_syscalls": 0,
+        "worker_socket_syscalls": 0,
+        "worker_syscalls": 2471,
+        "worker_task_resumes": 34,
+        "worker_uring_syscalls": 0
+      },
+      "whole_cohort_returns": "[(29, 1)]"
+    }
+  ],
+  "validation": {
+    "runtime_ci": "Complete macOS and ARM Linux runtime workflow, resumed after targeted failures; unchanged passes reused rather than rerunning the entire workspace.",
+    "apple": {
+      "vfs": 530,
+      "kernel_library": 65,
+      "kernel_integration": 2,
+      "process_conformance": 336,
+      "memory": 176,
+      "memory_metadata": 2,
+      "memory_translation": 4,
+      "linux": 237
+    },
+    "native_linux": {
+      "vfs": 529,
+      "kernel_library": 65,
+      "process_conformance": 336,
+      "linux": 237
+    },
+    "ignored": "Existing manual/hardware cases remain ignored by generic cargo test; Mac hardware acceptance ran explicitly.",
+    "strict_checks": true,
+    "workspace_release_builds": true,
+    "reclaim_footprint_examples": true,
+    "mac_product": 20,
+    "mac_nonhardware": 4,
+    "hardware": {
+      "passed": true,
+      "runtime_revision": "e6d700c3147a4fb5a2a772dfcbb28eb636ac53fc",
+      "rows": [
+        {
+          "target": "trames-mac-run",
+          "executable_sha256": "6640ffe6545bd4ed0fbe47ec390c2dac541ac99d49a616c326dc1f3bc0cd833c",
+          "exit": 0,
+          "passed_tests": 1
+        },
+        {
+          "target": "trames_hvf",
+          "executable_sha256": "f7bf04f7722fa9311d3dcce5099ee1720282269748aa6fc2da7d6cbb06093702",
+          "exit": 0,
+          "passed_tests": 47
+        }
+      ],
+      "source_note": "The harness built the stage-53 working tree through the final owner-lookup deduplication; runtime-version.json still named the baseline in that isolated source checkout. The later O_TRUNC control-open fix does not change HVF/memory/hardware paths, so those passes are reused."
+    },
+    "ipad_device_compile": true,
+    "ipad_simulator_compile": true,
+    "physical_ipad_test": false,
+    "go_gc_rounds": 30,
+    "docker_rounds": 8,
+    "docker_log_sha256": "8c8b929e8d6c44ec88a31702d2c73206cc355698e38f0f5e209f047c4625c804",
+    "reused_results": "After the final O_TRUNC control-open fix, the affected VFS control and pathname cases passed on macOS/native Linux and real Docker passed eight rounds; unchanged proc read matrices, memory, graphics and interpreter checks are reused. Formatting-only Mac adapter change does not trigger another full run."
+  },
+  "native_semantic_oracles": {
+    "namespace": {
+      "older_bind_errno": 22,
+      "self_bind_errno": 22,
+      "newer_bind_errno": 0,
+      "bound_inode_matches": true,
+      "unshare_drops_namespace_binding": true
+    },
+    "other_oracle_sha256": {
+      "native-directory-current.json": "e2fc1a820bce7dd028c9660b9a9fc2b965ae53e0808eaee37c42c3bcf3e3a5df",
+      "native-lifetime.json": "9963bf24f3f8ad84634d7c1197ef25a45d460f2d6b263286fe2b36276f37db26",
+      "native-directory-lifetime.json": "962e8ddf67835cb31e15ec29b459ced68d5ab2c2018b26b5170e6b7180b48c2a",
+      "native-auxv-unread.json": "622a7d55cf1b78cbb46dca6670a723f6f6177892e07ce8a9dde45f6d1900367a"
+    }
+  },
+  "fixed_during_acceptance": [
+    "Missing original cwd/root in solo directory-relative lookups.",
+    "Duplicate joined snapshot and discovery walk caused a single-core regression; both removed for available live providers.",
+    "io_uring remote proc reads needed actual FileWork dependency subscriptions, including a second page discovered by setproctitle.",
+    "Owner-only fixtures for newly shared OOM/sysctl/namespace resources replaced with actual retained epoll owner graphs.",
+    "Nonblocking TCP test setup now waits for accept readiness; no production network change.",
+    "runc O_TRUNC sysctl opens incorrectly became regular truncate jobs; owner/worker control-open semantics now match, verified against baseline and eight candidate Docker rounds."
+  ],
+  "remaining": [
+    "First cross-mm byte export/revalidation still uses original target-mm structural admission, without a full-cohort stop.",
+    "Actual mount/unshare/setns, credentials/capabilities, tracing/security effects and owner-only control graphs retain their boundaries.",
+    "Legacy synthetic providers and unavailable host accounting retain explicit joined fallback.",
+    "Deleted dentry-name history and anonymous endpoint O_PATH/pipe reopening retain inherited compatibility limits.",
+    "Generic unhandled dispatch still reaches the owner; global coordinator removal is incomplete."
+  ],
+  "installation": {
+    "channel": "dev",
+    "stable_unchanged": true,
+    "pending": false,
+    "benchmark_package_note": "Mac product source received a rustfmt-only adjustment after measurement; functional acceptance is reused. Final installation hash is recorded separately.",
+    "installed_binary_sha256": "ca3c181688dbb0debe5839a2dbead52fba2355412eb3a6aea28cdf78efc441e1",
+    "packaged_binary_sha256": "ca3c181688dbb0debe5839a2dbead52fba2355412eb3a6aea28cdf78efc441e1",
+    "mac_revision": "f407601292a3d181cd029146ce0ee2507bcb5d7d",
+    "runtime_revision": "b26b2ad732663e6aedb665a3e3bc61b676b9746e",
+    "installed_12_cpu_smoke_passed": true,
+    "installed_paths": {
+      "cohort_rounds": 1,
+      "cohort_stop_us": 0,
+      "service_caller_wait_us": 0,
+      "service_requests": 0,
+      "serviced_syscalls": 0,
+      "syscalls": 2585,
+      "vm_local_syscalls": 36,
+      "worker_direct_syscalls": 1940,
+      "worker_fd_syscalls": 406,
+      "worker_file_syscalls": 1936,
+      "worker_futex_waits": 25,
+      "worker_futex_wakes": 28,
+      "worker_gpu_calls": 0,
+      "worker_gpu_waits": 0,
+      "worker_poll_syscalls": 0,
+      "worker_socket_syscalls": 0,
+      "worker_syscalls": 2468,
+      "worker_task_resumes": 29,
+      "worker_uring_syscalls": 0
+    },
+    "stable_binary_sha256": "4f40615213e731b2a4ef9d8c6a0e85c5c7bdf31ab0c60b0354b55113f2a6a55d"
+  }
+}

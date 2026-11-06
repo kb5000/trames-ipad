@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-#![recursion_limit = "256"]
+#![recursion_limit = "512"]
 use std::{
     collections::VecDeque,
     env,

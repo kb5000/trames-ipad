@@ -2,6 +2,7 @@
 //! Version 3 embedding ABI. Retained v1 functions keep their signatures/semantics.
 //! All runtime/VFS objects stay on their owning worker. Only bounded byte copies
 //! require unsafe code; callers own and keep their C buffers valid for each call.
+#![recursion_limit = "512"]
 mod clipboard;
 mod session;
 mod terminals;
