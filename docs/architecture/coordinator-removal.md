@@ -2,21 +2,21 @@
 
 ## Current status — 2026-11-07
 
-Stage 60 moves the supported BPF/cgroup device-policy subsystem to calling workers:
-program loading, identity and ID reopening, attach/replace/detach/query, original
-FD lifetime, and the cgroup directory/control-file paths used to obtain targets.
-Pure verification runs outside the short original registry transaction. Device
-access consumes the same shared rule graph, with no new hot-path lock or check.
-Concurrent cgroup deletion returns ENODEV instead of indexing a removed group.
+Stage 61 removes unimplemented syscall numbers from joined dispatch. The Linux
+and session dispatch bodies now generate conservative entry recognition from the
+same definitions. Unknown entries finish on the calling worker after the original
+seccomp decision and retain the original task/log diagnostic. Known handler and
+resource/subcommand boundaries, explicit tracing and diagnostic-less legacy
+embeddings keep their actual routes. The cold classifier does not run on ordinary
+already-completed file/socket/futex/native paths.
 
-Stage 59 seccomp/NNP and stages 57–58 task/image/scoped-memory work remain in place.
-Both products use the same runtime. Local validation covers both complete runtime
-CI workflows, final affected checks, 394 process cases per host (including the
-recorded Linux TSYNC observer retry), 18 native-ELF HVF/interpreter fixture runs,
-native ARM64 Linux comparison and both iPad compile targets. See the
-[stage 60 validation](../validation/worker-bpf-20261107.json) for exact results,
-failures, retries and reuse. Mac Dev is the deployment target; stable/business
-and physical iPad installations remain unchanged.
+Earlier BPF/cgroup, seccomp, task/image and scoped-memory migrations remain in
+place. Local acceptance includes both runtime CI workflows, 396 process cases per
+host (three ignored), targeted final tracing/legacy checks, both iPad compile
+targets and 18 real HVF/interpreter runs with native ARM64 Linux comparison.
+See [stage 61 validation](../validation/worker-dispatch-20261107.json) for exact
+source hashes, timing controls, failures and validation reuse. Mac Dev is updated;
+stable/business and physical iPad installations remain unchanged.
 
 **The coordinator still exists.** Actual shared-mm quiescence, an in-cohort
 one-caller service, asynchronous collection and a whole-cohort return have different
@@ -38,20 +38,35 @@ costs. Counts of migrated entries or files are not a completion percentage.
 | Credentials and capability administration | Calling worker, shared ABI and original task credentials; future consumers refresh, accepted async work retains submission authority | Tracing and capability-less embeddings retain their boundary; unsupported user namespaces and file capabilities are unchanged |
 | BPF and cgroup device policy | Program administration uses the original registry/Files/hierarchy on the caller; target directory and control-file opens resolve directly | Existing unsupported BPF commands/types remain explicit errors; tracing/capability-less embeddings remain. Original device-access consumers retain the same live rules |
 | Seccomp and tracing | Supported installation/TSYNC, decisions and lifecycle effects use original source resources; original policy/NNP is visible to proc, fork and exec | Explicit tracing and capability-less embeddings remain; unsupported seccomp APIs are unchanged. Allowed calls still retain their own excluded resource/generic fallback |
-| Host lifecycle and generic dispatch fallback | Still joined when the actual event/exit requires it | Host exec creation/group control, terminal lifecycle, pause/cancel, transfer/timezone/writeback, supervision/admin/pressure/deadline/shutdown; any SVC/HLT/fault not completed, parked, serviced or scoped on the worker still reaches the generic joined fallback |
+| Host lifecycle and generic dispatch fallback | Unknown syscall numbers finish locally using generated entry recognition; actual resource/host events retain their own route | Host exec creation/group control, terminal lifecycle, pause/cancel, transfer/timezone/writeback, supervision/admin/pressure/deadline/shutdown; known SVC resources/subcommands and HLT/fault exits not completed, parked, serviced or scoped on the worker still reach the joined fallback |
 
 The last row is an important coverage gap: the remaining owner work is **not
 limited to a fixed set of rare controls**. The final worker-dispatch fallback is
-still reachable. Initial admission and legacy/control rescheduling also involve
+still reachable for known resources and actual host/backend events. Initial admission and legacy/control rescheduling also involve
 the owner; ordinary epoch-member migration, parking, wakeup and child/replacement
 admission already use the live execution queue. Single-CPU/solo execution retains
 its coordinated caller path, which does not by itself imply an extra RPC.
 
-The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/a1b8759dff09e2b8e1fa85607cde25e73b71544c/docs/architecture/coordination-boundaries.md)
+The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/c2d8643c924def8ff813b2d31de3dfc54cd64c26/docs/architecture/coordination-boundaries.md)
 records scopes, actual admission gates and source locations. Earlier sections
 below are historical records and do not override this inventory.
 
-### Stage 60 BPF measurements
+### Stage 61 unimplemented-call measurements
+
+Three alternating unprofiled pairs run 1,000 calls per thread. Raw unknown calls
+fall from **232.415 to 3.553 ms at four CPUs**, and **2020.502 to 9.456 ms at twelve
+CPUs**. ALLOW-filtered unknown calls fall from **230.869 to 3.591 ms** and
+**2045.767 to 10.080 ms**. Single-CPU raw/ALLOW results stay around 2.1 ms.
+
+Filter-denied calls were already local. Their short four/twelve-CPU controls get
+about 0.9/3.3 ms slower. With 100,000 calls, medians are approximately 2% higher at
+four/twelve CPUs and 5% at one CPU, with a larger single-CPU outlier retained.
+The fixed-latency cause remains unattributed; these results do not prove zero
+regression or universal acceleration. Native Linux references, all raw samples
+and the earlier build-overlapped run are recorded. Native Linux does not produce
+the same per-call diagnostic; guest results are not Firefox or Geekbench scores.
+
+### Stage 60 BPF measurements (historical)
 
 Three alternating, unprofiled pairs measure 30 complete policy-management rounds
 per thread; setup and thread creation precede the timed release. Raw four-CPU
@@ -4112,3 +4127,13 @@ attachment lifetime, atomic replacement and permission/device consumers; it does
 not introduce host BPF execution or new policy features. See the
 [shared implementation contract](https://github.com/kb5000/trames-runtime/blob/a1b8759dff09e2b8e1fa85607cde25e73b71544c/docs/architecture/coordination-boundaries.md#60-original-bpf-programs-and-cgroup-device-policy-administration--2026-11-07)
 and [validation record](../validation/worker-bpf-20261107.json).
+
+
+## 61. Generated dispatch recognition and source unimplemented completion — 2026-11-07
+
+Unknown syscall numbers now finish without an owner rendezvous, with one original
+policy decision and the same bounded diagnostic log. Recognition comes from the
+actual dispatch arms; AIO's pre-dispatch family reuses its existing predicate.
+Known resource/subcommand handlers remain conservative. See the
+[shared contract](https://github.com/kb5000/trames-runtime/blob/c2d8643c924def8ff813b2d31de3dfc54cd64c26/docs/architecture/coordination-boundaries.md#61-generated-syscall-entry-recognition-and-unimplemented-completion--2026-11-07)
+and [validation record](../validation/worker-dispatch-20261107.json).
