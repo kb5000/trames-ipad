@@ -2,13 +2,14 @@
 
 ## Current status — 2026-11-06
 
-Audited executable-code baseline: `b06c97a3e83e4ed81a08400cfe2991f224810dae`.
-The latest code batch is [stage 54, original mount transactions](#54-original-mount-transactions-and-root-replacement--2026-11-06).
-Mount/remount/bind/move/umount/pivot_root now use original shared namespace and
-fs_struct resources on the caller. Busy topology transactions park only that
-caller. Mac and iPad share this implementation. Mac Dev is updated; stable 1.5.3
-and business environments are unchanged. Both iPad targets compile; physical
-iPad acceptance remains skipped as previously chosen.
+Audited executable-code baseline: `a5c3b6510e69c5c491411318695a6c4ef24157c7`.
+The latest code batch is [stage 55, original task namespace membership](#55-original-task-namespace-membership--2026-11-06).
+Supported unshare/setns and close_range now use original task resources on the
+calling worker, including Files/fs detachment and all captured consumers. Busy
+mount namespace transactions park only that caller. Mac and iPad share this
+implementation. Mac Dev is updated; stable 1.5.3 and business environments are
+unchanged. Both iPad targets compile; physical iPad acceptance remains skipped
+as previously chosen.
 
 **The coordinator still exists, but ordinary admitted resource work no longer
 has to execute there.** Fork/clone/exec have removed the whole-cohort dependency,
@@ -29,7 +30,8 @@ are not a completion percentage.
 | Native libc/GPU/video/audio | Normal bodies and resource waits use calling/shared-resource paths | Exceptional mapping import, unstable entry and actual native lifecycle checks remain; AppKit affinity, device/disk pools and local fallback are not extra coordinators |
 | Dynamic proc/sys and proc pathname/FD consumers | Calling worker and original PID/mm/Files/fs/namespace resources | First cross-mm byte export and mapping invalidation use only the original mm admission boundary; legacy providers retain their explicit fallback |
 | Mount topology administration | Original namespace/fs resources on the caller; existing disk pool for host-backed paths; contention releases the CPU slot | Tracing and genuinely excluded pathname controls retain their explicit boundary |
-| Task namespace and credential administration | Still joined for actual membership/policy mutations | Unshare/setns, credentials/capabilities and their captured resource consumers; moving mount topology does not remove these task changes |
+| Task namespace membership and Files/fs detachment | Supported unshare/setns/close_range run on the caller, refresh future consumers and preserve accepted async operations | Tracing/security effects remain; clone creation still uses creator-mm custody; unsupported user/time namespaces are not added |
+| Credentials and capability administration | Actual task-policy mutations still use the owner boundary | Captured identity/permission consumers must move with a future complete credential subsystem |
 | Tracing/security and mixed owner resources | Actual joined task/control boundary | Installation/TSYNC, policy signal/termination effects, excluded SCM_RIGHTS/ring resources and missing source pumps remain. Pure custody-policy errors complete on continuous workers before quiescence |
 | Host lifecycle and generic dispatch fallback | Still joined when the actual event/exit requires it | Host exec creation/group control, terminal lifecycle, pause/cancel, transfer/timezone/writeback, supervision/admin/pressure/deadline/shutdown; any SVC/HLT/fault not completed, parked, serviced or scoped on the worker still reaches the generic joined fallback |
 
@@ -40,41 +42,38 @@ the owner; ordinary epoch-member migration, parking, wakeup and child/replacemen
 admission already use the live execution queue. Single-CPU/solo execution retains
 its coordinated caller path, which does not by itself imply an extra RPC.
 
-The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/b06c97a3e83e4ed81a08400cfe2991f224810dae/docs/architecture/coordination-boundaries.md)
+The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/a5c3b6510e69c5c491411318695a6c4ef24157c7/docs/architecture/coordination-boundaries.md)
 records scopes, actual admission gates and source locations. Earlier sections
 below are historical records and do not override this inventory.
 
 ### What the latest measurements prove
 
-Stage 54 uses one thread per configured CPU, each performing 128 checked
-tmpfs mount/unmount pairs. Seven unprofiled before/after pairs alternate order;
-the longest worker loop excludes thread creation and final join. This measures
-mount administration, not a Firefox/Geekbench or whole-container speedup.
+Stage 55 uses one thread per configured CPU, each performing 64 checked
+namespace rounds (unshare, UTS/network operations, mount/unmount, setns and
+close_range). Five unprofiled before/after pairs alternate order; the longest
+worker loop excludes thread creation and final join. This measures namespace
+administration, not Firefox/Geekbench or whole-container performance.
 
 | CPUs / threads | Previous loop | Current loop | Speedup |
 | --- | ---: | ---: | ---: |
-| 1 | 1.710 ms | 1.761 ms | 0.97x |
-| 2 | 20.513 ms | 3.976 ms | 5.16x |
-| 4 | 44.025 ms | 8.025 ms | 5.49x |
-| 12 | 345.190 ms | 22.216 ms | 15.54x |
+| 1 | 5.955 ms | 6.314 ms | 0.94x |
+| 2 | 33.416 ms | 12.401 ms | 2.70x |
+| 4 | 83.033 ms | 24.358 ms | 3.41x |
+| 12 | 533.462 ms | 76.896 ms | 6.94x |
 
-The single-CPU microbenchmark is approximately 3% slower (0.051 ms per measured
-loop), rather than a claimed universal speedup. The unchanged 256-iteration proc
-control workload ranges from 0.95x to 1.04x across CPU counts. An initial shared
-index implementation added more serial and reader overhead; immutable weak-index
-caching removes the shared index lock from unchanged lookups and avoids retaining
-mount resources through metadata.
+One CPU remains approximately 6% slower (0.358 ms per 64 rounds). Eliminating
+unnecessary namespace view copies, no-op detachments and source refreshes reduced
+the initial 42% regression. The unchanged proc control workload is 0.99x–1.01x.
+The one-CPU owner is itself the guest executor, so it does not gain from eliminating
+a cross-thread handoff. No universal speedup is claimed.
 
-Separate diagnostic runs have zero mount/umount/pivot_root cohort returns and
-zero owner-service requests. Multi-CPU compatibility still returns once for the
-explicit unshare and once for the final console ioctl. Unshare/setns membership
-and the generic worker fallback remain, rather than being hidden by that count.
-
-The [stage 54 evidence](../validation/worker-mount-20261106.json) records source and
-binary hashes, all timing samples, native Linux ABI comparison and local validation.
-[Stage 53](../validation/worker-proc-20261106.json) retains the previous proc-specific
-results. Task namespace/credential administration, actual owner-only control graphs,
-tracing/security effects and structural memory publication remain next boundaries.
+Separate multi-CPU diagnostic runs have zero unshare/setns/close_range cohort
+returns and zero owner-service requests; only the final console ioctl returns.
+The [stage 55 evidence](../validation/worker-task-namespace-20261106.json) records
+hashes, all timing pairs, native ARM Linux ABI comparison and local validation.
+[Stage 54](../validation/worker-mount-20261106.json) retains mount-specific results.
+Credentials/capabilities, original task/image construction, structural mapping
+publication, excluded control bodies and tracing/security remain next boundaries.
 
 ## Twenty-second migration implemented — worker Unix namespace controls and waits — 2026-11-03
 
@@ -3943,3 +3942,38 @@ signal/readiness and proc consumers together. Credentials/capabilities, unsuppor
 newer mount APIs/propagation, excluded path controls, tracing/security and general
 unhandled dispatch keep their documented boundaries. See the
 [shared contract](https://github.com/kb5000/trames-runtime/blob/b06c97a3e83e4ed81a08400cfe2991f224810dae/docs/architecture/coordination-boundaries.md#original-mount-transactions-and-root-replacement--2026-11-06).
+
+
+## 55. Original task namespace membership — 2026-11-06
+
+Runtime `a5c3b6510e69c5c491411318695a6c4ef24157c7` moves supported unshare/setns and close_range as one complete
+subsystem. Files/fs, UTS, mount, network/IPC/cgroup and pid-for-children membership
+commit on the caller. Source resource refresh covers pathname/descriptor factories,
+UTS/umask, native GPU image/event and audio notifications, exit ownership, proc
+observers and future async submissions. Already accepted io_uring/AIO/native work
+retains its original resources and wake target; changing namespaces does not
+redirect an accepted operation to a reused FD or a new cwd.
+
+Complete cold control OFDs now belong to original Files membership, using their
+own synchronized objects. Ordinary Shared OFD I/O acquires no new lock. Private
+projection caches no longer determine control lifetime. Fs membership counts actual
+tasks separately from observers; source exit and exec retire it before cold owner
+collection. The owner imports committed per-task bindings before service/custody,
+without replaying effects. Failed transactions preserve old membership; waiting
+setns retains the accepted namespace across close/reuse and can resume on another
+existing worker. No new coordinator/service thread or polling bus is introduced.
+
+Local validation passes 547 Apple VFS cases (546 on native Linux), 238 Linux ABI
+cases and 339 process cases, with targeted retries after updating the old
+close_range route test. Ten namespace transaction cases include serial rollback
+and busy owner-to-worker resumption. The native Linux/HVF/interpreter matrix has
+24 passing runs at 1/2/4/12 CPUs, raw and ALLOW-filtered. Strict checks, both iPad
+compile targets, Mac product tests, Go-GC and eight isolated Docker lifecycle
+rounds pass. Unchanged CPU/MMU/graphics acceptance is reused. Physical iPad testing
+and a stable release are outside this batch.
+
+Remaining boundaries include credentials/capabilities, original-owner task/image
+construction, structural memory publication, tracing/security, excluded control
+bodies and generic unhandled dispatch. Source-owned control lifetime alone does
+not migrate every control body. See the [shared contract](https://github.com/kb5000/trames-runtime/blob/a5c3b6510e69c5c491411318695a6c4ef24157c7/docs/architecture/coordination-boundaries.md#original-task-namespace-membership-and-complete-filesfs-lifetime--2026-11-06)
+and [validation record](../validation/worker-task-namespace-20261106.json).

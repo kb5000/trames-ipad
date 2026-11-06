@@ -1,0 +1,1189 @@
+{
+  "schema": 1,
+  "date": "2026-11-06",
+  "stage": 55,
+  "runtime_revision": "a5c3b6510e69c5c491411318695a6c4ef24157c7",
+  "baseline_runtime_revision": "b06c97a3e83e4ed81a08400cfe2991f224810dae",
+  "scope": "Complete supported task namespace membership: unshare/setns/close_range, original Files/fs ownership, publication and all captured consumers.",
+  "implementation": [
+    "Original per-task bindings commit on the source; original mount contention parks the caller and retains the accepted namespace across FD close/reuse. Owner collection/custody imports bindings without replay.",
+    "Files holds complete synchronized cold-control OFDs; ordinary Shared I/O is unchanged. Fs membership counts actual tasks and retires before cold projection collection.",
+    "Future direct/native/async consumers refresh together; accepted async work keeps original descriptors, paths, execution context and wake target. Original actor roots are preserved.",
+    "No new coordinator/resource thread, polling bus, per-call version check or ordinary guest-memory barrier. Serial execution avoids redundant candidate copies; private close_range/non-mount setns avoid unnecessary staging."
+  ],
+  "source_files": {
+    "crates/trames-linux/src/direct.rs": "d61f188732462ad7df340d348342048ba4130fc70bd9f0622cc8f01ecf945416",
+    "crates/trames-linux/src/direct/uring.rs": "736257194dad260909fdbecf85023799fb1cedad730656851926903b81c88d60",
+    "crates/trames-linux/src/direct/uring/subsystem_tests.rs": "5fe54aa3cf77fb9aa15e35fd2ab65225643ae933dd5f70179446ec4da8775e53",
+    "crates/trames-session/src/process.rs": "060755d5ab1f345d14ba6d3283534119175d316663aed4ce8f24e25aed5203f3",
+    "crates/trames-session/src/process_dispatch.rs": "3ff4c7d0447f6952aef649f4bc92b7e63d54ba58317b62c229812fde6a62a5eb",
+    "crates/trames-session/src/process_events.rs": "191f0b4287bf5b0402b60641455804393672808cf9ca50a863937f02b564a9a0",
+    "crates/trames-session/src/process_exec.rs": "7737daccd7e58d29eb29d7c0966afde9b301a2c241012b7c9228f03f4a10e224",
+    "crates/trames-session/src/process_exit.rs": "9470db6829f41d2ca3fceb019b924ee9de18d167a54f5cac2583bba4a728dfab",
+    "crates/trames-session/src/process_seccomp.rs": "56b59e575313cd95479fd51d1bb64f2cd25250a51662a445a05b1cc80e71d5cb",
+    "crates/trames-session/src/process_service.rs": "f941d9e441c482472971b13b29442127702c25b3653d149a36206001ac77e604",
+    "crates/trames-session/src/process_vm.rs": "dc33a3473b07e4a2eae612c1e38d89ab6ef058ebbcaa6887b7c4904a5993f779",
+    "crates/trames-session/src/run_queue.rs": "ae2cac8dbdb4d1a74d906661dec996a569a29dd10d9083f55f6af05aaab8b21f",
+    "crates/trames-session/src/worker_syscalls.rs": "bac5439e1c7c52e6b3edd8cc64f9073c50dfb1b4b6ebe6e5ad7aa8353a1a6cf6",
+    "crates/trames-session/src/workers.rs": "ea8a1391db28331106a3aeb34b1c165b95f097776243d5d30acc7fb6352f10e1",
+    "crates/trames-session/src/workers_uring_tests.rs": "dd496e8aa41ca570d6799133dfc9703922744f9544db2b6e0ccc3827293ff46f",
+    "crates/trames-vfs/src/direct_io.rs": "7032f2c778b35a575772ab166ae1c827742d9c7cd7aeef5ac482c4fdcdbf4a31",
+    "crates/trames-vfs/src/fd_table.rs": "6911594303ccf8e4e1de03564ced9b9a8d90d463e8ac1432164e98c9a308cae5",
+    "crates/trames-vfs/src/fs_context.rs": "b64b8b7fd3658fbc3badc114f903c644988fe64493e12314ae60dd125f51c99a",
+    "crates/trames-vfs/src/ipc/native.rs": "2a13f52c662e5edaef5420999628c9abea14fdaafcdf3dd0baccbb3cc5573f76",
+    "crates/trames-vfs/src/lib.rs": "9b51bd7c635a0a7afe36e08655008b15e20ef26a5f709179d747e384aebcba89",
+    "crates/trames-vfs/src/linux_namespace.rs": "a95c9aea1a0df3e48c18bf57d018728e829274af586ade0699f6d0e6e72e4179",
+    "crates/trames-vfs/src/mapped.rs": "4e07738a39d7dc42786a96734586b2ce630ba9dbaa26586046306ce22dc6734e",
+    "crates/trames-vfs/src/mounts.rs": "c15999d1d735ff96fce4748fe3332f7276b58e43fc441717683f258e4f1b270b",
+    "crates/trames-vfs/src/open_handle.rs": "f4ad484a604e736504bc5bb6dd6c5cf401d4e9793e5b034c306e8e45176e975b",
+    "crates/trames-vfs/src/path_queries.rs": "a3ee19d544e9d7ebb029ac067a882d03d07aad03c5c5818bdf5b0f46a5ce3533",
+    "crates/trames-vfs/src/proc_source.rs": "5b01cb1b7fcc8dd98d70418a48b0bcb077d1616a346b92d8229381c15f72b156",
+    "crates/trames-vfs/src/task_namespace.rs": "7f8e7c11f7dac65cc26e6b79892290c714f64711e4fc708a10b150bcea6c3890",
+    "docs/architecture/coordination-boundaries.md": "17ef5f27019b6033bcd5ff1d6e04978785e47f2cb26e06602b64f155374dc32c"
+  },
+  "fixture_files": {
+    "tests/fixtures/worker-task-namespace.c": "78c0b824a07711797fbc57257cd14e72f5d05cf13900fb653ce7454bb666a0c3",
+    "scripts/build-worker-task-namespace-fixture.sh": "eb9381a9ed7c8c4539d409cdf6ba596a70034a67a8c4e1ecddbbd53417070421",
+    "tests/integration/worker-task-namespace.py": "d221ae91e715b79518ed83b1030eac70ba850884cadabcc71532c1219b5d9201"
+  },
+  "fixture_build": "Native ARM Linux musl-gcc -static -O2 -Wall -Wextra -Werror -pthread; native run enters a private mount namespace.",
+  "fixture_sha256": "6e5b260cda47bda98c121b9b0828b0beb24df75fdb97ef66b28f798b7b9520ae",
+  "acceptance": {
+    "matrix": {
+      "hvf": {
+        "backend": "hvf",
+        "fixture_sha256": "6e5b260cda47bda98c121b9b0828b0beb24df75fdb97ef66b28f798b7b9520ae",
+        "cases": [
+          {
+            "cpus": 1,
+            "filtered": false,
+            "returncode": 0
+          },
+          {
+            "cpus": 1,
+            "filtered": true,
+            "returncode": 0
+          },
+          {
+            "cpus": 2,
+            "filtered": false,
+            "returncode": 0
+          },
+          {
+            "cpus": 2,
+            "filtered": true,
+            "returncode": 0
+          },
+          {
+            "cpus": 4,
+            "filtered": false,
+            "returncode": 0
+          },
+          {
+            "cpus": 4,
+            "filtered": true,
+            "returncode": 0
+          },
+          {
+            "cpus": 12,
+            "filtered": false,
+            "returncode": 0
+          },
+          {
+            "cpus": 12,
+            "filtered": true,
+            "returncode": 0
+          }
+        ],
+        "runner_sha256": "50155ebcce60083558c4c58b325fdaa5a8cc847a6deb554feef2515d41e39fd6"
+      },
+      "interpreter": {
+        "backend": "interpreter",
+        "fixture_sha256": "6e5b260cda47bda98c121b9b0828b0beb24df75fdb97ef66b28f798b7b9520ae",
+        "cases": [
+          {
+            "cpus": 1,
+            "filtered": false,
+            "returncode": 0
+          },
+          {
+            "cpus": 1,
+            "filtered": true,
+            "returncode": 0
+          },
+          {
+            "cpus": 2,
+            "filtered": false,
+            "returncode": 0
+          },
+          {
+            "cpus": 2,
+            "filtered": true,
+            "returncode": 0
+          },
+          {
+            "cpus": 4,
+            "filtered": false,
+            "returncode": 0
+          },
+          {
+            "cpus": 4,
+            "filtered": true,
+            "returncode": 0
+          },
+          {
+            "cpus": 12,
+            "filtered": false,
+            "returncode": 0
+          },
+          {
+            "cpus": 12,
+            "filtered": true,
+            "returncode": 0
+          }
+        ],
+        "runner_sha256": "2fef3425ea49f190623c934be692c879640d5f66240177b830ba50831bb45149"
+      },
+      "installed-dev": {
+        "backend": "hvf",
+        "fixture_sha256": "6e5b260cda47bda98c121b9b0828b0beb24df75fdb97ef66b28f798b7b9520ae",
+        "cases": [
+          {
+            "cpus": 12,
+            "filtered": false,
+            "returncode": 0
+          },
+          {
+            "cpus": 12,
+            "filtered": true,
+            "returncode": 0
+          }
+        ],
+        "runner_sha256": "340abd1fbf2d1bc1fe22ccecf315a4ec4c4cdef58646b90fcfd67fffdc0bb281"
+      },
+      "native": {
+        "backend": "native",
+        "fixture_sha256": "6e5b260cda47bda98c121b9b0828b0beb24df75fdb97ef66b28f798b7b9520ae",
+        "cases": [
+          {
+            "cpus": 1,
+            "filtered": false,
+            "returncode": 0
+          },
+          {
+            "cpus": 1,
+            "filtered": true,
+            "returncode": 0
+          },
+          {
+            "cpus": 2,
+            "filtered": false,
+            "returncode": 0
+          },
+          {
+            "cpus": 2,
+            "filtered": true,
+            "returncode": 0
+          },
+          {
+            "cpus": 4,
+            "filtered": false,
+            "returncode": 0
+          },
+          {
+            "cpus": 4,
+            "filtered": true,
+            "returncode": 0
+          },
+          {
+            "cpus": 12,
+            "filtered": false,
+            "returncode": 0
+          },
+          {
+            "cpus": 12,
+            "filtered": true,
+            "returncode": 0
+          }
+        ]
+      }
+    },
+    "diagnostics": {
+      "hvf/1-filtered": [
+        "trames mac cohorts: rounds=0 control_checks=0 services=0 memory_us=0 dispatch_us=0 stop_us=0",
+        "trames mac execution paths: {\"cohort_rounds\":0,\"cohort_stop_us\":0,\"service_caller_wait_us\":0,\"service_requests\":0,\"serviced_syscalls\":0,\"syscalls\":518,\"vm_local_syscalls\":0,\"worker_direct_syscalls\":0,\"worker_fd_syscalls\":0,\"worker_file_syscalls\":0,\"worker_futex_waits\":0,\"worker_futex_wakes\":0,\"worker_gpu_calls\":0,\"worker_gpu_waits\":0,\"worker_poll_syscalls\":0,\"worker_socket_syscalls\":0,\"worker_syscalls\":0,\"worker_task_resumes\":0,\"worker_uring_syscalls\":0}",
+        "trames mac cohort-return syscalls: []",
+        "trames mac cohort-return native: {}"
+      ],
+      "hvf/1-raw": [
+        "trames mac cohorts: rounds=0 control_checks=0 services=0 memory_us=0 dispatch_us=0 stop_us=0",
+        "trames mac execution paths: {\"cohort_rounds\":0,\"cohort_stop_us\":0,\"service_caller_wait_us\":0,\"service_requests\":0,\"serviced_syscalls\":0,\"syscalls\":516,\"vm_local_syscalls\":0,\"worker_direct_syscalls\":0,\"worker_fd_syscalls\":0,\"worker_file_syscalls\":0,\"worker_futex_waits\":0,\"worker_futex_wakes\":0,\"worker_gpu_calls\":0,\"worker_gpu_waits\":0,\"worker_poll_syscalls\":0,\"worker_socket_syscalls\":0,\"worker_syscalls\":0,\"worker_task_resumes\":0,\"worker_uring_syscalls\":0}",
+        "trames mac cohort-return syscalls: []",
+        "trames mac cohort-return native: {}"
+      ],
+      "hvf/12-filtered": [
+        "trames mac cohorts: rounds=1 control_checks=3 services=0 memory_us=374 dispatch_us=48 stop_us=0",
+        "trames mac execution paths: {\"cohort_rounds\":1,\"cohort_stop_us\":0,\"service_caller_wait_us\":0,\"service_requests\":0,\"serviced_syscalls\":0,\"syscalls\":5483,\"vm_local_syscalls\":36,\"worker_direct_syscalls\":1965,\"worker_fd_syscalls\":1772,\"worker_file_syscalls\":1567,\"worker_futex_waits\":38,\"worker_futex_wakes\":28,\"worker_gpu_calls\":0,\"worker_gpu_waits\":0,\"worker_poll_syscalls\":0,\"worker_socket_syscalls\":385,\"worker_syscalls\":5423,\"worker_task_resumes\":49,\"worker_uring_syscalls\":0}",
+        "trames mac cohort-return syscalls: [(29, 1)]",
+        "trames mac cohort-return native: {}"
+      ],
+      "hvf/12-raw": [
+        "trames mac cohorts: rounds=1 control_checks=4 services=0 memory_us=284 dispatch_us=50 stop_us=4",
+        "trames mac execution paths: {\"cohort_rounds\":1,\"cohort_stop_us\":4,\"service_caller_wait_us\":0,\"service_requests\":0,\"serviced_syscalls\":0,\"syscalls\":5488,\"vm_local_syscalls\":36,\"worker_direct_syscalls\":1965,\"worker_fd_syscalls\":1772,\"worker_file_syscalls\":1567,\"worker_futex_waits\":41,\"worker_futex_wakes\":31,\"worker_gpu_calls\":0,\"worker_gpu_waits\":0,\"worker_poll_syscalls\":0,\"worker_socket_syscalls\":385,\"worker_syscalls\":5430,\"worker_task_resumes\":89,\"worker_uring_syscalls\":0}",
+        "trames mac cohort-return syscalls: [(29, 1)]",
+        "trames mac cohort-return native: {}"
+      ],
+      "hvf/2-filtered": [
+        "trames mac cohorts: rounds=1 control_checks=2 services=0 memory_us=125 dispatch_us=71 stop_us=0",
+        "trames mac execution paths: {\"cohort_rounds\":1,\"cohort_stop_us\":0,\"service_caller_wait_us\":0,\"service_requests\":0,\"serviced_syscalls\":0,\"syscalls\":963,\"vm_local_syscalls\":6,\"worker_direct_syscalls\":335,\"worker_fd_syscalls\":302,\"worker_file_syscalls\":267,\"worker_futex_waits\":9,\"worker_futex_wakes\":8,\"worker_gpu_calls\":0,\"worker_gpu_waits\":0,\"worker_poll_syscalls\":0,\"worker_socket_syscalls\":65,\"worker_syscalls\":943,\"worker_task_resumes\":10,\"worker_uring_syscalls\":0}",
+        "trames mac cohort-return syscalls: [(29, 1)]",
+        "trames mac cohort-return native: {}"
+      ],
+      "hvf/2-raw": [
+        "trames mac cohorts: rounds=1 control_checks=2 services=0 memory_us=116 dispatch_us=109 stop_us=0",
+        "trames mac execution paths: {\"cohort_rounds\":1,\"cohort_stop_us\":0,\"service_caller_wait_us\":0,\"service_requests\":0,\"serviced_syscalls\":0,\"syscalls\":960,\"vm_local_syscalls\":6,\"worker_direct_syscalls\":335,\"worker_fd_syscalls\":302,\"worker_file_syscalls\":267,\"worker_futex_waits\":8,\"worker_futex_wakes\":8,\"worker_gpu_calls\":0,\"worker_gpu_waits\":0,\"worker_poll_syscalls\":0,\"worker_socket_syscalls\":65,\"worker_syscalls\":942,\"worker_task_resumes\":9,\"worker_uring_syscalls\":0}",
+        "trames mac cohort-return syscalls: [(29, 1)]",
+        "trames mac cohort-return native: {}"
+      ],
+      "hvf/4-filtered": [
+        "trames mac cohorts: rounds=1 control_checks=2 services=0 memory_us=138 dispatch_us=48 stop_us=0",
+        "trames mac execution paths: {\"cohort_rounds\":1,\"cohort_stop_us\":0,\"service_caller_wait_us\":0,\"service_requests\":0,\"serviced_syscalls\":0,\"syscalls\":1867,\"vm_local_syscalls\":12,\"worker_direct_syscalls\":661,\"worker_fd_syscalls\":596,\"worker_file_syscalls\":527,\"worker_futex_waits\":15,\"worker_futex_wakes\":12,\"worker_gpu_calls\":0,\"worker_gpu_waits\":0,\"worker_poll_syscalls\":0,\"worker_socket_syscalls\":129,\"worker_syscalls\":1839,\"worker_task_resumes\":19,\"worker_uring_syscalls\":0}",
+        "trames mac cohort-return syscalls: [(29, 1)]",
+        "trames mac cohort-return native: {}"
+      ],
+      "hvf/4-raw": [
+        "trames mac cohorts: rounds=1 control_checks=2 services=0 memory_us=126 dispatch_us=50 stop_us=0",
+        "trames mac execution paths: {\"cohort_rounds\":1,\"cohort_stop_us\":0,\"service_caller_wait_us\":0,\"service_requests\":0,\"serviced_syscalls\":0,\"syscalls\":1865,\"vm_local_syscalls\":12,\"worker_direct_syscalls\":661,\"worker_fd_syscalls\":596,\"worker_file_syscalls\":527,\"worker_futex_waits\":15,\"worker_futex_wakes\":12,\"worker_gpu_calls\":0,\"worker_gpu_waits\":0,\"worker_poll_syscalls\":0,\"worker_socket_syscalls\":129,\"worker_syscalls\":1839,\"worker_task_resumes\":18,\"worker_uring_syscalls\":0}",
+        "trames mac cohort-return syscalls: [(29, 1)]",
+        "trames mac cohort-return native: {}"
+      ],
+      "interpreter/1-filtered": [],
+      "interpreter/1-raw": [],
+      "interpreter/12-filtered": [],
+      "interpreter/12-raw": [],
+      "interpreter/2-filtered": [],
+      "interpreter/2-raw": [],
+      "interpreter/4-filtered": [],
+      "interpreter/4-raw": [],
+      "installed-dev/12-filtered": [
+        "trames mac cohorts: rounds=1 control_checks=4 services=0 memory_us=406 dispatch_us=59 stop_us=0",
+        "trames mac execution paths: {\"cohort_rounds\":1,\"cohort_stop_us\":0,\"service_caller_wait_us\":0,\"service_requests\":0,\"serviced_syscalls\":0,\"syscalls\":5490,\"vm_local_syscalls\":36,\"worker_direct_syscalls\":1965,\"worker_fd_syscalls\":1772,\"worker_file_syscalls\":1567,\"worker_futex_waits\":44,\"worker_futex_wakes\":28,\"worker_gpu_calls\":0,\"worker_gpu_waits\":0,\"worker_poll_syscalls\":0,\"worker_socket_syscalls\":385,\"worker_syscalls\":5430,\"worker_task_resumes\":79,\"worker_uring_syscalls\":0}",
+        "trames mac cohort-return syscalls: [(29, 1)]",
+        "trames mac cohort-return native: {}"
+      ],
+      "installed-dev/12-raw": [
+        "trames mac cohorts: rounds=1 control_checks=5 services=0 memory_us=731 dispatch_us=334 stop_us=0",
+        "trames mac execution paths: {\"cohort_rounds\":1,\"cohort_stop_us\":0,\"service_caller_wait_us\":0,\"service_requests\":0,\"serviced_syscalls\":0,\"syscalls\":5481,\"vm_local_syscalls\":36,\"worker_direct_syscalls\":1965,\"worker_fd_syscalls\":1772,\"worker_file_syscalls\":1567,\"worker_futex_waits\":37,\"worker_futex_wakes\":28,\"worker_gpu_calls\":0,\"worker_gpu_waits\":0,\"worker_poll_syscalls\":0,\"worker_socket_syscalls\":385,\"worker_syscalls\":5423,\"worker_task_resumes\":75,\"worker_uring_syscalls\":0}",
+        "trames mac cohort-return syscalls: [(29, 1)]",
+        "trames mac cohort-return native: {}"
+      ]
+    },
+    "checks": {
+      "resources-final.log": {
+        "sha256": "9669faeea266a281ba01a1bd5824b5cc496281499f716bd4abe114dc58f590ea",
+        "summary": [
+          "    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.55s",
+          "test result: ok. 238 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.85s",
+          "test result: ok. 547 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 2.26s",
+          "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+          "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+        ]
+      },
+      "conformance-final.log": {
+        "sha256": "14d4ca1c16af285a066a72782888707133c42c987d8ffd4d6f1d68e479b8210c",
+        "summary": [
+          "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.09s",
+          "test result: FAILED. 338 passed; 1 failed; 3 ignored; 0 measured; 0 filtered out; finished in 1.49s"
+        ]
+      },
+      "conformance-status-retry.log": {
+        "sha256": "9724311530fb4f8ad63e310f2f0795237ffd47aba39688b5264d8349ade7b293",
+        "summary": [
+          "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.04s",
+          "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 341 filtered out; finished in 0.00s"
+        ]
+      },
+      "process-namespace-final.log": {
+        "sha256": "5368985e2e8e787bba57b213dd33b47b1a281ab41c78a39f18596215c6a16f84",
+        "summary": [
+          "    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.95s",
+          "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 340 filtered out; finished in 0.02s"
+        ]
+      },
+      "namespace-final.log": {
+        "sha256": "a6bbbcd0e17f345a0d990991ad1b97cd51619d00d339c7df9316cd6d8f464682",
+        "summary": [
+          "    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.19s",
+          "test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 538 filtered out; finished in 0.01s"
+        ]
+      },
+      "runtime-strict-final.log": {
+        "sha256": "7c022b83ed5f291f19f58512b74ea8dcc832bfdc6e355f5b0adaf701b391e7a7",
+        "summary": [
+          "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.75s"
+        ]
+      },
+      "product-strict-final.log": {
+        "sha256": "ebd95641da6a797c6142367f49d56b2883cb6f35dc0b9c773ac1b7362db152b9",
+        "summary": [
+          "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 7.38s"
+        ]
+      },
+      "ios-device-final.log": {
+        "sha256": "f53fd33890ba209f8b674c8d0101df307f2457ebb08dcaaab9a518c565b78170",
+        "summary": [
+          "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.84s"
+        ]
+      },
+      "ios-sim-final.log": {
+        "sha256": "42d4dff235dccfd91309a06f3067ff4b9738058ad101620ae06c5e25cb7a7dc8",
+        "summary": [
+          "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.90s"
+        ]
+      },
+      "mac-product-final.log": {
+        "sha256": "4581ea77317e0e8a19ba0325ba6314bf70b200ea3e2791ee0933f2168038ad31",
+        "summary": [
+          "    Finished `test` profile [unoptimized + debuginfo] target(s) in 16.12s",
+          "test result: ok. 4 passed; 0 failed; 47 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+          "test result: ok. 20 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.01s",
+          "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+        ]
+      },
+      "build-interpreter-final.log": {
+        "sha256": "7d396c462c2e29b4f5139cbe3ccccf5e30229815f12b13c27b691921e58b7f73",
+        "summary": [
+          "    Finished `release` profile [optimized] target(s) in 16.81s"
+        ]
+      },
+      "go-gc.log": {
+        "sha256": "e8dd5e3fae6fa8b3df1090acd43b111cb7b1c7e49b8c57ade35be6d498d7b52e",
+        "summary": [
+          "GO_GC_START 1",
+          "GO_GC_PASS 1",
+          "GO_GC_START 2",
+          "GO_GC_PASS 2",
+          "GO_GC_START 3",
+          "GO_GC_PASS 3",
+          "GO_GC_START 4",
+          "GO_GC_PASS 4",
+          "GO_GC_START 5",
+          "GO_GC_PASS 5",
+          "GO_GC_START 6",
+          "GO_GC_PASS 6",
+          "GO_GC_START 7",
+          "GO_GC_PASS 7",
+          "GO_GC_START 8",
+          "GO_GC_PASS 8",
+          "GO_GC_START 9",
+          "GO_GC_PASS 9",
+          "GO_GC_START 10",
+          "GO_GC_PASS 10",
+          "GO_GC_START 11",
+          "GO_GC_PASS 11",
+          "GO_GC_START 12",
+          "GO_GC_PASS 12",
+          "GO_GC_START 13",
+          "GO_GC_PASS 13",
+          "GO_GC_START 14",
+          "GO_GC_PASS 14",
+          "GO_GC_START 15",
+          "GO_GC_PASS 15",
+          "GO_GC_START 16",
+          "GO_GC_PASS 16",
+          "GO_GC_START 17",
+          "GO_GC_PASS 17",
+          "GO_GC_START 18",
+          "GO_GC_PASS 18",
+          "GO_GC_START 19",
+          "GO_GC_PASS 19",
+          "GO_GC_START 20",
+          "GO_GC_PASS 20",
+          "GO_GC_START 21",
+          "GO_GC_PASS 21",
+          "GO_GC_START 22",
+          "GO_GC_PASS 22",
+          "GO_GC_START 23",
+          "GO_GC_PASS 23",
+          "GO_GC_START 24",
+          "GO_GC_PASS 24",
+          "GO_GC_START 25",
+          "GO_GC_PASS 25",
+          "GO_GC_START 26",
+          "GO_GC_PASS 26",
+          "GO_GC_START 27",
+          "GO_GC_PASS 27",
+          "GO_GC_START 28",
+          "GO_GC_PASS 28",
+          "GO_GC_START 29",
+          "GO_GC_PASS 29",
+          "GO_GC_START 30",
+          "GO_GC_PASS 30"
+        ]
+      },
+      "docker.log": {
+        "sha256": "5d810e82f4278a18a3fe1047c8599b5f10ded2118d1e053aec543ed26fd227ce",
+        "summary": [
+          "DOCKER_REPRO_PASS round=1",
+          "DOCKER_REPRO_PASS round=2",
+          "DOCKER_REPRO_PASS round=3",
+          "DOCKER_REPRO_PASS round=4",
+          "DOCKER_REPRO_PASS round=5",
+          "DOCKER_REPRO_PASS round=6",
+          "DOCKER_REPRO_PASS round=7",
+          "DOCKER_REPRO_PASS round=8"
+        ]
+      },
+      "runtime-boundaries.log": {
+        "sha256": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651",
+        "summary": [
+          "Project boundaries verified: standalone common runtime, iPad interpreter composition, Mac hardware composition"
+        ]
+      },
+      "ipad-boundaries-final.log": {
+        "sha256": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651",
+        "summary": [
+          "Project boundaries verified: standalone common runtime, iPad interpreter composition, Mac hardware composition"
+        ]
+      },
+      "mac-boundaries-final.log": {
+        "sha256": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651",
+        "summary": [
+          "Project boundaries verified: standalone common runtime, iPad interpreter composition, Mac hardware composition"
+        ]
+      },
+      "dev-package-final.log": {
+        "sha256": "f35e4f3bd732d9d48e675d4ce8c5da622758b83d97a020851831834232dec26c",
+        "summary": [
+          "    Finished `release` profile [optimized] target(s) in 20.37s"
+        ]
+      },
+      "dev-install-final.log": {
+        "sha256": "d81b37faaef60b5a1b635ce5a81a399a304e89d9aee6498d2d7eecf5f3f5bd41",
+        "summary": []
+      },
+      "native-resources": {
+        "sha256": "005d4a7ac6dce2e2bad7fca3dcc21978372f8061577fed8341309c020cfd6adf",
+        "summary": [
+          "    Finished `test` profile [unoptimized + debuginfo] target(s) in 12.89s",
+          "test result: ok. 238 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.80s",
+          "test result: ok. 546 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 1.46s",
+          "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+          "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+        ]
+      },
+      "native-conformance": {
+        "sha256": "e9d77b36bd3737fd8ff41419bdb61c76db2672c777aad10fe1d47157ac075947",
+        "summary": [
+          "    Finished `test` profile [unoptimized + debuginfo] target(s) in 14.93s",
+          "test result: FAILED. 338 passed; 1 failed; 3 ignored; 0 measured; 0 filtered out; finished in 1.67s"
+        ]
+      },
+      "native-worker_fd_status_controls": {
+        "sha256": "1cde09f5458943749beb926aca71178218fc112a56b99ac10890988164a1dda5",
+        "summary": [
+          "    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.26s",
+          "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 341 filtered out; finished in 0.00s"
+        ]
+      },
+      "native-task_namespace_entries": {
+        "sha256": "cdb29595e5f01e766c32de72a5480e1af7cbb14b3a04771a04b15599dcffb80e",
+        "summary": [
+          "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.06s",
+          "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 341 filtered out; finished in 0.02s"
+        ]
+      },
+      "native-namespace-final": {
+        "sha256": "cea3860427c4ca63ef6d05117bb07c102493e68354383ac7f47c121316b106a9",
+        "summary": [
+          "    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.46s",
+          "test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 537 filtered out; finished in 0.00s"
+        ]
+      },
+      "native-clippy": {
+        "sha256": "e9351ecbcaadfef0e08ed71112721633eae791318f97be7c692c2401ab39d1f0",
+        "summary": [
+          "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.99s"
+        ]
+      }
+    },
+    "mac_lifecycle": [
+      {
+        "check": "go-gc",
+        "code": 0
+      },
+      {
+        "check": "docker",
+        "code": 0
+      }
+    ]
+  },
+  "validation_summary": {
+    "apple_vfs_pass": 547,
+    "native_linux_vfs_pass": 546,
+    "linux_abi_pass": 238,
+    "process_pass": 339,
+    "namespace_cases": 10,
+    "mac_product_pass": 24,
+    "ipad_targets": [
+      "aarch64-apple-ios",
+      "aarch64-apple-ios-sim"
+    ],
+    "physical_ipad_tested": false
+  },
+  "validation_notes": [
+    "Full affected resource suites passed. Initial full process runs had 338 passes and one outdated close_range admission-route test failure on both hosts; that case was migrated to the real worker route, and the updated policy cases plus the failed legacy test passed on both. Unchanged successful cases were reused.",
+    "The iPad check initially inherited the command-line-tools macOS SDK. Retrying with the installed Xcode SDK and iOS deployment target 17.0 passed for device and simulator.",
+    "The serial wait enum was boxed only for the rare parked case after strict checks flagged its size. The affected namespace/policy cases, strict checks, final interpreter/HVF matrices and installed Dev smoke passed afterward. Docker/Go and unrelated product tests reuse their successful prior run; execution semantics are unchanged.",
+    "Unchanged CPU/MMU/graphics acceptance is reused. This is the complete affected local integration validation, not a new full hardware/graphics benchmark."
+  ],
+  "performance": {
+    "scope": "Fixed loops per worker; longest worker time excludes thread creation and final join; alternating unprofiled pairs",
+    "samples": [
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 1,
+        "repeat": 0,
+        "version": "before",
+        "elapsed_ns": 6113875
+      },
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 1,
+        "repeat": 0,
+        "version": "after",
+        "elapsed_ns": 6313667
+      },
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 1,
+        "repeat": 1,
+        "version": "after",
+        "elapsed_ns": 6458125
+      },
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 1,
+        "repeat": 1,
+        "version": "before",
+        "elapsed_ns": 5955458
+      },
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 1,
+        "repeat": 2,
+        "version": "before",
+        "elapsed_ns": 5877375
+      },
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 1,
+        "repeat": 2,
+        "version": "after",
+        "elapsed_ns": 6650708
+      },
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 1,
+        "repeat": 3,
+        "version": "after",
+        "elapsed_ns": 6217666
+      },
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 1,
+        "repeat": 3,
+        "version": "before",
+        "elapsed_ns": 5904208
+      },
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 1,
+        "repeat": 4,
+        "version": "before",
+        "elapsed_ns": 6074041
+      },
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 1,
+        "repeat": 4,
+        "version": "after",
+        "elapsed_ns": 6167875
+      },
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 2,
+        "repeat": 0,
+        "version": "before",
+        "elapsed_ns": 33305459
+      },
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 2,
+        "repeat": 0,
+        "version": "after",
+        "elapsed_ns": 12214667
+      },
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 2,
+        "repeat": 1,
+        "version": "after",
+        "elapsed_ns": 12400875
+      },
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 2,
+        "repeat": 1,
+        "version": "before",
+        "elapsed_ns": 33416333
+      },
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 2,
+        "repeat": 2,
+        "version": "before",
+        "elapsed_ns": 33361959
+      },
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 2,
+        "repeat": 2,
+        "version": "after",
+        "elapsed_ns": 12782042
+      },
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 2,
+        "repeat": 3,
+        "version": "after",
+        "elapsed_ns": 12896666
+      },
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 2,
+        "repeat": 3,
+        "version": "before",
+        "elapsed_ns": 33590167
+      },
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 2,
+        "repeat": 4,
+        "version": "before",
+        "elapsed_ns": 33994000
+      },
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 2,
+        "repeat": 4,
+        "version": "after",
+        "elapsed_ns": 12311333
+      },
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 4,
+        "repeat": 0,
+        "version": "before",
+        "elapsed_ns": 82365375
+      },
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 4,
+        "repeat": 0,
+        "version": "after",
+        "elapsed_ns": 23922917
+      },
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 4,
+        "repeat": 1,
+        "version": "after",
+        "elapsed_ns": 24416958
+      },
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 4,
+        "repeat": 1,
+        "version": "before",
+        "elapsed_ns": 82027458
+      },
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 4,
+        "repeat": 2,
+        "version": "before",
+        "elapsed_ns": 83033125
+      },
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 4,
+        "repeat": 2,
+        "version": "after",
+        "elapsed_ns": 24979167
+      },
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 4,
+        "repeat": 3,
+        "version": "after",
+        "elapsed_ns": 23231917
+      },
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 4,
+        "repeat": 3,
+        "version": "before",
+        "elapsed_ns": 84319125
+      },
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 4,
+        "repeat": 4,
+        "version": "before",
+        "elapsed_ns": 84547958
+      },
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 4,
+        "repeat": 4,
+        "version": "after",
+        "elapsed_ns": 24358000
+      },
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 12,
+        "repeat": 0,
+        "version": "before",
+        "elapsed_ns": 534133459
+      },
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 12,
+        "repeat": 0,
+        "version": "after",
+        "elapsed_ns": 76896083
+      },
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 12,
+        "repeat": 1,
+        "version": "after",
+        "elapsed_ns": 76386250
+      },
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 12,
+        "repeat": 1,
+        "version": "before",
+        "elapsed_ns": 535225750
+      },
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 12,
+        "repeat": 2,
+        "version": "before",
+        "elapsed_ns": 533330209
+      },
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 12,
+        "repeat": 2,
+        "version": "after",
+        "elapsed_ns": 73240000
+      },
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 12,
+        "repeat": 3,
+        "version": "after",
+        "elapsed_ns": 77285209
+      },
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 12,
+        "repeat": 3,
+        "version": "before",
+        "elapsed_ns": 527417709
+      },
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 12,
+        "repeat": 4,
+        "version": "before",
+        "elapsed_ns": 533461958
+      },
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 12,
+        "repeat": 4,
+        "version": "after",
+        "elapsed_ns": 77766667
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 1,
+        "repeat": 0,
+        "version": "before",
+        "elapsed_ns": 11776041
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 1,
+        "repeat": 0,
+        "version": "after",
+        "elapsed_ns": 12251833
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 1,
+        "repeat": 1,
+        "version": "after",
+        "elapsed_ns": 11812291
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 1,
+        "repeat": 1,
+        "version": "before",
+        "elapsed_ns": 12070000
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 1,
+        "repeat": 2,
+        "version": "before",
+        "elapsed_ns": 11618750
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 1,
+        "repeat": 2,
+        "version": "after",
+        "elapsed_ns": 11922291
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 1,
+        "repeat": 3,
+        "version": "after",
+        "elapsed_ns": 11902417
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 1,
+        "repeat": 3,
+        "version": "before",
+        "elapsed_ns": 11723583
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 1,
+        "repeat": 4,
+        "version": "before",
+        "elapsed_ns": 11899125
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 1,
+        "repeat": 4,
+        "version": "after",
+        "elapsed_ns": 11759500
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 2,
+        "repeat": 0,
+        "version": "before",
+        "elapsed_ns": 20838958
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 2,
+        "repeat": 0,
+        "version": "after",
+        "elapsed_ns": 20912875
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 2,
+        "repeat": 1,
+        "version": "after",
+        "elapsed_ns": 21521416
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 2,
+        "repeat": 1,
+        "version": "before",
+        "elapsed_ns": 21132875
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 2,
+        "repeat": 2,
+        "version": "before",
+        "elapsed_ns": 21755667
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 2,
+        "repeat": 2,
+        "version": "after",
+        "elapsed_ns": 20508375
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 2,
+        "repeat": 3,
+        "version": "after",
+        "elapsed_ns": 21118542
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 2,
+        "repeat": 3,
+        "version": "before",
+        "elapsed_ns": 21018833
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 2,
+        "repeat": 4,
+        "version": "before",
+        "elapsed_ns": 21002667
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 2,
+        "repeat": 4,
+        "version": "after",
+        "elapsed_ns": 21113375
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 4,
+        "repeat": 0,
+        "version": "before",
+        "elapsed_ns": 36044625
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 4,
+        "repeat": 0,
+        "version": "after",
+        "elapsed_ns": 37350791
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 4,
+        "repeat": 1,
+        "version": "after",
+        "elapsed_ns": 36687792
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 4,
+        "repeat": 1,
+        "version": "before",
+        "elapsed_ns": 36687334
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 4,
+        "repeat": 2,
+        "version": "before",
+        "elapsed_ns": 36269958
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 4,
+        "repeat": 2,
+        "version": "after",
+        "elapsed_ns": 35157708
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 4,
+        "repeat": 3,
+        "version": "after",
+        "elapsed_ns": 36364125
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 4,
+        "repeat": 3,
+        "version": "before",
+        "elapsed_ns": 35820792
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 4,
+        "repeat": 4,
+        "version": "before",
+        "elapsed_ns": 37192250
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 4,
+        "repeat": 4,
+        "version": "after",
+        "elapsed_ns": 37487250
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 12,
+        "repeat": 0,
+        "version": "before",
+        "elapsed_ns": 119708750
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 12,
+        "repeat": 0,
+        "version": "after",
+        "elapsed_ns": 101753625
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 12,
+        "repeat": 1,
+        "version": "after",
+        "elapsed_ns": 121889750
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 12,
+        "repeat": 1,
+        "version": "before",
+        "elapsed_ns": 119374375
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 12,
+        "repeat": 2,
+        "version": "before",
+        "elapsed_ns": 121988667
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 12,
+        "repeat": 2,
+        "version": "after",
+        "elapsed_ns": 120361542
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 12,
+        "repeat": 3,
+        "version": "after",
+        "elapsed_ns": 118683625
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 12,
+        "repeat": 3,
+        "version": "before",
+        "elapsed_ns": 119489125
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 12,
+        "repeat": 4,
+        "version": "before",
+        "elapsed_ns": 121117166
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 12,
+        "repeat": 4,
+        "version": "after",
+        "elapsed_ns": 96731417
+      }
+    ],
+    "sha256": {
+      "before": "8d071f7fc67a95da40b0b4106306f63b57336b29a78dcdcbf2e766374804bb3d",
+      "after": "50155ebcce60083558c4c58b325fdaa5a8cc847a6deb554feef2515d41e39fd6"
+    },
+    "medians": [
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 1,
+        "before": 5955458,
+        "after": 6313667,
+        "speedup": 0.9432645085653076
+      },
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 2,
+        "before": 33416333,
+        "after": 12400875,
+        "speedup": 2.6946754160492707
+      },
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 4,
+        "before": 83033125,
+        "after": 24358000,
+        "speedup": 3.4088646440594466
+      },
+      {
+        "fixture": "worker-task-namespace",
+        "cpus": 12,
+        "before": 533461958,
+        "after": 76896083,
+        "speedup": 6.937439947363769
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 1,
+        "before": 11776041,
+        "after": 11902417,
+        "speedup": 0.9893823246152441
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 2,
+        "before": 21018833,
+        "after": 21113375,
+        "speedup": 0.9955221749246627
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 4,
+        "before": 36269958,
+        "after": 36687792,
+        "speedup": 0.9886110889420655
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 12,
+        "before": 119708750,
+        "after": 118683625,
+        "speedup": 1.0086374594641847
+      }
+    ],
+    "interpretation": "Namespace-heavy per-worker microbenchmark only: 2.70x/3.41x/6.94x at 2/4/12 CPUs; one CPU 6.0% slower. Proc control 0.99x\u20131.01x. Not Firefox, Geekbench or whole-container performance."
+  },
+  "installation": {
+    "channel": "dev",
+    "dev_sha256": "340abd1fbf2d1bc1fe22ccecf315a4ec4c4cdef58646b90fcfd67fffdc0bb281",
+    "package_sha256": "340abd1fbf2d1bc1fe22ccecf315a4ec4c4cdef58646b90fcfd67fffdc0bb281",
+    "stable_sha256": "4f40615213e731b2a4ef9d8c6a0e85c5c7bdf31ab0c60b0354b55113f2a6a55d",
+    "stable_unchanged": true,
+    "business_environments_unchanged": true
+  },
+  "remaining": [
+    "Credentials/capability mutation and captured policy consumers",
+    "Original-owner task/image construction at creator-mm custody",
+    "Structural mapping publication and actual backing/lifetime escalations",
+    "Tracing/security lifecycle effects and excluded owner control bodies",
+    "Generic unhandled SVC/HLT/fault and actual host lifecycle fallback"
+  ],
+  "references": [
+    "https://github.com/torvalds/linux/blob/master/kernel/fork.c",
+    "https://github.com/torvalds/linux/blob/master/kernel/nsproxy.c",
+    "https://github.com/torvalds/linux/blob/master/fs/namespace.c",
+    "https://github.com/torvalds/linux/blob/master/fs/file.c"
+  ]
+}
