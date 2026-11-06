@@ -1,0 +1,3247 @@
+{
+  "schema": 1,
+  "date": "2026-11-07",
+  "stage": 62,
+  "recorded_at": "2026-11-06T18:56:49.304207+00:00",
+  "runtime_revision": "a4c1f20115757f72c6a023b81b9b13aa791db90f",
+  "baseline_runtime_revision": "c2d8643c924def8ff813b2d31de3dfc54cd64c26",
+  "global_coordinator_removal_complete": false,
+  "scope": [
+    "Complete currently supported membarrier subsystem (commands 0/1/8/16/512)",
+    "Original task/mm registration, active CPU/native/scoped execution leases and acknowledgement",
+    "Existing worker parking, readiness, cancellation, fork and exec dependencies"
+  ],
+  "implementation": [
+    "One ABI implementation consumes low 32 bits of cmd/flags, preserving existing supported mask 537 and errno semantics",
+    "Queries, registration and errors complete on the source worker after the original seccomp entry decision",
+    "Private/global requests visit original mm/all current guest execution domains and exclude the calling lease",
+    "A seeded completion count prevents early completion while later domains are still being visited",
+    "The existing domain mutex publishes and withdraws execution leases; it is not held across guest CPU or native bodies",
+    "Synchronous native and scoped mapping execution retain real leases, including the pre-CPU-interrupt-binding interval",
+    "Requested actors acknowledge with a full host fence after real retirement; notifications occur outside domain/queue locks",
+    "Pending callers return their CPU slot, retain their original View and resume through existing readiness without owner service, syscall replay, mm byte export or page-table rebuild",
+    "Ordinary retirement adds no full fence; one reusable pending flag per worker replaces the existing exit-state check",
+    "Accepted waits retain no guest pointers, task bodies, VFS or Files; cancellation does not invalidate outstanding actor acknowledgements"
+  ],
+  "constraints": [
+    "No new coordinator/service thread or polling bus",
+    "No additional policy or fence on ordinary guest-byte access; original CPU/native concurrency rules remain",
+    "Coherent AArch64 host and existing opaque backend entry/exit compiler boundary; late/quiescent entrants synchronize through original domain publication",
+    "Global scope covers this guest Linux instance, not unrelated host applications or GPU DMA",
+    "Same runtime on Mac/iPad; Dev-only installation"
+  ],
+  "source_files": {
+    "crates/trames-session/src/barrier.rs": "6a798112f29325c3da447c4235b16e4cea8ab0b052d9b68961b7984b33f22ed6",
+    "crates/trames-session/src/lib.rs": "e82078cde2d25111ced725d0c3dd77ef8bb7edd21829c7c51e876f2dfbe30c2a",
+    "crates/trames-session/src/process.rs": "e78b954c0ab8aba48ffef2b19a93b08b7510be2331e20c1f6afe2797fe55bec8",
+    "crates/trames-session/src/process_compat.rs": "4665926904250b443401326b0f194cdebadc1b429f9f8290baf1b2c2d4303967",
+    "crates/trames-session/src/process_dispatch.rs": "ee8686fd5c1bd1e6bb1eaba16dea7c10f48313e3943f3d6eeeee62c485212c2d",
+    "crates/trames-session/src/process_events.rs": "0bd89afdd28275b91a04865cee19944cf1b6546d717c82ec235b6ad6b5917755",
+    "crates/trames-session/src/process_lifecycle_mapping.rs": "0c5fe40383e119a92444bffc0379ce29f5d3327d754e793bdaeaf103647ddff2",
+    "crates/trames-session/src/process_seccomp.rs": "36c5eca4a77d7150d3e93ba99e050ca148bb7e81a71a59d82ba051293a6f3ad1",
+    "crates/trames-session/src/process_service.rs": "5a5c7d16e5b92428c03d8046e9fa7192c2fecee07292cfddaccb1bb3975a2763",
+    "crates/trames-session/src/process_vm.rs": "0c4a47c1ddf6aa5c12e59063a17cdedcce5f2c1b9463cbb77da9e35aacc81231",
+    "crates/trames-session/src/run_queue.rs": "4fe4f8b9592e48b8e47bb8b7721d99604f0517be4366646525c4c522533ce312",
+    "crates/trames-session/src/run_queue/domains.rs": "19c9e09c430e94f5620f2459cde7afac34580821752111631729c792fce80433",
+    "crates/trames-session/src/worker_syscalls.rs": "3eeffb8f4edbbc09569e4cbb7d64433331b97538322f6741329590937960b9e3",
+    "crates/trames-session/src/workers.rs": "d564264bc5d8119fe960bb4b2d1e15646ce51f5783193915e858be3840bec19b",
+    "crates/trames-session/src/workers_uring_tests.rs": "02925f2a4790626a3f0d147916f10ff9121785b9e5b99da2b0f81c38115bf304",
+    "docs/architecture/coordination-boundaries.md": "9c2592f6eabbeb0ce72cd6bec5071c9911521ece76fb07326d59e455afe7f13a"
+  },
+  "fixtures": {
+    "worker-membarrier.c": {
+      "path": "tests/fixtures/worker-membarrier.c",
+      "sha256": "bfbaf7999f087238eae45dc9860c46dbdfa43a938c3155f278bdc754172a2e03"
+    },
+    "runtime-compat.c": {
+      "path": "tests/fixtures/runtime-compat.c",
+      "sha256": "51475635b2aae4ad70eb8f29112ccc7f5342a43bc356af79ab2d3ee7ec6e8ee8"
+    },
+    "worker-seccomp.c": {
+      "path": "tests/fixtures/worker-seccomp.c",
+      "sha256": "182a2f61de9d8690ab5b7b4dccf104469650d03fd2f60cfef2efe121abd8e24e"
+    }
+  },
+  "acceptance": {
+    "runtime_macos": {
+      "path": "target/barrier-subsystem/runtime-macos-ci/summary.json",
+      "sha256": "c6ef511275f51268a5257edf828a8c70d67d065edd040d75bdff048223bb5fa7",
+      "adaptations": [],
+      "completed": true,
+      "context": {
+        "machine": "arm64",
+        "packages": "27.0.1",
+        "platform": "macOS-27.0.1-arm64-arm-64bit",
+        "rustc": "rustc 1.101.0-nightly (4ebd25825 2026-10-15)\nbinary: rustc\ncommit-hash: 4ebd258257737d5b7635c116fa7d281627a7e937\ncommit-date: 2026-10-15\nhost: aarch64-apple-darwin\nrelease: 1.101.0-nightly\nLLVM version: 23.1.4\n"
+      },
+      "job": "verify",
+      "local_actions": {
+        "cache": "Persistent local target directories.",
+        "checkout": "Isolated local source snapshot; source-state records HEAD and actual file hashes.",
+        "toolchain": "Provisioned pinned Rust toolchain, components and targets; rustc recorded above.",
+        "upload-artifact": "Logs and generated artifacts remain in the local checkout/output directory."
+      },
+      "runner_sha256": "a5a510c2e0c900e19d59e1d398f1361f814887498606b241d857615ca5f0321c",
+      "steps": [
+        {
+          "index": 1,
+          "name": "rustup show",
+          "status": "passed",
+          "exit_code": 0,
+          "seconds": 0.03976798057556152
+        },
+        {
+          "index": 2,
+          "name": "python3 scripts/check-execution-boundaries.py",
+          "status": "passed",
+          "exit_code": 0,
+          "seconds": 0.18886494636535645
+        },
+        {
+          "index": 3,
+          "name": "cargo fmt --all --check",
+          "status": "passed",
+          "exit_code": 0,
+          "seconds": 1.470163106918335
+        },
+        {
+          "index": 4,
+          "name": "cargo clippy --workspace --all-targets --all-features --locked -- -D warnings",
+          "status": "passed",
+          "exit_code": 0,
+          "seconds": 3.7161483764648438
+        },
+        {
+          "index": 5,
+          "name": "cargo test --workspace --all-features --locked",
+          "status": "passed",
+          "exit_code": 0,
+          "seconds": 13.144820928573608
+        },
+        {
+          "index": 6,
+          "name": "cargo build --workspace --all-features --release --locked",
+          "status": "passed",
+          "exit_code": 0,
+          "seconds": 5.161268949508667
+        },
+        {
+          "index": 7,
+          "name": "cargo run --release -p trames-memory --example reclaim-footprint --locked",
+          "status": "passed",
+          "exit_code": 0,
+          "seconds": 0.5370979309082031
+        }
+      ],
+      "workflow": ".github/workflows/runtime.yml",
+      "logs": [
+        {
+          "path": "target/barrier-subsystem/runtime-macos-ci/step-01.log",
+          "sha256": "a4a6a2e77ce93e216ac1bdd7f0ebd4b7a240da4f7d0028afbfa1ad91641dc56c"
+        },
+        {
+          "path": "target/barrier-subsystem/runtime-macos-ci/step-02.log",
+          "sha256": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651"
+        },
+        {
+          "path": "target/barrier-subsystem/runtime-macos-ci/step-03.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "target/barrier-subsystem/runtime-macos-ci/step-04.log",
+          "sha256": "624f9791607e435a1c3cd3c283d422cad0f86c1f819d19bda5a99a405d1e2b6c"
+        },
+        {
+          "path": "target/barrier-subsystem/runtime-macos-ci/step-05.log",
+          "sha256": "f357e6fe729961dd9951844d06fcafd2c885f348f029c99f2fe2f88704815b56"
+        },
+        {
+          "path": "target/barrier-subsystem/runtime-macos-ci/step-06.log",
+          "sha256": "5dfaf7b2a6591af130c2c13f70a1a7606455dbab198c167fcc6cef8582bdaac9"
+        },
+        {
+          "path": "target/barrier-subsystem/runtime-macos-ci/step-07.log",
+          "sha256": "8981919181ddac904815cfa79770511b891fa71d5a4b2cc15449393237edcdba"
+        }
+      ]
+    },
+    "runtime_linux": {
+      "path": "target/local-ci/io/barrier-subsystem/runtime-linux-ci/summary.json",
+      "sha256": "d0e2df21066b2d5321e1f593acfff5fac37bfded18450efe024c362f8ab2238c",
+      "adaptations": [
+        "Native ARM64 CLI and musl test executables; pinned QEMU remains the instruction oracle.",
+        "ThreadSanitizer target follows the ARM64 Linux host instead of hosted x86_64."
+      ],
+      "completed": true,
+      "context": {
+        "machine": "aarch64",
+        "packages": "363b68bfd79931eb35722a52c1a67ecbdddf646805ce787fbeb35a4a0027a7f4",
+        "platform": "Linux-7.0.0-38-generic-aarch64-with-glibc2.39",
+        "rustc": "rustc 1.101.0-nightly (4ebd25825 2026-10-15)\nbinary: rustc\ncommit-hash: 4ebd258257737d5b7635c116fa7d281627a7e937\ncommit-date: 2026-10-15\nhost: aarch64-unknown-linux-gnu\nrelease: 1.101.0-nightly\nLLVM version: 23.1.4\n"
+      },
+      "job": "verify",
+      "local_actions": {
+        "cache": "Persistent local target directories.",
+        "checkout": "Isolated local source snapshot; source-state records HEAD and actual file hashes.",
+        "toolchain": "Provisioned pinned Rust toolchain, components and targets; rustc recorded above.",
+        "upload-artifact": "Logs and generated artifacts remain in the local checkout/output directory."
+      },
+      "runner_sha256": "a5a510c2e0c900e19d59e1d398f1361f814887498606b241d857615ca5f0321c",
+      "steps": [
+        {
+          "index": 1,
+          "name": "rustup show",
+          "status": "passed",
+          "exit_code": 0,
+          "seconds": 0.015401124954223633
+        },
+        {
+          "index": 2,
+          "name": "python3 scripts/check-execution-boundaries.py",
+          "status": "passed",
+          "exit_code": 0,
+          "seconds": 0.07695460319519043
+        },
+        {
+          "index": 3,
+          "name": "cargo fmt --all --check",
+          "status": "passed",
+          "exit_code": 0,
+          "seconds": 0.9153227806091309
+        },
+        {
+          "index": 4,
+          "name": "cargo clippy --workspace --all-targets --all-features --locked -- -D warnings",
+          "status": "passed",
+          "exit_code": 0,
+          "seconds": 1.2552199363708496
+        },
+        {
+          "index": 5,
+          "name": "cargo test --workspace --all-features --locked",
+          "status": "passed",
+          "exit_code": 0,
+          "seconds": 10.794436931610107
+        },
+        {
+          "index": 6,
+          "name": "cargo build --workspace --all-features --release --locked",
+          "status": "passed",
+          "exit_code": 0,
+          "seconds": 1.9552907943725586
+        },
+        {
+          "index": 7,
+          "name": "cargo run --release -p trames-memory --example reclaim-footprint --locked",
+          "status": "passed",
+          "exit_code": 0,
+          "seconds": 0.16490888595581055
+        }
+      ],
+      "workflow": ".github/workflows/runtime.yml",
+      "logs": [
+        {
+          "path": "target/local-ci/io/barrier-subsystem/runtime-linux-ci/step-01.log",
+          "sha256": "72636920b473812425175422544a88a230699115a474bc30d039719194f48644"
+        },
+        {
+          "path": "target/local-ci/io/barrier-subsystem/runtime-linux-ci/step-02.log",
+          "sha256": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651"
+        },
+        {
+          "path": "target/local-ci/io/barrier-subsystem/runtime-linux-ci/step-03.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "target/local-ci/io/barrier-subsystem/runtime-linux-ci/step-04.log",
+          "sha256": "d95399dfa5464d1700f6972b96ae9d6d6dbfff758793dbb2248ed879cb38b45b"
+        },
+        {
+          "path": "target/local-ci/io/barrier-subsystem/runtime-linux-ci/step-05.log",
+          "sha256": "e68489c8e13b2b87f3c72455dadee59139dcd35f3dc43744bca6eacf3de1be40"
+        },
+        {
+          "path": "target/local-ci/io/barrier-subsystem/runtime-linux-ci/step-06.log",
+          "sha256": "ff794934361f9fc96c0c58f62efdf7b0e402a1715f813c6fd1374e968cc025e9"
+        },
+        {
+          "path": "target/local-ci/io/barrier-subsystem/runtime-linux-ci/step-07.log",
+          "sha256": "429c2db076b6ee503ebdc6147ffbb6b5ad04002bb6dee1b724912b0ab5a02560"
+        }
+      ]
+    },
+    "linux_driver": {
+      "path": "target/local-ci/io/barrier-subsystem/results.json",
+      "sha256": "635d21f348107e2afceb3adeee55ae78146e3e8d57209eb9820ffb8926e49b94",
+      "data": {
+        "source_sha256": {
+          "runtime/crates/trames-session/src/lib.rs": "e82078cde2d25111ced725d0c3dd77ef8bb7edd21829c7c51e876f2dfbe30c2a",
+          "runtime/crates/trames-session/src/process.rs": "e78b954c0ab8aba48ffef2b19a93b08b7510be2331e20c1f6afe2797fe55bec8",
+          "runtime/crates/trames-session/src/process_compat.rs": "4665926904250b443401326b0f194cdebadc1b429f9f8290baf1b2c2d4303967",
+          "runtime/crates/trames-session/src/process_dispatch.rs": "ee8686fd5c1bd1e6bb1eaba16dea7c10f48313e3943f3d6eeeee62c485212c2d",
+          "runtime/crates/trames-session/src/process_events.rs": "0bd89afdd28275b91a04865cee19944cf1b6546d717c82ec235b6ad6b5917755",
+          "runtime/crates/trames-session/src/process_lifecycle_mapping.rs": "0c5fe40383e119a92444bffc0379ce29f5d3327d754e793bdaeaf103647ddff2",
+          "runtime/crates/trames-session/src/process_seccomp.rs": "36c5eca4a77d7150d3e93ba99e050ca148bb7e81a71a59d82ba051293a6f3ad1",
+          "runtime/crates/trames-session/src/process_service.rs": "5a5c7d16e5b92428c03d8046e9fa7192c2fecee07292cfddaccb1bb3975a2763",
+          "runtime/crates/trames-session/src/process_vm.rs": "0c4a47c1ddf6aa5c12e59063a17cdedcce5f2c1b9463cbb77da9e35aacc81231",
+          "runtime/crates/trames-session/src/run_queue.rs": "4fe4f8b9592e48b8e47bb8b7721d99604f0517be4366646525c4c522533ce312",
+          "runtime/crates/trames-session/src/run_queue/domains.rs": "19c9e09c430e94f5620f2459cde7afac34580821752111631729c792fce80433",
+          "runtime/crates/trames-session/src/worker_syscalls.rs": "3eeffb8f4edbbc09569e4cbb7d64433331b97538322f6741329590937960b9e3",
+          "runtime/crates/trames-session/src/workers.rs": "d564264bc5d8119fe960bb4b2d1e15646ce51f5783193915e858be3840bec19b",
+          "runtime/crates/trames-session/src/workers_uring_tests.rs": "02925f2a4790626a3f0d147916f10ff9121785b9e5b99da2b0f81c38115bf304",
+          "runtime/crates/trames-session/src/barrier.rs": "6a798112f29325c3da447c4235b16e4cea8ab0b052d9b68961b7984b33f22ed6",
+          "tests/fixtures/worker-membarrier.c": "de8b0914cf99bd731eabd75f8e1bdddd372032bb037290222395b73a0c724ffd",
+          "tests/fixtures/runtime-compat.c": "51475635b2aae4ad70eb8f29112ccc7f5342a43bc356af79ab2d3ee7ec6e8ee8",
+          "scripts/run-local-ci.py": "a5a510c2e0c900e19d59e1d398f1361f814887498606b241d857615ca5f0321c"
+        },
+        "checks": [
+          {
+            "name": "process-all",
+            "code": 0,
+            "seconds": 33.777744267
+          },
+          {
+            "name": "core-clippy",
+            "code": 0,
+            "seconds": 3.658384809999987
+          },
+          {
+            "name": "runtime-ci",
+            "code": 0,
+            "seconds": 15.46289854199999
+          },
+          {
+            "name": "fixture-build",
+            "code": 0,
+            "seconds": 0.12051794100000279
+          },
+          {
+            "name": "compat-build",
+            "code": 0,
+            "seconds": 0.12051187000000141
+          }
+        ]
+      }
+    },
+    "linux_source_comparison": {
+      "runtime/crates/trames-session/src/lib.rs": {
+        "recorded_sha256": "e82078cde2d25111ced725d0c3dd77ef8bb7edd21829c7c51e876f2dfbe30c2a",
+        "current_sha256": "e82078cde2d25111ced725d0c3dd77ef8bb7edd21829c7c51e876f2dfbe30c2a",
+        "matches": true
+      },
+      "runtime/crates/trames-session/src/process.rs": {
+        "recorded_sha256": "e78b954c0ab8aba48ffef2b19a93b08b7510be2331e20c1f6afe2797fe55bec8",
+        "current_sha256": "e78b954c0ab8aba48ffef2b19a93b08b7510be2331e20c1f6afe2797fe55bec8",
+        "matches": true
+      },
+      "runtime/crates/trames-session/src/process_compat.rs": {
+        "recorded_sha256": "4665926904250b443401326b0f194cdebadc1b429f9f8290baf1b2c2d4303967",
+        "current_sha256": "4665926904250b443401326b0f194cdebadc1b429f9f8290baf1b2c2d4303967",
+        "matches": true
+      },
+      "runtime/crates/trames-session/src/process_dispatch.rs": {
+        "recorded_sha256": "ee8686fd5c1bd1e6bb1eaba16dea7c10f48313e3943f3d6eeeee62c485212c2d",
+        "current_sha256": "ee8686fd5c1bd1e6bb1eaba16dea7c10f48313e3943f3d6eeeee62c485212c2d",
+        "matches": true
+      },
+      "runtime/crates/trames-session/src/process_events.rs": {
+        "recorded_sha256": "0bd89afdd28275b91a04865cee19944cf1b6546d717c82ec235b6ad6b5917755",
+        "current_sha256": "0bd89afdd28275b91a04865cee19944cf1b6546d717c82ec235b6ad6b5917755",
+        "matches": true
+      },
+      "runtime/crates/trames-session/src/process_lifecycle_mapping.rs": {
+        "recorded_sha256": "0c5fe40383e119a92444bffc0379ce29f5d3327d754e793bdaeaf103647ddff2",
+        "current_sha256": "0c5fe40383e119a92444bffc0379ce29f5d3327d754e793bdaeaf103647ddff2",
+        "matches": true
+      },
+      "runtime/crates/trames-session/src/process_seccomp.rs": {
+        "recorded_sha256": "36c5eca4a77d7150d3e93ba99e050ca148bb7e81a71a59d82ba051293a6f3ad1",
+        "current_sha256": "36c5eca4a77d7150d3e93ba99e050ca148bb7e81a71a59d82ba051293a6f3ad1",
+        "matches": true
+      },
+      "runtime/crates/trames-session/src/process_service.rs": {
+        "recorded_sha256": "5a5c7d16e5b92428c03d8046e9fa7192c2fecee07292cfddaccb1bb3975a2763",
+        "current_sha256": "5a5c7d16e5b92428c03d8046e9fa7192c2fecee07292cfddaccb1bb3975a2763",
+        "matches": true
+      },
+      "runtime/crates/trames-session/src/process_vm.rs": {
+        "recorded_sha256": "0c4a47c1ddf6aa5c12e59063a17cdedcce5f2c1b9463cbb77da9e35aacc81231",
+        "current_sha256": "0c4a47c1ddf6aa5c12e59063a17cdedcce5f2c1b9463cbb77da9e35aacc81231",
+        "matches": true
+      },
+      "runtime/crates/trames-session/src/run_queue.rs": {
+        "recorded_sha256": "4fe4f8b9592e48b8e47bb8b7721d99604f0517be4366646525c4c522533ce312",
+        "current_sha256": "4fe4f8b9592e48b8e47bb8b7721d99604f0517be4366646525c4c522533ce312",
+        "matches": true
+      },
+      "runtime/crates/trames-session/src/run_queue/domains.rs": {
+        "recorded_sha256": "19c9e09c430e94f5620f2459cde7afac34580821752111631729c792fce80433",
+        "current_sha256": "19c9e09c430e94f5620f2459cde7afac34580821752111631729c792fce80433",
+        "matches": true
+      },
+      "runtime/crates/trames-session/src/worker_syscalls.rs": {
+        "recorded_sha256": "3eeffb8f4edbbc09569e4cbb7d64433331b97538322f6741329590937960b9e3",
+        "current_sha256": "3eeffb8f4edbbc09569e4cbb7d64433331b97538322f6741329590937960b9e3",
+        "matches": true
+      },
+      "runtime/crates/trames-session/src/workers.rs": {
+        "recorded_sha256": "d564264bc5d8119fe960bb4b2d1e15646ce51f5783193915e858be3840bec19b",
+        "current_sha256": "d564264bc5d8119fe960bb4b2d1e15646ce51f5783193915e858be3840bec19b",
+        "matches": true
+      },
+      "runtime/crates/trames-session/src/workers_uring_tests.rs": {
+        "recorded_sha256": "02925f2a4790626a3f0d147916f10ff9121785b9e5b99da2b0f81c38115bf304",
+        "current_sha256": "02925f2a4790626a3f0d147916f10ff9121785b9e5b99da2b0f81c38115bf304",
+        "matches": true
+      },
+      "runtime/crates/trames-session/src/barrier.rs": {
+        "recorded_sha256": "6a798112f29325c3da447c4235b16e4cea8ab0b052d9b68961b7984b33f22ed6",
+        "current_sha256": "6a798112f29325c3da447c4235b16e4cea8ab0b052d9b68961b7984b33f22ed6",
+        "matches": true
+      },
+      "tests/fixtures/worker-membarrier.c": {
+        "recorded_sha256": "de8b0914cf99bd731eabd75f8e1bdddd372032bb037290222395b73a0c724ffd",
+        "current_sha256": "bfbaf7999f087238eae45dc9860c46dbdfa43a938c3155f278bdc754172a2e03",
+        "matches": false
+      },
+      "tests/fixtures/runtime-compat.c": {
+        "recorded_sha256": "51475635b2aae4ad70eb8f29112ccc7f5342a43bc356af79ab2d3ee7ec6e8ee8",
+        "current_sha256": "51475635b2aae4ad70eb8f29112ccc7f5342a43bc356af79ab2d3ee7ec6e8ee8",
+        "matches": true
+      },
+      "scripts/run-local-ci.py": {
+        "recorded_sha256": "a5a510c2e0c900e19d59e1d398f1361f814887498606b241d857615ca5f0321c",
+        "current_sha256": "a5a510c2e0c900e19d59e1d398f1361f814887498606b241d857615ca5f0321c",
+        "matches": true
+      }
+    },
+    "process_macos": {
+      "passed": 400,
+      "failed": 0,
+      "ignored": 3,
+      "path": "target/barrier-subsystem/process-final.log",
+      "sha256": "08c3342b7e53405c437c4dc46600c88ef07ce1be3aab39107025445408627853"
+    },
+    "process_linux": {
+      "passed": 400,
+      "failed": 0,
+      "ignored": 3,
+      "path": "target/local-ci/io/barrier-subsystem/process-all.log",
+      "sha256": "bbf6f7598294fde3bf054570c291b20f8e23aa54773de916f3c4f93639151e0a"
+    },
+    "core_strict_clippy_macos": {
+      "path": "target/barrier-subsystem/core-clippy.log",
+      "sha256": "a9db49156b9dd76f6f0188e438ca9c1511d57d2554ad227724fe5d89ea8a241c"
+    },
+    "core_strict_clippy_linux": {
+      "path": "target/local-ci/io/barrier-subsystem/core-clippy.log",
+      "sha256": "43995c7dec8005db336847e882631e566ebc3eee0fedd2edaf8942098842276e"
+    },
+    "signed_hardware": {
+      "path": "target/barrier-subsystem/hardware",
+      "sha256": "bf1ea385bd4c32805cc44faabe535059bf5e27f2660abc0db62ba03850cf94ba",
+      "data": {
+        "passed": true,
+        "runtime_revision": "c2d8643c924def8ff813b2d31de3dfc54cd64c26",
+        "rows": [
+          {
+            "target": "trames-mac-run",
+            "executable_sha256": "88f7ce2103525278f2d18eb930b35216595e4f11d1e6b1fc68344dded9262e91",
+            "exit": 0,
+            "passed_tests": 1
+          },
+          {
+            "target": "trames_hvf",
+            "executable_sha256": "d4a923503b150a8402d90b8dd2586bba32bd12c174f95496d87765ce041654c6",
+            "exit": 0,
+            "passed_tests": 47
+          }
+        ]
+      },
+      "interpretation": "48 fresh signed hardware tests passed (1 product, 47 HVF). Recorded c2d8643 pin was pre-commit build metadata; tested working-tree production source is the stage-62 source recorded above, not stage-61 code.",
+      "log": {
+        "path": "target/barrier-subsystem/hardware-driver.log",
+        "sha256": "2598324981b54ebf820371e44720ceb4e3d6371d351cd4baae389eadeab964e5"
+      }
+    },
+    "mac_product": {
+      "passed": 24,
+      "failed": 0,
+      "expected_ignored": 48,
+      "log": {
+        "path": "target/barrier-subsystem/mac-product-tests.log",
+        "sha256": "4305f9c74214890e391f65cba1cc199a36b731e58ba40100fc46316f40ff4efe"
+      }
+    },
+    "ipad_compile": {
+      "path": "target/barrier-subsystem/ipad-checks.json",
+      "sha256": "cdc8829a61446e15f8a3a168e6c6e4c907eb956b4b40394ac49c89534faaab14",
+      "data": [
+        {
+          "target": "aarch64-apple-ios",
+          "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+          "code": 0
+        },
+        {
+          "target": "aarch64-apple-ios-sim",
+          "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk",
+          "code": 0
+        }
+      ],
+      "logs": [
+        {
+          "path": "target/barrier-subsystem/aarch64-apple-ios-check.log",
+          "sha256": "64c85c7e61b18ad29de42fdd7a7152628c57f034c296413e8c7053df6d3085d4"
+        },
+        {
+          "path": "target/barrier-subsystem/aarch64-apple-ios-sim-check.log",
+          "sha256": "eecebde312f7d96753a83b3ddd7a020d26174b4528dec2a77fe93dc86a03b096"
+        }
+      ]
+    },
+    "guest_matrix": {
+      "path": "target/barrier-subsystem/guest/results.json",
+      "sha256": "a740e1851d7fb87cf66f37a7d5114904e4b68d9c6284cd17badc6fca7f08c905",
+      "data": [
+        {
+          "case": "hvf-1-runtime-compat",
+          "code": 0,
+          "seconds": 0.011770791,
+          "passed": true,
+          "command": [
+            "/Users/main/dev/trames/target/mount-subsystem/mac/target/release/trames-mac-run",
+            "--cpus",
+            "1",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/bin/runtime-compat=/Users/main/dev/trames/target/local-ci/io/barrier-subsystem/runtime-compat",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/bin/runtime-compat"
+          ],
+          "runner_sha256": "551dddc56534843d4b429f213282f6a8e449cba47135ca27aa3b203ce572e835",
+          "fixture_sha256": "146084cf9953baeb882e66572210ea1686754625142ea3c1710e439a74f27711"
+        },
+        {
+          "case": "hvf-1-worker-membarrier-8-0",
+          "code": 0,
+          "seconds": 0.011931374999999998,
+          "passed": true,
+          "command": [
+            "/Users/main/dev/trames/target/mount-subsystem/mac/target/release/trames-mac-run",
+            "--cpus",
+            "1",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/barrier-subsystem/worker-membarrier",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "1",
+            "30",
+            "8",
+            "0"
+          ],
+          "runner_sha256": "551dddc56534843d4b429f213282f6a8e449cba47135ca27aa3b203ce572e835",
+          "fixture_sha256": "acc70ae7c6e13be575516628eff506fac9af2762c33ce8fb0d78770ae533f3f5"
+        },
+        {
+          "case": "hvf-1-worker-membarrier-8-1",
+          "code": 0,
+          "seconds": 0.011428458999999995,
+          "passed": true,
+          "command": [
+            "/Users/main/dev/trames/target/mount-subsystem/mac/target/release/trames-mac-run",
+            "--cpus",
+            "1",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/barrier-subsystem/worker-membarrier",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "1",
+            "30",
+            "8",
+            "1"
+          ],
+          "runner_sha256": "551dddc56534843d4b429f213282f6a8e449cba47135ca27aa3b203ce572e835",
+          "fixture_sha256": "acc70ae7c6e13be575516628eff506fac9af2762c33ce8fb0d78770ae533f3f5"
+        },
+        {
+          "case": "hvf-1-worker-membarrier-1-0",
+          "code": 0,
+          "seconds": 0.02214379200000001,
+          "passed": true,
+          "command": [
+            "/Users/main/dev/trames/target/mount-subsystem/mac/target/release/trames-mac-run",
+            "--cpus",
+            "1",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/barrier-subsystem/worker-membarrier",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "1",
+            "30",
+            "1",
+            "0"
+          ],
+          "runner_sha256": "551dddc56534843d4b429f213282f6a8e449cba47135ca27aa3b203ce572e835",
+          "fixture_sha256": "acc70ae7c6e13be575516628eff506fac9af2762c33ce8fb0d78770ae533f3f5"
+        },
+        {
+          "case": "hvf-1-worker-membarrier-1-1",
+          "code": 0,
+          "seconds": 0.011750833000000002,
+          "passed": true,
+          "command": [
+            "/Users/main/dev/trames/target/mount-subsystem/mac/target/release/trames-mac-run",
+            "--cpus",
+            "1",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/barrier-subsystem/worker-membarrier",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "1",
+            "30",
+            "1",
+            "1"
+          ],
+          "runner_sha256": "551dddc56534843d4b429f213282f6a8e449cba47135ca27aa3b203ce572e835",
+          "fixture_sha256": "acc70ae7c6e13be575516628eff506fac9af2762c33ce8fb0d78770ae533f3f5"
+        },
+        {
+          "case": "hvf-4-runtime-compat",
+          "code": 0,
+          "seconds": 0.021748124999999993,
+          "passed": true,
+          "command": [
+            "/Users/main/dev/trames/target/mount-subsystem/mac/target/release/trames-mac-run",
+            "--cpus",
+            "4",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/bin/runtime-compat=/Users/main/dev/trames/target/local-ci/io/barrier-subsystem/runtime-compat",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/bin/runtime-compat"
+          ],
+          "runner_sha256": "551dddc56534843d4b429f213282f6a8e449cba47135ca27aa3b203ce572e835",
+          "fixture_sha256": "146084cf9953baeb882e66572210ea1686754625142ea3c1710e439a74f27711"
+        },
+        {
+          "case": "hvf-4-worker-membarrier-8-0",
+          "code": 0,
+          "seconds": 0.022223417000000023,
+          "passed": true,
+          "command": [
+            "/Users/main/dev/trames/target/mount-subsystem/mac/target/release/trames-mac-run",
+            "--cpus",
+            "4",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/barrier-subsystem/worker-membarrier",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "4",
+            "30",
+            "8",
+            "0"
+          ],
+          "runner_sha256": "551dddc56534843d4b429f213282f6a8e449cba47135ca27aa3b203ce572e835",
+          "fixture_sha256": "acc70ae7c6e13be575516628eff506fac9af2762c33ce8fb0d78770ae533f3f5"
+        },
+        {
+          "case": "hvf-4-worker-membarrier-8-1",
+          "code": 0,
+          "seconds": 0.011655667000000008,
+          "passed": true,
+          "command": [
+            "/Users/main/dev/trames/target/mount-subsystem/mac/target/release/trames-mac-run",
+            "--cpus",
+            "4",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/barrier-subsystem/worker-membarrier",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "4",
+            "30",
+            "8",
+            "1"
+          ],
+          "runner_sha256": "551dddc56534843d4b429f213282f6a8e449cba47135ca27aa3b203ce572e835",
+          "fixture_sha256": "acc70ae7c6e13be575516628eff506fac9af2762c33ce8fb0d78770ae533f3f5"
+        },
+        {
+          "case": "hvf-4-worker-membarrier-1-0",
+          "code": 0,
+          "seconds": 0.02146479200000001,
+          "passed": true,
+          "command": [
+            "/Users/main/dev/trames/target/mount-subsystem/mac/target/release/trames-mac-run",
+            "--cpus",
+            "4",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/barrier-subsystem/worker-membarrier",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "4",
+            "30",
+            "1",
+            "0"
+          ],
+          "runner_sha256": "551dddc56534843d4b429f213282f6a8e449cba47135ca27aa3b203ce572e835",
+          "fixture_sha256": "acc70ae7c6e13be575516628eff506fac9af2762c33ce8fb0d78770ae533f3f5"
+        },
+        {
+          "case": "hvf-4-worker-membarrier-1-1",
+          "code": 0,
+          "seconds": 0.011613792000000012,
+          "passed": true,
+          "command": [
+            "/Users/main/dev/trames/target/mount-subsystem/mac/target/release/trames-mac-run",
+            "--cpus",
+            "4",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/barrier-subsystem/worker-membarrier",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "4",
+            "30",
+            "1",
+            "1"
+          ],
+          "runner_sha256": "551dddc56534843d4b429f213282f6a8e449cba47135ca27aa3b203ce572e835",
+          "fixture_sha256": "acc70ae7c6e13be575516628eff506fac9af2762c33ce8fb0d78770ae533f3f5"
+        },
+        {
+          "case": "hvf-12-runtime-compat",
+          "code": 0,
+          "seconds": 0.011823459000000008,
+          "passed": true,
+          "command": [
+            "/Users/main/dev/trames/target/mount-subsystem/mac/target/release/trames-mac-run",
+            "--cpus",
+            "12",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/bin/runtime-compat=/Users/main/dev/trames/target/local-ci/io/barrier-subsystem/runtime-compat",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/bin/runtime-compat"
+          ],
+          "runner_sha256": "551dddc56534843d4b429f213282f6a8e449cba47135ca27aa3b203ce572e835",
+          "fixture_sha256": "146084cf9953baeb882e66572210ea1686754625142ea3c1710e439a74f27711"
+        },
+        {
+          "case": "hvf-12-worker-membarrier-8-0",
+          "code": 0,
+          "seconds": 0.023747832999999996,
+          "passed": true,
+          "command": [
+            "/Users/main/dev/trames/target/mount-subsystem/mac/target/release/trames-mac-run",
+            "--cpus",
+            "12",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/barrier-subsystem/worker-membarrier",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "12",
+            "30",
+            "8",
+            "0"
+          ],
+          "runner_sha256": "551dddc56534843d4b429f213282f6a8e449cba47135ca27aa3b203ce572e835",
+          "fixture_sha256": "acc70ae7c6e13be575516628eff506fac9af2762c33ce8fb0d78770ae533f3f5"
+        },
+        {
+          "case": "hvf-12-worker-membarrier-8-1",
+          "code": 0,
+          "seconds": 0.024039792000000004,
+          "passed": true,
+          "command": [
+            "/Users/main/dev/trames/target/mount-subsystem/mac/target/release/trames-mac-run",
+            "--cpus",
+            "12",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/barrier-subsystem/worker-membarrier",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "12",
+            "30",
+            "8",
+            "1"
+          ],
+          "runner_sha256": "551dddc56534843d4b429f213282f6a8e449cba47135ca27aa3b203ce572e835",
+          "fixture_sha256": "acc70ae7c6e13be575516628eff506fac9af2762c33ce8fb0d78770ae533f3f5"
+        },
+        {
+          "case": "hvf-12-worker-membarrier-1-0",
+          "code": 0,
+          "seconds": 0.021301000000000014,
+          "passed": true,
+          "command": [
+            "/Users/main/dev/trames/target/mount-subsystem/mac/target/release/trames-mac-run",
+            "--cpus",
+            "12",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/barrier-subsystem/worker-membarrier",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "12",
+            "30",
+            "1",
+            "0"
+          ],
+          "runner_sha256": "551dddc56534843d4b429f213282f6a8e449cba47135ca27aa3b203ce572e835",
+          "fixture_sha256": "acc70ae7c6e13be575516628eff506fac9af2762c33ce8fb0d78770ae533f3f5"
+        },
+        {
+          "case": "hvf-12-worker-membarrier-1-1",
+          "code": 0,
+          "seconds": 0.021919999999999995,
+          "passed": true,
+          "command": [
+            "/Users/main/dev/trames/target/mount-subsystem/mac/target/release/trames-mac-run",
+            "--cpus",
+            "12",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/barrier-subsystem/worker-membarrier",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "12",
+            "30",
+            "1",
+            "1"
+          ],
+          "runner_sha256": "551dddc56534843d4b429f213282f6a8e449cba47135ca27aa3b203ce572e835",
+          "fixture_sha256": "acc70ae7c6e13be575516628eff506fac9af2762c33ce8fb0d78770ae533f3f5"
+        },
+        {
+          "case": "interpreter-1-runtime-compat",
+          "code": 0,
+          "seconds": 0.422330209,
+          "passed": true,
+          "command": [
+            "/Users/main/dev/trames/target/release/trames-run",
+            "--cpus",
+            "1",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/bin/runtime-compat=/Users/main/dev/trames/target/local-ci/io/barrier-subsystem/runtime-compat",
+            "--max-instructions",
+            "1000000000",
+            "--memory",
+            "--guest",
+            "/bin/runtime-compat"
+          ],
+          "runner_sha256": "85484468755aa1edad4f14d754d0fe34f43cd4880423447d0cce89dd961016f2",
+          "fixture_sha256": "146084cf9953baeb882e66572210ea1686754625142ea3c1710e439a74f27711"
+        },
+        {
+          "case": "interpreter-1-worker-membarrier-8-0",
+          "code": 0,
+          "seconds": 0.023517291999999967,
+          "passed": true,
+          "command": [
+            "/Users/main/dev/trames/target/release/trames-run",
+            "--cpus",
+            "1",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/barrier-subsystem/worker-membarrier",
+            "--max-instructions",
+            "1000000000",
+            "--memory",
+            "--guest",
+            "/case",
+            "1",
+            "30",
+            "8",
+            "0"
+          ],
+          "runner_sha256": "85484468755aa1edad4f14d754d0fe34f43cd4880423447d0cce89dd961016f2",
+          "fixture_sha256": "acc70ae7c6e13be575516628eff506fac9af2762c33ce8fb0d78770ae533f3f5"
+        },
+        {
+          "case": "interpreter-1-worker-membarrier-8-1",
+          "code": 0,
+          "seconds": 0.012401582999999938,
+          "passed": true,
+          "command": [
+            "/Users/main/dev/trames/target/release/trames-run",
+            "--cpus",
+            "1",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/barrier-subsystem/worker-membarrier",
+            "--max-instructions",
+            "1000000000",
+            "--memory",
+            "--guest",
+            "/case",
+            "1",
+            "30",
+            "8",
+            "1"
+          ],
+          "runner_sha256": "85484468755aa1edad4f14d754d0fe34f43cd4880423447d0cce89dd961016f2",
+          "fixture_sha256": "acc70ae7c6e13be575516628eff506fac9af2762c33ce8fb0d78770ae533f3f5"
+        },
+        {
+          "case": "interpreter-1-worker-membarrier-1-0",
+          "code": 0,
+          "seconds": 0.011185707999999961,
+          "passed": true,
+          "command": [
+            "/Users/main/dev/trames/target/release/trames-run",
+            "--cpus",
+            "1",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/barrier-subsystem/worker-membarrier",
+            "--max-instructions",
+            "1000000000",
+            "--memory",
+            "--guest",
+            "/case",
+            "1",
+            "30",
+            "1",
+            "0"
+          ],
+          "runner_sha256": "85484468755aa1edad4f14d754d0fe34f43cd4880423447d0cce89dd961016f2",
+          "fixture_sha256": "acc70ae7c6e13be575516628eff506fac9af2762c33ce8fb0d78770ae533f3f5"
+        },
+        {
+          "case": "interpreter-1-worker-membarrier-1-1",
+          "code": 0,
+          "seconds": 0.009182208000000025,
+          "passed": true,
+          "command": [
+            "/Users/main/dev/trames/target/release/trames-run",
+            "--cpus",
+            "1",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/barrier-subsystem/worker-membarrier",
+            "--max-instructions",
+            "1000000000",
+            "--memory",
+            "--guest",
+            "/case",
+            "1",
+            "30",
+            "1",
+            "1"
+          ],
+          "runner_sha256": "85484468755aa1edad4f14d754d0fe34f43cd4880423447d0cce89dd961016f2",
+          "fixture_sha256": "acc70ae7c6e13be575516628eff506fac9af2762c33ce8fb0d78770ae533f3f5"
+        },
+        {
+          "case": "interpreter-4-runtime-compat",
+          "code": 0,
+          "seconds": 0.009829917000000021,
+          "passed": true,
+          "command": [
+            "/Users/main/dev/trames/target/release/trames-run",
+            "--cpus",
+            "4",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/bin/runtime-compat=/Users/main/dev/trames/target/local-ci/io/barrier-subsystem/runtime-compat",
+            "--max-instructions",
+            "1000000000",
+            "--memory",
+            "--guest",
+            "/bin/runtime-compat"
+          ],
+          "runner_sha256": "85484468755aa1edad4f14d754d0fe34f43cd4880423447d0cce89dd961016f2",
+          "fixture_sha256": "146084cf9953baeb882e66572210ea1686754625142ea3c1710e439a74f27711"
+        },
+        {
+          "case": "interpreter-4-worker-membarrier-8-0",
+          "code": 0,
+          "seconds": 0.011564416000000022,
+          "passed": true,
+          "command": [
+            "/Users/main/dev/trames/target/release/trames-run",
+            "--cpus",
+            "4",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/barrier-subsystem/worker-membarrier",
+            "--max-instructions",
+            "1000000000",
+            "--memory",
+            "--guest",
+            "/case",
+            "4",
+            "30",
+            "8",
+            "0"
+          ],
+          "runner_sha256": "85484468755aa1edad4f14d754d0fe34f43cd4880423447d0cce89dd961016f2",
+          "fixture_sha256": "acc70ae7c6e13be575516628eff506fac9af2762c33ce8fb0d78770ae533f3f5"
+        },
+        {
+          "case": "interpreter-4-worker-membarrier-8-1",
+          "code": 0,
+          "seconds": 0.011641582999999955,
+          "passed": true,
+          "command": [
+            "/Users/main/dev/trames/target/release/trames-run",
+            "--cpus",
+            "4",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/barrier-subsystem/worker-membarrier",
+            "--max-instructions",
+            "1000000000",
+            "--memory",
+            "--guest",
+            "/case",
+            "4",
+            "30",
+            "8",
+            "1"
+          ],
+          "runner_sha256": "85484468755aa1edad4f14d754d0fe34f43cd4880423447d0cce89dd961016f2",
+          "fixture_sha256": "acc70ae7c6e13be575516628eff506fac9af2762c33ce8fb0d78770ae533f3f5"
+        },
+        {
+          "case": "interpreter-4-worker-membarrier-1-0",
+          "code": 0,
+          "seconds": 0.011742625000000007,
+          "passed": true,
+          "command": [
+            "/Users/main/dev/trames/target/release/trames-run",
+            "--cpus",
+            "4",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/barrier-subsystem/worker-membarrier",
+            "--max-instructions",
+            "1000000000",
+            "--memory",
+            "--guest",
+            "/case",
+            "4",
+            "30",
+            "1",
+            "0"
+          ],
+          "runner_sha256": "85484468755aa1edad4f14d754d0fe34f43cd4880423447d0cce89dd961016f2",
+          "fixture_sha256": "acc70ae7c6e13be575516628eff506fac9af2762c33ce8fb0d78770ae533f3f5"
+        },
+        {
+          "case": "interpreter-4-worker-membarrier-1-1",
+          "code": 0,
+          "seconds": 0.011652459000000004,
+          "passed": true,
+          "command": [
+            "/Users/main/dev/trames/target/release/trames-run",
+            "--cpus",
+            "4",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/barrier-subsystem/worker-membarrier",
+            "--max-instructions",
+            "1000000000",
+            "--memory",
+            "--guest",
+            "/case",
+            "4",
+            "30",
+            "1",
+            "1"
+          ],
+          "runner_sha256": "85484468755aa1edad4f14d754d0fe34f43cd4880423447d0cce89dd961016f2",
+          "fixture_sha256": "acc70ae7c6e13be575516628eff506fac9af2762c33ce8fb0d78770ae533f3f5"
+        },
+        {
+          "case": "interpreter-12-runtime-compat",
+          "code": 0,
+          "seconds": 0.011660834000000064,
+          "passed": true,
+          "command": [
+            "/Users/main/dev/trames/target/release/trames-run",
+            "--cpus",
+            "12",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/bin/runtime-compat=/Users/main/dev/trames/target/local-ci/io/barrier-subsystem/runtime-compat",
+            "--max-instructions",
+            "1000000000",
+            "--memory",
+            "--guest",
+            "/bin/runtime-compat"
+          ],
+          "runner_sha256": "85484468755aa1edad4f14d754d0fe34f43cd4880423447d0cce89dd961016f2",
+          "fixture_sha256": "146084cf9953baeb882e66572210ea1686754625142ea3c1710e439a74f27711"
+        },
+        {
+          "case": "interpreter-12-worker-membarrier-8-0",
+          "code": 0,
+          "seconds": 0.01116687500000002,
+          "passed": true,
+          "command": [
+            "/Users/main/dev/trames/target/release/trames-run",
+            "--cpus",
+            "12",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/barrier-subsystem/worker-membarrier",
+            "--max-instructions",
+            "1000000000",
+            "--memory",
+            "--guest",
+            "/case",
+            "12",
+            "30",
+            "8",
+            "0"
+          ],
+          "runner_sha256": "85484468755aa1edad4f14d754d0fe34f43cd4880423447d0cce89dd961016f2",
+          "fixture_sha256": "acc70ae7c6e13be575516628eff506fac9af2762c33ce8fb0d78770ae533f3f5"
+        },
+        {
+          "case": "interpreter-12-worker-membarrier-8-1",
+          "code": 0,
+          "seconds": 0.012059875000000053,
+          "passed": true,
+          "command": [
+            "/Users/main/dev/trames/target/release/trames-run",
+            "--cpus",
+            "12",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/barrier-subsystem/worker-membarrier",
+            "--max-instructions",
+            "1000000000",
+            "--memory",
+            "--guest",
+            "/case",
+            "12",
+            "30",
+            "8",
+            "1"
+          ],
+          "runner_sha256": "85484468755aa1edad4f14d754d0fe34f43cd4880423447d0cce89dd961016f2",
+          "fixture_sha256": "acc70ae7c6e13be575516628eff506fac9af2762c33ce8fb0d78770ae533f3f5"
+        },
+        {
+          "case": "interpreter-12-worker-membarrier-1-0",
+          "code": 0,
+          "seconds": 0.01176166600000017,
+          "passed": true,
+          "command": [
+            "/Users/main/dev/trames/target/release/trames-run",
+            "--cpus",
+            "12",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/barrier-subsystem/worker-membarrier",
+            "--max-instructions",
+            "1000000000",
+            "--memory",
+            "--guest",
+            "/case",
+            "12",
+            "30",
+            "1",
+            "0"
+          ],
+          "runner_sha256": "85484468755aa1edad4f14d754d0fe34f43cd4880423447d0cce89dd961016f2",
+          "fixture_sha256": "acc70ae7c6e13be575516628eff506fac9af2762c33ce8fb0d78770ae533f3f5"
+        },
+        {
+          "case": "interpreter-12-worker-membarrier-1-1",
+          "code": 0,
+          "seconds": 0.011447458000000132,
+          "passed": true,
+          "command": [
+            "/Users/main/dev/trames/target/release/trames-run",
+            "--cpus",
+            "12",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/barrier-subsystem/worker-membarrier",
+            "--max-instructions",
+            "1000000000",
+            "--memory",
+            "--guest",
+            "/case",
+            "12",
+            "30",
+            "1",
+            "1"
+          ],
+          "runner_sha256": "85484468755aa1edad4f14d754d0fe34f43cd4880423447d0cce89dd961016f2",
+          "fixture_sha256": "acc70ae7c6e13be575516628eff506fac9af2762c33ce8fb0d78770ae533f3f5"
+        }
+      ],
+      "description": "HVF and interpreter; 1/4/12 CPUs; runtime compatibility and private/global raw/ALLOW-filtered calls. Functional runs include wide-register ABI and fork inheritance checks; runtime-compat checks exec reset.",
+      "logs": [
+        {
+          "path": "target/barrier-subsystem/guest/hvf-1-runtime-compat.log",
+          "sha256": "128adb23347541d5825efde3cd69d4713a33e2ce2e8dece459b394ce18896cba"
+        },
+        {
+          "path": "target/barrier-subsystem/guest/hvf-1-worker-membarrier-1-0.log",
+          "sha256": "c3cce7bec40863e9b298ea34b81a0100a9e72d73d14ecb29ecaa0805f6dedd34"
+        },
+        {
+          "path": "target/barrier-subsystem/guest/hvf-1-worker-membarrier-1-1.log",
+          "sha256": "d404a47072220254766f8a49c39afb298953f8335899f577937f9e8e330ce776"
+        },
+        {
+          "path": "target/barrier-subsystem/guest/hvf-1-worker-membarrier-8-0.log",
+          "sha256": "3151520b8d3eeee674f5fed05ec6ef6881bf700369795fecccab7d2387fef48f"
+        },
+        {
+          "path": "target/barrier-subsystem/guest/hvf-1-worker-membarrier-8-1.log",
+          "sha256": "6be28dec0a68f9aea4786d3191a71416c16f6bfc5df86bf898be2b9346f3474d"
+        },
+        {
+          "path": "target/barrier-subsystem/guest/hvf-12-runtime-compat.log",
+          "sha256": "c720c212775098689172ca94c233b6040bccb99854f19010f280d2949ad1a43c"
+        },
+        {
+          "path": "target/barrier-subsystem/guest/hvf-12-worker-membarrier-1-0.log",
+          "sha256": "82c21dedac2ae353ec1163a50876ae599a289ea3fc0a6f9eadc85c2fe5f66a79"
+        },
+        {
+          "path": "target/barrier-subsystem/guest/hvf-12-worker-membarrier-1-1.log",
+          "sha256": "3107d04e4c7783c60c99a5469e291f06abce75ace97507dffad2e6812da3f541"
+        },
+        {
+          "path": "target/barrier-subsystem/guest/hvf-12-worker-membarrier-8-0.log",
+          "sha256": "6f0c166ce0480830e5d2c181300c5af0f363fee909babe2c2406d22e6c412889"
+        },
+        {
+          "path": "target/barrier-subsystem/guest/hvf-12-worker-membarrier-8-1.log",
+          "sha256": "06d3a1260f3ab520b331da83886f0d0eff7883f666e1791479b0dcd37e4fa7e2"
+        },
+        {
+          "path": "target/barrier-subsystem/guest/hvf-4-runtime-compat.log",
+          "sha256": "c28d93a8a497aaa241074dd39158e745f17bd7a0d0309ca7149ad1b01ca2d4bf"
+        },
+        {
+          "path": "target/barrier-subsystem/guest/hvf-4-worker-membarrier-1-0.log",
+          "sha256": "ad7d30e6f708d20a35fa65fb1a5a9d7f25ce48b6bff8a0ec9a00caa6ed4131a2"
+        },
+        {
+          "path": "target/barrier-subsystem/guest/hvf-4-worker-membarrier-1-1.log",
+          "sha256": "0d8016cc5574d02f8a2fd636133f708fe9a47122e273104582328bbe1239c2cb"
+        },
+        {
+          "path": "target/barrier-subsystem/guest/hvf-4-worker-membarrier-8-0.log",
+          "sha256": "21972fa89caab46ebbd8c98ac535ef77ddf2c368c79f87a1672919fb5f5ddf71"
+        },
+        {
+          "path": "target/barrier-subsystem/guest/hvf-4-worker-membarrier-8-1.log",
+          "sha256": "d549f23c4739000b46bec1f7c8cd840ac8df4c7c45ace51deae9e7eb99f8960c"
+        },
+        {
+          "path": "target/barrier-subsystem/guest/interpreter-1-runtime-compat.log",
+          "sha256": "4fc636eee141d3eb5d25e0ce14f48b7a7b54e592eae6891ae2796cc5f3d67913"
+        },
+        {
+          "path": "target/barrier-subsystem/guest/interpreter-1-worker-membarrier-1-0.log",
+          "sha256": "cb4d31bd378a12732af909ded13a8b4bd4a83c288309e5686435dffca4c1a7be"
+        },
+        {
+          "path": "target/barrier-subsystem/guest/interpreter-1-worker-membarrier-1-1.log",
+          "sha256": "37c367498f50b8346bdfe587da9c680b5cb445ad03ad06d55d8fe0f9983bf0cc"
+        },
+        {
+          "path": "target/barrier-subsystem/guest/interpreter-1-worker-membarrier-8-0.log",
+          "sha256": "245bb30ed91c3ee8e273d9a1ee9331d4d5fb63748fb2ec3d3798009bede238dc"
+        },
+        {
+          "path": "target/barrier-subsystem/guest/interpreter-1-worker-membarrier-8-1.log",
+          "sha256": "20d78a2e5402349a6aa121ae0c07b8c36a2a5faacb68acac86f412091ea338bb"
+        },
+        {
+          "path": "target/barrier-subsystem/guest/interpreter-12-runtime-compat.log",
+          "sha256": "91d4540cc288eb129f1f84b13caaa53a3adf8fba9699ff65c92a9d17e52fe06d"
+        },
+        {
+          "path": "target/barrier-subsystem/guest/interpreter-12-worker-membarrier-1-0.log",
+          "sha256": "7f40d52a8ccbbeb383659ef4740d25fcfb41ad249a32826879c3f6272d497746"
+        },
+        {
+          "path": "target/barrier-subsystem/guest/interpreter-12-worker-membarrier-1-1.log",
+          "sha256": "3f12e09d9f0f6ff022e6c731f88be5353d68b12d2238027117a37913f106c5eb"
+        },
+        {
+          "path": "target/barrier-subsystem/guest/interpreter-12-worker-membarrier-8-0.log",
+          "sha256": "d7642db920c9b74465bf89bd1b1fb8c9c77f09dddc63c350508fad59fed10749"
+        },
+        {
+          "path": "target/barrier-subsystem/guest/interpreter-12-worker-membarrier-8-1.log",
+          "sha256": "8549f7706d4a6998ebe6d57cd411a7b5e78b5fb07c0c69feba5f573bba43c064"
+        },
+        {
+          "path": "target/barrier-subsystem/guest/interpreter-4-runtime-compat.log",
+          "sha256": "c0300fdb3632aaf75b67742dcde4c5ead6e071fa012f90e2c0f9edb9452b163d"
+        },
+        {
+          "path": "target/barrier-subsystem/guest/interpreter-4-worker-membarrier-1-0.log",
+          "sha256": "44b7d511040f455ec540f115380751c07d3ea41d13dcd525edfc6ad1e54e68f7"
+        },
+        {
+          "path": "target/barrier-subsystem/guest/interpreter-4-worker-membarrier-1-1.log",
+          "sha256": "3a151e7195dae4c4d7c3f7744f6faf5424647a159a95001f6ae56befee53317c"
+        },
+        {
+          "path": "target/barrier-subsystem/guest/interpreter-4-worker-membarrier-8-0.log",
+          "sha256": "481fa6b6b65d0262d26fe2afd0edcf3b9ab018821b0d7fe45559303a5644ba43"
+        },
+        {
+          "path": "target/barrier-subsystem/guest/interpreter-4-worker-membarrier-8-1.log",
+          "sha256": "426a73e62491aedace33539c737261bf41031711568b992a5b0452fc20ba28bd"
+        }
+      ]
+    },
+    "native_arm64_functional": {
+      "path": "target/local-ci/io/barrier-subsystem/native-functional.json",
+      "sha256": "4218442c00c8c144c6237ac5724d10f03f3183a124b6d2b8993ac3ab135e52ad",
+      "data": [
+        {
+          "args": [
+            "1",
+            "10",
+            "8",
+            "0"
+          ],
+          "code": 0,
+          "stdout": "worker-membarrier: threads=1 rounds=10 command=8 filtered=0 elapsed_ns=19219: ok\n",
+          "stderr": ""
+        },
+        {
+          "args": [
+            "4",
+            "10",
+            "8",
+            "1"
+          ],
+          "code": 0,
+          "stdout": "worker-membarrier: threads=4 rounds=10 command=8 filtered=1 elapsed_ns=67331: ok\n",
+          "stderr": ""
+        },
+        {
+          "args": [
+            "4",
+            "5",
+            "1",
+            "0"
+          ],
+          "code": 0,
+          "stdout": "worker-membarrier: threads=4 rounds=5 command=1 filtered=0 elapsed_ns=44595655: ok\n",
+          "stderr": ""
+        }
+      ]
+    },
+    "installed_dev_smoke": {
+      "path": "target/barrier-subsystem/installed-guest/results.json",
+      "sha256": "7321e57a2e7c1a9627dd5249be4cf93ca704e40d2068cea4e5a66df9a4d23b97",
+      "data": [
+        {
+          "case": "hvf-4-runtime-compat",
+          "code": 0,
+          "seconds": 0.57375275,
+          "passed": true,
+          "command": [
+            "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+            "--cpus",
+            "4",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/bin/runtime-compat=/Users/main/dev/trames/target/local-ci/io/barrier-subsystem/runtime-compat",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/bin/runtime-compat"
+          ],
+          "runner_sha256": "80ebd7b4242e91b5655f56cb3d0a4a7f59c55f7848d5db93b8ea7a6a2cb3d62b",
+          "fixture_sha256": "146084cf9953baeb882e66572210ea1686754625142ea3c1710e439a74f27711"
+        },
+        {
+          "case": "hvf-4-worker-membarrier-8-0",
+          "code": 0,
+          "seconds": 0.023110999999999993,
+          "passed": true,
+          "command": [
+            "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+            "--cpus",
+            "4",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/barrier-subsystem/worker-membarrier",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "4",
+            "30",
+            "8",
+            "0"
+          ],
+          "runner_sha256": "80ebd7b4242e91b5655f56cb3d0a4a7f59c55f7848d5db93b8ea7a6a2cb3d62b",
+          "fixture_sha256": "acc70ae7c6e13be575516628eff506fac9af2762c33ce8fb0d78770ae533f3f5"
+        },
+        {
+          "case": "hvf-4-worker-membarrier-8-1",
+          "code": 0,
+          "seconds": 0.024477791999999998,
+          "passed": true,
+          "command": [
+            "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+            "--cpus",
+            "4",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/barrier-subsystem/worker-membarrier",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "4",
+            "30",
+            "8",
+            "1"
+          ],
+          "runner_sha256": "80ebd7b4242e91b5655f56cb3d0a4a7f59c55f7848d5db93b8ea7a6a2cb3d62b",
+          "fixture_sha256": "acc70ae7c6e13be575516628eff506fac9af2762c33ce8fb0d78770ae533f3f5"
+        },
+        {
+          "case": "hvf-4-worker-membarrier-1-0",
+          "code": 0,
+          "seconds": 0.011960167000000022,
+          "passed": true,
+          "command": [
+            "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+            "--cpus",
+            "4",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/barrier-subsystem/worker-membarrier",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "4",
+            "30",
+            "1",
+            "0"
+          ],
+          "runner_sha256": "80ebd7b4242e91b5655f56cb3d0a4a7f59c55f7848d5db93b8ea7a6a2cb3d62b",
+          "fixture_sha256": "acc70ae7c6e13be575516628eff506fac9af2762c33ce8fb0d78770ae533f3f5"
+        },
+        {
+          "case": "hvf-4-worker-membarrier-1-1",
+          "code": 0,
+          "seconds": 0.01170983400000003,
+          "passed": true,
+          "command": [
+            "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+            "--cpus",
+            "4",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/barrier-subsystem/worker-membarrier",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "4",
+            "30",
+            "1",
+            "1"
+          ],
+          "runner_sha256": "80ebd7b4242e91b5655f56cb3d0a4a7f59c55f7848d5db93b8ea7a6a2cb3d62b",
+          "fixture_sha256": "acc70ae7c6e13be575516628eff506fac9af2762c33ce8fb0d78770ae533f3f5"
+        },
+        {
+          "case": "hvf-12-runtime-compat",
+          "code": 0,
+          "seconds": 0.011778375000000008,
+          "passed": true,
+          "command": [
+            "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+            "--cpus",
+            "12",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/bin/runtime-compat=/Users/main/dev/trames/target/local-ci/io/barrier-subsystem/runtime-compat",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/bin/runtime-compat"
+          ],
+          "runner_sha256": "80ebd7b4242e91b5655f56cb3d0a4a7f59c55f7848d5db93b8ea7a6a2cb3d62b",
+          "fixture_sha256": "146084cf9953baeb882e66572210ea1686754625142ea3c1710e439a74f27711"
+        },
+        {
+          "case": "hvf-12-worker-membarrier-8-0",
+          "code": 0,
+          "seconds": 0.022832541999999956,
+          "passed": true,
+          "command": [
+            "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+            "--cpus",
+            "12",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/barrier-subsystem/worker-membarrier",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "12",
+            "30",
+            "8",
+            "0"
+          ],
+          "runner_sha256": "80ebd7b4242e91b5655f56cb3d0a4a7f59c55f7848d5db93b8ea7a6a2cb3d62b",
+          "fixture_sha256": "acc70ae7c6e13be575516628eff506fac9af2762c33ce8fb0d78770ae533f3f5"
+        },
+        {
+          "case": "hvf-12-worker-membarrier-8-1",
+          "code": 0,
+          "seconds": 0.011705874999999977,
+          "passed": true,
+          "command": [
+            "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+            "--cpus",
+            "12",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/barrier-subsystem/worker-membarrier",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "12",
+            "30",
+            "8",
+            "1"
+          ],
+          "runner_sha256": "80ebd7b4242e91b5655f56cb3d0a4a7f59c55f7848d5db93b8ea7a6a2cb3d62b",
+          "fixture_sha256": "acc70ae7c6e13be575516628eff506fac9af2762c33ce8fb0d78770ae533f3f5"
+        },
+        {
+          "case": "hvf-12-worker-membarrier-1-0",
+          "code": 0,
+          "seconds": 0.01162970799999996,
+          "passed": true,
+          "command": [
+            "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+            "--cpus",
+            "12",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/barrier-subsystem/worker-membarrier",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "12",
+            "30",
+            "1",
+            "0"
+          ],
+          "runner_sha256": "80ebd7b4242e91b5655f56cb3d0a4a7f59c55f7848d5db93b8ea7a6a2cb3d62b",
+          "fixture_sha256": "acc70ae7c6e13be575516628eff506fac9af2762c33ce8fb0d78770ae533f3f5"
+        },
+        {
+          "case": "hvf-12-worker-membarrier-1-1",
+          "code": 0,
+          "seconds": 0.011728749999999954,
+          "passed": true,
+          "command": [
+            "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+            "--cpus",
+            "12",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/barrier-subsystem/worker-membarrier",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "12",
+            "30",
+            "1",
+            "1"
+          ],
+          "runner_sha256": "80ebd7b4242e91b5655f56cb3d0a4a7f59c55f7848d5db93b8ea7a6a2cb3d62b",
+          "fixture_sha256": "acc70ae7c6e13be575516628eff506fac9af2762c33ce8fb0d78770ae533f3f5"
+        }
+      ],
+      "logs": [
+        {
+          "path": "target/barrier-subsystem/installed-guest/hvf-12-runtime-compat.log",
+          "sha256": "8d79ee3557248cc23e1273fa80a202b7d0dab147ac59262351c4e486d759aa5c"
+        },
+        {
+          "path": "target/barrier-subsystem/installed-guest/hvf-12-worker-membarrier-1-0.log",
+          "sha256": "338c66039298ed0975f1dc23152b0598277994dff2a5cbaa0cd2212d4e643197"
+        },
+        {
+          "path": "target/barrier-subsystem/installed-guest/hvf-12-worker-membarrier-1-1.log",
+          "sha256": "df3caa6efdb2d22495d33aedfe9a453f8904e2a5b2197014287b7d8738f55f49"
+        },
+        {
+          "path": "target/barrier-subsystem/installed-guest/hvf-12-worker-membarrier-8-0.log",
+          "sha256": "95246fc9cae1a6a8633627eee7766892bbf8e6ce35fcb044c8110727dec59249"
+        },
+        {
+          "path": "target/barrier-subsystem/installed-guest/hvf-12-worker-membarrier-8-1.log",
+          "sha256": "1076aa0ceddc0cb7474a95390551aca83bb571123fb71ed1a5a6961071dee904"
+        },
+        {
+          "path": "target/barrier-subsystem/installed-guest/hvf-4-runtime-compat.log",
+          "sha256": "23a2c01f8191b89be8ecd048d6797e9da296ed4822d109bbda956b518603507b"
+        },
+        {
+          "path": "target/barrier-subsystem/installed-guest/hvf-4-worker-membarrier-1-0.log",
+          "sha256": "1f7642c97356956d041888d3202dd3e0788292238dd535e01b374509a82973da"
+        },
+        {
+          "path": "target/barrier-subsystem/installed-guest/hvf-4-worker-membarrier-1-1.log",
+          "sha256": "7aefb4093593c531e957a0da99b3f9b2422ac663513a67b245995245d99dc3d7"
+        },
+        {
+          "path": "target/barrier-subsystem/installed-guest/hvf-4-worker-membarrier-8-0.log",
+          "sha256": "e317fe918b084bc08b0284ead1ca4bbcb47842c47ab833670ea01043550036e3"
+        },
+        {
+          "path": "target/barrier-subsystem/installed-guest/hvf-4-worker-membarrier-8-1.log",
+          "sha256": "f40a38301adafaa049aabf95a4dc345f75fcfb994acc8a39062fd57b3b528b1f"
+        }
+      ]
+    },
+    "product_boundaries": {
+      "path": "target/barrier-subsystem/product-boundaries-final.log",
+      "sha256": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651"
+    },
+    "meaningful_concurrency_checks": [
+      "Native pre-entry and scoped guest-execution leases cannot acknowledge before actual return",
+      "Unrelated original domains remain unaffected by private barriers",
+      "Sixteen concurrent requests and waiter cancellation retain original acknowledgements",
+      "One CPU slot can park a barrier caller and run unrelated work, retaining the exact original memory View",
+      "Source ABI controls avoid owner service/cohort returns/checkpoints; explicit tracing is a positive fallback control"
+    ]
+  },
+  "performance": {
+    "method": "Three alternating before/after pairs, unprofiled, no overlapping builds. Same static ARM64 fixture and arguments; 50 barrier calls per thread. Timer excludes setup/thread creation/preflight/fork. Both versions skip only the preflight wide-register ABI check because the old ABI rejects it. Native functional and final guest checks do not skip that check.",
+    "barriers": {
+      "path": "target/barrier-subsystem/benchmark/results.json",
+      "sha256": "8a1d6071b510d32841fd7838de434b20eed61a35baabf8c60bfcbd694941766e",
+      "fixture_sha256": "acc70ae7c6e13be575516628eff506fac9af2762c33ce8fb0d78770ae533f3f5",
+      "runner_sha256": {
+        "before": "4ff534318d78b94cbb7a711bdd6acc2908b72f996ce7b11f8f63ca1549c7e6d1",
+        "after": "551dddc56534843d4b429f213282f6a8e449cba47135ca27aa3b203ce572e835"
+      },
+      "rows": [
+        {
+          "name": "before-1-8-0",
+          "runner": "before",
+          "cpus": 1,
+          "command": 8,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 224292,
+          "wall_seconds": 0.413559458
+        },
+        {
+          "name": "after-1-8-0",
+          "runner": "after",
+          "cpus": 1,
+          "command": 8,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 131041,
+          "wall_seconds": 0.045579166000000004
+        },
+        {
+          "name": "after-1-8-1",
+          "runner": "after",
+          "cpus": 1,
+          "command": 8,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 96875,
+          "wall_seconds": 0.024309417
+        },
+        {
+          "name": "before-1-8-1",
+          "runner": "before",
+          "cpus": 1,
+          "command": 8,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 94000,
+          "wall_seconds": 0.012025375000000005
+        },
+        {
+          "name": "before-1-8-2",
+          "runner": "before",
+          "cpus": 1,
+          "command": 8,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 94042,
+          "wall_seconds": 0.012053959000000058
+        },
+        {
+          "name": "after-1-8-2",
+          "runner": "after",
+          "cpus": 1,
+          "command": 8,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 96167,
+          "wall_seconds": 0.011849292000000067
+        },
+        {
+          "name": "before-1-1-0",
+          "runner": "before",
+          "cpus": 1,
+          "command": 1,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 129375,
+          "wall_seconds": 0.011741208000000003
+        },
+        {
+          "name": "after-1-1-0",
+          "runner": "after",
+          "cpus": 1,
+          "command": 1,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 93125,
+          "wall_seconds": 0.011911624999999981
+        },
+        {
+          "name": "after-1-1-1",
+          "runner": "after",
+          "cpus": 1,
+          "command": 1,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 94292,
+          "wall_seconds": 0.011963500000000016
+        },
+        {
+          "name": "before-1-1-1",
+          "runner": "before",
+          "cpus": 1,
+          "command": 1,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 93250,
+          "wall_seconds": 0.011781374999999983
+        },
+        {
+          "name": "before-1-1-2",
+          "runner": "before",
+          "cpus": 1,
+          "command": 1,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 98542,
+          "wall_seconds": 0.011840290999999947
+        },
+        {
+          "name": "after-1-1-2",
+          "runner": "after",
+          "cpus": 1,
+          "command": 1,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 93709,
+          "wall_seconds": 0.011748124999999998
+        },
+        {
+          "name": "before-4-8-0",
+          "runner": "before",
+          "cpus": 4,
+          "command": 8,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 13347542,
+          "wall_seconds": 0.023863042
+        },
+        {
+          "name": "after-4-8-0",
+          "runner": "after",
+          "cpus": 4,
+          "command": 8,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 886583,
+          "wall_seconds": 0.022906207999999983
+        },
+        {
+          "name": "after-4-8-1",
+          "runner": "after",
+          "cpus": 4,
+          "command": 8,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 578000,
+          "wall_seconds": 0.01208958299999996
+        },
+        {
+          "name": "before-4-8-1",
+          "runner": "before",
+          "cpus": 4,
+          "command": 8,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 13195917,
+          "wall_seconds": 0.044691666999999935
+        },
+        {
+          "name": "before-4-8-2",
+          "runner": "before",
+          "cpus": 4,
+          "command": 8,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 13534291,
+          "wall_seconds": 0.023083458999999973
+        },
+        {
+          "name": "after-4-8-2",
+          "runner": "after",
+          "cpus": 4,
+          "command": 8,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 670500,
+          "wall_seconds": 0.011636249999999904
+        },
+        {
+          "name": "before-4-1-0",
+          "runner": "before",
+          "cpus": 4,
+          "command": 1,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 12564750,
+          "wall_seconds": 0.023782749999999964
+        },
+        {
+          "name": "after-4-1-0",
+          "runner": "after",
+          "cpus": 4,
+          "command": 1,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 541667,
+          "wall_seconds": 0.011720249999999988
+        },
+        {
+          "name": "after-4-1-1",
+          "runner": "after",
+          "cpus": 4,
+          "command": 1,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 755083,
+          "wall_seconds": 0.012043041000000088
+        },
+        {
+          "name": "before-4-1-1",
+          "runner": "before",
+          "cpus": 4,
+          "command": 1,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 13694250,
+          "wall_seconds": 0.023970500000000117
+        },
+        {
+          "name": "before-4-1-2",
+          "runner": "before",
+          "cpus": 4,
+          "command": 1,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 10474375,
+          "wall_seconds": 0.024094916000000133
+        },
+        {
+          "name": "after-4-1-2",
+          "runner": "after",
+          "cpus": 4,
+          "command": 1,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 853625,
+          "wall_seconds": 0.011982584000000074
+        },
+        {
+          "name": "before-12-8-0",
+          "runner": "before",
+          "cpus": 12,
+          "command": 8,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 78909708,
+          "wall_seconds": 0.14483012499999992
+        },
+        {
+          "name": "after-12-8-0",
+          "runner": "after",
+          "cpus": 12,
+          "command": 8,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 3132083,
+          "wall_seconds": 0.022799875000000025
+        },
+        {
+          "name": "after-12-8-1",
+          "runner": "after",
+          "cpus": 12,
+          "command": 8,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 2688167,
+          "wall_seconds": 0.02181991700000019
+        },
+        {
+          "name": "before-12-8-1",
+          "runner": "before",
+          "cpus": 12,
+          "command": 8,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 72874459,
+          "wall_seconds": 0.14018320800000006
+        },
+        {
+          "name": "before-12-8-2",
+          "runner": "before",
+          "cpus": 12,
+          "command": 8,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 73062208,
+          "wall_seconds": 0.08769458299999999
+        },
+        {
+          "name": "after-12-8-2",
+          "runner": "after",
+          "cpus": 12,
+          "command": 8,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 2388417,
+          "wall_seconds": 0.020806083000000086
+        },
+        {
+          "name": "before-12-1-0",
+          "runner": "before",
+          "cpus": 12,
+          "command": 1,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 76647000,
+          "wall_seconds": 0.1434899999999999
+        },
+        {
+          "name": "after-12-1-0",
+          "runner": "after",
+          "cpus": 12,
+          "command": 1,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 1696750,
+          "wall_seconds": 0.02415879199999993
+        },
+        {
+          "name": "after-12-1-1",
+          "runner": "after",
+          "cpus": 12,
+          "command": 1,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 1683167,
+          "wall_seconds": 0.023769083000000135
+        },
+        {
+          "name": "before-12-1-1",
+          "runner": "before",
+          "cpus": 12,
+          "command": 1,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 71907042,
+          "wall_seconds": 0.08856883399999993
+        },
+        {
+          "name": "before-12-1-2",
+          "runner": "before",
+          "cpus": 12,
+          "command": 1,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 75510708,
+          "wall_seconds": 0.08781479200000009
+        },
+        {
+          "name": "after-12-1-2",
+          "runner": "after",
+          "cpus": 12,
+          "command": 1,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 1734042,
+          "wall_seconds": 0.02354604199999999
+        }
+      ],
+      "medians": [
+        {
+          "cpus": 1,
+          "command": 8,
+          "before_ms": 0.094042,
+          "after_ms": 0.096875,
+          "change_percent": 3.012483783841269
+        },
+        {
+          "cpus": 1,
+          "command": 1,
+          "before_ms": 0.098542,
+          "after_ms": 0.093709,
+          "change_percent": -4.904507722595442
+        },
+        {
+          "cpus": 4,
+          "command": 8,
+          "before_ms": 13.347542,
+          "after_ms": 0.6705,
+          "change_percent": -94.97660318281824
+        },
+        {
+          "cpus": 4,
+          "command": 1,
+          "before_ms": 12.56475,
+          "after_ms": 0.755083,
+          "change_percent": -93.9904653892835
+        },
+        {
+          "cpus": 12,
+          "command": 8,
+          "before_ms": 73.062208,
+          "after_ms": 2.688167,
+          "change_percent": -96.3207148078525
+        },
+        {
+          "cpus": 12,
+          "command": 1,
+          "before_ms": 75.510708,
+          "after_ms": 1.69675,
+          "change_percent": -97.75296769830312
+        }
+      ],
+      "logs": [
+        {
+          "path": "target/barrier-subsystem/benchmark/after-1-1-0.log",
+          "sha256": "e53246e50c8ad33146b2758137d2c337cd20be4fd20e1c29aec25601252b4c5b"
+        },
+        {
+          "path": "target/barrier-subsystem/benchmark/after-1-1-1.log",
+          "sha256": "6cba2858c54a3bfc9dd58583dc031bf0fde9624594ec464845be344731045118"
+        },
+        {
+          "path": "target/barrier-subsystem/benchmark/after-1-1-2.log",
+          "sha256": "cb79a519d2ad842ca717a9e404dc2fb1c676726904024e1d2311c5066a27487a"
+        },
+        {
+          "path": "target/barrier-subsystem/benchmark/after-1-8-0.log",
+          "sha256": "a9dd2240e13e72b573ca43dfb76d8996cc26051394f809a8cfbb6fad75067c77"
+        },
+        {
+          "path": "target/barrier-subsystem/benchmark/after-1-8-1.log",
+          "sha256": "5bf4a3ff676c729a8ba1dc5c0a466b07164ce7b018c5b8b81aa8d069cc0b9f58"
+        },
+        {
+          "path": "target/barrier-subsystem/benchmark/after-1-8-2.log",
+          "sha256": "fa1aa9b06085d1db7c8af7052dbc29c9e102f6372d237a66fd0d9c1afd329801"
+        },
+        {
+          "path": "target/barrier-subsystem/benchmark/after-12-1-0.log",
+          "sha256": "55bb9bafc84a6bc55b0b5ae7b23a1672441f31fc279c92ecd1325d385d7fec54"
+        },
+        {
+          "path": "target/barrier-subsystem/benchmark/after-12-1-1.log",
+          "sha256": "87cc0a015ea3a9329c9e8c4b89324b03ffd7c1e98fc35e5933a91b38bcccfdef"
+        },
+        {
+          "path": "target/barrier-subsystem/benchmark/after-12-1-2.log",
+          "sha256": "c6d652745d0f4eee61370975df0e18600f729637b2ed86d61d5fab51ee1cd3e8"
+        },
+        {
+          "path": "target/barrier-subsystem/benchmark/after-12-8-0.log",
+          "sha256": "ddb500784a88f3470ee635f26ad5417dfea954628c02464bd1b6236c0198efc8"
+        },
+        {
+          "path": "target/barrier-subsystem/benchmark/after-12-8-1.log",
+          "sha256": "11b2f55b1d384440c1d9284e5c90909daf275b58b3df12bdf01836520da82460"
+        },
+        {
+          "path": "target/barrier-subsystem/benchmark/after-12-8-2.log",
+          "sha256": "0a289e60c1bbddeefe82150c21ebc0a6054ebd9e0c6a12552140f5326804ed67"
+        },
+        {
+          "path": "target/barrier-subsystem/benchmark/after-4-1-0.log",
+          "sha256": "9c148a54d37c1af1f866c7f08d44a37d4398cd19d3f2c71157f5cba6400fc53c"
+        },
+        {
+          "path": "target/barrier-subsystem/benchmark/after-4-1-1.log",
+          "sha256": "608b471330278b02ea8ba475a8a217db3a7180c27c992029a9fcda35a83add03"
+        },
+        {
+          "path": "target/barrier-subsystem/benchmark/after-4-1-2.log",
+          "sha256": "6bc7cc2fee28a2e447f9f250aa8ad91e22b11fd3bf76dce2ae2146f4b7eface2"
+        },
+        {
+          "path": "target/barrier-subsystem/benchmark/after-4-8-0.log",
+          "sha256": "d857ae6ef9605638de86c55ee94111efc36563a51882ef9058ab7f1c4729f4f1"
+        },
+        {
+          "path": "target/barrier-subsystem/benchmark/after-4-8-1.log",
+          "sha256": "7b7062a823fc11d912beb2428fc3aca9773f65f0b242019fc05a80e3754789f3"
+        },
+        {
+          "path": "target/barrier-subsystem/benchmark/after-4-8-2.log",
+          "sha256": "a1bc1bc69b2872a49b35819f13281ffeef18cb3937a5863acb98efb5e4d4d7aa"
+        },
+        {
+          "path": "target/barrier-subsystem/benchmark/before-1-1-0.log",
+          "sha256": "bfebca54aeb3c25a124760302c8f629032778a7f0e10f585166619d3869b59ae"
+        },
+        {
+          "path": "target/barrier-subsystem/benchmark/before-1-1-1.log",
+          "sha256": "73b41fa381c642c81d88cfe31809fef686dadf0c820eece260985a64d2f47681"
+        },
+        {
+          "path": "target/barrier-subsystem/benchmark/before-1-1-2.log",
+          "sha256": "de0aafb4c7670e14cb21e2036fb1286ffd0654ecd16af9ec7039b06aeb804d92"
+        },
+        {
+          "path": "target/barrier-subsystem/benchmark/before-1-8-0.log",
+          "sha256": "626e5f85d33d92728f794b0d9096d59ef973cae2df2cfb4c516080628a75ab51"
+        },
+        {
+          "path": "target/barrier-subsystem/benchmark/before-1-8-1.log",
+          "sha256": "27b8994bd06c7524652ac37ea8dd7696bd40a2aea88d6dbf0dfa9a6f854821aa"
+        },
+        {
+          "path": "target/barrier-subsystem/benchmark/before-1-8-2.log",
+          "sha256": "49b2a112087f3363fce81c439cb74d1f37b6be2cff863d14ec122b1c8a548b70"
+        },
+        {
+          "path": "target/barrier-subsystem/benchmark/before-12-1-0.log",
+          "sha256": "348945b247761df6d389fe9e75055253e6e7f899e17b6f86710f7c196dea4fd2"
+        },
+        {
+          "path": "target/barrier-subsystem/benchmark/before-12-1-1.log",
+          "sha256": "03b2d6c9e0c1dc11673ba3cc91910f2bd50f15893f60079234e420fa5f08e39b"
+        },
+        {
+          "path": "target/barrier-subsystem/benchmark/before-12-1-2.log",
+          "sha256": "8a1a22bba6266405a5e1837deaa909461748919b237e78d8d26ee95b122264ae"
+        },
+        {
+          "path": "target/barrier-subsystem/benchmark/before-12-8-0.log",
+          "sha256": "62307ee0d532a56921a72446a77095a025ae2be98518700842c363e07867bf03"
+        },
+        {
+          "path": "target/barrier-subsystem/benchmark/before-12-8-1.log",
+          "sha256": "c1589a63a0f546a168a9ec5e03af7e04afe2b7f32dc89123f6c49507550cbe4a"
+        },
+        {
+          "path": "target/barrier-subsystem/benchmark/before-12-8-2.log",
+          "sha256": "45ab6d1f34679d9cfcfe1629c3234ca8f94654b7624e0789ecf141fc7eb0f99e"
+        },
+        {
+          "path": "target/barrier-subsystem/benchmark/before-4-1-0.log",
+          "sha256": "d79bea9083605675d96f387f5561770f1e98bf11f99d21e8a7c5d531b49430ba"
+        },
+        {
+          "path": "target/barrier-subsystem/benchmark/before-4-1-1.log",
+          "sha256": "ebaa0c1bc265d36c2e83efb96de3dc1fd30de3242158299e0d5359a7fcfa5108"
+        },
+        {
+          "path": "target/barrier-subsystem/benchmark/before-4-1-2.log",
+          "sha256": "b2cd8680cd69892232250891f50e493391e61155e6d74a59e824fe3eb8b7c91d"
+        },
+        {
+          "path": "target/barrier-subsystem/benchmark/before-4-8-0.log",
+          "sha256": "cee83756fd459167e677741908f469150eb310a7973360e1e60a067a0555ea6e"
+        },
+        {
+          "path": "target/barrier-subsystem/benchmark/before-4-8-1.log",
+          "sha256": "1906b8d89efb0f68d4a3226278ae447ef62fe0a9ae56fa5fb74c46ec9cd2d3bc"
+        },
+        {
+          "path": "target/barrier-subsystem/benchmark/before-4-8-2.log",
+          "sha256": "baf363b3c5450acc5d2cb86fb091c2dd5a603bf5a0cc6df8b59c2ee3ca1e209d"
+        }
+      ]
+    },
+    "ordinary_controls": {
+      "method": "Three alternating pairs, 100000 calls/thread; raw getppid (mode 0) and already-local seccomp ERRNO (mode 2).",
+      "path": "target/barrier-subsystem/control/results.json",
+      "sha256": "3b30c5c31a8d5532a63cdfaa93bcce530a9f196c407bda0ef590f6c1991bc02e",
+      "fixture_sha256": "fa79ddbbf93cde0293c2aa7a036c9fc83740de4cd22885e5b98541ac0b15a6f9",
+      "runner_sha256": {
+        "before": "4ff534318d78b94cbb7a711bdd6acc2908b72f996ce7b11f8f63ca1549c7e6d1",
+        "after": "551dddc56534843d4b429f213282f6a8e449cba47135ca27aa3b203ce572e835"
+      },
+      "rows": [
+        {
+          "name": "before-1-0-0",
+          "runner": "before",
+          "cpus": 1,
+          "mode": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 133355042,
+          "wall_seconds": 0.145289541
+        },
+        {
+          "name": "after-1-0-0",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 132515667,
+          "wall_seconds": 0.145175209
+        },
+        {
+          "name": "after-1-0-1",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 133034875,
+          "wall_seconds": 0.195553959
+        },
+        {
+          "name": "before-1-0-1",
+          "runner": "before",
+          "cpus": 1,
+          "mode": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 133767792,
+          "wall_seconds": 0.145569375
+        },
+        {
+          "name": "before-1-0-2",
+          "runner": "before",
+          "cpus": 1,
+          "mode": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 133496000,
+          "wall_seconds": 0.193833625
+        },
+        {
+          "name": "after-1-0-2",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 133623667,
+          "wall_seconds": 0.14607354099999992
+        },
+        {
+          "name": "before-1-2-0",
+          "runner": "before",
+          "cpus": 1,
+          "mode": 2,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 120975875,
+          "wall_seconds": 0.14405883399999997
+        },
+        {
+          "name": "after-1-2-0",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 2,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 119478333,
+          "wall_seconds": 0.14823849999999994
+        },
+        {
+          "name": "after-1-2-1",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 2,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 119893958,
+          "wall_seconds": 0.13412316700000004
+        },
+        {
+          "name": "before-1-2-1",
+          "runner": "before",
+          "cpus": 1,
+          "mode": 2,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 119064459,
+          "wall_seconds": 0.1407577499999999
+        },
+        {
+          "name": "before-1-2-2",
+          "runner": "before",
+          "cpus": 1,
+          "mode": 2,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 118857000,
+          "wall_seconds": 0.14248150000000015
+        },
+        {
+          "name": "after-1-2-2",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 2,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 119342000,
+          "wall_seconds": 0.13680979199999999
+        },
+        {
+          "name": "before-4-0-0",
+          "runner": "before",
+          "cpus": 4,
+          "mode": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 122608708,
+          "wall_seconds": 0.13778750000000017
+        },
+        {
+          "name": "after-4-0-0",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 120650250,
+          "wall_seconds": 0.14041945800000022
+        },
+        {
+          "name": "after-4-0-1",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 122312083,
+          "wall_seconds": 0.14488333300000011
+        },
+        {
+          "name": "before-4-0-1",
+          "runner": "before",
+          "cpus": 4,
+          "mode": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 119477292,
+          "wall_seconds": 0.14865841700000004
+        },
+        {
+          "name": "before-4-0-2",
+          "runner": "before",
+          "cpus": 4,
+          "mode": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 126608791,
+          "wall_seconds": 0.15022887499999982
+        },
+        {
+          "name": "after-4-0-2",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 122909000,
+          "wall_seconds": 0.14776729200000016
+        },
+        {
+          "name": "before-4-2-0",
+          "runner": "before",
+          "cpus": 4,
+          "mode": 2,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 119724834,
+          "wall_seconds": 0.15020558299999998
+        },
+        {
+          "name": "after-4-2-0",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 2,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 120731083,
+          "wall_seconds": 0.15005166599999997
+        },
+        {
+          "name": "after-4-2-1",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 2,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 121803167,
+          "wall_seconds": 0.14443662499999999
+        },
+        {
+          "name": "before-4-2-1",
+          "runner": "before",
+          "cpus": 4,
+          "mode": 2,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 120390625,
+          "wall_seconds": 0.15029987499999997
+        },
+        {
+          "name": "before-4-2-2",
+          "runner": "before",
+          "cpus": 4,
+          "mode": 2,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 124108709,
+          "wall_seconds": 0.15028808299999996
+        },
+        {
+          "name": "after-4-2-2",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 2,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 121784583,
+          "wall_seconds": 0.14454179200000006
+        },
+        {
+          "name": "before-12-0-0",
+          "runner": "before",
+          "cpus": 12,
+          "mode": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 219995917,
+          "wall_seconds": 0.24999029199999967
+        },
+        {
+          "name": "after-12-0-0",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 219647833,
+          "wall_seconds": 0.25726787499999926
+        },
+        {
+          "name": "after-12-0-1",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 220938667,
+          "wall_seconds": 0.257293958
+        },
+        {
+          "name": "before-12-0-1",
+          "runner": "before",
+          "cpus": 12,
+          "mode": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 219260459,
+          "wall_seconds": 0.25775070800000055
+        },
+        {
+          "name": "before-12-0-2",
+          "runner": "before",
+          "cpus": 12,
+          "mode": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 217814250,
+          "wall_seconds": 0.24971216699999932
+        },
+        {
+          "name": "after-12-0-2",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 218742166,
+          "wall_seconds": 0.26989224999999983
+        },
+        {
+          "name": "before-12-2-0",
+          "runner": "before",
+          "cpus": 12,
+          "mode": 2,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 222062084,
+          "wall_seconds": 0.2712429580000002
+        },
+        {
+          "name": "after-12-2-0",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 2,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 219916417,
+          "wall_seconds": 0.253623417
+        },
+        {
+          "name": "after-12-2-1",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 2,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 220918167,
+          "wall_seconds": 0.24705133299999993
+        },
+        {
+          "name": "before-12-2-1",
+          "runner": "before",
+          "cpus": 12,
+          "mode": 2,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 217660333,
+          "wall_seconds": 0.23368354199999963
+        },
+        {
+          "name": "before-12-2-2",
+          "runner": "before",
+          "cpus": 12,
+          "mode": 2,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 219691834,
+          "wall_seconds": 0.2534702910000002
+        },
+        {
+          "name": "after-12-2-2",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 2,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 221858958,
+          "wall_seconds": 0.2703568340000002
+        }
+      ],
+      "medians": [
+        {
+          "cpus": 1,
+          "mode": 0,
+          "before_ms": 133.496,
+          "after_ms": 133.034875,
+          "change_percent": -0.34542233475159945
+        },
+        {
+          "cpus": 1,
+          "mode": 2,
+          "before_ms": 119.064459,
+          "after_ms": 119.478333,
+          "change_percent": 0.3476049893276656
+        },
+        {
+          "cpus": 4,
+          "mode": 0,
+          "before_ms": 122.608708,
+          "after_ms": 122.312083,
+          "change_percent": -0.24192816712496068
+        },
+        {
+          "cpus": 4,
+          "mode": 2,
+          "before_ms": 120.390625,
+          "after_ms": 121.784583,
+          "change_percent": 1.1578625827384892
+        },
+        {
+          "cpus": 12,
+          "mode": 0,
+          "before_ms": 219.260459,
+          "after_ms": 219.647833,
+          "change_percent": 0.17667298598513792
+        },
+        {
+          "cpus": 12,
+          "mode": 2,
+          "before_ms": 219.691834,
+          "after_ms": 220.918167,
+          "change_percent": 0.5582060005016043
+        }
+      ],
+      "logs": [
+        {
+          "path": "target/barrier-subsystem/control/after-1-0-0.log",
+          "sha256": "91d7c0c940b5c61343ed548052c664264a96a8bf4de2f375d0ac695c33221982"
+        },
+        {
+          "path": "target/barrier-subsystem/control/after-1-0-1.log",
+          "sha256": "925b9a2cde4bc836d7cef7754b02b22f22937484b9b232ebf43b7fbda8b20586"
+        },
+        {
+          "path": "target/barrier-subsystem/control/after-1-0-2.log",
+          "sha256": "7724cc7160e03567d197fb56b6eacbb307c657b6c4160f11142697bc6fba9e03"
+        },
+        {
+          "path": "target/barrier-subsystem/control/after-1-2-0.log",
+          "sha256": "7e7dec4cbea7a3e499f91bb8c43e41f3d3d3e1c23c459ace5573c0b3009cc503"
+        },
+        {
+          "path": "target/barrier-subsystem/control/after-1-2-1.log",
+          "sha256": "af266b6f059a3848fcb0b0671ccf07e0aefbad00e5b0ebbea5c7e002df64995d"
+        },
+        {
+          "path": "target/barrier-subsystem/control/after-1-2-2.log",
+          "sha256": "c93cf9b86e62f95fc22a5948d53549b0206e28b60d181a42d7f6d28ef5728e35"
+        },
+        {
+          "path": "target/barrier-subsystem/control/after-12-0-0.log",
+          "sha256": "05eaca029fd44579d7d2a518870f17ad54f5664ef374d9d0e157c65024d65b34"
+        },
+        {
+          "path": "target/barrier-subsystem/control/after-12-0-1.log",
+          "sha256": "3b91e8cbbce00c00666c492d9128e81672d723c52f5440a179bb838b53bacd54"
+        },
+        {
+          "path": "target/barrier-subsystem/control/after-12-0-2.log",
+          "sha256": "192fff89cd0bbbe3a587bc78c46cb00f7ebfdf408f224f3cbd4ad41c289a6e11"
+        },
+        {
+          "path": "target/barrier-subsystem/control/after-12-2-0.log",
+          "sha256": "fd47d7b2a20e14e6d7412b947a56f29f20ba27fae8cd146f736e7b5689e67f49"
+        },
+        {
+          "path": "target/barrier-subsystem/control/after-12-2-1.log",
+          "sha256": "f55900b8b5cce6bd30a71fd18e91ab3f863f69943bc3378e46e2bb7e2f06688b"
+        },
+        {
+          "path": "target/barrier-subsystem/control/after-12-2-2.log",
+          "sha256": "2669c4af21b20097a2ea447d977936fb029508a091a9f2e3f2cf4ec686748827"
+        },
+        {
+          "path": "target/barrier-subsystem/control/after-4-0-0.log",
+          "sha256": "6b4541ff754b26a1d3ab67145637f2786adae506e52e97eea032f51c096b6f15"
+        },
+        {
+          "path": "target/barrier-subsystem/control/after-4-0-1.log",
+          "sha256": "435cea7a0162d49aa44ed82369334af33f447f196e3922ce61ad43ed8e9faf82"
+        },
+        {
+          "path": "target/barrier-subsystem/control/after-4-0-2.log",
+          "sha256": "f0f1a780ef0026786bbce84e43c0614c6cc6c4bce9b7819ca766bf9e0058ab90"
+        },
+        {
+          "path": "target/barrier-subsystem/control/after-4-2-0.log",
+          "sha256": "a5bcf65a552f48df820d34f5d233c665ecf5771d0492f20cee6c45bb9ba05661"
+        },
+        {
+          "path": "target/barrier-subsystem/control/after-4-2-1.log",
+          "sha256": "a4edb8c21d382bf30b00cdc10e5a5c0d871591e91fa4ce9cf13078992e00963c"
+        },
+        {
+          "path": "target/barrier-subsystem/control/after-4-2-2.log",
+          "sha256": "799acb00b0a79f82ce2f6055f3116fd5664bf28b8d818ec84fd056de4f2e9aa0"
+        },
+        {
+          "path": "target/barrier-subsystem/control/before-1-0-0.log",
+          "sha256": "e0eb2c199182adfbf2ee0564e9e2d9e8c1bcf0b425e4e0dcefe2bf50658661ca"
+        },
+        {
+          "path": "target/barrier-subsystem/control/before-1-0-1.log",
+          "sha256": "f9039c2b61793514997551aae13ee4ccfe6510917255a125650b45bac4b78e6a"
+        },
+        {
+          "path": "target/barrier-subsystem/control/before-1-0-2.log",
+          "sha256": "4f2bf6a4aae39d9235782c3014b5883eb1f81b6e3d04f4e1f34bf1a53424a961"
+        },
+        {
+          "path": "target/barrier-subsystem/control/before-1-2-0.log",
+          "sha256": "f8ea05c4191a240fdf8377cd1094956a1bbf166bd8dfe19af1eba3d814d9a654"
+        },
+        {
+          "path": "target/barrier-subsystem/control/before-1-2-1.log",
+          "sha256": "b40016a1983c3975f867255b7e3716f9042236423f9ed23044082f6d1cef03df"
+        },
+        {
+          "path": "target/barrier-subsystem/control/before-1-2-2.log",
+          "sha256": "1c3189c46304c153f3859f704e5c29fe024ed2496c2d64e6ca64e55bff3f5303"
+        },
+        {
+          "path": "target/barrier-subsystem/control/before-12-0-0.log",
+          "sha256": "7a4576645b277897e754431cc129b9e4e5cac3e5e7cc7d4f21f17446b999cfb3"
+        },
+        {
+          "path": "target/barrier-subsystem/control/before-12-0-1.log",
+          "sha256": "b47a09ad1169f5dfdaf9cb803c9b2fecc567df66ef1407ad28666a79d595bef6"
+        },
+        {
+          "path": "target/barrier-subsystem/control/before-12-0-2.log",
+          "sha256": "5812ea0d703feb256a841b434e2e04ca3bcef821282a8af666ec0235bc55490a"
+        },
+        {
+          "path": "target/barrier-subsystem/control/before-12-2-0.log",
+          "sha256": "d51db0c6e97aa4f749a6b68c75609c877a4e31912a5cc463f7a260fbbc532dac"
+        },
+        {
+          "path": "target/barrier-subsystem/control/before-12-2-1.log",
+          "sha256": "6caf7e5c11513c29489d9edd3f3f08dec156bc3f20e45cb58f890800dacb6a48"
+        },
+        {
+          "path": "target/barrier-subsystem/control/before-12-2-2.log",
+          "sha256": "8ab1c0438193017860dfe4291357e7a3b6abec0f881862b324322e86e6a216f8"
+        },
+        {
+          "path": "target/barrier-subsystem/control/before-4-0-0.log",
+          "sha256": "657ad825f79027d85a9de354477527e197bba3f72e5f877318da6754ea44ea26"
+        },
+        {
+          "path": "target/barrier-subsystem/control/before-4-0-1.log",
+          "sha256": "623fe9d754d0fc2e4e18ac0d1e1170b47829c7d733a88de57598d5b5f9bff3fe"
+        },
+        {
+          "path": "target/barrier-subsystem/control/before-4-0-2.log",
+          "sha256": "66a527336ede010252a13613ecee538ae231e4951adfbd51d6dd5ac1d4b1dd6d"
+        },
+        {
+          "path": "target/barrier-subsystem/control/before-4-2-0.log",
+          "sha256": "4a18361d8ecd93d9155c1abb3452b1ae1ef44f56e6d7823c26496792022ad65e"
+        },
+        {
+          "path": "target/barrier-subsystem/control/before-4-2-1.log",
+          "sha256": "80181c3718508d5769ae71b259b9c039e75cdeb336998faf4c9dee90d182e729"
+        },
+        {
+          "path": "target/barrier-subsystem/control/before-4-2-2.log",
+          "sha256": "caa511aef4f3122bec3391365241eb86c3cc27d96c6ef86d8740f57e7a75c326"
+        }
+      ]
+    },
+    "native_arm64_linux": {
+      "path": "target/local-ci/io/barrier-subsystem/native-benchmark.json",
+      "sha256": "1e5788658aa83a5b7c3d44ed40e071c22d66a22ac7af957dabef321d18204a0c",
+      "data": {
+        "binary_sha256": "acc70ae7c6e13be575516628eff506fac9af2762c33ce8fb0d78770ae533f3f5",
+        "rows": [
+          {
+            "threads": 1,
+            "command": 8,
+            "rep": 0,
+            "code": 0,
+            "elapsed_ns": 27795,
+            "stdout": "worker-membarrier: threads=1 rounds=50 command=8 filtered=0 elapsed_ns=27795: ok\n",
+            "stderr": ""
+          },
+          {
+            "threads": 1,
+            "command": 8,
+            "rep": 1,
+            "code": 0,
+            "elapsed_ns": 30628,
+            "stdout": "worker-membarrier: threads=1 rounds=50 command=8 filtered=0 elapsed_ns=30628: ok\n",
+            "stderr": ""
+          },
+          {
+            "threads": 1,
+            "command": 8,
+            "rep": 2,
+            "code": 0,
+            "elapsed_ns": 28920,
+            "stdout": "worker-membarrier: threads=1 rounds=50 command=8 filtered=0 elapsed_ns=28920: ok\n",
+            "stderr": ""
+          },
+          {
+            "threads": 1,
+            "command": 1,
+            "rep": 0,
+            "code": 0,
+            "elapsed_ns": 256453210,
+            "stdout": "worker-membarrier: threads=1 rounds=50 command=1 filtered=0 elapsed_ns=256453210: ok\n",
+            "stderr": ""
+          },
+          {
+            "threads": 1,
+            "command": 1,
+            "rep": 1,
+            "code": 0,
+            "elapsed_ns": 243380265,
+            "stdout": "worker-membarrier: threads=1 rounds=50 command=1 filtered=0 elapsed_ns=243380265: ok\n",
+            "stderr": ""
+          },
+          {
+            "threads": 1,
+            "command": 1,
+            "rep": 2,
+            "code": 0,
+            "elapsed_ns": 243354387,
+            "stdout": "worker-membarrier: threads=1 rounds=50 command=1 filtered=0 elapsed_ns=243354387: ok\n",
+            "stderr": ""
+          },
+          {
+            "threads": 4,
+            "command": 8,
+            "rep": 0,
+            "code": 0,
+            "elapsed_ns": 1796537,
+            "stdout": "worker-membarrier: threads=4 rounds=50 command=8 filtered=0 elapsed_ns=1796537: ok\n",
+            "stderr": ""
+          },
+          {
+            "threads": 4,
+            "command": 8,
+            "rep": 1,
+            "code": 0,
+            "elapsed_ns": 1761283,
+            "stdout": "worker-membarrier: threads=4 rounds=50 command=8 filtered=0 elapsed_ns=1761283: ok\n",
+            "stderr": ""
+          },
+          {
+            "threads": 4,
+            "command": 8,
+            "rep": 2,
+            "code": 0,
+            "elapsed_ns": 981195,
+            "stdout": "worker-membarrier: threads=4 rounds=50 command=8 filtered=0 elapsed_ns=981195: ok\n",
+            "stderr": ""
+          },
+          {
+            "threads": 4,
+            "command": 1,
+            "rep": 0,
+            "code": 0,
+            "elapsed_ns": 468566503,
+            "stdout": "worker-membarrier: threads=4 rounds=50 command=1 filtered=0 elapsed_ns=468566503: ok\n",
+            "stderr": ""
+          },
+          {
+            "threads": 4,
+            "command": 1,
+            "rep": 1,
+            "code": 0,
+            "elapsed_ns": 459805546,
+            "stdout": "worker-membarrier: threads=4 rounds=50 command=1 filtered=0 elapsed_ns=459805546: ok\n",
+            "stderr": ""
+          },
+          {
+            "threads": 4,
+            "command": 1,
+            "rep": 2,
+            "code": 0,
+            "elapsed_ns": 468918417,
+            "stdout": "worker-membarrier: threads=4 rounds=50 command=1 filtered=0 elapsed_ns=468918417: ok\n",
+            "stderr": ""
+          },
+          {
+            "threads": 12,
+            "command": 8,
+            "rep": 0,
+            "code": 0,
+            "elapsed_ns": 5174880,
+            "stdout": "worker-membarrier: threads=12 rounds=50 command=8 filtered=0 elapsed_ns=5174880: ok\n",
+            "stderr": ""
+          },
+          {
+            "threads": 12,
+            "command": 8,
+            "rep": 1,
+            "code": 0,
+            "elapsed_ns": 3567031,
+            "stdout": "worker-membarrier: threads=12 rounds=50 command=8 filtered=0 elapsed_ns=3567031: ok\n",
+            "stderr": ""
+          },
+          {
+            "threads": 12,
+            "command": 8,
+            "rep": 2,
+            "code": 0,
+            "elapsed_ns": 3259329,
+            "stdout": "worker-membarrier: threads=12 rounds=50 command=8 filtered=0 elapsed_ns=3259329: ok\n",
+            "stderr": ""
+          },
+          {
+            "threads": 12,
+            "command": 1,
+            "rep": 0,
+            "code": 0,
+            "elapsed_ns": 442479242,
+            "stdout": "worker-membarrier: threads=12 rounds=50 command=1 filtered=0 elapsed_ns=442479242: ok\n",
+            "stderr": ""
+          },
+          {
+            "threads": 12,
+            "command": 1,
+            "rep": 1,
+            "code": 0,
+            "elapsed_ns": 452045372,
+            "stdout": "worker-membarrier: threads=12 rounds=50 command=1 filtered=0 elapsed_ns=452045372: ok\n",
+            "stderr": ""
+          },
+          {
+            "threads": 12,
+            "command": 1,
+            "rep": 2,
+            "code": 0,
+            "elapsed_ns": 457940166,
+            "stdout": "worker-membarrier: threads=12 rounds=50 command=1 filtered=0 elapsed_ns=457940166: ok\n",
+            "stderr": ""
+          }
+        ]
+      },
+      "medians": [
+        {
+          "threads": 1,
+          "command": 8,
+          "median_ms": 0.02892
+        },
+        {
+          "threads": 1,
+          "command": 1,
+          "median_ms": 243.380265
+        },
+        {
+          "threads": 4,
+          "command": 8,
+          "median_ms": 1.761283
+        },
+        {
+          "threads": 4,
+          "command": 1,
+          "median_ms": 468.566503
+        },
+        {
+          "threads": 12,
+          "command": 8,
+          "median_ms": 3.567031
+        },
+        {
+          "threads": 12,
+          "command": 1,
+          "median_ms": 452.045372
+        }
+      ],
+      "environment": "Native ARM64 Ubuntu local CI VM, 6 provisioned CPUs, 8 GiB; 12-thread cases oversubscribe and no CPU pinning is used.",
+      "caveat": "Linux GLOBAL includes a real system-wide grace period and different background kernel/userspace tasks. It is not a direct primitive/native-speed comparison to this userspace guest execution domain."
+    },
+    "runners": {
+      "before_revision": "c2d8643c924def8ff813b2d31de3dfc54cd64c26",
+      "before_sha256": "4ff534318d78b94cbb7a711bdd6acc2908b72f996ce7b11f8f63ca1549c7e6d1",
+      "measured_after_sha256": "551dddc56534843d4b429f213282f6a8e449cba47135ca27aa3b203ce572e835",
+      "measured_after_source_revision": "a4c1f20115757f72c6a023b81b9b13aa791db90f",
+      "final_installed_sha256": "80ebd7b4242e91b5655f56cb3d0a4a7f59c55f7848d5db93b8ea7a6a2cb3d62b",
+      "metadata_note": "Measured candidate and final installed runner use identical production source. The final build changes the embedded runtime pin from pre-commit metadata to the committed revision; final 4/12-CPU functional smoke tests cover that installed binary."
+    }
+  },
+  "performance_interpretation": [
+    "Four-CPU barriers fall from roughly 12.6-13.3 ms to 0.67-0.76 ms; twelve-CPU barriers fall from 73.1-75.5 ms to 1.70-2.69 ms for this 50-call-per-thread fixture",
+    "Single-CPU fixture totals remain near 0.1 ms",
+    "Ordinary long-call controls range from -0.35% to +1.16%; three samples do not prove universal zero overhead",
+    "No membarrier (283) cohort-return entries in final guest diagnostic samples; other startup, console, mappings and controls still have boundaries and aggregate counts are not claimed to be zero",
+    "These are synchronization fixtures, not Firefox, Docker startup or Geekbench scores"
+  ],
+  "corrected_failures": [
+    {
+      "failure": {
+        "path": "target/barrier-subsystem/guest-setup-failure/results.json",
+        "sha256": "d88181a883764c5f39033a44367534028a9c8bb6a196055877d31b36ad61348b",
+        "data": [
+          {
+            "case": "hvf-1-runtime-compat",
+            "code": 1,
+            "seconds": 0.545247917,
+            "passed": false,
+            "command": [
+              "/Users/main/dev/trames/target/mount-subsystem/mac/target/release/trames-mac-run",
+              "--cpus",
+              "1",
+              "--network",
+              "off",
+              "--metrics",
+              "--exec-file",
+              "/case=/Users/main/dev/trames/target/local-ci/io/barrier-subsystem/runtime-compat",
+              "--rootfs",
+              "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+              "--timeout",
+              "60",
+              "--no-pty",
+              "--no-windows",
+              "/case"
+            ],
+            "runner_sha256": "551dddc56534843d4b429f213282f6a8e449cba47135ca27aa3b203ce572e835",
+            "fixture_sha256": "146084cf9953baeb882e66572210ea1686754625142ea3c1710e439a74f27711"
+          }
+        ]
+      },
+      "cause": "Initial harness injected runtime-compat at /case, but its exec test intentionally calls /bin/runtime-compat.",
+      "correction": "Changed only the harness injection/entry path to /bin/runtime-compat. Full final matrix and installed smoke pass; no production change was made for this harness error."
+    }
+  ],
+  "validation_reuse": [
+    "Fresh complete macOS/Linux runtime workflows at this merge boundary, affected process tests and strict clippy, fresh signed hardware/product tests and both iPad compile targets",
+    "Final committed-pin build was followed by signature/version/hash checks and ten installed Dev smoke cases; unchanged production source does not require repeating the completed full workflows",
+    "Linux fixture was recompiled after adding the optional benchmark ABI-preflight switch; final source and executable hashes are recorded",
+    "No repeat of unrelated Firefox/network/storage/graphics end-to-end acceptance or iPad physical installation for this runtime-only subsystem"
+  ],
+  "physical_ipad_acceptance": "Not run or installed in this batch; device and simulator compile checks passed.",
+  "known_unattributed_issues": [
+    "Previous stage-61 short denied-control fixed-latency regression remains unattributed; this different long-call control fixture does not establish its resolution"
+  ],
+  "remaining_boundaries": [
+    "Explicit tracing and capability-less/solo callers retain their existing coordinated route",
+    "Unsupported global-expedited, sync-core and rseq barrier APIs remain unsupported",
+    "Known handler resources/subcommands that refuse source admission",
+    "Actual host lifecycle/admin, exceptional native/memory publication, HLT/fault/backend exits and cold/solo orchestration"
+  ],
+  "deployment": {
+    "channel": "dev",
+    "installed": true,
+    "mac_revision": "ec76d6f295f2f7f2af034b58bf9d20f14d1f27aa",
+    "runtime_revision": "a4c1f20115757f72c6a023b81b9b13aa791db90f",
+    "app": "/Users/main/Applications/Trames Dev.app",
+    "cli": "/Users/main/.local/bin/trames-dev",
+    "version": "Trames Dev 1.5.3 (dev) runtime a4c1f20115757f72c6a023b81b9b13aa791db90f",
+    "runner_sha256": "80ebd7b4242e91b5655f56cb3d0a4a7f59c55f7848d5db93b8ea7a6a2cb3d62b",
+    "built_runner_sha256": "80ebd7b4242e91b5655f56cb3d0a4a7f59c55f7848d5db93b8ea7a6a2cb3d62b",
+    "installed_smoke_passed": 10,
+    "installer_log": {
+      "path": "target/barrier-subsystem/dev-install.log",
+      "sha256": "d81b37faaef60b5a1b635ce5a81a399a304e89d9aee6498d2d7eecf5f3f5bd41"
+    },
+    "stable_runner_sha256": "4f40615213e731b2a4ef9d8c6a0e85c5c7bdf31ab0c60b0354b55113f2a6a55d",
+    "expected_unchanged_stable_runner_sha256": "4f40615213e731b2a4ef9d8c6a0e85c5c7bdf31ab0c60b0354b55113f2a6a55d",
+    "stable_business_environments_modified": false,
+    "physical_ipad_modified": false
+  }
+}

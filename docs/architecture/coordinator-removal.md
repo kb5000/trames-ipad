@@ -2,21 +2,21 @@
 
 ## Current status — 2026-11-07
 
-Stage 61 removes unimplemented syscall numbers from joined dispatch. The Linux
-and session dispatch bodies now generate conservative entry recognition from the
-same definitions. Unknown entries finish on the calling worker after the original
-seccomp decision and retain the original task/log diagnostic. Known handler and
-resource/subcommand boundaries, explicit tracing and diagnostic-less legacy
-embeddings keep their actual routes. The cold classifier does not run on ordinary
-already-completed file/socket/futex/native paths.
+Stage 62 moves supported membarrier query/register/private/global/registration
+queries onto execution workers and original mm state. Actual barriers visit the
+current execution leases and wait for requested host fences. A pending caller
+releases its CPU slot and retains its View; the operation needs no mm byte export,
+page-table update or coordinator callback. Synchronous native bodies and scoped
+mapping batches participate in the same execution protocol.
 
-Earlier BPF/cgroup, seccomp, task/image and scoped-memory migrations remain in
-place. Local acceptance includes both runtime CI workflows, 396 process cases per
-host (three ignored), targeted final tracing/legacy checks, both iPad compile
-targets and 18 real HVF/interpreter runs with native ARM64 Linux comparison.
-See [stage 61 validation](../validation/worker-dispatch-20261107.json) for exact
-source hashes, timing controls, failures and validation reuse. Mac Dev is updated;
-stable/business and physical iPad installations remain unchanged.
+Earlier generated-dispatch, BPF/cgroup, seccomp, task/image and scoped-memory work
+remains in place. Both local runtime workflows and 400 process cases per host
+(three ignored) pass, together with iPad compile targets and 30 real HVF/interpreter
+cases at 1/4/12 CPUs, including ALLOW, full fork/exec compatibility and native
+Linux argument checks. See [stage 62 validation](../validation/worker-membarrier-20261107.json)
+for exact source, hardware acceptance, timing controls and remaining limits.
+Mac Dev and its CLI are updated; ten installed 4/12-CPU smoke cases pass.
+Stable/business and physical iPad installations remain unchanged.
 
 **The coordinator still exists.** Actual shared-mm quiescence, an in-cohort
 one-caller service, asynchronous collection and a whole-cohort return have different
@@ -36,6 +36,7 @@ costs. Counts of migrated entries or files are not a completion percentage.
 | Mount topology administration | Original namespace/fs resources on the caller; existing disk pool for host-backed paths; contention releases the CPU slot | Tracing and genuinely excluded pathname controls retain their explicit boundary |
 | Task namespace membership and Files/fs detachment | Supported unshare/setns/close_range run on the caller, refresh future consumers and preserve accepted async operations | Tracing and capability-less embeddings remain; clone creation still uses creator-mm custody; unsupported user/time namespaces are not added |
 | Credentials and capability administration | Calling worker, shared ABI and original task credentials; future consumers refresh, accepted async work retains submission authority | Tracing and capability-less embeddings retain their boundary; unsupported user namespaces and file capabilities are unchanged |
+| Memory barriers | Supported membarrier controls run on source workers, using original mm registration and active execution leases; pending callers return their CPU slot | Only requested fences affect relevant execution actors. Tracing and capability-less/solo callers keep their existing route; unsupported barrier commands remain unsupported |
 | BPF and cgroup device policy | Program administration uses the original registry/Files/hierarchy on the caller; target directory and control-file opens resolve directly | Existing unsupported BPF commands/types remain explicit errors; tracing/capability-less embeddings remain. Original device-access consumers retain the same live rules |
 | Seccomp and tracing | Supported installation/TSYNC, decisions and lifecycle effects use original source resources; original policy/NNP is visible to proc, fork and exec | Explicit tracing and capability-less embeddings remain; unsupported seccomp APIs are unchanged. Allowed calls still retain their own excluded resource/generic fallback |
 | Host lifecycle and generic dispatch fallback | Unknown syscall numbers finish locally using generated entry recognition; actual resource/host events retain their own route | Host exec creation/group control, terminal lifecycle, pause/cancel, transfer/timezone/writeback, supervision/admin/pressure/deadline/shutdown; known SVC resources/subcommands and HLT/fault exits not completed, parked, serviced or scoped on the worker still reach the joined fallback |
@@ -47,11 +48,28 @@ the owner; ordinary epoch-member migration, parking, wakeup and child/replacemen
 admission already use the live execution queue. Single-CPU/solo execution retains
 its coordinated caller path, which does not by itself imply an extra RPC.
 
-The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/c2d8643c924def8ff813b2d31de3dfc54cd64c26/docs/architecture/coordination-boundaries.md)
+The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/a4c1f20115757f72c6a023b81b9b13aa791db90f/docs/architecture/coordination-boundaries.md)
 records scopes, actual admission gates and source locations. Earlier sections
 below are historical records and do not override this inventory.
 
-### Stage 61 unimplemented-call measurements
+### Stage 62 memory-barrier measurements
+
+Three alternating pairs measure 50 calls per thread:
+
+| Scope | 4 CPUs before → after | 12 CPUs before → after |
+| --- | ---: | ---: |
+| Private expedited | 13.348 → 0.671 ms | 73.062 → 2.688 ms |
+| Global | 12.565 → 0.755 ms | 75.511 → 1.697 ms |
+
+Single-CPU calls remain near 0.1 ms for this fixture. Separate 100,000-call ordinary
+identity and already-local ERRNO controls range from -0.35% to +1.16%; three samples
+do not prove universal zero overhead. Native Linux references and raw samples are
+recorded. Linux GLOBAL includes a real system-wide grace period and a different
+population of kernel/userspace tasks, so its timings are not a direct primitive
+comparison. These are synchronization fixture results, not Firefox/Geekbench scores.
+The previous stage-61 short denied-control latency issue remains unattributed.
+
+### Stage 61 unimplemented-call measurements (historical)
 
 Three alternating unprofiled pairs run 1,000 calls per thread. Raw unknown calls
 fall from **232.415 to 3.553 ms at four CPUs**, and **2020.502 to 9.456 ms at twelve
@@ -4137,3 +4155,11 @@ actual dispatch arms; AIO's pre-dispatch family reuses its existing predicate.
 Known resource/subcommand handlers remain conservative. See the
 [shared contract](https://github.com/kb5000/trames-runtime/blob/c2d8643c924def8ff813b2d31de3dfc54cd64c26/docs/architecture/coordination-boundaries.md#61-generated-syscall-entry-recognition-and-unimplemented-completion--2026-11-07)
 and [validation record](../validation/worker-dispatch-20261107.json).
+
+
+## 62. Original execution-lease memory barriers — 2026-11-07
+
+The supported barrier subsystem and its native/scoped execution dependencies now
+run on existing workers, retaining original mm registration, accepted waits and
+actual acknowledgement fences. See the [shared contract](https://github.com/kb5000/trames-runtime/blob/a4c1f20115757f72c6a023b81b9b13aa791db90f/docs/architecture/coordination-boundaries.md#62-original-execution-lease-memory-barriers--2026-11-07)
+and [validation record](../validation/worker-membarrier-20261107.json).
