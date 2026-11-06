@@ -2,28 +2,26 @@
 
 ## Current status — 2026-11-06
 
-Runtime `4962de8d33d15b97e31d6ff61ba31ca099eec536` (stage 57) completes the supported task/image lifecycle subsystem and its original
-memory, file, identity, directory and queue dependencies. Fork/clone/vfork,
-execve/execveat and supported pure/mixed mapping scopes now execute on existing
-CPU workers. Child publication, nonleader PID replacement and detached old-mm
-retirement use original shared resources without a Kernel callback. CPU/native
-byte access takes no new task-body or registry lock.
+Runtime `aeca5a59a6d53549ed39478081480fc4b4ed9f29` (stage 58) completes the supported
+scoped-memory subsystem: first proc-byte activation, returned/cold task cleanup,
+and mapped-file layout transactions. These now run on existing execution workers
+using original task/mm/backing resources. Direct file calls and io_uring share the
+same accepted mutation resource; cancellation keeps original authority and waits.
 
-Contended task/mm admission parks the original operation and frees its CPU slot.
-Additive anonymous mmap publishes directly while peers continue. Native executable,
-shebang and ELF-interpreter preparation uses the existing bounded disk pool,
-retaining accepted arguments and original file authority. The actual affected
-mm/group stays paused, while unrelated tasks can use that execution slot. Private
-resident namespace errors finish locally without disk/completion/owner messages.
+A pending file mutation blocks new mapping publication, returns only its original
+backing readers, and holds the exclusive ticket through existing disk-pool
+completion. Independent byte return breaks a structural-scope wait cycle without
+replaying a guest syscall. Final CPU-domain removal wakes retained cold-memory
+cleanup. No coordinator/service thread, process-wide pause counter or ordinary
+byte-access lock/check is added.
 
-The whole batch passes local integration checks. Both runtime CI host workflows,
-the interpreter product Rust suite, both iPad compile targets, HVF/interpreter guest
-matrices and isolated Go/Docker workloads pass. The exact evidence and residual
-performance costs are recorded in [stage 57 validation](../validation/worker-task-lifecycle-20261106.json).
-Mac Dev is installed and its actual CLI passes memory/private-disk exec smoke
-checks. The stable binary is verified unchanged; business environments are not
-restarted. The iPad source pin is updated; device and simulator compile, while
-physical iPad acceptance remains skipped as previously chosen.
+Local acceptance includes both runtime CI host workflows, 381 final process cases
+per host (three ignored), 24 Mac product tests, 48 explicit signed hardware tests,
+both iPad compile targets, and mapped-file stress on HVF and the interpreter at
+1/4/12 CPUs. One hundred repeated exit tests cover 900 completion scenarios.
+Unchanged passing checks are reused; see [stage 58 validation](../validation/worker-scoped-memory-20261106.json).
+Mac Dev uses the paired runtime. Stable/business environments remain unchanged;
+physical iPad acceptance is still skipped as previously chosen.
 
 **The coordinator still exists.** Actual shared-mm quiescence, an in-cohort
 one-caller service, asynchronous collection and a whole-cohort return have different
@@ -31,15 +29,15 @@ costs. Counts of migrated entries or files are not a completion percentage.
 
 | Area | Current execution | Remaining boundary |
 | --- | --- | --- |
-| Admitted file/path/FD, Unix/TCP I/O and cross-resource transfer | Calling worker and original shared objects | Excluded paths/descriptors/controls and layout changes still have explicit escalation |
+| Admitted file/path/FD, Unix/TCP I/O and cross-resource transfer | Calling worker and original shared objects | Excluded paths/descriptors/controls retain explicit escalation; supported layout changes now use original backing admission |
 | Futexes, clocks/timers, admitted event/child/signal waits and caught signals | Source execution; blocking returns the CPU slot | Legacy nonmember wake/adoption, unsupported wait resources and actual task-policy effects remain |
 | Scheduling attributes and CPU affinity | Original task atomics, original PID/group/UID authority and task-scoped completion on the caller | Tracing and actual task-policy effects retain their boundary; unsupported features keep their errno. Required original CPU slots start directly from the live queue |
-| Exit/group/default-fatal termination, STOP/CONT and vfork release | Source resources and original group/family notifications | CPU/statistics and cold task projections return asynchronously to the owner; cold shared-mm cleanup may need that mm's byte checkpoint |
+| Exit/group/default-fatal termination, STOP/CONT and vfork release | Source resources and original group/family notifications | Returned CPU/statistics and cold cleanup complete on existing workers; the actual shared mm may still need its byte checkpoint. Outside-cohort/solo and tracing/policy remain separate |
 | fork/clone/vfork and execve/execveat | Existing workers handle pure and mixed mapping scopes, nonleader rekey and original-mm retirement; existing disk pool prepares native images without retaining a CPU slot | Affected actors still pause; actual tracing/policy and solo/host invocation remain distinct |
-| Mapping topology, pins and mapped-file layout | Supported brk/mmap/munmap/mremap/mprotect/msync/madvise and buffer-registration checkpoints publish on an existing worker; additive anonymous mmap is direct | Proc/cold-mm-only checkpoints, mapped-file layout transactions and excluded backing/lifetime/policy cases retain explicit owner boundaries |
+| Mapping topology, pins and mapped-file layout | Supported brk/mmap/munmap/mremap/mprotect/msync/madvise and buffer-registration checkpoints publish on an existing worker; additive anonymous mmap is direct | Proc/cold-mm checkpoints and supported mapped-file layout transactions now run on existing workers; excluded backing/lifetime/policy and capability-less embeddings retain explicit boundaries |
 | Residual FD/network compatibility | Owner service inside a live cohort, where admitted | Caller waits while peers continue; refusal before effects falls back to joined handling |
 | Native libc/GPU/video/audio | Normal bodies and resource waits use calling/shared-resource paths | Exceptional mapping import, unstable entry and actual native lifecycle checks remain; AppKit affinity, device/disk pools and local fallback are not extra coordinators |
-| Dynamic proc/sys and proc pathname/FD consumers | Calling worker and original PID/mm/Files/fs/namespace resources | First cross-mm byte export and mapping invalidation use only the original mm admission boundary; legacy providers retain their explicit fallback |
+| Dynamic proc/sys and proc pathname/FD consumers | Calling worker and original PID/mm/Files/fs/namespace resources | First cross-mm byte export and invalidation activate on an existing worker at the original task/mm boundary; legacy providers retain explicit fallback |
 | Mount topology administration | Original namespace/fs resources on the caller; existing disk pool for host-backed paths; contention releases the CPU slot | Tracing and genuinely excluded pathname controls retain their explicit boundary |
 | Task namespace membership and Files/fs detachment | Supported unshare/setns/close_range run on the caller, refresh future consumers and preserve accepted async operations | Tracing/security effects remain; clone creation still uses creator-mm custody; unsupported user/time namespaces are not added |
 | Credentials and capability administration | Calling worker, shared ABI and original task credentials; future consumers refresh, accepted async work retains submission authority | Tracing and actual policy lifecycle retain their boundary; unsupported user namespaces and file capabilities are unchanged |
@@ -53,11 +51,37 @@ the owner; ordinary epoch-member migration, parking, wakeup and child/replacemen
 admission already use the live execution queue. Single-CPU/solo execution retains
 its coordinated caller path, which does not by itself imply an extra RPC.
 
-The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/4962de8d33d15b97e31d6ff61ba31ca099eec536/docs/architecture/coordination-boundaries.md)
+The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/aeca5a59a6d53549ed39478081480fc4b4ed9f29/docs/architecture/coordination-boundaries.md)
 records scopes, actual admission gates and source locations. Earlier sections
 below are historical records and do not override this inventory.
 
-### Stage 57 measurements and final regression
+### Stage 58 measurements and remaining costs
+
+Nine alternating unprofiled pairs measure 100 mapped-file resizes while child
+processes read existing aliases and repeatedly map new ones:
+
+| Execution | One CPU / reader | Four CPUs / readers |
+| --- | ---: | ---: |
+| Stage 57 | 158.022 ms | 226.243 ms |
+| Stage 58 | 5.885 ms | 34.260 ms |
+| Native macOS | 0.465 ms | 0.653 ms |
+| Native ARM64 Linux CI guest | 0.074 ms | 0.112 ms |
+
+Separate diagnostic four-CPU runs reduce cohort rounds from 101 to one, with no
+compatibility service requests. The remaining round is the final console boundary.
+This is a fixture result, not a Firefox/Geekbench speedup. Native references use
+their own page sizes and schedulers; Linux has three samples and six provisioned
+CPUs. An earlier instrumented sample reached 813 ms; all nine unprofiled four-CPU
+samples took 25–41 ms. The outlier is retained, with no unsupported causal claim.
+
+Ordinary append/grow controls range from roughly -15% to +7% in short timed regions;
+three samples do not prove a general improvement. Native comparisons still show
+substantial original-mm pause, scheduling, hardware-exit and disk-dispatch costs.
+Actual policy/control bodies, exceptional native import, legacy resources, host
+administration and the general joined fallback remain in the inventory above.
+The earlier stage-56 Docker cleanup timeout remains unattributed.
+
+### Stage 57 measurements and final regression (historical)
 
 | Fixed-work comparison | 4 CPUs | 12 CPUs |
 | --- | ---: | ---: |
@@ -4038,3 +4062,13 @@ original-resource dependencies together. The current inventory and measurements
 at the top of this document supersede stage-56 lifecycle boundaries. See the
 [shared implementation audit](https://github.com/kb5000/trames-runtime/blob/4962de8d33d15b97e31d6ff61ba31ca099eec536/docs/architecture/coordination-boundaries.md#57-original-taskimage-lifecycle-and-mapping-dependencies--2026-11-06)
 and [exact validation record](../validation/worker-task-lifecycle-20261106.json).
+
+
+## 58. Original scoped-memory activation, completion and file layouts — 2026-11-06
+
+The entire supported scoped-memory batch is integrated together, including original
+proc-byte publication, cold/returned CPU completion and mapped-file mutations with
+new aliases, io_uring, cancellation and external borrowers. The current inventory
+supersedes the proc/cold-mm/layout boundaries recorded in earlier stages. See the
+[shared implementation and defect analysis](https://github.com/kb5000/trames-runtime/blob/aeca5a59a6d53549ed39478081480fc4b4ed9f29/docs/architecture/coordination-boundaries.md#58-original-scoped-memory-activation-completion-and-file-layouts--2026-11-06)
+and [exact validation record](../validation/worker-scoped-memory-20261106.json).
