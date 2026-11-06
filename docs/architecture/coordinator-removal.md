@@ -2,14 +2,14 @@
 
 ## Current status — 2026-11-06
 
-Audited executable-code baseline: `a5c3b6510e69c5c491411318695a6c4ef24157c7`.
-The latest code batch is [stage 55, original task namespace membership](#55-original-task-namespace-membership--2026-11-06).
-Supported unshare/setns and close_range now use original task resources on the
-calling worker, including Files/fs detachment and all captured consumers. Busy
-mount namespace transactions park only that caller. Mac and iPad share this
-implementation. Mac Dev is updated; stable 1.5.3 and business environments are
-unchanged. Both iPad targets compile; physical iPad acceptance remains skipped
-as previously chosen.
+Audited executable-code baseline: `cb2b6209446be2b032c8c9ec759df0226e66ee0b`.
+The latest code batch is [stage 56, original credentials](#56-original-credentials-and-permission-consumers--2026-11-06).
+Supported ID/groups, capabilities and credential prctl now run on the calling
+worker with all captured permission consumers. Original target credentials feed
+signals, limits, scheduling, proc and family notifications directly. Mac and iPad
+share this implementation. This batch updates Mac Dev only; stable 1.5.3 and
+business environments are unchanged. Both iPad targets compile; physical iPad
+acceptance remains skipped as previously chosen.
 
 **The coordinator still exists, but ordinary admitted resource work no longer
 has to execute there.** Fork/clone/exec have removed the whole-cohort dependency,
@@ -31,7 +31,7 @@ are not a completion percentage.
 | Dynamic proc/sys and proc pathname/FD consumers | Calling worker and original PID/mm/Files/fs/namespace resources | First cross-mm byte export and mapping invalidation use only the original mm admission boundary; legacy providers retain their explicit fallback |
 | Mount topology administration | Original namespace/fs resources on the caller; existing disk pool for host-backed paths; contention releases the CPU slot | Tracing and genuinely excluded pathname controls retain their explicit boundary |
 | Task namespace membership and Files/fs detachment | Supported unshare/setns/close_range run on the caller, refresh future consumers and preserve accepted async operations | Tracing/security effects remain; clone creation still uses creator-mm custody; unsupported user/time namespaces are not added |
-| Credentials and capability administration | Actual task-policy mutations still use the owner boundary | Captured identity/permission consumers must move with a future complete credential subsystem |
+| Credentials and capability administration | Calling worker, shared ABI and original task credentials; future consumers refresh, accepted async work retains submission authority | Tracing and actual policy lifecycle retain their boundary; unsupported user namespaces and file capabilities are unchanged |
 | Tracing/security and mixed owner resources | Actual joined task/control boundary | Installation/TSYNC, policy signal/termination effects, excluded SCM_RIGHTS/ring resources and missing source pumps remain. Pure custody-policy errors complete on continuous workers before quiescence |
 | Host lifecycle and generic dispatch fallback | Still joined when the actual event/exit requires it | Host exec creation/group control, terminal lifecycle, pause/cancel, transfer/timezone/writeback, supervision/admin/pressure/deadline/shutdown; any SVC/HLT/fault not completed, parked, serviced or scoped on the worker still reaches the generic joined fallback |
 
@@ -42,38 +42,41 @@ the owner; ordinary epoch-member migration, parking, wakeup and child/replacemen
 admission already use the live execution queue. Single-CPU/solo execution retains
 its coordinated caller path, which does not by itself imply an extra RPC.
 
-The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/a5c3b6510e69c5c491411318695a6c4ef24157c7/docs/architecture/coordination-boundaries.md)
+The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/cb2b6209446be2b032c8c9ec759df0226e66ee0b/docs/architecture/coordination-boundaries.md)
 records scopes, actual admission gates and source locations. Earlier sections
 below are historical records and do not override this inventory.
 
 ### What the latest measurements prove
 
-Stage 55 uses one thread per configured CPU, each performing 64 checked
-namespace rounds (unshare, UTS/network operations, mount/unmount, setns and
-close_range). Five unprofiled before/after pairs alternate order; the longest
-worker loop excludes thread creation and final join. This measures namespace
-administration, not Firefox/Geekbench or whole-container performance.
+Stage 56 measures 256 checked credential-administration rounds per worker with
+five alternating unprofiled before/after pairs. The longest worker loop excludes
+thread creation and final join. Each round changes fs IDs, drops/restores and
+queries capabilities, verifies a denied setgid and reads the current IDs.
 
 | CPUs / threads | Previous loop | Current loop | Speedup |
 | --- | ---: | ---: | ---: |
-| 1 | 5.955 ms | 6.314 ms | 0.94x |
-| 2 | 33.416 ms | 12.401 ms | 2.70x |
-| 4 | 83.033 ms | 24.358 ms | 3.41x |
-| 12 | 533.462 ms | 76.896 ms | 6.94x |
+| 1 | 4.443 ms | 3.552 ms | 1.25x |
+| 2 | 137.874 ms | 19.107 ms | 7.22x |
+| 4 | 323.613 ms | 37.179 ms | 8.70x |
+| 12 | 1977.995 ms | 92.936 ms | 21.28x |
 
-One CPU remains approximately 6% slower (0.358 ms per 64 rounds). Eliminating
-unnecessary namespace view copies, no-op detachments and source refreshes reduced
-the initial 42% regression. The unchanged proc control workload is 0.99x–1.01x.
-The one-CPU owner is itself the guest executor, so it does not gain from eliminating
-a cross-thread handoff. No universal speedup is claimed.
+This is a credential microbenchmark, not a Firefox/Geekbench or whole-container
+speedup. Original get-ID fast paths are preserved. Source conformance tests show
+zero owner-service requests or cohort returns for the exercised supported calls,
+including filtered and denied entries. The full capability/exec fixture also
+passes. All timing pairs and source hashes are in the
+[stage 56 validation](../validation/worker-credentials-20261106.json).
 
-Separate multi-CPU diagnostic runs have zero unshare/setns/close_range cohort
-returns and zero owner-service requests; only the final console ioctl returns.
-The [stage 55 evidence](../validation/worker-task-namespace-20261106.json) records
-hashes, all timing pairs, native ARM Linux ABI comparison and local validation.
-[Stage 54](../validation/worker-mount-20261106.json) retains mount-specific results.
-Credentials/capabilities, original task/image construction, structural mapping
-publication, excluded control bodies and tracing/security remain next boundaries.
+The first Docker run timed out while cleaning up round 6. Two later baseline runs
+and three candidate runs completed eight rounds each, including the final binary.
+The initial timeout remains unattributed; passing retries do not prove that this
+intermittent lifecycle issue is fixed. The original logs are retained, and the
+stable application is not updated by this batch.
+
+Original task/image construction, structural mapping publication, excluded control
+bodies and tracing/security remain the next coordinator boundaries. The previous
+namespace-specific measurements remain in the
+[stage 55 evidence](../validation/worker-task-namespace-20261106.json).
 
 ## Twenty-second migration implemented — worker Unix namespace controls and waits — 2026-11-03
 
@@ -3977,3 +3980,33 @@ construction, structural memory publication, tracing/security, excluded control
 bodies and generic unhandled dispatch. Source-owned control lifetime alone does
 not migrate every control body. See the [shared contract](https://github.com/kb5000/trames-runtime/blob/a5c3b6510e69c5c491411318695a6c4ef24157c7/docs/architecture/coordination-boundaries.md#original-task-namespace-membership-and-complete-filesfs-lifetime--2026-11-06)
 and [validation record](../validation/worker-task-namespace-20261106.json).
+
+
+## 56. Original credentials and permission consumers — 2026-11-06
+
+Runtime `cb2b6209446be2b032c8c9ec759df0226e66ee0b` moves the supported credential subsystem as a whole.
+UID/GID/res-ID/fs-ID/groups, capget/capset and credential prctl share one source and
+serial ABI. A successful mutation publishes one original task credential record,
+clears sensitive dumpability/parent-death state in order, and refreshes future
+path/FD/socket/UTS/kernel-log/native/async and local sender/limit consumers. Existing
+async requests retain their accepted authority. Cold owner collection imports
+committed bindings rather than replaying changes. Ordinary identity getters keep
+their existing fast path and ordinary file permissions take no new lock.
+
+Remote signal, scheduler, prlimit/capget and proc observers use the original record.
+Child wait and SIGCHLD identity follow the same record without reconstructing the
+family graph. Shared-mm dumpability is visible immediately; fork/exec isolate it.
+Native comparison also fixes invalid fs-ID queries, saved-ID permission rules,
+setres-ID no-op behavior, group validation/sorting/count ordering and remote
+capget error ordering.
+
+Validation passes 547 Apple VFS cases (546 native Linux), 243 Linux ABI cases,
+67 kernel unit/integration cases, 342 process cases, 24 Mac product cases, both
+compile targets for iPad, and 24 native ARM Linux/HVF/interpreter fixture runs.
+The complete legacy capability/exec fixture passes at 1/4 CPUs. Targeted source
+tests prove immediate original observers before owner collection, future permission
+changes, retained async authority and exactly one seccomp decision. Strict checks,
+Go-GC and final Docker acceptance pass; the initial intermittent Docker cleanup
+timeout remains explicitly recorded above. No physical iPad or stable deployment
+is claimed. See [validation](../validation/worker-credentials-20261106.json) and the
+[shared contract](https://github.com/kb5000/trames-runtime/blob/cb2b6209446be2b032c8c9ec759df0226e66ee0b/docs/architecture/coordination-boundaries.md#original-credentials-and-complete-permission-consumers--2026-11-06).

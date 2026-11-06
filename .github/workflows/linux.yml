@@ -1461,6 +1461,10 @@ jobs:
           python3 tests/integration/capabilities.py
         env:
           TRAMES_RUNNER: ${{ github.workspace }}/target/release/trames-run
+      - name: Validate source credential mutation and original permission consumers
+        run: |
+          bash scripts/build-worker-credentials-fixture.sh
+          python3 tests/integration/worker-credentials.py --backend interpreter --runner target/release/trames-run --fixture tests/fixtures/bin/worker-credentials --output target/worker-credentials
       - name: Compare signalfd and shared signal queues with native Linux
         run: |
           bash scripts/build-signalfd-fixtures.sh
