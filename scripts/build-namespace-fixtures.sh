@@ -12,3 +12,4 @@ mkdir -p tests/fixtures/bin
 "$compiler" -static -O2 -Wall -Wextra -Werror tests/fixtures/overlay-lifetime.c -o tests/fixtures/bin/overlay-lifetime
 
 "$compiler" -static -O2 -Wall -Wextra -Werror -pthread tests/fixtures/pid-namespaces.c -o tests/fixtures/bin/pid-namespaces
+"$compiler" -static -O2 -Wall -Wextra -Werror tests/fixtures/pid-identity.c -o tests/fixtures/bin/pid-identity

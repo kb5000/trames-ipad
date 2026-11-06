@@ -2,30 +2,41 @@
 
 ## Current status — 2026-11-06
 
-Audited executable-code baseline: `cb2b6209446be2b032c8c9ec759df0226e66ee0b`.
-The latest code batch is [stage 56, original credentials](#56-original-credentials-and-permission-consumers--2026-11-06).
-Supported ID/groups, capabilities and credential prctl now run on the calling
-worker with all captured permission consumers. Original target credentials feed
-signals, limits, scheduling, proc and family notifications directly. Mac and iPad
-share this implementation. This batch updates Mac Dev only; stable 1.5.3 and
-business environments are unchanged. Both iPad targets compile; physical iPad
-acceptance remains skipped as previously chosen.
+Runtime `4962de8d33d15b97e31d6ff61ba31ca099eec536` (stage 57) completes the supported task/image lifecycle subsystem and its original
+memory, file, identity, directory and queue dependencies. Fork/clone/vfork,
+execve/execveat and supported pure/mixed mapping scopes now execute on existing
+CPU workers. Child publication, nonleader PID replacement and detached old-mm
+retirement use original shared resources without a Kernel callback. CPU/native
+byte access takes no new task-body or registry lock.
 
-**The coordinator still exists, but ordinary admitted resource work no longer
-has to execute there.** Fork/clone/exec have removed the whole-cohort dependency,
-while retaining original-owner construction at creator-mm custody. A scoped
-handoff, a one-caller compatibility service, asynchronous collection and a full
-cohort return are different costs. Counts of migrations, tables or source files
-are not a completion percentage.
+Contended task/mm admission parks the original operation and frees its CPU slot.
+Additive anonymous mmap publishes directly while peers continue. Native executable,
+shebang and ELF-interpreter preparation uses the existing bounded disk pool,
+retaining accepted arguments and original file authority. The actual affected
+mm/group stays paused, while unrelated tasks can use that execution slot. Private
+resident namespace errors finish locally without disk/completion/owner messages.
+
+The whole batch passes local integration checks. Both runtime CI host workflows,
+the interpreter product Rust suite, both iPad compile targets, HVF/interpreter guest
+matrices and isolated Go/Docker workloads pass. The exact evidence and residual
+performance costs are recorded in [stage 57 validation](../validation/worker-task-lifecycle-20261106.json).
+Mac Dev is installed and its actual CLI passes memory/private-disk exec smoke
+checks. The stable binary is verified unchanged; business environments are not
+restarted. The iPad source pin is updated; device and simulator compile, while
+physical iPad acceptance remains skipped as previously chosen.
+
+**The coordinator still exists.** Actual shared-mm quiescence, an in-cohort
+one-caller service, asynchronous collection and a whole-cohort return have different
+costs. Counts of migrated entries or files are not a completion percentage.
 
 | Area | Current execution | Remaining boundary |
 | --- | --- | --- |
 | Admitted file/path/FD, Unix/TCP I/O and cross-resource transfer | Calling worker and original shared objects | Excluded paths/descriptors/controls and layout changes still have explicit escalation |
 | Futexes, clocks/timers, admitted event/child/signal waits and caught signals | Source execution; blocking returns the CPU slot | Legacy nonmember wake/adoption, unsupported wait resources and actual task-policy effects remain |
 | Scheduling attributes and CPU affinity | Original task atomics, original PID/group/UID authority and task-scoped completion on the caller | Tracing and actual task-policy effects retain their boundary; unsupported features keep their errno. Required original CPU slots start directly from the live queue |
-| Exit/group/default-fatal termination, STOP/CONT and vfork release | Source resources and original group/family notifications | CPU/statistics and cold Rc projections return asynchronously to the owner; cold shared-mm cleanup may need that mm's byte checkpoint |
-| fork/clone/vfork and execve/execveat | Only creator-mm actors quiesce; unrelated mms continue | The original owner still constructs/commits the task, VFS and image graph; this is not source-thread independent |
-| Mapping topology, pins and mapped-file layout | Affected mm/backing checkpoint; additive private-anonymous mmap has in-cohort publication | Owner publication remains; real excluded backing/lifetime/policy cases can require a full return |
+| Exit/group/default-fatal termination, STOP/CONT and vfork release | Source resources and original group/family notifications | CPU/statistics and cold task projections return asynchronously to the owner; cold shared-mm cleanup may need that mm's byte checkpoint |
+| fork/clone/vfork and execve/execveat | Existing workers handle pure and mixed mapping scopes, nonleader rekey and original-mm retirement; existing disk pool prepares native images without retaining a CPU slot | Affected actors still pause; actual tracing/policy and solo/host invocation remain distinct |
+| Mapping topology, pins and mapped-file layout | Supported brk/mmap/munmap/mremap/mprotect/msync/madvise and buffer-registration checkpoints publish on an existing worker; additive anonymous mmap is direct | Proc/cold-mm-only checkpoints, mapped-file layout transactions and excluded backing/lifetime/policy cases retain explicit owner boundaries |
 | Residual FD/network compatibility | Owner service inside a live cohort, where admitted | Caller waits while peers continue; refusal before effects falls back to joined handling |
 | Native libc/GPU/video/audio | Normal bodies and resource waits use calling/shared-resource paths | Exceptional mapping import, unstable entry and actual native lifecycle checks remain; AppKit affinity, device/disk pools and local fallback are not extra coordinators |
 | Dynamic proc/sys and proc pathname/FD consumers | Calling worker and original PID/mm/Files/fs/namespace resources | First cross-mm byte export and mapping invalidation use only the original mm admission boundary; legacy providers retain their explicit fallback |
@@ -42,41 +53,50 @@ the owner; ordinary epoch-member migration, parking, wakeup and child/replacemen
 admission already use the live execution queue. Single-CPU/solo execution retains
 its coordinated caller path, which does not by itself imply an extra RPC.
 
-The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/cb2b6209446be2b032c8c9ec759df0226e66ee0b/docs/architecture/coordination-boundaries.md)
+The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/4962de8d33d15b97e31d6ff61ba31ca099eec536/docs/architecture/coordination-boundaries.md)
 records scopes, actual admission gates and source locations. Earlier sections
 below are historical records and do not override this inventory.
 
-### What the latest measurements prove
+### Stage 57 measurements and final regression
 
-Stage 56 measures 256 checked credential-administration rounds per worker with
-five alternating unprofiled before/after pairs. The longest worker loop excludes
-thread creation and final join. Each round changes fs IDs, drops/restores and
-queries capabilities, verifies a denied setgid and reads the current IDs.
+| Fixed-work comparison | 4 CPUs | 12 CPUs |
+| --- | ---: | ---: |
+| Mapping + short compute, overall elapsed time | −9.1% | −24.8% |
+| Mapping + longer compute, overall elapsed time | −18.5% | −43.7% |
+| Plain vfork, end-to-end source lifecycle versus pre-source baseline | −11.0% | −14.3% |
+| Vfork with control object, same baseline | −22.9% | −24.4% |
+| Failed private-disk exec, incremental image-I/O cost | +10.5% | +6.3% |
 
-| CPUs / threads | Previous loop | Current loop | Speedup |
-| --- | ---: | ---: | ---: |
-| 1 | 4.443 ms | 3.552 ms | 1.25x |
-| 2 | 137.874 ms | 19.107 ms | 7.22x |
-| 4 | 323.613 ms | 37.179 ms | 8.70x |
-| 12 | 1977.995 ms | 92.936 ms | 21.28x |
+These are fixture results, not Firefox/Geekbench speedups. Native macOS and native
+ARM64 Linux references, exact checksums and all samples are retained. Short mapping
+work increases summed peer wall latency even while total time improves; longer
+work decreases it. Actual shared-mm pauses and startup overlap remain measurable.
+Native macOS uses 16KiB pages; the Linux guest uses 4KiB pages.
 
-This is a credential microbenchmark, not a Firefox/Geekbench or whole-container
-speedup. Original get-ID fast paths are preserved. Source conformance tests show
-zero owner-service requests or cohort returns for the exercised supported calls,
-including filtered and denied entries. The full capability/exec fixture also
-passes. All timing pairs and source hashes are in the
-[stage 56 validation](../validation/worker-credentials-20261106.json).
+The private-disk failure cost is about 2.8/1.8 microseconds per call. A short
+four-CPU control-vfork mean was dominated by a large tail; nine 256-round alternating
+pairs give plain +0.5%, control +6.3%. These residual costs remain recorded.
 
-The first Docker run timed out while cleaning up round 6. Two later baseline runs
-and three candidate runs completed eight rounds each, including the final binary.
-The initial timeout remains unattributed; passing retries do not prove that this
-intermittent lifecycle issue is fixed. The original logs are retained, and the
-stable application is not updated by this batch.
+Long nonleader exec stress found and fixed a real cancellation defect: an unfinished
+image could be mistaken for an installed replacement when the epoch stopped,
+allowing the old guest to run past exec. The pending request now explicitly retains
+its blocked syscall and accepted arguments. A deterministic before-fix failure is
+retained; the fixed test passes on both hosts. Forty hardware runs perform 512
+nonleader replacements each (20,480 total) in the previously failing private store.
+Late completion after termination cannot revive a task.
 
-Original task/image construction, structural mapping publication, excluded control
-bodies and tracing/security remain the next coordinator boundaries. The previous
-namespace-specific measurements remain in the
-[stage 55 evidence](../validation/worker-task-namespace-20261106.json).
+Final acceptance includes 369 process cases per host (three ignored), all runtime
+workspace checks on macOS/Linux, 66 lifecycle, 24 mapping and 24 private-store exec
+guest cases at 1/4/12 CPUs, thirty Go GC starts and eight isolated Docker rounds.
+The Wayland test entry needed the same type-recursion limit as existing product
+entry points to avoid a pinned-nightly compiler ICE; no production code changed.
+Its four optional graphical tests remain ignored in the default test suite.
+Unchanged guest inputs and unrelated graphical acceptance are reused.
+
+The earlier stage-56 Docker round-6 cleanup timeout remains unattributed; this
+passing run is not evidence that its cause is fixed. Remaining work is recorded
+in the table above, especially proc/cold-mm checkpoints, mapped-file layouts,
+actual policy/control bodies and generic fallback.
 
 ## Twenty-second migration implemented — worker Unix namespace controls and waits — 2026-11-03
 
@@ -957,7 +977,7 @@ and graphics checks were reused; physical iPad checks remain skipped.
 [Samples and validation](../validation/epoll-live-20261102.json),
 [fixture](../../tests/fixtures/fd-create-bench.c),
 [harness](../../tests/performance/fd-create.py), and
-[shared ownership](https://github.com/kb5000/trames-runtime/blob/main/docs/architecture/execution-backends.md#live-epoll-interests-and-worker-inotify-registration-2026-11-02)
+[shared ownership](https://github.com/kb5000/trames-runtime/blob/4962de8d33d15b97e31d6ff61ba31ca099eec536/docs/architecture/execution-backends.md#live-epoll-interests-and-worker-inotify-registration-2026-11-02)
 record the implementation and remaining boundaries.
 
 ## Eighth migration implemented — 2026-11-02
@@ -1011,7 +1031,7 @@ graphics results were reused; physical iPad testing remains skipped.
 [Samples and validation](../validation/tcp-state-controls-20261102.json),
 [fixture](../../tests/fixtures/fd-create-bench.c),
 [harness](../../tests/performance/fd-create.py), and
-[shared state ownership](https://github.com/kb5000/trames-runtime/blob/main/docs/architecture/execution-backends.md#shared-native-tcp-connection-state-and-controls-2026-11-02)
+[shared state ownership](https://github.com/kb5000/trames-runtime/blob/4962de8d33d15b97e31d6ff61ba31ca099eec536/docs/architecture/execution-backends.md#shared-native-tcp-connection-state-and-controls-2026-11-02)
 record this stage. Socket factory/full close ownership and the remaining
 connection/accept controls are still next, followed by epoll and task/signal
 ownership. The small lifecycle owner loop remains deliberate.
@@ -1086,7 +1106,7 @@ binary; existing sessions keep their old executable until restarted.
 [Samples, hashes and validation](../validation/tcp-close-20261102.json),
 the [session/control fixture](../../tests/fixtures/fd-create-bench.c),
 [comparison harness](../../tests/performance/fd-create.py), and shared
-[ownership design](https://github.com/kb5000/trames-runtime/blob/main/docs/architecture/execution-backends.md#quiescent-connected-tcp-close-2026-11-02)
+[ownership design](https://github.com/kb5000/trames-runtime/blob/4962de8d33d15b97e31d6ff61ba31ca099eec536/docs/architecture/execution-backends.md#quiescent-connected-tcp-close-2026-11-02)
 record reproduction and remaining scope. Creation, stateful network controls and
 broader close ownership remain the next migration work.
 
@@ -1159,8 +1179,8 @@ remains skipped. The installed Mac development app contains the measured binary;
 existing sessions keep their prior executable until restarted.
 
 [Samples, reviewed source hashes and validation](../validation/socket-control-direct-20261102.json),
-the shared [control design](https://github.com/kb5000/trames-runtime/blob/main/docs/architecture/execution-backends.md#direct-native-tcp-controls-2026-11-02),
-and [native implementation](https://github.com/kb5000/trames-runtime/blob/main/crates/trames-net/src/native/control.rs)
+the shared [control design](https://github.com/kb5000/trames-runtime/blob/4962de8d33d15b97e31d6ff61ba31ca099eec536/docs/architecture/execution-backends.md#direct-native-tcp-controls-2026-11-02),
+and [native implementation](https://github.com/kb5000/trames-runtime/blob/4962de8d33d15b97e31d6ff61ba31ca099eec536/crates/trames-net/src/native/control.rs)
 record the reviewed behavior and remaining scope.
 
 ## Fifth migration implemented — 2026-11-02
@@ -1222,7 +1242,7 @@ skipped. Mac's installed development app contains the measured binary; existing
 sessions keep their old executable until restarted.
 
 [Raw samples, hashes and validation](../validation/socket-idle-close-20261102.json)
-and the shared [Files/close design](https://github.com/kb5000/trames-runtime/blob/main/docs/architecture/execution-backends.md#idle-tcp-close-and-live-files-identity-2026-11-02)
+and the shared [Files/close design](https://github.com/kb5000/trames-runtime/blob/4962de8d33d15b97e31d6ff61ba31ca099eec536/docs/architecture/execution-backends.md#idle-tcp-close-and-live-files-identity-2026-11-02)
 record reproduction and the remaining boundary.
 
 ## Fourth migration implemented — 2026-11-02
@@ -1292,7 +1312,7 @@ current executable until restarted.
 [Samples, hashes and validation](../validation/socket-control-20261102.json),
 the [fixture](../../tests/fixtures/fd-create-bench.c),
 [comparison harness](../../tests/performance/fd-create.py), and shared
-[ownership design](https://github.com/kb5000/trames-runtime/blob/main/docs/architecture/execution-backends.md#live-tcp-publication-and-short-socket-services-2026-11-02)
+[ownership design](https://github.com/kb5000/trames-runtime/blob/4962de8d33d15b97e31d6ff61ba31ca099eec536/docs/architecture/execution-backends.md#live-tcp-publication-and-short-socket-services-2026-11-02)
 record the result and remaining boundaries.
 
 ## Third migration implemented — 2026-11-02
@@ -1349,7 +1369,7 @@ development app contains the measured binary.
 [Samples, hashes, native references and validation](../validation/descriptor-create-20261102.json),
 the [fixed-work fixture](../../tests/fixtures/fd-create-bench.c) and
 [comparison harness](../../tests/performance/fd-create.py) record reproduction.
-The shared [execution design](https://github.com/kb5000/trames-runtime/blob/main/docs/architecture/execution-backends.md#worker-anonymous-resource-creation-2026-11-02)
+The shared [execution design](https://github.com/kb5000/trames-runtime/blob/4962de8d33d15b97e31d6ff61ba31ca099eec536/docs/architecture/execution-backends.md#worker-anonymous-resource-creation-2026-11-02)
 documents ownership and publication. Epoll/watch state, sockets/connect/accept/
 SCM_RIGHTS, inotify add-watch control, signalfd/task masks and signal-producing
 pipe operations retain their existing owner boundaries, alongside structural VM
@@ -1406,7 +1426,7 @@ The harness also runs a Linux/macOS native-only reference.
 At this second checkpoint, `O_TRUNC` opens, directory cursors and mutations, lower-overlay
 files, special endpoints, pipe/socket/accept/event/timer creation, signal/task
 state, structural VM changes and native-device registration still had owner
-boundaries. The shared [execution design](https://github.com/kb5000/trames-runtime/blob/main/docs/architecture/execution-backends.md#worker-regular-file-opens-and-publication-2026-11-02)
+boundaries. The shared [execution design](https://github.com/kb5000/trames-runtime/blob/4962de8d33d15b97e31d6ff61ba31ca099eec536/docs/architecture/execution-backends.md#worker-regular-file-opens-and-publication-2026-11-02)
 records the publication and ownership rules. No coordinator/resource thread or
 polling bus was added.
 
@@ -1423,7 +1443,7 @@ without being evaluated twice. No extra execution/resource thread is added.
 
 The ownership proof and remaining epoch boundary for root/cwd/mount/credential
 changes are documented in the shared runtime's
-[execution design](https://github.com/kb5000/trames-runtime/blob/main/docs/architecture/execution-backends.md#worker-pathname-metadata-2026-11-02).
+[execution design](https://github.com/kb5000/trames-runtime/blob/4962de8d33d15b97e31d6ff61ba31ca099eec536/docs/architecture/execution-backends.md#worker-pathname-metadata-2026-11-02).
 Dynamic proc/sys/dev endpoints and unsupported control descriptors still defer.
 At this first checkpoint, open/create, directory mutations, full FD publication,
 signal/task state and structural VM ownership remained subsequent stages.
@@ -1507,13 +1527,13 @@ normal execution acquires no new profiling counters, checks or barriers.
 | Host control, PTY resize/hangup/signals, systemd/session lifecycle and memory pressure | `cohort_control` and the product adapter poll/dispatch actual changes. Real signals, timer expiry, foreground group changes or stop requests can request a join. | Keep a small session control loop; publish targeted task/domain events so unrelated workers continue. Eliminating this loop's existence is less useful than eliminating its data-path responsibility. |
 
 Source anchors in the shared runtime:
-[worker admission](https://github.com/kb5000/trames-runtime/blob/main/crates/trames-session/src/worker_syscalls.rs),
-[worker execution](https://github.com/kb5000/trames-runtime/blob/main/crates/trames-session/src/workers.rs),
-[process owner and dispatch](https://github.com/kb5000/trames-runtime/blob/main/crates/trames-session/src/process.rs),
-[VM/control boundaries](https://github.com/kb5000/trames-runtime/blob/main/crates/trames-session/src/process_vm.rs),
-[remaining services](https://github.com/kb5000/trames-runtime/blob/main/crates/trames-session/src/process_service.rs),
-[shared direct I/O](https://github.com/kb5000/trames-runtime/blob/main/crates/trames-linux/src/direct.rs),
-[file captures](https://github.com/kb5000/trames-runtime/blob/main/crates/trames-vfs/src/file_io.rs).
+[worker admission](https://github.com/kb5000/trames-runtime/blob/4962de8d33d15b97e31d6ff61ba31ca099eec536/crates/trames-session/src/worker_syscalls.rs),
+[worker execution](https://github.com/kb5000/trames-runtime/blob/4962de8d33d15b97e31d6ff61ba31ca099eec536/crates/trames-session/src/workers.rs),
+[process owner and dispatch](https://github.com/kb5000/trames-runtime/blob/4962de8d33d15b97e31d6ff61ba31ca099eec536/crates/trames-session/src/process.rs),
+[VM/control boundaries](https://github.com/kb5000/trames-runtime/blob/4962de8d33d15b97e31d6ff61ba31ca099eec536/crates/trames-session/src/process_vm.rs),
+[remaining services](https://github.com/kb5000/trames-runtime/blob/4962de8d33d15b97e31d6ff61ba31ca099eec536/crates/trames-session/src/process_service.rs),
+[shared direct I/O](https://github.com/kb5000/trames-runtime/blob/4962de8d33d15b97e31d6ff61ba31ca099eec536/crates/trames-linux/src/direct.rs),
+[file captures](https://github.com/kb5000/trames-runtime/blob/4962de8d33d15b97e31d6ff61ba31ca099eec536/crates/trames-vfs/src/file_io.rs).
 
 ### Current measurements
 
@@ -4010,3 +4030,11 @@ Go-GC and final Docker acceptance pass; the initial intermittent Docker cleanup
 timeout remains explicitly recorded above. No physical iPad or stable deployment
 is claimed. See [validation](../validation/worker-credentials-20261106.json) and the
 [shared contract](https://github.com/kb5000/trames-runtime/blob/cb2b6209446be2b032c8c9ec759df0226e66ee0b/docs/architecture/coordination-boundaries.md#original-credentials-and-complete-permission-consumers--2026-11-06).
+
+## 57. Original task/image lifecycle and mapping dependencies — 2026-11-06
+
+This batch moves the complete supported construction/replacement subsystem and its
+original-resource dependencies together. The current inventory and measurements
+at the top of this document supersede stage-56 lifecycle boundaries. See the
+[shared implementation audit](https://github.com/kb5000/trames-runtime/blob/4962de8d33d15b97e31d6ff61ba31ca099eec536/docs/architecture/coordination-boundaries.md#57-original-taskimage-lifecycle-and-mapping-dependencies--2026-11-06)
+and [exact validation record](../validation/worker-task-lifecycle-20261106.json).

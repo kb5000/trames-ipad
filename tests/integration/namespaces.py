@@ -44,6 +44,14 @@ with tempfile.TemporaryDirectory(prefix='trames-namespaces-') as folder:
             b'pid: clone hierarchy, proc mount views, signals/waitid, threads, orphan adoption and init shutdown: ok\n'
             b'pid: unshare/setns child-only semantics, dead namespace rejection and subreaper: ok\n'), (cpus, result.returncode, result.stdout, result.stderr[-8000:])
         print(f'{cpus}-CPU guest PID hierarchy, proc views, signals/waits, threads, init shutdown and subreaper passed', flush=True)
+    for cpus in ('1', '4', '12'):
+        result = subprocess.run([RUNNER, '--storage', str(Path(folder)/('pid-identity-'+cpus)), '--cpus', cpus,
+            '--network', 'off', '--max-instructions', '1000000000',
+            '--exec-file', f"/pid-identity={ROOT/'tests/fixtures/bin/pid-identity'}", '--guest', '/pid-identity'],
+            capture_output=True, timeout=90)
+        assert result.returncode == 0 and result.stdout == b'{"case":"pid-identity","passed":true}\n', (
+            cpus, result.returncode, result.stdout, result.stderr[-8000:])
+        print(f'{cpus}-CPU retained signal sender and surviving PGID/SID identity passed', flush=True)
     command = [RUNNER, '--storage', str(Path(folder)/'busybox'), '--network', 'off',
                '--rootfs', str(ROOT/'target/alpine-download/alpine-minirootfs-3.22.6-aarch64.tar.gz'),
                '--exec-file', f"/jail/bin/sh={ROOT/'target/busybox-build/busybox'}",

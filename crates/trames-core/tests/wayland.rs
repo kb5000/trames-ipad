@@ -1,4 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+// Match the product entry points when monomorphizing the retained task graph.
+#![recursion_limit = "512"]
 //! Real, Alpine-signed, unmodified ARM64 Wayland clients inside the guest.
 //! This headless sink checks protocol, pixels and text state, not Apple rendering.
 use std::{
