@@ -1,0 +1,5243 @@
+{
+  "schema": 1,
+  "date": "2026-11-07",
+  "stage": 63,
+  "recorded_at": "2026-11-06T19:25:38.720674+00:00",
+  "runtime_revision": "0c2adca6acb919750007eb97aa686e8a06f555a8",
+  "baseline_runtime_revision": "a4c1f20115757f72c6a023b81b9b13aa791db90f",
+  "global_coordinator_removal_complete": false,
+  "scope": [
+    "getrandom shared source/solo ABI and original memory access",
+    "Original random/urandom OFD control errors and complete supported device/UUID consumers"
+  ],
+  "implementation": [
+    "Calling worker invokes the existing host CSPRNG through the same CpuMemory permission/preflight/write implementation as solo execution",
+    "No guest entropy pool, extra policy, fence, global lock, resource/service thread or polling bus",
+    "32-bit flags consume register low bits; supported flags 0..3 and existing 1 MiB transfer bound remain",
+    "Original whole-output preflight and conservative cross-fault EFAULT semantics remain; NULL zero-length succeeds while out-of-range zero-length pointers remain EFAULT",
+    "Random-device controls preserve ENOTTY/EBADF on one original OFD without consuming unused guest pointer arguments; FIONBIO/FIOASYNC retain their original flag/subscription implementations",
+    "Descriptor replacement cannot redirect an accepted original OFD; other inode kinds do not inherit entropy behavior",
+    "Loader/ASLR entropy, device scalar/vector/positioned bytes, nonblocking status, poll and UUID/boot_id share their original host CSPRNG/resource implementations"
+  ],
+  "source_files": {
+    "crates/trames-linux/src/direct.rs": "57b8ac5aae836e2a40680c54516cc3ac9dccd7ad6c87116dfdffcfa6dbce7781",
+    "crates/trames-linux/src/entropy.rs": "0ef0ecece991a46217e08f28e808aa425013417c6ab8d607b3ea40160c304f04",
+    "crates/trames-linux/src/lib.rs": "6710b4b4fffc0a34158bcb0783894eda2eea1d281e46ead205e99cb93ced7ea5",
+    "crates/trames-linux/src/state.rs": "1fed6d3a7acb9217b76fffb2751e77ad9a0dc3505f2e874bae82be3c66fe55c8",
+    "crates/trames-session/src/process_seccomp.rs": "566fd0304e00b5b428c5d74ca58e3acbfbb67df4d8a94e9f48ce6bdafa447083",
+    "crates/trames-session/src/process_vm.rs": "98dcb54ebc4ca52601caa287f6bbab6b2476d78e17d5fa30bf13a15586f3defd",
+    "crates/trames-session/src/worker_syscalls.rs": "7173ce84828fa4cbaadb2ee3bb60aa22019f59775953eaf92271aa26a7d1de27",
+    "crates/trames-vfs/src/direct_io.rs": "d69f7909d23c95aa4efdb8dc26f3b951916097f2eb018b37793339671e88f038",
+    "docs/architecture/coordination-boundaries.md": "b4665eed347e63b66958a150d0320ce6dfd76358042396e7972dd35388014150"
+  },
+  "fixture": {
+    "path": "tests/fixtures/worker-entropy.c",
+    "sha256": "a8f4e0384d1395487a9077b8bb36a55b3bf011e8ee7b83a4a5963bf99863a911",
+    "linux_binary_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+  },
+  "acceptance": {
+    "runtime_macos": {
+      "path": "target/entropy-subsystem/runtime-macos-ci/summary.json",
+      "sha256": "398b5e1a1208d6bd9eb23678b2ffcae1328881fb0a0d18be42853939336cd621",
+      "adaptations": [],
+      "completed": true,
+      "context": {
+        "machine": "arm64",
+        "packages": "27.0.1",
+        "platform": "macOS-27.0.1-arm64-arm-64bit",
+        "rustc": "rustc 1.101.0-nightly (4ebd25825 2026-10-15)\nbinary: rustc\ncommit-hash: 4ebd258257737d5b7635c116fa7d281627a7e937\ncommit-date: 2026-10-15\nhost: aarch64-apple-darwin\nrelease: 1.101.0-nightly\nLLVM version: 23.1.4\n"
+      },
+      "job": "verify",
+      "local_actions": {
+        "cache": "Persistent local target directories.",
+        "checkout": "Isolated local source snapshot; source-state records HEAD and actual file hashes.",
+        "toolchain": "Provisioned pinned Rust toolchain, components and targets; rustc recorded above.",
+        "upload-artifact": "Logs and generated artifacts remain in the local checkout/output directory."
+      },
+      "runner_sha256": "a5a510c2e0c900e19d59e1d398f1361f814887498606b241d857615ca5f0321c",
+      "steps": [
+        {
+          "index": 1,
+          "name": "rustup show",
+          "status": "passed",
+          "exit_code": 0,
+          "seconds": 0.03422379493713379
+        },
+        {
+          "index": 2,
+          "name": "python3 scripts/check-execution-boundaries.py",
+          "status": "passed",
+          "exit_code": 0,
+          "seconds": 0.16558623313903809
+        },
+        {
+          "index": 3,
+          "name": "cargo fmt --all --check",
+          "status": "passed",
+          "exit_code": 0,
+          "seconds": 1.2039778232574463
+        },
+        {
+          "index": 4,
+          "name": "cargo clippy --workspace --all-targets --all-features --locked -- -D warnings",
+          "status": "passed",
+          "exit_code": 0,
+          "seconds": 6.083003759384155
+        },
+        {
+          "index": 5,
+          "name": "cargo test --workspace --all-features --locked",
+          "status": "passed",
+          "exit_code": 0,
+          "seconds": 20.9879469871521
+        },
+        {
+          "index": 6,
+          "name": "cargo build --workspace --all-features --release --locked",
+          "status": "passed",
+          "exit_code": 0,
+          "seconds": 8.861702919006348
+        },
+        {
+          "index": 7,
+          "name": "cargo run --release -p trames-memory --example reclaim-footprint --locked",
+          "status": "passed",
+          "exit_code": 0,
+          "seconds": 0.34956979751586914
+        }
+      ],
+      "workflow": ".github/workflows/runtime.yml",
+      "logs": [
+        {
+          "path": "target/entropy-subsystem/runtime-macos-ci/step-01.log",
+          "sha256": "a4a6a2e77ce93e216ac1bdd7f0ebd4b7a240da4f7d0028afbfa1ad91641dc56c"
+        },
+        {
+          "path": "target/entropy-subsystem/runtime-macos-ci/step-02.log",
+          "sha256": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651"
+        },
+        {
+          "path": "target/entropy-subsystem/runtime-macos-ci/step-03.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "target/entropy-subsystem/runtime-macos-ci/step-04.log",
+          "sha256": "b8f3c860169581f07c685e1e5877d3d4bbc4f57f90afc350949836c052a79263"
+        },
+        {
+          "path": "target/entropy-subsystem/runtime-macos-ci/step-05.log",
+          "sha256": "8504450627762b03c2d4ef0b7a9dbbd5262f3bdf84b21a3737be7ee3fcd316d2"
+        },
+        {
+          "path": "target/entropy-subsystem/runtime-macos-ci/step-06.log",
+          "sha256": "c90f301b404e57ea148bb7dfa883be5bf33e0209a0f2b3b24836613ea2c8e436"
+        },
+        {
+          "path": "target/entropy-subsystem/runtime-macos-ci/step-07.log",
+          "sha256": "63317929100896504732cc5eafc804aad0e8481b3918952f5190471bd9f563c7"
+        }
+      ]
+    },
+    "runtime_linux": {
+      "path": "target/local-ci/io/entropy-subsystem/runtime-linux-ci/summary.json",
+      "sha256": "42886f93cdc225f8fca7c766b5ad968c7186dfba73887f4335a6a51276155bab",
+      "adaptations": [
+        "Native ARM64 CLI and musl test executables; pinned QEMU remains the instruction oracle.",
+        "ThreadSanitizer target follows the ARM64 Linux host instead of hosted x86_64."
+      ],
+      "completed": true,
+      "context": {
+        "machine": "aarch64",
+        "packages": "363b68bfd79931eb35722a52c1a67ecbdddf646805ce787fbeb35a4a0027a7f4",
+        "platform": "Linux-7.0.0-38-generic-aarch64-with-glibc2.39",
+        "rustc": "rustc 1.101.0-nightly (4ebd25825 2026-10-15)\nbinary: rustc\ncommit-hash: 4ebd258257737d5b7635c116fa7d281627a7e937\ncommit-date: 2026-10-15\nhost: aarch64-unknown-linux-gnu\nrelease: 1.101.0-nightly\nLLVM version: 23.1.4\n"
+      },
+      "job": "verify",
+      "local_actions": {
+        "cache": "Persistent local target directories.",
+        "checkout": "Isolated local source snapshot; source-state records HEAD and actual file hashes.",
+        "toolchain": "Provisioned pinned Rust toolchain, components and targets; rustc recorded above.",
+        "upload-artifact": "Logs and generated artifacts remain in the local checkout/output directory."
+      },
+      "runner_sha256": "a5a510c2e0c900e19d59e1d398f1361f814887498606b241d857615ca5f0321c",
+      "steps": [
+        {
+          "index": 1,
+          "name": "rustup show",
+          "status": "passed",
+          "exit_code": 0,
+          "seconds": 0.015008926391601562
+        },
+        {
+          "index": 2,
+          "name": "python3 scripts/check-execution-boundaries.py",
+          "status": "passed",
+          "exit_code": 0,
+          "seconds": 0.08304142951965332
+        },
+        {
+          "index": 3,
+          "name": "cargo fmt --all --check",
+          "status": "passed",
+          "exit_code": 0,
+          "seconds": 0.9202103614807129
+        },
+        {
+          "index": 4,
+          "name": "cargo clippy --workspace --all-targets --all-features --locked -- -D warnings",
+          "status": "passed",
+          "exit_code": 0,
+          "seconds": 3.9750752449035645
+        },
+        {
+          "index": 5,
+          "name": "cargo test --workspace --all-features --locked",
+          "status": "passed",
+          "exit_code": 0,
+          "seconds": 20.655739784240723
+        },
+        {
+          "index": 6,
+          "name": "cargo build --workspace --all-features --release --locked",
+          "status": "passed",
+          "exit_code": 0,
+          "seconds": 6.488459348678589
+        },
+        {
+          "index": 7,
+          "name": "cargo run --release -p trames-memory --example reclaim-footprint --locked",
+          "status": "passed",
+          "exit_code": 0,
+          "seconds": 0.1725618839263916
+        }
+      ],
+      "workflow": ".github/workflows/runtime.yml",
+      "logs": [
+        {
+          "path": "target/local-ci/io/entropy-subsystem/runtime-linux-ci/step-01.log",
+          "sha256": "72636920b473812425175422544a88a230699115a474bc30d039719194f48644"
+        },
+        {
+          "path": "target/local-ci/io/entropy-subsystem/runtime-linux-ci/step-02.log",
+          "sha256": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651"
+        },
+        {
+          "path": "target/local-ci/io/entropy-subsystem/runtime-linux-ci/step-03.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "target/local-ci/io/entropy-subsystem/runtime-linux-ci/step-04.log",
+          "sha256": "22eacb5c665431b19cf5a08448f6a607a03d382f0f4604b396ddaed229dded42"
+        },
+        {
+          "path": "target/local-ci/io/entropy-subsystem/runtime-linux-ci/step-05.log",
+          "sha256": "0205cf40151bdf0fc21da83407c6d510cbaa94c61ee8654302c7c8d8b5d835f3"
+        },
+        {
+          "path": "target/local-ci/io/entropy-subsystem/runtime-linux-ci/step-06.log",
+          "sha256": "86059d4bb3d1bc7c45f6ca3eed6443e39ace4cfe5fc21ef29b8664b0db0d290f"
+        },
+        {
+          "path": "target/local-ci/io/entropy-subsystem/runtime-linux-ci/step-07.log",
+          "sha256": "f0452b2db8d3dd18ac4752267cca6a3379b7534e368905c8b47dfaf0c147a774"
+        }
+      ]
+    },
+    "process_macos": {
+      "passed": 402,
+      "failed": 0,
+      "ignored": 3,
+      "log": {
+        "path": "target/entropy-subsystem/process-final.log",
+        "sha256": "3be844101c944a793898cd9f71ae01f6bee11b0f6ab597982f5c352b439cb489"
+      }
+    },
+    "process_linux": {
+      "passed": 402,
+      "failed": 0,
+      "ignored": 3,
+      "log": {
+        "path": "target/local-ci/io/entropy-subsystem/process-all.log",
+        "sha256": "37117c6eab2693aaefffc364711148ef462f5ace26b8e58e6be15abda18d8e5c"
+      }
+    },
+    "final_affected_macos": {
+      "path": "target/entropy-subsystem/source-accepted.log",
+      "sha256": "5a55d7522083c9f07564670bfd324b9747dac7b28688184a58798ee9e75f7afc"
+    },
+    "final_affected_linux": {
+      "log": {
+        "path": "target/local-ci/io/entropy-subsystem/process-entropy-final.log",
+        "sha256": "644f323fa60b31dbf765be4903636f996275617c91017847b8276beda0c1592b"
+      },
+      "source": {
+        "path": "target/local-ci/io/entropy-subsystem/results.json",
+        "sha256": "4b06947d54e73c4697176809eb4dd44b75f7eb7af4ac97980d0ac808f3e811b6",
+        "data": {
+          "source_sha256": {
+            "runtime/crates/trames-linux/src/direct.rs": "57b8ac5aae836e2a40680c54516cc3ac9dccd7ad6c87116dfdffcfa6dbce7781",
+            "runtime/crates/trames-linux/src/lib.rs": "6710b4b4fffc0a34158bcb0783894eda2eea1d281e46ead205e99cb93ced7ea5",
+            "runtime/crates/trames-linux/src/state.rs": "1fed6d3a7acb9217b76fffb2751e77ad9a0dc3505f2e874bae82be3c66fe55c8",
+            "runtime/crates/trames-session/src/process_seccomp.rs": "566fd0304e00b5b428c5d74ca58e3acbfbb67df4d8a94e9f48ce6bdafa447083",
+            "runtime/crates/trames-session/src/process_vm.rs": "98dcb54ebc4ca52601caa287f6bbab6b2476d78e17d5fa30bf13a15586f3defd",
+            "runtime/crates/trames-session/src/worker_syscalls.rs": "7173ce84828fa4cbaadb2ee3bb60aa22019f59775953eaf92271aa26a7d1de27",
+            "runtime/crates/trames-vfs/src/direct_io.rs": "d69f7909d23c95aa4efdb8dc26f3b951916097f2eb018b37793339671e88f038",
+            "runtime/crates/trames-linux/src/entropy.rs": "0ef0ecece991a46217e08f28e808aa425013417c6ab8d607b3ea40160c304f04",
+            "tests/fixtures/worker-entropy.c": "a8f4e0384d1395487a9077b8bb36a55b3bf011e8ee7b83a4a5963bf99863a911",
+            "scripts/run-local-ci.py": "a5a510c2e0c900e19d59e1d398f1361f814887498606b241d857615ca5f0321c"
+          },
+          "checks": [
+            {
+              "name": "process-entropy-final",
+              "code": 0,
+              "seconds": 4.857037562999949
+            }
+          ]
+        }
+      }
+    },
+    "core_strict_clippy_macos": {
+      "path": "target/entropy-subsystem/core-clippy-accepted.log",
+      "sha256": "16099a741e309c55cbe11ffa15df79da6547d5f1e46e32d6fd03eb4e1f3c5857"
+    },
+    "core_strict_clippy_linux": {
+      "path": "target/local-ci/io/entropy-subsystem/core-clippy.log",
+      "sha256": "448bce4ef36ff410dd17f3c71f34c6a27a6fc6f55d28fa38556a9224ed85eca3"
+    },
+    "production_prefixes_unchanged_since_baseline": {
+      "crates/trames-session/src/process_seccomp.rs": "97d75e7fbe66ccae8a833bc9d7ade51669195945996a0334369631044ce6674f",
+      "crates/trames-session/src/process_vm.rs": "8b2df8f632a402fbf2d824711495423a6e87bd070e90ede9d090c814eeaebf9f"
+    },
+    "ipad_compile": {
+      "path": "target/entropy-subsystem/ipad-checks.json",
+      "sha256": "cdc8829a61446e15f8a3a168e6c6e4c907eb956b4b40394ac49c89534faaab14",
+      "data": [
+        {
+          "target": "aarch64-apple-ios",
+          "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+          "code": 0
+        },
+        {
+          "target": "aarch64-apple-ios-sim",
+          "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk",
+          "code": 0
+        }
+      ],
+      "logs": [
+        {
+          "path": "target/entropy-subsystem/aarch64-apple-ios-check.log",
+          "sha256": "a246453f633b0b1d1a1afe34e914737eb1abdfe576918b5b4e16dad31bc2225d"
+        },
+        {
+          "path": "target/entropy-subsystem/aarch64-apple-ios-sim-check.log",
+          "sha256": "1b098f44a91c802a04467da237fa2bc7f207ba166cc88390bad617a1cc920601"
+        }
+      ]
+    },
+    "guest_matrix": {
+      "path": "target/entropy-subsystem/guest/results.json",
+      "sha256": "00810ee75f8114e9141883b178fe4f06d2c509851572f11e8c566a53b3d5fa39",
+      "data": [
+        {
+          "case": "hvf-1-0-0",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.432226,
+          "command": [
+            "/Users/main/dev/trames/target/mount-subsystem/mac/target/release/trames-mac-run",
+            "--cpus",
+            "1",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "1",
+            "10",
+            "0",
+            "0"
+          ],
+          "runner_sha256": "bac86c81836bc5c646674f0d18bd6ee7a0916a41fd135034d7d425779807968d",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "hvf-1-0-1",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.02386887500000001,
+          "command": [
+            "/Users/main/dev/trames/target/mount-subsystem/mac/target/release/trames-mac-run",
+            "--cpus",
+            "1",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "1",
+            "10",
+            "0",
+            "1"
+          ],
+          "runner_sha256": "bac86c81836bc5c646674f0d18bd6ee7a0916a41fd135034d7d425779807968d",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "hvf-1-0-2",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.024169500000000066,
+          "command": [
+            "/Users/main/dev/trames/target/mount-subsystem/mac/target/release/trames-mac-run",
+            "--cpus",
+            "1",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "1",
+            "10",
+            "0",
+            "2"
+          ],
+          "runner_sha256": "bac86c81836bc5c646674f0d18bd6ee7a0916a41fd135034d7d425779807968d",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "hvf-1-1-0",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.021782958999999935,
+          "command": [
+            "/Users/main/dev/trames/target/mount-subsystem/mac/target/release/trames-mac-run",
+            "--cpus",
+            "1",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "1",
+            "10",
+            "1",
+            "0"
+          ],
+          "runner_sha256": "bac86c81836bc5c646674f0d18bd6ee7a0916a41fd135034d7d425779807968d",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "hvf-1-1-1",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.010223125,
+          "command": [
+            "/Users/main/dev/trames/target/mount-subsystem/mac/target/release/trames-mac-run",
+            "--cpus",
+            "1",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "1",
+            "10",
+            "1",
+            "1"
+          ],
+          "runner_sha256": "bac86c81836bc5c646674f0d18bd6ee7a0916a41fd135034d7d425779807968d",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "hvf-1-1-2",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.011704249999999972,
+          "command": [
+            "/Users/main/dev/trames/target/mount-subsystem/mac/target/release/trames-mac-run",
+            "--cpus",
+            "1",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "1",
+            "10",
+            "1",
+            "2"
+          ],
+          "runner_sha256": "bac86c81836bc5c646674f0d18bd6ee7a0916a41fd135034d7d425779807968d",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "hvf-1-2-0",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.010892833000000102,
+          "command": [
+            "/Users/main/dev/trames/target/mount-subsystem/mac/target/release/trames-mac-run",
+            "--cpus",
+            "1",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "1",
+            "10",
+            "2",
+            "0"
+          ],
+          "runner_sha256": "bac86c81836bc5c646674f0d18bd6ee7a0916a41fd135034d7d425779807968d",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "hvf-1-2-1",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.011131917000000047,
+          "command": [
+            "/Users/main/dev/trames/target/mount-subsystem/mac/target/release/trames-mac-run",
+            "--cpus",
+            "1",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "1",
+            "10",
+            "2",
+            "1"
+          ],
+          "runner_sha256": "bac86c81836bc5c646674f0d18bd6ee7a0916a41fd135034d7d425779807968d",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "hvf-1-2-2",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.01182079200000008,
+          "command": [
+            "/Users/main/dev/trames/target/mount-subsystem/mac/target/release/trames-mac-run",
+            "--cpus",
+            "1",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "1",
+            "10",
+            "2",
+            "2"
+          ],
+          "runner_sha256": "bac86c81836bc5c646674f0d18bd6ee7a0916a41fd135034d7d425779807968d",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "hvf-4-0-0",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.020777374999999987,
+          "command": [
+            "/Users/main/dev/trames/target/mount-subsystem/mac/target/release/trames-mac-run",
+            "--cpus",
+            "4",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "4",
+            "10",
+            "0",
+            "0"
+          ],
+          "runner_sha256": "bac86c81836bc5c646674f0d18bd6ee7a0916a41fd135034d7d425779807968d",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "hvf-4-0-1",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.021985917000000077,
+          "command": [
+            "/Users/main/dev/trames/target/mount-subsystem/mac/target/release/trames-mac-run",
+            "--cpus",
+            "4",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "4",
+            "10",
+            "0",
+            "1"
+          ],
+          "runner_sha256": "bac86c81836bc5c646674f0d18bd6ee7a0916a41fd135034d7d425779807968d",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "hvf-4-0-2",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.011880040999999952,
+          "command": [
+            "/Users/main/dev/trames/target/mount-subsystem/mac/target/release/trames-mac-run",
+            "--cpus",
+            "4",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "4",
+            "10",
+            "0",
+            "2"
+          ],
+          "runner_sha256": "bac86c81836bc5c646674f0d18bd6ee7a0916a41fd135034d7d425779807968d",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "hvf-4-1-0",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.011610458999999906,
+          "command": [
+            "/Users/main/dev/trames/target/mount-subsystem/mac/target/release/trames-mac-run",
+            "--cpus",
+            "4",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "4",
+            "10",
+            "1",
+            "0"
+          ],
+          "runner_sha256": "bac86c81836bc5c646674f0d18bd6ee7a0916a41fd135034d7d425779807968d",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "hvf-4-1-1",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.019367415999999915,
+          "command": [
+            "/Users/main/dev/trames/target/mount-subsystem/mac/target/release/trames-mac-run",
+            "--cpus",
+            "4",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "4",
+            "10",
+            "1",
+            "1"
+          ],
+          "runner_sha256": "bac86c81836bc5c646674f0d18bd6ee7a0916a41fd135034d7d425779807968d",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "hvf-4-1-2",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.020750500000000005,
+          "command": [
+            "/Users/main/dev/trames/target/mount-subsystem/mac/target/release/trames-mac-run",
+            "--cpus",
+            "4",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "4",
+            "10",
+            "1",
+            "2"
+          ],
+          "runner_sha256": "bac86c81836bc5c646674f0d18bd6ee7a0916a41fd135034d7d425779807968d",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "hvf-4-2-0",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.022536375000000053,
+          "command": [
+            "/Users/main/dev/trames/target/mount-subsystem/mac/target/release/trames-mac-run",
+            "--cpus",
+            "4",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "4",
+            "10",
+            "2",
+            "0"
+          ],
+          "runner_sha256": "bac86c81836bc5c646674f0d18bd6ee7a0916a41fd135034d7d425779807968d",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "hvf-4-2-1",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.023268625000000043,
+          "command": [
+            "/Users/main/dev/trames/target/mount-subsystem/mac/target/release/trames-mac-run",
+            "--cpus",
+            "4",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "4",
+            "10",
+            "2",
+            "1"
+          ],
+          "runner_sha256": "bac86c81836bc5c646674f0d18bd6ee7a0916a41fd135034d7d425779807968d",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "hvf-4-2-2",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.022781834,
+          "command": [
+            "/Users/main/dev/trames/target/mount-subsystem/mac/target/release/trames-mac-run",
+            "--cpus",
+            "4",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "4",
+            "10",
+            "2",
+            "2"
+          ],
+          "runner_sha256": "bac86c81836bc5c646674f0d18bd6ee7a0916a41fd135034d7d425779807968d",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "hvf-12-0-0",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.022029333999999956,
+          "command": [
+            "/Users/main/dev/trames/target/mount-subsystem/mac/target/release/trames-mac-run",
+            "--cpus",
+            "12",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "12",
+            "10",
+            "0",
+            "0"
+          ],
+          "runner_sha256": "bac86c81836bc5c646674f0d18bd6ee7a0916a41fd135034d7d425779807968d",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "hvf-12-0-1",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.023881625000000017,
+          "command": [
+            "/Users/main/dev/trames/target/mount-subsystem/mac/target/release/trames-mac-run",
+            "--cpus",
+            "12",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "12",
+            "10",
+            "0",
+            "1"
+          ],
+          "runner_sha256": "bac86c81836bc5c646674f0d18bd6ee7a0916a41fd135034d7d425779807968d",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "hvf-12-0-2",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.019837541999999986,
+          "command": [
+            "/Users/main/dev/trames/target/mount-subsystem/mac/target/release/trames-mac-run",
+            "--cpus",
+            "12",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "12",
+            "10",
+            "0",
+            "2"
+          ],
+          "runner_sha256": "bac86c81836bc5c646674f0d18bd6ee7a0916a41fd135034d7d425779807968d",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "hvf-12-1-0",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.02262145800000004,
+          "command": [
+            "/Users/main/dev/trames/target/mount-subsystem/mac/target/release/trames-mac-run",
+            "--cpus",
+            "12",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "12",
+            "10",
+            "1",
+            "0"
+          ],
+          "runner_sha256": "bac86c81836bc5c646674f0d18bd6ee7a0916a41fd135034d7d425779807968d",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "hvf-12-1-1",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.02254350000000005,
+          "command": [
+            "/Users/main/dev/trames/target/mount-subsystem/mac/target/release/trames-mac-run",
+            "--cpus",
+            "12",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "12",
+            "10",
+            "1",
+            "1"
+          ],
+          "runner_sha256": "bac86c81836bc5c646674f0d18bd6ee7a0916a41fd135034d7d425779807968d",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "hvf-12-1-2",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.022419957999999962,
+          "command": [
+            "/Users/main/dev/trames/target/mount-subsystem/mac/target/release/trames-mac-run",
+            "--cpus",
+            "12",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "12",
+            "10",
+            "1",
+            "2"
+          ],
+          "runner_sha256": "bac86c81836bc5c646674f0d18bd6ee7a0916a41fd135034d7d425779807968d",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "hvf-12-2-0",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.023334625000000164,
+          "command": [
+            "/Users/main/dev/trames/target/mount-subsystem/mac/target/release/trames-mac-run",
+            "--cpus",
+            "12",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "12",
+            "10",
+            "2",
+            "0"
+          ],
+          "runner_sha256": "bac86c81836bc5c646674f0d18bd6ee7a0916a41fd135034d7d425779807968d",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "hvf-12-2-1",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.02401587500000013,
+          "command": [
+            "/Users/main/dev/trames/target/mount-subsystem/mac/target/release/trames-mac-run",
+            "--cpus",
+            "12",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "12",
+            "10",
+            "2",
+            "1"
+          ],
+          "runner_sha256": "bac86c81836bc5c646674f0d18bd6ee7a0916a41fd135034d7d425779807968d",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "hvf-12-2-2",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.023209208000000148,
+          "command": [
+            "/Users/main/dev/trames/target/mount-subsystem/mac/target/release/trames-mac-run",
+            "--cpus",
+            "12",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "12",
+            "10",
+            "2",
+            "2"
+          ],
+          "runner_sha256": "bac86c81836bc5c646674f0d18bd6ee7a0916a41fd135034d7d425779807968d",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "interpreter-1-0-0",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.42047075,
+          "command": [
+            "/Users/main/dev/trames/target/release/trames-run",
+            "--cpus",
+            "1",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--max-instructions",
+            "1000000000",
+            "--memory",
+            "--guest",
+            "/case",
+            "1",
+            "10",
+            "0",
+            "0"
+          ],
+          "runner_sha256": "82fae0a611248ebc930d08eb704a150f5f942aaf40a57a98c4f3a4a24842eede",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "interpreter-1-0-1",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.02524054199999992,
+          "command": [
+            "/Users/main/dev/trames/target/release/trames-run",
+            "--cpus",
+            "1",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--max-instructions",
+            "1000000000",
+            "--memory",
+            "--guest",
+            "/case",
+            "1",
+            "10",
+            "0",
+            "1"
+          ],
+          "runner_sha256": "82fae0a611248ebc930d08eb704a150f5f942aaf40a57a98c4f3a4a24842eede",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "interpreter-1-0-2",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.012223625000000071,
+          "command": [
+            "/Users/main/dev/trames/target/release/trames-run",
+            "--cpus",
+            "1",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--max-instructions",
+            "1000000000",
+            "--memory",
+            "--guest",
+            "/case",
+            "1",
+            "10",
+            "0",
+            "2"
+          ],
+          "runner_sha256": "82fae0a611248ebc930d08eb704a150f5f942aaf40a57a98c4f3a4a24842eede",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "interpreter-1-1-0",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.012129999999999974,
+          "command": [
+            "/Users/main/dev/trames/target/release/trames-run",
+            "--cpus",
+            "1",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--max-instructions",
+            "1000000000",
+            "--memory",
+            "--guest",
+            "/case",
+            "1",
+            "10",
+            "1",
+            "0"
+          ],
+          "runner_sha256": "82fae0a611248ebc930d08eb704a150f5f942aaf40a57a98c4f3a4a24842eede",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "interpreter-1-1-1",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.01172200000000001,
+          "command": [
+            "/Users/main/dev/trames/target/release/trames-run",
+            "--cpus",
+            "1",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--max-instructions",
+            "1000000000",
+            "--memory",
+            "--guest",
+            "/case",
+            "1",
+            "10",
+            "1",
+            "1"
+          ],
+          "runner_sha256": "82fae0a611248ebc930d08eb704a150f5f942aaf40a57a98c4f3a4a24842eede",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "interpreter-1-1-2",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.011684374999999969,
+          "command": [
+            "/Users/main/dev/trames/target/release/trames-run",
+            "--cpus",
+            "1",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--max-instructions",
+            "1000000000",
+            "--memory",
+            "--guest",
+            "/case",
+            "1",
+            "10",
+            "1",
+            "2"
+          ],
+          "runner_sha256": "82fae0a611248ebc930d08eb704a150f5f942aaf40a57a98c4f3a4a24842eede",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "interpreter-1-2-0",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.0116195830000001,
+          "command": [
+            "/Users/main/dev/trames/target/release/trames-run",
+            "--cpus",
+            "1",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--max-instructions",
+            "1000000000",
+            "--memory",
+            "--guest",
+            "/case",
+            "1",
+            "10",
+            "2",
+            "0"
+          ],
+          "runner_sha256": "82fae0a611248ebc930d08eb704a150f5f942aaf40a57a98c4f3a4a24842eede",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "interpreter-1-2-1",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.011778749999999949,
+          "command": [
+            "/Users/main/dev/trames/target/release/trames-run",
+            "--cpus",
+            "1",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--max-instructions",
+            "1000000000",
+            "--memory",
+            "--guest",
+            "/case",
+            "1",
+            "10",
+            "2",
+            "1"
+          ],
+          "runner_sha256": "82fae0a611248ebc930d08eb704a150f5f942aaf40a57a98c4f3a4a24842eede",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "interpreter-1-2-2",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.01180987499999997,
+          "command": [
+            "/Users/main/dev/trames/target/release/trames-run",
+            "--cpus",
+            "1",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--max-instructions",
+            "1000000000",
+            "--memory",
+            "--guest",
+            "/case",
+            "1",
+            "10",
+            "2",
+            "2"
+          ],
+          "runner_sha256": "82fae0a611248ebc930d08eb704a150f5f942aaf40a57a98c4f3a4a24842eede",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "interpreter-4-0-0",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.011831458000000072,
+          "command": [
+            "/Users/main/dev/trames/target/release/trames-run",
+            "--cpus",
+            "4",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--max-instructions",
+            "1000000000",
+            "--memory",
+            "--guest",
+            "/case",
+            "4",
+            "10",
+            "0",
+            "0"
+          ],
+          "runner_sha256": "82fae0a611248ebc930d08eb704a150f5f942aaf40a57a98c4f3a4a24842eede",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "interpreter-4-0-1",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.01165087499999995,
+          "command": [
+            "/Users/main/dev/trames/target/release/trames-run",
+            "--cpus",
+            "4",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--max-instructions",
+            "1000000000",
+            "--memory",
+            "--guest",
+            "/case",
+            "4",
+            "10",
+            "0",
+            "1"
+          ],
+          "runner_sha256": "82fae0a611248ebc930d08eb704a150f5f942aaf40a57a98c4f3a4a24842eede",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "interpreter-4-0-2",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.010955250000000083,
+          "command": [
+            "/Users/main/dev/trames/target/release/trames-run",
+            "--cpus",
+            "4",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--max-instructions",
+            "1000000000",
+            "--memory",
+            "--guest",
+            "/case",
+            "4",
+            "10",
+            "0",
+            "2"
+          ],
+          "runner_sha256": "82fae0a611248ebc930d08eb704a150f5f942aaf40a57a98c4f3a4a24842eede",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "interpreter-4-1-0",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.011942083000000103,
+          "command": [
+            "/Users/main/dev/trames/target/release/trames-run",
+            "--cpus",
+            "4",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--max-instructions",
+            "1000000000",
+            "--memory",
+            "--guest",
+            "/case",
+            "4",
+            "10",
+            "1",
+            "0"
+          ],
+          "runner_sha256": "82fae0a611248ebc930d08eb704a150f5f942aaf40a57a98c4f3a4a24842eede",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "interpreter-4-1-1",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.010980541999999982,
+          "command": [
+            "/Users/main/dev/trames/target/release/trames-run",
+            "--cpus",
+            "4",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--max-instructions",
+            "1000000000",
+            "--memory",
+            "--guest",
+            "/case",
+            "4",
+            "10",
+            "1",
+            "1"
+          ],
+          "runner_sha256": "82fae0a611248ebc930d08eb704a150f5f942aaf40a57a98c4f3a4a24842eede",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "interpreter-4-1-2",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.011021166999999998,
+          "command": [
+            "/Users/main/dev/trames/target/release/trames-run",
+            "--cpus",
+            "4",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--max-instructions",
+            "1000000000",
+            "--memory",
+            "--guest",
+            "/case",
+            "4",
+            "10",
+            "1",
+            "2"
+          ],
+          "runner_sha256": "82fae0a611248ebc930d08eb704a150f5f942aaf40a57a98c4f3a4a24842eede",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "interpreter-4-2-0",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.009990667000000064,
+          "command": [
+            "/Users/main/dev/trames/target/release/trames-run",
+            "--cpus",
+            "4",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--max-instructions",
+            "1000000000",
+            "--memory",
+            "--guest",
+            "/case",
+            "4",
+            "10",
+            "2",
+            "0"
+          ],
+          "runner_sha256": "82fae0a611248ebc930d08eb704a150f5f942aaf40a57a98c4f3a4a24842eede",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "interpreter-4-2-1",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.011759832999999942,
+          "command": [
+            "/Users/main/dev/trames/target/release/trames-run",
+            "--cpus",
+            "4",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--max-instructions",
+            "1000000000",
+            "--memory",
+            "--guest",
+            "/case",
+            "4",
+            "10",
+            "2",
+            "1"
+          ],
+          "runner_sha256": "82fae0a611248ebc930d08eb704a150f5f942aaf40a57a98c4f3a4a24842eede",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "interpreter-4-2-2",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.01183825000000005,
+          "command": [
+            "/Users/main/dev/trames/target/release/trames-run",
+            "--cpus",
+            "4",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--max-instructions",
+            "1000000000",
+            "--memory",
+            "--guest",
+            "/case",
+            "4",
+            "10",
+            "2",
+            "2"
+          ],
+          "runner_sha256": "82fae0a611248ebc930d08eb704a150f5f942aaf40a57a98c4f3a4a24842eede",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "interpreter-12-0-0",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.011702749999999984,
+          "command": [
+            "/Users/main/dev/trames/target/release/trames-run",
+            "--cpus",
+            "12",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--max-instructions",
+            "1000000000",
+            "--memory",
+            "--guest",
+            "/case",
+            "12",
+            "10",
+            "0",
+            "0"
+          ],
+          "runner_sha256": "82fae0a611248ebc930d08eb704a150f5f942aaf40a57a98c4f3a4a24842eede",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "interpreter-12-0-1",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.011826791000000059,
+          "command": [
+            "/Users/main/dev/trames/target/release/trames-run",
+            "--cpus",
+            "12",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--max-instructions",
+            "1000000000",
+            "--memory",
+            "--guest",
+            "/case",
+            "12",
+            "10",
+            "0",
+            "1"
+          ],
+          "runner_sha256": "82fae0a611248ebc930d08eb704a150f5f942aaf40a57a98c4f3a4a24842eede",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "interpreter-12-0-2",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.011237417000000027,
+          "command": [
+            "/Users/main/dev/trames/target/release/trames-run",
+            "--cpus",
+            "12",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--max-instructions",
+            "1000000000",
+            "--memory",
+            "--guest",
+            "/case",
+            "12",
+            "10",
+            "0",
+            "2"
+          ],
+          "runner_sha256": "82fae0a611248ebc930d08eb704a150f5f942aaf40a57a98c4f3a4a24842eede",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "interpreter-12-1-0",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.011727416000000046,
+          "command": [
+            "/Users/main/dev/trames/target/release/trames-run",
+            "--cpus",
+            "12",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--max-instructions",
+            "1000000000",
+            "--memory",
+            "--guest",
+            "/case",
+            "12",
+            "10",
+            "1",
+            "0"
+          ],
+          "runner_sha256": "82fae0a611248ebc930d08eb704a150f5f942aaf40a57a98c4f3a4a24842eede",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "interpreter-12-1-1",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.011650166000000128,
+          "command": [
+            "/Users/main/dev/trames/target/release/trames-run",
+            "--cpus",
+            "12",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--max-instructions",
+            "1000000000",
+            "--memory",
+            "--guest",
+            "/case",
+            "12",
+            "10",
+            "1",
+            "1"
+          ],
+          "runner_sha256": "82fae0a611248ebc930d08eb704a150f5f942aaf40a57a98c4f3a4a24842eede",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "interpreter-12-1-2",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.011203667000000195,
+          "command": [
+            "/Users/main/dev/trames/target/release/trames-run",
+            "--cpus",
+            "12",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--max-instructions",
+            "1000000000",
+            "--memory",
+            "--guest",
+            "/case",
+            "12",
+            "10",
+            "1",
+            "2"
+          ],
+          "runner_sha256": "82fae0a611248ebc930d08eb704a150f5f942aaf40a57a98c4f3a4a24842eede",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "interpreter-12-2-0",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.009725041999999906,
+          "command": [
+            "/Users/main/dev/trames/target/release/trames-run",
+            "--cpus",
+            "12",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--max-instructions",
+            "1000000000",
+            "--memory",
+            "--guest",
+            "/case",
+            "12",
+            "10",
+            "2",
+            "0"
+          ],
+          "runner_sha256": "82fae0a611248ebc930d08eb704a150f5f942aaf40a57a98c4f3a4a24842eede",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "interpreter-12-2-1",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.011312624999999965,
+          "command": [
+            "/Users/main/dev/trames/target/release/trames-run",
+            "--cpus",
+            "12",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--max-instructions",
+            "1000000000",
+            "--memory",
+            "--guest",
+            "/case",
+            "12",
+            "10",
+            "2",
+            "1"
+          ],
+          "runner_sha256": "82fae0a611248ebc930d08eb704a150f5f942aaf40a57a98c4f3a4a24842eede",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "interpreter-12-2-2",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.02191520899999988,
+          "command": [
+            "/Users/main/dev/trames/target/release/trames-run",
+            "--cpus",
+            "12",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--max-instructions",
+            "1000000000",
+            "--memory",
+            "--guest",
+            "/case",
+            "12",
+            "10",
+            "2",
+            "2"
+          ],
+          "runner_sha256": "82fae0a611248ebc930d08eb704a150f5f942aaf40a57a98c4f3a4a24842eede",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        }
+      ],
+      "logs": [
+        {
+          "path": "target/entropy-subsystem/guest/hvf-1-0-0.log",
+          "sha256": "09975c66f732feeeb74e1ed7ed420fb42c1cc79b996a79be5eb85ca0174d2c43"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/hvf-1-0-1.log",
+          "sha256": "36d6a2286c1aa19a1da03116628b49c0edcc2530e57e542a921b115ffec0196d"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/hvf-1-0-2.log",
+          "sha256": "b406b3acfb9c653b90d8e31f0f70d3c062a79733819437dfc55795cc19df81a7"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/hvf-1-1-0.log",
+          "sha256": "8a5fd0b4e4e81802d06c29815cd7ad67324ea4577b64862992721fa7bd13bc40"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/hvf-1-1-1.log",
+          "sha256": "9a7aae729e002962691d1beb21445dc8e46ae693527e75e8f466ac2c8ef0e038"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/hvf-1-1-2.log",
+          "sha256": "837f9b495223130fe6ad3883c06a47be40803595f53077d6673869b042c60e60"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/hvf-1-2-0.log",
+          "sha256": "8a3557f655064de4ccda1aac4e2ba86140415e839bebb304207ecd93975272b2"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/hvf-1-2-1.log",
+          "sha256": "20b168b304edab51c34998efade0b741e5a9773670accebc484f41dba98110f2"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/hvf-1-2-2.log",
+          "sha256": "f0d291197d48266913051055d225189631cab474b8009dde9b3b2db4f491899d"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/hvf-12-0-0.log",
+          "sha256": "ce7f77df4e83223cc370fe67f48c8736af17ee90d44e324fb35976894ce8e24e"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/hvf-12-0-1.log",
+          "sha256": "1a09a85f58a0efba5f6ed3753feed40e1b84d9f7dc18f61affcef083a591a426"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/hvf-12-0-2.log",
+          "sha256": "559ad2e3376f0c7e5a3ba1cd0ba529927841153f8647b5529d8780c6ababa33b"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/hvf-12-1-0.log",
+          "sha256": "90fe79ca9dc1bcb7a4e3143199a9f51c4b74bc3993b97d38ebfb8ea8ebe4d3dc"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/hvf-12-1-1.log",
+          "sha256": "b41a4d01326b2d24dbba8ad5f4a525e89c60a8d897018fbecc7eb3117b056862"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/hvf-12-1-2.log",
+          "sha256": "158249f69cad9098edf3786f6da89a88b4f81ebddace8fd975380b6d5822ae22"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/hvf-12-2-0.log",
+          "sha256": "6ef3674e303798b49c85c5c657ea0a90edc76b0a17942e8759003a5c02ee0d01"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/hvf-12-2-1.log",
+          "sha256": "5be342d76e5944bbcca23ab91725040df20445c448c3ab0326c253799f030213"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/hvf-12-2-2.log",
+          "sha256": "d2169db678596a0a4c549a605fdffd199a2661f8f17633ca7e0b87cf6ded63ab"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/hvf-4-0-0.log",
+          "sha256": "91e1c0a03db4fed9ab9200b13d4b52f6ec5fe3f2155d87303c53043b1c184a58"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/hvf-4-0-1.log",
+          "sha256": "aef0338352fc08e458ad94beda71c109f94927782fc11d9e7368eafa742d387d"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/hvf-4-0-2.log",
+          "sha256": "58c24ee7918951c0ef514090e84addade9c69ef048f64b9af7d6b36e6cf88c7d"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/hvf-4-1-0.log",
+          "sha256": "a660ac8106c58293f7c8e1edffc3278cf89841cf69393632213f554b8a9e8750"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/hvf-4-1-1.log",
+          "sha256": "a8901bc936fb0c9d1cbde3fb27b472b54d915c64667dbdc1693c7d9a4477dddc"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/hvf-4-1-2.log",
+          "sha256": "716751ebc029015ab578438afe16ae89dedfb0629e969ec37cb27e483a516d43"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/hvf-4-2-0.log",
+          "sha256": "6457616f1c9a17a239ca0eb7a8a7680c0f12d300126702bc1b6e83bae3fc9278"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/hvf-4-2-1.log",
+          "sha256": "f39da466e79a6532c96484b9686b4a07608b9ae160c4be0f10b96b8474e14989"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/hvf-4-2-2.log",
+          "sha256": "338738059ada441941b145505c5838fd064629bf88bd975f9ee021a3cdd5b8eb"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/interpreter-1-0-0.log",
+          "sha256": "048da56f8ae83c49ea0032e860f0082223cb59393654ab62d1940d16253e9324"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/interpreter-1-0-1.log",
+          "sha256": "30c2be3ab7a9c0c5723fb1aa53e98be2b1ae7c5e64395e9c92eaff39892a2215"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/interpreter-1-0-2.log",
+          "sha256": "588df0951284d9ed4b51f1482e396c133b81c92622c9cd5620dcae8293821f67"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/interpreter-1-1-0.log",
+          "sha256": "75ee5bc8797e03baa32177999898c92983be58f6d0bc9ce2beb33b4c18632a63"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/interpreter-1-1-1.log",
+          "sha256": "69c75d3a68cf5235b66acfb6073c09e2b1973ecc413fff897603f848cd20242f"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/interpreter-1-1-2.log",
+          "sha256": "04f411d6a70615787cd48656de0b9d9e10959ec016f3c19418f6961e31f2b603"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/interpreter-1-2-0.log",
+          "sha256": "b3766f2db888a1f0d0b5e38e3682b33328e4d49a8ca62cb5eddb74fec5a5ff62"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/interpreter-1-2-1.log",
+          "sha256": "f783904d1f634facf366850bd7d918807ed3dfff5c6d87f59039facad66a8cf9"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/interpreter-1-2-2.log",
+          "sha256": "7244a867ee928637b2d3fd7338f4283de32a1074a1de2580af7bbc933ab18e6e"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/interpreter-12-0-0.log",
+          "sha256": "7fd097e42136a3c302c58f42e98bda7e1d250f19681e94f8ce7be9dac638891b"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/interpreter-12-0-1.log",
+          "sha256": "946c2b75e79a05fce3646bb27de37fd940e8444cc94eaf2583cb7cdb51f02d2f"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/interpreter-12-0-2.log",
+          "sha256": "f33d388c98ec0f0c875bf9f962ce1b57ee811f35202c31aaeef25e5323d8c99d"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/interpreter-12-1-0.log",
+          "sha256": "7c006d6c37eceab8e986335efba2fd3753f14b5bcd91069f5817c64a42b54374"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/interpreter-12-1-1.log",
+          "sha256": "81cc924fc6165ce6dcfa5e2e8830341977ca78ecf6455a62b75cdf51340d13b9"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/interpreter-12-1-2.log",
+          "sha256": "f55d04e0d43b7424d4082014a8e76886047829e9446b499dc19be0ad6c7e29cd"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/interpreter-12-2-0.log",
+          "sha256": "abe8bf27f83c1b9d74b23010420896cb8f0edf072b67b1b3ab284b61493adfd9"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/interpreter-12-2-1.log",
+          "sha256": "ffe36a05e0d29ce7f16e53e33d81feb3df4304395bb17b222e666a28c283b351"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/interpreter-12-2-2.log",
+          "sha256": "c9018b197b91eaa15aba75ce19e5d4a7a6dff0b5790bbe925799a50bfb5d8c3c"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/interpreter-4-0-0.log",
+          "sha256": "b6fb3d7ba1a4a1c680e50975b9de519c59f77ea9505c51eabfe3633704473035"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/interpreter-4-0-1.log",
+          "sha256": "1b18f2e0b5b9902eb041a05deccf774615a5065846abc8404fa298cafe593a71"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/interpreter-4-0-2.log",
+          "sha256": "fac8707abb0598b104ad307bf0be54d5b19560945bf07151a147b2ec8e594587"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/interpreter-4-1-0.log",
+          "sha256": "14c2de57b9d3aee593c56393e1d64b82e82501c8a8b958e997c477707d26089d"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/interpreter-4-1-1.log",
+          "sha256": "662c93c1217e30cb41fc709fd68263b74478fa9b784cd9f85b1635e7246b9821"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/interpreter-4-1-2.log",
+          "sha256": "8d024dfe88638c17cff3d20eeb9d04619cd9190efa40ba1bbb731f03a2a7872e"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/interpreter-4-2-0.log",
+          "sha256": "70b26db9ca11a87edd5e75215da6ad43906a13678792ab8665f452ba718da56d"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/interpreter-4-2-1.log",
+          "sha256": "7ee21e00c90bbde6c09c7b7d5bb4daed3afc45a5876fa41ed2a8a67074d1149c"
+        },
+        {
+          "path": "target/entropy-subsystem/guest/interpreter-4-2-2.log",
+          "sha256": "967fb340360bbecf193ce95dece809a51f5f0a0a4c6681c648493e7900554c22"
+        }
+      ]
+    },
+    "installed_dev": {
+      "path": "target/entropy-subsystem/installed-guest/results.json",
+      "sha256": "817b44276331675be2929b3be053d20c4a034905041cb4fd92888b01d30e6fbe",
+      "data": [
+        {
+          "case": "hvf-4-0-0",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.5244291670000001,
+          "command": [
+            "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+            "--cpus",
+            "4",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "4",
+            "10",
+            "0",
+            "0"
+          ],
+          "runner_sha256": "200d721febdb7898e24c194a543f36de6d9fe8657a6117d9e0da3176f0a2ef07",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "hvf-4-0-1",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.012220624999999985,
+          "command": [
+            "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+            "--cpus",
+            "4",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "4",
+            "10",
+            "0",
+            "1"
+          ],
+          "runner_sha256": "200d721febdb7898e24c194a543f36de6d9fe8657a6117d9e0da3176f0a2ef07",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "hvf-4-0-2",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.011893041999999965,
+          "command": [
+            "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+            "--cpus",
+            "4",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "4",
+            "10",
+            "0",
+            "2"
+          ],
+          "runner_sha256": "200d721febdb7898e24c194a543f36de6d9fe8657a6117d9e0da3176f0a2ef07",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "hvf-4-1-0",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.011836957999999953,
+          "command": [
+            "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+            "--cpus",
+            "4",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "4",
+            "10",
+            "1",
+            "0"
+          ],
+          "runner_sha256": "200d721febdb7898e24c194a543f36de6d9fe8657a6117d9e0da3176f0a2ef07",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "hvf-4-1-1",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.011901665999999977,
+          "command": [
+            "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+            "--cpus",
+            "4",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "4",
+            "10",
+            "1",
+            "1"
+          ],
+          "runner_sha256": "200d721febdb7898e24c194a543f36de6d9fe8657a6117d9e0da3176f0a2ef07",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "hvf-4-1-2",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.011798624999999952,
+          "command": [
+            "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+            "--cpus",
+            "4",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "4",
+            "10",
+            "1",
+            "2"
+          ],
+          "runner_sha256": "200d721febdb7898e24c194a543f36de6d9fe8657a6117d9e0da3176f0a2ef07",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "hvf-4-2-0",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.011737165999999966,
+          "command": [
+            "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+            "--cpus",
+            "4",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "4",
+            "10",
+            "2",
+            "0"
+          ],
+          "runner_sha256": "200d721febdb7898e24c194a543f36de6d9fe8657a6117d9e0da3176f0a2ef07",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "hvf-4-2-1",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.01167000000000007,
+          "command": [
+            "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+            "--cpus",
+            "4",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "4",
+            "10",
+            "2",
+            "1"
+          ],
+          "runner_sha256": "200d721febdb7898e24c194a543f36de6d9fe8657a6117d9e0da3176f0a2ef07",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "hvf-4-2-2",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.011669457999999966,
+          "command": [
+            "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+            "--cpus",
+            "4",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "4",
+            "10",
+            "2",
+            "2"
+          ],
+          "runner_sha256": "200d721febdb7898e24c194a543f36de6d9fe8657a6117d9e0da3176f0a2ef07",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "hvf-12-0-0",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.012092125000000009,
+          "command": [
+            "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+            "--cpus",
+            "12",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "12",
+            "10",
+            "0",
+            "0"
+          ],
+          "runner_sha256": "200d721febdb7898e24c194a543f36de6d9fe8657a6117d9e0da3176f0a2ef07",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "hvf-12-0-1",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.011825874999999986,
+          "command": [
+            "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+            "--cpus",
+            "12",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "12",
+            "10",
+            "0",
+            "1"
+          ],
+          "runner_sha256": "200d721febdb7898e24c194a543f36de6d9fe8657a6117d9e0da3176f0a2ef07",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "hvf-12-0-2",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.011539958999999933,
+          "command": [
+            "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+            "--cpus",
+            "12",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "12",
+            "10",
+            "0",
+            "2"
+          ],
+          "runner_sha256": "200d721febdb7898e24c194a543f36de6d9fe8657a6117d9e0da3176f0a2ef07",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "hvf-12-1-0",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.011946875000000023,
+          "command": [
+            "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+            "--cpus",
+            "12",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "12",
+            "10",
+            "1",
+            "0"
+          ],
+          "runner_sha256": "200d721febdb7898e24c194a543f36de6d9fe8657a6117d9e0da3176f0a2ef07",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "hvf-12-1-1",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.01170900000000008,
+          "command": [
+            "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+            "--cpus",
+            "12",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "12",
+            "10",
+            "1",
+            "1"
+          ],
+          "runner_sha256": "200d721febdb7898e24c194a543f36de6d9fe8657a6117d9e0da3176f0a2ef07",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "hvf-12-1-2",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.011598791000000053,
+          "command": [
+            "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+            "--cpus",
+            "12",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "12",
+            "10",
+            "1",
+            "2"
+          ],
+          "runner_sha256": "200d721febdb7898e24c194a543f36de6d9fe8657a6117d9e0da3176f0a2ef07",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "hvf-12-2-0",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.022100750000000002,
+          "command": [
+            "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+            "--cpus",
+            "12",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "12",
+            "10",
+            "2",
+            "0"
+          ],
+          "runner_sha256": "200d721febdb7898e24c194a543f36de6d9fe8657a6117d9e0da3176f0a2ef07",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "hvf-12-2-1",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.012017999999999973,
+          "command": [
+            "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+            "--cpus",
+            "12",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "12",
+            "10",
+            "2",
+            "1"
+          ],
+          "runner_sha256": "200d721febdb7898e24c194a543f36de6d9fe8657a6117d9e0da3176f0a2ef07",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        },
+        {
+          "case": "hvf-12-2-2",
+          "code": 0,
+          "passed": true,
+          "seconds": 0.011868416999999964,
+          "command": [
+            "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+            "--cpus",
+            "12",
+            "--network",
+            "off",
+            "--metrics",
+            "--exec-file",
+            "/case=/Users/main/dev/trames/target/local-ci/io/entropy-subsystem/worker-entropy",
+            "--rootfs",
+            "/Users/main/dev/trames/target/memory-checkpoints/empty-rootfs",
+            "--timeout",
+            "60",
+            "--no-pty",
+            "--no-windows",
+            "/case",
+            "12",
+            "10",
+            "2",
+            "2"
+          ],
+          "runner_sha256": "200d721febdb7898e24c194a543f36de6d9fe8657a6117d9e0da3176f0a2ef07",
+          "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126"
+        }
+      ],
+      "logs": [
+        {
+          "path": "target/entropy-subsystem/installed-guest/hvf-12-0-0.log",
+          "sha256": "e6cddec10f7be61db49eb3c994bf856b9b4ff69e577dc600f3578554e4a5b5b3"
+        },
+        {
+          "path": "target/entropy-subsystem/installed-guest/hvf-12-0-1.log",
+          "sha256": "e60e120665f6a86735f701acf3e8f0e239561668bad47314278fda0549f49307"
+        },
+        {
+          "path": "target/entropy-subsystem/installed-guest/hvf-12-0-2.log",
+          "sha256": "9123e36bf55f5f514b4b1f3cc9d0ec310755515206d244f76fc958b5a33f5212"
+        },
+        {
+          "path": "target/entropy-subsystem/installed-guest/hvf-12-1-0.log",
+          "sha256": "ca4217ca1f61ed57c8a00ec5a9fcad5c146432bfbaa819955cacb166e50b8185"
+        },
+        {
+          "path": "target/entropy-subsystem/installed-guest/hvf-12-1-1.log",
+          "sha256": "605fcae5c49c48bca5c875b23cebaeae39029ea81134239eaf7e1ed220811f5b"
+        },
+        {
+          "path": "target/entropy-subsystem/installed-guest/hvf-12-1-2.log",
+          "sha256": "d2019c42d59271a57d86150c27a72e5b74c0e69610ec8b23f336715b3ed7433d"
+        },
+        {
+          "path": "target/entropy-subsystem/installed-guest/hvf-12-2-0.log",
+          "sha256": "6d29e347a10b08f2a7e9e3553cc3ad22e320a403fb5c155c5a65f69903fe676e"
+        },
+        {
+          "path": "target/entropy-subsystem/installed-guest/hvf-12-2-1.log",
+          "sha256": "111c647a3acecad32c43447d88edd3ae89e2e3a0d477943c4a0592f623413295"
+        },
+        {
+          "path": "target/entropy-subsystem/installed-guest/hvf-12-2-2.log",
+          "sha256": "2481382db614c4acf0d95d8deab7ac0df8e547450889fdc25b71653c3e1bf1e1"
+        },
+        {
+          "path": "target/entropy-subsystem/installed-guest/hvf-4-0-0.log",
+          "sha256": "14755f7cd0cb700a35705ccdd03afa4826ef366e58a82c7af562ea66b3f14271"
+        },
+        {
+          "path": "target/entropy-subsystem/installed-guest/hvf-4-0-1.log",
+          "sha256": "c40098d01fca475bec7ed3c35038b36eb5e9f9817677c153d995511beb5e033e"
+        },
+        {
+          "path": "target/entropy-subsystem/installed-guest/hvf-4-0-2.log",
+          "sha256": "123a29c475b9083bdc47bcbf27caa445e6fe1347e6eb790428d7871c46eeff53"
+        },
+        {
+          "path": "target/entropy-subsystem/installed-guest/hvf-4-1-0.log",
+          "sha256": "0b23dd7ecc757fe5c9bc374ad23aac81c1fb835cb1bdd7d3232609efa614aee4"
+        },
+        {
+          "path": "target/entropy-subsystem/installed-guest/hvf-4-1-1.log",
+          "sha256": "f8d30386f474434577f729db60af58b016cfac7532bcaa4c024d3a0ef9e35bdd"
+        },
+        {
+          "path": "target/entropy-subsystem/installed-guest/hvf-4-1-2.log",
+          "sha256": "a1af8c4884b7407754398cc40f1b6bab8c0c11d0c26aff7ba676db4479372e86"
+        },
+        {
+          "path": "target/entropy-subsystem/installed-guest/hvf-4-2-0.log",
+          "sha256": "4a6fca7ffb66e613cd708712ae3bdea76f02a7fd606ac063b1e9c219ca44c0a7"
+        },
+        {
+          "path": "target/entropy-subsystem/installed-guest/hvf-4-2-1.log",
+          "sha256": "544f34b5fc0497b1e04016f90bb24138aea85742bd8f6fef4853890bf89f1310"
+        },
+        {
+          "path": "target/entropy-subsystem/installed-guest/hvf-4-2-2.log",
+          "sha256": "be8893faa788b4e4fefdb23764791f3109adab6ba8e80f15fb73ff88f9da3a2c"
+        }
+      ]
+    },
+    "boundaries": {
+      "runtime": {
+        "path": "target/entropy-subsystem/runtime-boundaries.log",
+        "sha256": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651"
+      },
+      "product": {
+        "path": "target/entropy-subsystem/product-boundaries-final.log",
+        "sha256": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651"
+      }
+    },
+    "fmt": {
+      "path": "target/entropy-subsystem/fmt-accepted.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "hardware_reuse": {
+      "record": "docs/validation/worker-membarrier-20261107.json",
+      "passed": 48,
+      "mac_product_passed": 24,
+      "note": "Stage-62 signed CPU/MMU hardware and product tests are reused: no Mac/HVF/backend/interrupt/mapping protocol code changed. Shared Linux changes have fresh runtime workflows, process coverage and actual HVF/interpreter programs; no fresh hardware count is claimed."
+    }
+  },
+  "performance": {
+    "method": "Three alternating unprofiled pairs with 200 64-byte requests/thread; setup/device/UUID/ABI preflight and thread creation precede the timed release. Same static Linux binary/arguments on both versions; both skip only the wide-register preflight unsupported by the baseline. Functional guest/native runs retain it.",
+    "background": "Agent builds and tests completed before the sequential measurement driver. Other user background workload is not controlled.",
+    "policies": {
+      "0": "raw",
+      "1": "ALLOW getrandom",
+      "2": "ERRNO 42 for getrandom, other calls allowed"
+    },
+    "apis": {
+      "0": "getrandom 64 bytes",
+      "1": "urandom read 64 bytes",
+      "2": "random readv 16+48 bytes"
+    },
+    "main": {
+      "path": "target/entropy-subsystem/benchmark/results.json",
+      "sha256": "148b1fe170cda79ae940878ecd9fc3e1d13369fa732b672f3374fb28f14fb4c5",
+      "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126",
+      "runner_sha256": {
+        "before": "80ebd7b4242e91b5655f56cb3d0a4a7f59c55f7848d5db93b8ea7a6a2cb3d62b",
+        "after": "bac86c81836bc5c646674f0d18bd6ee7a0916a41fd135034d7d425779807968d"
+      },
+      "rows": [
+        {
+          "runner": "before",
+          "cpus": 1,
+          "policy": 0,
+          "api": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 1210208,
+          "wall_seconds": 0.408390458
+        },
+        {
+          "runner": "after",
+          "cpus": 1,
+          "policy": 0,
+          "api": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 984083,
+          "wall_seconds": 0.044719416999999984
+        },
+        {
+          "runner": "after",
+          "cpus": 1,
+          "policy": 0,
+          "api": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 889083,
+          "wall_seconds": 0.024103708
+        },
+        {
+          "runner": "before",
+          "cpus": 1,
+          "policy": 0,
+          "api": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 826042,
+          "wall_seconds": 0.010428500000000063
+        },
+        {
+          "runner": "before",
+          "cpus": 1,
+          "policy": 0,
+          "api": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 802541,
+          "wall_seconds": 0.012017834000000005
+        },
+        {
+          "runner": "after",
+          "cpus": 1,
+          "policy": 0,
+          "api": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 604875,
+          "wall_seconds": 0.02428620799999992
+        },
+        {
+          "runner": "before",
+          "cpus": 1,
+          "policy": 1,
+          "api": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 567750,
+          "wall_seconds": 0.011898124999999982
+        },
+        {
+          "runner": "after",
+          "cpus": 1,
+          "policy": 1,
+          "api": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 538333,
+          "wall_seconds": 0.010985040999999973
+        },
+        {
+          "runner": "after",
+          "cpus": 1,
+          "policy": 1,
+          "api": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 546125,
+          "wall_seconds": 0.010425917000000062
+        },
+        {
+          "runner": "before",
+          "cpus": 1,
+          "policy": 1,
+          "api": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 544916,
+          "wall_seconds": 0.011977624999999992
+        },
+        {
+          "runner": "before",
+          "cpus": 1,
+          "policy": 1,
+          "api": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 540542,
+          "wall_seconds": 0.011871333000000095
+        },
+        {
+          "runner": "after",
+          "cpus": 1,
+          "policy": 1,
+          "api": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 567833,
+          "wall_seconds": 0.011713834000000034
+        },
+        {
+          "runner": "before",
+          "cpus": 1,
+          "policy": 2,
+          "api": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 354250,
+          "wall_seconds": 0.01174799999999998
+        },
+        {
+          "runner": "after",
+          "cpus": 1,
+          "policy": 2,
+          "api": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 342833,
+          "wall_seconds": 0.011889040999999989
+        },
+        {
+          "runner": "after",
+          "cpus": 1,
+          "policy": 2,
+          "api": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 335125,
+          "wall_seconds": 0.011927416999999996
+        },
+        {
+          "runner": "before",
+          "cpus": 1,
+          "policy": 2,
+          "api": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 333208,
+          "wall_seconds": 0.011983332999999985
+        },
+        {
+          "runner": "before",
+          "cpus": 1,
+          "policy": 2,
+          "api": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 332417,
+          "wall_seconds": 0.011928041999999972
+        },
+        {
+          "runner": "after",
+          "cpus": 1,
+          "policy": 2,
+          "api": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 337334,
+          "wall_seconds": 0.012093875000000032
+        },
+        {
+          "runner": "before",
+          "cpus": 1,
+          "policy": 0,
+          "api": 1,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 600792,
+          "wall_seconds": 0.01185262499999995
+        },
+        {
+          "runner": "after",
+          "cpus": 1,
+          "policy": 0,
+          "api": 1,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 777750,
+          "wall_seconds": 0.011977499999999974
+        },
+        {
+          "runner": "after",
+          "cpus": 1,
+          "policy": 0,
+          "api": 1,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 581166,
+          "wall_seconds": 0.011961957999999995
+        },
+        {
+          "runner": "before",
+          "cpus": 1,
+          "policy": 0,
+          "api": 1,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 585708,
+          "wall_seconds": 0.01203058400000001
+        },
+        {
+          "runner": "before",
+          "cpus": 1,
+          "policy": 0,
+          "api": 1,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 583666,
+          "wall_seconds": 0.012160082999999933
+        },
+        {
+          "runner": "after",
+          "cpus": 1,
+          "policy": 0,
+          "api": 1,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 611917,
+          "wall_seconds": 0.011972749999999976
+        },
+        {
+          "runner": "before",
+          "cpus": 1,
+          "policy": 0,
+          "api": 2,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 607917,
+          "wall_seconds": 0.011846709000000066
+        },
+        {
+          "runner": "after",
+          "cpus": 1,
+          "policy": 0,
+          "api": 2,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 668208,
+          "wall_seconds": 0.011792000000000025
+        },
+        {
+          "runner": "after",
+          "cpus": 1,
+          "policy": 0,
+          "api": 2,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 608167,
+          "wall_seconds": 0.010794291999999928
+        },
+        {
+          "runner": "before",
+          "cpus": 1,
+          "policy": 0,
+          "api": 2,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 603583,
+          "wall_seconds": 0.010340083
+        },
+        {
+          "runner": "before",
+          "cpus": 1,
+          "policy": 0,
+          "api": 2,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 646166,
+          "wall_seconds": 0.011929291999999925
+        },
+        {
+          "runner": "after",
+          "cpus": 1,
+          "policy": 0,
+          "api": 2,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 623250,
+          "wall_seconds": 0.011701540999999982
+        },
+        {
+          "runner": "before",
+          "cpus": 4,
+          "policy": 0,
+          "api": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 47997542,
+          "wall_seconds": 0.08299216600000003
+        },
+        {
+          "runner": "after",
+          "cpus": 4,
+          "policy": 0,
+          "api": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 841167,
+          "wall_seconds": 0.024052207999999964
+        },
+        {
+          "runner": "after",
+          "cpus": 4,
+          "policy": 0,
+          "api": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 902959,
+          "wall_seconds": 0.022239416999999984
+        },
+        {
+          "runner": "before",
+          "cpus": 4,
+          "policy": 0,
+          "api": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 47344167,
+          "wall_seconds": 0.08828712500000002
+        },
+        {
+          "runner": "before",
+          "cpus": 4,
+          "policy": 0,
+          "api": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 46075291,
+          "wall_seconds": 0.07922083400000002
+        },
+        {
+          "runner": "after",
+          "cpus": 4,
+          "policy": 0,
+          "api": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 887959,
+          "wall_seconds": 0.022702624999999976
+        },
+        {
+          "runner": "before",
+          "cpus": 4,
+          "policy": 1,
+          "api": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 46688417,
+          "wall_seconds": 0.08518412500000005
+        },
+        {
+          "runner": "after",
+          "cpus": 4,
+          "policy": 1,
+          "api": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 854917,
+          "wall_seconds": 0.02413350000000003
+        },
+        {
+          "runner": "after",
+          "cpus": 4,
+          "policy": 1,
+          "api": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 1012417,
+          "wall_seconds": 0.011803291999999965
+        },
+        {
+          "runner": "before",
+          "cpus": 4,
+          "policy": 1,
+          "api": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 47767541,
+          "wall_seconds": 0.078346166
+        },
+        {
+          "runner": "before",
+          "cpus": 4,
+          "policy": 1,
+          "api": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 46676917,
+          "wall_seconds": 0.08292133300000004
+        },
+        {
+          "runner": "after",
+          "cpus": 4,
+          "policy": 1,
+          "api": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 1038750,
+          "wall_seconds": 0.022271458000000077
+        },
+        {
+          "runner": "before",
+          "cpus": 4,
+          "policy": 2,
+          "api": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 496834,
+          "wall_seconds": 0.012000416000000014
+        },
+        {
+          "runner": "after",
+          "cpus": 4,
+          "policy": 2,
+          "api": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 441583,
+          "wall_seconds": 0.021688290999999804
+        },
+        {
+          "runner": "after",
+          "cpus": 4,
+          "policy": 2,
+          "api": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 479375,
+          "wall_seconds": 0.012067834
+        },
+        {
+          "runner": "before",
+          "cpus": 4,
+          "policy": 2,
+          "api": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 697250,
+          "wall_seconds": 0.01176804099999984
+        },
+        {
+          "runner": "before",
+          "cpus": 4,
+          "policy": 2,
+          "api": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 447041,
+          "wall_seconds": 0.011595582999999854
+        },
+        {
+          "runner": "after",
+          "cpus": 4,
+          "policy": 2,
+          "api": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 484459,
+          "wall_seconds": 0.020594
+        },
+        {
+          "runner": "before",
+          "cpus": 4,
+          "policy": 0,
+          "api": 1,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 881917,
+          "wall_seconds": 0.011929999999999996
+        },
+        {
+          "runner": "after",
+          "cpus": 4,
+          "policy": 0,
+          "api": 1,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 791083,
+          "wall_seconds": 0.023869291000000015
+        },
+        {
+          "runner": "after",
+          "cpus": 4,
+          "policy": 0,
+          "api": 1,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 960292,
+          "wall_seconds": 0.02083654200000007
+        },
+        {
+          "runner": "before",
+          "cpus": 4,
+          "policy": 0,
+          "api": 1,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 1242416,
+          "wall_seconds": 0.011910250000000122
+        },
+        {
+          "runner": "before",
+          "cpus": 4,
+          "policy": 0,
+          "api": 1,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 1087500,
+          "wall_seconds": 0.011630250000000064
+        },
+        {
+          "runner": "after",
+          "cpus": 4,
+          "policy": 0,
+          "api": 1,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 852208,
+          "wall_seconds": 0.02349837499999996
+        },
+        {
+          "runner": "before",
+          "cpus": 4,
+          "policy": 0,
+          "api": 2,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 1172125,
+          "wall_seconds": 0.01172008400000002
+        },
+        {
+          "runner": "after",
+          "cpus": 4,
+          "policy": 0,
+          "api": 2,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 833750,
+          "wall_seconds": 0.019739415999999954
+        },
+        {
+          "runner": "after",
+          "cpus": 4,
+          "policy": 0,
+          "api": 2,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 1373167,
+          "wall_seconds": 0.020266417000000203
+        },
+        {
+          "runner": "before",
+          "cpus": 4,
+          "policy": 0,
+          "api": 2,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 946041,
+          "wall_seconds": 0.012071833000000032
+        },
+        {
+          "runner": "before",
+          "cpus": 4,
+          "policy": 0,
+          "api": 2,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 951291,
+          "wall_seconds": 0.011862041999999962
+        },
+        {
+          "runner": "after",
+          "cpus": 4,
+          "policy": 0,
+          "api": 2,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 799208,
+          "wall_seconds": 0.02386920800000003
+        },
+        {
+          "runner": "before",
+          "cpus": 12,
+          "policy": 0,
+          "api": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 398956083,
+          "wall_seconds": 0.4390084999999999
+        },
+        {
+          "runner": "after",
+          "cpus": 12,
+          "policy": 0,
+          "api": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 4146750,
+          "wall_seconds": 0.02413354099999987
+        },
+        {
+          "runner": "after",
+          "cpus": 12,
+          "policy": 0,
+          "api": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 3251250,
+          "wall_seconds": 0.023964166000000287
+        },
+        {
+          "runner": "before",
+          "cpus": 12,
+          "policy": 0,
+          "api": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 396514042,
+          "wall_seconds": 0.42473512499999977
+        },
+        {
+          "runner": "before",
+          "cpus": 12,
+          "policy": 0,
+          "api": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 404608625,
+          "wall_seconds": 0.432581667
+        },
+        {
+          "runner": "after",
+          "cpus": 12,
+          "policy": 0,
+          "api": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 3379500,
+          "wall_seconds": 0.024120291000000016
+        },
+        {
+          "runner": "before",
+          "cpus": 12,
+          "policy": 1,
+          "api": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 402456125,
+          "wall_seconds": 0.418498708
+        },
+        {
+          "runner": "after",
+          "cpus": 12,
+          "policy": 1,
+          "api": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 3743125,
+          "wall_seconds": 0.02193762500000007
+        },
+        {
+          "runner": "after",
+          "cpus": 12,
+          "policy": 1,
+          "api": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 3422542,
+          "wall_seconds": 0.024023124999999812
+        },
+        {
+          "runner": "before",
+          "cpus": 12,
+          "policy": 1,
+          "api": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 392436500,
+          "wall_seconds": 0.43273354200000025
+        },
+        {
+          "runner": "before",
+          "cpus": 12,
+          "policy": 1,
+          "api": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 406900292,
+          "wall_seconds": 0.4327669580000002
+        },
+        {
+          "runner": "after",
+          "cpus": 12,
+          "policy": 1,
+          "api": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 2632417,
+          "wall_seconds": 0.02418812499999934
+        },
+        {
+          "runner": "before",
+          "cpus": 12,
+          "policy": 2,
+          "api": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 1254458,
+          "wall_seconds": 0.023906208999999734
+        },
+        {
+          "runner": "after",
+          "cpus": 12,
+          "policy": 2,
+          "api": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 1299667,
+          "wall_seconds": 0.02406804199999968
+        },
+        {
+          "runner": "after",
+          "cpus": 12,
+          "policy": 2,
+          "api": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 1234167,
+          "wall_seconds": 0.024016125000000166
+        },
+        {
+          "runner": "before",
+          "cpus": 12,
+          "policy": 2,
+          "api": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 2022167,
+          "wall_seconds": 0.01203608299999992
+        },
+        {
+          "runner": "before",
+          "cpus": 12,
+          "policy": 2,
+          "api": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 1997458,
+          "wall_seconds": 0.012055000000000149
+        },
+        {
+          "runner": "after",
+          "cpus": 12,
+          "policy": 2,
+          "api": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 2426625,
+          "wall_seconds": 0.023998208000000076
+        },
+        {
+          "runner": "before",
+          "cpus": 12,
+          "policy": 0,
+          "api": 1,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 2020834,
+          "wall_seconds": 0.02392616599999986
+        },
+        {
+          "runner": "after",
+          "cpus": 12,
+          "policy": 0,
+          "api": 1,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 2057542,
+          "wall_seconds": 0.024132790999999543
+        },
+        {
+          "runner": "after",
+          "cpus": 12,
+          "policy": 0,
+          "api": 1,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 2000167,
+          "wall_seconds": 0.024083292000000256
+        },
+        {
+          "runner": "before",
+          "cpus": 12,
+          "policy": 0,
+          "api": 1,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 3651625,
+          "wall_seconds": 0.024030291999999953
+        },
+        {
+          "runner": "before",
+          "cpus": 12,
+          "policy": 0,
+          "api": 1,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 3524792,
+          "wall_seconds": 0.023822166999999617
+        },
+        {
+          "runner": "after",
+          "cpus": 12,
+          "policy": 0,
+          "api": 1,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 2707667,
+          "wall_seconds": 0.02416604099999997
+        },
+        {
+          "runner": "before",
+          "cpus": 12,
+          "policy": 0,
+          "api": 2,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 2357500,
+          "wall_seconds": 0.024093582999999974
+        },
+        {
+          "runner": "after",
+          "cpus": 12,
+          "policy": 0,
+          "api": 2,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 2924042,
+          "wall_seconds": 0.024177166000000305
+        },
+        {
+          "runner": "after",
+          "cpus": 12,
+          "policy": 0,
+          "api": 2,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 2885375,
+          "wall_seconds": 0.024072207999999762
+        },
+        {
+          "runner": "before",
+          "cpus": 12,
+          "policy": 0,
+          "api": 2,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 3110166,
+          "wall_seconds": 0.02406041699999939
+        },
+        {
+          "runner": "before",
+          "cpus": 12,
+          "policy": 0,
+          "api": 2,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 2546333,
+          "wall_seconds": 0.022668708000000315
+        },
+        {
+          "runner": "after",
+          "cpus": 12,
+          "policy": 0,
+          "api": 2,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 2143292,
+          "wall_seconds": 0.023610332999999706
+        }
+      ],
+      "medians": [
+        {
+          "cpus": 1,
+          "policy": 0,
+          "api": 0,
+          "before_ms": 0.826042,
+          "after_ms": 0.889083,
+          "change_percent": 7.63169427220407
+        },
+        {
+          "cpus": 1,
+          "policy": 0,
+          "api": 1,
+          "before_ms": 0.585708,
+          "after_ms": 0.611917,
+          "change_percent": 4.474755338837788
+        },
+        {
+          "cpus": 1,
+          "policy": 0,
+          "api": 2,
+          "before_ms": 0.607917,
+          "after_ms": 0.62325,
+          "change_percent": 2.5222193161237305
+        },
+        {
+          "cpus": 1,
+          "policy": 1,
+          "api": 0,
+          "before_ms": 0.544916,
+          "after_ms": 0.546125,
+          "change_percent": 0.22186905871730556
+        },
+        {
+          "cpus": 1,
+          "policy": 2,
+          "api": 0,
+          "before_ms": 0.333208,
+          "after_ms": 0.337334,
+          "change_percent": 1.2382655878610427
+        },
+        {
+          "cpus": 4,
+          "policy": 0,
+          "api": 0,
+          "before_ms": 47.344167,
+          "after_ms": 0.887959,
+          "change_percent": -98.1244595559153
+        },
+        {
+          "cpus": 4,
+          "policy": 0,
+          "api": 1,
+          "before_ms": 1.0875,
+          "after_ms": 0.852208,
+          "change_percent": -21.636045977011488
+        },
+        {
+          "cpus": 4,
+          "policy": 0,
+          "api": 2,
+          "before_ms": 0.951291,
+          "after_ms": 0.83375,
+          "change_percent": -12.355945762127462
+        },
+        {
+          "cpus": 4,
+          "policy": 1,
+          "api": 0,
+          "before_ms": 46.688417,
+          "after_ms": 1.012417,
+          "change_percent": -97.83154567009629
+        },
+        {
+          "cpus": 4,
+          "policy": 2,
+          "api": 0,
+          "before_ms": 0.496834,
+          "after_ms": 0.479375,
+          "change_percent": -3.5140509707467737
+        },
+        {
+          "cpus": 12,
+          "policy": 0,
+          "api": 0,
+          "before_ms": 398.956083,
+          "after_ms": 3.3795,
+          "change_percent": -99.15291428204642
+        },
+        {
+          "cpus": 12,
+          "policy": 0,
+          "api": 1,
+          "before_ms": 3.524792,
+          "after_ms": 2.057542,
+          "change_percent": -41.62656973801574
+        },
+        {
+          "cpus": 12,
+          "policy": 0,
+          "api": 2,
+          "before_ms": 2.546333,
+          "after_ms": 2.885375,
+          "change_percent": 13.314912071594698
+        },
+        {
+          "cpus": 12,
+          "policy": 1,
+          "api": 0,
+          "before_ms": 402.456125,
+          "after_ms": 3.422542,
+          "change_percent": -99.14958630583645
+        },
+        {
+          "cpus": 12,
+          "policy": 2,
+          "api": 0,
+          "before_ms": 1.997458,
+          "after_ms": 1.299667,
+          "change_percent": -34.93395105178683
+        }
+      ],
+      "logs": [
+        {
+          "path": "target/entropy-subsystem/benchmark/after-1-0-0-0.log",
+          "sha256": "7b0a5a883d5813f856b659a5346dcf7d57b6abf1c38a18d0cdadfd4b155d76da"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-1-0-0-1.log",
+          "sha256": "d46cb69abb88b7532a45dbd918ed1bce5d4fbc9b50c1df2216e2c5f837503643"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-1-0-0-2.log",
+          "sha256": "f3db1d8ebedfe0a9b029b10aa71e0b7c70b60d64f82920bd3844bb7f3737ec6a"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-1-0-1-0.log",
+          "sha256": "326b6d0f37c2dadec37727f80b85730163b27b332f1806f3f9a3f285fed1f9dd"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-1-0-1-1.log",
+          "sha256": "2f6a31682cbb3c2a3d5990350e2bb182c4ada4f542696be410ec1580ee13c659"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-1-0-1-2.log",
+          "sha256": "7e9035513fe76e4f18ceddb2b31e42a1cd7362574e0c68e3bf5ae40bb2ca1bdb"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-1-0-2-0.log",
+          "sha256": "e861a0a39d99f573c2bc7b4714ae5bf8faced19d8e1561c74d19130352e1d1cb"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-1-0-2-1.log",
+          "sha256": "39570bc99b7ec78cb2c7f4bbce8d52cd15897bc6af5a7c79de1dc8e22ae06cb7"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-1-0-2-2.log",
+          "sha256": "d3a349e64eb1a2cdf26b5f84f36ce137e2c3065090f7b73e1e03fba8221567b3"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-1-1-0-0.log",
+          "sha256": "b909a2db3ce9b9f318d515d525cbd279d9dcabe4428bc7eaef09eef3a2f97d4d"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-1-1-0-1.log",
+          "sha256": "238a9aa1fe65d11826ccb61e836fdda45921deb93a90624f5a897df1c90271cb"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-1-1-0-2.log",
+          "sha256": "7280b56a5e9ed18afd36d6324fb510788a89b04bcb1b605c0eab6b68559e431b"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-1-2-0-0.log",
+          "sha256": "1bfd16fd304b18b680ab3cb0598beb165755b3f17e61a1a35554681c6d1fa9ac"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-1-2-0-1.log",
+          "sha256": "82c001336596aa5d7e409b18511698c971809d0c5e2982c73eac455a618e6147"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-1-2-0-2.log",
+          "sha256": "6bd8da16ad16d62ab2e96bb095970738eb805fdd8b080bf5ea4c043323c9df80"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-12-0-0-0.log",
+          "sha256": "bc6e60a3a8f29d043aeb9c4d523327dce6d90c658f9212979945e1fc5501976c"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-12-0-0-1.log",
+          "sha256": "89c229edcae0cf6132f94b16b0536379a142e25c2d385fc8714d362b21d2c607"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-12-0-0-2.log",
+          "sha256": "f151b458334523699f732109524c9932290832acb2c45d6e76ee2338b1edf7db"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-12-0-1-0.log",
+          "sha256": "c0b3b57d747e51d6dce842d27a926dcc2dd43e6a35e4ee4a21709a79d856e72e"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-12-0-1-1.log",
+          "sha256": "7298fd9a7876a6f5ce1eb7f32b47e0a215ea916b785eda8faf3327822205fb95"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-12-0-1-2.log",
+          "sha256": "5b51b7aafbeb638441d936f00db76a2ceb6a10dae590f75063e317b4ac91c933"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-12-0-2-0.log",
+          "sha256": "fbeb23f919728b1ae5ead599ecf72f8f43cb13c9676fac29e2324258b4e82463"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-12-0-2-1.log",
+          "sha256": "5f3da742741230d4d2e27858864c7a2ef3230a3a501b938ef56888fe5fca940a"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-12-0-2-2.log",
+          "sha256": "e409c294a8790ef56cf018dc919a6bb15a64e6a30bcdf6e9e8a25a9b11936666"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-12-1-0-0.log",
+          "sha256": "9b4b367b7d9204fe2ec9c7a8861cca24da4e28330b643fd2f5df9e88dee7c1b4"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-12-1-0-1.log",
+          "sha256": "a15d6523ebee1ed5a0ba96183d23bb8c4af483ad7516ccbfa38dd4bfde129bff"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-12-1-0-2.log",
+          "sha256": "c8bfe73ce455b89e3f467daf8894c0af63a9b534ccaef8d42a0af78e2764f602"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-12-2-0-0.log",
+          "sha256": "d194fc4e53571a8c33e98735fa2d3a3537ccbbf05fe1546b13e122b107a4e0ce"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-12-2-0-1.log",
+          "sha256": "eb7144e8973d3ebd86d3e4ec0a0f15e6dd273df9b90c38154e3f456a7458b3cb"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-12-2-0-2.log",
+          "sha256": "5325b92a0fdafbd35ec6b5629fd87aa2b20e59690d52344fbda4dce2e7093b04"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-4-0-0-0.log",
+          "sha256": "6179dfe357b658579d33fbc3d87d4821b4be40ae93acf0b1aab762457f697679"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-4-0-0-1.log",
+          "sha256": "c497642ca978f773d39b641b0934008a8e90acd2969ac762122d560bd90b6f28"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-4-0-0-2.log",
+          "sha256": "fcf09d6d527bc519a62ad6097cd29f889b4f9bde807f274b800281989d129a3c"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-4-0-1-0.log",
+          "sha256": "65e9c0954340806f51d1d254d225d8394ae882da23a4fae5e1d3b83808a164da"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-4-0-1-1.log",
+          "sha256": "f8a40f92b17f3708e5b764aaf279b35552385fdd576a725b596729a3bacaa9b5"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-4-0-1-2.log",
+          "sha256": "fc42364082bec9891f0a659108a8d5323828b82bb2c4204330b3eb221b233f55"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-4-0-2-0.log",
+          "sha256": "e9ebbfc3ccf01f7ee1c6178ff7139edcf2e226237be2c9099fb2db7309f467ce"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-4-0-2-1.log",
+          "sha256": "e2d55662da07b1e772d20027a4874df7f0ec2d73ec7758017d315abf659d7fc5"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-4-0-2-2.log",
+          "sha256": "3c777b4fdc7af8b79481d258627bf71e98f4fa36a46e7ae4c72099e68364e708"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-4-1-0-0.log",
+          "sha256": "db1a38b96f3349cf182f31dbe7282dd1fbd31d42abf6804bb6606bafddb817e5"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-4-1-0-1.log",
+          "sha256": "de9563d80dc6f9a327fc4328eb9f8658e76cfdbd9fa24a4f9b1ee36d342a0779"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-4-1-0-2.log",
+          "sha256": "a76f6d6cb0b4f52bb6354f8ffde98434abdb9903c127cf5622ed5bee055c2c39"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-4-2-0-0.log",
+          "sha256": "5a59ccdb5d82a34b88f482d067d2a0e4cb9a5a5c0e329a732a43ccbf9d650aef"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-4-2-0-1.log",
+          "sha256": "ce1fcfc79060ebfc9ee7be2425d4714a263a5a0d67487f434e7b0fa332cfcf01"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/after-4-2-0-2.log",
+          "sha256": "24072005c7fd8b474fb72171a4562c732c8dfc88af7dd9e99a81fdcc4f486b15"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-1-0-0-0.log",
+          "sha256": "b49a91b50ae38cc38605d8271badf9e699d1171c1ee731c28dafacea401cc51c"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-1-0-0-1.log",
+          "sha256": "87162fc5235e464cba09a1aad42b701aec295e613c0257aaa99515d964708f81"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-1-0-0-2.log",
+          "sha256": "9f690a55eec4af1978d022b4c7f56dc49f6cc3f7a15f7484d5070c742ec9d9b2"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-1-0-1-0.log",
+          "sha256": "c275b014f8ad3abf783b1d40bfa1c1c21c5bc1ce0c451a5f07ab57a59a28cafc"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-1-0-1-1.log",
+          "sha256": "ad1f29b3cdad4527cef31b0135252551aa388dc10cfc91e4707917752d30c3dd"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-1-0-1-2.log",
+          "sha256": "7d101173123e879bcee337c1e44eefa6f04fad76ed6cca11aea1a7a507c08062"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-1-0-2-0.log",
+          "sha256": "785dd94083c6d682fd004b76181971830497852db3b73825d1c666b3c764af36"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-1-0-2-1.log",
+          "sha256": "59d723f920697b55edff7ab1591ca4e717bc6551ff4004e23784dee85dcaa016"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-1-0-2-2.log",
+          "sha256": "1dc8b543a407e9243421c301f52f4f6804c1ced15e5e38cd4268adc8908e347c"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-1-1-0-0.log",
+          "sha256": "a2d6394e75511c4c822808d4c9de642d3cc5f1b056ebd08f46adcdfc8dbdaae9"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-1-1-0-1.log",
+          "sha256": "e961d0dbc2cf1fc8ca1af31bf2551d194d7dd171e3fb326c278b615d68133cd9"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-1-1-0-2.log",
+          "sha256": "bd4a63004e8940f964c5882c3f13c0b67cebe871bdfcf774392a0cd3a16c1768"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-1-2-0-0.log",
+          "sha256": "c8850eebe14081610208ce0d9188077d5436d05375bef623604d6a9c673a166a"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-1-2-0-1.log",
+          "sha256": "d57360b395e130e1b0e452f95b0708d5472dd6fe6ddbee83a31c66d3fd025a7d"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-1-2-0-2.log",
+          "sha256": "2785cc9875a97f6739a8b2c2151ec10e1170d9c44181bb04af66861ce39aa171"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-12-0-0-0.log",
+          "sha256": "5740432df1272d34662886fd68951ed80745e0bb351608f7cee33a6f1fea6117"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-12-0-0-1.log",
+          "sha256": "10fdf0f7a6e86a21fe3b118dc7eaf03596b0bdde37cd9f6817501b165ed45033"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-12-0-0-2.log",
+          "sha256": "c27119ec64731bf9228dbbcc79f14125cd4b4ff9b18c7dbc1be8dfad12310960"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-12-0-1-0.log",
+          "sha256": "f114403fe0091d5a25205b0efed18522d765856dba36d17ce14b58d08117dab2"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-12-0-1-1.log",
+          "sha256": "af658f163db8ccfab7ad9ef7acce307777cbb47cfdf3dce6c338c2760f9b5e78"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-12-0-1-2.log",
+          "sha256": "0574e80f3c49cb35b2f5c0a06da88e847a4a667f4caf70f85aab7d9db2da92a6"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-12-0-2-0.log",
+          "sha256": "d7caed71fb08cefee4a980d16d41c1e2f7c970c1cc2e6e272a4acd14237cf825"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-12-0-2-1.log",
+          "sha256": "27cd247674bf76aa41b627784826846016a017ead550a2500fc810249e505070"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-12-0-2-2.log",
+          "sha256": "b04061f86ba8cc3c363b89e43454b7afca19b0366a265b3043804d69ec412e60"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-12-1-0-0.log",
+          "sha256": "a6f3c5d9a2fbf8fe7676682dd693bfb67de79741ece3989556a71056eb9ada9f"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-12-1-0-1.log",
+          "sha256": "ab185e7c14d3e34c07a389aab0129fa4fa79a95b18125089af301b767c1a7451"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-12-1-0-2.log",
+          "sha256": "e056efc309a2a711fbb0d657db84024eb5b878f3dbeafcc60ccf170705fd90d1"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-12-2-0-0.log",
+          "sha256": "6cedebc12262d96f98a85399ad782fafebfb25dc8a3b6b11fb4a3673b78fb0b1"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-12-2-0-1.log",
+          "sha256": "d668338237595ab526f96578aa3b4406d1e7192f0d75526c3e7d0eb0eae09bc0"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-12-2-0-2.log",
+          "sha256": "c4ad47cfd617eafb93f6c6fe5afc01f39e4e2f1bd8100e62ebf79e769ae599e4"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-4-0-0-0.log",
+          "sha256": "703c0a77c5a33bb02da4db10a30c45dfc6c6f29fca753d85e1946d5e6c2ef90e"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-4-0-0-1.log",
+          "sha256": "414645092ecc750334989c2fae43c1f9794f49c6abc3ffb349955e89271886cf"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-4-0-0-2.log",
+          "sha256": "076613ae7a29b2e8f3f5dfedc3890644e84d2f8e116b73b8867b35a6f9e1e0b0"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-4-0-1-0.log",
+          "sha256": "3e79abbf235f4b311365491c21c8ed81ad41f818c7da4e8d59c6f83ebc1806d9"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-4-0-1-1.log",
+          "sha256": "b13351899282e3a80bc26e76fdee3284b879653501a20a9a1cc0edf7a29bae32"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-4-0-1-2.log",
+          "sha256": "59a7211de47476673555702aaa28b7c236516df49733a6c91dd6ac35d3c396aa"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-4-0-2-0.log",
+          "sha256": "821e2791e430db740c89176c1095286298ec2050f0d6c3fd404037c3ed38da91"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-4-0-2-1.log",
+          "sha256": "5d19fe4c2ef3d7d52dc3aae55f59e00d82db882cc9878e50524f04f21131e326"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-4-0-2-2.log",
+          "sha256": "76c44e08fd147a0195f26682fa1e8d1ae9aa9e2fc3c31ebf93074fca13d1787e"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-4-1-0-0.log",
+          "sha256": "da5478807256d6e335205c7b5eaf51bf4aa0e30389f734e066b6543aabb831c1"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-4-1-0-1.log",
+          "sha256": "ad2698f7a69f4aaab6917e9b424ac48738127da527394983ebbccc4e2a9426f7"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-4-1-0-2.log",
+          "sha256": "0ff6ebd6ac0fd36c7f363fe1c9cffb6b8a40285790d94ab2d3eb0455134be7d5"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-4-2-0-0.log",
+          "sha256": "8c0ba352a5b55c098d3b758f3136655aa8f9e2959186f153ebe6f63592a0f4af"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-4-2-0-1.log",
+          "sha256": "67ae0c73598d3994bfca70e94b17a79f8e51ba8e30cf4077bcd6ae599fd5d13f"
+        },
+        {
+          "path": "target/entropy-subsystem/benchmark/before-4-2-0-2.log",
+          "sha256": "c3c803d0b0482f825225f596bcf71e4d65148df896c7efc3ef0c3c91394c3316"
+        }
+      ]
+    },
+    "long_denied_control": {
+      "method": "100000 calls/thread on the already-local denied getrandom path, same alternating pairs.",
+      "path": "target/entropy-subsystem/denied-control/results.json",
+      "sha256": "22d4229d6f7e1c1644212a6ff2981318dbeb89a1e2a432b5747cf49fc22d14b6",
+      "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126",
+      "runner_sha256": {
+        "before": "80ebd7b4242e91b5655f56cb3d0a4a7f59c55f7848d5db93b8ea7a6a2cb3d62b",
+        "after": "bac86c81836bc5c646674f0d18bd6ee7a0916a41fd135034d7d425779807968d"
+      },
+      "rows": [
+        {
+          "runner": "before",
+          "cpus": 1,
+          "policy": 2,
+          "api": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 158227875,
+          "wall_seconds": 0.19715066699999984
+        },
+        {
+          "runner": "after",
+          "cpus": 1,
+          "policy": 2,
+          "api": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 159479666,
+          "wall_seconds": 0.20194579200000007
+        },
+        {
+          "runner": "after",
+          "cpus": 1,
+          "policy": 2,
+          "api": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 159207000,
+          "wall_seconds": 0.19880187500000002
+        },
+        {
+          "runner": "before",
+          "cpus": 1,
+          "policy": 2,
+          "api": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 160539750,
+          "wall_seconds": 0.19089270899999988
+        },
+        {
+          "runner": "before",
+          "cpus": 1,
+          "policy": 2,
+          "api": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 159684083,
+          "wall_seconds": 0.1895809169999998
+        },
+        {
+          "runner": "after",
+          "cpus": 1,
+          "policy": 2,
+          "api": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 159475750,
+          "wall_seconds": 0.19134470799999992
+        },
+        {
+          "runner": "before",
+          "cpus": 4,
+          "policy": 2,
+          "api": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 121902209,
+          "wall_seconds": 0.1501540420000005
+        },
+        {
+          "runner": "after",
+          "cpus": 4,
+          "policy": 2,
+          "api": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 123497208,
+          "wall_seconds": 0.14997083300000025
+        },
+        {
+          "runner": "after",
+          "cpus": 4,
+          "policy": 2,
+          "api": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 121069667,
+          "wall_seconds": 0.150073291
+        },
+        {
+          "runner": "before",
+          "cpus": 4,
+          "policy": 2,
+          "api": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 123821250,
+          "wall_seconds": 0.14942775000000008
+        },
+        {
+          "runner": "before",
+          "cpus": 4,
+          "policy": 2,
+          "api": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 121565041,
+          "wall_seconds": 0.1498722499999996
+        },
+        {
+          "runner": "after",
+          "cpus": 4,
+          "policy": 2,
+          "api": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 121673000,
+          "wall_seconds": 0.1453289169999996
+        },
+        {
+          "runner": "before",
+          "cpus": 12,
+          "policy": 2,
+          "api": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 227817292,
+          "wall_seconds": 0.25021795800000035
+        },
+        {
+          "runner": "after",
+          "cpus": 12,
+          "policy": 2,
+          "api": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 231427208,
+          "wall_seconds": 0.2577185420000001
+        },
+        {
+          "runner": "after",
+          "cpus": 12,
+          "policy": 2,
+          "api": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 230919250,
+          "wall_seconds": 0.24956954099999962
+        },
+        {
+          "runner": "before",
+          "cpus": 12,
+          "policy": 2,
+          "api": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 229125916,
+          "wall_seconds": 0.2536031660000013
+        },
+        {
+          "runner": "before",
+          "cpus": 12,
+          "policy": 2,
+          "api": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 231737166,
+          "wall_seconds": 0.24674354099999896
+        },
+        {
+          "runner": "after",
+          "cpus": 12,
+          "policy": 2,
+          "api": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 228566708,
+          "wall_seconds": 0.2481101670000001
+        }
+      ],
+      "medians": [
+        {
+          "cpus": 1,
+          "policy": 2,
+          "api": 0,
+          "before_ms": 159.684083,
+          "after_ms": 159.47575,
+          "change_percent": -0.13046572713197868
+        },
+        {
+          "cpus": 4,
+          "policy": 2,
+          "api": 0,
+          "before_ms": 121.902209,
+          "after_ms": 121.673,
+          "change_percent": -0.18802694543459397
+        },
+        {
+          "cpus": 12,
+          "policy": 2,
+          "api": 0,
+          "before_ms": 229.125916,
+          "after_ms": 230.91925,
+          "change_percent": 0.782684923341459
+        }
+      ],
+      "logs": [
+        {
+          "path": "target/entropy-subsystem/denied-control/after-1-2-0-0.log",
+          "sha256": "9e54fe879b9569013b63fdaf232131ef118bd3fae5658df0de01259b8b6aa97e"
+        },
+        {
+          "path": "target/entropy-subsystem/denied-control/after-1-2-0-1.log",
+          "sha256": "6d5502cdab507c3decfada046250550f397687972b5e106f6e237ffc9c3cf08d"
+        },
+        {
+          "path": "target/entropy-subsystem/denied-control/after-1-2-0-2.log",
+          "sha256": "89bff8d322e5850e6a1fa09180b5b5c72fdbe240fa9ba54ea3746c1c7a4be836"
+        },
+        {
+          "path": "target/entropy-subsystem/denied-control/after-12-2-0-0.log",
+          "sha256": "f22db9154e3e96a250fb310a9e7413a1de506e08fbc7420cf8612e3cd03e79be"
+        },
+        {
+          "path": "target/entropy-subsystem/denied-control/after-12-2-0-1.log",
+          "sha256": "26d40645ced5381a5e5c6fa1ae3dedeca09b0ee4c77bcbf44bee81e8b0cdb45c"
+        },
+        {
+          "path": "target/entropy-subsystem/denied-control/after-12-2-0-2.log",
+          "sha256": "1bf00ce60f168e393f082b58dcf23df1543f23a3b1b25c5603d4b6be899802b8"
+        },
+        {
+          "path": "target/entropy-subsystem/denied-control/after-4-2-0-0.log",
+          "sha256": "f2017ef2bcaa0e4bc5a67afe13cbc3f22c552f36135f2502e266fa37e4c8ea50"
+        },
+        {
+          "path": "target/entropy-subsystem/denied-control/after-4-2-0-1.log",
+          "sha256": "c928e2f83dfd9ff8309820c1c1405707d880136d58dea1ead860be93a8867cc9"
+        },
+        {
+          "path": "target/entropy-subsystem/denied-control/after-4-2-0-2.log",
+          "sha256": "a01c8aa6fef93bdeff7e2ff51ac479ed55958ee1a51576e640485b8b2ff1a1a5"
+        },
+        {
+          "path": "target/entropy-subsystem/denied-control/before-1-2-0-0.log",
+          "sha256": "4753a7918031ca2a2ee9f599af2a691015dfeedc15054de7848d525ee03cc0c3"
+        },
+        {
+          "path": "target/entropy-subsystem/denied-control/before-1-2-0-1.log",
+          "sha256": "a47f3fbb1ef33dfc13a008a630781a5bc72e2f1cdec3f1169e23b7e1aa715192"
+        },
+        {
+          "path": "target/entropy-subsystem/denied-control/before-1-2-0-2.log",
+          "sha256": "0547087c1b9b55711babbb0bfc387fd53d2c0c2d2ece9bedceb1b57878cdc910"
+        },
+        {
+          "path": "target/entropy-subsystem/denied-control/before-12-2-0-0.log",
+          "sha256": "b386942f3ffabe0f38589e9dda0bfa62152ec07f6425e584777c8e5fe9ce3e54"
+        },
+        {
+          "path": "target/entropy-subsystem/denied-control/before-12-2-0-1.log",
+          "sha256": "1b071af10ee7907bfd6390ae3b80e57c96488727fb392a88e83cfe32f0987920"
+        },
+        {
+          "path": "target/entropy-subsystem/denied-control/before-12-2-0-2.log",
+          "sha256": "b688893b53d30f5956bc0a88a3ebacd12bcfbd96cc8f7cfff3fbfc81f07174ee"
+        },
+        {
+          "path": "target/entropy-subsystem/denied-control/before-4-2-0-0.log",
+          "sha256": "97ad7b9e3b095c391366e19dd6f5dc26f83bc606a748e1a176b6adcaa461b77e"
+        },
+        {
+          "path": "target/entropy-subsystem/denied-control/before-4-2-0-1.log",
+          "sha256": "99e1b4dacb42a1ba4c0120f901f5702b371edfe186f26e3ca507a462e00e01e3"
+        },
+        {
+          "path": "target/entropy-subsystem/denied-control/before-4-2-0-2.log",
+          "sha256": "c933780b27d2eb2deaac0d25971d233f7b4a777f3363aa428c3290fcc588d24c"
+        }
+      ]
+    },
+    "long_short_case_review": {
+      "method": "20000 calls/thread for the initially slower short single-CPU raw and twelve-CPU random-device readv cases.",
+      "path": "target/entropy-subsystem/long-controls/results.json",
+      "sha256": "3e9ac2b0f2df40ed75102dc0d4e0007cbcd742b1d060e42d3c121e39cfc2ea09",
+      "fixture_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126",
+      "runner_sha256": {
+        "before": "80ebd7b4242e91b5655f56cb3d0a4a7f59c55f7848d5db93b8ea7a6a2cb3d62b",
+        "after": "bac86c81836bc5c646674f0d18bd6ee7a0916a41fd135034d7d425779807968d"
+      },
+      "rows": [
+        {
+          "runner": "before",
+          "cpus": 1,
+          "policy": 0,
+          "api": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 52299625,
+          "wall_seconds": 0.08650875
+        },
+        {
+          "runner": "after",
+          "cpus": 1,
+          "policy": 0,
+          "api": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 52160041,
+          "wall_seconds": 0.08266587500000001
+        },
+        {
+          "runner": "after",
+          "cpus": 1,
+          "policy": 0,
+          "api": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 51848792,
+          "wall_seconds": 0.08291658300000002
+        },
+        {
+          "runner": "before",
+          "cpus": 1,
+          "policy": 0,
+          "api": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 52081542,
+          "wall_seconds": 0.085605667
+        },
+        {
+          "runner": "before",
+          "cpus": 1,
+          "policy": 0,
+          "api": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 52205041,
+          "wall_seconds": 0.07977125000000002
+        },
+        {
+          "runner": "after",
+          "cpus": 1,
+          "policy": 0,
+          "api": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 52357458,
+          "wall_seconds": 0.08308591699999995
+        },
+        {
+          "runner": "before",
+          "cpus": 12,
+          "policy": 0,
+          "api": 2,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 198321791,
+          "wall_seconds": 0.2623738750000001
+        },
+        {
+          "runner": "after",
+          "cpus": 12,
+          "policy": 0,
+          "api": 2,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 200452708,
+          "wall_seconds": 0.25638462500000003
+        },
+        {
+          "runner": "after",
+          "cpus": 12,
+          "policy": 0,
+          "api": 2,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 195418916,
+          "wall_seconds": 0.25341091700000007
+        },
+        {
+          "runner": "before",
+          "cpus": 12,
+          "policy": 0,
+          "api": 2,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 200066875,
+          "wall_seconds": 0.25334845799999983
+        },
+        {
+          "runner": "before",
+          "cpus": 12,
+          "policy": 0,
+          "api": 2,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 197232625,
+          "wall_seconds": 0.25087183299999993
+        },
+        {
+          "runner": "after",
+          "cpus": 12,
+          "policy": 0,
+          "api": 2,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 210190083,
+          "wall_seconds": 0.26084270900000006
+        }
+      ],
+      "medians": [
+        {
+          "cpus": 1,
+          "policy": 0,
+          "api": 0,
+          "before_ms": 52.205041,
+          "after_ms": 52.160041,
+          "change_percent": -0.08619857227963879
+        },
+        {
+          "cpus": 12,
+          "policy": 0,
+          "api": 2,
+          "before_ms": 198.321791,
+          "after_ms": 200.452708,
+          "change_percent": 1.0744744635752257
+        }
+      ],
+      "logs": [
+        {
+          "path": "target/entropy-subsystem/long-controls/after-1-0-0-0.log",
+          "sha256": "680ac8e4b85c32d85617f70a1f156ac390ceab89e25503c42f4ecad28e15826e"
+        },
+        {
+          "path": "target/entropy-subsystem/long-controls/after-1-0-0-1.log",
+          "sha256": "dbcd99c48d3dd1f9cf4600864121ff1ec6bec665409fc4dc2dc05d16871f3aa7"
+        },
+        {
+          "path": "target/entropy-subsystem/long-controls/after-1-0-0-2.log",
+          "sha256": "ff313e7710a22ba2e11c77cd2652f9321d72858dd3e2fb0046642955a36e225b"
+        },
+        {
+          "path": "target/entropy-subsystem/long-controls/after-12-0-2-0.log",
+          "sha256": "64d244d7835c1ce10d754db2a952a5061018dbac407415384cf494653d2fadf9"
+        },
+        {
+          "path": "target/entropy-subsystem/long-controls/after-12-0-2-1.log",
+          "sha256": "63ed045d7373799581687d1d27e30583e922099f6de5607d99071d95ae02f664"
+        },
+        {
+          "path": "target/entropy-subsystem/long-controls/after-12-0-2-2.log",
+          "sha256": "f3de012061981460d86e76c1565fa93f6e1fff91479d5858270e0cc661abccf2"
+        },
+        {
+          "path": "target/entropy-subsystem/long-controls/before-1-0-0-0.log",
+          "sha256": "2b28b036b873cbd7bf508c08dc93391c300be3882f4c8b41f27768897258afc4"
+        },
+        {
+          "path": "target/entropy-subsystem/long-controls/before-1-0-0-1.log",
+          "sha256": "e67f5370a096594d481f6e5ea6f49209d9a210cc93491191cf1709ef598e9632"
+        },
+        {
+          "path": "target/entropy-subsystem/long-controls/before-1-0-0-2.log",
+          "sha256": "e93e52f268b9b96f6712ea1111c4d4d9bce046a161e68a8fd117768ce6cf2c82"
+        },
+        {
+          "path": "target/entropy-subsystem/long-controls/before-12-0-2-0.log",
+          "sha256": "ee1234722bdbf5eafba3bede0f19cfeca834bb88e3d80cdb8cc39df5713ca151"
+        },
+        {
+          "path": "target/entropy-subsystem/long-controls/before-12-0-2-1.log",
+          "sha256": "58bd82192e5a6db94ed43c968ee6010f6752013f7ef6826971e974c737cb92a5"
+        },
+        {
+          "path": "target/entropy-subsystem/long-controls/before-12-0-2-2.log",
+          "sha256": "a8e1934d96b92c35ef16f11d8d30340117621e77ffdcb889ba6c287159b371d1"
+        }
+      ]
+    },
+    "native_arm64_linux": {
+      "path": "target/local-ci/io/entropy-subsystem/native-results.json",
+      "sha256": "3204ffa40d26c804c206e3a8ff2481d14300a1e6ef221a30a6b929a4fbe4bc2d",
+      "data": {
+        "fixture_sha256": "a8f4e0384d1395487a9077b8bb36a55b3bf011e8ee7b83a4a5963bf99863a911",
+        "binary_sha256": "db43621a2292c842341cf67c117f246191c562d483b5e655fbeed6a6adc3a126",
+        "rows": [
+          {
+            "cpus": 1,
+            "policy": 0,
+            "api": 0,
+            "rep": 0,
+            "code": 0,
+            "elapsed_ns": 76572,
+            "stdout": "worker-entropy: threads=1 rounds=200 policy=0 api=0 elapsed_ns=76572: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 1,
+            "policy": 0,
+            "api": 0,
+            "rep": 1,
+            "code": 0,
+            "elapsed_ns": 78232,
+            "stdout": "worker-entropy: threads=1 rounds=200 policy=0 api=0 elapsed_ns=78232: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 1,
+            "policy": 0,
+            "api": 0,
+            "rep": 2,
+            "code": 0,
+            "elapsed_ns": 84664,
+            "stdout": "worker-entropy: threads=1 rounds=200 policy=0 api=0 elapsed_ns=84664: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 1,
+            "policy": 1,
+            "api": 0,
+            "rep": 0,
+            "code": 0,
+            "elapsed_ns": 81759,
+            "stdout": "worker-entropy: threads=1 rounds=200 policy=1 api=0 elapsed_ns=81759: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 1,
+            "policy": 1,
+            "api": 0,
+            "rep": 1,
+            "code": 0,
+            "elapsed_ns": 88276,
+            "stdout": "worker-entropy: threads=1 rounds=200 policy=1 api=0 elapsed_ns=88276: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 1,
+            "policy": 1,
+            "api": 0,
+            "rep": 2,
+            "code": 0,
+            "elapsed_ns": 119817,
+            "stdout": "worker-entropy: threads=1 rounds=200 policy=1 api=0 elapsed_ns=119817: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 1,
+            "policy": 2,
+            "api": 0,
+            "rep": 0,
+            "code": 0,
+            "elapsed_ns": 49678,
+            "stdout": "worker-entropy: threads=1 rounds=200 policy=2 api=0 elapsed_ns=49678: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 1,
+            "policy": 2,
+            "api": 0,
+            "rep": 1,
+            "code": 0,
+            "elapsed_ns": 46358,
+            "stdout": "worker-entropy: threads=1 rounds=200 policy=2 api=0 elapsed_ns=46358: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 1,
+            "policy": 2,
+            "api": 0,
+            "rep": 2,
+            "code": 0,
+            "elapsed_ns": 46150,
+            "stdout": "worker-entropy: threads=1 rounds=200 policy=2 api=0 elapsed_ns=46150: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 1,
+            "policy": 0,
+            "api": 1,
+            "rep": 0,
+            "code": 0,
+            "elapsed_ns": 87362,
+            "stdout": "worker-entropy: threads=1 rounds=200 policy=0 api=1 elapsed_ns=87362: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 1,
+            "policy": 0,
+            "api": 1,
+            "rep": 1,
+            "code": 0,
+            "elapsed_ns": 84789,
+            "stdout": "worker-entropy: threads=1 rounds=200 policy=0 api=1 elapsed_ns=84789: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 1,
+            "policy": 0,
+            "api": 1,
+            "rep": 2,
+            "code": 0,
+            "elapsed_ns": 90434,
+            "stdout": "worker-entropy: threads=1 rounds=200 policy=0 api=1 elapsed_ns=90434: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 1,
+            "policy": 0,
+            "api": 2,
+            "rep": 0,
+            "code": 0,
+            "elapsed_ns": 94376,
+            "stdout": "worker-entropy: threads=1 rounds=200 policy=0 api=2 elapsed_ns=94376: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 1,
+            "policy": 0,
+            "api": 2,
+            "rep": 1,
+            "code": 0,
+            "elapsed_ns": 87445,
+            "stdout": "worker-entropy: threads=1 rounds=200 policy=0 api=2 elapsed_ns=87445: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 1,
+            "policy": 0,
+            "api": 2,
+            "rep": 2,
+            "code": 0,
+            "elapsed_ns": 86906,
+            "stdout": "worker-entropy: threads=1 rounds=200 policy=0 api=2 elapsed_ns=86906: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 4,
+            "policy": 0,
+            "api": 0,
+            "rep": 0,
+            "code": 0,
+            "elapsed_ns": 112554,
+            "stdout": "worker-entropy: threads=4 rounds=200 policy=0 api=0 elapsed_ns=112554: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 4,
+            "policy": 0,
+            "api": 0,
+            "rep": 1,
+            "code": 0,
+            "elapsed_ns": 162772,
+            "stdout": "worker-entropy: threads=4 rounds=200 policy=0 api=0 elapsed_ns=162772: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 4,
+            "policy": 0,
+            "api": 0,
+            "rep": 2,
+            "code": 0,
+            "elapsed_ns": 120896,
+            "stdout": "worker-entropy: threads=4 rounds=200 policy=0 api=0 elapsed_ns=120896: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 4,
+            "policy": 1,
+            "api": 0,
+            "rep": 0,
+            "code": 0,
+            "elapsed_ns": 142934,
+            "stdout": "worker-entropy: threads=4 rounds=200 policy=1 api=0 elapsed_ns=142934: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 4,
+            "policy": 1,
+            "api": 0,
+            "rep": 1,
+            "code": 0,
+            "elapsed_ns": 223407,
+            "stdout": "worker-entropy: threads=4 rounds=200 policy=1 api=0 elapsed_ns=223407: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 4,
+            "policy": 1,
+            "api": 0,
+            "rep": 2,
+            "code": 0,
+            "elapsed_ns": 149948,
+            "stdout": "worker-entropy: threads=4 rounds=200 policy=1 api=0 elapsed_ns=149948: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 4,
+            "policy": 2,
+            "api": 0,
+            "rep": 0,
+            "code": 0,
+            "elapsed_ns": 93961,
+            "stdout": "worker-entropy: threads=4 rounds=200 policy=2 api=0 elapsed_ns=93961: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 4,
+            "policy": 2,
+            "api": 0,
+            "rep": 1,
+            "code": 0,
+            "elapsed_ns": 97489,
+            "stdout": "worker-entropy: threads=4 rounds=200 policy=2 api=0 elapsed_ns=97489: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 4,
+            "policy": 2,
+            "api": 0,
+            "rep": 2,
+            "code": 0,
+            "elapsed_ns": 109317,
+            "stdout": "worker-entropy: threads=4 rounds=200 policy=2 api=0 elapsed_ns=109317: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 4,
+            "policy": 0,
+            "api": 1,
+            "rep": 0,
+            "code": 0,
+            "elapsed_ns": 151608,
+            "stdout": "worker-entropy: threads=4 rounds=200 policy=0 api=1 elapsed_ns=151608: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 4,
+            "policy": 0,
+            "api": 1,
+            "rep": 1,
+            "code": 0,
+            "elapsed_ns": 133264,
+            "stdout": "worker-entropy: threads=4 rounds=200 policy=0 api=1 elapsed_ns=133264: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 4,
+            "policy": 0,
+            "api": 1,
+            "rep": 2,
+            "code": 0,
+            "elapsed_ns": 148246,
+            "stdout": "worker-entropy: threads=4 rounds=200 policy=0 api=1 elapsed_ns=148246: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 4,
+            "policy": 0,
+            "api": 2,
+            "rep": 0,
+            "code": 0,
+            "elapsed_ns": 137082,
+            "stdout": "worker-entropy: threads=4 rounds=200 policy=0 api=2 elapsed_ns=137082: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 4,
+            "policy": 0,
+            "api": 2,
+            "rep": 1,
+            "code": 0,
+            "elapsed_ns": 141564,
+            "stdout": "worker-entropy: threads=4 rounds=200 policy=0 api=2 elapsed_ns=141564: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 4,
+            "policy": 0,
+            "api": 2,
+            "rep": 2,
+            "code": 0,
+            "elapsed_ns": 128242,
+            "stdout": "worker-entropy: threads=4 rounds=200 policy=0 api=2 elapsed_ns=128242: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 12,
+            "policy": 0,
+            "api": 0,
+            "rep": 0,
+            "code": 0,
+            "elapsed_ns": 321435,
+            "stdout": "worker-entropy: threads=12 rounds=200 policy=0 api=0 elapsed_ns=321435: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 12,
+            "policy": 0,
+            "api": 0,
+            "rep": 1,
+            "code": 0,
+            "elapsed_ns": 369868,
+            "stdout": "worker-entropy: threads=12 rounds=200 policy=0 api=0 elapsed_ns=369868: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 12,
+            "policy": 0,
+            "api": 0,
+            "rep": 2,
+            "code": 0,
+            "elapsed_ns": 251753,
+            "stdout": "worker-entropy: threads=12 rounds=200 policy=0 api=0 elapsed_ns=251753: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 12,
+            "policy": 1,
+            "api": 0,
+            "rep": 0,
+            "code": 0,
+            "elapsed_ns": 422161,
+            "stdout": "worker-entropy: threads=12 rounds=200 policy=1 api=0 elapsed_ns=422161: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 12,
+            "policy": 1,
+            "api": 0,
+            "rep": 1,
+            "code": 0,
+            "elapsed_ns": 368249,
+            "stdout": "worker-entropy: threads=12 rounds=200 policy=1 api=0 elapsed_ns=368249: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 12,
+            "policy": 1,
+            "api": 0,
+            "rep": 2,
+            "code": 0,
+            "elapsed_ns": 342809,
+            "stdout": "worker-entropy: threads=12 rounds=200 policy=1 api=0 elapsed_ns=342809: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 12,
+            "policy": 2,
+            "api": 0,
+            "rep": 0,
+            "code": 0,
+            "elapsed_ns": 266154,
+            "stdout": "worker-entropy: threads=12 rounds=200 policy=2 api=0 elapsed_ns=266154: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 12,
+            "policy": 2,
+            "api": 0,
+            "rep": 1,
+            "code": 0,
+            "elapsed_ns": 208839,
+            "stdout": "worker-entropy: threads=12 rounds=200 policy=2 api=0 elapsed_ns=208839: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 12,
+            "policy": 2,
+            "api": 0,
+            "rep": 2,
+            "code": 0,
+            "elapsed_ns": 206225,
+            "stdout": "worker-entropy: threads=12 rounds=200 policy=2 api=0 elapsed_ns=206225: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 12,
+            "policy": 0,
+            "api": 1,
+            "rep": 0,
+            "code": 0,
+            "elapsed_ns": 305789,
+            "stdout": "worker-entropy: threads=12 rounds=200 policy=0 api=1 elapsed_ns=305789: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 12,
+            "policy": 0,
+            "api": 1,
+            "rep": 1,
+            "code": 0,
+            "elapsed_ns": 334549,
+            "stdout": "worker-entropy: threads=12 rounds=200 policy=0 api=1 elapsed_ns=334549: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 12,
+            "policy": 0,
+            "api": 1,
+            "rep": 2,
+            "code": 0,
+            "elapsed_ns": 256443,
+            "stdout": "worker-entropy: threads=12 rounds=200 policy=0 api=1 elapsed_ns=256443: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 12,
+            "policy": 0,
+            "api": 2,
+            "rep": 0,
+            "code": 0,
+            "elapsed_ns": 317534,
+            "stdout": "worker-entropy: threads=12 rounds=200 policy=0 api=2 elapsed_ns=317534: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 12,
+            "policy": 0,
+            "api": 2,
+            "rep": 1,
+            "code": 0,
+            "elapsed_ns": 333844,
+            "stdout": "worker-entropy: threads=12 rounds=200 policy=0 api=2 elapsed_ns=333844: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 12,
+            "policy": 0,
+            "api": 2,
+            "rep": 2,
+            "code": 0,
+            "elapsed_ns": 373852,
+            "stdout": "worker-entropy: threads=12 rounds=200 policy=0 api=2 elapsed_ns=373852: ok\n",
+            "stderr": ""
+          }
+        ]
+      },
+      "environment": "Native ARM64 Ubuntu local CI VM, 6 CPUs/8 GiB; twelve guest threads oversubscribe; no CPU pinning.",
+      "note": "Same static Linux program, full functional preflight and 200 requests/thread. Kernel CSPRNG/seccomp/device implementation and background population differ."
+    },
+    "native_macos": {
+      "path": "target/entropy-subsystem/host-results.json",
+      "sha256": "2af064c1b24e919f29cab28c29451aba2cd93f7f6ceba89e225826a8ccd80ed3",
+      "data": {
+        "binary_sha256": "66059c9914ca6c59d27911c8f37d07873d6085829571cd255bf4a8b61600a9e5",
+        "rows": [
+          {
+            "cpus": 1,
+            "rep": 0,
+            "code": 0,
+            "elapsed_ns": 446000,
+            "stdout": "worker-entropy: threads=1 rounds=200 policy=0 api=0 elapsed_ns=446000: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 1,
+            "rep": 1,
+            "code": 0,
+            "elapsed_ns": 355000,
+            "stdout": "worker-entropy: threads=1 rounds=200 policy=0 api=0 elapsed_ns=355000: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 1,
+            "rep": 2,
+            "code": 0,
+            "elapsed_ns": 302000,
+            "stdout": "worker-entropy: threads=1 rounds=200 policy=0 api=0 elapsed_ns=302000: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 4,
+            "rep": 0,
+            "code": 0,
+            "elapsed_ns": 415000,
+            "stdout": "worker-entropy: threads=4 rounds=200 policy=0 api=0 elapsed_ns=415000: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 4,
+            "rep": 1,
+            "code": 0,
+            "elapsed_ns": 440000,
+            "stdout": "worker-entropy: threads=4 rounds=200 policy=0 api=0 elapsed_ns=440000: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 4,
+            "rep": 2,
+            "code": 0,
+            "elapsed_ns": 618000,
+            "stdout": "worker-entropy: threads=4 rounds=200 policy=0 api=0 elapsed_ns=618000: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 12,
+            "rep": 0,
+            "code": 0,
+            "elapsed_ns": 2205000,
+            "stdout": "worker-entropy: threads=12 rounds=200 policy=0 api=0 elapsed_ns=2205000: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 12,
+            "rep": 1,
+            "code": 0,
+            "elapsed_ns": 2189000,
+            "stdout": "worker-entropy: threads=12 rounds=200 policy=0 api=0 elapsed_ns=2189000: ok\n",
+            "stderr": ""
+          },
+          {
+            "cpus": 12,
+            "rep": 2,
+            "code": 0,
+            "elapsed_ns": 1979000,
+            "stdout": "worker-entropy: threads=12 rounds=200 policy=0 api=0 elapsed_ns=1979000: ok\n",
+            "stderr": ""
+          }
+        ]
+      },
+      "note": "Native clang -O2 fixture uses getentropy (the same 64-byte host provider) with 200 calls/thread. It does not emulate Linux seccomp, proc or descriptor APIs."
+    },
+    "baseline_runner_sha256": "80ebd7b4242e91b5655f56cb3d0a4a7f59c55f7848d5db93b8ea7a6a2cb3d62b",
+    "candidate_runner_sha256": "bac86c81836bc5c646674f0d18bd6ee7a0916a41fd135034d7d425779807968d",
+    "candidate_note": "Measured binary uses final production source with pre-commit embedded runtime metadata. Later modifications only refine cfg(test) observation criteria and English docs; production prefixes are unchanged. Final committed-pin installation is covered by eighteen actual program smoke cases."
+  },
+  "interpretation": [
+    "Four-CPU raw/ALLOW getrandom totals fall from 47.344/46.688 ms to 0.888/1.012 ms; twelve CPUs from 398.956/402.456 ms to 3.380/3.423 ms",
+    "Short single-CPU raw and twelve-CPU readv controls initially vary by +7.63%/+13.31%; at 20000 calls medians change by -0.09%/+1.07%. No sustained regression is established, but three samples do not prove universal zero overhead",
+    "100000-call already-local ERRNO controls change by -0.19% to +0.78%",
+    "Unchanged device paths have mixed short results; improvements are not attributed to a new byte-I/O algorithm",
+    "Final guest metrics have no getrandom (278) cohort returns; other console/startup services and mapping scopes remain, so aggregate service counts are not claimed to be zero",
+    "No Firefox, Docker startup or Geekbench acceleration is inferred from these fixtures"
+  ],
+  "corrected_failures": [
+    {
+      "kind": "Incorrect zero-length oracle assumption",
+      "evidence": {
+        "path": "target/entropy-subsystem/native-first-incorrect-zero-preflight.json",
+        "sha256": "039dfd732130dab2f32c2375d841541585d83763f8e2ce0c21ec16b2a134c174",
+        "data": {
+          "fixture_sha256": "52539e9878716d02ce7cb99231f71004cc2e2f1575479815b8ee1f10c6128a22",
+          "binary_sha256": "49f475e2e9515f35d1a940bc5c6851a9cfe607892ee552edaa1473a1c602aa7b",
+          "rows": [
+            {
+              "cpus": 1,
+              "policy": 0,
+              "api": 0,
+              "rep": 0,
+              "code": -6,
+              "elapsed_ns": null,
+              "stdout": "",
+              "stderr": "worker-entropy: tests/fixtures/worker-entropy.c:56: preflight: Assertion `syscall(SYS_getrandom, (void *)-1, 0, 0) == 0' failed.\n"
+            }
+          ]
+        }
+      },
+      "correction": "Initial test expected an out-of-range zero-length pointer to succeed. Native Linux returns EFAULT. Reverted the draft early return before delivery; final preflight verifies NULL success and invalid-range failure. Low-32-bit flags correction is independently verified."
+    },
+    {
+      "kind": "Mac network access restriction",
+      "process_log": {
+        "path": "target/entropy-subsystem/process-all.log",
+        "sha256": "369b3c50ed19af4c2d3e1c7d238b592f688cc5ec1f62a7193dbcb29e0b262efe"
+      },
+      "runtime_log": {
+        "path": "target/entropy-subsystem/runtime-macos-first-network-restriction.log",
+        "sha256": "3c57dfdfcc12503acb11017abbeb1eecc7018b41bb10993480596a1f88ca6a70"
+      },
+      "correction": "Seventeen process network tests and Linux-layer socket tests were initially denied OS networking. Failed process cases passed with network access; final full runtime workflows and full process coverage passed."
+    },
+    {
+      "kind": "Fixed-budget concurrent test observations",
+      "linux_log": {
+        "path": "target/entropy-subsystem/process-first-linux-concurrent-failure.log",
+        "sha256": "0d8e22929af00464e3113c1645aedbb809759995ff0a2ff07dcb3a2388381159"
+      },
+      "mac_log": {
+        "path": "target/entropy-subsystem/process-complete-final.log",
+        "sha256": "2a05ac77919331418b009c5eff4875d8a408705f19ea4d0fec61d79238c20da1"
+      },
+      "standalone_repeats": {
+        "path": "target/entropy-subsystem/linux-test-diagnostic-final-driver.log",
+        "sha256": "f8de0189d4b261ad319db575cf7cc9c2e48cb5b5727cbda02243e4b30aa43269"
+      },
+      "correction": "Original failures did not record exact guest values; twenty standalone entropy repeats passed, so the original cause is not conclusively attributed. Final tests explicitly yield and drive at most eight budgeted epochs, require both original guest observations, retain one policy decision and assert zero services/returns/checkpoints. Both final affected tests pass; no production workaround was added."
+    }
+  ],
+  "validation_reuse": [
+    "Both complete seven-step runtime workflows validate final production source; later test-only edits retain identical production prefixes and refresh both affected source tests on Mac/Linux",
+    "402 process cases per host are covered, with final two-case refresh and final Mac strict core clippy; no repeat of unchanged passed CPU/network/graphics workflows for test-wait/doc edits",
+    "No extra signed hardware/product rerun: Mac/HVF/interrupt/mapping code is unchanged; stage-62 results are explicitly reused",
+    "Final committed-pin Dev package has signature/version/hash checks plus eighteen 4/12-CPU program smoke cases"
+  ],
+  "physical_ipad_acceptance": "Device/simulator compile checks passed; no physical iPad build installation or UI acceptance in this batch.",
+  "known_unattributed_issues": [
+    "Stage-61 short denied-control fixed-latency issue remains unattributed; this different fixture does not establish its resolution",
+    "Original fixed-budget assertion failure values were unavailable; final observation criteria remove the startup assumption without claiming a guest production bug was found"
+  ],
+  "remaining_boundaries": [
+    "Explicit tracing and genuinely absent descriptor/legacy capabilities",
+    "Known excluded handlers/resources/subcommands outside this entropy subsystem",
+    "Host/terminal lifecycle/admin, exceptional native/memory publication, unhandled backend/HLT/fault exits and cold/solo orchestration",
+    "Guest entropy pool credit/reseed controls and GRND_INSECURE remain unsupported; this batch removes coordinator use rather than implementing those APIs"
+  ],
+  "deployment": {
+    "channel": "dev",
+    "installed": true,
+    "mac_revision": "4b43dc2630b75a51cdffdee2a08d84aab6eef379",
+    "runtime_revision": "0c2adca6acb919750007eb97aa686e8a06f555a8",
+    "app": "/Users/main/Applications/Trames Dev.app",
+    "cli": "/Users/main/.local/bin/trames-dev",
+    "version": "Trames Dev 1.5.3 (dev) runtime 0c2adca6acb919750007eb97aa686e8a06f555a8",
+    "runner_sha256": "200d721febdb7898e24c194a543f36de6d9fe8657a6117d9e0da3176f0a2ef07",
+    "built_runner_sha256": "200d721febdb7898e24c194a543f36de6d9fe8657a6117d9e0da3176f0a2ef07",
+    "installed_smoke_passed": 18,
+    "installer_log": {
+      "path": "target/entropy-subsystem/dev-install.log",
+      "sha256": "d81b37faaef60b5a1b635ce5a81a399a304e89d9aee6498d2d7eecf5f3f5bd41"
+    },
+    "stable_runner_sha256": "4f40615213e731b2a4ef9d8c6a0e85c5c7bdf31ab0c60b0354b55113f2a6a55d",
+    "expected_unchanged_stable_runner_sha256": "4f40615213e731b2a4ef9d8c6a0e85c5c7bdf31ab0c60b0354b55113f2a6a55d",
+    "stable_business_environments_modified": false,
+    "physical_ipad_modified": false
+  }
+}

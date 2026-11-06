@@ -2,20 +2,18 @@
 
 ## Current status — 2026-11-07
 
-Stage 62 moves supported membarrier query/register/private/global/registration
-queries onto execution workers and original mm state. Actual barriers visit the
-current execution leases and wait for requested host fences. A pending caller
-releases its CPU slot and retains its View; the operation needs no mm byte export,
-page-table update or coordinator callback. Synchronous native bodies and scoped
-mapping batches participate in the same execution protocol.
+Stage 63 moves getrandom to the calling executor and shared ABI/CSPRNG. Random
+and urandom controls now return existing unsupported errors on their original
+OFD, retaining O_PATH and policy semantics. Device scalar/vector/positioned
+reads/writes, nonblocking controls, poll and random UUID/boot_id paths are checked
+together. No guest entropy pool, service thread, ordinary-access fence or new
+permission policy is introduced.
 
-Earlier generated-dispatch, BPF/cgroup, seccomp, task/image and scoped-memory work
-remains in place. Both local runtime workflows and 400 process cases per host
-(three ignored) pass, together with iPad compile targets and 30 real HVF/interpreter
-cases at 1/4/12 CPUs, including ALLOW, full fork/exec compatibility and native
-Linux argument checks. See [stage 62 validation](../validation/worker-membarrier-20261107.json)
-for exact source, hardware acceptance, timing controls and remaining limits.
-Mac Dev and its CLI are updated; ten installed 4/12-CPU smoke cases pass.
+Both local runtime workflows and 402 process cases per host are covered, with
+final affected-test refreshes, both iPad compile targets and 54 real
+HVF/interpreter cases at 1/4/12 CPUs. See [stage 63 validation](../validation/worker-entropy-20261107.json)
+for source hashes, native references, corrected test assumptions and controls.
+Mac Dev and its CLI are updated; eighteen installed 4/12-CPU smoke cases pass.
 Stable/business and physical iPad installations remain unchanged.
 
 **The coordinator still exists.** Actual shared-mm quiescence, an in-cohort
@@ -37,6 +35,7 @@ costs. Counts of migrated entries or files are not a completion percentage.
 | Task namespace membership and Files/fs detachment | Supported unshare/setns/close_range run on the caller, refresh future consumers and preserve accepted async operations | Tracing and capability-less embeddings remain; clone creation still uses creator-mm custody; unsupported user/time namespaces are not added |
 | Credentials and capability administration | Calling worker, shared ABI and original task credentials; future consumers refresh, accepted async work retains submission authority | Tracing and capability-less embeddings retain their boundary; unsupported user namespaces and file capabilities are unchanged |
 | Memory barriers | Supported membarrier controls run on source workers, using original mm registration and active execution leases; pending callers return their CPU slot | Only requested fences affect relevant execution actors. Tracing and capability-less/solo callers keep their existing route; unsupported barrier commands remain unsupported |
+| Entropy and random devices | getrandom and supported random/urandom device/UUID operations run on the caller; unsupported entropy controls return on the original OFD | Tracing and absent descriptor capabilities retain their boundary; guest entropy credit/reseed APIs and GRND_INSECURE remain unsupported |
 | BPF and cgroup device policy | Program administration uses the original registry/Files/hierarchy on the caller; target directory and control-file opens resolve directly | Existing unsupported BPF commands/types remain explicit errors; tracing/capability-less embeddings remain. Original device-access consumers retain the same live rules |
 | Seccomp and tracing | Supported installation/TSYNC, decisions and lifecycle effects use original source resources; original policy/NNP is visible to proc, fork and exec | Explicit tracing and capability-less embeddings remain; unsupported seccomp APIs are unchanged. Allowed calls still retain their own excluded resource/generic fallback |
 | Host lifecycle and generic dispatch fallback | Unknown syscall numbers finish locally using generated entry recognition; actual resource/host events retain their own route | Host exec creation/group control, terminal lifecycle, pause/cancel, transfer/timezone/writeback, supervision/admin/pressure/deadline/shutdown; known SVC resources/subcommands and HLT/fault exits not completed, parked, serviced or scoped on the worker still reach the joined fallback |
@@ -48,11 +47,28 @@ the owner; ordinary epoch-member migration, parking, wakeup and child/replacemen
 admission already use the live execution queue. Single-CPU/solo execution retains
 its coordinated caller path, which does not by itself imply an extra RPC.
 
-The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/a4c1f20115757f72c6a023b81b9b13aa791db90f/docs/architecture/coordination-boundaries.md)
+The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/0c2adca6acb919750007eb97aa686e8a06f555a8/docs/architecture/coordination-boundaries.md)
 records scopes, actual admission gates and source locations. Earlier sections
 below are historical records and do not override this inventory.
 
-### Stage 62 memory-barrier measurements
+### Stage 63 entropy measurements
+
+Three alternating pairs measure 200 64-byte requests per thread:
+
+| getrandom policy | 4 CPUs before → after | 12 CPUs before → after |
+| --- | ---: | ---: |
+| Raw | 47.344 → 0.888 ms | 398.956 → 3.380 ms |
+| ALLOW | 46.688 → 1.012 ms | 402.456 → 3.423 ms |
+
+The short raw single-CPU and twelve-CPU random-device readv cases initially vary
+by +7.63%/+13.31%. At 20,000 calls their medians change by -0.09%/+1.07%.
+Already-local ERRNO controls at 100,000 calls range from -0.19% to +0.78%.
+These samples do not prove universal zero overhead. Unchanged device paths' short
+improvements are not attributed to a new byte-I/O algorithm. macOS getentropy and
+native ARM64 Linux references use the same 64-byte granularity; their APIs and
+background workload differ. These are entropy fixtures, not Firefox/Geekbench scores.
+
+### Stage 62 memory-barrier measurements (historical)
 
 Three alternating pairs measure 50 calls per thread:
 
@@ -4163,3 +4179,13 @@ The supported barrier subsystem and its native/scoped execution dependencies now
 run on existing workers, retaining original mm registration, accepted waits and
 actual acknowledgement fences. See the [shared contract](https://github.com/kb5000/trames-runtime/blob/a4c1f20115757f72c6a023b81b9b13aa791db90f/docs/architecture/coordination-boundaries.md#62-original-execution-lease-memory-barriers--2026-11-07)
 and [validation record](../validation/worker-membarrier-20261107.json).
+
+
+## 63. Source entropy and original random-device controls — 2026-11-07
+
+getrandom now executes through the original memory interface on the caller;
+random-device control errors preserve the accepted OFD and policy without owner
+service. Flags consume their Linux 32-bit argument. Device and UUID resource
+consumers are validated with the complete subsystem. See the
+[shared contract](https://github.com/kb5000/trames-runtime/blob/0c2adca6acb919750007eb97aa686e8a06f555a8/docs/architecture/coordination-boundaries.md#63-source-entropy-and-original-random-device-controls--2026-11-07)
+and [validation record](../validation/worker-entropy-20261107.json).
