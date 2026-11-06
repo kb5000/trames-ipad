@@ -2,24 +2,21 @@
 
 ## Current status — 2026-11-07
 
-Stage 59 completes the supported seccomp subsystem: installation/prctl, TSYNC,
-entry decisions, signal/termination effects, proc observations and birth/exec
-inheritance now use original task/group resources on execution workers. Busy
-installation returns the CPU slot. Ordinary entry reads an immutable policy
-without locking; accepted calls keep their original decision after later changes.
-No policy operation pauses the whole cohort or creates a new resource thread.
+Stage 60 moves the supported BPF/cgroup device-policy subsystem to calling workers:
+program loading, identity and ID reopening, attach/replace/detach/query, original
+FD lifetime, and the cgroup directory/control-file paths used to obtain targets.
+Pure verification runs outside the short original registry transaction. Device
+access consumes the same shared rule graph, with no new hot-path lock or check.
+Concurrent cgroup deletion returns ENODEV instead of indexing a removed group.
 
-Late NNP publication also updates prepared exec credentials and initial auxv before
-commit, using retained executable metadata. This closes a dependency that cannot
-be solved by moving only the seccomp syscall entry. Stage 58's scoped-memory and
-stage 57's task/image lifecycle work remains in place.
-
-Local acceptance includes 394 process cases on each host (three ignored), runtime
-CI with affected-only retries, 24 Mac product and 48 signed hardware cases, both
-iPad compile targets, and native Linux/HVF/interpreter fixtures at 1/4/12 CPUs.
-See [stage 59 validation](../validation/worker-seccomp-20261107.json). Stable and
-business environments remain unchanged; this batch targets Dev. Physical iPad
-acceptance remains skipped as previously chosen.
+Stage 59 seccomp/NNP and stages 57–58 task/image/scoped-memory work remain in place.
+Both products use the same runtime. Local validation covers both complete runtime
+CI workflows, final affected checks, 394 process cases per host (including the
+recorded Linux TSYNC observer retry), 18 native-ELF HVF/interpreter fixture runs,
+native ARM64 Linux comparison and both iPad compile targets. See the
+[stage 60 validation](../validation/worker-bpf-20261107.json) for exact results,
+failures, retries and reuse. Mac Dev is the deployment target; stable/business
+and physical iPad installations remain unchanged.
 
 **The coordinator still exists.** Actual shared-mm quiescence, an in-cohort
 one-caller service, asynchronous collection and a whole-cohort return have different
@@ -39,6 +36,7 @@ costs. Counts of migrated entries or files are not a completion percentage.
 | Mount topology administration | Original namespace/fs resources on the caller; existing disk pool for host-backed paths; contention releases the CPU slot | Tracing and genuinely excluded pathname controls retain their explicit boundary |
 | Task namespace membership and Files/fs detachment | Supported unshare/setns/close_range run on the caller, refresh future consumers and preserve accepted async operations | Tracing and capability-less embeddings remain; clone creation still uses creator-mm custody; unsupported user/time namespaces are not added |
 | Credentials and capability administration | Calling worker, shared ABI and original task credentials; future consumers refresh, accepted async work retains submission authority | Tracing and capability-less embeddings retain their boundary; unsupported user namespaces and file capabilities are unchanged |
+| BPF and cgroup device policy | Program administration uses the original registry/Files/hierarchy on the caller; target directory and control-file opens resolve directly | Existing unsupported BPF commands/types remain explicit errors; tracing/capability-less embeddings remain. Original device-access consumers retain the same live rules |
 | Seccomp and tracing | Supported installation/TSYNC, decisions and lifecycle effects use original source resources; original policy/NNP is visible to proc, fork and exec | Explicit tracing and capability-less embeddings remain; unsupported seccomp APIs are unchanged. Allowed calls still retain their own excluded resource/generic fallback |
 | Host lifecycle and generic dispatch fallback | Still joined when the actual event/exit requires it | Host exec creation/group control, terminal lifecycle, pause/cancel, transfer/timezone/writeback, supervision/admin/pressure/deadline/shutdown; any SVC/HLT/fault not completed, parked, serviced or scoped on the worker still reaches the generic joined fallback |
 
@@ -49,11 +47,25 @@ the owner; ordinary epoch-member migration, parking, wakeup and child/replacemen
 admission already use the live execution queue. Single-CPU/solo execution retains
 its coordinated caller path, which does not by itself imply an extra RPC.
 
-The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/38cdbba7a1967863a77fb0e432ec59cfa46e153c/docs/architecture/coordination-boundaries.md)
+The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/a1b8759dff09e2b8e1fa85607cde25e73b71544c/docs/architecture/coordination-boundaries.md)
 records scopes, actual admission gates and source locations. Earlier sections
 below are historical records and do not override this inventory.
 
-### Stage 59 policy measurements
+### Stage 60 BPF measurements
+
+Three alternating, unprofiled pairs measure 30 complete policy-management rounds
+per thread; setup and thread creation precede the timed release. Raw four-CPU
+work falls from **109.684 to 1.759 ms**, and twelve-CPU work from **988.187 to
+5.834 ms**. ALLOW-filtered results fall from **122.323 to 1.558 ms** and
+**992.495 to 6.261 ms** respectively. One-CPU results remain near 1.2 ms.
+
+These are BPF management fixtures, not Firefox, Docker startup or Geekbench scores.
+The final diagnostics contain no BPF (280) or cgroup target-open (56) cohort-return
+entries. Other startup/control/console boundaries remain; aggregate service counts
+are not claimed to be zero. Native Linux references and an earlier run overlapping
+build activity are retained separately. macOS has no equivalent Linux BPF syscall.
+
+### Stage 59 policy measurements (historical)
 
 Five alternating unprofiled pairs measure 5,000 calls per thread. Filter-denied
 calls fall from **932.887 to 6.124 ms at four CPUs**, and **5775.095 to 12.548 ms
@@ -4090,3 +4102,13 @@ Accepted policy and guest bytes survive resource contention and cancellation;
 late NNP publication refreshes a prepared exec image under original group custody.
 Ordinary syscall entry remains lock-free. See the [shared contract](https://github.com/kb5000/trames-runtime/blob/38cdbba7a1967863a77fb0e432ec59cfa46e153c/docs/architecture/coordination-boundaries.md#59-original-seccomp-policy-tsync-and-lifecycle-consumers--2026-11-07)
 and [validation record](../validation/worker-seccomp-20261107.json).
+
+
+## 60. Original BPF programs and cgroup device-policy administration — 2026-11-07
+
+The supported policy subsystem and its target-path dependencies now use original
+shared resources on execution workers. This includes registry/FD publication,
+attachment lifetime, atomic replacement and permission/device consumers; it does
+not introduce host BPF execution or new policy features. See the
+[shared implementation contract](https://github.com/kb5000/trames-runtime/blob/a1b8759dff09e2b8e1fa85607cde25e73b71544c/docs/architecture/coordination-boundaries.md#60-original-bpf-programs-and-cgroup-device-policy-administration--2026-11-07)
+and [validation record](../validation/worker-bpf-20261107.json).

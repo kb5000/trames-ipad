@@ -1,0 +1,1781 @@
+{
+  "schema": 1,
+  "date": "2026-11-07",
+  "stage": 60,
+  "recorded_at": "2026-11-06T17:51:20.341818+00:00",
+  "runtime_revision": "a1b8759dff09e2b8e1fa85607cde25e73b71544c",
+  "baseline_runtime_revision": "38cdbba7a1967863a77fb0e432ec59cfa46e153c",
+  "global_coordinator_removal_complete": false,
+  "scope": [
+    "Supported BPF load, attach/replace/detach, ID reopening, info and query",
+    "Original program registry, Files publication, FD/attachment lifetime and device consumers",
+    "Original cgroup directory/control-file opens, relative paths and deleted target identity"
+  ],
+  "implementation": [
+    "Shared byte ABI over retained descriptor factories; source and solo use the same resource methods",
+    "Bounded pure verifier work outside the original registry transaction",
+    "FD reservation and original weak ID registry preserve publication/quota/lifetime semantics",
+    "Original hierarchy transaction validates target presence and attachment constraints before effects",
+    "Existing shared device rules feed open, mknod, PTY peer and proc-reopen consumers",
+    "Future factories follow task credential/Files refresh; accepted calls retain original authority"
+  ],
+  "constraints": [
+    "No new coordinator/resource-service thread or polling bus",
+    "No new ordinary guest-byte lock/fence/check or device-check synchronization",
+    "No host BPF forwarding or new unsupported BPF features",
+    "Same runtime on Mac and iPad; Dev-only deployment"
+  ],
+  "source_files": {
+    "crates/trames-linux/src/bpf.rs": "bd02a5798acfe19cee30f26d07efa96750fe8769ca8c9bca3766a38585ab8780",
+    "crates/trames-linux/src/descriptor_create.rs": "887bfc9e950764c5c3e0848465c3fddaeab7568f95eb549d2184d0d4a96737fb",
+    "crates/trames-linux/src/direct.rs": "2ae0b1d8855b2639a9282e7e151c3948f002ac4853a6f2351c54740cd043a071",
+    "crates/trames-session/src/process_seccomp.rs": "b3af5a290be19db61b8af3330087f9054e2f070c587df2712e2d99ace10b6713",
+    "crates/trames-session/src/worker_syscalls.rs": "1c3ab821812a52bdcf329b5c042e0ba9d3bece48f1af2ea7eee0566ab0a803b9",
+    "crates/trames-vfs/src/bpf.rs": "2e50023d611965ffbcad49bc5b611de34afcbfbaf8c408e9bf732629c3ed7860",
+    "crates/trames-vfs/src/cgroup.rs": "8897387b1fac87285f5f4b2201333344aaed42429952bb621f0469f2e0dc7645",
+    "crates/trames-vfs/src/descriptor_factory.rs": "850e7c887870116111381cde528901dd38a899bb5bc1db41718a30ca6825eaa3",
+    "crates/trames-vfs/src/lib.rs": "fe0faae43d0f6c3bc75cc6cd8b3b580e500d27da49cedf082e7fcf90b00728b8",
+    "crates/trames-vfs/src/mounts.rs": "42932706d896fa215bd72fd7228a8c662104fdd5dbd8ccff0aa2677ed25824a1",
+    "docs/architecture/coordination-boundaries.md": "18a25d83389127f3daa3fd7a5f76344af961ea024a34f4d6b3e7ef93dfecdb65"
+  },
+  "fixtures": {
+    "cgroup-bpf.c": {
+      "path": "tests/fixtures/cgroup-bpf.c",
+      "sha256": "6c60f1b65319125923c6fc1571f08cbab95e0d6111b6fdfa9da8bc9c92e7d0f0"
+    },
+    "worker-bpf.c": {
+      "path": "tests/fixtures/worker-bpf.c",
+      "sha256": "237d3d5af81294dc6e220e565ceabdb692b8e2447a3e7e670dfcf24a928a622d"
+    }
+  },
+  "acceptance": {
+    "runtime_macos_initial": {
+      "path": "target/bpf-subsystem/runtime-macos-ci/summary.json",
+      "sha256": "043053a9cec5d554e64375e2dbd6aac94b477dbf573626ab21897edc5a7f0163",
+      "context": {
+        "machine": "arm64",
+        "packages": "27.0.1",
+        "platform": "macOS-27.0.1-arm64-arm-64bit",
+        "rustc": "rustc 1.101.0-nightly (4ebd25825 2026-10-15)\nbinary: rustc\ncommit-hash: 4ebd258257737d5b7635c116fa7d281627a7e937\ncommit-date: 2026-10-15\nhost: aarch64-apple-darwin\nrelease: 1.101.0-nightly\nLLVM version: 23.1.4\n"
+      },
+      "completed": true,
+      "steps": [
+        {
+          "exit_code": 0,
+          "index": 1,
+          "name": "rustup show",
+          "seconds": 0.02079010009765625,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "index": 2,
+          "name": "python3 scripts/check-execution-boundaries.py",
+          "seconds": 0.07332372665405273,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "index": 3,
+          "name": "cargo fmt --all --check",
+          "seconds": 1.0604000091552734,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "index": 4,
+          "name": "cargo clippy --workspace --all-targets --all-features --locked -- -D warnings",
+          "seconds": 5.909754037857056,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "index": 5,
+          "name": "cargo test --workspace --all-features --locked",
+          "seconds": 29.500854969024658,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "index": 6,
+          "name": "cargo build --workspace --all-features --release --locked",
+          "seconds": 10.275690078735352,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "index": 7,
+          "name": "cargo run --release -p trames-memory --example reclaim-footprint --locked",
+          "seconds": 4.0880138874053955,
+          "status": "passed"
+        }
+      ],
+      "logs": [
+        {
+          "path": "target/bpf-subsystem/runtime-macos-ci/step-01.log",
+          "sha256": "a4a6a2e77ce93e216ac1bdd7f0ebd4b7a240da4f7d0028afbfa1ad91641dc56c"
+        },
+        {
+          "path": "target/bpf-subsystem/runtime-macos-ci/step-02.log",
+          "sha256": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651"
+        },
+        {
+          "path": "target/bpf-subsystem/runtime-macos-ci/step-03.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "target/bpf-subsystem/runtime-macos-ci/step-04.log",
+          "sha256": "ece1d7d497e819d7abb647dcdf77e68a4ccfd96128be14d9d215370ed77143b4"
+        },
+        {
+          "path": "target/bpf-subsystem/runtime-macos-ci/step-05.log",
+          "sha256": "ee1fee80143a0343812168ea49f7980c6bd484a2f5378945484897090ab534e5"
+        },
+        {
+          "path": "target/bpf-subsystem/runtime-macos-ci/step-06.log",
+          "sha256": "52ff86a527af844020ca74684bdfa68d77b64ce489094dca4df2b5b51a7a3a47"
+        },
+        {
+          "path": "target/bpf-subsystem/runtime-macos-ci/step-07.log",
+          "sha256": "07a2540ba1c984e090233ec59409945d2d11230dae026b6becf39730d6d8dd24"
+        }
+      ]
+    },
+    "runtime_linux_initial": {
+      "path": "target/local-ci/io/bpf-subsystem/runtime-linux-ci/summary.json",
+      "sha256": "297a225af4c4b4d9d3cf61bdcee7e52fe186ce9165534a22f5db15c559badf89",
+      "context": {
+        "machine": "aarch64",
+        "packages": "363b68bfd79931eb35722a52c1a67ecbdddf646805ce787fbeb35a4a0027a7f4",
+        "platform": "Linux-7.0.0-38-generic-aarch64-with-glibc2.39",
+        "rustc": "rustc 1.101.0-nightly (4ebd25825 2026-10-15)\nbinary: rustc\ncommit-hash: 4ebd258257737d5b7635c116fa7d281627a7e937\ncommit-date: 2026-10-15\nhost: aarch64-unknown-linux-gnu\nrelease: 1.101.0-nightly\nLLVM version: 23.1.4\n"
+      },
+      "completed": true,
+      "steps": [
+        {
+          "exit_code": 0,
+          "index": 1,
+          "name": "rustup show",
+          "seconds": 0.016510725021362305,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "index": 2,
+          "name": "python3 scripts/check-execution-boundaries.py",
+          "seconds": 0.08672380447387695,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "index": 3,
+          "name": "cargo fmt --all --check",
+          "seconds": 1.0340020656585693,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "index": 4,
+          "name": "cargo clippy --workspace --all-targets --all-features --locked -- -D warnings",
+          "seconds": 5.808965682983398,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "index": 5,
+          "name": "cargo test --workspace --all-features --locked",
+          "seconds": 30.53072214126587,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "index": 6,
+          "name": "cargo build --workspace --all-features --release --locked",
+          "seconds": 6.498843431472778,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "index": 7,
+          "name": "cargo run --release -p trames-memory --example reclaim-footprint --locked",
+          "seconds": 0.16103720664978027,
+          "status": "passed"
+        }
+      ],
+      "logs": [
+        {
+          "path": "target/local-ci/io/bpf-subsystem/runtime-linux-ci/step-01.log",
+          "sha256": "72636920b473812425175422544a88a230699115a474bc30d039719194f48644"
+        },
+        {
+          "path": "target/local-ci/io/bpf-subsystem/runtime-linux-ci/step-02.log",
+          "sha256": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651"
+        },
+        {
+          "path": "target/local-ci/io/bpf-subsystem/runtime-linux-ci/step-03.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "target/local-ci/io/bpf-subsystem/runtime-linux-ci/step-04.log",
+          "sha256": "79e8a4e508f5a82213c00e8103c3461b0194f18c118317fdcd0e335a6f52b006"
+        },
+        {
+          "path": "target/local-ci/io/bpf-subsystem/runtime-linux-ci/step-05.log",
+          "sha256": "1b856668b88fb14d379c927f6048bdf36636db433728e848de07ef15ed774d0d"
+        },
+        {
+          "path": "target/local-ci/io/bpf-subsystem/runtime-linux-ci/step-06.log",
+          "sha256": "49b93d0af822b6c2270312bc9631b092c07b4fe42c26e730b9ee513e1f17c7df"
+        },
+        {
+          "path": "target/local-ci/io/bpf-subsystem/runtime-linux-ci/step-07.log",
+          "sha256": "f0452b2db8d3dd18ac4752267cca6a3379b7534e368905c8b47dfaf0c147a774"
+        }
+      ]
+    },
+    "checks": {
+      "mac-affected-process": {
+        "path": "target/bpf-subsystem/affected-process.log",
+        "sha256": "f741c100569a6fb645e9c07714af6be6cc2906e9b1b4242fcb17494e70ebd9f5",
+        "test_results": [
+          "test result: ok. 394 passed; 0 failed; 3 ignored; 0 measured; 0 filtered out; finished in 1.82s"
+        ]
+      },
+      "mac-affected-vfs-linux": {
+        "path": "target/bpf-subsystem/affected-vfs-linux.log",
+        "sha256": "5d8f9f70cbb7170c0ad649e6625b3420672b97b03b8b4964429a406abed2286f",
+        "test_results": [
+          "test result: ok. 247 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.80s",
+          "test result: ok. 560 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 2.42s",
+          "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+          "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+        ]
+      },
+      "mac-affected-clippy": {
+        "path": "target/bpf-subsystem/affected-clippy.log",
+        "sha256": "fd8da5b6cd0e5d8c59798d45ddecf56098e1d4bd955e21b2afaefe6ba4d3ba1e",
+        "test_results": []
+      },
+      "mac-core-clippy": {
+        "path": "target/bpf-subsystem/core-clippy.log",
+        "sha256": "45033e019c0474ed72420cb3ed7d2a6b8f520ef23cfe27f20919d22517dc0e34",
+        "test_results": []
+      },
+      "mac-tsync-test-final": {
+        "path": "target/bpf-subsystem/tsync-test-final.log",
+        "sha256": "c22cb33122f38e90d49d8098fe21dc7e54bdc74db04a95aba86cb014995f9319",
+        "test_results": [
+          "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 396 filtered out; finished in 0.03s"
+        ]
+      },
+      "mac-aarch64-apple-ios-check": {
+        "path": "target/bpf-subsystem/aarch64-apple-ios-check.log",
+        "sha256": "9505bc96ed73ef3f1ae0fb8035f2ae6886483d2de7d477f71dd6e262058c38e1",
+        "test_results": []
+      },
+      "mac-aarch64-apple-ios-sim-check": {
+        "path": "target/bpf-subsystem/aarch64-apple-ios-sim-check.log",
+        "sha256": "25972a0e06e4ce8fb68096628556f59007934dba09205b7bd1f90895e775641f",
+        "test_results": []
+      },
+      "mac-mac-build-final": {
+        "path": "target/bpf-subsystem/mac-build-final.log",
+        "sha256": "cf098cc84372c6bdc37953af4088deec365fc4142cee09d5096994166b39cba6",
+        "test_results": []
+      },
+      "mac-interpreter-build-final": {
+        "path": "target/bpf-subsystem/interpreter-build-final.log",
+        "sha256": "0232444972ea1db61f865796885a9fce56916f9891991548d7766ce2f7bd45f4",
+        "test_results": []
+      },
+      "mac-runtime-boundaries": {
+        "path": "target/bpf-subsystem/runtime-boundaries.log",
+        "sha256": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651",
+        "test_results": []
+      },
+      "mac-ipad-boundaries": {
+        "path": "target/bpf-subsystem/ipad-boundaries.log",
+        "sha256": "44683867d869a7a31f3df8ecf48c8f7b0cbf1c5cec4bb7387d0c2aae80ac463d",
+        "test_results": []
+      },
+      "mac-path-dependency-final": {
+        "path": "target/bpf-subsystem/path-dependency-final.log",
+        "sha256": "b131cd6ccc6caa23b09ccfbfd2dc1e7f0eb19ab249d527de6bde6d7f34bf91ef",
+        "test_results": [
+          "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 560 filtered out; finished in 0.01s"
+        ]
+      },
+      "linux-affected-process": {
+        "path": "target/local-ci/io/bpf-subsystem/affected-process.log",
+        "sha256": "06ce4bbc6b535760268c08e8d149503ba4787002ff21eca1a72e66985b3227f9",
+        "test_results": [
+          "test result: FAILED. 393 passed; 1 failed; 3 ignored; 0 measured; 0 filtered out; finished in 3.38s"
+        ]
+      },
+      "linux-tsync-test-final": {
+        "path": "target/local-ci/io/bpf-subsystem/tsync-test-final.log",
+        "sha256": "e4bd54f6861b7ab04e7ec577980a82c81527615d1959fd6371952c8e89cd0320",
+        "test_results": [
+          "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 396 filtered out; finished in 0.01s"
+        ]
+      },
+      "linux-affected-core-clippy": {
+        "path": "target/local-ci/io/bpf-subsystem/affected-core-clippy.log",
+        "sha256": "60107fee6368b5d726b7a406af87fb322f78a1efcdaf0967c4aa4880613f32d2",
+        "test_results": []
+      },
+      "linux-affected-vfs-linux": {
+        "path": "target/local-ci/io/bpf-subsystem/affected-vfs-linux.log",
+        "sha256": "c2ea6b2e97b6442d6616d24c2a6322d713347f376ee1e82ef28dcd6bc3af275f",
+        "test_results": [
+          "test result: ok. 247 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.77s",
+          "test result: ok. 559 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 1.09s",
+          "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+          "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+        ]
+      },
+      "linux-affected-clippy": {
+        "path": "target/local-ci/io/bpf-subsystem/affected-clippy.log",
+        "sha256": "d6b76dcdb14ab07b419505e10773cd3b961bd80e3e81c7f916680a50e5aac9c8",
+        "test_results": []
+      },
+      "linux-native-cgroup-bpf": {
+        "path": "target/local-ci/io/bpf-subsystem/native-cgroup-bpf.log",
+        "sha256": "94570e40bfc7ce7225b562775e15322842ca28dd0b5095034d742e662558dd34",
+        "test_results": []
+      },
+      "linux-native-worker-bpf": {
+        "path": "target/local-ci/io/bpf-subsystem/native-worker-bpf.log",
+        "sha256": "91d70693a1d06fa8da00237e89e85760ae38d4d80528cd648aaab3a03b0eda33",
+        "test_results": []
+      }
+    },
+    "linux_initial_affected_results": {
+      "source_sha256": {
+        "runtime/crates/trames-linux/src/bpf.rs": "bd02a5798acfe19cee30f26d07efa96750fe8769ca8c9bca3766a38585ab8780",
+        "runtime/crates/trames-linux/src/descriptor_create.rs": "887bfc9e950764c5c3e0848465c3fddaeab7568f95eb549d2184d0d4a96737fb",
+        "runtime/crates/trames-linux/src/direct.rs": "2ae0b1d8855b2639a9282e7e151c3948f002ac4853a6f2351c54740cd043a071",
+        "runtime/crates/trames-session/src/process_seccomp.rs": "0c80331dbf12e7adb16f23ca10480bd8077a37f84553296a6ac650f0d33c0407",
+        "runtime/crates/trames-session/src/worker_syscalls.rs": "1c3ab821812a52bdcf329b5c042e0ba9d3bece48f1af2ea7eee0566ab0a803b9",
+        "runtime/crates/trames-vfs/src/bpf.rs": "2e50023d611965ffbcad49bc5b611de34afcbfbaf8c408e9bf732629c3ed7860",
+        "runtime/crates/trames-vfs/src/cgroup.rs": "8897387b1fac87285f5f4b2201333344aaed42429952bb621f0469f2e0dc7645",
+        "runtime/crates/trames-vfs/src/descriptor_factory.rs": "850e7c887870116111381cde528901dd38a899bb5bc1db41718a30ca6825eaa3",
+        "runtime/crates/trames-vfs/src/lib.rs": "fe0faae43d0f6c3bc75cc6cd8b3b580e500d27da49cedf082e7fcf90b00728b8",
+        "runtime/crates/trames-vfs/src/mounts.rs": "42932706d896fa215bd72fd7228a8c662104fdd5dbd8ccff0aa2677ed25824a1",
+        "tests/fixtures/cgroup-bpf.c": "6c60f1b65319125923c6fc1571f08cbab95e0d6111b6fdfa9da8bc9c92e7d0f0",
+        "tests/fixtures/worker-bpf.c": "a31f5cc9cbf5a9fa7d85603c723c6523f34c67ab0e9788b8864195e830a252f8",
+        "scripts/run-local-ci.py": "a5a510c2e0c900e19d59e1d398f1361f814887498606b241d857615ca5f0321c"
+      },
+      "checks": [
+        {
+          "name": "affected-process",
+          "code": 101,
+          "seconds": 19.525119168999993
+        }
+      ]
+    },
+    "linux_affected_retry_results": {
+      "source_sha256": {
+        "runtime/crates/trames-linux/src/bpf.rs": "bd02a5798acfe19cee30f26d07efa96750fe8769ca8c9bca3766a38585ab8780",
+        "runtime/crates/trames-linux/src/descriptor_create.rs": "887bfc9e950764c5c3e0848465c3fddaeab7568f95eb549d2184d0d4a96737fb",
+        "runtime/crates/trames-linux/src/direct.rs": "2ae0b1d8855b2639a9282e7e151c3948f002ac4853a6f2351c54740cd043a071",
+        "runtime/crates/trames-session/src/process_seccomp.rs": "b3af5a290be19db61b8af3330087f9054e2f070c587df2712e2d99ace10b6713",
+        "runtime/crates/trames-session/src/worker_syscalls.rs": "1c3ab821812a52bdcf329b5c042e0ba9d3bece48f1af2ea7eee0566ab0a803b9",
+        "runtime/crates/trames-vfs/src/bpf.rs": "2e50023d611965ffbcad49bc5b611de34afcbfbaf8c408e9bf732629c3ed7860",
+        "runtime/crates/trames-vfs/src/cgroup.rs": "8897387b1fac87285f5f4b2201333344aaed42429952bb621f0469f2e0dc7645",
+        "runtime/crates/trames-vfs/src/descriptor_factory.rs": "850e7c887870116111381cde528901dd38a899bb5bc1db41718a30ca6825eaa3",
+        "runtime/crates/trames-vfs/src/lib.rs": "fe0faae43d0f6c3bc75cc6cd8b3b580e500d27da49cedf082e7fcf90b00728b8",
+        "runtime/crates/trames-vfs/src/mounts.rs": "42932706d896fa215bd72fd7228a8c662104fdd5dbd8ccff0aa2677ed25824a1",
+        "tests/fixtures/cgroup-bpf.c": "6c60f1b65319125923c6fc1571f08cbab95e0d6111b6fdfa9da8bc9c92e7d0f0",
+        "tests/fixtures/worker-bpf.c": "237d3d5af81294dc6e220e565ceabdb692b8e2447a3e7e670dfcf24a928a622d",
+        "scripts/run-local-ci.py": "a5a510c2e0c900e19d59e1d398f1361f814887498606b241d857615ca5f0321c"
+      },
+      "checks": [
+        {
+          "name": "tsync-test-final",
+          "code": 0,
+          "seconds": 4.772526901000106
+        },
+        {
+          "name": "affected-core-clippy",
+          "code": 0,
+          "seconds": 2.630655219999994
+        },
+        {
+          "name": "affected-vfs-linux",
+          "code": 0,
+          "seconds": 15.163983687999917
+        },
+        {
+          "name": "affected-clippy",
+          "code": 0,
+          "seconds": 3.4249297369999567
+        }
+      ]
+    },
+    "ipad_compile_targets": [
+      {
+        "target": "aarch64-apple-ios",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+        "code": 0
+      },
+      {
+        "target": "aarch64-apple-ios-sim",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk",
+        "code": 0
+      }
+    ],
+    "guest_final_matrix": [
+      {
+        "case": "hvf-1-cgroup-bpf",
+        "code": 0,
+        "seconds": 0.837398458,
+        "passed": true,
+        "runner_sha256": "b13498e2b9ff8b34c65278e7a86d2dafb80a5e8575bd9b8ae34388c5d35a8114",
+        "fixture_sha256": "dae8c7b07183fcf02e5ecd62205fb915acad2d58aa69dc16faf71fd7a12651c9",
+        "log": {
+          "path": "target/bpf-subsystem/guest/hvf-1-cgroup-bpf.log",
+          "sha256": "6fec6245f0c493105027d0ec036a3489e358eb3043959a1fbae2118327fa94ba"
+        }
+      },
+      {
+        "case": "hvf-1-worker-bpf",
+        "code": 0,
+        "seconds": 0.02272679199999994,
+        "passed": true,
+        "runner_sha256": "b13498e2b9ff8b34c65278e7a86d2dafb80a5e8575bd9b8ae34388c5d35a8114",
+        "fixture_sha256": "336553495646f084490d0d189dd6d9889ad85fcde8a2fd55e2e0be3852be7c63",
+        "log": {
+          "path": "target/bpf-subsystem/guest/hvf-1-worker-bpf.log",
+          "sha256": "9208273dd6f6cfad060ae45984177cf76e63ae01b52ffc0450c9c26149a460ca"
+        }
+      },
+      {
+        "case": "hvf-1-worker-bpf-filtered",
+        "code": 0,
+        "seconds": 0.023817540999999998,
+        "passed": true,
+        "runner_sha256": "b13498e2b9ff8b34c65278e7a86d2dafb80a5e8575bd9b8ae34388c5d35a8114",
+        "fixture_sha256": "336553495646f084490d0d189dd6d9889ad85fcde8a2fd55e2e0be3852be7c63",
+        "log": {
+          "path": "target/bpf-subsystem/guest/hvf-1-worker-bpf-filtered.log",
+          "sha256": "cf0dd6fc6405b24654ac4dc24070c778cbd22edef9d6ac7b01bab3afc7a13456"
+        }
+      },
+      {
+        "case": "hvf-4-cgroup-bpf",
+        "code": 0,
+        "seconds": 0.01172574999999998,
+        "passed": true,
+        "runner_sha256": "b13498e2b9ff8b34c65278e7a86d2dafb80a5e8575bd9b8ae34388c5d35a8114",
+        "fixture_sha256": "dae8c7b07183fcf02e5ecd62205fb915acad2d58aa69dc16faf71fd7a12651c9",
+        "log": {
+          "path": "target/bpf-subsystem/guest/hvf-4-cgroup-bpf.log",
+          "sha256": "8f1b7403cf22f7ca12d773e0e4e658d27e430800c114134ce7b1b35899cbd9d0"
+        }
+      },
+      {
+        "case": "hvf-4-worker-bpf",
+        "code": 0,
+        "seconds": 0.021526833000000023,
+        "passed": true,
+        "runner_sha256": "b13498e2b9ff8b34c65278e7a86d2dafb80a5e8575bd9b8ae34388c5d35a8114",
+        "fixture_sha256": "336553495646f084490d0d189dd6d9889ad85fcde8a2fd55e2e0be3852be7c63",
+        "log": {
+          "path": "target/bpf-subsystem/guest/hvf-4-worker-bpf.log",
+          "sha256": "43fe855f354d4f5b421a81673618b162dc1b31aef689a5bff0d049a1859f1a4d"
+        }
+      },
+      {
+        "case": "hvf-4-worker-bpf-filtered",
+        "code": 0,
+        "seconds": 0.023890999999999996,
+        "passed": true,
+        "runner_sha256": "b13498e2b9ff8b34c65278e7a86d2dafb80a5e8575bd9b8ae34388c5d35a8114",
+        "fixture_sha256": "336553495646f084490d0d189dd6d9889ad85fcde8a2fd55e2e0be3852be7c63",
+        "log": {
+          "path": "target/bpf-subsystem/guest/hvf-4-worker-bpf-filtered.log",
+          "sha256": "f4619861f9af319e25208cb163cbc03c8b1c130472e4a2fe8aef9500ddeef393"
+        }
+      },
+      {
+        "case": "hvf-12-cgroup-bpf",
+        "code": 0,
+        "seconds": 0.020807249999999833,
+        "passed": true,
+        "runner_sha256": "b13498e2b9ff8b34c65278e7a86d2dafb80a5e8575bd9b8ae34388c5d35a8114",
+        "fixture_sha256": "dae8c7b07183fcf02e5ecd62205fb915acad2d58aa69dc16faf71fd7a12651c9",
+        "log": {
+          "path": "target/bpf-subsystem/guest/hvf-12-cgroup-bpf.log",
+          "sha256": "988065b98e1b589ce21d5764806fa6e31ed38e3a30e5cfea633cb4825c26b473"
+        }
+      },
+      {
+        "case": "hvf-12-worker-bpf",
+        "code": 0,
+        "seconds": 0.022002625000000053,
+        "passed": true,
+        "runner_sha256": "b13498e2b9ff8b34c65278e7a86d2dafb80a5e8575bd9b8ae34388c5d35a8114",
+        "fixture_sha256": "336553495646f084490d0d189dd6d9889ad85fcde8a2fd55e2e0be3852be7c63",
+        "log": {
+          "path": "target/bpf-subsystem/guest/hvf-12-worker-bpf.log",
+          "sha256": "715e42670c0e5b29790f914c6273bbf019dda121fb0952dd4bb96d91a6276182"
+        }
+      },
+      {
+        "case": "hvf-12-worker-bpf-filtered",
+        "code": 0,
+        "seconds": 0.039478875000000135,
+        "passed": true,
+        "runner_sha256": "b13498e2b9ff8b34c65278e7a86d2dafb80a5e8575bd9b8ae34388c5d35a8114",
+        "fixture_sha256": "336553495646f084490d0d189dd6d9889ad85fcde8a2fd55e2e0be3852be7c63",
+        "log": {
+          "path": "target/bpf-subsystem/guest/hvf-12-worker-bpf-filtered.log",
+          "sha256": "d06967517a9c640f0a6ff959a2b9b912ac1a8bc53e0ad54c000980e682c9ee4b"
+        }
+      },
+      {
+        "case": "interpreter-1-cgroup-bpf",
+        "code": 0,
+        "seconds": 0.4095964160000001,
+        "passed": true,
+        "runner_sha256": "8d512c224f23b33bc5821599567a4e3fdedfb41ff4bea0f07c4037a9562c06b0",
+        "fixture_sha256": "dae8c7b07183fcf02e5ecd62205fb915acad2d58aa69dc16faf71fd7a12651c9",
+        "log": {
+          "path": "target/bpf-subsystem/guest/interpreter-1-cgroup-bpf.log",
+          "sha256": "5d6596237fc21317af17e2d27dee81fc9bd90fd33b3889f4230a5f1f5bb35477"
+        }
+      },
+      {
+        "case": "interpreter-1-worker-bpf",
+        "code": 0,
+        "seconds": 0.024505833000000088,
+        "passed": true,
+        "runner_sha256": "8d512c224f23b33bc5821599567a4e3fdedfb41ff4bea0f07c4037a9562c06b0",
+        "fixture_sha256": "336553495646f084490d0d189dd6d9889ad85fcde8a2fd55e2e0be3852be7c63",
+        "log": {
+          "path": "target/bpf-subsystem/guest/interpreter-1-worker-bpf.log",
+          "sha256": "4f7d00bfe9f2a28b285ffe452ec036447dc9931df2a077ef2df6608b34f1f8af"
+        }
+      },
+      {
+        "case": "interpreter-1-worker-bpf-filtered",
+        "code": 0,
+        "seconds": 0.012457125000000069,
+        "passed": true,
+        "runner_sha256": "8d512c224f23b33bc5821599567a4e3fdedfb41ff4bea0f07c4037a9562c06b0",
+        "fixture_sha256": "336553495646f084490d0d189dd6d9889ad85fcde8a2fd55e2e0be3852be7c63",
+        "log": {
+          "path": "target/bpf-subsystem/guest/interpreter-1-worker-bpf-filtered.log",
+          "sha256": "d766f2f91e8213dc53f73ef5b2cee66830f7288ba9de36c28bd1dfde4cc6aead"
+        }
+      },
+      {
+        "case": "interpreter-4-cgroup-bpf",
+        "code": 0,
+        "seconds": 0.011235834000000056,
+        "passed": true,
+        "runner_sha256": "8d512c224f23b33bc5821599567a4e3fdedfb41ff4bea0f07c4037a9562c06b0",
+        "fixture_sha256": "dae8c7b07183fcf02e5ecd62205fb915acad2d58aa69dc16faf71fd7a12651c9",
+        "log": {
+          "path": "target/bpf-subsystem/guest/interpreter-4-cgroup-bpf.log",
+          "sha256": "8723c26d75221ef62ce5d1a83454564f0fad72ed6a01117f83a4ada72b577063"
+        }
+      },
+      {
+        "case": "interpreter-4-worker-bpf",
+        "code": 0,
+        "seconds": 0.01173087500000003,
+        "passed": true,
+        "runner_sha256": "8d512c224f23b33bc5821599567a4e3fdedfb41ff4bea0f07c4037a9562c06b0",
+        "fixture_sha256": "336553495646f084490d0d189dd6d9889ad85fcde8a2fd55e2e0be3852be7c63",
+        "log": {
+          "path": "target/bpf-subsystem/guest/interpreter-4-worker-bpf.log",
+          "sha256": "69449c5a2bdfb74f783afc47a1afe8a048639f7a9f905060c8743b54c46e20a7"
+        }
+      },
+      {
+        "case": "interpreter-4-worker-bpf-filtered",
+        "code": 0,
+        "seconds": 0.011883624999999842,
+        "passed": true,
+        "runner_sha256": "8d512c224f23b33bc5821599567a4e3fdedfb41ff4bea0f07c4037a9562c06b0",
+        "fixture_sha256": "336553495646f084490d0d189dd6d9889ad85fcde8a2fd55e2e0be3852be7c63",
+        "log": {
+          "path": "target/bpf-subsystem/guest/interpreter-4-worker-bpf-filtered.log",
+          "sha256": "b786a2bc6d5c2cd1770d79143da3161ff97034fc3029b0dc183ac6acc2fef730"
+        }
+      },
+      {
+        "case": "interpreter-12-cgroup-bpf",
+        "code": 0,
+        "seconds": 0.011650500000000008,
+        "passed": true,
+        "runner_sha256": "8d512c224f23b33bc5821599567a4e3fdedfb41ff4bea0f07c4037a9562c06b0",
+        "fixture_sha256": "dae8c7b07183fcf02e5ecd62205fb915acad2d58aa69dc16faf71fd7a12651c9",
+        "log": {
+          "path": "target/bpf-subsystem/guest/interpreter-12-cgroup-bpf.log",
+          "sha256": "78899b247b5f191d438425f93646bee0e16a3de6b0bfbeb6d4c3dfdd9e0e28c3"
+        }
+      },
+      {
+        "case": "interpreter-12-worker-bpf",
+        "code": 0,
+        "seconds": 0.023797625000000044,
+        "passed": true,
+        "runner_sha256": "8d512c224f23b33bc5821599567a4e3fdedfb41ff4bea0f07c4037a9562c06b0",
+        "fixture_sha256": "336553495646f084490d0d189dd6d9889ad85fcde8a2fd55e2e0be3852be7c63",
+        "log": {
+          "path": "target/bpf-subsystem/guest/interpreter-12-worker-bpf.log",
+          "sha256": "8fc54ff7961e38dd6a986727fe264dd15b284008caeb17593d1dec5fd7b2bb78"
+        }
+      },
+      {
+        "case": "interpreter-12-worker-bpf-filtered",
+        "code": 0,
+        "seconds": 0.02387262500000009,
+        "passed": true,
+        "runner_sha256": "8d512c224f23b33bc5821599567a4e3fdedfb41ff4bea0f07c4037a9562c06b0",
+        "fixture_sha256": "336553495646f084490d0d189dd6d9889ad85fcde8a2fd55e2e0be3852be7c63",
+        "log": {
+          "path": "target/bpf-subsystem/guest/interpreter-12-worker-bpf-filtered.log",
+          "sha256": "e02e5de30dfc1a8fda48b7fcdc2b055087c794aee3ef15ea613154d4e080d434"
+        }
+      }
+    ],
+    "final_diagnostics": [
+      {
+        "path": "target/bpf-subsystem/guest/hvf-1-worker-bpf-filtered.log",
+        "sha256": "cf0dd6fc6405b24654ac4dc24070c778cbd22edef9d6ac7b01bab3afc7a13456",
+        "observations": [
+          "trames mac cohorts: rounds=0 control_checks=0 services=0 memory_us=0 dispatch_us=0 stop_us=0",
+          "trames mac cohort-return syscalls: []"
+        ]
+      },
+      {
+        "path": "target/bpf-subsystem/guest/hvf-1-worker-bpf.log",
+        "sha256": "9208273dd6f6cfad060ae45984177cf76e63ae01b52ffc0450c9c26149a460ca",
+        "observations": [
+          "trames mac cohorts: rounds=0 control_checks=0 services=0 memory_us=0 dispatch_us=0 stop_us=0",
+          "trames mac cohort-return syscalls: []"
+        ]
+      },
+      {
+        "path": "target/bpf-subsystem/guest/hvf-12-worker-bpf-filtered.log",
+        "sha256": "d06967517a9c640f0a6ff959a2b9b912ac1a8bc53e0ad54c000980e682c9ee4b",
+        "observations": [
+          "trames mac cohorts: rounds=13 control_checks=0 services=0 memory_us=297 dispatch_us=948 stop_us=168",
+          "trames mac cohort-return syscalls: [(99, 12), (220, 3), (64, 1), (135, 1)]"
+        ]
+      },
+      {
+        "path": "target/bpf-subsystem/guest/hvf-12-worker-bpf.log",
+        "sha256": "715e42670c0e5b29790f914c6273bbf019dda121fb0952dd4bb96d91a6276182",
+        "observations": [
+          "trames mac cohorts: rounds=13 control_checks=0 services=1 memory_us=322 dispatch_us=929 stop_us=119",
+          "trames mac cohort-return syscalls: [(99, 12), (135, 3), (222, 1)]"
+        ]
+      },
+      {
+        "path": "target/bpf-subsystem/guest/hvf-4-worker-bpf-filtered.log",
+        "sha256": "f4619861f9af319e25208cb163cbc03c8b1c130472e4a2fe8aef9500ddeef393",
+        "observations": [
+          "trames mac cohorts: rounds=5 control_checks=0 services=0 memory_us=95 dispatch_us=185 stop_us=47",
+          "trames mac cohort-return syscalls: [(99, 4), (64, 1)]"
+        ]
+      },
+      {
+        "path": "target/bpf-subsystem/guest/hvf-4-worker-bpf.log",
+        "sha256": "43fe855f354d4f5b421a81673618b162dc1b31aef689a5bff0d049a1859f1a4d",
+        "observations": [
+          "trames mac cohorts: rounds=5 control_checks=0 services=1 memory_us=95 dispatch_us=202 stop_us=27",
+          "trames mac cohort-return syscalls: [(99, 4)]"
+        ]
+      }
+    ],
+    "native_initial": [
+      {
+        "name": "cgroup-bpf",
+        "code": 0
+      },
+      {
+        "name": "worker-bpf",
+        "code": 0
+      },
+      {
+        "name": "native-cgroup-bpf",
+        "code": 0
+      },
+      {
+        "name": "native-worker-bpf",
+        "code": 0
+      }
+    ]
+  },
+  "performance": {
+    "paired": {
+      "fixture_sha256": "336553495646f084490d0d189dd6d9889ad85fcde8a2fd55e2e0be3852be7c63",
+      "runner_sha256": {
+        "before": "336d2dbed9a806cd66b6bb93aeb6df7e2371d6cbe32444327b66f07e3948db48",
+        "after": "b13498e2b9ff8b34c65278e7a86d2dafb80a5e8575bd9b8ae34388c5d35a8114"
+      },
+      "rows": [
+        {
+          "name": "before-1-0-0",
+          "runner": "before",
+          "cpus": 1,
+          "mode": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 1201459,
+          "wall_seconds": 0.012054416999999998
+        },
+        {
+          "name": "after-1-0-0",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 1227708,
+          "wall_seconds": 0.024600292000000003
+        },
+        {
+          "name": "after-1-0-1",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 1241333,
+          "wall_seconds": 0.021412417000000003
+        },
+        {
+          "name": "before-1-0-1",
+          "runner": "before",
+          "cpus": 1,
+          "mode": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 1210792,
+          "wall_seconds": 0.012411915999999995
+        },
+        {
+          "name": "before-1-0-2",
+          "runner": "before",
+          "cpus": 1,
+          "mode": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 1218083,
+          "wall_seconds": 0.011821667000000008
+        },
+        {
+          "name": "after-1-0-2",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 1239166,
+          "wall_seconds": 0.011999583000000008
+        },
+        {
+          "name": "before-1-1-0",
+          "runner": "before",
+          "cpus": 1,
+          "mode": 1,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 1216792,
+          "wall_seconds": 0.010896416999999992
+        },
+        {
+          "name": "after-1-1-0",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 1,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 1217750,
+          "wall_seconds": 0.011755874999999999
+        },
+        {
+          "name": "after-1-1-1",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 1,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 1202916,
+          "wall_seconds": 0.011863167000000008
+        },
+        {
+          "name": "before-1-1-1",
+          "runner": "before",
+          "cpus": 1,
+          "mode": 1,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 1285709,
+          "wall_seconds": 0.011782583000000013
+        },
+        {
+          "name": "before-1-1-2",
+          "runner": "before",
+          "cpus": 1,
+          "mode": 1,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 1234959,
+          "wall_seconds": 0.012791416
+        },
+        {
+          "name": "after-1-1-2",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 1,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 1212833,
+          "wall_seconds": 0.01179691599999999
+        },
+        {
+          "name": "before-4-0-0",
+          "runner": "before",
+          "cpus": 4,
+          "mode": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 112192458,
+          "wall_seconds": 0.14225604199999997
+        },
+        {
+          "name": "after-4-0-0",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 1500417,
+          "wall_seconds": 0.022135291
+        },
+        {
+          "name": "after-4-0-1",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 1758792,
+          "wall_seconds": 0.024252249999999975
+        },
+        {
+          "name": "before-4-0-1",
+          "runner": "before",
+          "cpus": 4,
+          "mode": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 107724000,
+          "wall_seconds": 0.13735170799999996
+        },
+        {
+          "name": "before-4-0-2",
+          "runner": "before",
+          "cpus": 4,
+          "mode": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 109683917,
+          "wall_seconds": 0.14345958400000003
+        },
+        {
+          "name": "after-4-0-2",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 1971833,
+          "wall_seconds": 0.02438058300000001
+        },
+        {
+          "name": "before-4-1-0",
+          "runner": "before",
+          "cpus": 4,
+          "mode": 1,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 107344083,
+          "wall_seconds": 0.12613774999999994
+        },
+        {
+          "name": "after-4-1-0",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 1,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 1590500,
+          "wall_seconds": 0.022524417000000074
+        },
+        {
+          "name": "after-4-1-1",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 1,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 1555541,
+          "wall_seconds": 0.023925666000000012
+        },
+        {
+          "name": "before-4-1-1",
+          "runner": "before",
+          "cpus": 4,
+          "mode": 1,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 122322709,
+          "wall_seconds": 0.141172917
+        },
+        {
+          "name": "before-4-1-2",
+          "runner": "before",
+          "cpus": 4,
+          "mode": 1,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 123293334,
+          "wall_seconds": 0.14238333300000017
+        },
+        {
+          "name": "after-4-1-2",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 1,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 1558167,
+          "wall_seconds": 0.02416229099999989
+        },
+        {
+          "name": "before-12-0-0",
+          "runner": "before",
+          "cpus": 12,
+          "mode": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 986531792,
+          "wall_seconds": 1.0125711250000002
+        },
+        {
+          "name": "after-12-0-0",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 5723959,
+          "wall_seconds": 0.024104374999999845
+        },
+        {
+          "name": "after-12-0-1",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 5833667,
+          "wall_seconds": 0.022992083999999746
+        },
+        {
+          "name": "before-12-0-1",
+          "runner": "before",
+          "cpus": 12,
+          "mode": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 988187375,
+          "wall_seconds": 1.0537456670000003
+        },
+        {
+          "name": "before-12-0-2",
+          "runner": "before",
+          "cpus": 12,
+          "mode": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 988987375,
+          "wall_seconds": 1.020821083
+        },
+        {
+          "name": "after-12-0-2",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 5863709,
+          "wall_seconds": 0.02368758400000015
+        },
+        {
+          "name": "before-12-1-0",
+          "runner": "before",
+          "cpus": 12,
+          "mode": 1,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 982338208,
+          "wall_seconds": 1.0003939589999993
+        },
+        {
+          "name": "after-12-1-0",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 1,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 6688500,
+          "wall_seconds": 0.024077667000000247
+        },
+        {
+          "name": "after-12-1-1",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 1,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 5729625,
+          "wall_seconds": 0.024044332999999973
+        },
+        {
+          "name": "before-12-1-1",
+          "runner": "before",
+          "cpus": 12,
+          "mode": 1,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 999397334,
+          "wall_seconds": 1.0491038330000002
+        },
+        {
+          "name": "before-12-1-2",
+          "runner": "before",
+          "cpus": 12,
+          "mode": 1,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 992495417,
+          "wall_seconds": 1.0583821670000004
+        },
+        {
+          "name": "after-12-1-2",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 1,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 6261292,
+          "wall_seconds": 0.023925917000000574
+        }
+      ]
+    },
+    "native_linux": {
+      "binary_sha256": "336553495646f084490d0d189dd6d9889ad85fcde8a2fd55e2e0be3852be7c63",
+      "rows": [
+        {
+          "threads": 1,
+          "mode": 0,
+          "rep": 0,
+          "code": 0,
+          "stdout": "worker-bpf: threads=1 rounds=30 filtered=0 elapsed_ns=1993331: ok\n",
+          "stderr": "",
+          "elapsed_ns": 1993331
+        },
+        {
+          "threads": 1,
+          "mode": 0,
+          "rep": 1,
+          "code": 0,
+          "stdout": "worker-bpf: threads=1 rounds=30 filtered=0 elapsed_ns=2087142: ok\n",
+          "stderr": "",
+          "elapsed_ns": 2087142
+        },
+        {
+          "threads": 1,
+          "mode": 0,
+          "rep": 2,
+          "code": 0,
+          "stdout": "worker-bpf: threads=1 rounds=30 filtered=0 elapsed_ns=2980912: ok\n",
+          "stderr": "",
+          "elapsed_ns": 2980912
+        },
+        {
+          "threads": 1,
+          "mode": 1,
+          "rep": 0,
+          "code": 0,
+          "stdout": "worker-bpf: threads=1 rounds=30 filtered=1 elapsed_ns=3132319: ok\n",
+          "stderr": "",
+          "elapsed_ns": 3132319
+        },
+        {
+          "threads": 1,
+          "mode": 1,
+          "rep": 1,
+          "code": 0,
+          "stdout": "worker-bpf: threads=1 rounds=30 filtered=1 elapsed_ns=2538904: ok\n",
+          "stderr": "",
+          "elapsed_ns": 2538904
+        },
+        {
+          "threads": 1,
+          "mode": 1,
+          "rep": 2,
+          "code": 0,
+          "stdout": "worker-bpf: threads=1 rounds=30 filtered=1 elapsed_ns=1909689: ok\n",
+          "stderr": "",
+          "elapsed_ns": 1909689
+        },
+        {
+          "threads": 4,
+          "mode": 0,
+          "rep": 0,
+          "code": 0,
+          "stdout": "worker-bpf: threads=4 rounds=30 filtered=0 elapsed_ns=3926234: ok\n",
+          "stderr": "",
+          "elapsed_ns": 3926234
+        },
+        {
+          "threads": 4,
+          "mode": 0,
+          "rep": 1,
+          "code": 0,
+          "stdout": "worker-bpf: threads=4 rounds=30 filtered=0 elapsed_ns=2335236: ok\n",
+          "stderr": "",
+          "elapsed_ns": 2335236
+        },
+        {
+          "threads": 4,
+          "mode": 0,
+          "rep": 2,
+          "code": 0,
+          "stdout": "worker-bpf: threads=4 rounds=30 filtered=0 elapsed_ns=1580829: ok\n",
+          "stderr": "",
+          "elapsed_ns": 1580829
+        },
+        {
+          "threads": 4,
+          "mode": 1,
+          "rep": 0,
+          "code": 0,
+          "stdout": "worker-bpf: threads=4 rounds=30 filtered=1 elapsed_ns=5710647: ok\n",
+          "stderr": "",
+          "elapsed_ns": 5710647
+        },
+        {
+          "threads": 4,
+          "mode": 1,
+          "rep": 1,
+          "code": 0,
+          "stdout": "worker-bpf: threads=4 rounds=30 filtered=1 elapsed_ns=2589206: ok\n",
+          "stderr": "",
+          "elapsed_ns": 2589206
+        },
+        {
+          "threads": 4,
+          "mode": 1,
+          "rep": 2,
+          "code": 0,
+          "stdout": "worker-bpf: threads=4 rounds=30 filtered=1 elapsed_ns=1673890: ok\n",
+          "stderr": "",
+          "elapsed_ns": 1673890
+        },
+        {
+          "threads": 12,
+          "mode": 0,
+          "rep": 0,
+          "code": 0,
+          "stdout": "worker-bpf: threads=12 rounds=30 filtered=0 elapsed_ns=7001707: ok\n",
+          "stderr": "",
+          "elapsed_ns": 7001707
+        },
+        {
+          "threads": 12,
+          "mode": 0,
+          "rep": 1,
+          "code": 0,
+          "stdout": "worker-bpf: threads=12 rounds=30 filtered=0 elapsed_ns=8223002: ok\n",
+          "stderr": "",
+          "elapsed_ns": 8223002
+        },
+        {
+          "threads": 12,
+          "mode": 0,
+          "rep": 2,
+          "code": 0,
+          "stdout": "worker-bpf: threads=12 rounds=30 filtered=0 elapsed_ns=5496061: ok\n",
+          "stderr": "",
+          "elapsed_ns": 5496061
+        },
+        {
+          "threads": 12,
+          "mode": 1,
+          "rep": 0,
+          "code": 0,
+          "stdout": "worker-bpf: threads=12 rounds=30 filtered=1 elapsed_ns=7833213: ok\n",
+          "stderr": "",
+          "elapsed_ns": 7833213
+        },
+        {
+          "threads": 12,
+          "mode": 1,
+          "rep": 1,
+          "code": 0,
+          "stdout": "worker-bpf: threads=12 rounds=30 filtered=1 elapsed_ns=8876597: ok\n",
+          "stderr": "",
+          "elapsed_ns": 8876597
+        },
+        {
+          "threads": 12,
+          "mode": 1,
+          "rep": 2,
+          "code": 0,
+          "stdout": "worker-bpf: threads=12 rounds=30 filtered=1 elapsed_ns=4579536: ok\n",
+          "stderr": "",
+          "elapsed_ns": 4579536
+        }
+      ]
+    },
+    "medians": [
+      {
+        "cpus": 1,
+        "filtered": false,
+        "before_ms": 1.210792,
+        "after_ms": 1.239166,
+        "speedup": 0.9771023414134992,
+        "native_linux_ms": 2.087142
+      },
+      {
+        "cpus": 1,
+        "filtered": true,
+        "before_ms": 1.234959,
+        "after_ms": 1.212833,
+        "speedup": 1.018243237115085,
+        "native_linux_ms": 2.538904
+      },
+      {
+        "cpus": 4,
+        "filtered": false,
+        "before_ms": 109.683917,
+        "after_ms": 1.758792,
+        "speedup": 62.36321122679657,
+        "native_linux_ms": 2.335236
+      },
+      {
+        "cpus": 4,
+        "filtered": true,
+        "before_ms": 122.322709,
+        "after_ms": 1.558167,
+        "speedup": 78.50423542534273,
+        "native_linux_ms": 2.589206
+      },
+      {
+        "cpus": 12,
+        "filtered": false,
+        "before_ms": 988.187375,
+        "after_ms": 5.833667,
+        "speedup": 169.3938606711696,
+        "native_linux_ms": 7.001707
+      },
+      {
+        "cpus": 12,
+        "filtered": true,
+        "before_ms": 992.495417,
+        "after_ms": 6.261292,
+        "speedup": 158.51287833245917,
+        "native_linux_ms": 7.833213
+      }
+    ],
+    "earlier_overlapped_build_run": {
+      "fixture_sha256": "336553495646f084490d0d189dd6d9889ad85fcde8a2fd55e2e0be3852be7c63",
+      "runner_sha256": {
+        "before": "336d2dbed9a806cd66b6bb93aeb6df7e2371d6cbe32444327b66f07e3948db48",
+        "after": "b13498e2b9ff8b34c65278e7a86d2dafb80a5e8575bd9b8ae34388c5d35a8114"
+      },
+      "rows": [
+        {
+          "name": "before-1-0-0",
+          "runner": "before",
+          "cpus": 1,
+          "mode": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 1368542,
+          "wall_seconds": 0.374966333
+        },
+        {
+          "name": "after-1-0-0",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 1306000,
+          "wall_seconds": 0.024146208000000002
+        },
+        {
+          "name": "after-1-0-1",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 1405208,
+          "wall_seconds": 0.024022082999999972
+        },
+        {
+          "name": "before-1-0-1",
+          "runner": "before",
+          "cpus": 1,
+          "mode": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 1268500,
+          "wall_seconds": 0.011955749999999987
+        },
+        {
+          "name": "before-1-0-2",
+          "runner": "before",
+          "cpus": 1,
+          "mode": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 1284958,
+          "wall_seconds": 0.01195912499999996
+        },
+        {
+          "name": "after-1-0-2",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 1275041,
+          "wall_seconds": 0.023970665999999974
+        },
+        {
+          "name": "before-1-1-0",
+          "runner": "before",
+          "cpus": 1,
+          "mode": 1,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 1261500,
+          "wall_seconds": 0.011929958999999934
+        },
+        {
+          "name": "after-1-1-0",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 1,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 1294958,
+          "wall_seconds": 0.024164750000000068
+        },
+        {
+          "name": "after-1-1-1",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 1,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 1373167,
+          "wall_seconds": 0.023499833999999997
+        },
+        {
+          "name": "before-1-1-1",
+          "runner": "before",
+          "cpus": 1,
+          "mode": 1,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 1344250,
+          "wall_seconds": 0.012447291999999943
+        },
+        {
+          "name": "before-1-1-2",
+          "runner": "before",
+          "cpus": 1,
+          "mode": 1,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 1717084,
+          "wall_seconds": 0.012028166999999979
+        },
+        {
+          "name": "after-1-1-2",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 1,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 1810625,
+          "wall_seconds": 0.024098750000000058
+        },
+        {
+          "name": "before-4-0-0",
+          "runner": "before",
+          "cpus": 4,
+          "mode": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 131326291,
+          "wall_seconds": 0.18489254100000008
+        },
+        {
+          "name": "after-4-0-0",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 2071750,
+          "wall_seconds": 0.024098042000000097
+        },
+        {
+          "name": "after-4-0-1",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 1916500,
+          "wall_seconds": 0.02403112499999982
+        },
+        {
+          "name": "before-4-0-1",
+          "runner": "before",
+          "cpus": 4,
+          "mode": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 133608667,
+          "wall_seconds": 0.1784062500000001
+        },
+        {
+          "name": "before-4-0-2",
+          "runner": "before",
+          "cpus": 4,
+          "mode": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 129428250,
+          "wall_seconds": 0.19077395800000008
+        },
+        {
+          "name": "after-4-0-2",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 1465625,
+          "wall_seconds": 0.02248145899999998
+        },
+        {
+          "name": "before-4-1-0",
+          "runner": "before",
+          "cpus": 4,
+          "mode": 1,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 119491584,
+          "wall_seconds": 0.18681608299999986
+        },
+        {
+          "name": "after-4-1-0",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 1,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 1391000,
+          "wall_seconds": 0.02313675000000015
+        },
+        {
+          "name": "after-4-1-1",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 1,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 1781125,
+          "wall_seconds": 0.021012457999999956
+        },
+        {
+          "name": "before-4-1-1",
+          "runner": "before",
+          "cpus": 4,
+          "mode": 1,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 122706625,
+          "wall_seconds": 0.18366000000000016
+        },
+        {
+          "name": "before-4-1-2",
+          "runner": "before",
+          "cpus": 4,
+          "mode": 1,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 115396250,
+          "wall_seconds": 0.13462224999999983
+        },
+        {
+          "name": "after-4-1-2",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 1,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 1501959,
+          "wall_seconds": 0.02397087500000028
+        },
+        {
+          "name": "before-12-0-0",
+          "runner": "before",
+          "cpus": 12,
+          "mode": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 869490625,
+          "wall_seconds": 0.8912922500000002
+        },
+        {
+          "name": "after-12-0-0",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 6225208,
+          "wall_seconds": 0.044455375000000075
+        },
+        {
+          "name": "after-12-0-1",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 5424291,
+          "wall_seconds": 0.04035708299999996
+        },
+        {
+          "name": "before-12-0-1",
+          "runner": "before",
+          "cpus": 12,
+          "mode": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 749581375,
+          "wall_seconds": 0.82491475
+        },
+        {
+          "name": "before-12-0-2",
+          "runner": "before",
+          "cpus": 12,
+          "mode": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 710401292,
+          "wall_seconds": 0.77833825
+        },
+        {
+          "name": "after-12-0-2",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 5969208,
+          "wall_seconds": 0.04700870899999998
+        },
+        {
+          "name": "before-12-1-0",
+          "runner": "before",
+          "cpus": 12,
+          "mode": 1,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 876693917,
+          "wall_seconds": 0.9050818749999996
+        },
+        {
+          "name": "after-12-1-0",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 1,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 11176291,
+          "wall_seconds": 0.0494155420000002
+        },
+        {
+          "name": "after-12-1-1",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 1,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 6013084,
+          "wall_seconds": 0.04667537500000041
+        },
+        {
+          "name": "before-12-1-1",
+          "runner": "before",
+          "cpus": 12,
+          "mode": 1,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 1028801167,
+          "wall_seconds": 1.0509331670000002
+        },
+        {
+          "name": "before-12-1-2",
+          "runner": "before",
+          "cpus": 12,
+          "mode": 1,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 1041346959,
+          "wall_seconds": 1.125084416
+        },
+        {
+          "name": "after-12-1-2",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 1,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 6362625,
+          "wall_seconds": 0.04680450000000036
+        }
+      ]
+    },
+    "source_note": "Paired benchmark uses final production source. Subsequent changes only adjust the TSYNC test wait, docs and version pin; installed metadata build is separately smoke-tested."
+  },
+  "performance_interpretation": [
+    "Three alternating unprofiled pairs per CPU count and filter mode; 30 complete policy-management rounds per thread. Raw samples are retained.",
+    "Thread creation, target directory opens and optional TSYNC precede the timed release. Each round loads, queries identity, attaches, queries IDs, closes/reopens, replaces, detaches and checks old IDs.",
+    "Large gains remove BPF cohort returns, not device I/O costs; no Firefox, Docker startup or Geekbench speedup is inferred.",
+    "One-CPU medians remain near 1.2 ms. Three short samples do not establish a general improvement or absence of small regressions.",
+    "Native Linux reference is an ARM64 CI guest with six provisioned CPUs; twelve threads are oversubscribed. No CPU pinning. macOS has no equivalent Linux BPF syscall.",
+    "Trames implements a bounded device-program subset, while native Linux uses its full BPF verifier and object machinery; lower times do not imply full BPF equivalence or general native performance.",
+    "The initial timing run overlapped Linux affected-check compilation and is retained separately; the reported medians use the subsequent run after those jobs finished.",
+    "Final BPF and target-open cohort-return entries are absent. Aggregate service counts can include other calls; they are not represented as globally zero."
+  ],
+  "corrected_failures": [
+    "Moving policy entry exposed target cgroup opens as a remaining joined dependency. Original cgroup directory/control paths now execute through shared filesystem identities, including relative dirfd and deleted/recreated targets.",
+    "Concurrent cgroup removal could invalidate the ID between target lookup and hierarchy indexing. Recheck existence inside the attachment transaction; return the original ENODEV result.",
+    "The existing TSYNC test assumed four global instruction budgets guaranteed peer scheduling and could also stop after only the first observation. The isolated original test passed; the corrected test waits for all three observations under a five-second bound, retaining source/no-service assertions.",
+    "An early restricted host test run denied loopback sockets. The authorized local run and complete runtime workflow passed; no production networking change was made.",
+    "New path-test setup initially omitted the proc provider required by the existing source resolver and selected a pids file without enabling that controller. Corrected the test setup; the capability-less boundary remains unchanged."
+  ],
+  "validation_reuse": "Both complete runtime workflows passed before the final cgroup-path dependency fix. Final affected VFS/Linux ABI, process and strict checks plus iPad builds and the real guest matrix cover that fix. Mac process suite passed all 394 cases; Linux affected suite passed 393 and failed only the existing timing-sensitive TSYNC observer, whose corrected targeted retry passes (3 unrelated cases ignored on each host). No full suite rerun is attributed to the test-wait-only change. Unchanged stage-59 product/HVF tests and earlier instruction/graphics/Go/Docker acceptance are reused, not claimed as newly run.",
+  "physical_ipad_acceptance": "Device/simulator compile checks only; no new physical iPad deployment.",
+  "known_unattributed_issue": "Stage-56 intermittent Docker cleanup timeout remains unattributed. No Firefox or Docker acceptance rerun is claimed.",
+  "remaining_boundaries": [
+    "Explicit tracing and capability-less embeddings",
+    "Underlying excluded resources and general unhandled SVC/HLT/fault dispatch",
+    "Actual shared-mm quiescence and exceptional native mapping import",
+    "Host lifecycle/admin, cold/solo and legacy resource paths"
+  ],
+  "deployment": {
+    "status": "Mac Dev installed and verified; stable binary unchanged; no business restart; iPad source/compile checks only",
+    "version": "Trames Dev 1.5.3 (dev) runtime a1b8759dff09e2b8e1fa85607cde25e73b71544c",
+    "runtime_revision": "a1b8759dff09e2b8e1fa85607cde25e73b71544c",
+    "mac_revision": "295b9c2eabe0fc37a4b2895a879354f2b123bccf",
+    "runner_sha256": "3ad924856da2594b2f21c3e9e62de5f2b758b9b23589bf59c71614c1d245505b",
+    "stable_runner_sha256": "4f40615213e731b2a4ef9d8c6a0e85c5c7bdf31ab0c60b0354b55113f2a6a55d",
+    "cases": [
+      {
+        "case": "hvf-4-cgroup-bpf",
+        "code": 0,
+        "seconds": 0.536361459,
+        "passed": true,
+        "runner_sha256": "3ad924856da2594b2f21c3e9e62de5f2b758b9b23589bf59c71614c1d245505b",
+        "fixture_sha256": "dae8c7b07183fcf02e5ecd62205fb915acad2d58aa69dc16faf71fd7a12651c9",
+        "log": {
+          "path": "target/bpf-subsystem/installed-guest/hvf-4-cgroup-bpf.log",
+          "sha256": "3701d507ec8422790e5b2fe46e0a335a33a6ab9bdec1f5f0b8f12a72b8c274af"
+        }
+      },
+      {
+        "case": "hvf-4-worker-bpf",
+        "code": 0,
+        "seconds": 0.024924291999999904,
+        "passed": true,
+        "runner_sha256": "3ad924856da2594b2f21c3e9e62de5f2b758b9b23589bf59c71614c1d245505b",
+        "fixture_sha256": "336553495646f084490d0d189dd6d9889ad85fcde8a2fd55e2e0be3852be7c63",
+        "log": {
+          "path": "target/bpf-subsystem/installed-guest/hvf-4-worker-bpf.log",
+          "sha256": "8420228773ef1cfbb67fc259667af0ce889d6ede2ec1ad4fd18307f648fe4052"
+        }
+      },
+      {
+        "case": "hvf-4-worker-bpf-filtered",
+        "code": 0,
+        "seconds": 0.02360145899999999,
+        "passed": true,
+        "runner_sha256": "3ad924856da2594b2f21c3e9e62de5f2b758b9b23589bf59c71614c1d245505b",
+        "fixture_sha256": "336553495646f084490d0d189dd6d9889ad85fcde8a2fd55e2e0be3852be7c63",
+        "log": {
+          "path": "target/bpf-subsystem/installed-guest/hvf-4-worker-bpf-filtered.log",
+          "sha256": "6f6f3ed1580563fa65ee78889a3a2be83452d63ce9e099af042dfdd2d1defd88"
+        }
+      },
+      {
+        "case": "hvf-12-cgroup-bpf",
+        "code": 0,
+        "seconds": 0.012078833999999983,
+        "passed": true,
+        "runner_sha256": "3ad924856da2594b2f21c3e9e62de5f2b758b9b23589bf59c71614c1d245505b",
+        "fixture_sha256": "dae8c7b07183fcf02e5ecd62205fb915acad2d58aa69dc16faf71fd7a12651c9",
+        "log": {
+          "path": "target/bpf-subsystem/installed-guest/hvf-12-cgroup-bpf.log",
+          "sha256": "32e0abb75163d59f727596e8775c825cad9fbf6ae7f53ac2371a3ec424f76bfd"
+        }
+      },
+      {
+        "case": "hvf-12-worker-bpf",
+        "code": 0,
+        "seconds": 0.023898708000000046,
+        "passed": true,
+        "runner_sha256": "3ad924856da2594b2f21c3e9e62de5f2b758b9b23589bf59c71614c1d245505b",
+        "fixture_sha256": "336553495646f084490d0d189dd6d9889ad85fcde8a2fd55e2e0be3852be7c63",
+        "log": {
+          "path": "target/bpf-subsystem/installed-guest/hvf-12-worker-bpf.log",
+          "sha256": "63576be4477d83850506d4850aab8c5a0ce15ee77a3e5c41d060ca8c6fd3602b"
+        }
+      },
+      {
+        "case": "hvf-12-worker-bpf-filtered",
+        "code": 0,
+        "seconds": 0.02029566599999999,
+        "passed": true,
+        "runner_sha256": "3ad924856da2594b2f21c3e9e62de5f2b758b9b23589bf59c71614c1d245505b",
+        "fixture_sha256": "336553495646f084490d0d189dd6d9889ad85fcde8a2fd55e2e0be3852be7c63",
+        "log": {
+          "path": "target/bpf-subsystem/installed-guest/hvf-12-worker-bpf-filtered.log",
+          "sha256": "53e190c70c0a95d39214254337364e07ac0cfb16d953c6c727c1d5b575decf6c"
+        }
+      }
+    ]
+  }
+}
