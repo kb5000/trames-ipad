@@ -1,27 +1,25 @@
 # Coordinator dependency audit
 
-## Current status — 2026-11-06
+## Current status — 2026-11-07
 
-Runtime `aeca5a59a6d53549ed39478081480fc4b4ed9f29` (stage 58) completes the supported
-scoped-memory subsystem: first proc-byte activation, returned/cold task cleanup,
-and mapped-file layout transactions. These now run on existing execution workers
-using original task/mm/backing resources. Direct file calls and io_uring share the
-same accepted mutation resource; cancellation keeps original authority and waits.
+Stage 59 completes the supported seccomp subsystem: installation/prctl, TSYNC,
+entry decisions, signal/termination effects, proc observations and birth/exec
+inheritance now use original task/group resources on execution workers. Busy
+installation returns the CPU slot. Ordinary entry reads an immutable policy
+without locking; accepted calls keep their original decision after later changes.
+No policy operation pauses the whole cohort or creates a new resource thread.
 
-A pending file mutation blocks new mapping publication, returns only its original
-backing readers, and holds the exclusive ticket through existing disk-pool
-completion. Independent byte return breaks a structural-scope wait cycle without
-replaying a guest syscall. Final CPU-domain removal wakes retained cold-memory
-cleanup. No coordinator/service thread, process-wide pause counter or ordinary
-byte-access lock/check is added.
+Late NNP publication also updates prepared exec credentials and initial auxv before
+commit, using retained executable metadata. This closes a dependency that cannot
+be solved by moving only the seccomp syscall entry. Stage 58's scoped-memory and
+stage 57's task/image lifecycle work remains in place.
 
-Local acceptance includes both runtime CI host workflows, 381 final process cases
-per host (three ignored), 24 Mac product tests, 48 explicit signed hardware tests,
-both iPad compile targets, and mapped-file stress on HVF and the interpreter at
-1/4/12 CPUs. One hundred repeated exit tests cover 900 completion scenarios.
-Unchanged passing checks are reused; see [stage 58 validation](../validation/worker-scoped-memory-20261106.json).
-Mac Dev uses the paired runtime. Stable/business environments remain unchanged;
-physical iPad acceptance is still skipped as previously chosen.
+Local acceptance includes 394 process cases on each host (three ignored), runtime
+CI with affected-only retries, 24 Mac product and 48 signed hardware cases, both
+iPad compile targets, and native Linux/HVF/interpreter fixtures at 1/4/12 CPUs.
+See [stage 59 validation](../validation/worker-seccomp-20261107.json). Stable and
+business environments remain unchanged; this batch targets Dev. Physical iPad
+acceptance remains skipped as previously chosen.
 
 **The coordinator still exists.** Actual shared-mm quiescence, an in-cohort
 one-caller service, asynchronous collection and a whole-cohort return have different
@@ -30,18 +28,18 @@ costs. Counts of migrated entries or files are not a completion percentage.
 | Area | Current execution | Remaining boundary |
 | --- | --- | --- |
 | Admitted file/path/FD, Unix/TCP I/O and cross-resource transfer | Calling worker and original shared objects | Excluded paths/descriptors/controls retain explicit escalation; supported layout changes now use original backing admission |
-| Futexes, clocks/timers, admitted event/child/signal waits and caught signals | Source execution; blocking returns the CPU slot | Legacy nonmember wake/adoption, unsupported wait resources and actual task-policy effects remain |
-| Scheduling attributes and CPU affinity | Original task atomics, original PID/group/UID authority and task-scoped completion on the caller | Tracing and actual task-policy effects retain their boundary; unsupported features keep their errno. Required original CPU slots start directly from the live queue |
-| Exit/group/default-fatal termination, STOP/CONT and vfork release | Source resources and original group/family notifications | Returned CPU/statistics and cold cleanup complete on existing workers; the actual shared mm may still need its byte checkpoint. Outside-cohort/solo and tracing/policy remain separate |
-| fork/clone/vfork and execve/execveat | Existing workers handle pure and mixed mapping scopes, nonleader rekey and original-mm retirement; existing disk pool prepares native images without retaining a CPU slot | Affected actors still pause; actual tracing/policy and solo/host invocation remain distinct |
+| Futexes, clocks/timers, admitted event/child/signal waits and caught signals | Source execution; blocking returns the CPU slot | Legacy nonmember wake/adoption, unsupported wait resources and capability-less embeddings remain |
+| Scheduling attributes and CPU affinity | Original task atomics, original PID/group/UID authority and task-scoped completion on the caller | Tracing and capability-less embeddings retain their boundary; unsupported features keep their errno. Required original CPU slots start directly from the live queue |
+| Exit/group/default-fatal termination, STOP/CONT and vfork release | Source resources and original group/family notifications | Returned CPU/statistics and cold cleanup complete on existing workers; the actual shared mm may still need its byte checkpoint. Outside-cohort/solo and tracing/capability-less embeddings remain separate |
+| fork/clone/vfork and execve/execveat | Existing workers handle pure and mixed mapping scopes, nonleader rekey and original-mm retirement; existing disk pool prepares native images without retaining a CPU slot | Affected actors still pause; actual tracing/capability-less embeddings and solo/host invocation remain distinct |
 | Mapping topology, pins and mapped-file layout | Supported brk/mmap/munmap/mremap/mprotect/msync/madvise and buffer-registration checkpoints publish on an existing worker; additive anonymous mmap is direct | Proc/cold-mm checkpoints and supported mapped-file layout transactions now run on existing workers; excluded backing/lifetime/policy and capability-less embeddings retain explicit boundaries |
 | Residual FD/network compatibility | Owner service inside a live cohort, where admitted | Caller waits while peers continue; refusal before effects falls back to joined handling |
 | Native libc/GPU/video/audio | Normal bodies and resource waits use calling/shared-resource paths | Exceptional mapping import, unstable entry and actual native lifecycle checks remain; AppKit affinity, device/disk pools and local fallback are not extra coordinators |
 | Dynamic proc/sys and proc pathname/FD consumers | Calling worker and original PID/mm/Files/fs/namespace resources | First cross-mm byte export and invalidation activate on an existing worker at the original task/mm boundary; legacy providers retain explicit fallback |
 | Mount topology administration | Original namespace/fs resources on the caller; existing disk pool for host-backed paths; contention releases the CPU slot | Tracing and genuinely excluded pathname controls retain their explicit boundary |
-| Task namespace membership and Files/fs detachment | Supported unshare/setns/close_range run on the caller, refresh future consumers and preserve accepted async operations | Tracing/security effects remain; clone creation still uses creator-mm custody; unsupported user/time namespaces are not added |
-| Credentials and capability administration | Calling worker, shared ABI and original task credentials; future consumers refresh, accepted async work retains submission authority | Tracing and actual policy lifecycle retain their boundary; unsupported user namespaces and file capabilities are unchanged |
-| Tracing/security and mixed owner resources | Actual joined task/control boundary | Installation/TSYNC, policy signal/termination effects, excluded SCM_RIGHTS/ring resources and missing source pumps remain. Pure custody-policy errors complete on continuous workers before quiescence |
+| Task namespace membership and Files/fs detachment | Supported unshare/setns/close_range run on the caller, refresh future consumers and preserve accepted async operations | Tracing and capability-less embeddings remain; clone creation still uses creator-mm custody; unsupported user/time namespaces are not added |
+| Credentials and capability administration | Calling worker, shared ABI and original task credentials; future consumers refresh, accepted async work retains submission authority | Tracing and capability-less embeddings retain their boundary; unsupported user namespaces and file capabilities are unchanged |
+| Seccomp and tracing | Supported installation/TSYNC, decisions and lifecycle effects use original source resources; original policy/NNP is visible to proc, fork and exec | Explicit tracing and capability-less embeddings remain; unsupported seccomp APIs are unchanged. Allowed calls still retain their own excluded resource/generic fallback |
 | Host lifecycle and generic dispatch fallback | Still joined when the actual event/exit requires it | Host exec creation/group control, terminal lifecycle, pause/cancel, transfer/timezone/writeback, supervision/admin/pressure/deadline/shutdown; any SVC/HLT/fault not completed, parked, serviced or scoped on the worker still reaches the generic joined fallback |
 
 The last row is an important coverage gap: the remaining owner work is **not
@@ -51,11 +49,21 @@ the owner; ordinary epoch-member migration, parking, wakeup and child/replacemen
 admission already use the live execution queue. Single-CPU/solo execution retains
 its coordinated caller path, which does not by itself imply an extra RPC.
 
-The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/aeca5a59a6d53549ed39478081480fc4b4ed9f29/docs/architecture/coordination-boundaries.md)
+The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/38cdbba7a1967863a77fb0e432ec59cfa46e153c/docs/architecture/coordination-boundaries.md)
 records scopes, actual admission gates and source locations. Earlier sections
 below are historical records and do not override this inventory.
 
-### Stage 58 measurements and remaining costs
+### Stage 59 policy measurements
+
+Five alternating unprofiled pairs measure 5,000 calls per thread. Filter-denied
+calls fall from **932.887 to 6.124 ms at four CPUs**, and **5775.095 to 12.548 ms
+at twelve CPUs**, by eliminating repeated whole-cohort returns. These are syscall
+fixture results, not Firefox or Geekbench speedups. Unfiltered/ALLOW controls range
+from roughly -5.3% to +2.8%; single-CPU controls stay within 1%. Native macOS and
+Linux references, final-source confirmation, raw samples and limits are recorded
+in the validation artifact. The coordinator and the explicit fallback rows remain.
+
+### Stage 58 measurements and remaining costs (historical)
 
 Nine alternating unprofiled pairs measure 100 mapped-file resizes while child
 processes read existing aliases and repeatedly map new ones:
@@ -4072,3 +4080,13 @@ new aliases, io_uring, cancellation and external borrowers. The current inventor
 supersedes the proc/cold-mm/layout boundaries recorded in earlier stages. See the
 [shared implementation and defect analysis](https://github.com/kb5000/trames-runtime/blob/aeca5a59a6d53549ed39478081480fc4b4ed9f29/docs/architecture/coordination-boundaries.md#58-original-scoped-memory-activation-completion-and-file-layouts--2026-11-06)
 and [exact validation record](../validation/worker-scoped-memory-20261106.json).
+
+
+## 59. Original seccomp policy and complete lifecycle consumers — 2026-11-07
+
+Supported strict/filter/prctl installation, TSYNC, entry results, source SIGSYS/
+termination, proc visibility and fork/exec inheritance are integrated as one batch.
+Accepted policy and guest bytes survive resource contention and cancellation;
+late NNP publication refreshes a prepared exec image under original group custody.
+Ordinary syscall entry remains lock-free. See the [shared contract](https://github.com/kb5000/trames-runtime/blob/38cdbba7a1967863a77fb0e432ec59cfa46e153c/docs/architecture/coordination-boundaries.md#59-original-seccomp-policy-tsync-and-lifecycle-consumers--2026-11-07)
+and [validation record](../validation/worker-seccomp-20261107.json).

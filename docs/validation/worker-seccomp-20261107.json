@@ -1,0 +1,2782 @@
+{
+  "schema": 1,
+  "date": "2026-11-07",
+  "stage": 59,
+  "recorded_at": "2026-11-06T17:24:12.010006+00:00",
+  "runtime_revision": "38cdbba7a1967863a77fb0e432ec59cfa46e153c",
+  "baseline_runtime_revision": "aeca5a59a6d53549ed39478081480fc4b4ed9f29",
+  "global_coordinator_removal_complete": false,
+  "scope": [
+    "Supported strict/filter/prctl installation and TSYNC",
+    "Accepted per-entry policy and local signal/termination effects",
+    "Original proc visibility, fork/exec inheritance, NNP and prepared-exec privilege dependencies"
+  ],
+  "implementation": [
+    "Immutable original task policy publication with no syscall-entry lock",
+    "Source local/prctl install, TSYNC, error/TRAP/thread/group effects",
+    "Shared original task NNP and independent fork inheritance",
+    "Group custody admission for birth and install, retained installation wait releases slots",
+    "Accepted entry retained across pending mmap retry",
+    "Live proc policy observation independent of old image metadata",
+    "Late TSYNC NNP refreshes prepared exec credentials and initial auxv using accepted metadata under original group admission"
+  ],
+  "constraints": [
+    "No new coordinator/resource-service thread or polling bus",
+    "Busy installation releases execution slots",
+    "No syscall-entry lock or allocation; immutable policy publication",
+    "No new ordinary guest-byte permission policy or memory fence",
+    "Shared Mac/iPad runtime"
+  ],
+  "source_files": {
+    "crates/trames-session/src/process.rs": "a4ab8e7ea3c704119ce05c68de2b57a844184f560858ec70d4fbfb8ef3e1518d",
+    "crates/trames-session/src/process_birth.rs": "50366d2f896cfc98ec100e6c97ecea6a70492730ac8fd9b7176694ad0d3d3218",
+    "crates/trames-session/src/process_dispatch.rs": "67168ce4488973dcdf5f07286f1aa4a819e3d9f6fcec0bc81415703d6d088ac2",
+    "crates/trames-session/src/process_events.rs": "a21c4d8e2012089b58b1b9e5527091879fde25fc4ef5f4c71cea09c6ca3649ad",
+    "crates/trames-session/src/process_exec.rs": "1ffac1b35363fd21c3ecc8b163c285bf33df7ed5f2ef21c0755aac7ecb0e6394",
+    "crates/trames-session/src/process_lifecycle.rs": "1408218505b0034528c7dea01f8f56adc14b03f54bce222e26dac9def2dff6a8",
+    "crates/trames-session/src/process_seccomp.rs": "2349982cba72f4d58d1a02b318b02d831c295a3663f81440f8493394b088294d",
+    "crates/trames-session/src/process_vm.rs": "d6397814be26fed962b3af35cdad12673d7fb43e58cf0eb3a483fc04c58d6418",
+    "crates/trames-session/src/run_queue.rs": "b89cbb0095508ee629f429a400c9c4795aeff1ba78adcd983733bf2f0606a4ff",
+    "crates/trames-session/src/worker_syscalls.rs": "7a2b75bd8063e9160d9407ad20ab0e4c62f87134a99f98fbd1ddc8ea66a633fd",
+    "crates/trames-session/src/workers.rs": "799ea77accb5fde43d5d1e4096db332463bb999dceb3293f2835d0640728c4e3",
+    "crates/trames-shared/src/custody.rs": "0ad71d91ac51eda9149294d60cafbaa98f18516e8c3e4fad1c8baa0aa2eea98d",
+    "crates/trames-vfs/src/capabilities.rs": "f1da629fecc1308c5341c6e23491f0872b9dacfa2601ffbba684afb86a2f76ba",
+    "crates/trames-vfs/src/credentials.rs": "516acc56afea6debe6816af7229d45dd6409f9ba07ba0e419fcce70e86c50518",
+    "crates/trames-vfs/src/lib.rs": "8cf584edf517db41b394e99eb449ebdf3fd1fa7f2cb58380521d9957f101d27b",
+    "crates/trames-vfs/src/proc_source.rs": "3e7c943bd5bfe8de8b670377508b35e3c23014e40128950c52f31441f1da8423",
+    "crates/trames-vfs/src/pseudo.rs": "184d3517c524c7608f0ed0bb8e91ecbd4abdc1558a444640100cd236f203f6a5",
+    "docs/architecture/coordination-boundaries.md": "aa652c9610ea3239d26a96cdd6260af39285a68db07920ca841380fc8f56852d"
+  },
+  "fixtures": {
+    "seccomp.c": {
+      "path": "tests/fixtures/seccomp.c",
+      "sha256": "c745e35c15086044f67682d8ae9892edcb942d5596d56e5d9f241aaf3fb2f41a"
+    },
+    "worker-seccomp.c": {
+      "path": "tests/fixtures/worker-seccomp.c",
+      "sha256": "182a2f61de9d8690ab5b7b4dccf104469650d03fd2f60cfef2efe121abd8e24e"
+    }
+  },
+  "acceptance": {
+    "checks": {
+      "mac-process-final": {
+        "path": "target/seccomp-subsystem/process-final.log",
+        "sha256": "d7456e91cee66b05d1d5447978324b6f15bd293bebf464d2e213b430a88109c5",
+        "test_results": [
+          "test result: ok. 394 passed; 0 failed; 3 ignored; 0 measured; 0 filtered out; finished in 2.19s"
+        ]
+      },
+      "mac-vfs-linux-final": {
+        "path": "target/seccomp-subsystem/vfs-linux-final.log",
+        "sha256": "12918b834f62e44db27d5b8c431c8d187f40e233c096de12ec96ce942e872651",
+        "test_results": [
+          "test result: ok. 246 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.83s",
+          "test result: ok. 556 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 2.28s",
+          "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+          "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+        ]
+      },
+      "mac-shared-final": {
+        "path": "target/seccomp-subsystem/shared-final.log",
+        "sha256": "a7729580e8f4739511ac9983cf711c44656e6b576cc600ad4302a2a6a7260112",
+        "test_results": [
+          "test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s",
+          "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+        ]
+      },
+      "mac-core-clippy-final": {
+        "path": "target/seccomp-subsystem/core-clippy-final.log",
+        "sha256": "1a1113fb327e44f8e84c01208c6e02764bb5986cf4d9a62c4c840bf94d6f5c44",
+        "test_results": []
+      },
+      "mac-vfs-clippy-final": {
+        "path": "target/seccomp-subsystem/vfs-clippy-final.log",
+        "sha256": "73fa01dbc281b21b0c960ea4edf7df492aeec5d9c39d3e7965e2788c96985796",
+        "test_results": []
+      },
+      "mac-mac-product-tests": {
+        "path": "target/seccomp-subsystem/mac-product-tests.log",
+        "sha256": "59af65ae0b40da57cf119f8c2086bbf80b4d4975c46b87f16a16d5a377d58c63",
+        "test_results": [
+          "test result: ok. 4 passed; 0 failed; 47 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+          "test result: ok. 20 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.02s",
+          "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+        ]
+      },
+      "mac-aarch64-apple-ios-check": {
+        "path": "target/seccomp-subsystem/aarch64-apple-ios-check.log",
+        "sha256": "d331b1ee05112f34db5753ea55aaf204460d23ea5ac696b3c384f998f8b5ec1c",
+        "test_results": []
+      },
+      "mac-aarch64-apple-ios-sim-check": {
+        "path": "target/seccomp-subsystem/aarch64-apple-ios-sim-check.log",
+        "sha256": "db09fd20ddb39111b542baf05b173edf487fd4076c5e1de6f22f4c20592385a7",
+        "test_results": []
+      },
+      "mac-final-format": {
+        "path": "target/seccomp-subsystem/final-format.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "test_results": []
+      },
+      "mac-ipad-boundaries": {
+        "path": "target/seccomp-subsystem/ipad-boundaries.log",
+        "sha256": "44683867d869a7a31f3df8ecf48c8f7b0cbf1c5cec4bb7387d0c2aae80ac463d",
+        "test_results": []
+      },
+      "mac-runtime-boundaries": {
+        "path": "target/seccomp-subsystem/runtime-boundaries.log",
+        "sha256": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651",
+        "test_results": []
+      },
+      "mac-mac-boundaries-final": {
+        "path": "target/seccomp-subsystem/mac-boundaries-final.log",
+        "sha256": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651",
+        "test_results": []
+      },
+      "mac-mac-build-final": {
+        "path": "target/seccomp-subsystem/mac-build-final.log",
+        "sha256": "daa22766358b540e1e4bde5b37c5c9330751e23f0df45d5047522e9395cbfe9f",
+        "test_results": []
+      },
+      "mac-interpreter-build-final": {
+        "path": "target/seccomp-subsystem/interpreter-build-final.log",
+        "sha256": "2092c4f8c68c1f3f578c7f1b9316b382bd48bad9e8eed32d94bc1abc1f94aea6",
+        "test_results": []
+      },
+      "linux-process-final": {
+        "path": "target/local-ci/io/seccomp-subsystem/process-final.log",
+        "sha256": "01ed8d9da23b8fbfe95e15d62561081fcc9f163c555d866a3555a015f3b03ad0",
+        "test_results": [
+          "test result: ok. 394 passed; 0 failed; 3 ignored; 0 measured; 0 filtered out; finished in 1.81s"
+        ]
+      },
+      "linux-vfs-linux-final": {
+        "path": "target/local-ci/io/seccomp-subsystem/vfs-linux-final.log",
+        "sha256": "0c84b957a69de1ca0c814acdbaa8301fb8fda10ebf7172433519523ce2c28025",
+        "test_results": [
+          "test result: ok. 246 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.78s",
+          "test result: ok. 555 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 1.12s",
+          "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+          "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+        ]
+      },
+      "linux-remaining-runtime-tests": {
+        "path": "target/local-ci/io/seccomp-subsystem/remaining-runtime-tests.log",
+        "sha256": "abd5b5d9281fdf38147bf3f1b3dadec0a170c180e3a02666f539a69397cee3a4",
+        "test_results": [
+          "test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s",
+          "test result: ok. 555 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 1.43s",
+          "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+          "test result: ok. 61 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s",
+          "test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s",
+          "test result: ok. 0 passed; 0 failed; 3 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+          "test result: ok. 0 passed; 0 failed; 5 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+          "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+          "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+          "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+          "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+          "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+        ]
+      },
+      "linux-runtime-doc-tests": {
+        "path": "target/local-ci/io/seccomp-subsystem/runtime-doc-tests.log",
+        "sha256": "0c27b14946c105118a5b6ef71e8782e7933fb34d8dd37b366bac0af4751e6d88",
+        "test_results": [
+          "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+          "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+          "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+          "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+          "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+          "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+          "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+          "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+          "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+          "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+          "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+          "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+          "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+          "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+          "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+          "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+          "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+          "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+          "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+        ]
+      },
+      "linux-core-clippy-final": {
+        "path": "target/local-ci/io/seccomp-subsystem/core-clippy-final.log",
+        "sha256": "cfa3c4c8e3a07229b582676aa1b7d09541b6ff2b56346dbff0f97ffc2c96a91a",
+        "test_results": []
+      },
+      "linux-vfs-clippy-final": {
+        "path": "target/local-ci/io/seccomp-subsystem/vfs-clippy-final.log",
+        "sha256": "e83766626a935b2e86662ce48fc43e917237eb97604ce13b760cedb4f362222b",
+        "test_results": []
+      },
+      "linux-shared-clippy": {
+        "path": "target/local-ci/io/seccomp-subsystem/shared-clippy.log",
+        "sha256": "16af95a2b3490cb42bf429b536932a49602797d67e3343e9326356ecce3abc23",
+        "test_results": []
+      },
+      "linux-native-seccomp": {
+        "path": "target/local-ci/io/seccomp-subsystem/native-seccomp.log",
+        "sha256": "dada40074e7082124f38501e8f4de25368609c18a6592d93de1abc772e5e306f",
+        "test_results": []
+      }
+    },
+    "runtime_macos_initial": {
+      "path": "target/seccomp-subsystem/runtime-macos-ci/summary.json",
+      "sha256": "0ce395dbea681273eb3db258fb7feaa9a225670df9954ca0995a27c7fb99de7e",
+      "completed": true,
+      "context": {
+        "machine": "arm64",
+        "packages": "27.0.1",
+        "platform": "macOS-27.0.1-arm64-arm-64bit",
+        "rustc": "rustc 1.101.0-nightly (4ebd25825 2026-10-15)\nbinary: rustc\ncommit-hash: 4ebd258257737d5b7635c116fa7d281627a7e937\ncommit-date: 2026-10-15\nhost: aarch64-apple-darwin\nrelease: 1.101.0-nightly\nLLVM version: 23.1.4\n"
+      },
+      "steps": [
+        {
+          "exit_code": 0,
+          "index": 1,
+          "name": "rustup show",
+          "seconds": 0.021077871322631836,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "index": 2,
+          "name": "python3 scripts/check-execution-boundaries.py",
+          "seconds": 0.06963706016540527,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "index": 3,
+          "name": "cargo fmt --all --check",
+          "seconds": 1.0986969470977783,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "index": 4,
+          "name": "cargo clippy --workspace --all-targets --all-features --locked -- -D warnings",
+          "seconds": 5.840641975402832,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "index": 5,
+          "name": "cargo test --workspace --all-features --locked",
+          "seconds": 26.180871963500977,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "index": 6,
+          "name": "cargo build --workspace --all-features --release --locked",
+          "seconds": 8.363158702850342,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "index": 7,
+          "name": "cargo run --release -p trames-memory --example reclaim-footprint --locked",
+          "seconds": 3.2592320442199707,
+          "status": "passed"
+        }
+      ],
+      "logs": [
+        {
+          "path": "target/seccomp-subsystem/runtime-macos-ci/step-01.log",
+          "sha256": "a4a6a2e77ce93e216ac1bdd7f0ebd4b7a240da4f7d0028afbfa1ad91641dc56c"
+        },
+        {
+          "path": "target/seccomp-subsystem/runtime-macos-ci/step-02.log",
+          "sha256": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651"
+        },
+        {
+          "path": "target/seccomp-subsystem/runtime-macos-ci/step-03.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "target/seccomp-subsystem/runtime-macos-ci/step-04.log",
+          "sha256": "a249ef979f9b7bb74dd5b716108b76863a43c94a4d1cab090cdc1e19db9fe497"
+        },
+        {
+          "path": "target/seccomp-subsystem/runtime-macos-ci/step-05.log",
+          "sha256": "daa834efdffcda984bffdbd670ed754edcbf3acae8bc31fe4516a6b058639979"
+        },
+        {
+          "path": "target/seccomp-subsystem/runtime-macos-ci/step-06.log",
+          "sha256": "3dffbfafe9bfd03b892b7847b5f6bfaae1ee690f1923bb5edbe1d7b788d1dc46"
+        },
+        {
+          "path": "target/seccomp-subsystem/runtime-macos-ci/step-07.log",
+          "sha256": "bc2cb855cfa968397497b989d8499d530fa1273736cd7ac367d480bc3dbda912"
+        }
+      ]
+    },
+    "runtime_linux_initial": {
+      "path": "target/local-ci/io/seccomp-subsystem/runtime-linux-ci/summary.json",
+      "sha256": "ffc930454ace9dcf706f27c9bac2067486c29bc3271eeb4688bbe024f61b3a09",
+      "completed": false,
+      "context": {
+        "machine": "aarch64",
+        "packages": "363b68bfd79931eb35722a52c1a67ecbdddf646805ce787fbeb35a4a0027a7f4",
+        "platform": "Linux-7.0.0-38-generic-aarch64-with-glibc2.39",
+        "rustc": "rustc 1.101.0-nightly (4ebd25825 2026-10-15)\nbinary: rustc\ncommit-hash: 4ebd258257737d5b7635c116fa7d281627a7e937\ncommit-date: 2026-10-15\nhost: aarch64-unknown-linux-gnu\nrelease: 1.101.0-nightly\nLLVM version: 23.1.4\n"
+      },
+      "steps": [
+        {
+          "exit_code": 0,
+          "index": 1,
+          "name": "rustup show",
+          "seconds": 0.015097618103027344,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "index": 2,
+          "name": "python3 scripts/check-execution-boundaries.py",
+          "seconds": 0.0812995433807373,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "index": 3,
+          "name": "cargo fmt --all --check",
+          "seconds": 0.9283723831176758,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "index": 4,
+          "name": "cargo clippy --workspace --all-targets --all-features --locked -- -D warnings",
+          "seconds": 5.823261976242065,
+          "status": "passed"
+        },
+        {
+          "exit_code": 101,
+          "index": 5,
+          "name": "cargo test --workspace --all-features --locked",
+          "seconds": 29.120643377304077,
+          "status": "failed"
+        }
+      ],
+      "logs": [
+        {
+          "path": "target/local-ci/io/seccomp-subsystem/runtime-linux-ci/step-01.log",
+          "sha256": "72636920b473812425175422544a88a230699115a474bc30d039719194f48644"
+        },
+        {
+          "path": "target/local-ci/io/seccomp-subsystem/runtime-linux-ci/step-02.log",
+          "sha256": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651"
+        },
+        {
+          "path": "target/local-ci/io/seccomp-subsystem/runtime-linux-ci/step-03.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "target/local-ci/io/seccomp-subsystem/runtime-linux-ci/step-04.log",
+          "sha256": "9ec217579712dcb0ba9f7bb69bb347d57f27010f432b4b82fe6ca9af79480bbb"
+        },
+        {
+          "path": "target/local-ci/io/seccomp-subsystem/runtime-linux-ci/step-05.log",
+          "sha256": "45ec0c4a800ce0a6301c566cd0f2436430a90b87c1fc8056fbe6f4b3242331a0"
+        }
+      ]
+    },
+    "runtime_linux_remaining": {
+      "path": "target/local-ci/io/seccomp-subsystem/runtime-linux-finish/summary.json",
+      "sha256": "8d603146fa97aded7ed8fe920620e1e4e434431b88338c7e437dbffefac9019f",
+      "completed": false,
+      "context": {
+        "machine": "aarch64",
+        "packages": "363b68bfd79931eb35722a52c1a67ecbdddf646805ce787fbeb35a4a0027a7f4",
+        "platform": "Linux-7.0.0-38-generic-aarch64-with-glibc2.39",
+        "rustc": "rustc 1.101.0-nightly (4ebd25825 2026-10-15)\nbinary: rustc\ncommit-hash: 4ebd258257737d5b7635c116fa7d281627a7e937\ncommit-date: 2026-10-15\nhost: aarch64-unknown-linux-gnu\nrelease: 1.101.0-nightly\nLLVM version: 23.1.4\n"
+      },
+      "steps": [
+        {
+          "index": 1,
+          "name": null,
+          "status": "not-run"
+        },
+        {
+          "index": 2,
+          "name": null,
+          "status": "not-run"
+        },
+        {
+          "index": 3,
+          "name": null,
+          "status": "not-run"
+        },
+        {
+          "index": 4,
+          "name": null,
+          "status": "not-run"
+        },
+        {
+          "index": 5,
+          "name": null,
+          "status": "not-run"
+        },
+        {
+          "exit_code": 0,
+          "index": 6,
+          "name": "cargo build --workspace --all-features --release --locked",
+          "seconds": 8.504634618759155,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "index": 7,
+          "name": "cargo run --release -p trames-memory --example reclaim-footprint --locked",
+          "seconds": 2.68613862991333,
+          "status": "passed"
+        }
+      ],
+      "logs": [
+        {
+          "path": "target/local-ci/io/seccomp-subsystem/runtime-linux-finish/step-06.log",
+          "sha256": "32068c6879197d1842dba0b3e5f002236040b5055577a4a70329dd99d058d0c0"
+        },
+        {
+          "path": "target/local-ci/io/seccomp-subsystem/runtime-linux-finish/step-07.log",
+          "sha256": "60ee137ee78aa4d688eb3d4784d028e7b8a268bb6a9d38417da6ca91eebca615"
+        }
+      ]
+    },
+    "linux_retry_results": [
+      {
+        "name": "remaining-runtime-tests",
+        "code": 0,
+        "seconds": 24.444536333999963
+      },
+      {
+        "name": "runtime-doc-tests",
+        "code": 0,
+        "seconds": 13.331186331999959
+      },
+      {
+        "name": "shared-clippy",
+        "code": 0,
+        "seconds": 1.2474384760000135
+      },
+      {
+        "name": "runtime-ci-finish",
+        "code": 0,
+        "seconds": 11.312693867000007
+      },
+      {
+        "name": "seccomp-build",
+        "code": 0,
+        "seconds": 0.17455079899997372
+      },
+      {
+        "name": "worker-seccomp-build",
+        "code": 0,
+        "seconds": 0.12461654100002306
+      },
+      {
+        "name": "native-seccomp",
+        "code": 0,
+        "seconds": 3.241463619000001
+      },
+      {
+        "name": "native-worker-1-0",
+        "code": 0,
+        "seconds": 0.004747269999995751
+      },
+      {
+        "name": "native-worker-1-1",
+        "code": 0,
+        "seconds": 0.004604215000028944
+      },
+      {
+        "name": "native-worker-1-2",
+        "code": 0,
+        "seconds": 0.004685639000001629
+      },
+      {
+        "name": "native-worker-4-0",
+        "code": 0,
+        "seconds": 0.004161132999968231
+      },
+      {
+        "name": "native-worker-4-1",
+        "code": 0,
+        "seconds": 0.00401970299998311
+      },
+      {
+        "name": "native-worker-4-2",
+        "code": 0,
+        "seconds": 0.004364193000014893
+      },
+      {
+        "name": "native-worker-12-0",
+        "code": 0,
+        "seconds": 0.00948962299997902
+      },
+      {
+        "name": "native-worker-12-1",
+        "code": 0,
+        "seconds": 0.00937211100000468
+      },
+      {
+        "name": "native-worker-12-2",
+        "code": 0,
+        "seconds": 0.00688108999997894
+      }
+    ],
+    "linux_final_exec_dependencies": {
+      "source_sha256": {
+        "crates/trames-session/src/process_exec.rs": "1ffac1b35363fd21c3ecc8b163c285bf33df7ed5f2ef21c0755aac7ecb0e6394",
+        "crates/trames-session/src/process_lifecycle.rs": "1408218505b0034528c7dea01f8f56adc14b03f54bce222e26dac9def2dff6a8",
+        "crates/trames-vfs/src/lib.rs": "8cf584edf517db41b394e99eb449ebdf3fd1fa7f2cb58380521d9957f101d27b",
+        "crates/trames-vfs/src/credentials.rs": "516acc56afea6debe6816af7229d45dd6409f9ba07ba0e419fcce70e86c50518",
+        "crates/trames-vfs/src/capabilities.rs": "f1da629fecc1308c5341c6e23491f0872b9dacfa2601ffbba684afb86a2f76ba"
+      },
+      "checks": [
+        {
+          "name": "process-final",
+          "code": 0
+        },
+        {
+          "name": "vfs-linux-final",
+          "code": 0
+        },
+        {
+          "name": "core-clippy-final",
+          "code": 0
+        },
+        {
+          "name": "vfs-clippy-final",
+          "code": 0
+        }
+      ]
+    },
+    "ipad_compile_targets": [
+      {
+        "target": "aarch64-apple-ios",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+        "code": 0
+      },
+      {
+        "target": "aarch64-apple-ios-sim",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk",
+        "code": 0
+      }
+    ],
+    "guest_final_matrix": [
+      {
+        "case": "hvf-1-seccomp",
+        "code": 0,
+        "seconds": 0.5825254590000001,
+        "passed": true,
+        "runner_sha256": "336d2dbed9a806cd66b6bb93aeb6df7e2371d6cbe32444327b66f07e3948db48",
+        "fixture_sha256": "b10d59e60927d79d942b8cf308ac628d066b77b78d2c0de03abd2c2a7bf168bb",
+        "log": {
+          "path": "target/seccomp-subsystem/guest/hvf-1-seccomp.log",
+          "sha256": "e31582f653e8566077c7f91c20a8fe510fb3d43ff44912390a34a074c5958d98"
+        }
+      },
+      {
+        "case": "hvf-1-worker-seccomp",
+        "code": 0,
+        "seconds": 0.04723695799999994,
+        "passed": true,
+        "runner_sha256": "336d2dbed9a806cd66b6bb93aeb6df7e2371d6cbe32444327b66f07e3948db48",
+        "fixture_sha256": "fa79ddbbf93cde0293c2aa7a036c9fc83740de4cd22885e5b98541ac0b15a6f9",
+        "log": {
+          "path": "target/seccomp-subsystem/guest/hvf-1-worker-seccomp.log",
+          "sha256": "bdce672b88241942835cb6fdd5d7ff2708b6721225202dabc10d2bb738e1ca1b"
+        }
+      },
+      {
+        "case": "hvf-4-seccomp",
+        "code": 0,
+        "seconds": 0.024085874999999923,
+        "passed": true,
+        "runner_sha256": "336d2dbed9a806cd66b6bb93aeb6df7e2371d6cbe32444327b66f07e3948db48",
+        "fixture_sha256": "b10d59e60927d79d942b8cf308ac628d066b77b78d2c0de03abd2c2a7bf168bb",
+        "log": {
+          "path": "target/seccomp-subsystem/guest/hvf-4-seccomp.log",
+          "sha256": "06e5b21018cb1fc93f3ee139cf5dd4028365440b81adef4e5e9b8f9d3b517a7d"
+        }
+      },
+      {
+        "case": "hvf-4-worker-seccomp",
+        "code": 0,
+        "seconds": 0.022129167000000005,
+        "passed": true,
+        "runner_sha256": "336d2dbed9a806cd66b6bb93aeb6df7e2371d6cbe32444327b66f07e3948db48",
+        "fixture_sha256": "fa79ddbbf93cde0293c2aa7a036c9fc83740de4cd22885e5b98541ac0b15a6f9",
+        "log": {
+          "path": "target/seccomp-subsystem/guest/hvf-4-worker-seccomp.log",
+          "sha256": "0b02477023c40d759af168758b2a0efefc6cd433165de5937d2b2d37a8cee1f4"
+        }
+      },
+      {
+        "case": "hvf-12-seccomp",
+        "code": 0,
+        "seconds": 0.023138375000000044,
+        "passed": true,
+        "runner_sha256": "336d2dbed9a806cd66b6bb93aeb6df7e2371d6cbe32444327b66f07e3948db48",
+        "fixture_sha256": "b10d59e60927d79d942b8cf308ac628d066b77b78d2c0de03abd2c2a7bf168bb",
+        "log": {
+          "path": "target/seccomp-subsystem/guest/hvf-12-seccomp.log",
+          "sha256": "f71f2eb138413cc59a50f71d9cbb5ca0bc120d0f77b319679716bca7ddd91c0a"
+        }
+      },
+      {
+        "case": "hvf-12-worker-seccomp",
+        "code": 0,
+        "seconds": 0.041661624999999924,
+        "passed": true,
+        "runner_sha256": "336d2dbed9a806cd66b6bb93aeb6df7e2371d6cbe32444327b66f07e3948db48",
+        "fixture_sha256": "fa79ddbbf93cde0293c2aa7a036c9fc83740de4cd22885e5b98541ac0b15a6f9",
+        "log": {
+          "path": "target/seccomp-subsystem/guest/hvf-12-worker-seccomp.log",
+          "sha256": "0eebca24173070013320feec9c916abff72e0fdc59922cf9abdd2826b7c834ca"
+        }
+      },
+      {
+        "case": "interpreter-1-seccomp",
+        "code": 0,
+        "seconds": 0.3747648750000001,
+        "passed": true,
+        "runner_sha256": "8ff20e4c46524c744bd96726f3374281fb40f9f2538f9639e1c7f04c31006b66",
+        "fixture_sha256": "b10d59e60927d79d942b8cf308ac628d066b77b78d2c0de03abd2c2a7bf168bb",
+        "log": {
+          "path": "target/seccomp-subsystem/guest/interpreter-1-seccomp.log",
+          "sha256": "b736b227b84ce8ffade06ea666ea9578fa6a0fab42e9971736d899d137efb705"
+        }
+      },
+      {
+        "case": "interpreter-1-worker-seccomp",
+        "code": 0,
+        "seconds": 0.0116161669999999,
+        "passed": true,
+        "runner_sha256": "8ff20e4c46524c744bd96726f3374281fb40f9f2538f9639e1c7f04c31006b66",
+        "fixture_sha256": "fa79ddbbf93cde0293c2aa7a036c9fc83740de4cd22885e5b98541ac0b15a6f9",
+        "log": {
+          "path": "target/seccomp-subsystem/guest/interpreter-1-worker-seccomp.log",
+          "sha256": "a5863f42957d8ff31cb9e091f7d34129637b8286759d5793a6158662d3fdb8ae"
+        }
+      },
+      {
+        "case": "interpreter-4-seccomp",
+        "code": 0,
+        "seconds": 0.011609791999999786,
+        "passed": true,
+        "runner_sha256": "8ff20e4c46524c744bd96726f3374281fb40f9f2538f9639e1c7f04c31006b66",
+        "fixture_sha256": "b10d59e60927d79d942b8cf308ac628d066b77b78d2c0de03abd2c2a7bf168bb",
+        "log": {
+          "path": "target/seccomp-subsystem/guest/interpreter-4-seccomp.log",
+          "sha256": "bf7e5f74c232c4b0ab2e4915d1274e50507402dc005ce93d4f0465131bee6e98"
+        }
+      },
+      {
+        "case": "interpreter-4-worker-seccomp",
+        "code": 0,
+        "seconds": 0.011888750000000003,
+        "passed": true,
+        "runner_sha256": "8ff20e4c46524c744bd96726f3374281fb40f9f2538f9639e1c7f04c31006b66",
+        "fixture_sha256": "fa79ddbbf93cde0293c2aa7a036c9fc83740de4cd22885e5b98541ac0b15a6f9",
+        "log": {
+          "path": "target/seccomp-subsystem/guest/interpreter-4-worker-seccomp.log",
+          "sha256": "2df02626031e27c8c79962c3e314d6d24f7df8a6f7c87c0eec47679bee0b87d1"
+        }
+      },
+      {
+        "case": "interpreter-12-seccomp",
+        "code": 0,
+        "seconds": 0.011622624999999998,
+        "passed": true,
+        "runner_sha256": "8ff20e4c46524c744bd96726f3374281fb40f9f2538f9639e1c7f04c31006b66",
+        "fixture_sha256": "b10d59e60927d79d942b8cf308ac628d066b77b78d2c0de03abd2c2a7bf168bb",
+        "log": {
+          "path": "target/seccomp-subsystem/guest/interpreter-12-seccomp.log",
+          "sha256": "b6bf4aeecbe9c96d5bdba9bba1713e1aaab34a01835208e1a88dd40e2af0ee42"
+        }
+      },
+      {
+        "case": "interpreter-12-worker-seccomp",
+        "code": 0,
+        "seconds": 0.024357374999999903,
+        "passed": true,
+        "runner_sha256": "8ff20e4c46524c744bd96726f3374281fb40f9f2538f9639e1c7f04c31006b66",
+        "fixture_sha256": "fa79ddbbf93cde0293c2aa7a036c9fc83740de4cd22885e5b98541ac0b15a6f9",
+        "log": {
+          "path": "target/seccomp-subsystem/guest/interpreter-12-worker-seccomp.log",
+          "sha256": "f23b9dffa4fa8d08cb7141e2b258e9b520e8b64a8f85b6842f6c7c139337d797"
+        }
+      }
+    ],
+    "signed_hardware": {
+      "passed": true,
+      "runtime_revision": "aeca5a59a6d53549ed39478081480fc4b4ed9f29",
+      "rows": [
+        {
+          "target": "trames-mac-run",
+          "executable_sha256": "cdd51caf775d7f351d7b283906d70643022d67d626a6f94b0211eea58ebc8393",
+          "exit": 0,
+          "passed_tests": 1
+        },
+        {
+          "target": "trames_hvf",
+          "executable_sha256": "39a6e64cce35cfaf165237f4224d2483117520692f2476ee43974acb6c9fa6cb",
+          "exit": 0,
+          "passed_tests": 47
+        }
+      ],
+      "source_note": "Run on the stage-59 working tree before the final exec-credential dependency fix. runtime_revision in the original result was the stale stage-58 pin, not the tested source identity. Unchanged HVF/product tests are reused; final common process/exec tests and final guest matrix were repeated."
+    }
+  },
+  "performance": {
+    "paired_candidate": {
+      "fixture_sha256": "fa79ddbbf93cde0293c2aa7a036c9fc83740de4cd22885e5b98541ac0b15a6f9",
+      "runner_sha256": {
+        "before": "4b933205f3be4b64159a61171ddd174cd12d217dc5ed50ed98bd12bd04092571",
+        "after": "efcc9ffe31d702ad6ffe1c4d8e9bfc72548c71664f56fe0548c0a3852422978c"
+      },
+      "rows": [
+        {
+          "name": "before-1-0-0",
+          "runner": "before",
+          "cpus": 1,
+          "mode": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 7199416,
+          "wall_seconds": 0.021394083
+        },
+        {
+          "name": "after-1-0-0",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 6774542,
+          "wall_seconds": 0.024636541000000005
+        },
+        {
+          "name": "after-1-0-1",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 6665875,
+          "wall_seconds": 0.021847375000000002
+        },
+        {
+          "name": "before-1-0-1",
+          "runner": "before",
+          "cpus": 1,
+          "mode": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 6596125,
+          "wall_seconds": 0.02111075000000001
+        },
+        {
+          "name": "before-1-0-2",
+          "runner": "before",
+          "cpus": 1,
+          "mode": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 6579666,
+          "wall_seconds": 0.020742874999999994
+        },
+        {
+          "name": "after-1-0-2",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 6622291,
+          "wall_seconds": 0.020767708999999995
+        },
+        {
+          "name": "after-1-0-3",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 0,
+          "rep": 3,
+          "code": 0,
+          "elapsed_ns": 6780333,
+          "wall_seconds": 0.023835124999999985
+        },
+        {
+          "name": "before-1-0-3",
+          "runner": "before",
+          "cpus": 1,
+          "mode": 0,
+          "rep": 3,
+          "code": 0,
+          "elapsed_ns": 6710625,
+          "wall_seconds": 0.020221667
+        },
+        {
+          "name": "before-1-0-4",
+          "runner": "before",
+          "cpus": 1,
+          "mode": 0,
+          "rep": 4,
+          "code": 0,
+          "elapsed_ns": 6608875,
+          "wall_seconds": 0.02396958299999996
+        },
+        {
+          "name": "after-1-0-4",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 0,
+          "rep": 4,
+          "code": 0,
+          "elapsed_ns": 6652000,
+          "wall_seconds": 0.023221500000000006
+        },
+        {
+          "name": "before-1-1-0",
+          "runner": "before",
+          "cpus": 1,
+          "mode": 1,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 6673583,
+          "wall_seconds": 0.02078666699999998
+        },
+        {
+          "name": "after-1-1-0",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 1,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 6673333,
+          "wall_seconds": 0.023167665999999976
+        },
+        {
+          "name": "after-1-1-1",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 1,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 6722875,
+          "wall_seconds": 0.020513292000000016
+        },
+        {
+          "name": "before-1-1-1",
+          "runner": "before",
+          "cpus": 1,
+          "mode": 1,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 6647584,
+          "wall_seconds": 0.019688874999999995
+        },
+        {
+          "name": "before-1-1-2",
+          "runner": "before",
+          "cpus": 1,
+          "mode": 1,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 6675792,
+          "wall_seconds": 0.02401283300000001
+        },
+        {
+          "name": "after-1-1-2",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 1,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 6739458,
+          "wall_seconds": 0.023509875000000013
+        },
+        {
+          "name": "after-1-1-3",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 1,
+          "rep": 3,
+          "code": 0,
+          "elapsed_ns": 6765833,
+          "wall_seconds": 0.018837541999999985
+        },
+        {
+          "name": "before-1-1-3",
+          "runner": "before",
+          "cpus": 1,
+          "mode": 1,
+          "rep": 3,
+          "code": 0,
+          "elapsed_ns": 6647167,
+          "wall_seconds": 0.02246300000000001
+        },
+        {
+          "name": "before-1-1-4",
+          "runner": "before",
+          "cpus": 1,
+          "mode": 1,
+          "rep": 4,
+          "code": 0,
+          "elapsed_ns": 6797333,
+          "wall_seconds": 0.01887025000000009
+        },
+        {
+          "name": "after-1-1-4",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 1,
+          "rep": 4,
+          "code": 0,
+          "elapsed_ns": 6745833,
+          "wall_seconds": 0.02226329199999999
+        },
+        {
+          "name": "before-1-2-0",
+          "runner": "before",
+          "cpus": 1,
+          "mode": 2,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 5987791,
+          "wall_seconds": 0.02226091699999999
+        },
+        {
+          "name": "after-1-2-0",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 2,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 6095000,
+          "wall_seconds": 0.022045041999999904
+        },
+        {
+          "name": "after-1-2-1",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 2,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 6012334,
+          "wall_seconds": 0.023147291999999986
+        },
+        {
+          "name": "before-1-2-1",
+          "runner": "before",
+          "cpus": 1,
+          "mode": 2,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 5977833,
+          "wall_seconds": 0.021234459000000094
+        },
+        {
+          "name": "before-1-2-2",
+          "runner": "before",
+          "cpus": 1,
+          "mode": 2,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 6080250,
+          "wall_seconds": 0.020567000000000002
+        },
+        {
+          "name": "after-1-2-2",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 2,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 6023333,
+          "wall_seconds": 0.02215762499999996
+        },
+        {
+          "name": "after-1-2-3",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 2,
+          "rep": 3,
+          "code": 0,
+          "elapsed_ns": 6002458,
+          "wall_seconds": 0.020631833000000044
+        },
+        {
+          "name": "before-1-2-3",
+          "runner": "before",
+          "cpus": 1,
+          "mode": 2,
+          "rep": 3,
+          "code": 0,
+          "elapsed_ns": 5955042,
+          "wall_seconds": 0.02071041699999998
+        },
+        {
+          "name": "before-1-2-4",
+          "runner": "before",
+          "cpus": 1,
+          "mode": 2,
+          "rep": 4,
+          "code": 0,
+          "elapsed_ns": 5998042,
+          "wall_seconds": 0.02054541700000012
+        },
+        {
+          "name": "after-1-2-4",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 2,
+          "rep": 4,
+          "code": 0,
+          "elapsed_ns": 6028334,
+          "wall_seconds": 0.020489415999999983
+        },
+        {
+          "name": "before-4-0-0",
+          "runner": "before",
+          "cpus": 4,
+          "mode": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 6138750,
+          "wall_seconds": 0.024012040999999984
+        },
+        {
+          "name": "after-4-0-0",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 6253833,
+          "wall_seconds": 0.023972166999999933
+        },
+        {
+          "name": "after-4-0-1",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 13945583,
+          "wall_seconds": 0.04634620800000011
+        },
+        {
+          "name": "before-4-0-1",
+          "runner": "before",
+          "cpus": 4,
+          "mode": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 6127458,
+          "wall_seconds": 0.024204749999999997
+        },
+        {
+          "name": "before-4-0-2",
+          "runner": "before",
+          "cpus": 4,
+          "mode": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 6116250,
+          "wall_seconds": 0.02402375000000001
+        },
+        {
+          "name": "after-4-0-2",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 6300667,
+          "wall_seconds": 0.022686458999999992
+        },
+        {
+          "name": "after-4-0-3",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 0,
+          "rep": 3,
+          "code": 0,
+          "elapsed_ns": 6080292,
+          "wall_seconds": 0.024023208000000018
+        },
+        {
+          "name": "before-4-0-3",
+          "runner": "before",
+          "cpus": 4,
+          "mode": 0,
+          "rep": 3,
+          "code": 0,
+          "elapsed_ns": 6162250,
+          "wall_seconds": 0.02418529200000008
+        },
+        {
+          "name": "before-4-0-4",
+          "runner": "before",
+          "cpus": 4,
+          "mode": 0,
+          "rep": 4,
+          "code": 0,
+          "elapsed_ns": 6116833,
+          "wall_seconds": 0.022078416000000045
+        },
+        {
+          "name": "after-4-0-4",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 0,
+          "rep": 4,
+          "code": 0,
+          "elapsed_ns": 6355083,
+          "wall_seconds": 0.023987041999999903
+        },
+        {
+          "name": "before-4-1-0",
+          "runner": "before",
+          "cpus": 4,
+          "mode": 1,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 6554709,
+          "wall_seconds": 0.02432704100000005
+        },
+        {
+          "name": "after-4-1-0",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 1,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 6255792,
+          "wall_seconds": 0.022249834000000135
+        },
+        {
+          "name": "after-4-1-1",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 1,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 6246000,
+          "wall_seconds": 0.02422220800000008
+        },
+        {
+          "name": "before-4-1-1",
+          "runner": "before",
+          "cpus": 4,
+          "mode": 1,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 6463541,
+          "wall_seconds": 0.024061250000000145
+        },
+        {
+          "name": "before-4-1-2",
+          "runner": "before",
+          "cpus": 4,
+          "mode": 1,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 6473708,
+          "wall_seconds": 0.023081791000000074
+        },
+        {
+          "name": "after-4-1-2",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 1,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 6219834,
+          "wall_seconds": 0.0227392500000001
+        },
+        {
+          "name": "after-4-1-3",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 1,
+          "rep": 3,
+          "code": 0,
+          "elapsed_ns": 6186041,
+          "wall_seconds": 0.02385087500000016
+        },
+        {
+          "name": "before-4-1-3",
+          "runner": "before",
+          "cpus": 4,
+          "mode": 1,
+          "rep": 3,
+          "code": 0,
+          "elapsed_ns": 6419208,
+          "wall_seconds": 0.024223082999999868
+        },
+        {
+          "name": "before-4-1-4",
+          "runner": "before",
+          "cpus": 4,
+          "mode": 1,
+          "rep": 4,
+          "code": 0,
+          "elapsed_ns": 6419958,
+          "wall_seconds": 0.024113542000000043
+        },
+        {
+          "name": "after-4-1-4",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 1,
+          "rep": 4,
+          "code": 0,
+          "elapsed_ns": 6337083,
+          "wall_seconds": 0.02318724999999988
+        },
+        {
+          "name": "before-4-2-0",
+          "runner": "before",
+          "cpus": 4,
+          "mode": 2,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 929886667,
+          "wall_seconds": 0.9502224999999997
+        },
+        {
+          "name": "after-4-2-0",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 2,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 6091541,
+          "wall_seconds": 0.023614625
+        },
+        {
+          "name": "after-4-2-1",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 2,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 6124125,
+          "wall_seconds": 0.022903125000000024
+        },
+        {
+          "name": "before-4-2-1",
+          "runner": "before",
+          "cpus": 4,
+          "mode": 2,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 937822583,
+          "wall_seconds": 0.9587956660000003
+        },
+        {
+          "name": "before-4-2-2",
+          "runner": "before",
+          "cpus": 4,
+          "mode": 2,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 932887042,
+          "wall_seconds": 0.9622533750000004
+        },
+        {
+          "name": "after-4-2-2",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 2,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 6192583,
+          "wall_seconds": 0.021530250000000528
+        },
+        {
+          "name": "after-4-2-3",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 2,
+          "rep": 3,
+          "code": 0,
+          "elapsed_ns": 6127500,
+          "wall_seconds": 0.023162000000000127
+        },
+        {
+          "name": "before-4-2-3",
+          "runner": "before",
+          "cpus": 4,
+          "mode": 2,
+          "rep": 3,
+          "code": 0,
+          "elapsed_ns": 924730875,
+          "wall_seconds": 0.9516415
+        },
+        {
+          "name": "before-4-2-4",
+          "runner": "before",
+          "cpus": 4,
+          "mode": 2,
+          "rep": 4,
+          "code": 0,
+          "elapsed_ns": 941583083,
+          "wall_seconds": 0.9533072499999999
+        },
+        {
+          "name": "after-4-2-4",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 2,
+          "rep": 4,
+          "code": 0,
+          "elapsed_ns": 5941125,
+          "wall_seconds": 0.022176500000000487
+        },
+        {
+          "name": "before-12-0-0",
+          "runner": "before",
+          "cpus": 12,
+          "mode": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 12598083,
+          "wall_seconds": 0.0320845830000005
+        },
+        {
+          "name": "after-12-0-0",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 12930084,
+          "wall_seconds": 0.04682154099999991
+        },
+        {
+          "name": "after-12-0-1",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 12666542,
+          "wall_seconds": 0.04466150000000013
+        },
+        {
+          "name": "before-12-0-1",
+          "runner": "before",
+          "cpus": 12,
+          "mode": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 12688167,
+          "wall_seconds": 0.04581175000000037
+        },
+        {
+          "name": "before-12-0-2",
+          "runner": "before",
+          "cpus": 12,
+          "mode": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 12999541,
+          "wall_seconds": 0.031696666000000207
+        },
+        {
+          "name": "after-12-0-2",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 12576083,
+          "wall_seconds": 0.0479619170000003
+        },
+        {
+          "name": "after-12-0-3",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 0,
+          "rep": 3,
+          "code": 0,
+          "elapsed_ns": 12596417,
+          "wall_seconds": 0.04695041700000058
+        },
+        {
+          "name": "before-12-0-3",
+          "runner": "before",
+          "cpus": 12,
+          "mode": 0,
+          "rep": 3,
+          "code": 0,
+          "elapsed_ns": 12330417,
+          "wall_seconds": 0.02867350000000002
+        },
+        {
+          "name": "before-12-0-4",
+          "runner": "before",
+          "cpus": 12,
+          "mode": 0,
+          "rep": 4,
+          "code": 0,
+          "elapsed_ns": 12674750,
+          "wall_seconds": 0.031798083000000865
+        },
+        {
+          "name": "after-12-0-4",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 0,
+          "rep": 4,
+          "code": 0,
+          "elapsed_ns": 12973916,
+          "wall_seconds": 0.040734958999999904
+        },
+        {
+          "name": "before-12-1-0",
+          "runner": "before",
+          "cpus": 12,
+          "mode": 1,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 14889792,
+          "wall_seconds": 0.047498124999999725
+        },
+        {
+          "name": "after-12-1-0",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 1,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 12593458,
+          "wall_seconds": 0.044928416000000304
+        },
+        {
+          "name": "after-12-1-1",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 1,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 14081667,
+          "wall_seconds": 0.046841209000000106
+        },
+        {
+          "name": "before-12-1-1",
+          "runner": "before",
+          "cpus": 12,
+          "mode": 1,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 15892084,
+          "wall_seconds": 0.042303958999999836
+        },
+        {
+          "name": "before-12-1-2",
+          "runner": "before",
+          "cpus": 12,
+          "mode": 1,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 14781750,
+          "wall_seconds": 0.04560233299999972
+        },
+        {
+          "name": "after-12-1-2",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 1,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 14251959,
+          "wall_seconds": 0.04043508299999932
+        },
+        {
+          "name": "after-12-1-3",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 1,
+          "rep": 3,
+          "code": 0,
+          "elapsed_ns": 13693875,
+          "wall_seconds": 0.04678879200000008
+        },
+        {
+          "name": "before-12-1-3",
+          "runner": "before",
+          "cpus": 12,
+          "mode": 1,
+          "rep": 3,
+          "code": 0,
+          "elapsed_ns": 14722292,
+          "wall_seconds": 0.04095120800000007
+        },
+        {
+          "name": "before-12-1-4",
+          "runner": "before",
+          "cpus": 12,
+          "mode": 1,
+          "rep": 4,
+          "code": 0,
+          "elapsed_ns": 14722166,
+          "wall_seconds": 0.044637791000000426
+        },
+        {
+          "name": "after-12-1-4",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 1,
+          "rep": 4,
+          "code": 0,
+          "elapsed_ns": 13997208,
+          "wall_seconds": 0.04566695799999998
+        },
+        {
+          "name": "before-12-2-0",
+          "runner": "before",
+          "cpus": 12,
+          "mode": 2,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 5775094750,
+          "wall_seconds": 5.802135084
+        },
+        {
+          "name": "after-12-2-0",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 2,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 12585208,
+          "wall_seconds": 0.04731100000000055
+        },
+        {
+          "name": "after-12-2-1",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 2,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 12547625,
+          "wall_seconds": 0.04707891600000025
+        },
+        {
+          "name": "before-12-2-1",
+          "runner": "before",
+          "cpus": 12,
+          "mode": 2,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 5928257625,
+          "wall_seconds": 5.976978166
+        },
+        {
+          "name": "before-12-2-2",
+          "runner": "before",
+          "cpus": 12,
+          "mode": 2,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 5723078916,
+          "wall_seconds": 5.778039207999999
+        },
+        {
+          "name": "after-12-2-2",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 2,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 12592333,
+          "wall_seconds": 0.04813120799999737
+        },
+        {
+          "name": "after-12-2-3",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 2,
+          "rep": 3,
+          "code": 0,
+          "elapsed_ns": 12437167,
+          "wall_seconds": 0.04715233399999974
+        },
+        {
+          "name": "before-12-2-3",
+          "runner": "before",
+          "cpus": 12,
+          "mode": 2,
+          "rep": 3,
+          "code": 0,
+          "elapsed_ns": 5816507125,
+          "wall_seconds": 5.861867208
+        },
+        {
+          "name": "before-12-2-4",
+          "runner": "before",
+          "cpus": 12,
+          "mode": 2,
+          "rep": 4,
+          "code": 0,
+          "elapsed_ns": 5610999459,
+          "wall_seconds": 5.661152040999998
+        },
+        {
+          "name": "after-12-2-4",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 2,
+          "rep": 4,
+          "code": 0,
+          "elapsed_ns": 12414583,
+          "wall_seconds": 0.041434457999997676
+        }
+      ],
+      "summary": [
+        {
+          "cpus": 1,
+          "mode": 0,
+          "before": 6.608875,
+          "after": 6.665875,
+          "change_percent": 0.8624765939740042,
+          "speedup": 0.9914489845669174
+        },
+        {
+          "cpus": 1,
+          "mode": 1,
+          "before": 6.673583,
+          "after": 6.739458,
+          "change_percent": 0.9871009321379631,
+          "speedup": 0.9902254751049713
+        },
+        {
+          "cpus": 1,
+          "mode": 2,
+          "before": 5.987791,
+          "after": 6.023333,
+          "change_percent": 0.5935744918284636,
+          "speedup": 0.9940992802489916
+        },
+        {
+          "cpus": 4,
+          "mode": 0,
+          "before": 6.127458,
+          "after": 6.300667,
+          "change_percent": 2.8267676416549925,
+          "speedup": 0.972509418447285
+        },
+        {
+          "cpus": 4,
+          "mode": 1,
+          "before": 6.463541,
+          "after": 6.246,
+          "change_percent": -3.3656628773608754,
+          "speedup": 1.034828850464297
+        },
+        {
+          "cpus": 4,
+          "mode": 2,
+          "before": 932.887042,
+          "after": 6.124125,
+          "change_percent": -99.34352984613544,
+          "speedup": 152.32984989692403
+        },
+        {
+          "cpus": 12,
+          "mode": 0,
+          "before": 12.67475,
+          "after": 12.666542,
+          "change_percent": -0.06475867374109434,
+          "speedup": 1.000648006377747
+        },
+        {
+          "cpus": 12,
+          "mode": 1,
+          "before": 14.78175,
+          "after": 13.997208,
+          "change_percent": -5.3075041859049215,
+          "speedup": 1.0560498922356516
+        },
+        {
+          "cpus": 12,
+          "mode": 2,
+          "before": 5775.09475,
+          "after": 12.547625,
+          "change_percent": -99.78272867297979,
+          "speedup": 460.2540122134667
+        }
+      ]
+    },
+    "final_source_confirmation": {
+      "fixture_sha256": "fa79ddbbf93cde0293c2aa7a036c9fc83740de4cd22885e5b98541ac0b15a6f9",
+      "runner_sha256": {
+        "after": "336d2dbed9a806cd66b6bb93aeb6df7e2371d6cbe32444327b66f07e3948db48"
+      },
+      "rows": [
+        {
+          "name": "after-1-0-0",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 6862666,
+          "wall_seconds": 0.02386025
+        },
+        {
+          "name": "after-1-0-1",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 6731375,
+          "wall_seconds": 0.022163542
+        },
+        {
+          "name": "after-1-0-2",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 6633125,
+          "wall_seconds": 0.023725417
+        },
+        {
+          "name": "after-1-0-3",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 0,
+          "rep": 3,
+          "code": 0,
+          "elapsed_ns": 6837208,
+          "wall_seconds": 0.021658708
+        },
+        {
+          "name": "after-1-0-4",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 0,
+          "rep": 4,
+          "code": 0,
+          "elapsed_ns": 6788750,
+          "wall_seconds": 0.021543583000000005
+        },
+        {
+          "name": "after-1-1-0",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 1,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 6759000,
+          "wall_seconds": 0.021984625000000008
+        },
+        {
+          "name": "after-1-1-1",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 1,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 6813958,
+          "wall_seconds": 0.023673
+        },
+        {
+          "name": "after-1-1-2",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 1,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 6617458,
+          "wall_seconds": 0.022951417
+        },
+        {
+          "name": "after-1-1-3",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 1,
+          "rep": 3,
+          "code": 0,
+          "elapsed_ns": 6749792,
+          "wall_seconds": 0.022343957999999997
+        },
+        {
+          "name": "after-1-1-4",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 1,
+          "rep": 4,
+          "code": 0,
+          "elapsed_ns": 6689167,
+          "wall_seconds": 0.022920958000000047
+        },
+        {
+          "name": "after-1-2-0",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 2,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 6118583,
+          "wall_seconds": 0.023838833000000004
+        },
+        {
+          "name": "after-1-2-1",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 2,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 5970750,
+          "wall_seconds": 0.02133600000000002
+        },
+        {
+          "name": "after-1-2-2",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 2,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 6061000,
+          "wall_seconds": 0.023815375000000027
+        },
+        {
+          "name": "after-1-2-3",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 2,
+          "rep": 3,
+          "code": 0,
+          "elapsed_ns": 6110917,
+          "wall_seconds": 0.021325916999999972
+        },
+        {
+          "name": "after-1-2-4",
+          "runner": "after",
+          "cpus": 1,
+          "mode": 2,
+          "rep": 4,
+          "code": 0,
+          "elapsed_ns": 5985666,
+          "wall_seconds": 0.022135209000000045
+        },
+        {
+          "name": "after-4-0-0",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 6190959,
+          "wall_seconds": 0.02396337500000001
+        },
+        {
+          "name": "after-4-0-1",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 6162875,
+          "wall_seconds": 0.02374124999999999
+        },
+        {
+          "name": "after-4-0-2",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 6307833,
+          "wall_seconds": 0.022572916
+        },
+        {
+          "name": "after-4-0-3",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 0,
+          "rep": 3,
+          "code": 0,
+          "elapsed_ns": 6212875,
+          "wall_seconds": 0.023007958999999967
+        },
+        {
+          "name": "after-4-0-4",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 0,
+          "rep": 4,
+          "code": 0,
+          "elapsed_ns": 6155417,
+          "wall_seconds": 0.023860500000000062
+        },
+        {
+          "name": "after-4-1-0",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 1,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 6258625,
+          "wall_seconds": 0.02401058300000003
+        },
+        {
+          "name": "after-4-1-1",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 1,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 6321833,
+          "wall_seconds": 0.023140792000000077
+        },
+        {
+          "name": "after-4-1-2",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 1,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 6267542,
+          "wall_seconds": 0.022792167000000085
+        },
+        {
+          "name": "after-4-1-3",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 1,
+          "rep": 3,
+          "code": 0,
+          "elapsed_ns": 6133292,
+          "wall_seconds": 0.023706499999999964
+        },
+        {
+          "name": "after-4-1-4",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 1,
+          "rep": 4,
+          "code": 0,
+          "elapsed_ns": 6237542,
+          "wall_seconds": 0.023101417000000013
+        },
+        {
+          "name": "after-4-2-0",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 2,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 6028667,
+          "wall_seconds": 0.023907124999999918
+        },
+        {
+          "name": "after-4-2-1",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 2,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 6039666,
+          "wall_seconds": 0.023814000000000002
+        },
+        {
+          "name": "after-4-2-2",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 2,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 6212375,
+          "wall_seconds": 0.024136166999999986
+        },
+        {
+          "name": "after-4-2-3",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 2,
+          "rep": 3,
+          "code": 0,
+          "elapsed_ns": 6047375,
+          "wall_seconds": 0.024094124999999966
+        },
+        {
+          "name": "after-4-2-4",
+          "runner": "after",
+          "cpus": 4,
+          "mode": 2,
+          "rep": 4,
+          "code": 0,
+          "elapsed_ns": 6255709,
+          "wall_seconds": 0.02369412500000001
+        },
+        {
+          "name": "after-12-0-0",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 0,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 12855417,
+          "wall_seconds": 0.045544209
+        },
+        {
+          "name": "after-12-0-1",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 0,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 12732042,
+          "wall_seconds": 0.04573074999999993
+        },
+        {
+          "name": "after-12-0-2",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 0,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 12569167,
+          "wall_seconds": 0.04036766599999986
+        },
+        {
+          "name": "after-12-0-3",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 0,
+          "rep": 3,
+          "code": 0,
+          "elapsed_ns": 13152625,
+          "wall_seconds": 0.04692320900000002
+        },
+        {
+          "name": "after-12-0-4",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 0,
+          "rep": 4,
+          "code": 0,
+          "elapsed_ns": 12832084,
+          "wall_seconds": 0.047308291
+        },
+        {
+          "name": "after-12-1-0",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 1,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 13518167,
+          "wall_seconds": 0.046962291000000045
+        },
+        {
+          "name": "after-12-1-1",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 1,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 12643250,
+          "wall_seconds": 0.04120016599999987
+        },
+        {
+          "name": "after-12-1-2",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 1,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 13034666,
+          "wall_seconds": 0.04809762500000003
+        },
+        {
+          "name": "after-12-1-3",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 1,
+          "rep": 3,
+          "code": 0,
+          "elapsed_ns": 12606042,
+          "wall_seconds": 0.0451820839999999
+        },
+        {
+          "name": "after-12-1-4",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 1,
+          "rep": 4,
+          "code": 0,
+          "elapsed_ns": 12764292,
+          "wall_seconds": 0.04807966699999988
+        },
+        {
+          "name": "after-12-2-0",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 2,
+          "rep": 0,
+          "code": 0,
+          "elapsed_ns": 12677500,
+          "wall_seconds": 0.04581449999999987
+        },
+        {
+          "name": "after-12-2-1",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 2,
+          "rep": 1,
+          "code": 0,
+          "elapsed_ns": 12307125,
+          "wall_seconds": 0.04633683300000002
+        },
+        {
+          "name": "after-12-2-2",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 2,
+          "rep": 2,
+          "code": 0,
+          "elapsed_ns": 12716917,
+          "wall_seconds": 0.04812762500000001
+        },
+        {
+          "name": "after-12-2-3",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 2,
+          "rep": 3,
+          "code": 0,
+          "elapsed_ns": 12652958,
+          "wall_seconds": 0.04410641699999984
+        },
+        {
+          "name": "after-12-2-4",
+          "runner": "after",
+          "cpus": 12,
+          "mode": 2,
+          "rep": 4,
+          "code": 0,
+          "elapsed_ns": 12941458,
+          "wall_seconds": 0.04333033300000011
+        }
+      ]
+    },
+    "native_linux": {
+      "binary_sha256": "fa79ddbbf93cde0293c2aa7a036c9fc83740de4cd22885e5b98541ac0b15a6f9",
+      "rows": [
+        {
+          "threads": 1,
+          "mode": 0,
+          "rep": 0,
+          "elapsed_ns": 701301,
+          "output": "worker-seccomp: threads=1 rounds=5000 mode=0 elapsed_ns=701301 calls=5000: ok\n"
+        },
+        {
+          "threads": 1,
+          "mode": 0,
+          "rep": 1,
+          "elapsed_ns": 696176,
+          "output": "worker-seccomp: threads=1 rounds=5000 mode=0 elapsed_ns=696176 calls=5000: ok\n"
+        },
+        {
+          "threads": 1,
+          "mode": 0,
+          "rep": 2,
+          "elapsed_ns": 746927,
+          "output": "worker-seccomp: threads=1 rounds=5000 mode=0 elapsed_ns=746927 calls=5000: ok\n"
+        },
+        {
+          "threads": 1,
+          "mode": 0,
+          "rep": 3,
+          "elapsed_ns": 708260,
+          "output": "worker-seccomp: threads=1 rounds=5000 mode=0 elapsed_ns=708260 calls=5000: ok\n"
+        },
+        {
+          "threads": 1,
+          "mode": 0,
+          "rep": 4,
+          "elapsed_ns": 683426,
+          "output": "worker-seccomp: threads=1 rounds=5000 mode=0 elapsed_ns=683426 calls=5000: ok\n"
+        },
+        {
+          "threads": 1,
+          "mode": 1,
+          "rep": 0,
+          "elapsed_ns": 798678,
+          "output": "worker-seccomp: threads=1 rounds=5000 mode=1 elapsed_ns=798678 calls=5000: ok\n"
+        },
+        {
+          "threads": 1,
+          "mode": 1,
+          "rep": 1,
+          "elapsed_ns": 827845,
+          "output": "worker-seccomp: threads=1 rounds=5000 mode=1 elapsed_ns=827845 calls=5000: ok\n"
+        },
+        {
+          "threads": 1,
+          "mode": 1,
+          "rep": 2,
+          "elapsed_ns": 788053,
+          "output": "worker-seccomp: threads=1 rounds=5000 mode=1 elapsed_ns=788053 calls=5000: ok\n"
+        },
+        {
+          "threads": 1,
+          "mode": 1,
+          "rep": 3,
+          "elapsed_ns": 787011,
+          "output": "worker-seccomp: threads=1 rounds=5000 mode=1 elapsed_ns=787011 calls=5000: ok\n"
+        },
+        {
+          "threads": 1,
+          "mode": 1,
+          "rep": 4,
+          "elapsed_ns": 789344,
+          "output": "worker-seccomp: threads=1 rounds=5000 mode=1 elapsed_ns=789344 calls=5000: ok\n"
+        },
+        {
+          "threads": 1,
+          "mode": 2,
+          "rep": 0,
+          "elapsed_ns": 776385,
+          "output": "worker-seccomp: threads=1 rounds=5000 mode=2 elapsed_ns=776385 calls=5000: ok\n"
+        },
+        {
+          "threads": 1,
+          "mode": 2,
+          "rep": 1,
+          "elapsed_ns": 754135,
+          "output": "worker-seccomp: threads=1 rounds=5000 mode=2 elapsed_ns=754135 calls=5000: ok\n"
+        },
+        {
+          "threads": 1,
+          "mode": 2,
+          "rep": 2,
+          "elapsed_ns": 653593,
+          "output": "worker-seccomp: threads=1 rounds=5000 mode=2 elapsed_ns=653593 calls=5000: ok\n"
+        },
+        {
+          "threads": 1,
+          "mode": 2,
+          "rep": 3,
+          "elapsed_ns": 647301,
+          "output": "worker-seccomp: threads=1 rounds=5000 mode=2 elapsed_ns=647301 calls=5000: ok\n"
+        },
+        {
+          "threads": 1,
+          "mode": 2,
+          "rep": 4,
+          "elapsed_ns": 673426,
+          "output": "worker-seccomp: threads=1 rounds=5000 mode=2 elapsed_ns=673426 calls=5000: ok\n"
+        },
+        {
+          "threads": 4,
+          "mode": 0,
+          "rep": 0,
+          "elapsed_ns": 706635,
+          "output": "worker-seccomp: threads=4 rounds=5000 mode=0 elapsed_ns=706635 calls=20000: ok\n"
+        },
+        {
+          "threads": 4,
+          "mode": 0,
+          "rep": 1,
+          "elapsed_ns": 683634,
+          "output": "worker-seccomp: threads=4 rounds=5000 mode=0 elapsed_ns=683634 calls=20000: ok\n"
+        },
+        {
+          "threads": 4,
+          "mode": 0,
+          "rep": 2,
+          "elapsed_ns": 746510,
+          "output": "worker-seccomp: threads=4 rounds=5000 mode=0 elapsed_ns=746510 calls=20000: ok\n"
+        },
+        {
+          "threads": 4,
+          "mode": 0,
+          "rep": 3,
+          "elapsed_ns": 756093,
+          "output": "worker-seccomp: threads=4 rounds=5000 mode=0 elapsed_ns=756093 calls=20000: ok\n"
+        },
+        {
+          "threads": 4,
+          "mode": 0,
+          "rep": 4,
+          "elapsed_ns": 797261,
+          "output": "worker-seccomp: threads=4 rounds=5000 mode=0 elapsed_ns=797261 calls=20000: ok\n"
+        },
+        {
+          "threads": 4,
+          "mode": 1,
+          "rep": 0,
+          "elapsed_ns": 788802,
+          "output": "worker-seccomp: threads=4 rounds=5000 mode=1 elapsed_ns=788802 calls=20000: ok\n"
+        },
+        {
+          "threads": 4,
+          "mode": 1,
+          "rep": 1,
+          "elapsed_ns": 833387,
+          "output": "worker-seccomp: threads=4 rounds=5000 mode=1 elapsed_ns=833387 calls=20000: ok\n"
+        },
+        {
+          "threads": 4,
+          "mode": 1,
+          "rep": 2,
+          "elapsed_ns": 827428,
+          "output": "worker-seccomp: threads=4 rounds=5000 mode=1 elapsed_ns=827428 calls=20000: ok\n"
+        },
+        {
+          "threads": 4,
+          "mode": 1,
+          "rep": 3,
+          "elapsed_ns": 838845,
+          "output": "worker-seccomp: threads=4 rounds=5000 mode=1 elapsed_ns=838845 calls=20000: ok\n"
+        },
+        {
+          "threads": 4,
+          "mode": 1,
+          "rep": 4,
+          "elapsed_ns": 806595,
+          "output": "worker-seccomp: threads=4 rounds=5000 mode=1 elapsed_ns=806595 calls=20000: ok\n"
+        },
+        {
+          "threads": 4,
+          "mode": 2,
+          "rep": 0,
+          "elapsed_ns": 719093,
+          "output": "worker-seccomp: threads=4 rounds=5000 mode=2 elapsed_ns=719093 calls=20000: ok\n"
+        },
+        {
+          "threads": 4,
+          "mode": 2,
+          "rep": 1,
+          "elapsed_ns": 730469,
+          "output": "worker-seccomp: threads=4 rounds=5000 mode=2 elapsed_ns=730469 calls=20000: ok\n"
+        },
+        {
+          "threads": 4,
+          "mode": 2,
+          "rep": 2,
+          "elapsed_ns": 730552,
+          "output": "worker-seccomp: threads=4 rounds=5000 mode=2 elapsed_ns=730552 calls=20000: ok\n"
+        },
+        {
+          "threads": 4,
+          "mode": 2,
+          "rep": 3,
+          "elapsed_ns": 727427,
+          "output": "worker-seccomp: threads=4 rounds=5000 mode=2 elapsed_ns=727427 calls=20000: ok\n"
+        },
+        {
+          "threads": 4,
+          "mode": 2,
+          "rep": 4,
+          "elapsed_ns": 700885,
+          "output": "worker-seccomp: threads=4 rounds=5000 mode=2 elapsed_ns=700885 calls=20000: ok\n"
+        },
+        {
+          "threads": 12,
+          "mode": 0,
+          "rep": 0,
+          "elapsed_ns": 2082028,
+          "output": "worker-seccomp: threads=12 rounds=5000 mode=0 elapsed_ns=2082028 calls=60000: ok\n"
+        },
+        {
+          "threads": 12,
+          "mode": 0,
+          "rep": 1,
+          "elapsed_ns": 2033611,
+          "output": "worker-seccomp: threads=12 rounds=5000 mode=0 elapsed_ns=2033611 calls=60000: ok\n"
+        },
+        {
+          "threads": 12,
+          "mode": 0,
+          "rep": 2,
+          "elapsed_ns": 2031736,
+          "output": "worker-seccomp: threads=12 rounds=5000 mode=0 elapsed_ns=2031736 calls=60000: ok\n"
+        },
+        {
+          "threads": 12,
+          "mode": 0,
+          "rep": 3,
+          "elapsed_ns": 2027653,
+          "output": "worker-seccomp: threads=12 rounds=5000 mode=0 elapsed_ns=2027653 calls=60000: ok\n"
+        },
+        {
+          "threads": 12,
+          "mode": 0,
+          "rep": 4,
+          "elapsed_ns": 2203239,
+          "output": "worker-seccomp: threads=12 rounds=5000 mode=0 elapsed_ns=2203239 calls=60000: ok\n"
+        },
+        {
+          "threads": 12,
+          "mode": 1,
+          "rep": 0,
+          "elapsed_ns": 2670453,
+          "output": "worker-seccomp: threads=12 rounds=5000 mode=1 elapsed_ns=2670453 calls=60000: ok\n"
+        },
+        {
+          "threads": 12,
+          "mode": 1,
+          "rep": 1,
+          "elapsed_ns": 1607397,
+          "output": "worker-seccomp: threads=12 rounds=5000 mode=1 elapsed_ns=1607397 calls=60000: ok\n"
+        },
+        {
+          "threads": 12,
+          "mode": 1,
+          "rep": 2,
+          "elapsed_ns": 2384991,
+          "output": "worker-seccomp: threads=12 rounds=5000 mode=1 elapsed_ns=2384991 calls=60000: ok\n"
+        },
+        {
+          "threads": 12,
+          "mode": 1,
+          "rep": 3,
+          "elapsed_ns": 2322323,
+          "output": "worker-seccomp: threads=12 rounds=5000 mode=1 elapsed_ns=2322323 calls=60000: ok\n"
+        },
+        {
+          "threads": 12,
+          "mode": 1,
+          "rep": 4,
+          "elapsed_ns": 3158919,
+          "output": "worker-seccomp: threads=12 rounds=5000 mode=1 elapsed_ns=3158919 calls=60000: ok\n"
+        },
+        {
+          "threads": 12,
+          "mode": 2,
+          "rep": 0,
+          "elapsed_ns": 1921193,
+          "output": "worker-seccomp: threads=12 rounds=5000 mode=2 elapsed_ns=1921193 calls=60000: ok\n"
+        },
+        {
+          "threads": 12,
+          "mode": 2,
+          "rep": 1,
+          "elapsed_ns": 2617202,
+          "output": "worker-seccomp: threads=12 rounds=5000 mode=2 elapsed_ns=2617202 calls=60000: ok\n"
+        },
+        {
+          "threads": 12,
+          "mode": 2,
+          "rep": 2,
+          "elapsed_ns": 2002319,
+          "output": "worker-seccomp: threads=12 rounds=5000 mode=2 elapsed_ns=2002319 calls=60000: ok\n"
+        },
+        {
+          "threads": 12,
+          "mode": 2,
+          "rep": 3,
+          "elapsed_ns": 1941318,
+          "output": "worker-seccomp: threads=12 rounds=5000 mode=2 elapsed_ns=1941318 calls=60000: ok\n"
+        },
+        {
+          "threads": 12,
+          "mode": 2,
+          "rep": 4,
+          "elapsed_ns": 1990277,
+          "output": "worker-seccomp: threads=12 rounds=5000 mode=2 elapsed_ns=1990277 calls=60000: ok\n"
+        }
+      ]
+    },
+    "native_macos": [
+      {
+        "threads": 1,
+        "rep": 0,
+        "code": 0,
+        "output": "worker-seccomp: threads=1 rounds=5000 mode=0 elapsed_ns=469000 calls=5000: ok\n",
+        "stderr": ""
+      },
+      {
+        "threads": 1,
+        "rep": 1,
+        "code": 0,
+        "output": "worker-seccomp: threads=1 rounds=5000 mode=0 elapsed_ns=466000 calls=5000: ok\n",
+        "stderr": ""
+      },
+      {
+        "threads": 1,
+        "rep": 2,
+        "code": 0,
+        "output": "worker-seccomp: threads=1 rounds=5000 mode=0 elapsed_ns=479000 calls=5000: ok\n",
+        "stderr": ""
+      },
+      {
+        "threads": 1,
+        "rep": 3,
+        "code": 0,
+        "output": "worker-seccomp: threads=1 rounds=5000 mode=0 elapsed_ns=471000 calls=5000: ok\n",
+        "stderr": ""
+      },
+      {
+        "threads": 1,
+        "rep": 4,
+        "code": 0,
+        "output": "worker-seccomp: threads=1 rounds=5000 mode=0 elapsed_ns=491000 calls=5000: ok\n",
+        "stderr": ""
+      },
+      {
+        "threads": 4,
+        "rep": 0,
+        "code": 0,
+        "output": "worker-seccomp: threads=4 rounds=5000 mode=0 elapsed_ns=741000 calls=20000: ok\n",
+        "stderr": ""
+      },
+      {
+        "threads": 4,
+        "rep": 1,
+        "code": 0,
+        "output": "worker-seccomp: threads=4 rounds=5000 mode=0 elapsed_ns=672000 calls=20000: ok\n",
+        "stderr": ""
+      },
+      {
+        "threads": 4,
+        "rep": 2,
+        "code": 0,
+        "output": "worker-seccomp: threads=4 rounds=5000 mode=0 elapsed_ns=590000 calls=20000: ok\n",
+        "stderr": ""
+      },
+      {
+        "threads": 4,
+        "rep": 3,
+        "code": 0,
+        "output": "worker-seccomp: threads=4 rounds=5000 mode=0 elapsed_ns=750000 calls=20000: ok\n",
+        "stderr": ""
+      },
+      {
+        "threads": 4,
+        "rep": 4,
+        "code": 0,
+        "output": "worker-seccomp: threads=4 rounds=5000 mode=0 elapsed_ns=689000 calls=20000: ok\n",
+        "stderr": ""
+      },
+      {
+        "threads": 12,
+        "rep": 0,
+        "code": 0,
+        "output": "worker-seccomp: threads=12 rounds=5000 mode=0 elapsed_ns=1284000 calls=60000: ok\n",
+        "stderr": ""
+      },
+      {
+        "threads": 12,
+        "rep": 1,
+        "code": 0,
+        "output": "worker-seccomp: threads=12 rounds=5000 mode=0 elapsed_ns=1208000 calls=60000: ok\n",
+        "stderr": ""
+      },
+      {
+        "threads": 12,
+        "rep": 2,
+        "code": 0,
+        "output": "worker-seccomp: threads=12 rounds=5000 mode=0 elapsed_ns=1235000 calls=60000: ok\n",
+        "stderr": ""
+      },
+      {
+        "threads": 12,
+        "rep": 3,
+        "code": 0,
+        "output": "worker-seccomp: threads=12 rounds=5000 mode=0 elapsed_ns=1269000 calls=60000: ok\n",
+        "stderr": ""
+      },
+      {
+        "threads": 12,
+        "rep": 4,
+        "code": 0,
+        "output": "worker-seccomp: threads=12 rounds=5000 mode=0 elapsed_ns=1130000 calls=60000: ok\n",
+        "stderr": ""
+      }
+    ],
+    "medians": [
+      {
+        "cpus": 1,
+        "mode": "unfiltered",
+        "before_ms": 6.608875,
+        "candidate_ms": 6.665875,
+        "final_confirmation_ms": 6.78875,
+        "paired_speedup": 0.9914489845669174,
+        "native_macos_ms": 0.471,
+        "native_linux_ms": 0.701301
+      },
+      {
+        "cpus": 1,
+        "mode": "ALLOW",
+        "before_ms": 6.673583,
+        "candidate_ms": 6.739458,
+        "final_confirmation_ms": 6.749792,
+        "paired_speedup": 0.9902254751049713,
+        "native_macos_ms": null,
+        "native_linux_ms": 0.789344
+      },
+      {
+        "cpus": 1,
+        "mode": "ERRNO42",
+        "before_ms": 5.987791,
+        "candidate_ms": 6.023333,
+        "final_confirmation_ms": 6.061,
+        "paired_speedup": 0.9940992802489916,
+        "native_macos_ms": null,
+        "native_linux_ms": 0.673426
+      },
+      {
+        "cpus": 4,
+        "mode": "unfiltered",
+        "before_ms": 6.127458,
+        "candidate_ms": 6.300667,
+        "final_confirmation_ms": 6.190959,
+        "paired_speedup": 0.972509418447285,
+        "native_macos_ms": 0.689,
+        "native_linux_ms": 0.74651
+      },
+      {
+        "cpus": 4,
+        "mode": "ALLOW",
+        "before_ms": 6.463541,
+        "candidate_ms": 6.246,
+        "final_confirmation_ms": 6.258625,
+        "paired_speedup": 1.034828850464297,
+        "native_macos_ms": null,
+        "native_linux_ms": 0.827428
+      },
+      {
+        "cpus": 4,
+        "mode": "ERRNO42",
+        "before_ms": 932.887042,
+        "candidate_ms": 6.124125,
+        "final_confirmation_ms": 6.047375,
+        "paired_speedup": 152.32984989692403,
+        "native_macos_ms": null,
+        "native_linux_ms": 0.727427
+      },
+      {
+        "cpus": 12,
+        "mode": "unfiltered",
+        "before_ms": 12.67475,
+        "candidate_ms": 12.666542,
+        "final_confirmation_ms": 12.832084,
+        "paired_speedup": 1.000648006377747,
+        "native_macos_ms": 1.235,
+        "native_linux_ms": 2.033611
+      },
+      {
+        "cpus": 12,
+        "mode": "ALLOW",
+        "before_ms": 14.78175,
+        "candidate_ms": 13.997208,
+        "final_confirmation_ms": 12.764292,
+        "paired_speedup": 1.0560498922356516,
+        "native_macos_ms": null,
+        "native_linux_ms": 2.384991
+      },
+      {
+        "cpus": 12,
+        "mode": "ERRNO42",
+        "before_ms": 5775.09475,
+        "candidate_ms": 12.547625,
+        "final_confirmation_ms": 12.6775,
+        "paired_speedup": 460.2540122134667,
+        "native_macos_ms": null,
+        "native_linux_ms": 1.990277
+      }
+    ],
+    "candidate_source_note": "Paired run predates the final prepared-exec credential/auxv dependency fix. The separate 45-sample confirmation uses the final committed runtime and installed Dev binary."
+  },
+  "performance_interpretation": [
+    "Five alternating before/candidate pairs per CPU count and mode; 5000 calls per thread. Final confirmation is after-only and is not a new paired comparison.",
+    "Timed region starts after threads are created and TSYNC completes, and ends when all workers finish. Joins are outside the timer.",
+    "Large denied-call gain removes repeated cohort returns; it is not a Firefox or Geekbench result.",
+    "Native macOS only supports the unfiltered control here; the Linux reference is a native ARM64 Linux-kernel CI guest with six provisioned CPUs, so twelve threads are oversubscribed.",
+    "Native references use different kernels, page sizes and scheduling; no CPU pinning. Short controls do not establish a general speedup or zero regression.",
+    "Final 4/12-CPU diagnostic logs have no denied getppid or TSYNC cohort-return entries and zero compatibility-service requests. Other allowed calls retain their underlying fallback."
+  ],
+  "corrected_failures": [
+    "An existing shared-custody test dropped its channel receiver while a callback copied before unsubscribe could still send. Keep the receiver alive through unlock/join; the actual wake assertion remains.",
+    "Early child signal binding used the parent PID namespace. Bind after child namespace activation; existing old-TID retention regression passes.",
+    "Late TSYNC NNP could leave a prepared setuid exec privileged. Refresh credentials/capabilities and retained plus initial-stack auxv under original group custody without re-reading executable metadata.",
+    "The benchmark initially required getppid > 0; guest init legitimately has parent 0. The corrected control accepts nonnegative results; all recorded final samples use that fixture."
+  ],
+  "validation_reuse": "Mac full runtime workflow passed before the final exec dependency fix. Linux workflow initially stopped at the shared test receiver lifetime failure: retain the failed summary, reuse already-passed checks, and rerun the failed and remaining suites/doc tests/build steps. Final Mac and Linux process suites (394 passed, 3 ignored each), affected VFS/Linux ABI and strict checks, iPad compile targets, final Mac/interpreter builds, guest fixtures and performance confirmation cover later changes. Unchanged product/HVF, instruction, graphical and prior Go/Docker acceptance is reused rather than represented as freshly rerun.",
+  "physical_ipad_acceptance": "Skipped; device and simulator compile checks passed. No new iPad installation claimed.",
+  "known_unattributed_issue": "The stage-56 intermittent Docker cleanup timeout remains unattributed; no new Docker or Firefox acceptance is claimed.",
+  "remaining_boundaries": [
+    "Explicit tracing and capability-less embeddings",
+    "Underlying allowed-call excluded resources and generic unhandled dispatch",
+    "Actual shared-mm quiescence and exceptional native mapping import",
+    "Host lifecycle/admin, cold/solo and legacy resource paths"
+  ],
+  "deployment": {
+    "status": "Mac Dev installed and smoke-tested; stable binary unchanged; no business restart; iPad source pin and compile checks only",
+    "version": "Trames Dev 1.5.3 (dev) runtime 38cdbba7a1967863a77fb0e432ec59cfa46e153c",
+    "runtime_revision": "38cdbba7a1967863a77fb0e432ec59cfa46e153c",
+    "mac_revision": "95b74303b1020c0a5f42fd0d7fd06c004b39bfc7",
+    "runner_sha256": "336d2dbed9a806cd66b6bb93aeb6df7e2371d6cbe32444327b66f07e3948db48",
+    "stable_runner_sha256": "4f40615213e731b2a4ef9d8c6a0e85c5c7bdf31ab0c60b0354b55113f2a6a55d",
+    "cases": [
+      {
+        "case": "hvf-4-seccomp",
+        "code": 0,
+        "seconds": 0.024198458,
+        "passed": true,
+        "runner_sha256": "336d2dbed9a806cd66b6bb93aeb6df7e2371d6cbe32444327b66f07e3948db48",
+        "fixture_sha256": "b10d59e60927d79d942b8cf308ac628d066b77b78d2c0de03abd2c2a7bf168bb",
+        "log": {
+          "path": "target/seccomp-subsystem/installed-guest/hvf-4-seccomp.log",
+          "sha256": "58bd4675b34e50fc225ebdc3113be010103dc70e02b63127a211a0cbdde57f8c"
+        }
+      },
+      {
+        "case": "hvf-4-worker-seccomp",
+        "code": 0,
+        "seconds": 0.020480915999999995,
+        "passed": true,
+        "runner_sha256": "336d2dbed9a806cd66b6bb93aeb6df7e2371d6cbe32444327b66f07e3948db48",
+        "fixture_sha256": "fa79ddbbf93cde0293c2aa7a036c9fc83740de4cd22885e5b98541ac0b15a6f9",
+        "log": {
+          "path": "target/seccomp-subsystem/installed-guest/hvf-4-worker-seccomp.log",
+          "sha256": "ff8bb4066cff8720e03ceb25c0ab25ea1b6ea8cad921db0f55f5fcbba338828a"
+        }
+      },
+      {
+        "case": "hvf-12-seccomp",
+        "code": 0,
+        "seconds": 0.010567875000000004,
+        "passed": true,
+        "runner_sha256": "336d2dbed9a806cd66b6bb93aeb6df7e2371d6cbe32444327b66f07e3948db48",
+        "fixture_sha256": "b10d59e60927d79d942b8cf308ac628d066b77b78d2c0de03abd2c2a7bf168bb",
+        "log": {
+          "path": "target/seccomp-subsystem/installed-guest/hvf-12-seccomp.log",
+          "sha256": "d3796e4ab14da3bd12744d59f65bb1330b3b9d239080a5a6eae37101d52d809f"
+        }
+      },
+      {
+        "case": "hvf-12-worker-seccomp",
+        "code": 0,
+        "seconds": 0.03884033399999999,
+        "passed": true,
+        "runner_sha256": "336d2dbed9a806cd66b6bb93aeb6df7e2371d6cbe32444327b66f07e3948db48",
+        "fixture_sha256": "fa79ddbbf93cde0293c2aa7a036c9fc83740de4cd22885e5b98541ac0b15a6f9",
+        "log": {
+          "path": "target/seccomp-subsystem/installed-guest/hvf-12-worker-seccomp.log",
+          "sha256": "d354e4953672ce721354040987ad463838edb642833d60272cc28f155d4c879a"
+        }
+      }
+    ]
+  }
+}
