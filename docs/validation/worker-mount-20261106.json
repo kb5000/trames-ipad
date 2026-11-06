@@ -1,0 +1,1383 @@
+{
+  "schema": 1,
+  "date": "2026-11-06",
+  "stage": 54,
+  "runtime_revision": "b06c97a3e83e4ed81a08400cfe2991f224810dae",
+  "baseline_runtime_revision": "b26b2ad732663e6aedb665a3e3bc61b676b9746e",
+  "scope": "Original mount topology transactions, shared pathname observers and original fs_struct root replacement. Task namespace membership remains a separate subsystem.",
+  "implementation": [
+    "Calling workers use the original namespace transaction mutex and shared graph; contention retains FileWork, subscribes to original readiness and releases its execution slot.",
+    "Weak immutable lookup-index caches refresh only on actual index publication; no cache keeps detached mounts or overlay layers alive.",
+    "Pivot replaces matching root/cwd references through a weak registry of original fs_structs; fork registration synchronizes with replacement, while open directory FDs retain their meaning.",
+    "No new coordinator/resource thread, polling message bus, guest data barrier or unsafe implementation was introduced."
+  ],
+  "source_files": {
+    "crates/trames-linux/src/direct/namespace.rs": "e48cad90fb94eee04dcdbd35917292da0637051fcb2c964a516c91c9a6742063",
+    "crates/trames-linux/src/state.rs": "e48f98ba0a76110e2d02b62fd06825a550e7792deedd9b9b15c50e5b149c1261",
+    "crates/trames-session/src/process.rs": "ec3cd805ce62f48213f7d463cb4bd670988706b635d756561f99df0a0be904e3",
+    "crates/trames-session/src/process_seccomp.rs": "d38983b5c7f61eefee8ca55f519829b640d2bf33d0ba2a13e7e17cab1fcb13a4",
+    "crates/trames-vfs/src/file_work.rs": "fe5fc3553d7d9fdc2532104696f621273a3ec812ea221a305eed44b75326fed9",
+    "crates/trames-vfs/src/fs_context.rs": "5aa619be7363b8d57553c9285bbf8713b0e9b1164c7c10646a5110b02c95982f",
+    "crates/trames-vfs/src/lib.rs": "d24311664c9eb8eb29a3a25c1fb323177f1b29e49356165e8ddd1588c3b84692",
+    "crates/trames-vfs/src/mounts.rs": "9d72a6c082b040b197242ff739bfefa969f8bfd01406639c5ab75d2f24d7dec2",
+    "crates/trames-vfs/src/mounts/admin.rs": "2e1e0abcce3137970addb81a5f8b6297bfc2d4a5fb49bb39e47e2964483e8822",
+    "crates/trames-vfs/src/mounts/registry.rs": "d823764b1ce03f7f3425854a6881910e7f16fd64d5a8438813f26055033afdb9",
+    "crates/trames-vfs/src/mounts/worker_tests.rs": "d96e72a3ef51338d858abed949196e01df1bf73bc5530f3223793531d535017a",
+    "crates/trames-vfs/src/namespace_work.rs": "6fcda9f41a58e9e818c9067212872d8b27ccf500b69257c54b932e4891bd6880",
+    "crates/trames-vfs/src/path_queries.rs": "4a722f5c5c7a6db4b67b6f34db5158e6862339c99ea34151e5f40f83bc7f314d",
+    "docs/architecture/coordination-boundaries.md": "003384cb88771d66b3ab045f919ebf6233b8345aebdec61f4c59d38d4ed8d430"
+  },
+  "fixture_files": {
+    "tests/fixtures/worker-mount.c": "12385a30276ec32215c6da3336a20ed57a79a451d579bb691f2dbfd084b8d260",
+    "scripts/build-worker-mount-fixture.sh": "49717009e2a9b294439b055520049e8ca8131460211aae9a36c75d0ca197d333",
+    "tests/integration/worker-mount.py": "05fde0a7724f19daa77b8cd2a79ab80580c6e3f5871fda8e99aec7119827faeb"
+  },
+  "fixture_build": "Native ARM Linux musl-gcc -static -O2 -Wall -Wextra -Werror -pthread; native execution first creates a private mount namespace.",
+  "fixture_sha256": "e9e298d62cff61d45a69c618e3689901d5c8e4fdb311124153208954505918f2",
+  "proc_control_fixture_sha256": "1257b72f9707a29eefb744977c2c783b0df0977baf84d107c03fa939a57b2bb6",
+  "acceptance": {
+    "matrix": {
+      "hvf": {
+        "backend": "hvf",
+        "fixture_sha256": "e9e298d62cff61d45a69c618e3689901d5c8e4fdb311124153208954505918f2",
+        "cases": [
+          {
+            "cpus": 1,
+            "filtered": false,
+            "returncode": 0
+          },
+          {
+            "cpus": 1,
+            "filtered": true,
+            "returncode": 0
+          },
+          {
+            "cpus": 2,
+            "filtered": false,
+            "returncode": 0
+          },
+          {
+            "cpus": 2,
+            "filtered": true,
+            "returncode": 0
+          },
+          {
+            "cpus": 4,
+            "filtered": false,
+            "returncode": 0
+          },
+          {
+            "cpus": 4,
+            "filtered": true,
+            "returncode": 0
+          },
+          {
+            "cpus": 12,
+            "filtered": false,
+            "returncode": 0
+          },
+          {
+            "cpus": 12,
+            "filtered": true,
+            "returncode": 0
+          }
+        ],
+        "runner_sha256": "57cad50e776a0b99666dc70e2ea8d76d869b7df53001d95084e1465711845c34"
+      },
+      "interpreter": {
+        "backend": "interpreter",
+        "fixture_sha256": "e9e298d62cff61d45a69c618e3689901d5c8e4fdb311124153208954505918f2",
+        "cases": [
+          {
+            "cpus": 1,
+            "filtered": false,
+            "returncode": 0
+          },
+          {
+            "cpus": 1,
+            "filtered": true,
+            "returncode": 0
+          },
+          {
+            "cpus": 2,
+            "filtered": false,
+            "returncode": 0
+          },
+          {
+            "cpus": 2,
+            "filtered": true,
+            "returncode": 0
+          },
+          {
+            "cpus": 4,
+            "filtered": false,
+            "returncode": 0
+          },
+          {
+            "cpus": 4,
+            "filtered": true,
+            "returncode": 0
+          },
+          {
+            "cpus": 12,
+            "filtered": false,
+            "returncode": 0
+          },
+          {
+            "cpus": 12,
+            "filtered": true,
+            "returncode": 0
+          }
+        ],
+        "runner_sha256": "389a5395eac0bdee453b9d921db010d96651e0b09f57aa62019808682b9c5a1b"
+      },
+      "native_linux": {
+        "backend": "native",
+        "fixture_sha256": "e9e298d62cff61d45a69c618e3689901d5c8e4fdb311124153208954505918f2",
+        "cases": [
+          {
+            "cpus": 1,
+            "filtered": false,
+            "returncode": 0
+          },
+          {
+            "cpus": 1,
+            "filtered": true,
+            "returncode": 0
+          },
+          {
+            "cpus": 4,
+            "filtered": false,
+            "returncode": 0
+          },
+          {
+            "cpus": 4,
+            "filtered": true,
+            "returncode": 0
+          },
+          {
+            "cpus": 12,
+            "filtered": false,
+            "returncode": 0
+          },
+          {
+            "cpus": 12,
+            "filtered": true,
+            "returncode": 0
+          },
+          {
+            "cpus": 2,
+            "filtered": false,
+            "returncode": 0
+          },
+          {
+            "cpus": 2,
+            "filtered": true,
+            "returncode": 0
+          }
+        ]
+      }
+    },
+    "previous_mount_namespace_fixture": [
+      {
+        "backend": "hvf",
+        "cpus": 1,
+        "exit": 0
+      },
+      {
+        "backend": "hvf",
+        "cpus": 12,
+        "exit": 0
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 1,
+        "exit": 0
+      },
+      {
+        "backend": "interpreter",
+        "cpus": 12,
+        "exit": 0
+      }
+    ],
+    "baseline": {
+      "backend": "hvf",
+      "fixture_sha256": "e9e298d62cff61d45a69c618e3689901d5c8e4fdb311124153208954505918f2",
+      "cases": [
+        {
+          "cpus": 12,
+          "filtered": false,
+          "returncode": 0
+        },
+        {
+          "cpus": 12,
+          "filtered": true,
+          "returncode": 0
+        }
+      ],
+      "runner_sha256": "ca3c181688dbb0debe5839a2dbead52fba2355412eb3a6aea28cdf78efc441e1"
+    },
+    "mac": [
+      {
+        "check": "go-gc",
+        "code": 0
+      },
+      {
+        "check": "docker",
+        "code": 0
+      }
+    ],
+    "go_gc_rounds": 30,
+    "isolated_docker_rounds": 8,
+    "storage": "Isolated reader-ui-repair test store; stable and business stores untouched."
+  },
+  "diagnostics_12_cpu_raw": {
+    "before": {
+      "log_sha256": "24e38362ba5c852613eea93eae1fa69c3c071b7d1d2efb9b1b0a137dd376647e",
+      "execution_paths": {
+        "cohort_rounds": 555,
+        "cohort_stop_us": 8963,
+        "service_caller_wait_us": 0,
+        "service_requests": 0,
+        "serviced_syscalls": 0,
+        "syscalls": 1003,
+        "vm_local_syscalls": 36,
+        "worker_direct_syscalls": 34,
+        "worker_fd_syscalls": 0,
+        "worker_file_syscalls": 34,
+        "worker_futex_waits": 29,
+        "worker_futex_wakes": 28,
+        "worker_gpu_calls": 0,
+        "worker_gpu_waits": 0,
+        "worker_poll_syscalls": 0,
+        "worker_socket_syscalls": 0,
+        "worker_syscalls": 147,
+        "worker_task_resumes": 28,
+        "worker_uring_syscalls": 0
+      },
+      "cohort_return_syscalls": [
+        [
+          39,
+          385
+        ],
+        [
+          40,
+          385
+        ],
+        [
+          29,
+          1
+        ],
+        [
+          41,
+          1
+        ],
+        [
+          97,
+          1
+        ]
+      ]
+    },
+    "after": {
+      "log_sha256": "c8fbb9aa75c0b2b0afda7f0ae98946977b377e6b1fde1c71b0717f4c89ba1f76",
+      "execution_paths": {
+        "cohort_rounds": 2,
+        "cohort_stop_us": 4,
+        "service_caller_wait_us": 0,
+        "service_requests": 0,
+        "serviced_syscalls": 0,
+        "syscalls": 1007,
+        "vm_local_syscalls": 36,
+        "worker_direct_syscalls": 805,
+        "worker_fd_syscalls": 0,
+        "worker_file_syscalls": 805,
+        "worker_futex_waits": 33,
+        "worker_futex_wakes": 28,
+        "worker_gpu_calls": 0,
+        "worker_gpu_waits": 0,
+        "worker_poll_syscalls": 0,
+        "worker_socket_syscalls": 0,
+        "worker_syscalls": 922,
+        "worker_task_resumes": 63,
+        "worker_uring_syscalls": 0
+      },
+      "cohort_return_syscalls": [
+        [
+          29,
+          1
+        ],
+        [
+          97,
+          1
+        ]
+      ]
+    }
+  },
+  "benchmark": {
+    "scope": "Fixed loops per worker; longest worker time excludes thread creation and final join; alternating unprofiled pairs",
+    "samples": [
+      {
+        "fixture": "worker-mount",
+        "cpus": 1,
+        "repeat": 0,
+        "version": "before",
+        "elapsed_ns": 1525875
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 1,
+        "repeat": 0,
+        "version": "after",
+        "elapsed_ns": 3404875
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 1,
+        "repeat": 1,
+        "version": "after",
+        "elapsed_ns": 2990542
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 1,
+        "repeat": 1,
+        "version": "before",
+        "elapsed_ns": 2578500
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 1,
+        "repeat": 2,
+        "version": "before",
+        "elapsed_ns": 2255875
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 1,
+        "repeat": 2,
+        "version": "after",
+        "elapsed_ns": 2002459
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 1,
+        "repeat": 3,
+        "version": "after",
+        "elapsed_ns": 1761000
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 1,
+        "repeat": 3,
+        "version": "before",
+        "elapsed_ns": 1721750
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 1,
+        "repeat": 4,
+        "version": "before",
+        "elapsed_ns": 1450416
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 1,
+        "repeat": 4,
+        "version": "after",
+        "elapsed_ns": 1490750
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 1,
+        "repeat": 5,
+        "version": "after",
+        "elapsed_ns": 1477625
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 1,
+        "repeat": 5,
+        "version": "before",
+        "elapsed_ns": 1709625
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 1,
+        "repeat": 6,
+        "version": "before",
+        "elapsed_ns": 1590584
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 1,
+        "repeat": 6,
+        "version": "after",
+        "elapsed_ns": 1538500
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 2,
+        "repeat": 0,
+        "version": "before",
+        "elapsed_ns": 20724708
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 2,
+        "repeat": 0,
+        "version": "after",
+        "elapsed_ns": 4340542
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 2,
+        "repeat": 1,
+        "version": "after",
+        "elapsed_ns": 3976459
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 2,
+        "repeat": 1,
+        "version": "before",
+        "elapsed_ns": 20552084
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 2,
+        "repeat": 2,
+        "version": "before",
+        "elapsed_ns": 20147125
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 2,
+        "repeat": 2,
+        "version": "after",
+        "elapsed_ns": 3601625
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 2,
+        "repeat": 3,
+        "version": "after",
+        "elapsed_ns": 4147042
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 2,
+        "repeat": 3,
+        "version": "before",
+        "elapsed_ns": 20506958
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 2,
+        "repeat": 4,
+        "version": "before",
+        "elapsed_ns": 20513250
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 2,
+        "repeat": 4,
+        "version": "after",
+        "elapsed_ns": 4034666
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 2,
+        "repeat": 5,
+        "version": "after",
+        "elapsed_ns": 3581959
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 2,
+        "repeat": 5,
+        "version": "before",
+        "elapsed_ns": 20452000
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 2,
+        "repeat": 6,
+        "version": "before",
+        "elapsed_ns": 20559333
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 2,
+        "repeat": 6,
+        "version": "after",
+        "elapsed_ns": 3903833
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 4,
+        "repeat": 0,
+        "version": "before",
+        "elapsed_ns": 44967292
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 4,
+        "repeat": 0,
+        "version": "after",
+        "elapsed_ns": 9185583
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 4,
+        "repeat": 1,
+        "version": "after",
+        "elapsed_ns": 11099583
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 4,
+        "repeat": 1,
+        "version": "before",
+        "elapsed_ns": 44000000
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 4,
+        "repeat": 2,
+        "version": "before",
+        "elapsed_ns": 45611125
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 4,
+        "repeat": 2,
+        "version": "after",
+        "elapsed_ns": 7816125
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 4,
+        "repeat": 3,
+        "version": "after",
+        "elapsed_ns": 8539792
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 4,
+        "repeat": 3,
+        "version": "before",
+        "elapsed_ns": 43811500
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 4,
+        "repeat": 4,
+        "version": "before",
+        "elapsed_ns": 41655583
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 4,
+        "repeat": 4,
+        "version": "after",
+        "elapsed_ns": 7728875
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 4,
+        "repeat": 5,
+        "version": "after",
+        "elapsed_ns": 8024875
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 4,
+        "repeat": 5,
+        "version": "before",
+        "elapsed_ns": 44245541
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 4,
+        "repeat": 6,
+        "version": "before",
+        "elapsed_ns": 44025167
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 4,
+        "repeat": 6,
+        "version": "after",
+        "elapsed_ns": 7052875
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 12,
+        "repeat": 0,
+        "version": "before",
+        "elapsed_ns": 301370792
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 12,
+        "repeat": 0,
+        "version": "after",
+        "elapsed_ns": 22215792
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 12,
+        "repeat": 1,
+        "version": "after",
+        "elapsed_ns": 26430000
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 12,
+        "repeat": 1,
+        "version": "before",
+        "elapsed_ns": 350229500
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 12,
+        "repeat": 2,
+        "version": "before",
+        "elapsed_ns": 347072375
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 12,
+        "repeat": 2,
+        "version": "after",
+        "elapsed_ns": 21599792
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 12,
+        "repeat": 3,
+        "version": "after",
+        "elapsed_ns": 20823666
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 12,
+        "repeat": 3,
+        "version": "before",
+        "elapsed_ns": 331171084
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 12,
+        "repeat": 4,
+        "version": "before",
+        "elapsed_ns": 323774459
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 12,
+        "repeat": 4,
+        "version": "after",
+        "elapsed_ns": 19908459
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 12,
+        "repeat": 5,
+        "version": "after",
+        "elapsed_ns": 27111292
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 12,
+        "repeat": 5,
+        "version": "before",
+        "elapsed_ns": 345190083
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 12,
+        "repeat": 6,
+        "version": "before",
+        "elapsed_ns": 350743000
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 12,
+        "repeat": 6,
+        "version": "after",
+        "elapsed_ns": 27263417
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 1,
+        "repeat": 0,
+        "version": "before",
+        "elapsed_ns": 12009833
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 1,
+        "repeat": 0,
+        "version": "after",
+        "elapsed_ns": 11783792
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 1,
+        "repeat": 1,
+        "version": "after",
+        "elapsed_ns": 11803334
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 1,
+        "repeat": 1,
+        "version": "before",
+        "elapsed_ns": 11757667
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 1,
+        "repeat": 2,
+        "version": "before",
+        "elapsed_ns": 11777125
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 1,
+        "repeat": 2,
+        "version": "after",
+        "elapsed_ns": 11707166
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 1,
+        "repeat": 3,
+        "version": "after",
+        "elapsed_ns": 11645166
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 1,
+        "repeat": 3,
+        "version": "before",
+        "elapsed_ns": 11834125
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 1,
+        "repeat": 4,
+        "version": "before",
+        "elapsed_ns": 11714375
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 1,
+        "repeat": 4,
+        "version": "after",
+        "elapsed_ns": 11699542
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 1,
+        "repeat": 5,
+        "version": "after",
+        "elapsed_ns": 11658500
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 1,
+        "repeat": 5,
+        "version": "before",
+        "elapsed_ns": 11853458
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 1,
+        "repeat": 6,
+        "version": "before",
+        "elapsed_ns": 11617500
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 1,
+        "repeat": 6,
+        "version": "after",
+        "elapsed_ns": 11690167
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 2,
+        "repeat": 0,
+        "version": "before",
+        "elapsed_ns": 21675416
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 2,
+        "repeat": 0,
+        "version": "after",
+        "elapsed_ns": 21028458
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 2,
+        "repeat": 1,
+        "version": "after",
+        "elapsed_ns": 21313292
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 2,
+        "repeat": 1,
+        "version": "before",
+        "elapsed_ns": 20400542
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 2,
+        "repeat": 2,
+        "version": "before",
+        "elapsed_ns": 20301000
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 2,
+        "repeat": 2,
+        "version": "after",
+        "elapsed_ns": 20764334
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 2,
+        "repeat": 3,
+        "version": "after",
+        "elapsed_ns": 22128792
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 2,
+        "repeat": 3,
+        "version": "before",
+        "elapsed_ns": 20623083
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 2,
+        "repeat": 4,
+        "version": "before",
+        "elapsed_ns": 20244958
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 2,
+        "repeat": 4,
+        "version": "after",
+        "elapsed_ns": 21754583
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 2,
+        "repeat": 5,
+        "version": "after",
+        "elapsed_ns": 22036833
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 2,
+        "repeat": 5,
+        "version": "before",
+        "elapsed_ns": 20935750
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 2,
+        "repeat": 6,
+        "version": "before",
+        "elapsed_ns": 20600250
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 2,
+        "repeat": 6,
+        "version": "after",
+        "elapsed_ns": 21629875
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 4,
+        "repeat": 0,
+        "version": "before",
+        "elapsed_ns": 35453917
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 4,
+        "repeat": 0,
+        "version": "after",
+        "elapsed_ns": 35669334
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 4,
+        "repeat": 1,
+        "version": "after",
+        "elapsed_ns": 36058875
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 4,
+        "repeat": 1,
+        "version": "before",
+        "elapsed_ns": 36172291
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 4,
+        "repeat": 2,
+        "version": "before",
+        "elapsed_ns": 35526459
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 4,
+        "repeat": 2,
+        "version": "after",
+        "elapsed_ns": 35782750
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 4,
+        "repeat": 3,
+        "version": "after",
+        "elapsed_ns": 37418208
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 4,
+        "repeat": 3,
+        "version": "before",
+        "elapsed_ns": 35136333
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 4,
+        "repeat": 4,
+        "version": "before",
+        "elapsed_ns": 36209459
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 4,
+        "repeat": 4,
+        "version": "after",
+        "elapsed_ns": 36398416
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 4,
+        "repeat": 5,
+        "version": "after",
+        "elapsed_ns": 35952375
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 4,
+        "repeat": 5,
+        "version": "before",
+        "elapsed_ns": 35158708
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 4,
+        "repeat": 6,
+        "version": "before",
+        "elapsed_ns": 35027042
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 4,
+        "repeat": 6,
+        "version": "after",
+        "elapsed_ns": 35741833
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 12,
+        "repeat": 0,
+        "version": "before",
+        "elapsed_ns": 93118750
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 12,
+        "repeat": 0,
+        "version": "after",
+        "elapsed_ns": 92305167
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 12,
+        "repeat": 1,
+        "version": "after",
+        "elapsed_ns": 98447166
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 12,
+        "repeat": 1,
+        "version": "before",
+        "elapsed_ns": 118084625
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 12,
+        "repeat": 2,
+        "version": "before",
+        "elapsed_ns": 101147000
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 12,
+        "repeat": 2,
+        "version": "after",
+        "elapsed_ns": 117321584
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 12,
+        "repeat": 3,
+        "version": "after",
+        "elapsed_ns": 96087459
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 12,
+        "repeat": 3,
+        "version": "before",
+        "elapsed_ns": 102572667
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 12,
+        "repeat": 4,
+        "version": "before",
+        "elapsed_ns": 104094666
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 12,
+        "repeat": 4,
+        "version": "after",
+        "elapsed_ns": 98173583
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 12,
+        "repeat": 5,
+        "version": "after",
+        "elapsed_ns": 119171416
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 12,
+        "repeat": 5,
+        "version": "before",
+        "elapsed_ns": 96819208
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 12,
+        "repeat": 6,
+        "version": "before",
+        "elapsed_ns": 102108125
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 12,
+        "repeat": 6,
+        "version": "after",
+        "elapsed_ns": 87576209
+      }
+    ],
+    "sha256": {
+      "before": "ca3c181688dbb0debe5839a2dbead52fba2355412eb3a6aea28cdf78efc441e1",
+      "after": "57cad50e776a0b99666dc70e2ea8d76d869b7df53001d95084e1465711845c34"
+    },
+    "loops_per_thread": {
+      "worker-mount": 128,
+      "worker-proc": 256
+    },
+    "warmup": "No separately recorded warmup; seven alternating pairs retained in full.",
+    "medians": [
+      {
+        "fixture": "worker-mount",
+        "cpus": 1,
+        "before_ns": 1709625,
+        "after_ns": 1761000,
+        "speedup": 0.9708262350936968
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 2,
+        "before_ns": 20513250,
+        "after_ns": 3976459,
+        "speedup": 5.15867257778843
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 4,
+        "before_ns": 44025167,
+        "after_ns": 8024875,
+        "speedup": 5.4860875714574995
+      },
+      {
+        "fixture": "worker-mount",
+        "cpus": 12,
+        "before_ns": 345190083,
+        "after_ns": 22215792,
+        "speedup": 15.53804982509739
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 1,
+        "before_ns": 11777125,
+        "after_ns": 11699542,
+        "speedup": 1.0066312852246695
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 2,
+        "before_ns": 20600250,
+        "after_ns": 21629875,
+        "speedup": 0.9523980143204711
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 4,
+        "before_ns": 35453917,
+        "after_ns": 35952375,
+        "speedup": 0.9861356030025833
+      },
+      {
+        "fixture": "worker-proc",
+        "cpus": 12,
+        "before_ns": 102108125,
+        "after_ns": 98173583,
+        "speedup": 1.0400774004550695
+      }
+    ],
+    "limitations": [
+      "Microbenchmark of mount administration; not a Firefox, Geekbench or full-container speedup.",
+      "Single-CPU median is about 3% slower (0.051 ms per 128-pair worker loop).",
+      "Unchanged proc control medians span approximately 0.95x to 1.04x.",
+      "Native ARM Linux is an ABI control in this batch, not a host performance result.",
+      "Measured candidate uses final executable source, built before committing the runtime revision; final canonical package embeds the new revision and is separately smoke-tested."
+    ]
+  },
+  "checks": [
+    {
+      "scope": "Apple VFS and Linux ABI",
+      "passed": true,
+      "log_sha256": "ce3d053674ea45b739c5f61d3c38424052ad1050a267a14163b6c933525bc07e",
+      "summary": [
+        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 16.24s",
+        "test result: ok. 237 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.83s",
+        "test result: ok. 534 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 2.31s"
+      ]
+    },
+    {
+      "scope": "Apple process/session conformance",
+      "passed": true,
+      "log_sha256": "6a7442c83b24b4a352f60a8777a41720e11af72dafe821fcf67de5e17adca2fb",
+      "summary": [
+        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 21.96s",
+        "test result: ok. 337 passed; 0 failed; 3 ignored; 0 measured; 0 filtered out; finished in 1.27s"
+      ]
+    },
+    {
+      "scope": "Mac product and nonhardware HVF",
+      "passed": true,
+      "log_sha256": "7019ea9e21eaca006cca292be4ee7a7c13d9ab0d62df4b02f1773972be816332",
+      "summary": [
+        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 11.08s",
+        "test result: ok. 4 passed; 0 failed; 47 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 20 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.01s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "scope": "Affected runtime strict all-target/all-feature Clippy",
+      "passed": true,
+      "log_sha256": "4d1fe7c5812c0a61ce863bbda7e0f6ebca0ac9871fc95de96ec5ad8d93efa4e8",
+      "summary": [
+        "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 5.25s"
+      ]
+    },
+    {
+      "scope": "iPad core/CLI/FFI strict Clippy",
+      "passed": true,
+      "log_sha256": "2d6c9ef10d936c7797fd477cc17403dc9b48f8f9399ba7a13dc96c00b6a8c958",
+      "summary": [
+        "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 4.73s"
+      ]
+    },
+    {
+      "scope": "Mac workspace strict Clippy",
+      "passed": true,
+      "log_sha256": "3e1a09573f66a2853f5075b622e4fd9bb3ff23458c383eaa5530ad83ed4c7eda",
+      "summary": [
+        "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.13s"
+      ]
+    },
+    {
+      "scope": "aarch64-apple-ios and aarch64-apple-ios-sim compilation",
+      "passed": true,
+      "log_sha256": "c31ff686eabc9e8aa3f7f6011ec9639d67ad85d82b73acd7f49e298e09c246c7",
+      "summary": [
+        "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.80s",
+        "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.71s"
+      ]
+    },
+    {
+      "scope": "Native ARM Linux VFS and ABI",
+      "passed": true,
+      "log_sha256": "66a45f1bd31413bb5278ce896385429b63c3491ca6a1fe713b34416366031799",
+      "summary": [
+        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 20.71s",
+        "test result: ok. 237 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 1.09s",
+        "test result: ok. 533 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 2.02s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "scope": "Native ARM Linux process/session conformance",
+      "passed": true,
+      "log_sha256": "3f0f304999a97e8fff5d6c3023d7421d99b4fc7e3bcc5383ab4916d93e4819e9",
+      "summary": [
+        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 27.45s",
+        "test result: ok. 337 passed; 0 failed; 3 ignored; 0 measured; 0 filtered out; finished in 1.60s"
+      ]
+    },
+    {
+      "scope": "Native ARM Linux strict affected Clippy",
+      "passed": true,
+      "log_sha256": "0ded1508b483b6d892b142017424f851d2c545a29ace9c98b20cb43f047713c3",
+      "summary": [
+        "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.51s"
+      ]
+    }
+  ],
+  "reuse": [
+    "Previously passed CPU/MMU and graphics/video acceptance reused because those sources did not change.",
+    "Stage 53 signed 47-case HVF and pressure acceptance reused; stage 54 runs its own real HVF mount fixture.",
+    "No physical iPad install/run in this batch; both compilation targets passed."
+  ],
+  "remaining_boundaries": [
+    "Unshare/setns task membership and all captured Files/fs, UTS, network/IPC/cgroup, pid-for-children, descriptor factories, signal/readiness and proc consumers remain next.",
+    "Credentials/capabilities, tracing/security effects and actual excluded pathname controls retain their boundary.",
+    "Inherited unsupported newer mount APIs and shared propagation are not newly advertised.",
+    "Generic unhandled dispatch and structural memory/task publication remain; global coordinator removal is incomplete."
+  ],
+  "installation": {
+    "channel": "dev",
+    "pending": false,
+    "mac_revision": "59e3d9d9eeaf561fb523698d8accc74f271bf268",
+    "runtime_revision": "b06c97a3e83e4ed81a08400cfe2991f224810dae",
+    "installed_binary_sha256": "8d071f7fc67a95da40b0b4106306f63b57336b29a78dcdcbf2e766374804bb3d",
+    "packaged_binary_sha256": "8d071f7fc67a95da40b0b4106306f63b57336b29a78dcdcbf2e766374804bb3d",
+    "version": "Trames Dev 1.5.3 (dev) runtime b06c97a3e83e4ed81a08400cfe2991f224810dae",
+    "installed_smoke": {
+      "backend": "hvf",
+      "fixture_sha256": "e9e298d62cff61d45a69c618e3689901d5c8e4fdb311124153208954505918f2",
+      "cases": [
+        {
+          "cpus": 12,
+          "filtered": false,
+          "returncode": 0
+        },
+        {
+          "cpus": 12,
+          "filtered": true,
+          "returncode": 0
+        }
+      ],
+      "runner_sha256": "8d071f7fc67a95da40b0b4106306f63b57336b29a78dcdcbf2e766374804bb3d",
+      "diagnostics": {
+        "raw": {
+          "log_sha256": "91cc84b3b78448137352d8653220e6fedfcdd6cdf0644bd8fd303662a44a4f45",
+          "execution_paths": {
+            "cohort_rounds": 2,
+            "cohort_stop_us": 4,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 1007,
+            "vm_local_syscalls": 36,
+            "worker_direct_syscalls": 805,
+            "worker_fd_syscalls": 0,
+            "worker_file_syscalls": 805,
+            "worker_futex_waits": 32,
+            "worker_futex_wakes": 28,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 922,
+            "worker_task_resumes": 100,
+            "worker_uring_syscalls": 0
+          },
+          "cohort_return_syscalls": [
+            [
+              29,
+              1
+            ],
+            [
+              97,
+              1
+            ]
+          ]
+        },
+        "filtered": {
+          "log_sha256": "4beafda1784d9956ad184c4cd44b0646501de0f6f47f02f49c074d422a5a99fe",
+          "execution_paths": {
+            "cohort_rounds": 2,
+            "cohort_stop_us": 0,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 1011,
+            "vm_local_syscalls": 36,
+            "worker_direct_syscalls": 805,
+            "worker_fd_syscalls": 0,
+            "worker_file_syscalls": 805,
+            "worker_futex_waits": 33,
+            "worker_futex_wakes": 29,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 924,
+            "worker_task_resumes": 97,
+            "worker_uring_syscalls": 0
+          },
+          "cohort_return_syscalls": [
+            [
+              29,
+              1
+            ],
+            [
+              97,
+              1
+            ]
+          ]
+        }
+      }
+    },
+    "stable_unchanged": true,
+    "stable_binary_sha256": "4f40615213e731b2a4ef9d8c6a0e85c5c7bdf31ab0c60b0354b55113f2a6a55d",
+    "stable_restarted": false
+  }
+}
