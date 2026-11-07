@@ -13,8 +13,8 @@ use trames_wayland::{InputEvent, Server, TextEdit};
 struct Sink {
     server: Server,
     began: Instant,
-    stdout: Vec<u8>,
-    stderr: Vec<u8>,
+    stdout: trames_vfs::CapturedBytes,
+    stderr: trames_vfs::CapturedBytes,
     frames: usize,
     last: u64,
     closed: bool,
@@ -27,12 +27,20 @@ struct Sink {
     resize_confirmed: bool,
 }
 impl GuestOutput for Sink {
+    fn source_console(&mut self) -> std::sync::Arc<dyn trames_vfs::ConsoleIo> {
+        std::sync::Arc::new(trames_vfs::CapturedConsole {
+            input: Default::default(),
+            output: self.stdout.clone(),
+            error: self.stderr.clone(),
+        })
+    }
+
     fn write(&mut self, fd: OutputFd, bytes: &[u8]) -> io::Result<usize> {
         match fd {
             OutputFd::Stdout => &mut self.stdout,
             OutputFd::Stderr => &mut self.stderr,
         }
-        .extend_from_slice(bytes);
+        .append(bytes);
         Ok(bytes.len())
     }
     fn control(&mut self, _: &mut trames_vfs::Vfs) -> io::Result<bool> {
@@ -193,8 +201,8 @@ fn run_options(program: &str, editor: bool, vulkan: bool, arguments: &[&str]) ->
     let mut sink = Sink {
         server,
         began: Instant::now(),
-        stdout: vec![],
-        stderr: vec![],
+        stdout: Default::default(),
+        stderr: Default::default(),
         frames: 0,
         last: 0,
         closed: false,
@@ -213,18 +221,18 @@ fn run_options(program: &str, editor: bool, vulkan: bool, arguments: &[&str]) ->
             String::from_utf8_lossy(&runtime.linux.vfs.syslog(3, 65536).unwrap_or_default())
         );
     }
-    eprintln!("{program}: result={result:?} frames={} focused={} text_sent={} text_confirmed={} closed={}\nstdout={}\nstderr={}\nlog={}",sink.frames,sink.focused,sink.text_sent,sink.text_confirmed,sink.closed,String::from_utf8_lossy(&sink.stdout),String::from_utf8_lossy(&sink.stderr),String::from_utf8_lossy(&runtime.linux.vfs.syslog(3,65536).unwrap_or_default()));
+    eprintln!("{program}: result={result:?} frames={} focused={} text_sent={} text_confirmed={} closed={}\nstdout={}\nstderr={}\nlog={}",sink.frames,sink.focused,sink.text_sent,sink.text_confirmed,sink.closed,String::from_utf8_lossy(&sink.stdout.snapshot()).into_owned(),String::from_utf8_lossy(&sink.stderr.snapshot()).into_owned(),String::from_utf8_lossy(&runtime.linux.vfs.syslog(3,65536).unwrap_or_default()));
     assert!(
         result.is_ok(),
         "{program}: {result:?}\nstdout={}\nstderr={}",
-        String::from_utf8_lossy(&sink.stdout),
-        String::from_utf8_lossy(&sink.stderr)
+        String::from_utf8_lossy(&sink.stdout.snapshot()).into_owned(),
+        String::from_utf8_lossy(&sink.stderr.snapshot()).into_owned()
     );
     assert_eq!(
         result.unwrap().code,
         0,
         "{}",
-        String::from_utf8_lossy(&sink.stderr)
+        String::from_utf8_lossy(&sink.stderr.snapshot()).into_owned()
     );
     sink
 }
@@ -232,7 +240,7 @@ fn run_options(program: &str, editor: bool, vulkan: bool, arguments: &[&str]) ->
 #[ignore = "prepare signed wayland-utils and weston-clients; set TRAMES_WAYLAND_STORE"]
 fn original_wayland_info_inside_guest() {
     let s = run("/usr/bin/wayland-info", false);
-    let out = String::from_utf8_lossy(&s.stdout);
+    let out = String::from_utf8_lossy(&s.stdout.snapshot()).into_owned();
     assert!(
         out.contains("wl_seat") && out.contains("xdg_wm_base"),
         "{out}"
@@ -260,7 +268,11 @@ fn original_vkcube_wayland_inside_guest() {
         true,
         &["--wsi", "wayland", "--c", "12"],
     );
-    assert!(s.frames > 0, "{}", String::from_utf8_lossy(&s.stderr));
+    assert!(
+        s.frames > 0,
+        "{}",
+        String::from_utf8_lossy(&s.stderr.snapshot()).into_owned()
+    );
     assert!(
         s.resized && s.resize_confirmed,
         "vkcube did not recreate its images after configure"

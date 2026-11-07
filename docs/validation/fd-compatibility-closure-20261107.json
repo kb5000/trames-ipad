@@ -1,0 +1,591 @@
+{
+  "schema": 1,
+  "date": "2026-11-07",
+  "stage": 64,
+  "recorded_at": "2026-11-07T12:10:37.095140+00:00",
+  "runtime_revision": "4d6926ba47d574250557314ea9335cb5ac4d8f1a",
+  "baseline_runtime_revision": "0c2adca6acb919750007eb97aa686e8a06f555a8",
+  "mac_revision": "a8d27ba2ed669bc18ecb7d8b3cc22df29639403f",
+  "global_coordinator_removal_complete": false,
+  "closed_execution_category": "Production FD/network compatibility RPC, including actual resource dependencies and refusal paths",
+  "implementation": [
+    "Original Send+Sync console byte resources bound once to actual OFDs; dup/fork/accepted I/O preserve resource identity after close/reuse. Same-thread UI/captured bytes; potentially blocking native descriptors use the existing bounded file pool. No new coordinator/resource/reader thread or polling bus; standalone CLI stdin reader removed.",
+    "Complete original epoll control and legacy/nested watch graph retained through source creation, close, fork, SCM_RIGHTS and retirement; existing poll/control admission remains explicit.",
+    "lseek/fstat retain original descriptions rather than incomplete query projections; no guest memory policy/fence added.",
+    "Source byte EPIPE returns its final errno and signals the original task once. No failed byte operation replays on owner merely to deliver SIGPIPE. MSG_NOSIGNAL retains errno without signal.",
+    "Removed Service event, Request/ReturnTo/reply transport and source wait, service_candidate, process_service owner handler, namespace stream-mask capture, Linux::network_service, run-queue/domain in-flight service state, and private legacy additive-mmap RPC. Local VM execution requires original task custody.",
+    "Historical transport-only tests and the test-only cost experiment retire with their deleted transport. Original lifecycle, I/O/resource, seccomp, output-fault and close/reuse behaviors remain covered. Public old service counters remain zero-valued product diagnostics."
+  ],
+  "source_files": {
+    "crates/trames-linux/src/descriptor_create.rs": "138a7c0788f3b0744c12481208c9c63437cc9fd0bb1c6ea338aa88b2e589e321",
+    "crates/trames-linux/src/direct.rs": "36828344c9eec7081d38ddad99bcadbc233ed4d1e7683adf34911cde6e62ebb0",
+    "crates/trames-linux/src/direct/console_tests.rs": "59868d13b5cd2e7a25417f4b9a6c0c1e258169c5cd070bf4ce60b7fe336a8030",
+    "crates/trames-linux/src/direct/file.rs": "9ddf0e520cd1906a4d8a78ada9fb66966649bac198a2aa54214773e1cde8351c",
+    "crates/trames-linux/src/direct/local_message.rs": "7d0b1d7d55d967c0bf77098bad7c334b58a1fa492d3def9954e6430dc4de5750",
+    "crates/trames-linux/src/lib.rs": "77ad89496d01055afa8e0aba9af52a30a1357c20b022ff91362d1752c9427678",
+    "crates/trames-linux/src/network.rs": "d46125da602463d6538e54b0a224e76c846b75c76631e58bf8b48edb8701fc2c",
+    "crates/trames-linux/src/path_queries.rs": "1b65b5769c67a904d6620c5333e783b7bc18fc653474662c37adaf068e9277d8",
+    "crates/trames-linux/src/state.rs": "3111ef6cadf803b5f09b5a4341c9fd0c41ba6b3c6d19b51ecbe7586608aa0007",
+    "crates/trames-session/src/lib.rs": "a1ebb97a8e46196ca4d03850b3341b666d8e90df67bedb2d65283e2e11b9fc16",
+    "crates/trames-session/src/process.rs": "e3e90f8f23ac5ec860405e5335ff890be13643a02fb57d76b2b13f3effb3f801",
+    "crates/trames-session/src/process_dispatch.rs": "9823bedafe0120066ae7c5106473a6ea36484d33684dbba80b59df0a4538fc41",
+    "crates/trames-session/src/process_lifecycle.rs": "b32c817f9f035e73aa95ef91aad9c05de776a8cd496bc46d6f624cfb2e1ec9dc",
+    "crates/trames-session/src/process_lifecycle_layouts.rs": "7d8b17ff68063bf89b578c0ba5a41913d91b548725bbbb7165b2e1f50d5cfdbf",
+    "crates/trames-session/src/process_lifecycle_memory.rs": "f5b6a56ba2415a8278fb06a1149c2783bd2a5422bb07cab319f304570240ecd6",
+    "crates/trames-session/src/process_lifecycle_retirement.rs": "2a1862ae1d9eaf22b41ac8f70eb04f7969ba1f0f0ef0d5358d1df9908166666b",
+    "crates/trames-session/src/process_proc.rs": "cd5f83fbf987b4cfc487355dd13371be2b0dd49ef336dff084a7bcc54a9aa5ff",
+    "crates/trames-session/src/process_seccomp.rs": "e00598f6d66aa9ad5fe9f09a6a2c1a6fff716c24213393be2a7f7786d5c4fc27",
+    "crates/trames-session/src/process_vm.rs": "d653f0c4aba8692232639aeda5e370632a4c268ebf7150a0bf443042119d78b1",
+    "crates/trames-session/src/run_queue.rs": "132e86ec0d20391fd1af9fe9abd83ff9784710d9e72a542593058dad667958d4",
+    "crates/trames-session/src/run_queue/domains.rs": "26999e7450fb18687443e8a25e20b01dd0eb0cde4dc911c2fbc4a0b9eec35c04",
+    "crates/trames-session/src/worker_syscalls.rs": "1a4c58cb8ace679590fe168ebc412a777b02ec9ac4b245383c6922ffd42de7ab",
+    "crates/trames-session/src/workers.rs": "84361a6a8c1564c4dd5b9619f39fe00b3e26c13cc325db771ecfa566b45e47da",
+    "crates/trames-session/src/workers_uring_tests.rs": "e673721a07f4cbce068dde0b1474e4410716c38d6e24953f751c726be08a2654",
+    "crates/trames-vfs/src/console.rs": "86bf725cb67ae01541f109241445854a8350032649585ce69c009506abbbbdce",
+    "crates/trames-vfs/src/descriptor_factory.rs": "c7f5f5f99b1e33e9402d097b489d84fdd59e6903338af176e5cfe564e2d9fe40",
+    "crates/trames-vfs/src/direct_io.rs": "8ce124f37e2e9106bffb9a777a287a47c783afe97b7f134ac5ea4dc0f5246ac8",
+    "crates/trames-vfs/src/epoll.rs": "bece5c597176aa8ea122befbe979aad73a1c5ad2b312bf56f991e1586ad60050",
+    "crates/trames-vfs/src/events.rs": "674e5f166b625cb4d7bd52ea2cadc252db0ca0d0c9498174611269167a97ad2e",
+    "crates/trames-vfs/src/fd_table.rs": "452d7877da8a01553c811cbeb560a1764b7573c4c85aafd83b8120798e977bf7",
+    "crates/trames-vfs/src/file_work.rs": "d09695e868646f50fa2f46290833d19f29729ab2d68b67b9b1185dca50afad85",
+    "crates/trames-vfs/src/ipc.rs": "60aec272023d0b30b42ef425d61bfd8d771019471bfec11644eddbbf23eedb7f",
+    "crates/trames-vfs/src/ipc/native.rs": "ac6c0e52be9efe851a9a6868abfb63f05bf3a663b3a16cf03255548946fb5331",
+    "crates/trames-vfs/src/ipc/shared_graph_tests.rs": "4d65cc7203da5850077900dac8761886f0e59152f5bc6ee36aa41702d93f5208",
+    "crates/trames-vfs/src/lib.rs": "a66508c605e53146dd6a8b1020c0384da63d0ab35d149e47289c35ffc2fb3fbe",
+    "crates/trames-vfs/src/linux_namespace.rs": "272272d6fe10704b4fcf0969b086752c602ac51347e0b0d595d5d41e0ef3622b",
+    "crates/trames-vfs/src/memfd.rs": "a826152fe77d361b4d41e6bb51c4809926598968965cd2aad2f310ed95b2f6e3",
+    "crates/trames-vfs/src/native_images.rs": "7d9ab102d3c84927403c75b923bbcfd7511d7eb08c79c55f2b60239bfe3995c1",
+    "crates/trames-vfs/src/network.rs": "da68c93f949dabc972caea300b5caf9ae30c36920abbcc472a7c31252935799b",
+    "crates/trames-vfs/src/open_handle.rs": "41c3287057631a43c3c2c2d3f5480fcf1646a2fbfe7202db2db1d66537cc90d0",
+    "crates/trames-vfs/src/path_queries.rs": "b3f1c35c86543b3056af7eb992d26ef7dc724287c1361bb67381d39e5cdb6cbc",
+    "crates/trames-vfs/src/pseudo.rs": "ca28fe625891d7f260559b1a974e1ceee4bce0794dbdabe72fd089796cef95c5",
+    "crates/trames-vfs/src/pty.rs": "77ade36b6770830fe928094818a2ec84a805b08409756d82b19596c0cb9c5f96",
+    "crates/trames-vfs/src/task_namespace.rs": "5cd5a45abb4c3fb43daec3fa6dc0e0b1779847b1569db87e33d211b4c4efcc83",
+    "crates/trames-vfs/src/task_transfer.rs": "c6a1e8ee4a94e5330ed877c7645b43fc15a77ec6d43a19365f1b143acd1ca00b",
+    "crates/trames-vfs/src/uring.rs": "9a4b91e5c0b430ee80f0cc3afddda57500f2431df51adc1649ac2da91f2edefa",
+    "docs/architecture/coordination-boundaries.md": "0e9cfafb48e55034b0af1d5492bf64b85cc97bfcd21f79ebe18ab029cd55d40c"
+  },
+  "removed_source_files": [
+    "crates/trames-session/src/coordination_cost.rs",
+    "crates/trames-session/src/process_service.rs"
+  ],
+  "ipad_composition_sources": {
+    "crates/trames-cli/src/main.rs": "048584fab9d461bb77b9bb37d823933e40d8113895a38c06d83b89d9f814bf0c",
+    "crates/trames-core/tests/wayland.rs": "7c1c650ac017add706eea9851e4241c5edb17f79a7641b321bfa151981104749",
+    "crates/trames-ffi/src/lib.rs": "6edb5d3a9dcdffc3a675b805a2d80b29fc51d37bc3bb12ffd8ffb6eb55894234",
+    "crates/trames-ffi/src/session.rs": "2f8bad1a1c6189db43a0c6e89d87873487d77083f63c2c7ae1c757f683377860",
+    "runtime-version.json": "b245786088152af5679233f1d52ac94861e1f5ef4bcaffe961fd458323990960",
+    "tests/fixtures/worker-fd-compat.c": "198b1a606a88aa730f36a47362d7b3c962b2e96c99eaa9a3dbfeb103d487c0c8"
+  },
+  "mac_composition_sources": {
+    "crates/trames-mac/src/console.rs": "b1feeda9a3981682f153eab8247c0e3aa9c178045dca20bcde4107103c082b7d",
+    "crates/trames-mac/src/session.rs": "87f6284b80fe22925a76e0aad42ada0169719c248db39e898507cca24f852b33",
+    "runtime-version.json": "b245786088152af5679233f1d52ac94861e1f5ef4bcaffe961fd458323990960"
+  },
+  "fixture": {
+    "source": "tests/fixtures/worker-fd-compat.c",
+    "source_sha256": "198b1a606a88aa730f36a47362d7b3c962b2e96c99eaa9a3dbfeb103d487c0c8",
+    "linux_binary_sha256": "460d4ae1f315d2d654ecf9c4f7fadfca06c459e1dbcdaa24ce1980d7aadbdc71"
+  },
+  "acceptance": {
+    "runtime_macos": {
+      "path": "target/fd-compat-closure/runtime-macos-ci/summary.json",
+      "sha256": "9f8dc0e5b03cf0b5835d402971a4fce5486b3f09e98cca6295cc9f28b93feaba",
+      "completed": true,
+      "steps": [
+        {
+          "name": "rustup show",
+          "status": "passed",
+          "seconds": 0.041420698165893555
+        },
+        {
+          "name": "python3 scripts/check-execution-boundaries.py",
+          "status": "passed",
+          "seconds": 0.24853897094726562
+        },
+        {
+          "name": "cargo fmt --all --check",
+          "status": "passed",
+          "seconds": 2.1940507888793945
+        },
+        {
+          "name": "cargo clippy --workspace --all-targets --all-features --locked -- -D warnings",
+          "status": "passed",
+          "seconds": 8.606575965881348
+        },
+        {
+          "name": "cargo test --workspace --all-features --locked",
+          "status": "passed",
+          "seconds": 18.338179111480713
+        },
+        {
+          "name": "cargo build --workspace --all-features --release --locked",
+          "status": "passed",
+          "seconds": 6.950773000717163
+        },
+        {
+          "name": "cargo run --release -p trames-memory --example reclaim-footprint --locked",
+          "status": "passed",
+          "seconds": 0.39008378982543945
+        }
+      ]
+    },
+    "runtime_linux": {
+      "path": "target/local-ci/io/fd-compat-closure/runtime-linux-ci/summary.json",
+      "sha256": "1ec2d3381102f4d81ac5f40a1ed823cf1cf53b0ef4dd39ca171b18a6b558b0f9",
+      "completed": true,
+      "steps": [
+        {
+          "name": "rustup show",
+          "status": "passed",
+          "seconds": 0.04960060119628906
+        },
+        {
+          "name": "python3 scripts/check-execution-boundaries.py",
+          "status": "passed",
+          "seconds": 0.2131481170654297
+        },
+        {
+          "name": "cargo fmt --all --check",
+          "status": "passed",
+          "seconds": 0.9124383926391602
+        },
+        {
+          "name": "cargo clippy --workspace --all-targets --all-features --locked -- -D warnings",
+          "status": "passed",
+          "seconds": 4.250659227371216
+        },
+        {
+          "name": "cargo test --workspace --all-features --locked",
+          "status": "passed",
+          "seconds": 22.32365393638611
+        },
+        {
+          "name": "cargo build --workspace --all-features --release --locked",
+          "status": "passed",
+          "seconds": 17.94165587425232
+        },
+        {
+          "name": "cargo run --release -p trames-memory --example reclaim-footprint --locked",
+          "status": "passed",
+          "seconds": 0.20244908332824707
+        }
+      ]
+    },
+    "process_macos": {
+      "path": "target/fd-compat-closure/process-complete.log",
+      "sha256": "d72a412142f32d5f0e3e37fe1015b63c51f73381709ef547ce573c90f16fb201",
+      "test_results": [
+        {
+          "passed": 383,
+          "failed": 0,
+          "ignored": 2
+        }
+      ]
+    },
+    "process_linux": {
+      "path": "target/local-ci/io/fd-compat-closure/process-all.log",
+      "sha256": "6c7ab0426f6d35381a1ef89fef0c60a471154dea307313a89d8617eba692c11b",
+      "test_results": [
+        {
+          "passed": 383,
+          "failed": 0,
+          "ignored": 2
+        }
+      ]
+    },
+    "vfs_macos": {
+      "path": "target/fd-compat-closure/vfs-complete-next.log",
+      "sha256": "0e1a1e4802e0d04532bfd547cc8810c8aaeb5c2f20d5c2068884f1fbbe9668b5",
+      "test_results": [
+        {
+          "passed": 530,
+          "failed": 0,
+          "ignored": 1
+        }
+      ]
+    },
+    "source_console_macos": {
+      "path": "target/fd-compat-closure/console-signal-final.log",
+      "sha256": "fe6656146c742e26f6d77d69f12045354c28f15a8cd7f1a0f7e7e0d15d2a0a32",
+      "test_results": [
+        {
+          "passed": 4,
+          "failed": 0,
+          "ignored": 0
+        }
+      ]
+    },
+    "host_console_slot": {
+      "path": "target/fd-compat-closure/host-console-slot-fixed.log",
+      "sha256": "f47bfec1fd8cd63ab36321880216d10d4444a9eaa22ff65f54a53884035bb8f0",
+      "test_results": [
+        {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        }
+      ]
+    },
+    "ipad_products": {
+      "path": "target/fd-compat-closure/ipad-product-tests.log",
+      "sha256": "b90bfb2015281afab356fb11310b15d5e4d77eebbf8201a850225eef25e17a81",
+      "test_results": [
+        {
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 383,
+          "failed": 0,
+          "ignored": 2
+        },
+        {
+          "passed": 0,
+          "failed": 0,
+          "ignored": 4
+        },
+        {
+          "passed": 7,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        }
+      ]
+    },
+    "mac_products": {
+      "path": "target/fd-compat-closure/mac-tests.log",
+      "sha256": "5022c736f6ca0df8d5a4099ffdce90c63013140009b6d7cdfb52408df58d9a25",
+      "test_results": [
+        {
+          "passed": 4,
+          "failed": 0,
+          "ignored": 47
+        },
+        {
+          "passed": 20,
+          "failed": 0,
+          "ignored": 1
+        },
+        {
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        }
+      ]
+    },
+    "strict_product_clippy": {
+      "path": "target/fd-compat-closure/product-clippy-final.log",
+      "sha256": "f1c5dd2628073da2987ab86d35b9d58e9afb7bf6aaf0114ab5e0756e4e3f1370"
+    },
+    "mac_strict_clippy": {
+      "path": "target/fd-compat-closure/mac-clippy.log",
+      "sha256": "7d448e2313e4b9bb9ca5993602f6b53226f5616eef52ef9c668f0f749e9609e4"
+    },
+    "mac_native_task_stream": {
+      "path": "target/fd-compat-closure/mac-native-task-stream.log",
+      "sha256": "e2f3baaa97ec15c9b0ebb72e6ba08b4f9c723946c493f27673c2bd86acd5b63a"
+    },
+    "ipad_compile": [
+      {
+        "target": "aarch64-apple-ios",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+        "code": 0
+      },
+      {
+        "target": "aarch64-apple-ios-sim",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk",
+        "code": 0
+      }
+    ],
+    "guest_matrix": {
+      "path": "target/fd-compat-closure/guest/results.json",
+      "sha256": "9ac69cc699b8383fbaa917b4f3f9f08efcbe6cbba5164e8f9c41937c3c2440d0",
+      "passed": 36,
+      "service_requests": 0,
+      "hvf_cohort_return_syscalls": [],
+      "cpus": [
+        1,
+        4,
+        12
+      ],
+      "policies": [
+        "raw",
+        "ALLOW"
+      ],
+      "workloads": [
+        "FD metadata/epoll",
+        "scalar/vector console output",
+        "socket controls"
+      ]
+    },
+    "installed_dev": {
+      "path": "target/fd-compat-closure/installed-guest/results.json",
+      "sha256": "98bb83667c67ba12a9f39238147dd63a31bfdc64d7e9b92e8bd28e90352e372b",
+      "passed": 12,
+      "service_requests": 0,
+      "cohort_return_syscalls": []
+    },
+    "pin_boundaries": [
+      {
+        "path": "target/fd-compat-closure/root-pin-check.log",
+        "sha256": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651"
+      },
+      {
+        "path": "target/fd-compat-closure/canonical-mac-boundaries.log",
+        "sha256": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651"
+      }
+    ],
+    "final_fmt": {
+      "path": "target/fd-compat-closure/final-fmt.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "hardware_reuse": "CPU/MMU/graphics implementation unchanged. Reuse prior oracle/hardware results; current 36 real backend cases and 12 installed HVF cases validate this runtime composition.",
+    "local_ci_shutdown": {
+      "stopped": true,
+      "path": "target/fd-compat-closure/linux-stop.log",
+      "sha256": "740aaf9203e9c36df52f0117f6729d022315b2f542bd9a28fc51b0215b7a6f4a"
+    }
+  },
+  "performance": {
+    "paired": {
+      "path": "target/fd-compat-closure/benchmark/results.json",
+      "sha256": "78489e0fe2831fa920b74fb8ff6f3ff01921384fbf2e3195d357786efdbdef8e"
+    },
+    "paired_runs": 108,
+    "paired_repetitions": 3,
+    "exact_runner_env": {
+      "TRAMES_MAC_BUNDLED": "1"
+    },
+    "single_core_long": {
+      "path": "target/fd-compat-closure/single-long/results.json",
+      "sha256": "76ec4023831c35662e42d9e18b6de1b88cf9228df6c97956090fa89575a9944a"
+    },
+    "single_core_long_runs": 36,
+    "single_core_long_iterations_per_thread": 20000,
+    "single_core_long_change_percent": [
+      -2.27,
+      0.61
+    ],
+    "native_reference": {
+      "path": "target/local-ci/io/fd-compat-closure/native-results.json",
+      "sha256": "fea316bd3bacabe1920c978e11110df9ad0666a4a51f0c8629913f482d1d48bc"
+    },
+    "native_runs": 54,
+    "native_context": "Same static Linux ABI binary, native ARM64 Linux local CI environment on this Mac, six virtual CPUs. Native stdout is a local /tmp file, evidence copied afterward; not the CI sharing mount and not macOS epoll.",
+    "rows": [
+      {
+        "cpus": 1,
+        "policy": 0,
+        "mode": 0,
+        "before_ms": 2.920875,
+        "after_ms": 3.177166,
+        "speedup": 0.9193334562940684,
+        "native_linux_ms": 0.22846
+      },
+      {
+        "cpus": 1,
+        "policy": 0,
+        "mode": 1,
+        "before_ms": 3.651875,
+        "after_ms": 3.678167,
+        "speedup": 0.9928518743167453,
+        "native_linux_ms": 0.36743
+      },
+      {
+        "cpus": 1,
+        "policy": 0,
+        "mode": 2,
+        "before_ms": 5.611167,
+        "after_ms": 5.321083,
+        "speedup": 1.054515969775326,
+        "native_linux_ms": 0.52143
+      },
+      {
+        "cpus": 1,
+        "policy": 1,
+        "mode": 0,
+        "before_ms": 2.013292,
+        "after_ms": 1.960667,
+        "speedup": 1.0268403558584909,
+        "native_linux_ms": 0.243288
+      },
+      {
+        "cpus": 1,
+        "policy": 1,
+        "mode": 1,
+        "before_ms": 3.737167,
+        "after_ms": 3.737125,
+        "speedup": 1.0000112385858113,
+        "native_linux_ms": 0.387134
+      },
+      {
+        "cpus": 1,
+        "policy": 1,
+        "mode": 2,
+        "before_ms": 5.365666,
+        "after_ms": 5.529542,
+        "speedup": 0.970363549096833,
+        "native_linux_ms": 0.548989
+      },
+      {
+        "cpus": 4,
+        "policy": 0,
+        "mode": 0,
+        "before_ms": 62.145875,
+        "after_ms": 3.690458,
+        "speedup": 16.839610422337824,
+        "native_linux_ms": 0.448379
+      },
+      {
+        "cpus": 4,
+        "policy": 0,
+        "mode": 1,
+        "before_ms": 73.318375,
+        "after_ms": 19.643,
+        "speedup": 3.7325446724023825,
+        "native_linux_ms": 0.990398
+      },
+      {
+        "cpus": 4,
+        "policy": 0,
+        "mode": 2,
+        "before_ms": 70.300375,
+        "after_ms": 9.712542,
+        "speedup": 7.238102548230938,
+        "native_linux_ms": 0.864482
+      },
+      {
+        "cpus": 4,
+        "policy": 1,
+        "mode": 0,
+        "before_ms": 145.2255,
+        "after_ms": 3.972042,
+        "speedup": 36.56192457179456,
+        "native_linux_ms": 0.486496
+      },
+      {
+        "cpus": 4,
+        "policy": 1,
+        "mode": 1,
+        "before_ms": 226.210333,
+        "after_ms": 19.820875,
+        "speedup": 11.412731930351207,
+        "native_linux_ms": 1.005951
+      },
+      {
+        "cpus": 4,
+        "policy": 1,
+        "mode": 2,
+        "before_ms": 181.074458,
+        "after_ms": 9.475208,
+        "speedup": 19.110341218894614,
+        "native_linux_ms": 0.892527
+      },
+      {
+        "cpus": 12,
+        "policy": 0,
+        "mode": 0,
+        "before_ms": 350.818708,
+        "after_ms": 12.147,
+        "speedup": 28.881098872149504,
+        "native_linux_ms": 1.466982
+      },
+      {
+        "cpus": 12,
+        "policy": 0,
+        "mode": 1,
+        "before_ms": 410.691333,
+        "after_ms": 69.179917,
+        "speedup": 5.936568744365506,
+        "native_linux_ms": 3.211984
+      },
+      {
+        "cpus": 12,
+        "policy": 0,
+        "mode": 2,
+        "before_ms": 380.887917,
+        "after_ms": 27.267042,
+        "speedup": 13.968802226512139,
+        "native_linux_ms": 2.325339
+      },
+      {
+        "cpus": 12,
+        "policy": 1,
+        "mode": 0,
+        "before_ms": 922.512791,
+        "after_ms": 12.006708,
+        "speedup": 76.83311620470823,
+        "native_linux_ms": 1.236708
+      },
+      {
+        "cpus": 12,
+        "policy": 1,
+        "mode": 1,
+        "before_ms": 1384.477708,
+        "after_ms": 68.512459,
+        "speedup": 20.20767796409117,
+        "native_linux_ms": 3.140544
+      },
+      {
+        "cpus": 12,
+        "policy": 1,
+        "mode": 2,
+        "before_ms": 1121.120125,
+        "after_ms": 27.073375,
+        "speedup": 41.410430912289286,
+        "native_linux_ms": 2.532888
+      }
+    ],
+    "claim_limit": "Synthetic fixed-work path measurements; no browser/application speedup inferred. Substantial syscall/native-console pool overhead remains."
+  },
+  "initial_failures_and_corrections": [
+    "Initial restricted host tests could not open native local sockets (EPERM); authorized native runs supplied the actual regression results.",
+    "Initial type/borrow errors during full shared-epoll migration were fixed before tests; strict check flagged callback type complexity, replaced with a type alias. Linux workflow resumed failed/affected inputs, preserving unchanged successful results.",
+    "Old tests deliberately treated epoll as an owner-only control and EPIPE as a mandatory owner checkpoint. Assertions were updated for complete shared epoll/source final errors while keeping queue, signal, close/reuse and lifecycle coverage.",
+    "New host-console slot test exposed unconditional parking even for an already-ready console; fixed readiness admission and EAGAIN retention before acceptance.",
+    "Nested mount epoll regression exposed missing shared legacy-graph observations; original graph capture restored before final passing VFS/workflow tests.",
+    "An early headless command used invalid nat mode; corrected to supported full. Initial direct-run launch redirected to an adjacent old bundle, visible through nonzero service counters; discarded and reran with TRAMES_MAC_BUNDLED=1 so hashes name the executed binaries.",
+    "Initial native stdout measurements used the CI sharing mount; discarded and reran with local storage.",
+    "Product pin check required the committed runtime and matching pin, so final checks ran after runtime publication.",
+    "After full workflows, only docs/comments and the final test-only SIGPIPE assertion changed in runtime; the new test passed on Mac and was included in the final Linux workflow. No broad CPU/Linux/network/graphics replay was triggered for documentation/pinning."
+  ],
+  "dev": {
+    "channel": "dev",
+    "installed": true,
+    "app": "/Users/main/Applications/Trames Dev.app",
+    "cli": "/Users/main/.local/bin/trames-dev",
+    "version": "Trames Dev 1.5.3 (dev) runtime 4d6926ba47d574250557314ea9335cb5ac4d8f1a",
+    "runner_sha256": "a723d875109cfc63888d20fb3a7207eb6f8173ea33407c6a336bda9f4398e3de",
+    "built_runner_sha256": "a723d875109cfc63888d20fb3a7207eb6f8173ea33407c6a336bda9f4398e3de",
+    "installed_smoke_passed": 12,
+    "stable_runner_sha256": "4f40615213e731b2a4ef9d8c6a0e85c5c7bdf31ab0c60b0354b55113f2a6a55d",
+    "stable_business_environments_modified": false,
+    "physical_ipad_modified": false
+  },
+  "remaining_boundaries": [
+    "Explicit tracing and genuinely absent source capabilities",
+    "Legacy terminal/host lifecycle and administrative events; initial/solo/cold orchestration",
+    "Actual excluded body/control, mixed wait, Unix ancillary owner-ledger and io_uring owner escalation cases; epoll lifetime sharing alone does not broaden all admission",
+    "Affected mm/backing topology and exceptional native-memory/HLT/fault publication",
+    "Native console bytes retain existing bounded I/O pool roundtrips and drain semantics; an already executing host syscall is not newly cancellable"
+  ],
+  "known_unattributed_issues": [
+    "Stage-61 short denied-control fixed latency remains unattributed; this different fixture does not establish resolution."
+  ]
+}

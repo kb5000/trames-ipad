@@ -279,11 +279,11 @@ pub unsafe extern "C" fn trames_session_terminal_input(
         let result = (|| {
             let data = unsafe { bytes(pointer, length) }?;
             let session = session(handle)?;
-            let mut b = session
+            let mut buffers = session
                 .buffers
                 .lock()
                 .map_err(|_| "session lock unavailable")?;
-            let b = b
+            let b = buffers
                 .terminals
                 .get_mut(&terminal)
                 .ok_or("invalid or closed terminal")?;
@@ -292,6 +292,13 @@ pub unsafe extern "C" fn trames_session_terminal_input(
             }
             let count = data.len().min(QUEUE_LIMIT - b.input.len());
             b.input.extend(&data[..count]);
+            if count != 0 {
+                session.console_revision[0].fetch_add(1, Ordering::Relaxed);
+            }
+            drop(buffers);
+            if count != 0 {
+                session.console_readiness.notify_locked();
+            }
             Ok::<_, &str>(count as i32)
         })();
         result.unwrap_or_else(error)
@@ -319,11 +326,11 @@ pub unsafe extern "C" fn trames_session_terminal_output(
     boundary(|| {
         let result = (|| {
             let session = session(handle)?;
-            let mut b = session
+            let mut buffers = session
                 .buffers
                 .lock()
                 .map_err(|_| "session lock unavailable")?;
-            let b = b
+            let b = buffers
                 .terminals
                 .get_mut(&terminal)
                 .ok_or("invalid or closed terminal")?;
@@ -331,6 +338,13 @@ pub unsafe extern "C" fn trames_session_terminal_output(
             let data: Vec<_> = b.output.iter().take(count).copied().collect();
             let count = unsafe { copy(pointer, capacity, &data) }?;
             b.output.drain(..count as usize);
+            if count != 0 {
+                session.console_revision[1].fetch_add(1, Ordering::Relaxed);
+            }
+            drop(buffers);
+            if count != 0 {
+                session.console_readiness.notify_locked();
+            }
             Ok::<_, &str>(count)
         })();
         result.unwrap_or_else(error)

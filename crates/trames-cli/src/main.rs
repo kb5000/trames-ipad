@@ -1,12 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #![recursion_limit = "512"]
 use std::{
-    collections::VecDeque,
     env,
     fs::File,
     io::{self, IsTerminal, Read, Write},
     process::{Command, ExitCode, Stdio},
-    sync::mpsc::{self, Receiver, TryRecvError},
 };
 use trames_core::{Runtime, DEFAULT_INSTRUCTION_LIMIT};
 use trames_elf::MAX_ELF_SIZE;
@@ -65,101 +63,49 @@ fn storage_budget(value: &str) -> Result<u64, Box<dyn std::error::Error>> {
 }
 
 struct HostOutput {
-    input: Receiver<io::Result<Vec<u8>>>,
-    pending: VecDeque<u8>,
-    eof: bool,
+    source: std::sync::Arc<trames_vfs::NativeConsole>,
 }
 impl HostOutput {
     fn new() -> Self {
-        let (tx, input) = mpsc::sync_channel(8);
-        std::thread::spawn(move || {
-            let mut stdin = io::stdin().lock();
-            loop {
-                let mut bytes = vec![0; 4096];
-                let item = match stdin.read(&mut bytes) {
-                    Ok(n) => {
-                        bytes.truncate(n);
-                        Ok(bytes)
-                    }
-                    Err(e) => Err(e),
-                };
-                let done = item.as_ref().map_or(true, Vec::is_empty);
-                if tx.send(item).is_err() || done {
-                    break;
-                }
-            }
-        });
         Self {
-            input,
-            pending: VecDeque::new(),
-            eof: false,
+            source: std::sync::Arc::new(trames_vfs::NativeConsole::stdio()),
         }
     }
 }
 impl GuestOutput for HostOutput {
+    fn source_console(&mut self) -> std::sync::Arc<dyn trames_vfs::ConsoleIo> {
+        self.source.clone()
+    }
     fn poll_control(&mut self, _: &trames_vfs::Vfs) -> io::Result<bool> {
         Ok(false)
     }
-    fn poll_stdin(&mut self, bytes: &mut [u8]) -> io::Result<usize> {
-        if bytes.is_empty() {
-            return Ok(0);
-        }
-        if self.pending.is_empty() && !self.eof {
-            match self.input.try_recv() {
-                Ok(Ok(input)) => {
-                    if input.is_empty() {
-                        self.eof = true;
-                    } else {
-                        self.pending.extend(input);
-                    }
-                }
-                Ok(Err(e)) => return Err(e),
-                Err(TryRecvError::Empty) => return Err(io::ErrorKind::WouldBlock.into()),
-                Err(TryRecvError::Disconnected) => self.eof = true,
-            }
-        }
-        let n = bytes.len().min(self.pending.len());
-        for b in &mut bytes[..n] {
-            *b = self.pending.pop_front().expect("pending");
-        }
-        Ok(n)
-    }
     fn stdin_ready(&mut self) -> io::Result<bool> {
-        if !self.pending.is_empty() || self.eof {
-            return Ok(true);
-        }
-        match self.input.try_recv() {
-            Ok(Ok(bytes)) => {
-                if bytes.is_empty() {
-                    self.eof = true;
-                } else {
-                    self.pending.extend(bytes);
-                }
-                Ok(true)
-            }
-            Ok(Err(e)) => Err(e),
-            Err(TryRecvError::Empty) => Ok(false),
-            Err(TryRecvError::Disconnected) => {
-                self.eof = true;
-                Ok(true)
-            }
-        }
+        Ok(trames_vfs::ConsoleIo::poll(&*self.source, trames_vfs::ConsoleStream::Input, 1).0 != 0)
+    }
+    fn poll_stdin(&mut self, bytes: &mut [u8]) -> io::Result<usize> {
+        let input =
+            trames_vfs::ConsoleIo::read(&*self.source, bytes.len()).map_err(console_error)?;
+        bytes[..input.len()].copy_from_slice(&input);
+        Ok(input.len())
     }
     fn write(&mut self, fd: OutputFd, bytes: &[u8]) -> io::Result<usize> {
-        match fd {
-            OutputFd::Stdout => {
-                let mut stream = io::stdout().lock();
-                let n = stream.write(bytes)?;
-                stream.flush()?;
-                Ok(n)
-            }
-            OutputFd::Stderr => {
-                let mut stream = io::stderr().lock();
-                let n = stream.write(bytes)?;
-                stream.flush()?;
-                Ok(n)
-            }
-        }
+        trames_vfs::ConsoleIo::write(
+            &*self.source,
+            match fd {
+                OutputFd::Stdout => trames_vfs::ConsoleStream::Output,
+                OutputFd::Stderr => trames_vfs::ConsoleStream::Error,
+            },
+            bytes,
+        )
+        .map_err(console_error)
+    }
+}
+fn console_error(error: trames_vfs::Errno) -> io::Error {
+    match error.0 {
+        11 => io::ErrorKind::WouldBlock.into(),
+        4 => io::ErrorKind::Interrupted.into(),
+        32 => io::ErrorKind::BrokenPipe.into(),
+        _ => io::Error::from_raw_os_error(error.0 as i32),
     }
 }
 

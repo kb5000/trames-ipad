@@ -2,23 +2,24 @@
 
 ## Current status — 2026-11-07
 
-Stage 63 moves getrandom to the calling executor and shared ABI/CSPRNG. Random
-and urandom controls now return existing unsupported errors on their original
-OFD, retaining O_PATH and policy semantics. Device scalar/vector/positioned
-reads/writes, nonblocking controls, poll and random UUID/boot_id paths are checked
-together. No guest entropy pool, service thread, ordinary-access fence or new
-permission policy is introduced.
+Stage 64 removes the entire production FD/network compatibility RPC entry,
+including its request/reply transport, caller-View loan, owner handler, admission
+classifier and in-flight bookkeeping. Console bytes use original shared OFDs and
+actual host/UI resources; complete epoll creation, FD observations and byte
+SIGPIPE finish through source resources. Blocking native console bytes reuse the
+existing bounded I/O pool. Former service errors and waits do not become a
+whole-cohort fallback.
 
-Both local runtime workflows and 402 process cases per host are covered, with
-final affected-test refreshes, both iPad compile targets and 54 real
-HVF/interpreter cases at 1/4/12 CPUs. See [stage 63 validation](../validation/worker-entropy-20261107.json)
-for source hashes, native references, corrected test assumptions and controls.
-Mac Dev and its CLI are updated; eighteen installed 4/12-CPU smoke cases pass.
-Stable/business and physical iPad installations remain unchanged.
+Both local runtime workflows, process regressions, both iPad compile targets and
+36 real HVF/interpreter cases at 1/4/12 CPUs pass. The real matrix has zero service
+requests and no cohort-return syscall. See [stage 64 validation](../validation/fd-compatibility-closure-20261107.json)
+for source hashes, native references and paired measurements. Mac Dev and its CLI
+are updated; stable/business and physical iPad installations remain unchanged.
 
-**The coordinator still exists.** Actual shared-mm quiescence, an in-cohort
-one-caller service, asynchronous collection and a whole-cohort return have different
-costs. Counts of migrated entries or files are not a completion percentage.
+**The coordinator still exists.** Actual shared-mm quiescence, asynchronous
+resource completion and a whole-cohort return have different costs. The residual
+FD/network compatibility category below has been deleted, rather than renamed.
+Other actual resource/tracing/host boundaries remain explicit.
 
 | Area | Current execution | Remaining boundary |
 | --- | --- | --- |
@@ -28,7 +29,6 @@ costs. Counts of migrated entries or files are not a completion percentage.
 | Exit/group/default-fatal termination, STOP/CONT and vfork release | Source resources and original group/family notifications | Returned CPU/statistics and cold cleanup complete on existing workers; the actual shared mm may still need its byte checkpoint. Outside-cohort/solo and tracing/capability-less embeddings remain separate |
 | fork/clone/vfork and execve/execveat | Existing workers handle pure and mixed mapping scopes, nonleader rekey and original-mm retirement; existing disk pool prepares native images without retaining a CPU slot | Affected actors still pause; actual tracing/capability-less embeddings and solo/host invocation remain distinct |
 | Mapping topology, pins and mapped-file layout | Supported brk/mmap/munmap/mremap/mprotect/msync/madvise and buffer-registration checkpoints publish on an existing worker; additive anonymous mmap is direct | Proc/cold-mm checkpoints and supported mapped-file layout transactions now run on existing workers; excluded backing/lifetime/policy and capability-less embeddings retain explicit boundaries |
-| Residual FD/network compatibility | Owner service inside a live cohort, where admitted | Caller waits while peers continue; refusal before effects falls back to joined handling |
 | Native libc/GPU/video/audio | Normal bodies and resource waits use calling/shared-resource paths | Exceptional mapping import, unstable entry and actual native lifecycle checks remain; AppKit affinity, device/disk pools and local fallback are not extra coordinators |
 | Dynamic proc/sys and proc pathname/FD consumers | Calling worker and original PID/mm/Files/fs/namespace resources | First cross-mm byte export and invalidation activate on an existing worker at the original task/mm boundary; legacy providers retain explicit fallback |
 | Mount topology administration | Original namespace/fs resources on the caller; existing disk pool for host-backed paths; contention releases the CPU slot | Tracing and genuinely excluded pathname controls retain their explicit boundary |
@@ -38,7 +38,7 @@ costs. Counts of migrated entries or files are not a completion percentage.
 | Entropy and random devices | getrandom and supported random/urandom device/UUID operations run on the caller; unsupported entropy controls return on the original OFD | Tracing and absent descriptor capabilities retain their boundary; guest entropy credit/reseed APIs and GRND_INSECURE remain unsupported |
 | BPF and cgroup device policy | Program administration uses the original registry/Files/hierarchy on the caller; target directory and control-file opens resolve directly | Existing unsupported BPF commands/types remain explicit errors; tracing/capability-less embeddings remain. Original device-access consumers retain the same live rules |
 | Seccomp and tracing | Supported installation/TSYNC, decisions and lifecycle effects use original source resources; original policy/NNP is visible to proc, fork and exec | Explicit tracing and capability-less embeddings remain; unsupported seccomp APIs are unchanged. Allowed calls still retain their own excluded resource/generic fallback |
-| Host lifecycle and generic dispatch fallback | Unknown syscall numbers finish locally using generated entry recognition; actual resource/host events retain their own route | Host exec creation/group control, terminal lifecycle, pause/cancel, transfer/timezone/writeback, supervision/admin/pressure/deadline/shutdown; known SVC resources/subcommands and HLT/fault exits not completed, parked, serviced or scoped on the worker still reach the joined fallback |
+| Host lifecycle and generic dispatch fallback | Unknown syscall numbers finish locally using generated entry recognition; actual resource/host events retain their own route | Host exec creation/group control, terminal lifecycle, pause/cancel, transfer/timezone/writeback, supervision/admin/pressure/deadline/shutdown; known SVC resources/subcommands and HLT/fault exits not completed, parked or scoped on the worker still reach the joined fallback |
 
 The last row is an important coverage gap: the remaining owner work is **not
 limited to a fixed set of rare controls**. The final worker-dispatch fallback is
@@ -47,9 +47,32 @@ the owner; ordinary epoch-member migration, parking, wakeup and child/replacemen
 admission already use the live execution queue. Single-CPU/solo execution retains
 its coordinated caller path, which does not by itself imply an extra RPC.
 
-The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/0c2adca6acb919750007eb97aa686e8a06f555a8/docs/architecture/coordination-boundaries.md)
+The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/4d6926ba47d574250557314ea9335cb5ac4d8f1a/docs/architecture/coordination-boundaries.md)
 records scopes, actual admission gates and source locations. Earlier sections
 below are historical records and do not override this inventory.
+
+### Stage 64 closed entry and performance
+
+The retired entry included epoll creation, FD seek/stat, eligible stream bytes,
+and network compatibility controls. This does not claim that every FD, terminal,
+SCM_RIGHTS body, mixed poll or native/memory checkpoint is now source-complete.
+Those independent boundaries remain in the table above. Public service counters
+are retained as zero-valued diagnostic compatibility fields; the production
+producer and handler are absent.
+
+| Raw-policy workload, 200 iterations/thread | 4 CPUs before → after | 12 CPUs before → after | Native ARM64 Linux, 12 threads |
+| --- | ---: | ---: | ---: |
+| FD observations / epoll | 62.146 → 3.690 ms | 350.819 → 12.147 ms | 1.467 ms |
+| Same plus scalar/vector console output | 73.318 → 19.643 ms | 410.691 → 69.180 ms | 3.212 ms |
+| Same plus socket controls | 70.300 → 9.713 ms | 380.888 → 27.267 ms | 2.325 ms |
+
+These are three alternating-order pairs against the previous runtime, using exact
+signed runners. Native Linux runs in the local ARM64 CI environment on the same
+Mac (six virtual CPUs); output goes to local storage rather than its evidence
+sharing mount. It is not native macOS epoll. Longer one-core controls changed
+between -2.27% and +0.61% over six combinations. Native console writes still pay
+for the existing bounded I/O pool; absolute syscall cost remains above native
+Linux. No whole-browser improvement is inferred from this fixture.
 
 ### Stage 63 entropy measurements
 
@@ -4187,5 +4210,13 @@ getrandom now executes through the original memory interface on the caller;
 random-device control errors preserve the accepted OFD and policy without owner
 service. Flags consume their Linux 32-bit argument. Device and UUID resource
 consumers are validated with the complete subsystem. See the
-[shared contract](https://github.com/kb5000/trames-runtime/blob/0c2adca6acb919750007eb97aa686e8a06f555a8/docs/architecture/coordination-boundaries.md#63-source-entropy-and-original-random-device-controls--2026-11-07)
+[shared contract](https://github.com/kb5000/trames-runtime/blob/4d6926ba47d574250557314ea9335cb5ac4d8f1a/docs/architecture/coordination-boundaries.md#63-source-entropy-and-original-random-device-controls--2026-11-07)
 and [validation record](../validation/worker-entropy-20261107.json).
+
+
+## 64. FD/network compatibility entry retired — 2026-11-07
+
+The current inventory and [runtime stage 64 audit](https://github.com/kb5000/trames-runtime/blob/4d6926ba47d574250557314ea9335cb5ac4d8f1a/docs/architecture/coordination-boundaries.md#64-retirement-of-the-fdnetwork-compatibility-rpc--2026-11-07)
+record the closed production entry, original-console and complete-epoll resources,
+source byte SIGPIPE, tests and remaining explicit boundaries. Validation is in
+[fd-compatibility-closure-20261107.json](../validation/fd-compatibility-closure-20261107.json).

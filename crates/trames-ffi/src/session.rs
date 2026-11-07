@@ -165,6 +165,8 @@ pub struct Session {
     pub wayland: Mutex<Option<trames_wayland::Server>>,
     pub bridge: trames_bridge::Broker,
     pub buffers: Mutex<Buffers>,
+    pub console_revision: [AtomicU64; 2],
+    pub console_readiness: Arc<trames_vfs::Readiness>,
     pub cancelled: AtomicBool,
     pub paused: AtomicBool,
     pub multiple_terminals: bool,
@@ -172,6 +174,14 @@ pub struct Session {
     commands: mpsc::SyncSender<Command>,
     transfers: Mutex<BTreeMap<u64, TransferTicket>>,
     next_transfer: AtomicU64,
+}
+impl trames_vfs::ReadinessDriver for Session {
+    fn notification_only(&self) -> bool {
+        true
+    }
+    fn attach(&self, _: Arc<trames_vfs::HostEvents>) -> io::Result<()> {
+        Ok(())
+    }
 }
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -246,6 +256,8 @@ impl Session {
         let permit = WorkerPermit;
         let (commands, receiver) = mpsc::sync_channel(8);
         let session = Arc::new(Self {
+            console_revision: Default::default(),
+            console_readiness: Arc::default(),
             display: trames_core::VulkanDisplay::default(),
             wayland: Mutex::new(None),
             bridge: trames_bridge::Broker::default(),
@@ -277,6 +289,10 @@ impl Session {
             transfers: Mutex::new(BTreeMap::new()),
             next_transfer: AtomicU64::new(1),
         });
+        let driver: Arc<dyn trames_vfs::ReadinessDriver> = session.clone();
+        session
+            .console_readiness
+            .set_driver(Arc::downgrade(&driver));
         let worker_session = session.clone();
         std::thread::Builder::new()
             .name("trames-local".into())
@@ -969,6 +985,72 @@ impl Write for CancelWriter<'_> {
     }
 }
 impl GuestOutput for Adapter {
+    fn source_console(&mut self) -> Arc<dyn trames_vfs::ConsoleIo> {
+        let input = self.session.clone();
+        let output = self.session.clone();
+        let poll = self.session.clone();
+        Arc::new(
+            trames_vfs::ConsoleCallbacks::new(
+                move |count| {
+                    if input.multiple_terminals {
+                        return Err(trames_vfs::Errno(11));
+                    }
+                    let mut buffers = input.buffers.lock().unwrap();
+                    let bytes = buffers.terminals.get_mut(&1).ok_or(trames_vfs::Errno(5))?;
+                    if count == 0 {
+                        return Ok(Vec::new());
+                    }
+                    if bytes.input.is_empty() {
+                        return Err(trames_vfs::Errno(11));
+                    }
+                    let count = count.min(bytes.input.len());
+                    let data = bytes.input.drain(..count).collect();
+                    input.console_revision[0].fetch_add(1, Ordering::Relaxed);
+                    Ok(data)
+                },
+                move |_, bytes| {
+                    let mut buffers = output.buffers.lock().unwrap();
+                    let Some(buffer) = buffers.terminals.get_mut(&1) else {
+                        return Ok(bytes.len());
+                    };
+                    let count = bytes.len().min(QUEUE_LIMIT - buffer.output.len());
+                    if count == 0 && !bytes.is_empty() {
+                        return Err(trames_vfs::Errno(11));
+                    }
+                    buffer.output.extend(&bytes[..count]);
+                    if count != 0 {
+                        output.console_revision[1].fetch_add(1, Ordering::Relaxed);
+                    }
+                    Ok(count)
+                },
+                move |stream, events| {
+                    let buffers = poll.buffers.lock().unwrap();
+                    let Some(buffer) = buffers.terminals.get(&1) else {
+                        return (16, [0; 2]);
+                    };
+                    let ready = if stream == trames_vfs::ConsoleStream::Input {
+                        if !poll.multiple_terminals && !buffer.input.is_empty() {
+                            1
+                        } else {
+                            0
+                        }
+                    } else if buffer.output.len() < QUEUE_LIMIT {
+                        4
+                    } else {
+                        0
+                    };
+                    (
+                        events & ready,
+                        [
+                            poll.console_revision[0].load(Ordering::Relaxed),
+                            poll.console_revision[1].load(Ordering::Relaxed),
+                        ],
+                    )
+                },
+            )
+            .readiness(self.session.console_readiness.clone()),
+        )
+    }
     fn poll_control(&mut self, vfs: &Vfs) -> io::Result<bool> {
         if self.session.cancelled.load(Ordering::Acquire)
             || self.session.paused.load(Ordering::Acquire)
