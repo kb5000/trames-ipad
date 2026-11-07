@@ -48,7 +48,7 @@ the owner; ordinary epoch-member migration, parking, wakeup and child/replacemen
 admission already use the live execution queue. Single-CPU/solo execution retains
 its coordinated caller path, which does not by itself imply an extra RPC.
 
-The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/2c9228d2e55d588f637125699e72e88ef88d6a42/docs/architecture/coordination-boundaries.md)
+The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/eb047dc35351f8d9a623afd9325a6974adae47bb/docs/architecture/coordination-boundaries.md)
 records scopes, actual admission gates and source locations. Earlier sections
 below are historical records and do not override this inventory.
 
@@ -4263,3 +4263,17 @@ SIGPIPE behavior is checked against native Linux. Solo execution borrows its
 original path context; ready calls avoid reconstructing a private VFS.
 See the [shared implementation audit](https://github.com/kb5000/trames-runtime/blob/2c9228d2e55d588f637125699e72e88ef88d6a42/docs/architecture/coordination-boundaries.md#65-unix-ancillary-lifetime-and-accepted-message-closure--2026-11-07)
 and [exact validation](../validation/unix-ancillary-closure-20261107.json).
+
+
+### Stable 1.5.4 release gate — 2026-11-07
+
+The release gate corrected two original-resource completion/observation defects:
+joined idle detection omitted accepted ELF disk jobs after a cohort returned,
+and a proc fdinfo read could reenter its own original offset transaction. Image
+jobs now reuse their existing owner unpark token. File-position mutations retain
+their original mutex/pending invariant and publish a relaxed committed scalar for
+nonblocking metadata observation. No new coordinator/service thread, ordinary
+syscall check or guest memory barrier is added. The original one/four-CPU systemd
+and eight-cycle Docker deployment checks are part of the release record, alongside
+actual artifact/source/signing provenance. The source-bound record is
+[release-1.5.4.json](../validation/release-1.5.4.json).
