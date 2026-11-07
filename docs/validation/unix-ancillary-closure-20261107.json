@@ -1,0 +1,1247 @@
+{
+  "schema": 1,
+  "date": "2026-11-07",
+  "stage": 65,
+  "recorded_at": "2026-11-07T13:20:54.292238+00:00",
+  "runtime_revision": "2c9228d2e55d588f637125699e72e88ef88d6a42",
+  "baseline_runtime_revision": "4d6926ba47d574250557314ea9335cb5ac4d8f1a",
+  "mac_revision": "adc3085ba3820a9be6210ae89d438872c1949073",
+  "ipad_parent_revision": "f90bf90c43956f4a085b3032e02a60b3fc6289c2",
+  "global_coordinator_removal_complete": false,
+  "closed_execution_category": "Unix ancillary owner lifetime, mixed-rights exclusion, reaping-triggered cohort join and separate accepted-message owner execution, including opaque io_uring lifetime dependency",
+  "implementation": [
+    "Full actual OpenHandles travel in mixed/opaque rights. Already-shared sets keep their compact Arc slice. Original Files capture/publication is synchronized; opaque metadata preparation and final callbacks/destruction are outside membership locks. Close/reuse cannot retarget accepted rights.",
+    "Deleted OwnerLedger/OwnerView, rights IDs, Owner/OwnerGraph variants, reaping APIs, local_rights_need_owner cohort gate, retained_message_owner and separate progress_owned/start_owned_local_message/batch owner execution. Existing graph cycle rejection and iterative retirement remain; no new coordinator/resource thread/global lock/guest memory barrier.",
+    "Accepted endpoint, rights, credentials, current batch item and resolved destination retain original resources across backpressure, STOP/CONT, close/reuse, faults and partial completion. Existing worker/solo prepared decoder and wait/subscription path are shared.",
+    "Solo/cold progress borrows the current original VFS resolver during the invocation; it is never retained in PendingIo or sent between threads. Avoids repeated private PathQueries construction, including on ordinary byte consumers.",
+    "io_uring opaque lifetime retains its original RetainedFd without owner tokens/collection. Does not broaden actual opaque control or SQE execution authority.",
+    "Native-Linux-verified signal correction: Unix stream EPIPE raises SIGPIPE unless suppressed; datagram and seqpacket EPIPE do not. Scalar/vector/message/batch and solo use the accepted endpoint kind. Positive partial stream batch raises once after the peer closes between actual deliveries."
+  ],
+  "source_files": {
+    "crates/trames-linux/src/direct.rs": "ae5ce599b9bbe0efe385b4383213e6c650455e5f17ea38a90f9b5845984a9d96",
+    "crates/trames-linux/src/direct/local_message.rs": "593d3581afc7090103e3afad9de254ed9351baecbab921174ec3b5855d9b883f",
+    "crates/trames-linux/src/direct/local_message/batch.rs": "adcc961933ce9553dfce6992a23795e21b7fa1da5238bae79ba571f1e7257663",
+    "crates/trames-linux/src/network/unix.rs": "b6f31ea8a79a3601a313bb7930600d71fbab8f9ec702bf9d647338a00f4bacf7",
+    "crates/trames-linux/src/network/unix/packet.rs": "a5c9a9e57e9eecf3933e0d2505a65aacf975f2325fb7996d5bb032865cf78675",
+    "crates/trames-linux/src/network_batch.rs": "b9ad97e18d1c825c9f390983c800ca0628922ccc193780a26867ff0d6abe86db",
+    "crates/trames-linux/src/uring.rs": "80e1ab9ffb78869e218b09c6582a9eaedc25ca16e86ac0348dc0d7e0bcdf438d",
+    "crates/trames-session/src/process.rs": "2792efb0a64549097915767d121fd733912e96753cf46afef479228e80685421",
+    "crates/trames-session/src/process_socket_wait.rs": "852121bcf9488daa196e8e50b6dc5a3a6f74cf513c3864cb1aab39145d812e78",
+    "crates/trames-session/src/process_vm.rs": "686838bed1e4f41818412b9c70979b19830a3978be69a291eab1751f686fe7ae",
+    "crates/trames-vfs/src/direct_io.rs": "f187090dc630abf1106f1f9df752d66c39fa2d37ef44c858810ab330b6ec49c3",
+    "crates/trames-vfs/src/fd_table.rs": "36766f055d7607990856c8bc2bcbf6635d4a0f0461c14f95fa5972e66690cc28",
+    "crates/trames-vfs/src/ipc.rs": "29ede3d6b6f2c089426a8c79ed1c82c05fb3e3361984495ae862463fb8e287ed",
+    "crates/trames-vfs/src/ipc/channel.rs": "1487fb341807e294699aa5716968f1f2bf125365dfc3f48295cd43a4851d0842",
+    "crates/trames-vfs/src/ipc/datagram.rs": "2b001bc241d4dda2d04aa2ae5a225836d5b24747296b223fd8262e311287e8cc",
+    "crates/trames-vfs/src/ipc/native.rs": "e8d66dbf24428a5f9369cf759e934cc8d50135f4b8beb1206cf6b74c9523558a",
+    "crates/trames-vfs/src/ipc/ownership.rs": "4cc5c6c9355e6a2768147eb5b0c4df0ea0766db5cf70a599607e6889bc565569",
+    "crates/trames-vfs/src/ipc/shared_graph_tests.rs": "c21ece947e5cc9ff7b13b447703cdad0a671d9c1485476f969f0a6a038297dd2",
+    "crates/trames-vfs/src/ipc/shared_rights.rs": "2996ecd5da04f7c35f36e7d1703171e9da0ffe3d2ae7f0db4dc0d767b4a591bc",
+    "crates/trames-vfs/src/lib.rs": "83f9278f5f0998457567536fd571bea0e7b1d12d1bff982b457ddf9a76d13339",
+    "crates/trames-vfs/src/task_transfer.rs": "858a2250334b880e5f3f6896688f94750fcc2be8fb1f4ebaf293af5ffbe7d733",
+    "crates/trames-vfs/src/uring.rs": "e8daca73b24a2ed4061c8c1f13e6ec17be65022239289646bf6181ded7a51d49",
+    "docs/architecture/coordination-boundaries.md": "224edfb2b46a3def8cb30ba59da464f1a67fccf5e04e496de77f4cead252f999"
+  },
+  "fixture": {
+    "source": "tests/fixtures/worker-unix-ancillary.c",
+    "source_sha256": "8016e4b8e3ecd00da88ecb1141801158f69d95829308c2b4d7e75f145b8e3a0e",
+    "linux_binary_sha256": "91f1623a8cde14bdab8a9e36c8fb30fb3d08c7d9839817707502c7cdd374f384",
+    "modes": [
+      "ordinary rights + eventfd close/reuse/import",
+      "partial addressed datagram batch EPIPE",
+      "same with MSG_NOSIGNAL",
+      "filesystem destination via proc-FD path",
+      "stream EPIPE + SIGPIPE",
+      "stream EPIPE + MSG_NOSIGNAL",
+      "seqpacket EPIPE without SIGPIPE",
+      "seqpacket MSG_NOSIGNAL"
+    ]
+  },
+  "acceptance": {
+    "runtime_macos": {
+      "path": "target/unix-ancillary-closure/runtime-macos-ci/summary.json",
+      "sha256": "350116136cc97ce7a0963897ba67a6215cab687a90e70a916df934d10a17bd2e",
+      "completed": true,
+      "steps": [
+        {
+          "exit_code": 0,
+          "name": "rustup show",
+          "reused": true,
+          "seconds": 0.02541804313659668,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "name": "python3 scripts/check-execution-boundaries.py",
+          "reused": true,
+          "seconds": 0.12894701957702637,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "name": "cargo fmt --all --check",
+          "seconds": 1.1825857162475586,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "name": "cargo clippy --workspace --all-targets --all-features --locked -- -D warnings",
+          "seconds": 6.101539134979248,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "name": "cargo test --workspace --all-features --locked",
+          "seconds": 28.346404790878296,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "name": "cargo build --workspace --all-features --release --locked",
+          "seconds": 6.816779851913452,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "name": "cargo run --release -p trames-memory --example reclaim-footprint --locked",
+          "seconds": 0.3629941940307617,
+          "status": "passed"
+        }
+      ],
+      "test_log": {
+        "path": "target/unix-ancillary-closure/runtime-macos-ci/step-05.log",
+        "sha256": "0cafe54c0def18bdde8eedddaae290eeb831857cb64206d585fb48cfe5a4d17f",
+        "results": [
+          {
+            "passed": 24,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 1,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 8,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 9,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 6,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 2,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 71,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 2,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 253,
+            "failed": 0,
+            "ignored": 1
+          },
+          {
+            "passed": 1,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 1,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 1,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 194,
+            "failed": 0,
+            "ignored": 1
+          },
+          {
+            "passed": 2,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 4,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 6,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 83,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 11,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 21,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 563,
+            "failed": 0,
+            "ignored": 1
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 1
+          },
+          {
+            "passed": 61,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 21,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 3
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 5
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          }
+        ]
+      }
+    },
+    "runtime_linux": {
+      "path": "target/local-ci/io/unix-ancillary-closure/runtime-linux-ci/summary.json",
+      "sha256": "ddf5b55082c1f4d46b9bec57610102a0b0ed156b440b7ba5c823389c630eb5f5",
+      "completed": true,
+      "steps": [
+        {
+          "exit_code": 0,
+          "name": "rustup show",
+          "reused": true,
+          "seconds": 0.015455245971679688,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "name": "python3 scripts/check-execution-boundaries.py",
+          "reused": true,
+          "seconds": 0.07532334327697754,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "name": "cargo fmt --all --check",
+          "seconds": 0.91269850730896,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "name": "cargo clippy --workspace --all-targets --all-features --locked -- -D warnings",
+          "seconds": 4.182146310806274,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "name": "cargo test --workspace --all-features --locked",
+          "seconds": 21.2457754611969,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "name": "cargo build --workspace --all-features --release --locked",
+          "seconds": 6.3243727684021,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "name": "cargo run --release -p trames-memory --example reclaim-footprint --locked",
+          "seconds": 0.16396546363830566,
+          "status": "passed"
+        }
+      ],
+      "test_log": {
+        "path": "target/local-ci/io/unix-ancillary-closure/runtime-linux-ci/step-05.log",
+        "sha256": "a9116989dd9676f2ffb873962b2e759565028e599cfe827b5d5bf52a9268135d",
+        "results": [
+          {
+            "passed": 24,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 1,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 8,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 9,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 6,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 2,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 71,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 2,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 253,
+            "failed": 0,
+            "ignored": 1
+          },
+          {
+            "passed": 1,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 194,
+            "failed": 0,
+            "ignored": 1
+          },
+          {
+            "passed": 2,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 4,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 6,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 83,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 11,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 21,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 562,
+            "failed": 0,
+            "ignored": 1
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 61,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 21,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 3
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 5
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          },
+          {
+            "passed": 0,
+            "failed": 0,
+            "ignored": 0
+          }
+        ]
+      }
+    },
+    "process_and_products_macos": {
+      "path": "target/unix-ancillary-closure/root-final.log",
+      "sha256": "4ed1e1aeaddc4cffab824c42227e97cae04fb3ad2f9c05bda8d1a445aee93950",
+      "results": [
+        {
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 383,
+          "failed": 0,
+          "ignored": 2
+        },
+        {
+          "passed": 0,
+          "failed": 0,
+          "ignored": 4
+        },
+        {
+          "passed": 7,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        }
+      ]
+    },
+    "process_linux": {
+      "path": "target/local-ci/io/unix-ancillary-closure/process-all.log",
+      "sha256": "5c3fb6de310c17d02f08c2a82e5f6e0bce4d8d608d704b51a7b8c9ebce02dbdc",
+      "results": [
+        {
+          "passed": 383,
+          "failed": 0,
+          "ignored": 2
+        }
+      ]
+    },
+    "linux_outer_test_threads": 1,
+    "mac_products": {
+      "path": "target/unix-ancillary-closure/mac-products.log",
+      "sha256": "ea2ed232e254ce3d1729a90c19cc7f31027fb40e02def107efa8aa58e4b8f22a",
+      "results": [
+        {
+          "passed": 20,
+          "failed": 0,
+          "ignored": 1
+        }
+      ]
+    },
+    "strict_product_clippy": {
+      "path": "target/unix-ancillary-closure/root-clippy.log",
+      "sha256": "aad782cd606f4ef211604e2f4bf9597668c1af83e36fd605d848356de99b5e4e"
+    },
+    "linux_strict_core_clippy": {
+      "path": "target/local-ci/io/unix-ancillary-closure/core-clippy.log",
+      "sha256": "48084a30d7128374e1b25de0b27dd6e0fd1ea95ee492cd679021de44172db467"
+    },
+    "ipad_compile": [
+      {
+        "target": "aarch64-apple-ios",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+        "code": 0
+      },
+      {
+        "target": "aarch64-apple-ios-sim",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk",
+        "code": 0
+      }
+    ],
+    "real_backends": {
+      "path": "target/unix-ancillary-closure/guest/results.json",
+      "sha256": "5f9f4a3fbdf377a3bdca28ed1c67e6f3bdb9404f5fc0194285ed47d805624e1e",
+      "passed": 96,
+      "cpus": [
+        1,
+        4,
+        12
+      ],
+      "policies": [
+        "raw",
+        "ALLOW"
+      ],
+      "hvf_cohort_return_syscalls": [],
+      "service_requests": 0,
+      "runner_sha256": {
+        "hvf": [
+          "7dbfbf103b3f7d0c9232f92a953edc0ba54f93df36a03eff5585a9b9fabfe040"
+        ],
+        "interpreter": [
+          "19ebeadbf4c8b6940d1d26174504e7dcaa3bc0c298119b64c37057de3d058c5b"
+        ]
+      }
+    },
+    "installed_dev": {
+      "path": "target/unix-ancillary-closure/installed-guest/results.json",
+      "sha256": "b4d20a8d4821a4fabbe71f744dc1e67d6533d3df3976012081378b13510f2967",
+      "passed": 32,
+      "cpus": [
+        4,
+        12
+      ],
+      "service_requests": 0,
+      "cohort_return_syscalls": []
+    },
+    "native_linux": {
+      "path": "target/local-ci/io/unix-ancillary-closure/native-results.json",
+      "sha256": "9219d6a06eea3e7d395271103b893763207ebc2738f9bd2a34900be09834646a",
+      "passed": 144
+    },
+    "paired_pin_checks": [
+      {
+        "path": "target/unix-ancillary-closure/root-boundaries.log",
+        "sha256": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651"
+      },
+      {
+        "path": "target/unix-ancillary-closure/mac-boundaries.log",
+        "sha256": "af28a218f17be8073395ede5dc70943adb5e97fb36cf444a13f4095bfcccf651"
+      }
+    ],
+    "hardware_reuse": "CPU/MMU/graphics implementations unchanged. Unrelated previous hardware/oracle results reused; current fixtures validate original resource composition on both executors. No physical iPad test/installation."
+  },
+  "performance": {
+    "paired": {
+      "path": "target/unix-ancillary-closure/benchmark/results.json",
+      "sha256": "ece9aa2bbf7b0ec691cdcaab2da6193073d1968c9a9c123fcafafa5f64c076f6"
+    },
+    "paired_runs": 216,
+    "repetitions": 3,
+    "iterations_per_thread": 200,
+    "exact_runner_env": {
+      "TRAMES_MAC_BUNDLED": "1"
+    },
+    "runner_sha256": {
+      "before": "a723d875109cfc63888d20fb3a7207eb6f8173ea33407c6a336bda9f4398e3de",
+      "after": "7dbfbf103b3f7d0c9232f92a953edc0ba54f93df36a03eff5585a9b9fabfe040"
+    },
+    "rows": [
+      {
+        "cpus": 1,
+        "policy": 0,
+        "mode": 0,
+        "before_ms": 6.406083,
+        "after_ms": 9.353792,
+        "change_percent": 46.01421804868904,
+        "native_linux_ms": 0.597785
+      },
+      {
+        "cpus": 1,
+        "policy": 0,
+        "mode": 2,
+        "before_ms": 5.031208,
+        "after_ms": 4.927584,
+        "change_percent": -2.059624646804503,
+        "native_linux_ms": 0.596743
+      },
+      {
+        "cpus": 1,
+        "policy": 0,
+        "mode": 3,
+        "before_ms": 7.047875,
+        "after_ms": 7.07225,
+        "change_percent": 0.3458489260947495,
+        "native_linux_ms": 0.6513
+      },
+      {
+        "cpus": 1,
+        "policy": 0,
+        "mode": 4,
+        "before_ms": 1.049833,
+        "after_ms": 1.100542,
+        "change_percent": 4.8301968027295805,
+        "native_linux_ms": 0.173955
+      },
+      {
+        "cpus": 1,
+        "policy": 0,
+        "mode": 5,
+        "before_ms": 0.482084,
+        "after_ms": 0.502625,
+        "change_percent": 4.260875698011124,
+        "native_linux_ms": 0.067758
+      },
+      {
+        "cpus": 1,
+        "policy": 0,
+        "mode": 7,
+        "before_ms": 0.47375,
+        "after_ms": 0.487958,
+        "change_percent": 2.9990501319261176,
+        "native_linux_ms": 0.068924
+      },
+      {
+        "cpus": 1,
+        "policy": 1,
+        "mode": 0,
+        "before_ms": 5.047458,
+        "after_ms": 4.873458,
+        "change_percent": -3.447279799059244,
+        "native_linux_ms": 0.615734
+      },
+      {
+        "cpus": 1,
+        "policy": 1,
+        "mode": 2,
+        "before_ms": 5.052125,
+        "after_ms": 5.148291,
+        "change_percent": 1.9034762599896116,
+        "native_linux_ms": 0.641637
+      },
+      {
+        "cpus": 1,
+        "policy": 1,
+        "mode": 3,
+        "before_ms": 7.140417,
+        "after_ms": 7.163,
+        "change_percent": 0.31627004417249527,
+        "native_linux_ms": 0.711311
+      },
+      {
+        "cpus": 1,
+        "policy": 1,
+        "mode": 4,
+        "before_ms": 1.04425,
+        "after_ms": 1.1025,
+        "change_percent": 5.578166147953079,
+        "native_linux_ms": 0.188781
+      },
+      {
+        "cpus": 1,
+        "policy": 1,
+        "mode": 5,
+        "before_ms": 0.465875,
+        "after_ms": 0.488333,
+        "change_percent": 4.820606385833104,
+        "native_linux_ms": 0.07617
+      },
+      {
+        "cpus": 1,
+        "policy": 1,
+        "mode": 7,
+        "before_ms": 0.46425,
+        "after_ms": 0.488292,
+        "change_percent": 5.178675282714051,
+        "native_linux_ms": 0.075504
+      },
+      {
+        "cpus": 4,
+        "policy": 0,
+        "mode": 0,
+        "before_ms": 8.8245,
+        "after_ms": 8.547417,
+        "change_percent": -3.1399286078531374,
+        "native_linux_ms": 1.114942
+      },
+      {
+        "cpus": 4,
+        "policy": 0,
+        "mode": 2,
+        "before_ms": 8.959667,
+        "after_ms": 8.822166,
+        "change_percent": -1.5346664111512198,
+        "native_linux_ms": 1.139846
+      },
+      {
+        "cpus": 4,
+        "policy": 0,
+        "mode": 3,
+        "before_ms": 17.764958,
+        "after_ms": 17.824959,
+        "change_percent": 0.33774918015567756,
+        "native_linux_ms": 1.319423
+      },
+      {
+        "cpus": 4,
+        "policy": 0,
+        "mode": 4,
+        "before_ms": 34.952959,
+        "after_ms": 2.171666,
+        "change_percent": -93.78688940183862,
+        "native_linux_ms": 0.485215
+      },
+      {
+        "cpus": 4,
+        "policy": 0,
+        "mode": 5,
+        "before_ms": 1.374791,
+        "after_ms": 1.37025,
+        "change_percent": -0.33030475177681096,
+        "native_linux_ms": 0.119732
+      },
+      {
+        "cpus": 4,
+        "policy": 0,
+        "mode": 7,
+        "before_ms": 1.40575,
+        "after_ms": 1.405125,
+        "change_percent": -0.044460252534239686,
+        "native_linux_ms": 0.1321
+      },
+      {
+        "cpus": 4,
+        "policy": 1,
+        "mode": 0,
+        "before_ms": 8.743125,
+        "after_ms": 8.424625,
+        "change_percent": -3.6428622489098617,
+        "native_linux_ms": 1.517075
+      },
+      {
+        "cpus": 4,
+        "policy": 1,
+        "mode": 2,
+        "before_ms": 8.742042,
+        "after_ms": 8.777167,
+        "change_percent": 0.40179399732922505,
+        "native_linux_ms": 1.198608
+      },
+      {
+        "cpus": 4,
+        "policy": 1,
+        "mode": 3,
+        "before_ms": 17.879208,
+        "after_ms": 17.880333,
+        "change_percent": 0.006292225024728815,
+        "native_linux_ms": 1.825795
+      },
+      {
+        "cpus": 4,
+        "policy": 1,
+        "mode": 4,
+        "before_ms": 35.3245,
+        "after_ms": 2.154416,
+        "change_percent": -93.90107149428867,
+        "native_linux_ms": 0.504289
+      },
+      {
+        "cpus": 4,
+        "policy": 1,
+        "mode": 5,
+        "before_ms": 1.126208,
+        "after_ms": 1.088458,
+        "change_percent": -3.3519562993692076,
+        "native_linux_ms": 0.119066
+      },
+      {
+        "cpus": 4,
+        "policy": 1,
+        "mode": 7,
+        "before_ms": 1.118,
+        "after_ms": 1.407459,
+        "change_percent": 25.890787119856885,
+        "native_linux_ms": 0.135682
+      },
+      {
+        "cpus": 12,
+        "policy": 0,
+        "mode": 0,
+        "before_ms": 32.060083,
+        "after_ms": 30.732875,
+        "change_percent": -4.139752227091864,
+        "native_linux_ms": 3.39147
+      },
+      {
+        "cpus": 12,
+        "policy": 0,
+        "mode": 2,
+        "before_ms": 31.52775,
+        "after_ms": 29.911459,
+        "change_percent": -5.126566278913025,
+        "native_linux_ms": 3.80443
+      },
+      {
+        "cpus": 12,
+        "policy": 0,
+        "mode": 3,
+        "before_ms": 67.443333,
+        "after_ms": 66.698083,
+        "change_percent": -1.1050017353086639,
+        "native_linux_ms": 3.607695
+      },
+      {
+        "cpus": 12,
+        "policy": 0,
+        "mode": 4,
+        "before_ms": 211.687,
+        "after_ms": 7.202375,
+        "change_percent": -96.59762999144964,
+        "native_linux_ms": 1.522863
+      },
+      {
+        "cpus": 12,
+        "policy": 0,
+        "mode": 5,
+        "before_ms": 4.842916,
+        "after_ms": 3.984167,
+        "change_percent": -17.7320647312487,
+        "native_linux_ms": 0.291021
+      },
+      {
+        "cpus": 12,
+        "policy": 0,
+        "mode": 7,
+        "before_ms": 3.951208,
+        "after_ms": 3.971666,
+        "change_percent": 0.5177657060827956,
+        "native_linux_ms": 0.258038
+      },
+      {
+        "cpus": 12,
+        "policy": 1,
+        "mode": 0,
+        "before_ms": 30.426625,
+        "after_ms": 30.777792,
+        "change_percent": 1.1541437803239685,
+        "native_linux_ms": 3.504955
+      },
+      {
+        "cpus": 12,
+        "policy": 1,
+        "mode": 2,
+        "before_ms": 31.857917,
+        "after_ms": 30.506625,
+        "change_percent": -4.241620693531223,
+        "native_linux_ms": 3.949066
+      },
+      {
+        "cpus": 12,
+        "policy": 1,
+        "mode": 3,
+        "before_ms": 66.56875,
+        "after_ms": 65.052959,
+        "change_percent": -2.277030889118392,
+        "native_linux_ms": 3.745501
+      },
+      {
+        "cpus": 12,
+        "policy": 1,
+        "mode": 4,
+        "before_ms": 221.19,
+        "after_ms": 6.408667,
+        "change_percent": -97.10264162032641,
+        "native_linux_ms": 1.497293
+      },
+      {
+        "cpus": 12,
+        "policy": 1,
+        "mode": 5,
+        "before_ms": 3.966292,
+        "after_ms": 3.76,
+        "change_percent": -5.201129921851444,
+        "native_linux_ms": 0.291521
+      },
+      {
+        "cpus": 12,
+        "policy": 1,
+        "mode": 7,
+        "before_ms": 4.451417,
+        "after_ms": 3.987125,
+        "change_percent": -10.430206830768718,
+        "native_linux_ms": 0.319257
+      }
+    ],
+    "long_single_core": {
+      "path": "target/unix-ancillary-closure/benchmark-long-single/results.json",
+      "sha256": "7c3405c685a3a68579f7b4c357a593617cf764de6c064f8a7c2c82e80b898571",
+      "runs": 72,
+      "iterations_per_thread": 20000,
+      "rows": [
+        {
+          "policy": 0,
+          "mode": 0,
+          "before_ms": 492.78475,
+          "after_ms": 493.776292,
+          "change_percent": 0.20121198961615683
+        },
+        {
+          "policy": 0,
+          "mode": 2,
+          "before_ms": 497.493958,
+          "after_ms": 505.4555,
+          "change_percent": 1.6003293853068312
+        },
+        {
+          "policy": 0,
+          "mode": 3,
+          "before_ms": 694.759959,
+          "after_ms": 688.743625,
+          "change_percent": -0.8659586555131327
+        },
+        {
+          "policy": 0,
+          "mode": 4,
+          "before_ms": 97.468917,
+          "after_ms": 101.078667,
+          "change_percent": 3.7034883643982663
+        },
+        {
+          "policy": 0,
+          "mode": 5,
+          "before_ms": 41.024375,
+          "after_ms": 43.222542,
+          "change_percent": 5.358197413123289
+        },
+        {
+          "policy": 0,
+          "mode": 7,
+          "before_ms": 40.966875,
+          "after_ms": 43.278375,
+          "change_percent": 5.642363494896796
+        },
+        {
+          "policy": 1,
+          "mode": 0,
+          "before_ms": 492.719875,
+          "after_ms": 496.358958,
+          "change_percent": 0.7385703692184054
+        },
+        {
+          "policy": 1,
+          "mode": 2,
+          "before_ms": 493.990375,
+          "after_ms": 504.23625,
+          "change_percent": 2.0741041766249024
+        },
+        {
+          "policy": 1,
+          "mode": 3,
+          "before_ms": 692.806917,
+          "after_ms": 704.273167,
+          "change_percent": 1.6550426559901021
+        },
+        {
+          "policy": 1,
+          "mode": 4,
+          "before_ms": 97.900875,
+          "after_ms": 101.024458,
+          "change_percent": 3.190556774901143
+        },
+        {
+          "policy": 1,
+          "mode": 5,
+          "before_ms": 40.899458,
+          "after_ms": 42.9735,
+          "change_percent": 5.071074535999953
+        },
+        {
+          "policy": 1,
+          "mode": 7,
+          "before_ms": 41.065667,
+          "after_ms": 43.3645,
+          "change_percent": 5.597943898001212
+        }
+      ]
+    },
+    "native_reference": {
+      "path": "target/local-ci/io/unix-ancillary-closure/native-results.json",
+      "sha256": "9219d6a06eea3e7d395271103b893763207ebc2738f9bd2a34900be09834646a",
+      "context": "ARM64 Linux local CI, 6 virtual CPUs, same Apple Silicon host; no Trames userspace kernel",
+      "stdout": "native local /tmp file; copied to shared evidence directory only after completion"
+    },
+    "claim_limit": "Fixed synthetic Unix workloads, not browser or Geekbench results. Source paths retain substantial syscall/resource overhead over native Linux. Cheap single-core error controls still regress by 3.19% to 5.64%. Short raw normal-rights sample +46% is retained; the 100x longer paired control is +0.20%. No universal zero-overhead claim.",
+    "excluded_baseline_modes": {
+      "path": "target/unix-ancillary-closure/baseline-oracle/results.json",
+      "sha256": "88fda4629e85e3c518dff03d03ce944ae8e90e711512dbcde8ab9248f119cd84",
+      "modes": [
+        1,
+        6
+      ],
+      "reason": "Previous binary raises extra SIGPIPE and fails corrected Linux oracle; neither mode is a valid paired speed comparison."
+    }
+  },
+  "initial_failures_and_corrections": [
+    "Initial fixture/tests assumed Unix datagram EPIPE raises SIGPIPE, matching the prior implementation. Native Linux rejected that assumption. Corrected fixture + source scalar/vector/message/batch/solo semantics passed both native Linux and real backends. Initial wrong-oracle 48-case logs are historical only and excluded from acceptance.",
+    "A draft opaque io_uring test attempted to retain epoll/ring as SQE files, which the existing API excludes. Kept the original exclusion; corrected lifetime test uses an opaque eventfd, while the opaque ring is still used to test actual SCM graph-cycle rejection.",
+    "Compile/style errors in the broad removal were fixed before acceptance (removed APIs, iterator lifetime, redundant closure, unnecessary unwrap/mut, let-and-return and bool assertion).",
+    "Initial Linux sync omitted newly modified network_batch.rs; regenerated source sync list and reran the affected process/runtime checks. Final source hash receipts include every changed Rust file.",
+    "First shared solo implementation built a private PathQueries VFS on every call, causing a large single-core regression. Replaced it with borrowed original resolver and removed unused byte-I/O pathname projections. Final backend matrix, CI and paired long controls use the optimized implementation.",
+    "Under parallel outer Linux tests, unchanged seccomp tests expecting completion within one shared-budget epoch failed intermittently (trap marker, strict-read metric, parent-death metadata). Isolated failing tests passed. Unchanged full process assertions pass with --test-threads=1; production scheduling and assertions were not modified. The parallel scheduling issue is not claimed fixed.",
+    "Root pin audit initially rejected intentionally uncommitted runtime; rerun passed after committing the runtime and pairing pins. Documentation/pinning did not trigger unrelated CPU/network/graphics replays."
+  ],
+  "primary_linux_reference": "https://github.com/torvalds/linux/blob/v6.17/net/unix/af_unix.c",
+  "dev": {
+    "installed": true,
+    "channel": "dev",
+    "app": "/Users/main/Applications/Trames Dev.app",
+    "cli": "/Users/main/.local/bin/trames-dev",
+    "version": "Trames Dev 1.5.3 (dev) runtime 2c9228d2e55d588f637125699e72e88ef88d6a42",
+    "runner_sha256": "f2b9279d30da3cbae370ada1d0396379bc849f74249a5bbbe131d7b01c1cb3ba",
+    "stable_runner_sha256": "4f40615213e731b2a4ef9d8c6a0e85c5c7bdf31ab0c60b0354b55113f2a6a55d",
+    "stable_business_environments_modified": false,
+    "physical_ipad_modified": false,
+    "build_log": {
+      "path": "target/unix-ancillary-closure/dev-build.log",
+      "sha256": "227ceceaa7dbfef0d28a6c6f74c0d20feb21d77df8ccd53768f39e5dadecf160"
+    },
+    "install_log": {
+      "path": "target/unix-ancillary-closure/dev-install.log",
+      "sha256": "d81b37faaef60b5a1b635ce5a81a399a304e89d9aee6498d2d7eecf5f3f5bd41"
+    }
+  },
+  "remaining_boundaries": [
+    "Actual excluded opaque body/control and io_uring SQE execution; mixed waits or absent source pumps/subscriptions",
+    "Explicit tracing and absent source descriptor/path capabilities; unsupported dynamic providers",
+    "Affected mm/backing topology and exceptional native-memory/HLT/fault publication",
+    "Initial/nonmember/cold/solo orchestration and host lifecycle/admin/session/terminal controls; final joined catch-all remains",
+    "Known parallel outer process-test shared-budget scheduling assumptions remain; serial outer acceptance does not change actual internal multi-worker tests"
+  ]
+}

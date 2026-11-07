@@ -2,28 +2,29 @@
 
 ## Current status — 2026-11-07
 
-Stage 64 removes the entire production FD/network compatibility RPC entry,
-including its request/reply transport, caller-View loan, owner handler, admission
-classifier and in-flight bookkeeping. Console bytes use original shared OFDs and
-actual host/UI resources; complete epoll creation, FD observations and byte
-SIGPIPE finish through source resources. Blocking native console bytes reuse the
-existing bounded I/O pool. Former service errors and waits do not become a
-whole-cohort fallback.
+Stage 65 closes the Unix ancillary lifetime and accepted-message subsystem.
+Messages retain actual original file descriptions, including mixed opaque
+SCM_RIGHTS sets. The owner ledger, periodic reaping join, separate accepted-message
+owner executor and duplicate owner lease are deleted. Opaque io_uring FD lifetime
+also uses the original object directly; actual excluded SQE bodies remain explicit.
+The `Unix ancillary owner controls` category has been removed from the shared
+runtime inventory. Stage 64's FD/network compatibility RPC remains deleted.
 
-Both local runtime workflows, process regressions, both iPad compile targets and
-36 real HVF/interpreter cases at 1/4/12 CPUs pass. The real matrix has zero service
-requests and no cohort-return syscall. See [stage 64 validation](../validation/fd-compatibility-closure-20261107.json)
-for source hashes, native references and paired measurements. Mac Dev and its CLI
-are updated; stable/business and physical iPad installations remain unchanged.
+Both runtime workflows, process regressions, iPad compile targets and real
+HVF/interpreter runs validate the shared implementation. See
+[stage 65 validation](../validation/unix-ancillary-closure-20261107.json)
+for exact final results, native Linux references and paired measurements.
+Mac Dev and its CLI are updated; stable/business and physical iPad installations
+remain unchanged.
 
 **The coordinator still exists.** Actual shared-mm quiescence, asynchronous
-resource completion and a whole-cohort return have different costs. The residual
-FD/network compatibility category below has been deleted, rather than renamed.
-Other actual resource/tracing/host boundaries remain explicit.
+resource completion and whole-cohort returns have different costs. Actual opaque
+control bodies, tracing, host lifecycle and the final dispatch catch-all remain
+explicit; outstanding rights alone no longer force a join.
 
 | Area | Current execution | Remaining boundary |
 | --- | --- | --- |
-| Admitted file/path/FD, Unix/TCP I/O and cross-resource transfer | Calling worker and original shared objects | Excluded paths/descriptors/controls retain explicit escalation; supported layout changes now use original backing admission |
+| Admitted file/path/FD, Unix/TCP I/O, SCM_RIGHTS and cross-resource transfer | Calling worker and original shared objects | Excluded paths/descriptors/controls retain explicit escalation; supported layout changes now use original backing admission |
 | Futexes, clocks/timers, admitted event/child/signal waits and caught signals | Source execution; blocking returns the CPU slot | Legacy nonmember wake/adoption, unsupported wait resources and capability-less embeddings remain |
 | Scheduling attributes and CPU affinity | Original task atomics, original PID/group/UID authority and task-scoped completion on the caller | Tracing and capability-less embeddings retain their boundary; unsupported features keep their errno. Required original CPU slots start directly from the live queue |
 | Exit/group/default-fatal termination, STOP/CONT and vfork release | Source resources and original group/family notifications | Returned CPU/statistics and cold cleanup complete on existing workers; the actual shared mm may still need its byte checkpoint. Outside-cohort/solo and tracing/capability-less embeddings remain separate |
@@ -47,9 +48,40 @@ the owner; ordinary epoch-member migration, parking, wakeup and child/replacemen
 admission already use the live execution queue. Single-CPU/solo execution retains
 its coordinated caller path, which does not by itself imply an extra RPC.
 
-The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/4d6926ba47d574250557314ea9335cb5ac4d8f1a/docs/architecture/coordination-boundaries.md)
+The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/2c9228d2e55d588f637125699e72e88ef88d6a42/docs/architecture/coordination-boundaries.md)
 records scopes, actual admission gates and source locations. Earlier sections
 below are historical records and do not override this inventory.
+
+### Stage 65 closed category and measured cost
+
+The Unix ancillary owner-control category is deleted, including its mixed-set
+lifetime, reaping-triggered join and accepted-message owner handoff. The existing
+cycle graph remains object synchronization, rather than an execution service.
+
+| Raw-policy workload, 200 iterations/thread | 4 CPUs before → after | 12 CPUs before → after | Native ARM64 Linux, 12 threads |
+| --- | ---: | ---: | ---: |
+| Ordinary SCM_RIGHTS, FD close/reuse and import | 8.825 → 8.547 ms | 32.060 → 30.733 ms | 3.391 ms |
+| Filesystem destination through proc-FD path | 17.765 → 17.825 ms | 67.443 → 66.698 ms | 3.608 ms |
+| Stream batch EPIPE with SIGPIPE | 34.953 → 2.172 ms | 211.687 → 7.202 ms | 1.523 ms |
+
+Three alternating pairs use exact signed runners and the same native-validated
+binary. The initial per-call private pathname projection caused a substantial
+single-CPU regression and was removed before integration. At 20,000 rounds,
+ordinary SCM_RIGHTS changes by +0.20%/+0.74% (raw/ALLOW); partial batches with
+MSG_NOSIGNAL change by +1.60%/+2.07%, and pathname controls by -0.87%/+1.66%.
+Very cheap stream/seqpacket error controls still cost +3.19% to +5.64%; this is not
+a zero-overhead claim. The short raw ordinary-rights +46% sample is not hidden;
+the longer paired control above distinguishes it from the corrected projection
+regression. Native Linux runs on this Mac in the six-vCPU local CI environment,
+with local stdout. No Firefox/Geekbench speedup is inferred.
+
+Both complete runtime workflows pass (Mac VFS 563, Linux VFS 562; Linux ABI 253),
+with 383 process tests per host, both iPad compile targets, 96 real backend cases
+and 144 native Linux cases. Linux process acceptance uses a serial outer test
+runner after unrelated seccomp tests exhibited one-epoch scheduling assumptions
+under heavy parallel test load; their assertions and production scheduling are
+unchanged. The old binary fails the corrected datagram/seqpacket signal oracle,
+so those modes are compatibility fixes rather than paired timing comparisons.
 
 ### Stage 64 closed entry and performance
 
@@ -4220,3 +4252,14 @@ The current inventory and [runtime stage 64 audit](https://github.com/kb5000/tra
 record the closed production entry, original-console and complete-epoll resources,
 source byte SIGPIPE, tests and remaining explicit boundaries. Validation is in
 [fd-compatibility-closure-20261107.json](../validation/fd-compatibility-closure-20261107.json).
+
+
+## 65. Unix ancillary lifetime and accepted-message closure — 2026-11-07
+
+The complete rights lifetime, opaque io_uring retention and accepted-message retry
+batch is integrated together. Full original OFDs survive close/reuse, import and
+source-thread final release without an owner ledger. Stream/datagram/seqpacket
+SIGPIPE behavior is checked against native Linux. Solo execution borrows its
+original path context; ready calls avoid reconstructing a private VFS.
+See the [shared implementation audit](https://github.com/kb5000/trames-runtime/blob/2c9228d2e55d588f637125699e72e88ef88d6a42/docs/architecture/coordination-boundaries.md#65-unix-ancillary-lifetime-and-accepted-message-closure--2026-11-07)
+and [exact validation](../validation/unix-ancillary-closure-20261107.json).
