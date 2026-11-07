@@ -1,0 +1,546 @@
+{
+  "schema": 1,
+  "version": "1.5.4",
+  "ipad_build": "49",
+  "date": "2026-11-07",
+  "recorded_at": "2026-11-07T14:36:06.570200+00:00",
+  "runtime_revision": "eb047dc35351f8d9a623afd9325a6974adae47bb",
+  "ipad_application_revision": "aa76e17a7b6a2fe109a340250013ade1f02f775b",
+  "mac_application_revision": "c67838f18b51a687323bd9e0b93afde18eadf666",
+  "application_tag": "v1.5.4",
+  "global_coordinator_removal_complete": false,
+  "release_scope": "Mac stable + separate Dev distribution and iPad stable device release, paired to the same shared userspace Linux runtime",
+  "release_fixes": [
+    "Accepted exec ELF jobs remain externally live after a worker cohort returns. Existing disk completion unparks the original driver; no new coordinator, worker-service or ordinary syscall/instruction check.",
+    "Proc fdinfo can observe its own original OFD without recursively locking its active offset transaction. Mutations and pending-read counts retain the original object mutex; a committed relaxed-atomic scalar supplies metadata observations without stronger guest memory order.",
+    "Mac managed start/restart requires a connectable console listener, rather than a stale socket pathname. Existing startup lock/deadline are retained; no guest hot path is involved.",
+    "A test-only Memory cache assertion now permits legitimate invalidation when unrelated tests advance the global backing revision. Original physical alias, code epoch and byte visibility assertions remain unconditional; production Memory code is unchanged."
+  ],
+  "source_fix_sha256": {
+    "crates/trames-memory/src/parallel/registry.rs": "fc2f5a434467de1e5163fa3b8533375dacb27759af91db8919b7dac1be7a3094",
+    "crates/trames-session/src/process.rs": "a09ee59fbddb0fc7cf19243dc5f4fa831bda666ca692a96d40d1d59af2f3c6bd",
+    "crates/trames-vfs/src/directory.rs": "580306142c0576188aa838ffc730d4ce074fd934f43f1db22af639e2791fae92",
+    "crates/trames-vfs/src/disk_io.rs": "f4cfc6dec1d36f254b5ca76ae0fa3a45c7bd0fd860485ea81f7facfcfdb13392",
+    "crates/trames-vfs/src/file_data.rs": "42eb8189e1a63aee28cad116c15b3c92a8660fee3c77a631144cb45d73b1c85e",
+    "crates/trames-vfs/src/file_io.rs": "a72efe9fcd5c131d6840071b7657305d80e84f2d22557aa1cc0f68286f3255c7",
+    "crates/trames-vfs/src/lib.rs": "5dcf92293a8d22ed54204d468daf33e4fa52d3ca81547d0891d555205914c30e",
+    "crates/trames-vfs/src/proc_source.rs": "6025da55c3968628950e5df081be6501d48009d6e94e79bfce4c4220811abc89",
+    "docs/architecture/coordination-boundaries.md": "63d8759088a39f343a36747792caa3bfd78e59059ac7256122196714d29dca79"
+  },
+  "acceptance": {
+    "runtime_macos": {
+      "path": "target/release-1.5.4/runtime-mac-ci/summary.json",
+      "sha256": "72a39cbbe7ef2dc1968cca72626fb604728d48e14b6e11dff24a0d15e2b8b7e6",
+      "completed": true,
+      "steps": [
+        {
+          "exit_code": 0,
+          "name": "rustup show",
+          "reused": true,
+          "seconds": 0.043554067611694336,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "name": "python3 scripts/check-execution-boundaries.py",
+          "reused": true,
+          "seconds": 0.13592314720153809,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "name": "cargo fmt --all --check",
+          "seconds": 1.1477980613708496,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "name": "cargo clippy --workspace --all-targets --all-features --locked -- -D warnings",
+          "seconds": 6.814656019210815,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "name": "cargo test --workspace --all-features --locked",
+          "seconds": 25.455878019332886,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "name": "cargo build --workspace --all-features --release --locked",
+          "seconds": 11.430444717407227,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "name": "cargo run --release -p trames-memory --example reclaim-footprint --locked",
+          "seconds": 3.492233991622925,
+          "status": "passed"
+        }
+      ]
+    },
+    "runtime_arm64_linux": {
+      "path": "target/local-ci/io/release-1.5.4/runtime-linux-ci/summary.json",
+      "sha256": "a3d2b33a151390c22c46dcf2911ad2b203f0525e98f5d6001451f85295a1d328",
+      "completed": true,
+      "steps": [
+        {
+          "exit_code": 0,
+          "name": "rustup show",
+          "reused": true,
+          "seconds": 0.015712499618530273,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "name": "python3 scripts/check-execution-boundaries.py",
+          "reused": true,
+          "seconds": 0.07689046859741211,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "name": "cargo fmt --all --check",
+          "seconds": 1.1949403285980225,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "name": "cargo clippy --workspace --all-targets --all-features --locked -- -D warnings",
+          "seconds": 6.276146173477173,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "name": "cargo test --workspace --all-features --locked",
+          "seconds": 31.484842538833618,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "name": "cargo build --workspace --all-features --release --locked",
+          "seconds": 7.326038360595703,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "name": "cargo run --release -p trames-memory --example reclaim-footprint --locked",
+          "seconds": 2.665914535522461,
+          "status": "passed"
+        }
+      ]
+    },
+    "mac_entire_workflow": {
+      "path": "target/release-1.5.4/mac-ci/summary.json",
+      "sha256": "6515c7ee1330145a84fbba035d2085105245ddffce1ffeed241169cf082b7fb3",
+      "completed": true,
+      "steps": [
+        {
+          "exit_code": 0,
+          "name": "rustup show",
+          "reused": true,
+          "seconds": 0.025699138641357422,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "name": "python3 scripts/check-execution-boundaries.py",
+          "reused": true,
+          "seconds": 0.10675215721130371,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "name": "cargo fmt --all --check",
+          "reused": true,
+          "seconds": 1.1102321147918701,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "name": "cargo clippy --workspace --all-targets --all-features --locked -- -D warnings",
+          "reused": true,
+          "seconds": 4.031990051269531,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "name": "cargo test --workspace --all-features --locked",
+          "reused": true,
+          "seconds": 14.607671976089478,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "name": "bash -n scripts/build-mac.sh scripts/install-mac.sh",
+          "reused": true,
+          "seconds": 0.03591012954711914,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "name": "python3 -m py_compile scripts/package-mac.py scripts/benchmark-firefox-video.py scripts/run-firefox-gpu.py tests/integration/mac-environments.py tests/integration/mac-packages.py tests/integration/mac-systemd.py tests/integration/mac-cli.py tests/integration/mac-channels.py tests/integration/mac-background.py tests/integration/mac-exec.py",
+          "reused": true,
+          "seconds": 0.19032597541809082,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "name": "bash tests/native/task-stream.sh",
+          "reused": true,
+          "seconds": 3.0909128189086914,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "name": "bash scripts/build-mac.sh",
+          "seconds": 22.8285551071167,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "name": "TRAMES_BUILD_CHANNEL=stable bash scripts/build-mac.sh",
+          "seconds": 14.052145957946777,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "name": "python3 scripts/package-mac.py --app 'target/release/Trames Dev.app' --unnotarized",
+          "seconds": 0.8240571022033691,
+          "status": "passed"
+        },
+        {
+          "exit_code": 0,
+          "name": "python3 scripts/package-mac.py --app target/release/Trames.app --unnotarized",
+          "seconds": 0.7579710483551025,
+          "status": "passed"
+        }
+      ]
+    },
+    "process_macos": {
+      "path": "target/release-1.5.4/process-final.log",
+      "sha256": "2ac3002391d1b9457abbe4eaaac142adee95e524ea32016d2ed64326b32231f0",
+      "results": [
+        {
+          "passed": 384,
+          "failed": 0,
+          "ignored": 2
+        }
+      ]
+    },
+    "process_arm64_linux": {
+      "path": "target/local-ci/io/release-1.5.4/process-all.log",
+      "sha256": "3ffee014f7157081b0d30136d3659631d85afbdb22d86c3d0475689af6695498",
+      "results": [
+        {
+          "passed": 384,
+          "failed": 0,
+          "ignored": 2
+        }
+      ]
+    },
+    "linux_outer_test_runner_threads": 1,
+    "source_proc_regression": {
+      "path": "target/release-1.5.4/proc-position-test.log",
+      "sha256": "8962b86d4f194a0592694db982791988d4f817326c59d0ca0bbb25115b142e6b",
+      "results": [
+        {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        }
+      ]
+    },
+    "exec_idle_regression": {
+      "path": "target/release-1.5.4/exec-idle-test.log",
+      "sha256": "2b23637fed862d8a0fd353e40ab599ba9822c1113dda94e53b5bfaab9d925ec9",
+      "results": [
+        {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        }
+      ]
+    },
+    "systemd": {
+      "path": "target/release-1.5.4/mac-systemd-passed/result.json",
+      "sha256": "e84efba79f8606a1e6e3526178c319a83ab535af78baa0a23d6ca4a23ada703e",
+      "cpus": [
+        1,
+        4
+      ],
+      "graceful_stop_and_restart": true,
+      "services_dbus_journal_notify_backup_restore": true
+    },
+    "unix_cli_and_parallel_exec": {
+      "path": "target/release-1.5.4/mac-exec-final/results.json",
+      "sha256": "cfe8ee022b4d0e6843fb42bd34a4a09c2cd658b926c6554f718d0a3b58efcd74",
+      "checks": [
+        "help_without_runtime",
+        "no_implicit_creation",
+        "scoped_config_and_defaults",
+        "idempotent_background_start",
+        "literal_argv_env_cwd",
+        "stdout_stderr_exit",
+        "binary_full_duplex_8MiB",
+        "pty_opt_in",
+        "concurrent_exec",
+        "signal_group_isolation",
+        "independent_shells_and_listing",
+        "persistent_restart",
+        "login_enable_disable"
+      ]
+    },
+    "final_installed_stable_docker": {
+      "path": "target/release-1.5.4/installed-server-acceptance.json",
+      "sha256": "7148ab0ed0e68369b571fcce8b1f1249fa9b0789aa7db3ecf2baa572c35140aa",
+      "cpus": 12,
+      "rounds": 8,
+      "checks": [
+        "start",
+        "health",
+        "three exec calls per round",
+        "inspect",
+        "stop",
+        "remove"
+      ],
+      "binary_sha256": "8fc21435034e8c041632e2e50419da9d2123bf790aedb0a1499286fc8367e614"
+    },
+    "go_gc": {
+      "path": "target/release-1.5.4/go-gc.log",
+      "sha256": "e8dd5e3fae6fa8b3df1090acd43b111cb7b1c7e49b8c57ade35be6d498d7b52e",
+      "cpus": 12,
+      "completed_starts": 30
+    },
+    "final_installed_smoke": {
+      "path": "target/release-1.5.4/installed-guest/results.json",
+      "sha256": "948c8a043cdab4b61986887f19cba5611cb0770ebd15dbe9cdba622a597cf0fb",
+      "passed": 32,
+      "cpus": [
+        4,
+        12
+      ],
+      "service_requests": 0,
+      "cohort_return_syscalls": []
+    },
+    "device_release": {
+      "path": "target/release-1.5.4/ipad-release-xcode.log",
+      "sha256": "ade80322e41e3adb30c1ed4ee2cca5cd1bd4b30d6bd3887e744a6cc96398a40f",
+      "linked_and_signed": true,
+      "app_and_fileprovider_verified_after_zip_extraction": true
+    },
+    "simulator_compile": {
+      "path": "target/release-1.5.4/ipad-simulator-check.log",
+      "sha256": "ff0b5d97e726df10984464e8127760788b975daa091a1fbe627f5c7ae5a0cf8c"
+    },
+    "frontend_model_and_ssh_tests": {
+      "path": "target/release-1.5.4/swift-package-final.log",
+      "sha256": "46ae71d51f122a5f6646a95b708ed95a3fb9c7080e3f3a5fa26d789c26b865a6"
+    },
+    "validation_reuse": "Shared stage-65 native/HVF/interpreter matrices and unchanged CPU/MMU/GPU/guest payload acceptance are retained. Final runtime workflows cover the changed original-resource code. Frontend model/SSH tests reuse unchanged frontend algorithms; changed device Rust is rebuilt. No new physical iPad acceptance."
+  },
+  "performance": {
+    "offset_metadata_pairs": {
+      "path": "target/release-1.5.4/position-benchmark/results.json",
+      "sha256": "4f77be8db6cd80e93f959601d0a6999d54a65501f847082e57abecd8cfdd2b62"
+    },
+    "initial_mixed_load_single_cpu_change_percent": 12.626871171118381,
+    "quiet_long_single_cpu": {
+      "path": "target/release-1.5.4/position-single-quiet/results.json",
+      "sha256": "fff5ee084d7cefd5e7a24feeca3bc0cb0d11dd3b1f97e337cfbe7bc4e23944fa",
+      "iterations_per_thread": 40000,
+      "before_ms": 392.489542,
+      "after_ms": 391.3475,
+      "change_percent": -0.29097386752789944
+    },
+    "native_arm64_linux": {
+      "path": "target/local-ci/io/release-1.5.4/native-offset-results.json",
+      "sha256": "44dd64f036b75fdbbd0b9a6bbca44e06ed328654a8112154e5a512d6086484c3",
+      "context": "Identical static Linux ABI binary natively in six-vCPU ARM64 local CI on the same Apple Silicon Mac, without Trames userspace kernel; not bare-metal macOS epoll.",
+      "rows": [
+        {
+          "cpus": 1,
+          "iterations_per_thread": 40000,
+          "median_ms": 40.298174
+        },
+        {
+          "cpus": 12,
+          "iterations_per_thread": 20000,
+          "median_ms": 93.49906
+        }
+      ]
+    },
+    "limit": "Fixed synthetic offset/metadata fixture, not a Firefox or whole-application score. The initial concurrent-build sample is retained; the quiet 2x-longer control distinguishes load variation. No universal zero-overhead claim."
+  },
+  "artifacts": {
+    "mac": [
+      {
+        "name": "release-report.json",
+        "sha256": "9dc520b6d11e6d08401b0030147f733791cb77dec6f1aa88d51640bb23a8a0a0",
+        "bytes": 3503,
+        "github_asset_digest_verified": true
+      },
+      {
+        "name": "Trames-1.5.4-mac-arm64-unnotarized.zip",
+        "sha256": "6def28d553b1c7bb39244aee6be0c4213a829f89286b92a4307e0405ad6389c9",
+        "bytes": 38586756,
+        "github_asset_digest_verified": true
+      },
+      {
+        "name": "Trames-1.5.4-mac-arm64-unnotarized.zip.sha256",
+        "sha256": "63153874e52c6f3570f69b004f046a98e6974b5fa65c14f3f77b0245ae6ebf44",
+        "bytes": 105,
+        "github_asset_digest_verified": true
+      },
+      {
+        "name": "Trames-Dev-1.5.4-mac-arm64-unnotarized.zip",
+        "sha256": "c36cd55b653497cf3bc34d044740abb1a740407a5c313226ad15ff2ed8590833",
+        "bytes": 38587613,
+        "github_asset_digest_verified": true
+      },
+      {
+        "name": "Trames-Dev-1.5.4-mac-arm64-unnotarized.zip.sha256",
+        "sha256": "fe63a619666c8d37a9554ba7cdbf22a04e9af2399b7e3a813a1a0fe383b72d52",
+        "bytes": 109,
+        "github_asset_digest_verified": true
+      }
+    ],
+    "ipad": [
+      {
+        "name": "release-report.json",
+        "sha256": "9dc520b6d11e6d08401b0030147f733791cb77dec6f1aa88d51640bb23a8a0a0",
+        "bytes": 3503,
+        "github_asset_digest_verified": true
+      },
+      {
+        "name": "Trames-1.5.4-build49-personal-team.ipa",
+        "sha256": "112dedf057765b91ade1531e476a585fb824d972d4fa88127c032e5e43888be5",
+        "bytes": 16709442,
+        "github_asset_digest_verified": true
+      },
+      {
+        "name": "Trames-1.5.4-build49-personal-team.ipa.sha256",
+        "sha256": "46b54d849a940da2e6db61c5feb5022e811c583795dbd5209fa05339abde349e",
+        "bytes": 105,
+        "github_asset_digest_verified": true
+      },
+      {
+        "name": "Trames-1.5.4-build49-unsigned.ipa",
+        "sha256": "d501a60ab67ea6a7294cc0b628e747fe9d072e10ad07c2ff9999970e898a052b",
+        "bytes": 16586126,
+        "github_asset_digest_verified": true
+      },
+      {
+        "name": "Trames-1.5.4-build49-unsigned.ipa.sha256",
+        "sha256": "d87870dd63a26ddf64a21b636caa9580998ef38460f06d1ec07b10896330770b",
+        "bytes": 100,
+        "github_asset_digest_verified": true
+      },
+      {
+        "name": "Trames-1.5.4-corresponding-source.tar.gz",
+        "sha256": "137e27d7a85a9983b2b79493a9c07ab6d0d3e345ca0d4e80067537ff06b91a59",
+        "bytes": 81415484,
+        "github_asset_digest_verified": true
+      },
+      {
+        "name": "Trames-1.5.4-corresponding-source.tar.gz.sha256",
+        "sha256": "c674f1990a989cf96b0f9bd31ed98029d251d212f283a3acde8f6960266ddcfe",
+        "bytes": 107,
+        "github_asset_digest_verified": true
+      }
+    ]
+  },
+  "package_verification": {
+    "path": "target/release-1.5.4/release-report.json",
+    "sha256": "9dc520b6d11e6d08401b0030147f733791cb77dec6f1aa88d51640bb23a8a0a0",
+    "all_inventory_sha256": true,
+    "exact_new_mac_logo": true,
+    "mac_package_executables_match_installed": true,
+    "signed_ipad_verified_after_extraction": true
+  },
+  "ipad": {
+    "version": "1.5.4",
+    "build": "49",
+    "runtime": "eb047dc35351f8d9a623afd9325a6974adae47bb",
+    "app_source": "aa76e17a7b6a2fe109a340250013ade1f02f775b",
+    "signing": "Apple Development Personal Team; registered devices only; profile expiry applies",
+    "bundles": [
+      {
+        "bundle_id": "org.trames.Trames.H9R66DLDMQ",
+        "version": "1.5.4",
+        "build": "49",
+        "executable_sha256": "bd197d83914679069080cf55aa0af85ec6e2a0fbc5e3aa2e0d5c2c4755e84c3a",
+        "app_group": "group.org.trames.Trames.H9R66DLDMQ",
+        "profile_expires_utc": "2026-11-10T17:05:16Z",
+        "profile_device_count": 1,
+        "paired_ipad_allowed": true,
+        "signature_verified": true,
+        "compiled_executable_sha256": "29cc032aae31395456be48951ca9702453566dbf11434c51ba02e31e4bad6f97"
+      },
+      {
+        "bundle_id": "org.trames.Trames.H9R66DLDMQ.FileProvider",
+        "version": "1.5.4",
+        "build": "49",
+        "executable_sha256": "a6c119936f800b54fd0d6960805aa707a5b66dbf6e77b40bc345a4192666bfa5",
+        "app_group": "group.org.trames.Trames.H9R66DLDMQ",
+        "profile_expires_utc": "2026-11-10T17:05:14Z",
+        "profile_device_count": 1,
+        "paired_ipad_allowed": true,
+        "signature_verified": true
+      }
+    ],
+    "assets": [
+      {
+        "name": "Trames-1.5.4-build49-personal-team.ipa",
+        "bytes": 16709442,
+        "sha256": "112dedf057765b91ade1531e476a585fb824d972d4fa88127c032e5e43888be5"
+      },
+      {
+        "name": "Trames-1.5.4-build49-unsigned.ipa",
+        "bytes": 16586126,
+        "sha256": "d501a60ab67ea6a7294cc0b628e747fe9d072e10ad07c2ff9999970e898a052b"
+      }
+    ],
+    "rust_static_library_sha256": "74ecdb38b3096c4d40e51285e2ca2dded5301b0fc0702301dfcb52e338266fe8",
+    "guest_reuse": "Source-unchanged verified GuestMusl/GuestVulkan data reused; all changed host Rust rebuilt and signed",
+    "physical_device_installation": false,
+    "release_resource_exclusion": "DEBUG-only GuestVulkan/wayland-acceptance removed before final root app signing; extension/profile/guest driver payloads preserved"
+  },
+  "installed": {
+    "mac": [
+      {
+        "channel": "stable",
+        "runner_sha256": "8fc21435034e8c041632e2e50419da9d2123bf790aedb0a1499286fc8367e614",
+        "version": "Trames 1.5.4 (stable) runtime eb047dc35351f8d9a623afd9325a6974adae47bb"
+      },
+      {
+        "channel": "dev",
+        "runner_sha256": "450f21b0a05bf2c81e0f521bff87ff3dbf7ab939e1be2c6dc81b4418d36c8c90",
+        "version": "Trames Dev 1.5.4 (dev) runtime eb047dc35351f8d9a623afd9325a6974adae47bb"
+      }
+    ],
+    "environment_storage_modified": false,
+    "existing_business_environments_restarted": false,
+    "physical_ipad_installed": false,
+    "physical_ipad_reason": "Previously paired physical iPad unavailable/offline during release"
+  },
+  "initial_findings_and_corrections": [
+    "New 12-CPU Docker startup returned false Deadlock while the same fresh isolated input passed on old stable. A cold-state dump identified a vfork parent and two execve children with pending image jobs; added original completion liveness and a deterministic immediate/delayed whole-kernel test.",
+    "One-CPU systemd then stalled inside host mutex acquisition. A native sample showed proc fdinfo rendering acquiring current_position while its own read held that original position mutex. Added committed atomic observation without changing the offset transaction or guest permissions.",
+    "The full systemd restart exposed a stale socket pathname accepted as ready. Replaced the readiness predicate with a live listener connection; the complete 1/4-CPU service/notify/journal/shutdown/backup flow passes.",
+    "The getty closed before PID 1 completed remaining units. Test waiting now follows the existing product 90-second shutdown contract rather than its old five-second post-terminal assumption.",
+    "A parallel Memory test observed a legitimate unrelated global backing revision change and invalidated its cached snapshot. Fixed the test eligibility assumption while retaining physical/code/data assertions, without production Memory changes.",
+    "Draft regression fixtures initially lacked typed original ProcTask authority and used an incorrect VFS seek API/import; corrected the fixture to use original weak PID resources and actual owned/source FileWork before final passing runtime workflows.",
+    "First systemd prepared input lacked installed systemd and failed DNS package fetching. Final acceptance uses the existing stopped, fully provisioned systemd fixture, in a disposable imported copy; business data was not used.",
+    "Xcode appended app-only SwiftTerm/ArgumentParser resolution to the library lock file; every existing library pin remained unchanged. Retained the app resolution separately and restored the unchanged library-only lock.",
+    "Local Apple tool lookup initially selected CommandLineTools rather than Xcode and could not locate cached XcodeGen. Explicit DEVELOPER_DIR and the repository-local cached tool resolved this; the existing Apple Development identity was available.",
+    "The signed IPA initially included DEBUG-only offline graphics fixtures. Applied the established release exclusion before the final app signing, preserving the extension/profiles and reducing the signed package to about 16 MiB. The final extracted IPA passes deep signature verification."
+  ],
+  "known_limits": [
+    "The Kernel owner still handles explicit tracing, genuinely excluded resources, affected-mm/backing publication and actual host/session lifecycle.",
+    "Mac archives are locally signed and unnotarized.",
+    "Personal Team iPad IPA is restricted to the single registered development device and embedded profile expiry (recorded in ipad.bundles). The generic unsigned IPA requires the user own matching app/group signing profiles.",
+    "Physical iPad was offline, so this release does not claim device installation or new on-device UI checks.",
+    "Existing running Mac business environments retain their loaded runtime until they are restarted; app and CLI replacement preserves their data."
+  ]
+}
