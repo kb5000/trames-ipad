@@ -2,31 +2,27 @@
 
 ## Current status — 2026-11-09
 
-Stage 70 closes **host process admission/group control and native terminal
-lifecycle** as joined execution categories. Accepted host launches retain original
-session resources across execution-cohort replacement. Existing execution workers
-construct and admit tasks; the existing disk pool loads images and searches PATH
-without retaining parent task/mm custody or a CPU slot. PID publication and
-client disconnect share one atomic lifetime; signals address original groups.
+Stage 71 closes the **cold process observation/source ownership** dependency.
+The owner now observes original queue membership before original task liveness,
+using the existing queue publication order. A returned source actor cannot become
+a foreign Ready task while its cold cleanup waits. This removes the intermittent
+extra cohort observed after stage 70; a returned `execve` counter alone was not
+proof that exec image work itself caused the stop.
 
-Both products pump native terminal open/close, input, resize and hangup on their
-original PTY resources while guest CPUs run. Pre-acquisition events cannot target
-a future job; route installation drains pending events and final master close
-notifies once. Source-born admission and cold retirement remain source-owned,
-even while original task/mm custody is unavailable. Non-terminal read-only tty
-probes finish on the original descriptor instead of joining just to return ENOTTY.
+The full cold process-table consumer chain now validates original identity after
+body custody: point/mutable lookup, checkout, read/write iteration, values,
+retention and removal. Stale snapshots cannot pair an old PID with a rekeyed,
+replaced or consumed body. Accepted source Handles keep their original authority;
+no new check, fence, global lock or service thread enters ordinary guest memory,
+CPU/native execution or source syscall bodies.
 
-Mac/Linux runtime gates, 397 process tests on each host, new lifecycle/race tests,
-both iPad compile targets and real HVF CLI/native-terminal workflows pass. The
-[validation record](../validation/host-lifecycle-20261109.json) records exact paired
-measurements, source hashes, native controls and remaining limits. This batch
-updates Mac Dev only; stable 1.5.4, business environments and physical iPad
-installations remain unchanged.
-
-Three alternating whole-flow pairs reduce 16 host exec commands from about 204 ms
-to 136–138 ms on 4/12 CPUs, with 51–53 cohort rounds becoming 1–2. Single CPU
-stays flat near 789.6 ms. Direct native macOS/Linux launch references are
-33.4/2.76 ms; different shells/APIs and the absent Unix transport limit comparison.
+Mac/Linux complete runtime gates, 401 process tests per host and both iPad compile
+targets pass. Eighty real HVF stress flows at 4/12 CPUs require exactly one final
+shutdown cohort. Single-CPU million-getpid controls remain approximately flat.
+The [validation record](../validation/process-observation-20261109.json) records
+actual before/after failures, source hashes, raw controls and remaining limits.
+This batch updates Mac Dev only; stable 1.5.4, business environments and physical
+iPad installations remain unchanged.
 
 **The coordinator still exists.** io_uring's remaining `owner_required` setters
 are the two actual source-maintenance failures: unavailable wait capability or an
@@ -53,6 +49,7 @@ not rename those remaining cases or claim the whole goal is finished.
 | Entropy and random devices | getrandom and supported random/urandom device/UUID operations run on the caller; unsupported entropy controls return on the original OFD | Tracing and absent descriptor capabilities retain their boundary; guest entropy credit/reseed APIs and GRND_INSECURE remain unsupported |
 | BPF and cgroup device policy | Program administration uses the original registry/Files/hierarchy on the caller; target directory and control-file opens resolve directly | Existing unsupported BPF commands/types remain explicit errors; tracing/capability-less embeddings remain. Original device-access consumers retain the same live rules |
 | Seccomp and tracing | Supported installation/TSYNC, decisions and lifecycle effects use original source resources; original policy/NNP is visible to proc, fork and exec | Explicit tracing and capability-less embeddings remain; unsupported seccomp APIs are unchanged. Allowed calls still retain their own excluded resource/generic fallback |
+| Cold process observation and source ownership | Original body custody/current PID identity; queue membership orders later exit observation | Accepted source Handles retain their original authority. Actual excluded/legacy actors remain explicit |
 | Host process and native terminal lifecycle | Host task creation/admission, original group control and UI native terminal open/close/input/resize/hangup progress on original resources and existing execution/disk workers | Legacy terminal-ID-0 events, one-time product terminal initialization and genuinely missing/excluded providers remain explicit |
 | Host administration and generic dispatch fallback | Unknown syscall numbers finish locally using generated entry recognition; actual administration retains its own route | Pause/cancel, transfer/timezone/writeback, supervision/admin/pressure/deadline/shutdown; known SVC resources/subcommands and HLT/fault exits not completed, parked or scoped on the worker still reach the joined fallback |
 
@@ -63,7 +60,7 @@ the owner; ordinary epoch-member migration, parking, wakeup and child/replacemen
 admission already use the live execution queue. Single-CPU/solo execution retains
 its coordinated caller path, which does not by itself imply an extra RPC.
 
-The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/c8a59a634b8544e6d690d847fb252966c58b5850/docs/architecture/coordination-boundaries.md)
+The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/7c7d1f068145e2eea39997886a1c51deea37a802/docs/architecture/coordination-boundaries.md)
 records scopes, actual admission gates and source locations. Earlier sections
 below are historical records and do not override this inventory.
 
@@ -4463,3 +4460,35 @@ one extra execve(221) joined return; the generic fallback remains an audit targe
 Product administration, legacy terminal
 ID 0, tracing, excluded providers and the generic joined fallback remain; the
 overall coordinator-removal goal stays active.
+
+
+## 71. Cold process observation/source ownership closure — 2026-11-09
+
+Stopped-cohort metrics alone initially suggested a remaining execve handoff.
+Temporary stop-reason diagnostics instead captured a cold Ready task that had
+already exited between the owner's liveness and queue-membership reads. Membership
+now precedes the exit read, ordered by the existing queue mutex. No new barrier or
+periodic check is required. Temporary diagnostic logging was removed before final
+validation and integration.
+
+The full observer dependency is closed across cold lookup/mutable lookup,
+checkout, body enumeration, retention and removal. Each original body is admitted
+before its current PID identity is validated. Stale snapshots skip removed,
+rekeyed, replaced or consumed originals; a retention callback cannot delete a new
+occupant based on its old snapshot. Waiting for a body never holds the original
+directory. Accepted source Handles, Memory roots and guest result semantics remain
+unchanged, and ordinary source execution has no extra validation/fence.
+
+Four added regression tests cover all observation forms and original custody;
+two stale-snapshot regressions fail on the baseline. Both complete local runtime
+workflows, 401 process cases per host and dual iPad compilation pass. Eighty real
+HVF terminal/exec workflows require exactly one shutdown cohort at 4/12 CPUs. Three
+alternating single-CPU controls with one million getpid calls change median wall
+time from 1340.7 to 1334.3 ms, approximately flat; native controls and cold-start
+outliers are preserved in the
+[validation record](../validation/process-observation-20261109.json).
+
+This closes a source-ownership dependency, not every remaining joined execution
+category. Actual host administration, legacy terminal ID 0, solo dispatch,
+tracing/excluded providers and the final generic fallback remain audit targets.
+Only Mac Dev is deployed, and the overall coordinator-removal goal stays active.

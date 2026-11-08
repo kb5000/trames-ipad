@@ -1,0 +1,1145 @@
+{
+  "date": "2026-11-09",
+  "stage": 71,
+  "status": "cold process observation and source ownership dependency closed; overall coordinator-removal goal active",
+  "baseline_runtime_revision": "c8a59a634b8544e6d690d847fb252966c58b5850",
+  "runtime_revision": "7c7d1f068145e2eea39997886a1c51deea37a802",
+  "sources": [
+    {
+      "path": "runtime/crates/trames-session/src/process_tasks.rs",
+      "sha256": "b19f556ee6d7b1700a91b07abc11b84feeb98dd1d634b0ab4685f0e75e45f626"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/process_vm.rs",
+      "sha256": "6dbafe17c113e8b97fd96c440b95b4b4b92354c0d6aa5a13f8ad8696aad13476"
+    },
+    {
+      "path": "runtime/docs/architecture/coordination-boundaries.md",
+      "sha256": "970a93924171624556a4fe55c8ac45d2b06c7a98eb82c21ff9ebe9a13ccd9a86"
+    }
+  ],
+  "mac_sources": [
+    {
+      "path": "tests/integration/mac-host-lifecycle.py",
+      "sha256": "766ffcceea7c2059e1b11e95b268c63f438c33f8a5b01516d680029fc4a14175"
+    }
+  ],
+  "checks": {
+    "runtime_mac": [
+      {
+        "exit_code": 0,
+        "index": 1,
+        "name": "rustup show",
+        "seconds": 0.027069091796875,
+        "status": "passed"
+      },
+      {
+        "exit_code": 0,
+        "index": 2,
+        "name": "python3 scripts/check-execution-boundaries.py",
+        "seconds": 0.12214398384094238,
+        "status": "passed"
+      },
+      {
+        "exit_code": 0,
+        "index": 3,
+        "name": "cargo fmt --all --check",
+        "seconds": 1.0579919815063477,
+        "status": "passed"
+      },
+      {
+        "exit_code": 0,
+        "index": 4,
+        "name": "cargo clippy --workspace --all-targets --all-features --locked -- -D warnings",
+        "seconds": 1.9212229251861572,
+        "status": "passed"
+      },
+      {
+        "exit_code": 0,
+        "index": 5,
+        "name": "cargo test --workspace --all-features --locked",
+        "seconds": 9.43118405342102,
+        "status": "passed"
+      },
+      {
+        "exit_code": 0,
+        "index": 6,
+        "name": "cargo build --workspace --all-features --release --locked",
+        "seconds": 2.947192668914795,
+        "status": "passed"
+      },
+      {
+        "exit_code": 0,
+        "index": 7,
+        "name": "cargo run --release -p trames-memory --example reclaim-footprint --locked",
+        "seconds": 0.3607199192047119,
+        "status": "passed"
+      }
+    ],
+    "runtime_linux": [
+      {
+        "exit_code": 0,
+        "index": 1,
+        "name": "rustup show",
+        "seconds": 0.017995357513427734,
+        "status": "passed"
+      },
+      {
+        "exit_code": 0,
+        "index": 2,
+        "name": "python3 scripts/check-execution-boundaries.py",
+        "seconds": 0.09027099609375,
+        "status": "passed"
+      },
+      {
+        "exit_code": 0,
+        "index": 3,
+        "name": "cargo fmt --all --check",
+        "seconds": 1.0020558834075928,
+        "status": "passed"
+      },
+      {
+        "exit_code": 0,
+        "index": 4,
+        "name": "cargo clippy --workspace --all-targets --all-features --locked -- -D warnings",
+        "seconds": 1.479546308517456,
+        "status": "passed"
+      },
+      {
+        "exit_code": 0,
+        "index": 5,
+        "name": "cargo test --workspace --all-features --locked",
+        "seconds": 13.81017780303955,
+        "status": "passed"
+      },
+      {
+        "exit_code": 0,
+        "index": 6,
+        "name": "cargo build --workspace --all-features --release --locked",
+        "seconds": 2.0455737113952637,
+        "status": "passed"
+      },
+      {
+        "exit_code": 0,
+        "index": 7,
+        "name": "cargo run --release -p trames-memory --example reclaim-footprint --locked",
+        "seconds": 0.18999004364013672,
+        "status": "passed"
+      }
+    ],
+    "process_mac": {
+      "passed": 401,
+      "ignored": 2
+    },
+    "process_linux": {
+      "passed": 401,
+      "ignored": 2
+    },
+    "strict_core_clippy": {
+      "mac": "passed",
+      "linux": "passed"
+    },
+    "ipad_compile": [
+      {
+        "target": "aarch64-apple-ios",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+        "code": 0
+      },
+      {
+        "target": "aarch64-apple-ios-sim",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk",
+        "code": 0
+      }
+    ],
+    "mac_product_prefix": [
+      {
+        "exit_code": 0,
+        "index": 1,
+        "name": "rustup show",
+        "seconds": 0.023196935653686523,
+        "status": "passed"
+      },
+      {
+        "exit_code": 0,
+        "index": 2,
+        "name": "python3 scripts/check-execution-boundaries.py",
+        "seconds": 0.11360979080200195,
+        "status": "passed"
+      },
+      {
+        "exit_code": 0,
+        "index": 3,
+        "name": "cargo fmt --all --check",
+        "seconds": 1.1054267883300781,
+        "status": "passed"
+      },
+      {
+        "exit_code": 0,
+        "index": 4,
+        "name": "cargo clippy --workspace --all-targets --all-features --locked -- -D warnings",
+        "seconds": 1.8261911869049072,
+        "status": "passed"
+      },
+      {
+        "exit_code": 0,
+        "index": 5,
+        "name": "cargo test --workspace --all-features --locked",
+        "seconds": 5.798788070678711,
+        "status": "passed"
+      },
+      {
+        "exit_code": 0,
+        "index": 6,
+        "name": "bash -n scripts/build-mac.sh scripts/install-mac.sh",
+        "seconds": 0.033290863037109375,
+        "status": "passed"
+      },
+      {
+        "exit_code": 0,
+        "index": 7,
+        "name": "python3 -m py_compile scripts/package-mac.py scripts/benchmark-firefox-video.py scripts/run-firefox-gpu.py tests/integration/mac-environments.py tests/integration/mac-packages.py tests/integration/mac-systemd.py tests/integration/mac-cli.py tests/integration/mac-channels.py tests/integration/mac-background.py tests/integration/mac-exec.py tests/integration/mac-host-lifecycle.py",
+        "seconds": 0.1828300952911377,
+        "status": "passed"
+      },
+      {
+        "exit_code": 0,
+        "index": 8,
+        "name": "bash tests/native/task-stream.sh",
+        "seconds": 3.0474178791046143,
+        "status": "passed"
+      },
+      {
+        "index": 9,
+        "name": null,
+        "status": "not-run"
+      },
+      {
+        "index": 10,
+        "name": null,
+        "status": "not-run"
+      },
+      {
+        "index": 11,
+        "name": null,
+        "status": "not-run"
+      },
+      {
+        "index": 12,
+        "name": null,
+        "status": "not-run"
+      }
+    ],
+    "paired_boundaries": {
+      "ipad": "passed",
+      "mac": "passed"
+    }
+  },
+  "baseline_failures": {
+    "stale_pid_snapshot": "old PID exposed a rekeyed body",
+    "retired_value_snapshot": "retired original remained a current value",
+    "temporary_stop_diagnostics": [
+      {
+        "workflow": "diagnostic-16",
+        "reason": "nonmember pid=29 ready=true x8=0"
+      },
+      {
+        "workflow": "detail-7",
+        "reason": "nonmember pid=41 ready=true x8=0 tgid=41 live=false owns=false"
+      }
+    ],
+    "diagnostics_removed_before_validation": true
+  },
+  "regressions": [
+    "cold_snapshot_iteration_never_pairs_a_rekeyed_body_with_its_retired_pid",
+    "cold_value_snapshots_skip_removed_replaced_and_consumed_originals",
+    "cold_lookup_revalidates_after_waiting_for_original_body_custody",
+    "cold_retain_does_not_visit_or_delete_a_replacement_from_its_old_snapshot"
+  ],
+  "real_hvf_stress": {
+    "passed": true,
+    "count": 80,
+    "cpus": [
+      4,
+      12
+    ],
+    "flows_per_cpu_count": 40,
+    "fixture_sha256": "766ffcceea7c2059e1b11e95b268c63f438c33f8a5b01516d680029fc4a14175",
+    "runner_sha256": "324d50f793350e6f8555eb73e60fdf701632f766dcd57e621cb2d3af847ec9d8",
+    "cases": [
+      {
+        "cpus": 4,
+        "iteration": 0,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 4,
+        "iteration": 1,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 4,
+        "iteration": 2,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 4,
+        "iteration": 3,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 4,
+        "iteration": 4,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 4,
+        "iteration": 5,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 4,
+        "iteration": 6,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 4,
+        "iteration": 7,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 4,
+        "iteration": 8,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 4,
+        "iteration": 9,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 4,
+        "iteration": 10,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 4,
+        "iteration": 11,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 4,
+        "iteration": 12,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 4,
+        "iteration": 13,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 4,
+        "iteration": 14,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 4,
+        "iteration": 15,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 4,
+        "iteration": 16,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 4,
+        "iteration": 17,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 4,
+        "iteration": 18,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 4,
+        "iteration": 19,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 4,
+        "iteration": 20,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 4,
+        "iteration": 21,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 4,
+        "iteration": 22,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 4,
+        "iteration": 23,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 4,
+        "iteration": 24,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 4,
+        "iteration": 25,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 4,
+        "iteration": 26,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 4,
+        "iteration": 27,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 4,
+        "iteration": 28,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 4,
+        "iteration": 29,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 4,
+        "iteration": 30,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 4,
+        "iteration": 31,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 4,
+        "iteration": 32,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 4,
+        "iteration": 33,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 4,
+        "iteration": 34,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 4,
+        "iteration": 35,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 4,
+        "iteration": 36,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 4,
+        "iteration": 37,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 4,
+        "iteration": 38,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 4,
+        "iteration": 39,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 12,
+        "iteration": 0,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 12,
+        "iteration": 1,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 12,
+        "iteration": 2,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 12,
+        "iteration": 3,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 12,
+        "iteration": 4,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 12,
+        "iteration": 5,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 12,
+        "iteration": 6,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 12,
+        "iteration": 7,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 12,
+        "iteration": 8,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 12,
+        "iteration": 9,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 12,
+        "iteration": 10,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 12,
+        "iteration": 11,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 12,
+        "iteration": 12,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 12,
+        "iteration": 13,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 12,
+        "iteration": 14,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 12,
+        "iteration": 15,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 12,
+        "iteration": 16,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 12,
+        "iteration": 17,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 12,
+        "iteration": 18,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 12,
+        "iteration": 19,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 12,
+        "iteration": 20,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 12,
+        "iteration": 21,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 12,
+        "iteration": 22,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 12,
+        "iteration": 23,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 12,
+        "iteration": 24,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 12,
+        "iteration": 25,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 12,
+        "iteration": 26,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 12,
+        "iteration": 27,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 12,
+        "iteration": 28,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 12,
+        "iteration": 29,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 12,
+        "iteration": 30,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 12,
+        "iteration": 31,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 12,
+        "iteration": 32,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 12,
+        "iteration": 33,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 12,
+        "iteration": 34,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 12,
+        "iteration": 35,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 12,
+        "iteration": 36,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 12,
+        "iteration": 37,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 12,
+        "iteration": 38,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      },
+      {
+        "cpus": 12,
+        "iteration": 39,
+        "cohort_rounds": 1,
+        "service_requests": 0,
+        "returned_syscalls": "[]"
+      }
+    ]
+  },
+  "single_cpu_control": {
+    "samples": [
+      {
+        "sample": 0,
+        "label": "before",
+        "elapsed_ns": 1845790375,
+        "metrics": {
+          "cohort_rounds": 0,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 1000001,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 0,
+          "worker_uring_syscalls": 0
+        },
+        "runner_sha256": "f742e429747686cc76bdf23505accebd7aea39c32f86d6b73ab39797eea8b7a5"
+      },
+      {
+        "sample": 0,
+        "label": "after",
+        "elapsed_ns": 1336819208,
+        "metrics": {
+          "cohort_rounds": 0,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 1000001,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 0,
+          "worker_uring_syscalls": 0
+        },
+        "runner_sha256": "324d50f793350e6f8555eb73e60fdf701632f766dcd57e621cb2d3af847ec9d8"
+      },
+      {
+        "sample": 1,
+        "label": "after",
+        "elapsed_ns": 1333522000,
+        "metrics": {
+          "cohort_rounds": 0,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 1000001,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 0,
+          "worker_uring_syscalls": 0
+        },
+        "runner_sha256": "324d50f793350e6f8555eb73e60fdf701632f766dcd57e621cb2d3af847ec9d8"
+      },
+      {
+        "sample": 1,
+        "label": "before",
+        "elapsed_ns": 1334937417,
+        "metrics": {
+          "cohort_rounds": 0,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 1000001,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 0,
+          "worker_uring_syscalls": 0
+        },
+        "runner_sha256": "f742e429747686cc76bdf23505accebd7aea39c32f86d6b73ab39797eea8b7a5"
+      },
+      {
+        "sample": 2,
+        "label": "before",
+        "elapsed_ns": 1340670833,
+        "metrics": {
+          "cohort_rounds": 0,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 1000001,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 0,
+          "worker_uring_syscalls": 0
+        },
+        "runner_sha256": "f742e429747686cc76bdf23505accebd7aea39c32f86d6b73ab39797eea8b7a5"
+      },
+      {
+        "sample": 2,
+        "label": "after",
+        "elapsed_ns": 1334250625,
+        "metrics": {
+          "cohort_rounds": 0,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 1000001,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 0,
+          "worker_uring_syscalls": 0
+        },
+        "runner_sha256": "324d50f793350e6f8555eb73e60fdf701632f766dcd57e621cb2d3af847ec9d8"
+      }
+    ],
+    "medians_ms": {
+      "before": 1340.670833,
+      "after": 1334.250625
+    },
+    "native_macos_getpid_1000000_ns": [
+      245242667,
+      8827416,
+      6449541
+    ],
+    "fixture_sha256": "e140e07cbbe5f259b7c6444ff4b5d5f0c72d27bc2eb8f97b23121a367c4eaaa6"
+  },
+  "native_linux_getpid_1000000_ns": [
+    140668282,
+    183357827,
+    183320869
+  ],
+  "control_fixture": {
+    "elf_hex": "7f454c460201010000000000000000000200b70001000000800040000000000040000000000000000000000000000000000000004000380001000000000000000100000005000000000000000000000000004000000000000000000000000000a400000000000000a40000000000000000100000000000000000000000000000134888d2f301a0f2881580d2010000d4730600f1a1ffff54000080d2a80b80d2010000d4",
+    "guest_command": [
+      "debug",
+      "run",
+      "--cpus",
+      "1",
+      "--no-windows",
+      "--network",
+      "off",
+      "--metrics",
+      "getpid-control.elf"
+    ],
+    "expected_syscalls": 1000001,
+    "native_macos_c": "#include <unistd.h>\nint main(void) {\n    volatile pid_t result = 0;\n    for (unsigned i = 0; i < 1000000; ++i) result = getpid();\n    return result <= 0;\n}\n",
+    "native_macos_build": "xcrun clang -O2 -Wall -Wextra -Werror getpid-control.c -o getpid-native-mac"
+  },
+  "limits": [
+    "The two cold-snapshot assertions fail on the baseline. Temporary profile-only diagnostics identify the retirement/membership ordering race; profiling outcome counters alone do not identify a stop trigger.",
+    "The 80 whole workflows use disposable Alpine disks, real HVF, host exec, native terminal open/resize/early-close/master-close and a busy guest peer. They require exactly one final shutdown cohort and no returned SVC outcomes.",
+    "No extra body identity check or fence is added to ordinary source syscall, CPU/native execution or guest memory access. Only cold process-table consumers revalidate their selected original body.",
+    "Single-CPU timings include process startup. Cold-start outliers remain in the raw counterbalanced three-pair samples; the small median difference is not a speedup claim.",
+    "Native Linux runs the identical static ELF in the existing six-vCPU local ARM64 CI instance. Native macOS calls libc getpid, which can use a userspace cache; its binary/compiler/API and startup differ. These references do not imply primitive parity or application speedup.",
+    "Both source CI runs match the final executable source hashes. Documentation and product metadata changes reuse those passing checks; paired boundaries, product CI and Dev installation are checked separately.",
+    "Actual host administration, legacy terminal ID 0, solo dispatch, excluded/traced providers and generic joined fallback remain explicit. The overall goal is active.",
+    "This batch deploys Mac Dev only; stable 1.5.4, existing business environments and physical iPad installations stay unchanged."
+  ],
+  "deployment": {
+    "channel": "Mac Dev only",
+    "status": "installed and accepted",
+    "application": "/Users/main/Applications/Trames Dev.app",
+    "version": "Trames Dev 1.5.4 (dev) runtime 7c7d1f068145e2eea39997886a1c51deea37a802",
+    "runner_sha256": "53a76c5b06b26124be17f79db227cbc0a39204856b001a386bc79c637f075395",
+    "stable_runner_sha256": "8fc21435034e8c041632e2e50419da9d2123bf790aedb0a1499286fc8367e614",
+    "stable_unchanged": true,
+    "business_restarted": false,
+    "physical_ipad_installed": false
+  },
+  "installed_native_terminal_acceptance": [
+    {
+      "passed": true,
+      "cpus": 4,
+      "runner_sha256": "53a76c5b06b26124be17f79db227cbc0a39204856b001a386bc79c637f075395",
+      "exec_16_elapsed_ns": 137431750,
+      "metrics": {
+        "cohort_rounds": 1,
+        "cohort_stop_us": 976,
+        "service_caller_wait_us": 0,
+        "service_requests": 0,
+        "serviced_syscalls": 0,
+        "syscalls": 3338,
+        "vm_local_syscalls": 338,
+        "worker_direct_syscalls": 1436,
+        "worker_fd_syscalls": 446,
+        "worker_file_syscalls": 196,
+        "worker_futex_waits": 8,
+        "worker_futex_wakes": 36,
+        "worker_gpu_calls": 0,
+        "worker_gpu_waits": 0,
+        "worker_poll_syscalls": 411,
+        "worker_socket_syscalls": 0,
+        "worker_syscalls": 3271,
+        "worker_task_resumes": 91,
+        "worker_uring_syscalls": 0
+      },
+      "checks": [
+        "live_exec",
+        "native_terminal_open",
+        "initial_size",
+        "live_resize",
+        "early_close_before_slave_open",
+        "master_close",
+        "busy_peer_survives",
+        "no_service_requests"
+      ]
+    },
+    {
+      "passed": true,
+      "cpus": 12,
+      "runner_sha256": "53a76c5b06b26124be17f79db227cbc0a39204856b001a386bc79c637f075395",
+      "exec_16_elapsed_ns": 138323500,
+      "metrics": {
+        "cohort_rounds": 1,
+        "cohort_stop_us": 539,
+        "service_caller_wait_us": 0,
+        "service_requests": 0,
+        "serviced_syscalls": 0,
+        "syscalls": 3522,
+        "vm_local_syscalls": 371,
+        "worker_direct_syscalls": 1480,
+        "worker_fd_syscalls": 471,
+        "worker_file_syscalls": 224,
+        "worker_futex_waits": 9,
+        "worker_futex_wakes": 39,
+        "worker_gpu_calls": 0,
+        "worker_gpu_waits": 0,
+        "worker_poll_syscalls": 412,
+        "worker_socket_syscalls": 0,
+        "worker_syscalls": 3453,
+        "worker_task_resumes": 90,
+        "worker_uring_syscalls": 0
+      },
+      "checks": [
+        "live_exec",
+        "native_terminal_open",
+        "initial_size",
+        "live_resize",
+        "early_close_before_slave_open",
+        "master_close",
+        "busy_peer_survives",
+        "no_service_requests"
+      ]
+    }
+  ],
+  "real_cli_acceptance": {
+    "passed": true,
+    "checks": [
+      "help_without_runtime",
+      "no_implicit_creation",
+      "scoped_config_and_defaults",
+      "idempotent_background_start",
+      "literal_argv_env_cwd",
+      "stdout_stderr_exit",
+      "binary_full_duplex_8MiB",
+      "pty_opt_in",
+      "concurrent_exec",
+      "signal_group_isolation",
+      "independent_shells_and_listing",
+      "persistent_restart",
+      "login_enable_disable"
+    ],
+    "runner_sha256": "53a76c5b06b26124be17f79db227cbc0a39204856b001a386bc79c637f075395"
+  }
+}
