@@ -16,6 +16,8 @@ p.add_argument('--fixture',type=Path,required=True)
 p.add_argument('--output',type=Path,required=True)
 p.add_argument('--samples',type=int,default=3)
 p.add_argument('--iterations',type=int,default=1000)
+p.add_argument('--modes',nargs='+',choices=['nop','register','statx','read','write','truncate'],default=['nop','register','statx'])
+p.add_argument('--cpus',type=int,nargs='+',choices=range(1,13),default=[1,2,4])
 a=p.parse_args();a.output.mkdir(parents=True,exist_ok=False)
 (a.output/'empty-rootfs').mkdir()
 sha=lambda path:hashlib.sha256(path.read_bytes()).hexdigest()
@@ -37,16 +39,16 @@ def run(label,runner,mode,workers,sample,diagnostics):
     report['rows'].append(row)
     print(name,round(value['longest_worker_ns']/1e6,3),'ms',flush=True)
 try:
-    for mode in ['nop','register','statx']:
-        for workers in [1,2,4]:
+    for mode in a.modes:
+        for workers in a.cpus:
             for sample in range(a.samples):
                 order=[('before',a.before),('after',a.after)]
                 if sample%2:order.reverse()
                 for label,runner in order:run(label,runner,mode,workers,sample,False)
             for label,runner in [('before',a.before),('after',a.after)]:run(label,runner,mode,workers,0,True)
     medians=[]
-    for mode in ['nop','register','statx']:
-        for workers in [1,2,4]:
+    for mode in a.modes:
+        for workers in a.cpus:
             row=dict(case=mode,workers=workers)
             for label in ['before','after']:
                 samples=[r for r in report['rows'] if r['case']==mode and r['workers']==workers and r['runner']==label and not r['diagnostics']]

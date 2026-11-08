@@ -2,30 +2,34 @@
 
 ## Current status — 2026-11-09
 
-Stage 66 closes the remaining original-Files and accepted-context handoffs in
-io_uring as one batch: registration/update/unregistration, source resource bodies,
-CQ observation, background progress and original lifetime/cancellation. Opaque
-OFDs no longer cause import or registration-mode refusal. Solo acceptance attaches
-the same source context immediately. Foreign CQ observers keep to their own mm;
-corrupt CQ heads return EINVAL without replay, and stale native subscriptions get
-one original-resource progress/rearm attempt before actual capability escalation.
-Ordinary shared-FD lookup stays on the existing fast path.
+Stage 67 deletes the remaining io_uring layout-work and signal-completion owner
+transports, including the public take/restore API and ID message records. They
+had no current consumer. An accepted completion now owns its actual dependency:
+the original backing ticket, retained file work and resource subscription. Missing
+a FileLayouts driver does not transfer work to a coordinator. Cancellation frees
+unissued dependencies; already accepted native work retains publication exclusion
+through completion in the existing file pool.
 
-Both runtime workflows, 384 process regressions per host, both iPad compile targets
-and 108 actual HVF/interpreter scenarios on 1/4/12 CPUs validate the implementation.
-Five paired Mac timing samples keep normal NOP/registration/statx workflows within
-about ±1.5% of stable 1.5.4. Exact evidence and limitations are in
-[stage 66 validation](../validation/uring-originals-20261109.json).
-Mac Dev is updated after validation. Stable 1.5.4 applications, business deployments
-and physical iPad installations remain unchanged in this development batch.
+Production file-size signals still use the captured original TaskSignal. A legacy
+caller without a mailbox observes its original task actor's atomic signal flag;
+there is no owner-ID message. Fork creates a fresh actor. Common file requests no
+longer embed a large FileWork: only actual waits allocate private dependency state,
+which is reused through retries.
 
-**The coordinator still exists.** This is not a claim of zero io_uring fallback:
-missing typed providers, genuinely unavailable native waits, excluded resource
-bodies and absent layout/signal capabilities keep explicit boundaries. Actual
-shared-mm quiescence, asynchronous resource completion and whole-cohort returns
-remain distinct. Stage 65's Unix ancillary owner ledger and stage 64's FD/network
-compatibility RPC remain deleted. The preceding stable release is recorded in
-[release 1.5.4 validation](../validation/release-1.5.4.json).
+Both full runtime workflows, 384 process assertions per host, 108 real backend
+scenarios and both iPad compile targets pass. The final long paired benchmark keeps
+single-CPU file work near baseline and shows no multi-core regression for the
+measured read/write/truncate cases. See
+[stage 67 validation](../validation/uring-completion-20261109.json) for exact data,
+source hashes and limits. Mac Dev is updated after validation. Stable 1.5.4,
+business environments and physical iPad installations stay unchanged in this batch.
+
+**The coordinator still exists.** io_uring's remaining `owner_required` setters
+are the two actual source-maintenance failures: unavailable wait capability or an
+unpumpable original body. Missing layout/signal capability is no longer a trigger.
+Missing typed providers, excluded resources/pins, tracing and actual host lifecycle
+remain explicit. Earlier stages retain their completed removals; this audit does
+not rename those remaining cases or claim the whole goal is finished.
 
 | Area | Current execution | Remaining boundary |
 | --- | --- | --- |
@@ -53,7 +57,7 @@ the owner; ordinary epoch-member migration, parking, wakeup and child/replacemen
 admission already use the live execution queue. Single-CPU/solo execution retains
 its coordinated caller path, which does not by itself imply an extra RPC.
 
-The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/dd671dfa62c99dc0d69aee2c72b9477e07ae4536/docs/architecture/coordination-boundaries.md)
+The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/17e7d5b5394c0d079aec5b4dda1086d4eb01dfab/docs/architecture/coordination-boundaries.md)
 records scopes, actual admission gates and source locations. Earlier sections
 below are historical records and do not override this inventory.
 
@@ -4311,3 +4315,31 @@ workers. Paired NOP/register/statx timing stays within about ±1.5%; no Firefox
 speedup or zero-fallback claim is inferred. Native Linux uses the same static
 benchmark but different filesystem backing for statx. The source-bound record is
 [uring-originals-20261109.json](../validation/uring-originals-20261109.json).
+
+
+## 67. Original io_uring completion dependencies — 2026-11-09
+
+The unconsumed owner layout queue, its exported work/ID record and take/restore
+API, and the owner signal-message queue are deleted together. Accepted file work
+now retains a private resource dependency and original backing ticket. It waits
+on that backing, resumes its original command without FD/path/input reimport,
+and returns native work to the existing pool. Native completion retains the ticket
+even after cancellation; unissued cancellation drops the dependency normally.
+Standard signal fallback uses the original task actor's coalescing atomic flag,
+not a queued owner/PID message. Production captured mailboxes are unchanged.
+
+Tests cover queued/inline execution without a layout driver, cancellation before
+and after native acceptance, close/reuse, real publication wakes, original signal
+targeting, coalescing and fork noninheritance. The normal file actor no longer
+embeds FileWork; dependency storage is allocated only during a real wait and kept
+through retries. Existing mapping admission and native I/O synchronization remain.
+No new thread, message bus or guest memory fence is introduced.
+
+Both runtime CI jobs and 384 process assertions per host pass. Both iPad compile
+targets and the 108 actual HVF/interpreter io_uring scenarios pass. Five alternating
+pairs at 10,000 operations per worker keep single-CPU read/write/truncate between
+-1.13% and +0.59% of the baseline; the measured multi-core cases have no regression.
+This is a bounded whole-workflow result, not a browser/general speedup claim.
+Native Linux uses the same static ELF in the six-vCPU CI environment, with different
+filesystem backing. Exact short/long data and limitations are in
+[uring-completion-20261109.json](../validation/uring-completion-20261109.json).

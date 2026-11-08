@@ -36,7 +36,7 @@ static void *run(void *opaque) {
     unsigned *tail=(void *)(q+p.sq_off.tail),*head=(void *)(q+p.cq_off.head);
     unsigned *cqtail=(void *)(q+p.cq_off.tail),*array=(void *)(q+p.sq_off.array);
     struct io_uring_cqe *cq=(void *)(q+p.cq_off.cqes);
-    struct statx st={0};
+    struct statx st={0}; uint32_t bytes=0x61746164;
     int rc=pthread_barrier_wait(&ready); assert(!rc || rc==PTHREAD_BARRIER_SERIAL_THREAD);
     uint64_t began=now();
     for(unsigned i=0;i<iterations;i++) {
@@ -53,12 +53,20 @@ static void *run(void *opaque) {
             s->addr=(uintptr_t)""; s->off=(uintptr_t)&st;
             s->len=STATX_BASIC_STATS; s->statx_flags=AT_EMPTY_PATH;
         }
+        int expected=0;
+        if(!strcmp(mode,"read") || !strcmp(mode,"write")) {
+            s->opcode=!strcmp(mode,"read")?IORING_OP_READ:IORING_OP_WRITE;
+            s->fd=job->fd; s->addr=(uintptr_t)&bytes; s->len=4; expected=4;
+        }
+        if(!strcmp(mode,"truncate")) {
+            s->opcode=55; s->fd=job->fd; s->off=(i&1)?4:1;
+        }
         array[slot]=slot; __atomic_store_n(tail,t+1,__ATOMIC_RELEASE);
         assert(syscall(SYS_io_uring_enter,fd,1,1,IORING_ENTER_GETEVENTS,NULL,0)==1);
         unsigned h=__atomic_load_n(head,__ATOMIC_RELAXED);
         assert(h!=__atomic_load_n(cqtail,__ATOMIC_ACQUIRE));
         struct io_uring_cqe c=cq[h&(p.cq_entries-1)];
-        assert(c.user_data==i+1 && !c.res && !c.flags);
+        assert(c.user_data==i+1 && c.res==expected && !c.flags);
         if(s->opcode==IORING_OP_STATX) assert(st.stx_size==4 && (st.stx_mode&S_IFMT)==S_IFREG);
         __atomic_store_n(head,h+1,__ATOMIC_RELEASE);
     }
@@ -69,13 +77,13 @@ static void *run(void *opaque) {
 int main(int argc,char **argv) {
     assert(argc==4); mode=argv[1]; unsigned workers=(unsigned)strtoul(argv[2],NULL,10);
     iterations=(unsigned)strtoul(argv[3],NULL,10);
-    assert(workers>=1 && workers<=4 && iterations && iterations<=100000);
-    assert(!strcmp(mode,"nop") || !strcmp(mode,"register") || !strcmp(mode,"statx"));
+    assert(workers>=1 && workers<=12 && iterations && iterations<=100000);
+    assert(!strcmp(mode,"nop") || !strcmp(mode,"register") || !strcmp(mode,"statx") || !strcmp(mode,"read") || !strcmp(mode,"write") || !strcmp(mode,"truncate"));
     struct io_uring_params probe={0}; int check=(int)syscall(SYS_io_uring_setup,2,&probe);
     if(check<0) { fprintf(stderr,"io_uring unavailable: %s\n",strerror(errno)); return 77; }
     assert(!close(check));
     assert(!mkdir("/tmp",0777) || errno==EEXIST);
-    pthread_t threads[4]; struct job jobs[4]={0};
+    pthread_t threads[12]; struct job jobs[12]={0};
     assert(!pthread_barrier_init(&ready,NULL,workers+1));
     for(unsigned i=0;i<workers;i++) {
         char path[96]; snprintf(path,sizeof path,"/tmp/uring-bench-%ld-%u",(long)getpid(),i);
