@@ -1,0 +1,1946 @@
+{
+  "date": "2026-11-09",
+  "stage": 68,
+  "status": "supported guest terminal/session/job-control subsystem closed; overall coordinator-removal goal active",
+  "baseline_runtime_revision": "17e7d5b5394c0d079aec5b4dda1086d4eb01dfab",
+  "runtime_revision": "b234928a70ee63ed4ec65618d68327d17996cdda",
+  "sources": [
+    {
+      "path": "runtime/crates/trames-kernel/src/family.rs",
+      "sha256": "5a346786caa0988de8bba20c130a5253d97a04803261ac32a7bed0c301b216cd"
+    },
+    {
+      "path": "runtime/crates/trames-kernel/src/signal/io.rs",
+      "sha256": "9214f67429ee4b1139c43218869c1479213104b695128d95a0c455f0e3bca401"
+    },
+    {
+      "path": "runtime/crates/trames-kernel/src/signal/io_guest.rs",
+      "sha256": "e1760c70be50928a801183a5c93511ad1bf2abb28245aad18c98c4e4e4de92c5"
+    },
+    {
+      "path": "runtime/crates/trames-kernel/src/signal/io_job.rs",
+      "sha256": "ec903353700cfbf5fe3964272ae7cbb8c2918ea32e51f83ecce8b920b101c70d"
+    },
+    {
+      "path": "runtime/crates/trames-kernel/src/signal/io_terminal.rs",
+      "sha256": "a8c51bc8b8f4ee045eeb72bb296da3613b76bf16c47b2c46d13bb5ad72e6b198"
+    },
+    {
+      "path": "runtime/crates/trames-kernel/src/signal/pid_identity.rs",
+      "sha256": "4f4d1aa25f990d312abfe10153cd13171cfedc932104f06336b3055075041be8"
+    },
+    {
+      "path": "runtime/crates/trames-kernel/src/task_control.rs",
+      "sha256": "51b21d5959ac68c2ae2c0b4f044fe711b9f85c3bc6c7c38d8fd78cf821675374"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/direct.rs",
+      "sha256": "c81e4022bf661ad9d14b8de09db931f343f871b5cbcdf1ecef57c1957b88272e"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/direct/aio.rs",
+      "sha256": "5dd941750149d222162f06fa829dcf9e0e69b7065a812bc19458407c539c1c26"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/direct/file.rs",
+      "sha256": "ef83082829af8c9b11aaf69265200ec62ef17be26aa26230a60d9d7da0c0bcbf"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/direct/local_message.rs",
+      "sha256": "d5578251d3da78f48ef7b0555588f6163c42ccd601c30fbf4c1a128a6dd571f4"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/direct/socket_wait.rs",
+      "sha256": "71163216efd19f2b504aab97418f08e2a2ca40a1ae482c68e44b9fef894347e8"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/direct/uring.rs",
+      "sha256": "daf9794c80b6812ebcaad4bca0ccfd19e51261365071fa8b1d443ac9f933314e"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/lib.rs",
+      "sha256": "4c72066c2cc0f0337e4b1f19c5ca15deb235364eabf90449dc09f01a26059f5a"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/pty.rs",
+      "sha256": "fa089368bcff662d869159639aba1cc35c3944132734cc749d3861c7d8e771b1"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/process.rs",
+      "sha256": "e065e71c5e0b0ab1d07276e1b961b6320d4c5eb4a18529cd5b06ff3fd2109997"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/process_birth.rs",
+      "sha256": "9163612a694912529049b5cce2900b4fba3dace560dfcc30dd21e0762212a7f1"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/process_dispatch.rs",
+      "sha256": "c712d9958defde94b985c42c46536ad6d4f1c86e4e72ab96b715e385259c4b48"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/process_exec.rs",
+      "sha256": "9e67afd078f811c4573a9f62349d4e2e21529cafb2c2b6acf4fbf003a6c8da03"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/process_job.rs",
+      "sha256": "bad9a4d30ce2e78911ebd766f9fe1b8f686169074bc35f86449a969075a7905a"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/process_lifecycle.rs",
+      "sha256": "5381f00b78ab7a84acef89ae453b9eee8a92dca5ead841aa58fc52af284bf517"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/process_pid.rs",
+      "sha256": "e5ff11ff46650d7a79ff28a788de822fe42d8b4cecbe3d7e55d352d5066b4264"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/process_proc.rs",
+      "sha256": "1d8a9c6853bad6479c102638eb6b94150fb2828ab7ca329bc7314c555de27d88"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/process_seccomp.rs",
+      "sha256": "9cf0edaf8e7475620d57c92839165490474b78bc5607c0d86980ec8c698e7d04"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/process_socket_wait.rs",
+      "sha256": "2a0ae254c28fca3430ef3630c28ad24d743a4935194ac25b3a846b6d669c9ce7"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/process_vm.rs",
+      "sha256": "5d2756288d0d698b0416e7def60cd624b6244d7047053663541b818df2c53516"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/worker_syscalls.rs",
+      "sha256": "dd293f6bed11dae5c501ac67bf18b8fe9c1451775aa7e7f75b251da3ff56f078"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/workers.rs",
+      "sha256": "c4c51b2c709ce326853eafdbc86b23a79d99c0ffdbd3348e38f6dbb016f4b6f6"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/descriptor_factory.rs",
+      "sha256": "fa9d133f5109502b5fd05c5b408828dd6975761d780f36c59ec191b26d3342df"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/direct_io.rs",
+      "sha256": "663fd3a343521aaf662fbf94a75e47f818cfa65e50ae33f8a35e65cf3c9bf8e7"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/lib.rs",
+      "sha256": "5e6fe3396edff323ac8cbdc0e54ecf2cd012fe4d99791b206ba305d86efd44ef"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/path_queries.rs",
+      "sha256": "61c446e7c13f857bd7b17b8b01ece657a607744fd5afdf52f2ba80be1e29089f"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/pseudo.rs",
+      "sha256": "1bad04939b018734b5eb7b6e696a5bdf17394d1652aaf3702dc0218a4fabd404"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/pty.rs",
+      "sha256": "98d646931b76e76c24524c158f4b5b37118ee4cb2710b2440330c8fbfcc4da60"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/pty/control.rs",
+      "sha256": "8deda4cbfde22f2ba7b401c95a9c195e43a1803f4ea30b088a8299b45bc18474"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/pty/shared.rs",
+      "sha256": "78f5f212aad397ec45e1dec50809c9ed0154ad91ee1306fed90b4c468dfaf7d6"
+    }
+  ],
+  "checks": {
+    "runtime_mac": {
+      "completed": true,
+      "steps": [
+        {
+          "index": 1,
+          "status": "passed",
+          "exit_code": 0,
+          "name": "rustup show",
+          "seconds": 0.022290945053100586
+        },
+        {
+          "index": 2,
+          "status": "passed",
+          "exit_code": 0,
+          "name": "python3 scripts/check-execution-boundaries.py",
+          "seconds": 0.0761420726776123
+        },
+        {
+          "index": 3,
+          "status": "passed",
+          "exit_code": 0,
+          "name": "cargo fmt --all --check",
+          "seconds": 1.5006999969482422
+        },
+        {
+          "index": 4,
+          "status": "passed",
+          "exit_code": 0,
+          "name": "cargo clippy --workspace --all-targets --all-features --locked -- -D warnings",
+          "seconds": 6.250074148178101
+        },
+        {
+          "index": 5,
+          "status": "passed",
+          "exit_code": 0,
+          "name": "cargo test --workspace --all-features --locked",
+          "seconds": 13.846214056015015
+        },
+        {
+          "index": 6,
+          "status": "passed",
+          "exit_code": 0,
+          "name": "cargo build --workspace --all-features --release --locked",
+          "seconds": 3.9019298553466797
+        },
+        {
+          "index": 7,
+          "status": "passed",
+          "exit_code": 0,
+          "name": "cargo run --release -p trames-memory --example reclaim-footprint --locked",
+          "seconds": 0.38888001441955566
+        }
+      ]
+    },
+    "runtime_linux": {
+      "completed": true,
+      "steps": [
+        {
+          "index": 1,
+          "status": "passed",
+          "exit_code": 0,
+          "name": "rustup show",
+          "seconds": 0.016796350479125977
+        },
+        {
+          "index": 2,
+          "status": "passed",
+          "exit_code": 0,
+          "name": "python3 scripts/check-execution-boundaries.py",
+          "seconds": 0.06455111503601074
+        },
+        {
+          "index": 3,
+          "status": "passed",
+          "exit_code": 0,
+          "name": "cargo fmt --all --check",
+          "seconds": 0.9343738555908203
+        },
+        {
+          "index": 4,
+          "status": "passed",
+          "exit_code": 0,
+          "name": "cargo clippy --workspace --all-targets --all-features --locked -- -D warnings",
+          "seconds": 6.027513265609741
+        },
+        {
+          "index": 5,
+          "status": "passed",
+          "exit_code": 0,
+          "name": "cargo test --workspace --all-features --locked",
+          "seconds": 31.713502168655396
+        },
+        {
+          "index": 6,
+          "status": "passed",
+          "exit_code": 0,
+          "name": "cargo build --workspace --all-features --release --locked",
+          "seconds": 9.650820970535278
+        },
+        {
+          "index": 7,
+          "status": "passed",
+          "exit_code": 0,
+          "name": "cargo run --release -p trames-memory --example reclaim-footprint --locked",
+          "seconds": 2.487086772918701
+        }
+      ]
+    },
+    "process_mac": {
+      "passed": 390,
+      "ignored": 2
+    },
+    "process_linux": {
+      "passed": 390,
+      "ignored": 2
+    },
+    "root_cli_ffi_clippy": "passed",
+    "apple": [
+      {
+        "target": "aarch64-apple-ios",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+        "code": 0
+      },
+      {
+        "target": "aarch64-apple-ios-sim",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk",
+        "code": 0
+      }
+    ],
+    "linux_source_hashes_match": true,
+    "mac_product": {
+      "local_workflow_steps": [
+        {
+          "index": 1,
+          "name": "rustup show",
+          "status": "passed",
+          "exit_code": 0,
+          "seconds": 0.02923417091369629
+        },
+        {
+          "index": 2,
+          "name": "python3 scripts/check-execution-boundaries.py",
+          "status": "passed",
+          "exit_code": 0,
+          "seconds": 0.19092202186584473
+        },
+        {
+          "index": 3,
+          "name": "cargo fmt --all --check",
+          "status": "passed",
+          "exit_code": 0,
+          "seconds": 1.1241490840911865
+        },
+        {
+          "index": 4,
+          "name": "cargo clippy --workspace --all-targets --all-features --locked -- -D warnings",
+          "status": "passed",
+          "exit_code": 0,
+          "seconds": 6.731042146682739
+        },
+        {
+          "index": 5,
+          "name": "cargo test --workspace --all-features --locked",
+          "status": "passed",
+          "exit_code": 0,
+          "seconds": 15.340019941329956
+        },
+        {
+          "index": 6,
+          "name": "bash -n scripts/build-mac.sh scripts/install-mac.sh",
+          "status": "passed",
+          "exit_code": 0,
+          "seconds": 0.06132984161376953
+        },
+        {
+          "index": 7,
+          "name": "python3 -m py_compile scripts/package-mac.py scripts/benchmark-firefox-video.py scripts/run-firefox-gpu.py tests/integration/mac-environments.py tests/integration/mac-packages.py tests/integration/mac-systemd.py tests/integration/mac-cli.py tests/integration/mac-channels.py tests/integration/mac-background.py tests/integration/mac-exec.py",
+          "status": "passed",
+          "exit_code": 0,
+          "seconds": 0.3527071475982666
+        },
+        {
+          "index": 8,
+          "name": "bash tests/native/task-stream.sh",
+          "status": "passed",
+          "exit_code": 0,
+          "seconds": 3.8729538917541504
+        }
+      ],
+      "dev_build": "passed; TRAMES_BUILD_CHANNEL=dev bash scripts/build-mac.sh",
+      "install": "passed; TRAMES_MODIFY_PATH=0 bash scripts/install-mac.sh",
+      "scope": "Product workflow steps 1\u20138 and explicit Dev build completed; stable build and release packaging excluded from this development-only batch."
+    }
+  },
+  "acceptance": {
+    "hvf": {
+      "passed": true,
+      "cases": [
+        {
+          "cpus": 1,
+          "mode": "compat",
+          "returncode": 0,
+          "wall_seconds": 0.009380625000000004,
+          "cohort_return_syscalls": [],
+          "metrics": {
+            "service_requests": 0,
+            "cohort_rounds": 0,
+            "worker_direct_syscalls": 0,
+            "worker_syscalls": 0,
+            "worker_task_resumes": 0
+          }
+        },
+        {
+          "cpus": 1,
+          "mode": "queries",
+          "returncode": 0,
+          "wall_seconds": 0.06006325,
+          "measurement": {
+            "mode": "queries",
+            "threads": 4,
+            "rounds": 1000,
+            "elapsed_ns": 51660042
+          },
+          "cohort_return_syscalls": [],
+          "metrics": {
+            "service_requests": 0,
+            "cohort_rounds": 0,
+            "worker_direct_syscalls": 0,
+            "worker_syscalls": 0,
+            "worker_task_resumes": 0
+          }
+        },
+        {
+          "cpus": 4,
+          "mode": "compat",
+          "returncode": 0,
+          "wall_seconds": 0.010453749999999998,
+          "cohort_return_syscalls": [],
+          "metrics": {
+            "service_requests": 0,
+            "cohort_rounds": 1,
+            "worker_direct_syscalls": 53,
+            "worker_syscalls": 152,
+            "worker_task_resumes": 20
+          }
+        },
+        {
+          "cpus": 4,
+          "mode": "queries",
+          "returncode": 0,
+          "wall_seconds": 0.027840166,
+          "measurement": {
+            "mode": "queries",
+            "threads": 4,
+            "rounds": 1000,
+            "elapsed_ns": 19218958
+          },
+          "cohort_return_syscalls": [],
+          "metrics": {
+            "service_requests": 0,
+            "cohort_rounds": 2,
+            "worker_direct_syscalls": 16010,
+            "worker_syscalls": 24061,
+            "worker_task_resumes": 4
+          }
+        },
+        {
+          "cpus": 12,
+          "mode": "compat",
+          "returncode": 0,
+          "wall_seconds": 0.011492667000000012,
+          "cohort_return_syscalls": [],
+          "metrics": {
+            "service_requests": 0,
+            "cohort_rounds": 1,
+            "worker_direct_syscalls": 53,
+            "worker_syscalls": 152,
+            "worker_task_resumes": 21
+          }
+        },
+        {
+          "cpus": 12,
+          "mode": "queries",
+          "returncode": 0,
+          "wall_seconds": 0.028403125,
+          "measurement": {
+            "mode": "queries",
+            "threads": 4,
+            "rounds": 1000,
+            "elapsed_ns": 19660209
+          },
+          "cohort_return_syscalls": [],
+          "metrics": {
+            "service_requests": 0,
+            "cohort_rounds": 2,
+            "worker_direct_syscalls": 16010,
+            "worker_syscalls": 24061,
+            "worker_task_resumes": 4
+          }
+        }
+      ]
+    },
+    "interpreter": {
+      "passed": true,
+      "cases": [
+        {
+          "cpus": 1,
+          "mode": "compat",
+          "returncode": 0,
+          "wall_seconds": 0.59588,
+          "metrics": {
+            "service_requests": 0,
+            "parallel_rounds": 0,
+            "worker_direct_syscalls": 0,
+            "worker_syscalls": 0,
+            "worker_task_resumes": 0,
+            "worker_io_waits": 0
+          }
+        },
+        {
+          "cpus": 1,
+          "mode": "queries",
+          "returncode": 0,
+          "wall_seconds": 0.04154345800000003,
+          "measurement": {
+            "mode": "queries",
+            "threads": 4,
+            "rounds": 1000,
+            "elapsed_ns": 28754250
+          },
+          "metrics": {
+            "service_requests": 0,
+            "parallel_rounds": 0,
+            "worker_direct_syscalls": 0,
+            "worker_syscalls": 0,
+            "worker_task_resumes": 0,
+            "worker_io_waits": 0
+          }
+        },
+        {
+          "cpus": 4,
+          "mode": "compat",
+          "returncode": 0,
+          "wall_seconds": 0.010374541000000015,
+          "metrics": {
+            "service_requests": 0,
+            "parallel_rounds": 1,
+            "worker_direct_syscalls": 53,
+            "worker_syscalls": 153,
+            "worker_task_resumes": 23,
+            "worker_io_waits": 6
+          }
+        },
+        {
+          "cpus": 4,
+          "mode": "queries",
+          "returncode": 0,
+          "wall_seconds": 0.02272287500000003,
+          "measurement": {
+            "mode": "queries",
+            "threads": 4,
+            "rounds": 1000,
+            "elapsed_ns": 16335500
+          },
+          "metrics": {
+            "service_requests": 0,
+            "parallel_rounds": 2,
+            "worker_direct_syscalls": 16010,
+            "worker_syscalls": 24061,
+            "worker_task_resumes": 3,
+            "worker_io_waits": 1
+          }
+        },
+        {
+          "cpus": 12,
+          "mode": "compat",
+          "returncode": 0,
+          "wall_seconds": 0.007550916000000019,
+          "metrics": {
+            "service_requests": 0,
+            "parallel_rounds": 1,
+            "worker_direct_syscalls": 53,
+            "worker_syscalls": 153,
+            "worker_task_resumes": 23,
+            "worker_io_waits": 6
+          }
+        },
+        {
+          "cpus": 12,
+          "mode": "queries",
+          "returncode": 0,
+          "wall_seconds": 0.020108499999999974,
+          "measurement": {
+            "mode": "queries",
+            "threads": 4,
+            "rounds": 1000,
+            "elapsed_ns": 14797500
+          },
+          "metrics": {
+            "service_requests": 0,
+            "parallel_rounds": 2,
+            "worker_direct_syscalls": 16010,
+            "worker_syscalls": 24063,
+            "worker_task_resumes": 5,
+            "worker_io_waits": 1
+          }
+        }
+      ]
+    },
+    "existing_regressions": {
+      "passed": true,
+      "cases": [
+        {
+          "backend": "hvf",
+          "cpus": 1,
+          "fixture": "pty",
+          "args": [],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "cohort_rounds": 0,
+            "worker_direct_syscalls": 0,
+            "worker_syscalls": 0,
+            "worker_task_resumes": 0
+          }
+        },
+        {
+          "backend": "hvf",
+          "cpus": 1,
+          "fixture": "worker-job-control",
+          "args": [
+            "compat",
+            "0",
+            "8"
+          ],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "cohort_rounds": 0,
+            "worker_direct_syscalls": 0,
+            "worker_syscalls": 0,
+            "worker_task_resumes": 0
+          }
+        },
+        {
+          "backend": "hvf",
+          "cpus": 1,
+          "fixture": "worker-job-control",
+          "args": [
+            "compat",
+            "1",
+            "8"
+          ],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "cohort_rounds": 0,
+            "worker_direct_syscalls": 0,
+            "worker_syscalls": 0,
+            "worker_task_resumes": 0
+          }
+        },
+        {
+          "backend": "hvf",
+          "cpus": 1,
+          "fixture": "worker-job-control",
+          "args": [
+            "compat",
+            "2",
+            "8"
+          ],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "cohort_rounds": 0,
+            "worker_direct_syscalls": 0,
+            "worker_syscalls": 0,
+            "worker_task_resumes": 0
+          }
+        },
+        {
+          "backend": "hvf",
+          "cpus": 1,
+          "fixture": "worker-pty",
+          "args": [
+            "read",
+            "spread"
+          ],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "cohort_rounds": 0,
+            "worker_direct_syscalls": 0,
+            "worker_syscalls": 0,
+            "worker_task_resumes": 0
+          }
+        },
+        {
+          "backend": "hvf",
+          "cpus": 1,
+          "fixture": "worker-pty",
+          "args": [
+            "vector",
+            "spread"
+          ],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "cohort_rounds": 0,
+            "worker_direct_syscalls": 0,
+            "worker_syscalls": 0,
+            "worker_task_resumes": 0
+          }
+        },
+        {
+          "backend": "hvf",
+          "cpus": 1,
+          "fixture": "worker-pty",
+          "args": [
+            "epoll",
+            "spread"
+          ],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "cohort_rounds": 0,
+            "worker_direct_syscalls": 0,
+            "worker_syscalls": 0,
+            "worker_task_resumes": 0
+          }
+        },
+        {
+          "backend": "hvf",
+          "cpus": 1,
+          "fixture": "worker-pty",
+          "args": [
+            "poll",
+            "spread"
+          ],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "cohort_rounds": 0,
+            "worker_direct_syscalls": 0,
+            "worker_syscalls": 0,
+            "worker_task_resumes": 0
+          }
+        },
+        {
+          "backend": "hvf",
+          "cpus": 4,
+          "fixture": "pty",
+          "args": [],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "cohort_rounds": 1,
+            "worker_direct_syscalls": 15,
+            "worker_syscalls": 46,
+            "worker_task_resumes": 8
+          }
+        },
+        {
+          "backend": "hvf",
+          "cpus": 4,
+          "fixture": "worker-job-control",
+          "args": [
+            "compat",
+            "0",
+            "8"
+          ],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "cohort_rounds": 2,
+            "worker_direct_syscalls": 2,
+            "worker_syscalls": 68,
+            "worker_task_resumes": 34
+          }
+        },
+        {
+          "backend": "hvf",
+          "cpus": 4,
+          "fixture": "worker-job-control",
+          "args": [
+            "compat",
+            "1",
+            "8"
+          ],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "cohort_rounds": 2,
+            "worker_direct_syscalls": 2,
+            "worker_syscalls": 72,
+            "worker_task_resumes": 34
+          }
+        },
+        {
+          "backend": "hvf",
+          "cpus": 4,
+          "fixture": "worker-job-control",
+          "args": [
+            "compat",
+            "2",
+            "8"
+          ],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "cohort_rounds": 2,
+            "worker_direct_syscalls": 2,
+            "worker_syscalls": 70,
+            "worker_task_resumes": 35
+          }
+        },
+        {
+          "backend": "hvf",
+          "cpus": 4,
+          "fixture": "worker-pty",
+          "args": [
+            "read",
+            "spread"
+          ],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "cohort_rounds": 1,
+            "worker_direct_syscalls": 260,
+            "worker_syscalls": 270,
+            "worker_task_resumes": 185
+          }
+        },
+        {
+          "backend": "hvf",
+          "cpus": 4,
+          "fixture": "worker-pty",
+          "args": [
+            "vector",
+            "spread"
+          ],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "cohort_rounds": 1,
+            "worker_direct_syscalls": 260,
+            "worker_syscalls": 270,
+            "worker_task_resumes": 167
+          }
+        },
+        {
+          "backend": "hvf",
+          "cpus": 4,
+          "fixture": "worker-pty",
+          "args": [
+            "epoll",
+            "spread"
+          ],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "cohort_rounds": 1,
+            "worker_direct_syscalls": 388,
+            "worker_syscalls": 400,
+            "worker_task_resumes": 137
+          }
+        },
+        {
+          "backend": "hvf",
+          "cpus": 4,
+          "fixture": "worker-pty",
+          "args": [
+            "poll",
+            "spread"
+          ],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "cohort_rounds": 1,
+            "worker_direct_syscalls": 388,
+            "worker_syscalls": 398,
+            "worker_task_resumes": 134
+          }
+        },
+        {
+          "backend": "hvf",
+          "cpus": 12,
+          "fixture": "pty",
+          "args": [],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "cohort_rounds": 1,
+            "worker_direct_syscalls": 15,
+            "worker_syscalls": 46,
+            "worker_task_resumes": 8
+          }
+        },
+        {
+          "backend": "hvf",
+          "cpus": 12,
+          "fixture": "worker-job-control",
+          "args": [
+            "compat",
+            "0",
+            "8"
+          ],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "cohort_rounds": 3,
+            "worker_direct_syscalls": 2,
+            "worker_syscalls": 68,
+            "worker_task_resumes": 34
+          }
+        },
+        {
+          "backend": "hvf",
+          "cpus": 12,
+          "fixture": "worker-job-control",
+          "args": [
+            "compat",
+            "1",
+            "8"
+          ],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "cohort_rounds": 3,
+            "worker_direct_syscalls": 2,
+            "worker_syscalls": 72,
+            "worker_task_resumes": 35
+          }
+        },
+        {
+          "backend": "hvf",
+          "cpus": 12,
+          "fixture": "worker-job-control",
+          "args": [
+            "compat",
+            "2",
+            "8"
+          ],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "cohort_rounds": 2,
+            "worker_direct_syscalls": 2,
+            "worker_syscalls": 69,
+            "worker_task_resumes": 32
+          }
+        },
+        {
+          "backend": "hvf",
+          "cpus": 12,
+          "fixture": "worker-pty",
+          "args": [
+            "read",
+            "spread"
+          ],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "cohort_rounds": 1,
+            "worker_direct_syscalls": 260,
+            "worker_syscalls": 270,
+            "worker_task_resumes": 185
+          }
+        },
+        {
+          "backend": "hvf",
+          "cpus": 12,
+          "fixture": "worker-pty",
+          "args": [
+            "vector",
+            "spread"
+          ],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "cohort_rounds": 1,
+            "worker_direct_syscalls": 260,
+            "worker_syscalls": 270,
+            "worker_task_resumes": 182
+          }
+        },
+        {
+          "backend": "hvf",
+          "cpus": 12,
+          "fixture": "worker-pty",
+          "args": [
+            "epoll",
+            "spread"
+          ],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "cohort_rounds": 1,
+            "worker_direct_syscalls": 388,
+            "worker_syscalls": 400,
+            "worker_task_resumes": 146
+          }
+        },
+        {
+          "backend": "hvf",
+          "cpus": 12,
+          "fixture": "worker-pty",
+          "args": [
+            "poll",
+            "spread"
+          ],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "cohort_rounds": 1,
+            "worker_direct_syscalls": 388,
+            "worker_syscalls": 398,
+            "worker_task_resumes": 130
+          }
+        },
+        {
+          "backend": "interpreter",
+          "cpus": 1,
+          "fixture": "pty",
+          "args": [],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "parallel_rounds": 0,
+            "worker_direct_syscalls": 0,
+            "worker_syscalls": 0,
+            "worker_task_resumes": 0,
+            "worker_io_waits": 0
+          }
+        },
+        {
+          "backend": "interpreter",
+          "cpus": 1,
+          "fixture": "worker-job-control",
+          "args": [
+            "compat",
+            "0",
+            "8"
+          ],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "parallel_rounds": 0,
+            "worker_direct_syscalls": 0,
+            "worker_syscalls": 0,
+            "worker_task_resumes": 0,
+            "worker_io_waits": 0
+          }
+        },
+        {
+          "backend": "interpreter",
+          "cpus": 1,
+          "fixture": "worker-job-control",
+          "args": [
+            "compat",
+            "1",
+            "8"
+          ],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "parallel_rounds": 0,
+            "worker_direct_syscalls": 0,
+            "worker_syscalls": 0,
+            "worker_task_resumes": 0,
+            "worker_io_waits": 0
+          }
+        },
+        {
+          "backend": "interpreter",
+          "cpus": 1,
+          "fixture": "worker-job-control",
+          "args": [
+            "compat",
+            "2",
+            "8"
+          ],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "parallel_rounds": 0,
+            "worker_direct_syscalls": 0,
+            "worker_syscalls": 0,
+            "worker_task_resumes": 0,
+            "worker_io_waits": 0
+          }
+        },
+        {
+          "backend": "interpreter",
+          "cpus": 1,
+          "fixture": "worker-pty",
+          "args": [
+            "read",
+            "spread"
+          ],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "parallel_rounds": 0,
+            "worker_direct_syscalls": 0,
+            "worker_syscalls": 0,
+            "worker_task_resumes": 0,
+            "worker_io_waits": 0
+          }
+        },
+        {
+          "backend": "interpreter",
+          "cpus": 1,
+          "fixture": "worker-pty",
+          "args": [
+            "vector",
+            "spread"
+          ],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "parallel_rounds": 0,
+            "worker_direct_syscalls": 0,
+            "worker_syscalls": 0,
+            "worker_task_resumes": 0,
+            "worker_io_waits": 0
+          }
+        },
+        {
+          "backend": "interpreter",
+          "cpus": 1,
+          "fixture": "worker-pty",
+          "args": [
+            "epoll",
+            "spread"
+          ],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "parallel_rounds": 0,
+            "worker_direct_syscalls": 0,
+            "worker_syscalls": 0,
+            "worker_task_resumes": 0,
+            "worker_io_waits": 0
+          }
+        },
+        {
+          "backend": "interpreter",
+          "cpus": 1,
+          "fixture": "worker-pty",
+          "args": [
+            "poll",
+            "spread"
+          ],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "parallel_rounds": 0,
+            "worker_direct_syscalls": 0,
+            "worker_syscalls": 0,
+            "worker_task_resumes": 0,
+            "worker_io_waits": 0
+          }
+        },
+        {
+          "backend": "interpreter",
+          "cpus": 4,
+          "fixture": "pty",
+          "args": [],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "parallel_rounds": 1,
+            "worker_direct_syscalls": 15,
+            "worker_syscalls": 46,
+            "worker_task_resumes": 8,
+            "worker_io_waits": 4
+          }
+        },
+        {
+          "backend": "interpreter",
+          "cpus": 4,
+          "fixture": "worker-job-control",
+          "args": [
+            "compat",
+            "0",
+            "8"
+          ],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "parallel_rounds": 3,
+            "worker_direct_syscalls": 2,
+            "worker_syscalls": 70,
+            "worker_task_resumes": 32,
+            "worker_io_waits": 1
+          }
+        },
+        {
+          "backend": "interpreter",
+          "cpus": 4,
+          "fixture": "worker-job-control",
+          "args": [
+            "compat",
+            "1",
+            "8"
+          ],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "parallel_rounds": 3,
+            "worker_direct_syscalls": 2,
+            "worker_syscalls": 74,
+            "worker_task_resumes": 34,
+            "worker_io_waits": 1
+          }
+        },
+        {
+          "backend": "interpreter",
+          "cpus": 4,
+          "fixture": "worker-job-control",
+          "args": [
+            "compat",
+            "2",
+            "8"
+          ],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "parallel_rounds": 3,
+            "worker_direct_syscalls": 2,
+            "worker_syscalls": 72,
+            "worker_task_resumes": 36,
+            "worker_io_waits": 1
+          }
+        },
+        {
+          "backend": "interpreter",
+          "cpus": 4,
+          "fixture": "worker-pty",
+          "args": [
+            "read",
+            "spread"
+          ],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "parallel_rounds": 1,
+            "worker_direct_syscalls": 260,
+            "worker_syscalls": 270,
+            "worker_task_resumes": 154,
+            "worker_io_waits": 153
+          }
+        },
+        {
+          "backend": "interpreter",
+          "cpus": 4,
+          "fixture": "worker-pty",
+          "args": [
+            "vector",
+            "spread"
+          ],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "parallel_rounds": 1,
+            "worker_direct_syscalls": 260,
+            "worker_syscalls": 270,
+            "worker_task_resumes": 153,
+            "worker_io_waits": 152
+          }
+        },
+        {
+          "backend": "interpreter",
+          "cpus": 4,
+          "fixture": "worker-pty",
+          "args": [
+            "epoll",
+            "spread"
+          ],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "parallel_rounds": 1,
+            "worker_direct_syscalls": 388,
+            "worker_syscalls": 400,
+            "worker_task_resumes": 186,
+            "worker_io_waits": 185
+          }
+        },
+        {
+          "backend": "interpreter",
+          "cpus": 4,
+          "fixture": "worker-pty",
+          "args": [
+            "poll",
+            "spread"
+          ],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "parallel_rounds": 1,
+            "worker_direct_syscalls": 388,
+            "worker_syscalls": 398,
+            "worker_task_resumes": 197,
+            "worker_io_waits": 193
+          }
+        },
+        {
+          "backend": "interpreter",
+          "cpus": 12,
+          "fixture": "pty",
+          "args": [],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "parallel_rounds": 1,
+            "worker_direct_syscalls": 15,
+            "worker_syscalls": 46,
+            "worker_task_resumes": 8,
+            "worker_io_waits": 4
+          }
+        },
+        {
+          "backend": "interpreter",
+          "cpus": 12,
+          "fixture": "worker-job-control",
+          "args": [
+            "compat",
+            "0",
+            "8"
+          ],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "parallel_rounds": 3,
+            "worker_direct_syscalls": 2,
+            "worker_syscalls": 70,
+            "worker_task_resumes": 33,
+            "worker_io_waits": 1
+          }
+        },
+        {
+          "backend": "interpreter",
+          "cpus": 12,
+          "fixture": "worker-job-control",
+          "args": [
+            "compat",
+            "1",
+            "8"
+          ],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "parallel_rounds": 3,
+            "worker_direct_syscalls": 2,
+            "worker_syscalls": 74,
+            "worker_task_resumes": 33,
+            "worker_io_waits": 1
+          }
+        },
+        {
+          "backend": "interpreter",
+          "cpus": 12,
+          "fixture": "worker-job-control",
+          "args": [
+            "compat",
+            "2",
+            "8"
+          ],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "parallel_rounds": 2,
+            "worker_direct_syscalls": 2,
+            "worker_syscalls": 71,
+            "worker_task_resumes": 36,
+            "worker_io_waits": 1
+          }
+        },
+        {
+          "backend": "interpreter",
+          "cpus": 12,
+          "fixture": "worker-pty",
+          "args": [
+            "read",
+            "spread"
+          ],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "parallel_rounds": 1,
+            "worker_direct_syscalls": 260,
+            "worker_syscalls": 270,
+            "worker_task_resumes": 140,
+            "worker_io_waits": 139
+          }
+        },
+        {
+          "backend": "interpreter",
+          "cpus": 12,
+          "fixture": "worker-pty",
+          "args": [
+            "vector",
+            "spread"
+          ],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "parallel_rounds": 1,
+            "worker_direct_syscalls": 260,
+            "worker_syscalls": 270,
+            "worker_task_resumes": 151,
+            "worker_io_waits": 150
+          }
+        },
+        {
+          "backend": "interpreter",
+          "cpus": 12,
+          "fixture": "worker-pty",
+          "args": [
+            "epoll",
+            "spread"
+          ],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "parallel_rounds": 1,
+            "worker_direct_syscalls": 388,
+            "worker_syscalls": 400,
+            "worker_task_resumes": 204,
+            "worker_io_waits": 200
+          }
+        },
+        {
+          "backend": "interpreter",
+          "cpus": 12,
+          "fixture": "worker-pty",
+          "args": [
+            "poll",
+            "spread"
+          ],
+          "code": 0,
+          "metrics": {
+            "service_requests": 0,
+            "parallel_rounds": 1,
+            "worker_direct_syscalls": 388,
+            "worker_syscalls": 398,
+            "worker_task_resumes": 199,
+            "worker_io_waits": 193
+          }
+        }
+      ]
+    }
+  },
+  "benchmark": {
+    "workload": "four threads; fork/session/PTY setup, 4000 rounds/thread of getpgid, getsid, tcgetsid, tcgetpgrp, tcgetattr and TIOCGWINSZ, then join/exit",
+    "fixture_sha256": "7d412ce6eea6e969b924e78bcbfaa57ba059ee6db53861c6330033a437938b52",
+    "source_sha256": "b64487a6261b6c748259a682d775e6e85c63718eb59f960492b7b5aa4863b094",
+    "baseline_runner_sha256": "6797c37cb09d5fac58ed9fb5e9284bb52f5471938e9530ac791d687cb973dbb5",
+    "final_runner_sha256": "e8d17fe9687fba765d4b7c40757e4bda26b061767cd157d615f09be9f2b7a41b",
+    "medians_ns": {
+      "1": {
+        "before": 169533458,
+        "after": 165843875
+      },
+      "4": {
+        "before": 3266305166,
+        "after": 62160083
+      },
+      "12": {
+        "before": 3346324875,
+        "after": 61280666
+      }
+    },
+    "sample_order": "Five counterbalanced initial pairs per CPU count; five final-after delta samples reuse the unchanged baseline. The final dispatch-only delta was measured after Linux CI was stopped.",
+    "samples": [
+      {
+        "cpus": 1,
+        "sample": 0,
+        "version": "before",
+        "elapsed_ns": 170356834,
+        "cohort_rounds": 0
+      },
+      {
+        "cpus": 1,
+        "sample": 1,
+        "version": "before",
+        "elapsed_ns": 171700750,
+        "cohort_rounds": 0
+      },
+      {
+        "cpus": 1,
+        "sample": 2,
+        "version": "before",
+        "elapsed_ns": 169046708,
+        "cohort_rounds": 0
+      },
+      {
+        "cpus": 1,
+        "sample": 3,
+        "version": "before",
+        "elapsed_ns": 169533458,
+        "cohort_rounds": 0
+      },
+      {
+        "cpus": 1,
+        "sample": 4,
+        "version": "before",
+        "elapsed_ns": 168691666,
+        "cohort_rounds": 0
+      },
+      {
+        "cpus": 4,
+        "sample": 0,
+        "version": "before",
+        "elapsed_ns": 3275315000,
+        "cohort_rounds": 48255
+      },
+      {
+        "cpus": 4,
+        "sample": 1,
+        "version": "before",
+        "elapsed_ns": 3259085000,
+        "cohort_rounds": 48188
+      },
+      {
+        "cpus": 4,
+        "sample": 2,
+        "version": "before",
+        "elapsed_ns": 3258235292,
+        "cohort_rounds": 48253
+      },
+      {
+        "cpus": 4,
+        "sample": 3,
+        "version": "before",
+        "elapsed_ns": 3266305166,
+        "cohort_rounds": 47909
+      },
+      {
+        "cpus": 4,
+        "sample": 4,
+        "version": "before",
+        "elapsed_ns": 3268222000,
+        "cohort_rounds": 47931
+      },
+      {
+        "cpus": 12,
+        "sample": 0,
+        "version": "before",
+        "elapsed_ns": 3376226709,
+        "cohort_rounds": 49177
+      },
+      {
+        "cpus": 12,
+        "sample": 1,
+        "version": "before",
+        "elapsed_ns": 3419974333,
+        "cohort_rounds": 48261
+      },
+      {
+        "cpus": 12,
+        "sample": 2,
+        "version": "before",
+        "elapsed_ns": 3314478167,
+        "cohort_rounds": 48664
+      },
+      {
+        "cpus": 12,
+        "sample": 3,
+        "version": "before",
+        "elapsed_ns": 3322307125,
+        "cohort_rounds": 48522
+      },
+      {
+        "cpus": 12,
+        "sample": 4,
+        "version": "before",
+        "elapsed_ns": 3346324875,
+        "cohort_rounds": 49235
+      },
+      {
+        "cpus": 1,
+        "sample": 0,
+        "version": "after",
+        "elapsed_ns": 189428542,
+        "cohort_rounds": 0
+      },
+      {
+        "cpus": 1,
+        "sample": 1,
+        "version": "after",
+        "elapsed_ns": 165321458,
+        "cohort_rounds": 0
+      },
+      {
+        "cpus": 1,
+        "sample": 2,
+        "version": "after",
+        "elapsed_ns": 165447209,
+        "cohort_rounds": 0
+      },
+      {
+        "cpus": 1,
+        "sample": 3,
+        "version": "after",
+        "elapsed_ns": 165843875,
+        "cohort_rounds": 0
+      },
+      {
+        "cpus": 1,
+        "sample": 4,
+        "version": "after",
+        "elapsed_ns": 166350666,
+        "cohort_rounds": 0
+      },
+      {
+        "cpus": 4,
+        "sample": 0,
+        "version": "after",
+        "elapsed_ns": 62672958,
+        "cohort_rounds": 2
+      },
+      {
+        "cpus": 4,
+        "sample": 1,
+        "version": "after",
+        "elapsed_ns": 61006041,
+        "cohort_rounds": 2
+      },
+      {
+        "cpus": 4,
+        "sample": 2,
+        "version": "after",
+        "elapsed_ns": 62160083,
+        "cohort_rounds": 2
+      },
+      {
+        "cpus": 4,
+        "sample": 3,
+        "version": "after",
+        "elapsed_ns": 60772500,
+        "cohort_rounds": 2
+      },
+      {
+        "cpus": 4,
+        "sample": 4,
+        "version": "after",
+        "elapsed_ns": 62546542,
+        "cohort_rounds": 2
+      },
+      {
+        "cpus": 12,
+        "sample": 0,
+        "version": "after",
+        "elapsed_ns": 61490125,
+        "cohort_rounds": 2
+      },
+      {
+        "cpus": 12,
+        "sample": 1,
+        "version": "after",
+        "elapsed_ns": 60661958,
+        "cohort_rounds": 2
+      },
+      {
+        "cpus": 12,
+        "sample": 2,
+        "version": "after",
+        "elapsed_ns": 61280666,
+        "cohort_rounds": 2
+      },
+      {
+        "cpus": 12,
+        "sample": 3,
+        "version": "after",
+        "elapsed_ns": 62035042,
+        "cohort_rounds": 2
+      },
+      {
+        "cpus": 12,
+        "sample": 4,
+        "version": "after",
+        "elapsed_ns": 60237083,
+        "cohort_rounds": 2
+      }
+    ],
+    "initial_single_cpu_regression": "First complete source implementation was about 8% slower on one CPU. Readonly controls now bypass async envelopes and unrelated admission/state probes; self job queries read original IDs directly.",
+    "native_mac": {
+      "passed": true,
+      "adaptation": "Darwin lacks sigwaitinfo; the unused compat branch uses sigwait. The measured queries branch is unchanged.",
+      "binary_sha256": "ad7d56ba77b82024bb230db6e8e1c71c8a4435eddbf2da537b1ab09d4c06d53f",
+      "source_sha256": "3a4f7c241ac7d07f45d89b79b8e8ababccd26f03ceffbffa106dd57455e6a511",
+      "samples": [
+        {
+          "mode": "queries",
+          "threads": 4,
+          "rounds": 4000,
+          "elapsed_ns": 77787000
+        },
+        {
+          "mode": "queries",
+          "threads": 4,
+          "rounds": 4000,
+          "elapsed_ns": 46543000
+        },
+        {
+          "mode": "queries",
+          "threads": 4,
+          "rounds": 4000,
+          "elapsed_ns": 43343000
+        },
+        {
+          "mode": "queries",
+          "threads": 4,
+          "rounds": 4000,
+          "elapsed_ns": 43021000
+        },
+        {
+          "mode": "queries",
+          "threads": 4,
+          "rounds": 4000,
+          "elapsed_ns": 42848000
+        }
+      ],
+      "median_ns": 43343000
+    },
+    "native_linux": {
+      "vcpus": 6,
+      "memory_gib": 8,
+      "samples": [
+        {
+          "mode": "queries",
+          "threads": 4,
+          "rounds": 4000,
+          "elapsed_ns": 5968748
+        },
+        {
+          "mode": "queries",
+          "threads": 4,
+          "rounds": 4000,
+          "elapsed_ns": 5974748
+        },
+        {
+          "mode": "queries",
+          "threads": 4,
+          "rounds": 4000,
+          "elapsed_ns": 5847875
+        },
+        {
+          "mode": "queries",
+          "threads": 4,
+          "rounds": 4000,
+          "elapsed_ns": 5867250
+        },
+        {
+          "mode": "queries",
+          "threads": 4,
+          "rounds": 4000,
+          "elapsed_ns": 5846541
+        }
+      ],
+      "median_ns": 5867250
+    },
+    "limits": [
+      "This bounded query workflow is not a browser/Geekbench/general application speedup.",
+      "Native macOS is Mach-O/clang with Darwin ABI; only its unused sigwaitinfo compatibility branch is adapted to sigwait. Its measured C query branch is unchanged.",
+      "Native Linux uses the identical static AArch64 ELF in the dedicated six-vCPU CI environment. This is test infrastructure, not a Linux-kernel VM product."
+    ]
+  },
+  "boundaries": {
+    "removed": [
+      "private and frozen guest PGID/SID/controlling-tty authority",
+      "guest tty bytes/control/job signals joining a coordinator",
+      "compatibility-devpts open and automatic tty-acquisition handoff",
+      "serial stopped-tty wait without original CONT readiness",
+      "filtered retained tty wait refusing worker adoption"
+    ],
+    "remaining": [
+      "legacy terminal-ID-0 GuestOutput and host/UI lifecycle",
+      "explicit tracing and genuinely missing/excluded providers",
+      "existing unsupported tty/termios modes and tty io_uring",
+      "other recorded generic/native/mapping/control fallback categories"
+    ]
+  },
+  "deployment": {
+    "channel": "dev only",
+    "stable_version": "1.5.4",
+    "stable_runner_sha256_before": "8fc21435034e8c041632e2e50419da9d2123bf790aedb0a1499286fc8367e614",
+    "stable_unchanged": true,
+    "business_restarted": false,
+    "physical_ipad_installed": false,
+    "mac_dev": "built, signed, installed and acceptance-tested",
+    "stable_runner_sha256_after": "8fc21435034e8c041632e2e50419da9d2123bf790aedb0a1499286fc8367e614",
+    "mac_dev_version": "Trames Dev 1.5.4 (dev) runtime b234928a70ee63ed4ec65618d68327d17996cdda",
+    "mac_dev_runner_sha256": "ae5591af84ceda9f7563f6d91fa7370175681019074bea6fd81f7a0fe51af942",
+    "installed_dev_acceptance": {
+      "backend": "hvf",
+      "fixture_sha256": "7d412ce6eea6e969b924e78bcbfaa57ba059ee6db53861c6330033a437938b52",
+      "passed": true,
+      "cases": [
+        {
+          "cpus": 1,
+          "mode": "compat",
+          "returncode": 0,
+          "wall_seconds": 0.011986791000000004,
+          "metrics": {
+            "cohort_rounds": 0,
+            "cohort_stop_us": 0,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 315,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 0,
+            "worker_fd_syscalls": 0,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 0,
+            "worker_task_resumes": 0,
+            "worker_uring_syscalls": 0
+          },
+          "cohort_return_syscalls": []
+        },
+        {
+          "cpus": 1,
+          "mode": "queries",
+          "returncode": 0,
+          "wall_seconds": 0.048033666999999995,
+          "measurement": {
+            "mode": "queries",
+            "threads": 4,
+            "rounds": 1000,
+            "elapsed_ns": 41827333
+          },
+          "metrics": {
+            "cohort_rounds": 0,
+            "cohort_stop_us": 0,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 30110,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 0,
+            "worker_fd_syscalls": 0,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 0,
+            "worker_task_resumes": 0,
+            "worker_uring_syscalls": 0
+          },
+          "cohort_return_syscalls": []
+        },
+        {
+          "cpus": 4,
+          "mode": "compat",
+          "returncode": 0,
+          "wall_seconds": 0.009142250000000005,
+          "metrics": {
+            "cohort_rounds": 1,
+            "cohort_stop_us": 0,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 165,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 53,
+            "worker_fd_syscalls": 21,
+            "worker_file_syscalls": 9,
+            "worker_futex_waits": 12,
+            "worker_futex_wakes": 8,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 152,
+            "worker_task_resumes": 23,
+            "worker_uring_syscalls": 0
+          },
+          "cohort_return_syscalls": []
+        },
+        {
+          "cpus": 4,
+          "mode": "queries",
+          "returncode": 0,
+          "wall_seconds": 0.023062749999999993,
+          "measurement": {
+            "mode": "queries",
+            "threads": 4,
+            "rounds": 1000,
+            "elapsed_ns": 16541084
+          },
+          "metrics": {
+            "cohort_rounds": 2,
+            "cohort_stop_us": 39,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 24073,
+            "vm_local_syscalls": 9,
+            "worker_direct_syscalls": 16010,
+            "worker_fd_syscalls": 1,
+            "worker_file_syscalls": 5,
+            "worker_futex_waits": 1,
+            "worker_futex_wakes": 5,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 24060,
+            "worker_task_resumes": 2,
+            "worker_uring_syscalls": 0
+          },
+          "cohort_return_syscalls": []
+        },
+        {
+          "cpus": 12,
+          "mode": "compat",
+          "returncode": 0,
+          "wall_seconds": 0.008613250000000003,
+          "metrics": {
+            "cohort_rounds": 1,
+            "cohort_stop_us": 0,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 165,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 53,
+            "worker_fd_syscalls": 21,
+            "worker_file_syscalls": 9,
+            "worker_futex_waits": 12,
+            "worker_futex_wakes": 8,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 152,
+            "worker_task_resumes": 22,
+            "worker_uring_syscalls": 0
+          },
+          "cohort_return_syscalls": []
+        },
+        {
+          "cpus": 12,
+          "mode": "queries",
+          "returncode": 0,
+          "wall_seconds": 0.02242375000000002,
+          "measurement": {
+            "mode": "queries",
+            "threads": 4,
+            "rounds": 1000,
+            "elapsed_ns": 16193875
+          },
+          "metrics": {
+            "cohort_rounds": 2,
+            "cohort_stop_us": 45,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 24074,
+            "vm_local_syscalls": 9,
+            "worker_direct_syscalls": 16010,
+            "worker_fd_syscalls": 1,
+            "worker_file_syscalls": 5,
+            "worker_futex_waits": 2,
+            "worker_futex_wakes": 5,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 24061,
+            "worker_task_resumes": 4,
+            "worker_uring_syscalls": 0
+          },
+          "cohort_return_syscalls": []
+        }
+      ],
+      "runner_sha256": "ae5591af84ceda9f7563f6d91fa7370175681019074bea6fd81f7a0fe51af942"
+    }
+  }
+}
