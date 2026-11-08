@@ -2,33 +2,36 @@
 
 ## Current status — 2026-11-09
 
-Stage 69 closes admitted **native mapping/entry checkpoints** as a joined
-execution category. Vulkan host-allocation import, live/private native access and
-root entry revalidation run on an existing executor using original task/mm custody.
-Only the affected mm/backing closure quiesces. Task/mm contention releases the CPU
-slot; GPU context/compile/fence waits retain their original Pending request after
-memory permits are released. HLT retirement, pre-effects cancellation and source
-faults use the same existing machinery.
+Stage 70 closes **host process admission/group control and native terminal
+lifecycle** as joined execution categories. Accepted host launches retain original
+session resources across execution-cohort replacement. Existing execution workers
+construct and admit tasks; the existing disk pool loads images and searches PATH
+without retaining parent task/mm custody or a CPU slot. PID publication and
+client disconnect share one atomic lifetime; signals address original groups.
 
-All structural classification now distinguishes SVC from HLT before interpreting
-x8, so an old syscall number cannot turn a native call into exec/clone/mmap work.
-Ordinary native bodies, CPU/native permissions and backing synchronization keep
-their shared implementation. No resource thread, polling bus, ordinary memory fence
-or global native lock is added.
+Both products pump native terminal open/close, input, resize and hangup on their
+original PTY resources while guest CPUs run. Pre-acquisition events cannot target
+a future job; route installation drains pending events and final master close
+notifies once. Source-born admission and cold retirement remain source-owned,
+even while original task/mm custody is unavailable. Non-terminal read-only tty
+probes finish on the original descriptor instead of joining just to return ENOTTY.
 
-The local runtime gates, process and delta regressions, iPad dual-target compile
-checks and 18 actual HVF/interpreter cases pass. Five whole-workflow pairs with 32
-Vulkan shared imports remove 32 native cohort returns on 4/12 CPUs and reduce
-12.2 ms to 10.4 ms; single CPU and file mapping controls remain approximately flat.
-The [validation record](../validation/native-checkpoint-20261109.json) records exact
-samples, source hashes, native controls and limits. Mac Dev is updated after
-validation; stable 1.5.4, business environments and physical iPad installations
-stay unchanged in this batch.
+Mac/Linux runtime gates, 397 process tests on each host, new lifecycle/race tests,
+both iPad compile targets and real HVF CLI/native-terminal workflows pass. The
+[validation record](../validation/host-lifecycle-20261109.json) records exact paired
+measurements, source hashes, native controls and remaining limits. This batch
+updates Mac Dev only; stable 1.5.4, business environments and physical iPad
+installations remain unchanged.
+
+Three alternating whole-flow pairs reduce 16 host exec commands from about 204 ms
+to 136–138 ms on 4/12 CPUs, with 51–53 cohort rounds becoming 1–2. Single CPU
+stays flat near 789.6 ms. Direct native macOS/Linux launch references are
+33.4/2.76 ms; different shells/APIs and the absent Unix transport limit comparison.
 
 **The coordinator still exists.** io_uring's remaining `owner_required` setters
 are the two actual source-maintenance failures: unavailable wait capability or an
 unpumpable original body. Missing layout/signal capability is no longer a trigger.
-Missing typed providers, excluded resources/pins, tracing and actual host lifecycle
+Missing typed providers, excluded resources/pins, tracing and actual host administration
 remain explicit. Earlier stages retain their completed removals; this audit does
 not rename those remaining cases or claim the whole goal is finished.
 
@@ -39,7 +42,7 @@ not rename those remaining cases or claim the whole goal is finished.
 | Guest terminals, sessions and job control | Calling worker and original process/TTY/Files/namespace resources; source and solo share the ABI | Legacy terminal-ID-0 GuestOutput and capability-less/traced embeddings retain their adapter. Unsupported tty controls and tty io_uring remain explicit errors |
 | Scheduling attributes and CPU affinity | Original task atomics, original PID/group/UID authority and task-scoped completion on the caller | Tracing and capability-less embeddings retain their boundary; unsupported features keep their errno. Required original CPU slots start directly from the live queue |
 | Exit/group/default-fatal termination, STOP/CONT and vfork release | Source resources and original group/family notifications | Returned CPU/statistics and cold cleanup complete on existing workers; the actual shared mm may still need its byte checkpoint. Outside-cohort/solo and tracing/capability-less embeddings remain separate |
-| fork/clone/vfork and execve/execveat | Existing workers handle pure and mixed mapping scopes, nonleader rekey and original-mm retirement; existing disk pool prepares native images without retaining a CPU slot | Affected actors still pause; actual tracing/capability-less embeddings and solo/host invocation remain distinct |
+| fork/clone/vfork and execve/execveat | Existing workers handle pure and mixed mapping scopes, nonleader rekey and original-mm retirement; existing disk pool prepares native images without retaining a CPU slot | Affected actors still pause; actual tracing/capability-less embeddings and solo invocation remain distinct |
 | Mapping topology, pins and mapped-file layout | Supported brk/mmap/munmap/mremap/mprotect/msync/madvise and buffer-registration checkpoints publish on an existing worker; additive anonymous mmap is direct | Proc/cold-mm checkpoints and supported mapped-file layout transactions now run on existing workers; excluded backing/lifetime/policy and capability-less embeddings retain explicit boundaries |
 | Native libc/GPU/video/audio | Normal bodies, resource waits and admitted mapping/entry checkpoints use calling/shared-resource execution; exceptional access reuses original task/mm custody | Tracing, capability-less embeddings and actual platform/host lifecycle remain; AppKit affinity, device/disk pools and local fallback are not extra coordinators |
 | Dynamic proc/sys and proc pathname/FD consumers | Calling worker and original PID/mm/Files/fs/namespace resources | First cross-mm byte export and invalidation activate on an existing worker at the original task/mm boundary; legacy providers retain explicit fallback |
@@ -50,7 +53,8 @@ not rename those remaining cases or claim the whole goal is finished.
 | Entropy and random devices | getrandom and supported random/urandom device/UUID operations run on the caller; unsupported entropy controls return on the original OFD | Tracing and absent descriptor capabilities retain their boundary; guest entropy credit/reseed APIs and GRND_INSECURE remain unsupported |
 | BPF and cgroup device policy | Program administration uses the original registry/Files/hierarchy on the caller; target directory and control-file opens resolve directly | Existing unsupported BPF commands/types remain explicit errors; tracing/capability-less embeddings remain. Original device-access consumers retain the same live rules |
 | Seccomp and tracing | Supported installation/TSYNC, decisions and lifecycle effects use original source resources; original policy/NNP is visible to proc, fork and exec | Explicit tracing and capability-less embeddings remain; unsupported seccomp APIs are unchanged. Allowed calls still retain their own excluded resource/generic fallback |
-| Host lifecycle and generic dispatch fallback | Unknown syscall numbers finish locally using generated entry recognition; actual resource/host events retain their own route | Host exec creation/group control, UI terminal launch/close and legacy terminal-ID-0 events, pause/cancel, transfer/timezone/writeback, supervision/admin/pressure/deadline/shutdown; known SVC resources/subcommands and HLT/fault exits not completed, parked or scoped on the worker still reach the joined fallback |
+| Host process and native terminal lifecycle | Host task creation/admission, original group control and UI native terminal open/close/input/resize/hangup progress on original resources and existing execution/disk workers | Legacy terminal-ID-0 events, one-time product terminal initialization and genuinely missing/excluded providers remain explicit |
+| Host administration and generic dispatch fallback | Unknown syscall numbers finish locally using generated entry recognition; actual administration retains its own route | Pause/cancel, transfer/timezone/writeback, supervision/admin/pressure/deadline/shutdown; known SVC resources/subcommands and HLT/fault exits not completed, parked or scoped on the worker still reach the joined fallback |
 
 The last row is an important coverage gap: the remaining owner work is **not
 limited to a fixed set of rare controls**. The final worker-dispatch fallback is
@@ -59,7 +63,7 @@ the owner; ordinary epoch-member migration, parking, wakeup and child/replacemen
 admission already use the live execution queue. Single-CPU/solo execution retains
 its coordinated caller path, which does not by itself imply an extra RPC.
 
-The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/44e8866b912785f5c638fe3ef868a95f7200b2a7/docs/architecture/coordination-boundaries.md)
+The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/c8a59a634b8544e6d690d847fb252966c58b5850/docs/architecture/coordination-boundaries.md)
 records scopes, actual admission gates and source locations. Earlier sections
 below are historical records and do not override this inventory.
 
@@ -4422,3 +4426,40 @@ native macOS/Linux file controls, different backing/durability limits, all hashe
 source-bound CI and delta reuse. Actual affected bytes still need their original
 checkpoint; host/UI lifecycle, tracing/capability-less embeddings and other generic
 fallbacks remain. The overall coordinator-removal goal stays active.
+
+
+## 70. Host process and native terminal lifecycle closure — 2026-11-09
+
+Host exec transport prepares original stdio/OFD resources while CPUs run. Its
+accepted launch is retained by the session, rather than an epoch or a numeric PID
+message. Existing executors nonblockingly acquire original metadata custody,
+construct an unpublished task and submit image/PATH loading to the existing disk
+pool. Completion admits that original task and View into the live execution queue,
+starting only required existing CPU slots. Disk/resource waits return the slot;
+cohort replacement preserves accepted operands and image completion.
+
+Client disconnect arbitrates with PID publication on one atomic lifetime. A
+published PID also publishes its original group-control route; acquire/release is
+limited to that actual host-event publication. Signals and final PTY master close
+use original task/group resources. Native terminal creation/close no longer asks
+either product adapter to stop all executors. No service/resource thread, polling
+bus or ordinary guest memory fence is introduced.
+
+Whole-flow validation found and closed two dependencies: source-born actors could
+be misclassified as foreign Ready tasks during admission or deferred cold exit;
+non-terminal TCGETS/other read-only tty probes still joined just to return ENOTTY.
+The former retains source ownership; the latter completes against the original
+OFD, preserving O_PATH/invalid-pointer ordering and descriptor reuse. Native Linux
+confirms ENOTTY/EBADF and EIO when acquiring a slave after its master closes.
+
+Tests hold image/task/mm custody, replace cohorts, disconnect before publication,
+return late images, race route binding/master close and run busy unrelated jobs
+with one executor. Real HVF workflows cover binary streams, literal arguments,
+concurrent host exec, group signals, native terminal sizes/resize, early queued
+open/close, surviving terminals and persistent restart. See the
+[validation record](../validation/host-lifecycle-20261109.json) for bounded paired
+measurements and native reference limits. Some whole-flow samples still contain
+one extra execve(221) joined return; the generic fallback remains an audit target.
+Product administration, legacy terminal
+ID 0, tracing, excluded providers and the generic joined fallback remain; the
+overall coordinator-removal goal stays active.

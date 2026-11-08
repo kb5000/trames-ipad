@@ -1,0 +1,1303 @@
+{
+  "date": "2026-11-09",
+  "stage": 70,
+  "status": "host process/native terminal joined execution category closed for admitted source execution; overall goal active",
+  "baseline_runtime_revision": "44e8866b912785f5c638fe3ef868a95f7200b2a7",
+  "tested_code_revision": "fff96b4648a77b03770fa237cc3b3b7abbfd4fc7",
+  "runtime_revision": "c8a59a634b8544e6d690d847fb252966c58b5850",
+  "sources": [
+    {
+      "path": "runtime/crates/trames-distro/src/terminals.rs",
+      "sha256": "b64f8955ef897a4bd6bd54c205cc4942417fe85e8c8348687e290893c2cbee0a"
+    },
+    {
+      "path": "runtime/crates/trames-kernel/src/signal/io_terminal.rs",
+      "sha256": "e81e42cc5fd1d7748092dd9d7cf031c8a25ec1688bbaf1fce77589fe706cff3a"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/direct.rs",
+      "sha256": "cf9c796439a02702484b224db13b00d548c79a1b6fbfbc9b08f6a7a4e894e3c7"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/lib.rs",
+      "sha256": "1d3b6a424ec65ef7a906e3dd46be5cb5ec679d79182abfd13cfc35963ceb22a2"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/process.rs",
+      "sha256": "368190f4da054842dc9f4cd2d660b0a61280360379f0739d84576eadaa72cd8f"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/process_birth.rs",
+      "sha256": "2f8a5c41379b0568e14d084935b7930f6302289504b0b955f445caf4ebbe5259"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/process_exec.rs",
+      "sha256": "c0b8e259ef4b84da8391cc097e89abd7c525d2234381fd30aa22fab1392f7111"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/process_host.rs",
+      "sha256": "7b5e06c33d120de1044dafb2c2a9512fa82474629b023a1f954ffb5aeda5526d"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/process_lifecycle.rs",
+      "sha256": "a7ea93b9fc9bda426e20b71c57cdc7a48403b2596bbd431399e2592ddd73df6e"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/process_lifecycle_host.rs",
+      "sha256": "b53c49949eba8f76a0b6ac8f4a7ed8b31a8df2879fad11e0188b86551dce5bec"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/process_vm.rs",
+      "sha256": "6f997511dc8b410e0f48f7c9184e7ba6b93f14a36872356ab0485dd0b117f12e"
+    },
+    {
+      "path": "runtime/crates/trames-session/src/run_queue.rs",
+      "sha256": "eb980f80ae0c0f32d5344a603db67cbcdb5c10aca212fe9d8e5beb1d2067b025"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/direct_io.rs",
+      "sha256": "985bc21d247716973046c5e650db289c23683b1de58bb0c2c5386aa748495ddb"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/pty.rs",
+      "sha256": "ab64700a407370721a8f3cd4d4dbb4c7376f8dab0f6161560fc7d022b801060a"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/pty/shared.rs",
+      "sha256": "043e6973916d95673af3a2be06b8d6287c8600339d4097f997f4a6f1e5571845"
+    },
+    {
+      "path": "runtime/docs/architecture/coordination-boundaries.md",
+      "sha256": "3d26a9350d7e2be9387099940a6d14938eaa3ca193e0afcf4e9442e56823e3df"
+    },
+    {
+      "path": "crates/trames-ffi/src/session.rs",
+      "sha256": "ff6d4f308e136e2106bf6c2e52c5c5c0a95f43f1e252bc37f85ddd013ccc3929"
+    }
+  ],
+  "mac_sources": [
+    {
+      "path": "crates/trames-mac/src/exec.rs",
+      "sha256": "741d563df5af3d399f67e368b5067cf2200130c9b71196e12fe1262d09dd2dfe"
+    },
+    {
+      "path": "crates/trames-mac/src/session.rs",
+      "sha256": "4a6bd7595a29e26259ae646dbd0dc825d6849a4b97ebf01700806110cbf047f3"
+    },
+    {
+      "path": "tests/integration/mac-host-lifecycle.py",
+      "sha256": "8d17b8e0fd71f84bc2c47014a8bb7c4990a76ac19e50af3ef5ca3de4b2919390"
+    },
+    {
+      "path": ".github/workflows/macos.yml",
+      "sha256": "c0f087f6d1da60ba75d2ed746df07adda943211ac50b30b1d4d029326dcd115b"
+    }
+  ],
+  "checks": {
+    "runtime_mac": [
+      {
+        "exit_code": 0,
+        "index": 1,
+        "name": "rustup show",
+        "reused": true,
+        "seconds": 0.01800823211669922,
+        "status": "passed"
+      },
+      {
+        "exit_code": 0,
+        "index": 2,
+        "name": "python3 scripts/check-execution-boundaries.py",
+        "reused": true,
+        "seconds": 0.08716177940368652,
+        "status": "passed"
+      },
+      {
+        "exit_code": 0,
+        "index": 3,
+        "name": "cargo fmt --all --check",
+        "seconds": 1.1180248260498047,
+        "status": "passed"
+      },
+      {
+        "exit_code": 0,
+        "index": 4,
+        "name": "cargo clippy --workspace --all-targets --all-features --locked -- -D warnings",
+        "seconds": 7.927820682525635,
+        "status": "passed"
+      },
+      {
+        "exit_code": 0,
+        "index": 5,
+        "name": "cargo test --workspace --all-features --locked",
+        "seconds": 24.978545904159546,
+        "status": "passed"
+      },
+      {
+        "exit_code": 0,
+        "index": 6,
+        "name": "cargo build --workspace --all-features --release --locked",
+        "seconds": 8.126278162002563,
+        "status": "passed"
+      },
+      {
+        "exit_code": 0,
+        "index": 7,
+        "name": "cargo run --release -p trames-memory --example reclaim-footprint --locked",
+        "seconds": 0.35680317878723145,
+        "status": "passed"
+      }
+    ],
+    "runtime_linux": [
+      {
+        "exit_code": 0,
+        "index": 1,
+        "name": "rustup show",
+        "reused": true,
+        "seconds": 0.01569533348083496,
+        "status": "passed"
+      },
+      {
+        "exit_code": 0,
+        "index": 2,
+        "name": "python3 scripts/check-execution-boundaries.py",
+        "reused": true,
+        "seconds": 0.07637286186218262,
+        "status": "passed"
+      },
+      {
+        "exit_code": 0,
+        "index": 3,
+        "name": "cargo fmt --all --check",
+        "seconds": 1.007645606994629,
+        "status": "passed"
+      },
+      {
+        "exit_code": 0,
+        "index": 4,
+        "name": "cargo clippy --workspace --all-targets --all-features --locked -- -D warnings",
+        "seconds": 5.740727663040161,
+        "status": "passed"
+      },
+      {
+        "exit_code": 0,
+        "index": 5,
+        "name": "cargo test --workspace --all-features --locked",
+        "seconds": 22.948404788970947,
+        "status": "passed"
+      },
+      {
+        "exit_code": 0,
+        "index": 6,
+        "name": "cargo build --workspace --all-features --release --locked",
+        "seconds": 6.523250579833984,
+        "status": "passed"
+      },
+      {
+        "exit_code": 0,
+        "index": 7,
+        "name": "cargo run --release -p trames-memory --example reclaim-footprint --locked",
+        "seconds": 0.1689300537109375,
+        "status": "passed"
+      }
+    ],
+    "process_mac": {
+      "passed": 397,
+      "ignored": 2
+    },
+    "process_linux": {
+      "passed": 397,
+      "ignored": 2
+    },
+    "strict_core_clippy": {
+      "mac": "passed",
+      "linux": "passed"
+    },
+    "ipad_compile": [
+      {
+        "target": "aarch64-apple-ios",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+        "code": 0
+      },
+      {
+        "target": "aarch64-apple-ios-sim",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk",
+        "code": 0
+      }
+    ],
+    "mac_product_prefix": [
+      {
+        "exit_code": 0,
+        "index": 1,
+        "name": "rustup show",
+        "seconds": 0.025697946548461914,
+        "status": "passed"
+      },
+      {
+        "exit_code": 0,
+        "index": 2,
+        "name": "python3 scripts/check-execution-boundaries.py",
+        "seconds": 0.11243200302124023,
+        "status": "passed"
+      },
+      {
+        "exit_code": 0,
+        "index": 3,
+        "name": "cargo fmt --all --check",
+        "seconds": 1.1000440120697021,
+        "status": "passed"
+      },
+      {
+        "exit_code": 0,
+        "index": 4,
+        "name": "cargo clippy --workspace --all-targets --all-features --locked -- -D warnings",
+        "seconds": 3.8025729656219482,
+        "status": "passed"
+      },
+      {
+        "exit_code": 0,
+        "index": 5,
+        "name": "cargo test --workspace --all-features --locked",
+        "seconds": 9.328136920928955,
+        "status": "passed"
+      },
+      {
+        "exit_code": 0,
+        "index": 6,
+        "name": "bash -n scripts/build-mac.sh scripts/install-mac.sh",
+        "seconds": 0.03373908996582031,
+        "status": "passed"
+      },
+      {
+        "exit_code": 0,
+        "index": 7,
+        "name": "python3 -m py_compile scripts/package-mac.py scripts/benchmark-firefox-video.py scripts/run-firefox-gpu.py tests/integration/mac-environments.py tests/integration/mac-packages.py tests/integration/mac-systemd.py tests/integration/mac-cli.py tests/integration/mac-channels.py tests/integration/mac-background.py tests/integration/mac-exec.py",
+        "seconds": 0.185089111328125,
+        "status": "passed"
+      },
+      {
+        "exit_code": 0,
+        "index": 8,
+        "name": "bash tests/native/task-stream.sh",
+        "seconds": 3.1453468799591064,
+        "status": "passed"
+      },
+      {
+        "index": 9,
+        "name": null,
+        "status": "not-run"
+      },
+      {
+        "index": 10,
+        "name": null,
+        "status": "not-run"
+      },
+      {
+        "index": 11,
+        "name": null,
+        "status": "not-run"
+      },
+      {
+        "index": 12,
+        "name": null,
+        "status": "not-run"
+      }
+    ],
+    "mac_python_delta": [
+      {
+        "index": 1,
+        "name": null,
+        "status": "not-run"
+      },
+      {
+        "index": 2,
+        "name": null,
+        "status": "not-run"
+      },
+      {
+        "index": 3,
+        "name": null,
+        "status": "not-run"
+      },
+      {
+        "index": 4,
+        "name": null,
+        "status": "not-run"
+      },
+      {
+        "index": 5,
+        "name": null,
+        "status": "not-run"
+      },
+      {
+        "index": 6,
+        "name": null,
+        "status": "not-run"
+      },
+      {
+        "exit_code": 0,
+        "index": 7,
+        "name": "python3 -m py_compile scripts/package-mac.py scripts/benchmark-firefox-video.py scripts/run-firefox-gpu.py tests/integration/mac-environments.py tests/integration/mac-packages.py tests/integration/mac-systemd.py tests/integration/mac-cli.py tests/integration/mac-channels.py tests/integration/mac-background.py tests/integration/mac-exec.py tests/integration/mac-host-lifecycle.py",
+        "seconds": 0.17814087867736816,
+        "status": "passed"
+      },
+      {
+        "index": 8,
+        "name": null,
+        "status": "not-run"
+      },
+      {
+        "index": 9,
+        "name": null,
+        "status": "not-run"
+      },
+      {
+        "index": 10,
+        "name": null,
+        "status": "not-run"
+      },
+      {
+        "index": 11,
+        "name": null,
+        "status": "not-run"
+      },
+      {
+        "index": 12,
+        "name": null,
+        "status": "not-run"
+      }
+    ],
+    "final_paired_boundaries": {
+      "ipad": "passed",
+      "mac": "passed"
+    },
+    "reuse_scope": "Final runtime commit adds documentation only; unchanged executable source gates are reused. Paired product metadata/boundaries, Python workflow delta, signed Dev build and installed real-HVF acceptance were rerun."
+  },
+  "semantic_oracles": {
+    "native_arm64_linux": {
+      "pipe_tcgets_errno": 25,
+      "opath_tcgets_errno": 9,
+      "closed_master_acquire_errno": 5
+    },
+    "source_lifecycle_tests": [
+      "sole_busy_executor_admission_completion_no_owner_hook",
+      "held_image_releases_parent_task_mm",
+      "accepted_image_survives_epoch_replacement",
+      "disconnect_before_pid_and_late_completion",
+      "source_born_cold_retirement_not_foreign_ready",
+      "host_stdio_probe_error_order_and_ofd_reuse",
+      "concurrent_route_install_close_one_hangup",
+      "pid_publication_disconnect_atomic_race"
+    ]
+  },
+  "performance": {
+    "samples": [
+      {
+        "passed": true,
+        "cpus": 1,
+        "runner_sha256": "9fbcde761f55d284945346fad4b410bc876c5c86ff63285caba71e6cb37fe1f7",
+        "exec_16_elapsed_ns": 789543500,
+        "metrics": {
+          "cohort_rounds": 0,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 4977,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 0,
+          "worker_uring_syscalls": 0
+        },
+        "checks": [
+          "live_exec",
+          "native_terminal_open",
+          "initial_size",
+          "live_resize",
+          "early_close_before_slave_open",
+          "master_close",
+          "busy_peer_survives",
+          "no_service_requests"
+        ],
+        "sample": 0,
+        "label": "before"
+      },
+      {
+        "passed": true,
+        "cpus": 1,
+        "runner_sha256": "65aff454dca35ed98e1cbe2d7fb9d11454c9980e5d7912ea5185bb008dac0467",
+        "exec_16_elapsed_ns": 789796208,
+        "metrics": {
+          "cohort_rounds": 0,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 4972,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 0,
+          "worker_uring_syscalls": 0
+        },
+        "checks": [
+          "live_exec",
+          "native_terminal_open",
+          "initial_size",
+          "live_resize",
+          "early_close_before_slave_open",
+          "master_close",
+          "busy_peer_survives",
+          "no_service_requests"
+        ],
+        "sample": 0,
+        "label": "after"
+      },
+      {
+        "passed": true,
+        "cpus": 1,
+        "runner_sha256": "65aff454dca35ed98e1cbe2d7fb9d11454c9980e5d7912ea5185bb008dac0467",
+        "exec_16_elapsed_ns": 789655708,
+        "metrics": {
+          "cohort_rounds": 0,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 4975,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 0,
+          "worker_uring_syscalls": 0
+        },
+        "checks": [
+          "live_exec",
+          "native_terminal_open",
+          "initial_size",
+          "live_resize",
+          "early_close_before_slave_open",
+          "master_close",
+          "busy_peer_survives",
+          "no_service_requests"
+        ],
+        "sample": 1,
+        "label": "after"
+      },
+      {
+        "passed": true,
+        "cpus": 1,
+        "runner_sha256": "9fbcde761f55d284945346fad4b410bc876c5c86ff63285caba71e6cb37fe1f7",
+        "exec_16_elapsed_ns": 789584333,
+        "metrics": {
+          "cohort_rounds": 0,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 4975,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 0,
+          "worker_uring_syscalls": 0
+        },
+        "checks": [
+          "live_exec",
+          "native_terminal_open",
+          "initial_size",
+          "live_resize",
+          "early_close_before_slave_open",
+          "master_close",
+          "busy_peer_survives",
+          "no_service_requests"
+        ],
+        "sample": 1,
+        "label": "before"
+      },
+      {
+        "passed": true,
+        "cpus": 1,
+        "runner_sha256": "9fbcde761f55d284945346fad4b410bc876c5c86ff63285caba71e6cb37fe1f7",
+        "exec_16_elapsed_ns": 790779459,
+        "metrics": {
+          "cohort_rounds": 0,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 4975,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 0,
+          "worker_uring_syscalls": 0
+        },
+        "checks": [
+          "live_exec",
+          "native_terminal_open",
+          "initial_size",
+          "live_resize",
+          "early_close_before_slave_open",
+          "master_close",
+          "busy_peer_survives",
+          "no_service_requests"
+        ],
+        "sample": 2,
+        "label": "before"
+      },
+      {
+        "passed": true,
+        "cpus": 1,
+        "runner_sha256": "65aff454dca35ed98e1cbe2d7fb9d11454c9980e5d7912ea5185bb008dac0467",
+        "exec_16_elapsed_ns": 789631084,
+        "metrics": {
+          "cohort_rounds": 0,
+          "cohort_stop_us": 0,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 4973,
+          "vm_local_syscalls": 0,
+          "worker_direct_syscalls": 0,
+          "worker_fd_syscalls": 0,
+          "worker_file_syscalls": 0,
+          "worker_futex_waits": 0,
+          "worker_futex_wakes": 0,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 0,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 0,
+          "worker_task_resumes": 0,
+          "worker_uring_syscalls": 0
+        },
+        "checks": [
+          "live_exec",
+          "native_terminal_open",
+          "initial_size",
+          "live_resize",
+          "early_close_before_slave_open",
+          "master_close",
+          "busy_peer_survives",
+          "no_service_requests"
+        ],
+        "sample": 2,
+        "label": "after"
+      },
+      {
+        "passed": true,
+        "cpus": 4,
+        "runner_sha256": "9fbcde761f55d284945346fad4b410bc876c5c86ff63285caba71e6cb37fe1f7",
+        "exec_16_elapsed_ns": 204485916,
+        "metrics": {
+          "cohort_rounds": 52,
+          "cohort_stop_us": 77909,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 3036,
+          "vm_local_syscalls": 311,
+          "worker_direct_syscalls": 1346,
+          "worker_fd_syscalls": 385,
+          "worker_file_syscalls": 201,
+          "worker_futex_waits": 8,
+          "worker_futex_wakes": 28,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 367,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 2935,
+          "worker_task_resumes": 72,
+          "worker_uring_syscalls": 0
+        },
+        "checks": [
+          "live_exec",
+          "native_terminal_open",
+          "initial_size",
+          "live_resize",
+          "early_close_before_slave_open",
+          "master_close",
+          "busy_peer_survives",
+          "no_service_requests"
+        ],
+        "sample": 0,
+        "label": "before"
+      },
+      {
+        "passed": true,
+        "cpus": 4,
+        "runner_sha256": "65aff454dca35ed98e1cbe2d7fb9d11454c9980e5d7912ea5185bb008dac0467",
+        "exec_16_elapsed_ns": 132814167,
+        "metrics": {
+          "cohort_rounds": 1,
+          "cohort_stop_us": 621,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 3487,
+          "vm_local_syscalls": 373,
+          "worker_direct_syscalls": 1462,
+          "worker_fd_syscalls": 458,
+          "worker_file_syscalls": 212,
+          "worker_futex_waits": 9,
+          "worker_futex_wakes": 41,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 410,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 3417,
+          "worker_task_resumes": 92,
+          "worker_uring_syscalls": 0
+        },
+        "checks": [
+          "live_exec",
+          "native_terminal_open",
+          "initial_size",
+          "live_resize",
+          "early_close_before_slave_open",
+          "master_close",
+          "busy_peer_survives",
+          "no_service_requests"
+        ],
+        "sample": 0,
+        "label": "after"
+      },
+      {
+        "passed": true,
+        "cpus": 4,
+        "runner_sha256": "65aff454dca35ed98e1cbe2d7fb9d11454c9980e5d7912ea5185bb008dac0467",
+        "exec_16_elapsed_ns": 136503292,
+        "metrics": {
+          "cohort_rounds": 1,
+          "cohort_stop_us": 1870,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 3675,
+          "vm_local_syscalls": 405,
+          "worker_direct_syscalls": 1521,
+          "worker_fd_syscalls": 495,
+          "worker_file_syscalls": 255,
+          "worker_futex_waits": 7,
+          "worker_futex_wakes": 41,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 411,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 3604,
+          "worker_task_resumes": 90,
+          "worker_uring_syscalls": 0
+        },
+        "checks": [
+          "live_exec",
+          "native_terminal_open",
+          "initial_size",
+          "live_resize",
+          "early_close_before_slave_open",
+          "master_close",
+          "busy_peer_survives",
+          "no_service_requests"
+        ],
+        "sample": 1,
+        "label": "after"
+      },
+      {
+        "passed": true,
+        "cpus": 4,
+        "runner_sha256": "9fbcde761f55d284945346fad4b410bc876c5c86ff63285caba71e6cb37fe1f7",
+        "exec_16_elapsed_ns": 204492042,
+        "metrics": {
+          "cohort_rounds": 53,
+          "cohort_stop_us": 67855,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 3067,
+          "vm_local_syscalls": 314,
+          "worker_direct_syscalls": 1364,
+          "worker_fd_syscalls": 388,
+          "worker_file_syscalls": 211,
+          "worker_futex_waits": 7,
+          "worker_futex_wakes": 28,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 368,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 2971,
+          "worker_task_resumes": 69,
+          "worker_uring_syscalls": 0
+        },
+        "checks": [
+          "live_exec",
+          "native_terminal_open",
+          "initial_size",
+          "live_resize",
+          "early_close_before_slave_open",
+          "master_close",
+          "busy_peer_survives",
+          "no_service_requests"
+        ],
+        "sample": 1,
+        "label": "before"
+      },
+      {
+        "passed": true,
+        "cpus": 4,
+        "runner_sha256": "9fbcde761f55d284945346fad4b410bc876c5c86ff63285caba71e6cb37fe1f7",
+        "exec_16_elapsed_ns": 204482333,
+        "metrics": {
+          "cohort_rounds": 52,
+          "cohort_stop_us": 75742,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 3226,
+          "vm_local_syscalls": 293,
+          "worker_direct_syscalls": 1345,
+          "worker_fd_syscalls": 370,
+          "worker_file_syscalls": 195,
+          "worker_futex_waits": 8,
+          "worker_futex_wakes": 28,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 368,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 2874,
+          "worker_task_resumes": 71,
+          "worker_uring_syscalls": 0
+        },
+        "checks": [
+          "live_exec",
+          "native_terminal_open",
+          "initial_size",
+          "live_resize",
+          "early_close_before_slave_open",
+          "master_close",
+          "busy_peer_survives",
+          "no_service_requests"
+        ],
+        "sample": 2,
+        "label": "before"
+      },
+      {
+        "passed": true,
+        "cpus": 4,
+        "runner_sha256": "65aff454dca35ed98e1cbe2d7fb9d11454c9980e5d7912ea5185bb008dac0467",
+        "exec_16_elapsed_ns": 135859541,
+        "metrics": {
+          "cohort_rounds": 1,
+          "cohort_stop_us": 893,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 3631,
+          "vm_local_syscalls": 397,
+          "worker_direct_syscalls": 1505,
+          "worker_fd_syscalls": 486,
+          "worker_file_syscalls": 243,
+          "worker_futex_waits": 9,
+          "worker_futex_wakes": 41,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 411,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 3564,
+          "worker_task_resumes": 92,
+          "worker_uring_syscalls": 0
+        },
+        "checks": [
+          "live_exec",
+          "native_terminal_open",
+          "initial_size",
+          "live_resize",
+          "early_close_before_slave_open",
+          "master_close",
+          "busy_peer_survives",
+          "no_service_requests"
+        ],
+        "sample": 2,
+        "label": "after"
+      },
+      {
+        "passed": true,
+        "cpus": 12,
+        "runner_sha256": "9fbcde761f55d284945346fad4b410bc876c5c86ff63285caba71e6cb37fe1f7",
+        "exec_16_elapsed_ns": 202690208,
+        "metrics": {
+          "cohort_rounds": 51,
+          "cohort_stop_us": 72722,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 3182,
+          "vm_local_syscalls": 292,
+          "worker_direct_syscalls": 1330,
+          "worker_fd_syscalls": 361,
+          "worker_file_syscalls": 192,
+          "worker_futex_waits": 9,
+          "worker_futex_wakes": 28,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 366,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 2837,
+          "worker_task_resumes": 72,
+          "worker_uring_syscalls": 0
+        },
+        "checks": [
+          "live_exec",
+          "native_terminal_open",
+          "initial_size",
+          "live_resize",
+          "early_close_before_slave_open",
+          "master_close",
+          "busy_peer_survives",
+          "no_service_requests"
+        ],
+        "sample": 0,
+        "label": "before"
+      },
+      {
+        "passed": true,
+        "cpus": 12,
+        "runner_sha256": "65aff454dca35ed98e1cbe2d7fb9d11454c9980e5d7912ea5185bb008dac0467",
+        "exec_16_elapsed_ns": 137777917,
+        "metrics": {
+          "cohort_rounds": 2,
+          "cohort_stop_us": 1112,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 3618,
+          "vm_local_syscalls": 394,
+          "worker_direct_syscalls": 1510,
+          "worker_fd_syscalls": 483,
+          "worker_file_syscalls": 248,
+          "worker_futex_waits": 9,
+          "worker_futex_wakes": 40,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 411,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 3550,
+          "worker_task_resumes": 89,
+          "worker_uring_syscalls": 0
+        },
+        "checks": [
+          "live_exec",
+          "native_terminal_open",
+          "initial_size",
+          "live_resize",
+          "early_close_before_slave_open",
+          "master_close",
+          "busy_peer_survives",
+          "no_service_requests"
+        ],
+        "sample": 0,
+        "label": "after"
+      },
+      {
+        "passed": true,
+        "cpus": 12,
+        "runner_sha256": "65aff454dca35ed98e1cbe2d7fb9d11454c9980e5d7912ea5185bb008dac0467",
+        "exec_16_elapsed_ns": 139519292,
+        "metrics": {
+          "cohort_rounds": 1,
+          "cohort_stop_us": 869,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 3596,
+          "vm_local_syscalls": 385,
+          "worker_direct_syscalls": 1508,
+          "worker_fd_syscalls": 486,
+          "worker_file_syscalls": 249,
+          "worker_futex_waits": 8,
+          "worker_futex_wakes": 41,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 411,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 3524,
+          "worker_task_resumes": 91,
+          "worker_uring_syscalls": 0
+        },
+        "checks": [
+          "live_exec",
+          "native_terminal_open",
+          "initial_size",
+          "live_resize",
+          "early_close_before_slave_open",
+          "master_close",
+          "busy_peer_survives",
+          "no_service_requests"
+        ],
+        "sample": 1,
+        "label": "after"
+      },
+      {
+        "passed": true,
+        "cpus": 12,
+        "runner_sha256": "9fbcde761f55d284945346fad4b410bc876c5c86ff63285caba71e6cb37fe1f7",
+        "exec_16_elapsed_ns": 203934666,
+        "metrics": {
+          "cohort_rounds": 53,
+          "cohort_stop_us": 77058,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 3191,
+          "vm_local_syscalls": 292,
+          "worker_direct_syscalls": 1339,
+          "worker_fd_syscalls": 363,
+          "worker_file_syscalls": 192,
+          "worker_futex_waits": 8,
+          "worker_futex_wakes": 28,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 368,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 2847,
+          "worker_task_resumes": 71,
+          "worker_uring_syscalls": 0
+        },
+        "checks": [
+          "live_exec",
+          "native_terminal_open",
+          "initial_size",
+          "live_resize",
+          "early_close_before_slave_open",
+          "master_close",
+          "busy_peer_survives",
+          "no_service_requests"
+        ],
+        "sample": 1,
+        "label": "before"
+      },
+      {
+        "passed": true,
+        "cpus": 12,
+        "runner_sha256": "9fbcde761f55d284945346fad4b410bc876c5c86ff63285caba71e6cb37fe1f7",
+        "exec_16_elapsed_ns": 204643292,
+        "metrics": {
+          "cohort_rounds": 51,
+          "cohort_stop_us": 71444,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 3241,
+          "vm_local_syscalls": 297,
+          "worker_direct_syscalls": 1355,
+          "worker_fd_syscalls": 378,
+          "worker_file_syscalls": 205,
+          "worker_futex_waits": 9,
+          "worker_futex_wakes": 28,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 368,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 2904,
+          "worker_task_resumes": 72,
+          "worker_uring_syscalls": 0
+        },
+        "checks": [
+          "live_exec",
+          "native_terminal_open",
+          "initial_size",
+          "live_resize",
+          "early_close_before_slave_open",
+          "master_close",
+          "busy_peer_survives",
+          "no_service_requests"
+        ],
+        "sample": 2,
+        "label": "before"
+      },
+      {
+        "passed": true,
+        "cpus": 12,
+        "runner_sha256": "65aff454dca35ed98e1cbe2d7fb9d11454c9980e5d7912ea5185bb008dac0467",
+        "exec_16_elapsed_ns": 137015792,
+        "metrics": {
+          "cohort_rounds": 1,
+          "cohort_stop_us": 303,
+          "service_caller_wait_us": 0,
+          "service_requests": 0,
+          "serviced_syscalls": 0,
+          "syscalls": 3693,
+          "vm_local_syscalls": 400,
+          "worker_direct_syscalls": 1546,
+          "worker_fd_syscalls": 503,
+          "worker_file_syscalls": 268,
+          "worker_futex_waits": 9,
+          "worker_futex_wakes": 41,
+          "worker_gpu_calls": 0,
+          "worker_gpu_waits": 0,
+          "worker_poll_syscalls": 415,
+          "worker_socket_syscalls": 0,
+          "worker_syscalls": 3626,
+          "worker_task_resumes": 95,
+          "worker_uring_syscalls": 0
+        },
+        "checks": [
+          "live_exec",
+          "native_terminal_open",
+          "initial_size",
+          "live_resize",
+          "early_close_before_slave_open",
+          "master_close",
+          "busy_peer_survives",
+          "no_service_requests"
+        ],
+        "sample": 2,
+        "label": "after"
+      }
+    ],
+    "medians": [
+      {
+        "cpus": 1,
+        "before": {
+          "exec_16_ms": 789.584333,
+          "cohort_rounds": [
+            0,
+            0,
+            0
+          ]
+        },
+        "after": {
+          "exec_16_ms": 789.655708,
+          "cohort_rounds": [
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      {
+        "cpus": 4,
+        "before": {
+          "exec_16_ms": 204.485916,
+          "cohort_rounds": [
+            52,
+            53,
+            52
+          ]
+        },
+        "after": {
+          "exec_16_ms": 135.859541,
+          "cohort_rounds": [
+            1,
+            1,
+            1
+          ]
+        }
+      },
+      {
+        "cpus": 12,
+        "before": {
+          "exec_16_ms": 203.934666,
+          "cohort_rounds": [
+            51,
+            53,
+            51
+          ]
+        },
+        "after": {
+          "exec_16_ms": 137.777917,
+          "cohort_rounds": [
+            2,
+            1,
+            1
+          ]
+        }
+      }
+    ],
+    "native_macos_exec_16_ns": [
+      36716167,
+      33442833,
+      33119667
+    ],
+    "fixture_sha256": "8d17b8e0fd71f84bc2c47014a8bb7c4990a76ac19e50af3ef5ca3de4b2919390"
+  },
+  "native_linux_exec_16_ns": [
+    3035645,
+    2755393,
+    2610309
+  ],
+  "real_cli_acceptance": {
+    "passed": true,
+    "checks": [
+      "help_without_runtime",
+      "no_implicit_creation",
+      "scoped_config_and_defaults",
+      "idempotent_background_start",
+      "literal_argv_env_cwd",
+      "stdout_stderr_exit",
+      "binary_full_duplex_8MiB",
+      "pty_opt_in",
+      "concurrent_exec",
+      "signal_group_isolation",
+      "independent_shells_and_listing",
+      "persistent_restart",
+      "login_enable_disable"
+    ],
+    "runner_sha256": "f742e429747686cc76bdf23505accebd7aea39c32f86d6b73ab39797eea8b7a5"
+  },
+  "limits": [
+    "Mac real-HVF tests use disposable Alpine 3.22.6 disks, network/windows disabled.",
+    "The 16-exec timer includes real socket transport, host polling, image loading and shell execution while a guest job stays busy. Cohort counts cover the full terminal/exec workflow.",
+    "Native macOS/Linux references directly start their host shell without Unix transport; shell binaries, ABIs and filesystem backing differ. Linux runs in the existing six-vCPU local ARM64 CI instance, stopped before Mac paired timing.",
+    "No Firefox/general application speedup or native-performance parity is inferred.",
+    "Final runtime audit commit changes documentation only; exact executable source hashes match both passed CI runs. Product pin/build metadata are checked after that fast-forward.",
+    "Only Mac Dev is deployed. Stable 1.5.4, business environments and physical iPad installations are unchanged.",
+    "Single-CPU/solo, legacy terminal ID 0, one-time product initialization, actual host administration, tracing/excluded providers and generic joined dispatch remain explicit.",
+    "One extra execve(221) joined return appears in some final whole-flow samples. The generic joined fallback remains an audit target; the full workflow is not claimed to have zero remaining cohort boundaries."
+  ],
+  "deployment": {
+    "channel": "Mac Dev only",
+    "status": "installed and accepted",
+    "application": "/Users/main/Applications/Trames Dev.app",
+    "version": "Trames Dev 1.5.4 (dev) runtime c8a59a634b8544e6d690d847fb252966c58b5850",
+    "runner_sha256": "f742e429747686cc76bdf23505accebd7aea39c32f86d6b73ab39797eea8b7a5",
+    "stable_runner_sha256": "8fc21435034e8c041632e2e50419da9d2123bf790aedb0a1499286fc8367e614",
+    "stable_unchanged": true,
+    "business_restarted": false,
+    "physical_ipad_installed": false
+  },
+  "pre_integration_real_cli_acceptance": {
+    "passed": true,
+    "checks": [
+      "help_without_runtime",
+      "no_implicit_creation",
+      "scoped_config_and_defaults",
+      "idempotent_background_start",
+      "literal_argv_env_cwd",
+      "stdout_stderr_exit",
+      "binary_full_duplex_8MiB",
+      "pty_opt_in",
+      "concurrent_exec",
+      "signal_group_isolation",
+      "independent_shells_and_listing",
+      "persistent_restart",
+      "login_enable_disable"
+    ],
+    "runner_sha256": "17b449800dfb446557a4666982fd273b4de1c9166e67d9ca34a63e8b88fbe2d8"
+  },
+  "installed_native_terminal_acceptance": [
+    {
+      "passed": true,
+      "cpus": 4,
+      "runner_sha256": "f742e429747686cc76bdf23505accebd7aea39c32f86d6b73ab39797eea8b7a5",
+      "exec_16_elapsed_ns": 139591750,
+      "metrics": {
+        "cohort_rounds": 2,
+        "cohort_stop_us": 2495,
+        "service_caller_wait_us": 0,
+        "service_requests": 0,
+        "serviced_syscalls": 0,
+        "syscalls": 3466,
+        "vm_local_syscalls": 360,
+        "worker_direct_syscalls": 1471,
+        "worker_fd_syscalls": 463,
+        "worker_file_syscalls": 221,
+        "worker_futex_waits": 9,
+        "worker_futex_wakes": 37,
+        "worker_gpu_calls": 0,
+        "worker_gpu_waits": 0,
+        "worker_poll_syscalls": 411,
+        "worker_socket_syscalls": 0,
+        "worker_syscalls": 3399,
+        "worker_task_resumes": 89,
+        "worker_uring_syscalls": 0
+      },
+      "checks": [
+        "live_exec",
+        "native_terminal_open",
+        "initial_size",
+        "live_resize",
+        "early_close_before_slave_open",
+        "master_close",
+        "busy_peer_survives",
+        "no_service_requests"
+      ]
+    },
+    {
+      "passed": true,
+      "cpus": 12,
+      "runner_sha256": "f742e429747686cc76bdf23505accebd7aea39c32f86d6b73ab39797eea8b7a5",
+      "exec_16_elapsed_ns": 136311583,
+      "metrics": {
+        "cohort_rounds": 1,
+        "cohort_stop_us": 593,
+        "service_caller_wait_us": 0,
+        "service_requests": 0,
+        "serviced_syscalls": 0,
+        "syscalls": 3716,
+        "vm_local_syscalls": 403,
+        "worker_direct_syscalls": 1533,
+        "worker_fd_syscalls": 505,
+        "worker_file_syscalls": 258,
+        "worker_futex_waits": 9,
+        "worker_futex_wakes": 41,
+        "worker_gpu_calls": 0,
+        "worker_gpu_waits": 0,
+        "worker_poll_syscalls": 414,
+        "worker_socket_syscalls": 0,
+        "worker_syscalls": 3643,
+        "worker_task_resumes": 96,
+        "worker_uring_syscalls": 0
+      },
+      "checks": [
+        "live_exec",
+        "native_terminal_open",
+        "initial_size",
+        "live_resize",
+        "early_close_before_slave_open",
+        "master_close",
+        "busy_peer_survives",
+        "no_service_requests"
+      ]
+    }
+  ]
+}

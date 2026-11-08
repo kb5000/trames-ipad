@@ -1076,11 +1076,7 @@ impl GuestOutput for Adapter {
                 let Some(terminals) = self.terminals.as_mut() else {
                     return Ok(true);
                 };
-                if !terminals.can_pump_live(&buffers.terminals) {
-                    return Ok(true);
-                }
-                // Existing PTY object locks protect the byte transport. Open,
-                // close, resize signals and process changes still join.
+                // Open/close, input, resize and hangup use original PTY resources.
                 terminals.pump(&mut buffers.terminals);
             } else if buffers.terminals.get(&1).is_some_and(|b| b.size.is_some()) {
                 return Ok(true);
