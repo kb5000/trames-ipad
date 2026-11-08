@@ -2,26 +2,28 @@
 
 ## Current status — 2026-11-09
 
-Stage 68 closes the supported **guest terminal/session/job-control subsystem**.
-PGID/SID and controlling-terminal ownership now have original process resources,
-shared by threads. setpgid/setsid, foreground controls, automatic slave opens,
-/dev/tty, termios/winsize, keyboard signals, hangup, fork/exec/exit, proc, group
-signal routing and child wait selection use the same live authority. Observer
-refresh cannot overwrite source membership with an old snapshot.
+Stage 69 closes admitted **native mapping/entry checkpoints** as a joined
+execution category. Vulkan host-allocation import, live/private native access and
+root entry revalidation run on an existing executor using original task/mm custody.
+Only the affected mm/backing closure quiesces. Task/mm contention releases the CPU
+slot; GPU context/compile/fence waits retain their original Pending request after
+memory permits are released. HLT retirement, pre-effects cancellation and source
+faults use the same existing machinery.
 
-Background read/write/ioctl stops retain the original SVC/OFD across O_NONBLOCK,
-FD close/reuse, filters and cohort handoff. Actual stops subscribe to original
-CONT/termination readiness. This also fixes the serial write/ioctl wake gap;
-there is no periodic retry or new resource/coordinator thread. Read-only tty
-controls and self job queries use the common direct ABI without async envelopes,
-unrelated policy lookup or global observer refresh.
+All structural classification now distinguishes SVC from HLT before interpreting
+x8, so an old syscall number cannot turn a native call into exec/clone/mmap work.
+Ordinary native bodies, CPU/native permissions and backing synchronization keep
+their shared implementation. No resource thread, polling bus, ordinary memory fence
+or global native lock is added.
 
-Both runtime workflows, 390 process regressions per host, both iPad compile
-targets and the complete real-backend terminal acceptance pass. Validation records
-exact hashes, native comparisons and bounded before/after timing in
-[job-control-20261109.json](../validation/job-control-20261109.json). Mac Dev is
-updated after validation; stable 1.5.4, business environments and physical iPad
-installations stay unchanged in this batch.
+The local runtime gates, process and delta regressions, iPad dual-target compile
+checks and 18 actual HVF/interpreter cases pass. Five whole-workflow pairs with 32
+Vulkan shared imports remove 32 native cohort returns on 4/12 CPUs and reduce
+12.2 ms to 10.4 ms; single CPU and file mapping controls remain approximately flat.
+The [validation record](../validation/native-checkpoint-20261109.json) records exact
+samples, source hashes, native controls and limits. Mac Dev is updated after
+validation; stable 1.5.4, business environments and physical iPad installations
+stay unchanged in this batch.
 
 **The coordinator still exists.** io_uring's remaining `owner_required` setters
 are the two actual source-maintenance failures: unavailable wait capability or an
@@ -39,7 +41,7 @@ not rename those remaining cases or claim the whole goal is finished.
 | Exit/group/default-fatal termination, STOP/CONT and vfork release | Source resources and original group/family notifications | Returned CPU/statistics and cold cleanup complete on existing workers; the actual shared mm may still need its byte checkpoint. Outside-cohort/solo and tracing/capability-less embeddings remain separate |
 | fork/clone/vfork and execve/execveat | Existing workers handle pure and mixed mapping scopes, nonleader rekey and original-mm retirement; existing disk pool prepares native images without retaining a CPU slot | Affected actors still pause; actual tracing/capability-less embeddings and solo/host invocation remain distinct |
 | Mapping topology, pins and mapped-file layout | Supported brk/mmap/munmap/mremap/mprotect/msync/madvise and buffer-registration checkpoints publish on an existing worker; additive anonymous mmap is direct | Proc/cold-mm checkpoints and supported mapped-file layout transactions now run on existing workers; excluded backing/lifetime/policy and capability-less embeddings retain explicit boundaries |
-| Native libc/GPU/video/audio | Normal bodies and resource waits use calling/shared-resource paths | Exceptional mapping import, unstable entry and actual native lifecycle checks remain; AppKit affinity, device/disk pools and local fallback are not extra coordinators |
+| Native libc/GPU/video/audio | Normal bodies, resource waits and admitted mapping/entry checkpoints use calling/shared-resource execution; exceptional access reuses original task/mm custody | Tracing, capability-less embeddings and actual platform/host lifecycle remain; AppKit affinity, device/disk pools and local fallback are not extra coordinators |
 | Dynamic proc/sys and proc pathname/FD consumers | Calling worker and original PID/mm/Files/fs/namespace resources | First cross-mm byte export and invalidation activate on an existing worker at the original task/mm boundary; legacy providers retain explicit fallback |
 | Mount topology administration | Original namespace/fs resources on the caller; existing disk pool for host-backed paths; contention releases the CPU slot | Tracing and genuinely excluded pathname controls retain their explicit boundary |
 | Task namespace membership and Files/fs detachment | Supported unshare/setns/close_range run on the caller, refresh future consumers and preserve accepted async operations | Tracing and capability-less embeddings remain; clone creation still uses creator-mm custody; unsupported user/time namespaces are not added |
@@ -57,7 +59,7 @@ the owner; ordinary epoch-member migration, parking, wakeup and child/replacemen
 admission already use the live execution queue. Single-CPU/solo execution retains
 its coordinated caller path, which does not by itself imply an extra RPC.
 
-The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/b234928a70ee63ed4ec65618d68327d17996cdda/docs/architecture/coordination-boundaries.md)
+The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/44e8866b912785f5c638fe3ef868a95f7200b2a7/docs/architecture/coordination-boundaries.md)
 records scopes, actual admission gates and source locations. Earlier sections
 below are historical records and do not override this inventory.
 
@@ -4393,3 +4395,30 @@ Legacy GuestOutput terminal ID 0, host launch/control, explicit tracing and genu
 missing/excluded providers remain distinct boundaries. Existing unsupported tty
 controls/termios modes and tty io_uring are not implemented by this batch. This
 closes one complete supported subsystem; the overall coordinator goal stays active.
+
+
+## 69. Original native mapping/entry checkpoint closure — 2026-11-09
+
+The complete admitted native checkpoint path now uses the original CPU/job,
+original task/mm/backing custody and existing execution slots. It covers live/
+private native memory and Vulkan host allocation imports, with common entry
+validation and native/device bodies. Resource waits release scope permits; accepted
+GPU work retains its original Pending state, and unissued work preserves operands
+through contention or cancellation. Bounded unstable-entry faults return through
+source signal delivery. SVC/HLT classification prevents stale x8 from selecting an
+unrelated structural operation.
+
+Tests cover exact retirement, COW, entry instability for pure/GPU/video/audio,
+original task/mm contention, cancellation and unrelated-mm progress with one slot.
+The same static ELF runs private/shared file and GPU import workflows on HVF and
+the interpreter at 1/4/12 CPUs. HVF confirms exact shared-map counts and no native
+cohort returns. Five counterbalanced whole-workflow pairs for 32 imports change
+4/12-CPU medians from 12.182/12.188 ms to 10.426/10.400 ms, with 32 → 0 native
+cohort returns. Single CPU is 9.379 → 9.118 ms; file controls stay within -1.2%
+to +0.5%. These bounded results do not imply a Firefox/general speedup.
+
+The [validation record](../validation/native-checkpoint-20261109.json) includes
+native macOS/Linux file controls, different backing/durability limits, all hashes,
+source-bound CI and delta reuse. Actual affected bytes still need their original
+checkpoint; host/UI lifecycle, tracing/capability-less embeddings and other generic
+fallbacks remain. The overall coordinator-removal goal stays active.
