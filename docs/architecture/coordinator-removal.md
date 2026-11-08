@@ -1,30 +1,35 @@
 # Coordinator dependency audit
 
-## Current status — 2026-11-07
+## Current status — 2026-11-09
 
-Stage 65 closes the Unix ancillary lifetime and accepted-message subsystem.
-Messages retain actual original file descriptions, including mixed opaque
-SCM_RIGHTS sets. The owner ledger, periodic reaping join, separate accepted-message
-owner executor and duplicate owner lease are deleted. Opaque io_uring FD lifetime
-also uses the original object directly; actual excluded SQE bodies remain explicit.
-The `Unix ancillary owner controls` category has been removed from the shared
-runtime inventory. Stage 64's FD/network compatibility RPC remains deleted.
+Stage 66 closes the remaining original-Files and accepted-context handoffs in
+io_uring as one batch: registration/update/unregistration, source resource bodies,
+CQ observation, background progress and original lifetime/cancellation. Opaque
+OFDs no longer cause import or registration-mode refusal. Solo acceptance attaches
+the same source context immediately. Foreign CQ observers keep to their own mm;
+corrupt CQ heads return EINVAL without replay, and stale native subscriptions get
+one original-resource progress/rearm attempt before actual capability escalation.
+Ordinary shared-FD lookup stays on the existing fast path.
 
-Both runtime workflows, process regressions, iPad compile targets and real
-HVF/interpreter runs validate the shared implementation. See
-[stage 65 validation](../validation/unix-ancillary-closure-20261107.json)
-for exact final results, native Linux references and paired measurements.
-Mac Dev and its CLI are updated; stable/business and physical iPad installations
-remain unchanged.
+Both runtime workflows, 384 process regressions per host, both iPad compile targets
+and 108 actual HVF/interpreter scenarios on 1/4/12 CPUs validate the implementation.
+Five paired Mac timing samples keep normal NOP/registration/statx workflows within
+about ±1.5% of stable 1.5.4. Exact evidence and limitations are in
+[stage 66 validation](../validation/uring-originals-20261109.json).
+Mac Dev is updated after validation. Stable 1.5.4 applications, business deployments
+and physical iPad installations remain unchanged in this development batch.
 
-**The coordinator still exists.** Actual shared-mm quiescence, asynchronous
-resource completion and whole-cohort returns have different costs. Actual opaque
-control bodies, tracing, host lifecycle and the final dispatch catch-all remain
-explicit; outstanding rights alone no longer force a join.
+**The coordinator still exists.** This is not a claim of zero io_uring fallback:
+missing typed providers, genuinely unavailable native waits, excluded resource
+bodies and absent layout/signal capabilities keep explicit boundaries. Actual
+shared-mm quiescence, asynchronous resource completion and whole-cohort returns
+remain distinct. Stage 65's Unix ancillary owner ledger and stage 64's FD/network
+compatibility RPC remain deleted. The preceding stable release is recorded in
+[release 1.5.4 validation](../validation/release-1.5.4.json).
 
 | Area | Current execution | Remaining boundary |
 | --- | --- | --- |
-| Admitted file/path/FD, Unix/TCP I/O, SCM_RIGHTS and cross-resource transfer | Calling worker and original shared objects | Excluded paths/descriptors/controls retain explicit escalation; supported layout changes now use original backing admission |
+| Admitted file/path/FD, io_uring, Unix/TCP I/O, SCM_RIGHTS and cross-resource transfer | Calling worker and original shared objects | Excluded paths/descriptors/controls retain explicit escalation; supported layout changes now use original backing admission |
 | Futexes, clocks/timers, admitted event/child/signal waits and caught signals | Source execution; blocking returns the CPU slot | Legacy nonmember wake/adoption, unsupported wait resources and capability-less embeddings remain |
 | Scheduling attributes and CPU affinity | Original task atomics, original PID/group/UID authority and task-scoped completion on the caller | Tracing and capability-less embeddings retain their boundary; unsupported features keep their errno. Required original CPU slots start directly from the live queue |
 | Exit/group/default-fatal termination, STOP/CONT and vfork release | Source resources and original group/family notifications | Returned CPU/statistics and cold cleanup complete on existing workers; the actual shared mm may still need its byte checkpoint. Outside-cohort/solo and tracing/capability-less embeddings remain separate |
@@ -48,7 +53,7 @@ the owner; ordinary epoch-member migration, parking, wakeup and child/replacemen
 admission already use the live execution queue. Single-CPU/solo execution retains
 its coordinated caller path, which does not by itself imply an extra RPC.
 
-The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/eb047dc35351f8d9a623afd9325a6974adae47bb/docs/architecture/coordination-boundaries.md)
+The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/dd671dfa62c99dc0d69aee2c72b9477e07ae4536/docs/architecture/coordination-boundaries.md)
 records scopes, actual admission gates and source locations. Earlier sections
 below are historical records and do not override this inventory.
 
@@ -4277,3 +4282,32 @@ syscall check or guest memory barrier is added. The original one/four-CPU system
 and eight-cycle Docker deployment checks are part of the release record, alongside
 actual artifact/source/signing provenance. The source-bound record is
 [release-1.5.4.json](../validation/release-1.5.4.json).
+
+
+## 66. Original io_uring Files and source-context closure — 2026-11-09
+
+Registration and accepted-request import now retain complete original OFDs,
+including opaque descriptions. The source resolver's temporary alias retains the
+exact original object; it neither publishes a guest FD nor promotes metadata to
+body authority. Close/reuse, registration removal, cancellation and final release
+keep the original lifetime. All callbacks execute outside Files/ring metadata locks.
+Solo acceptance and worker admission use the same request execution context.
+Foreign CQ observation no longer asks the coordinator to recover another task.
+
+Corrupt CQ indices return EINVAL on enter/resume while retaining accepted requests
+and completion overflow for a corrected queue. Failed subscription setup gets one
+source progress/rearm attempt: ready native requests can finish without a needless
+owner transition. Still-unpumpable live requests retain the real capability
+boundary. No new resource thread, busy message bus, memory fence or global lock is
+added. Ordinary shared-FD lookup and native file/layout resources retain their
+existing implementations.
+
+The shared runtime's stage 66 audit records the exact remaining cases. Both full
+runtime jobs and 384 process assertions per host pass; iPad device/simulator compile
+checks pass. The 108 real backend cases cover mapped queues, IPv4/IPv6, CQ poll/epoll,
+fixed/selected buffers, multishot pressure, close/reuse and cancellation/exit on
+1/4/12 CPUs. Exact 707-entry async and 129-entry registered workflows remain on the
+workers. Paired NOP/register/statx timing stays within about ±1.5%; no Firefox
+speedup or zero-fallback claim is inferred. Native Linux uses the same static
+benchmark but different filesystem backing for statx. The source-bound record is
+[uring-originals-20261109.json](../validation/uring-originals-20261109.json).

@@ -1,0 +1,1878 @@
+{
+  "date": "2026-11-09",
+  "stage": 66,
+  "status": "original io_uring Files/context handoffs integrated; explicit capability/resource fallbacks remain",
+  "baseline_runtime_revision": "eb047dc35351f8d9a623afd9325a6974adae47bb",
+  "runtime_revision": "dd671dfa62c99dc0d69aee2c72b9477e07ae4536",
+  "sources": [
+    {
+      "path": "runtime/crates/trames-linux/src/direct/uring.rs",
+      "sha256": "739ae2386a3f650f6ad4cc501ecf2bb0ab0ef3c9c60fcb7bc23716bb72be379d"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/direct/uring/actor.rs",
+      "sha256": "342516e250ad9efb1cab8f4a6919f839233aa448d5251f0909144aea06837034"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/direct/uring/background.rs",
+      "sha256": "066803bed899e475e901fcc6ff87bd8353ffaf1edfead5df6d0804ce9180795e"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/direct/uring/poll.rs",
+      "sha256": "92838817478ebf59214c71eada4b58beebe222403e598b85826488285d50b807"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/direct/uring/subsystem_tests.rs",
+      "sha256": "368454522f4357c9b0633aa2188ea35109de2cde02f7e19eafa4c1913bba566e"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/direct/uring/wait.rs",
+      "sha256": "3cc7276b324e8371c994bd101a10ecba24d1665db00c3f5711c2e893104151e2"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/direct/uring/wait_tests.rs",
+      "sha256": "0f91cc8d1c094c9405bb7974176b94d8e4002537ae69e21e6ebd1c2c641e975c"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/uring.rs",
+      "sha256": "1689a534d75b5d20b47c2d0b077bbb689ba7690d71401452e3b4502bd62b7c40"
+    },
+    {
+      "path": "runtime/crates/trames-linux/src/uring/execute.rs",
+      "sha256": "44bb876a7e46e53f6aa05e522c42e227ed3f4e8d5c896822dabae20c00e1ba55"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/fd_table.rs",
+      "sha256": "07b53b866bc08383f168d4db330bc42f7c0c4504c27de7b3c3b174af424748db"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/path_queries.rs",
+      "sha256": "0fe6021cc9396539bd57093d67292c9825b9243e611d61d2c84009d2a0bde10f"
+    },
+    {
+      "path": "runtime/crates/trames-vfs/src/uring.rs",
+      "sha256": "d1488dc7ab5ff6169b50d09bd7c01e6cdd97c94dbc608d1db641d2508f94c8c7"
+    },
+    {
+      "path": "runtime/docs/architecture/coordination-boundaries.md",
+      "sha256": "2bf141e35b7c10c08a59cb64c754a92baab28af2f57bec7a9923ccff7dceef03"
+    }
+  ],
+  "checks": {
+    "runtime_mac": {
+      "completed": true,
+      "steps": [
+        {
+          "index": 1,
+          "name": "rustup show",
+          "status": "passed",
+          "exit_code": 0
+        },
+        {
+          "index": 2,
+          "name": "python3 scripts/check-execution-boundaries.py",
+          "status": "passed",
+          "exit_code": 0
+        },
+        {
+          "index": 3,
+          "name": "cargo fmt --all --check",
+          "status": "passed",
+          "exit_code": 0
+        },
+        {
+          "index": 4,
+          "name": "cargo clippy --workspace --all-targets --all-features --locked -- -D warnings",
+          "status": "passed",
+          "exit_code": 0
+        },
+        {
+          "index": 5,
+          "name": "cargo test --workspace --all-features --locked",
+          "status": "passed",
+          "exit_code": 0
+        },
+        {
+          "index": 6,
+          "name": "cargo build --workspace --all-features --release --locked",
+          "status": "passed",
+          "exit_code": 0
+        },
+        {
+          "index": 7,
+          "name": "cargo run --release -p trames-memory --example reclaim-footprint --locked",
+          "status": "passed",
+          "exit_code": 0
+        }
+      ]
+    },
+    "runtime_linux": {
+      "completed": true,
+      "steps": [
+        {
+          "index": 1,
+          "name": "rustup show",
+          "status": "passed",
+          "exit_code": 0
+        },
+        {
+          "index": 2,
+          "name": "python3 scripts/check-execution-boundaries.py",
+          "status": "passed",
+          "exit_code": 0
+        },
+        {
+          "index": 3,
+          "name": "cargo fmt --all --check",
+          "status": "passed",
+          "exit_code": 0
+        },
+        {
+          "index": 4,
+          "name": "cargo clippy --workspace --all-targets --all-features --locked -- -D warnings",
+          "status": "passed",
+          "exit_code": 0
+        },
+        {
+          "index": 5,
+          "name": "cargo test --workspace --all-features --locked",
+          "status": "passed",
+          "exit_code": 0
+        },
+        {
+          "index": 6,
+          "name": "cargo build --workspace --all-features --release --locked",
+          "status": "passed",
+          "exit_code": 0
+        },
+        {
+          "index": 7,
+          "name": "cargo run --release -p trames-memory --example reclaim-footprint --locked",
+          "status": "passed",
+          "exit_code": 0
+        }
+      ]
+    },
+    "linux_final": [
+      {
+        "name": "process-uring-final",
+        "code": 0,
+        "seconds": 9.882432602999998
+      },
+      {
+        "name": "core-clippy",
+        "code": 0,
+        "seconds": 3.1210673280000023
+      },
+      {
+        "name": "runtime-ci",
+        "code": 0,
+        "seconds": 51.419430383999995
+      }
+    ],
+    "mac_affected_test_totals": {
+      "trames_linux": {
+        "passed": 255,
+        "failed": 0,
+        "ignored": 1
+      },
+      "trames_vfs": {
+        "passed": 565,
+        "failed": 0,
+        "ignored": 1
+      }
+    },
+    "linux_affected_test_totals": {
+      "trames_linux": {
+        "passed": 255,
+        "failed": 0,
+        "ignored": 1
+      },
+      "trames_vfs": {
+        "passed": 564,
+        "failed": 0,
+        "ignored": 1
+      }
+    },
+    "mac_product_workflow": {
+      "scope": "All eight checks before packaging; Dev build/sign/install separately; stable-only build/package intentionally excluded.",
+      "passed_steps": [
+        {
+          "index": 1,
+          "name": "rustup show",
+          "status": "passed",
+          "exit_code": 0
+        },
+        {
+          "index": 2,
+          "name": "python3 scripts/check-execution-boundaries.py",
+          "status": "passed",
+          "exit_code": 0
+        },
+        {
+          "index": 3,
+          "name": "cargo fmt --all --check",
+          "status": "passed",
+          "exit_code": 0
+        },
+        {
+          "index": 4,
+          "name": "cargo clippy --workspace --all-targets --all-features --locked -- -D warnings",
+          "status": "passed",
+          "exit_code": 0
+        },
+        {
+          "index": 5,
+          "name": "cargo test --workspace --all-features --locked",
+          "status": "passed",
+          "exit_code": 0
+        },
+        {
+          "index": 6,
+          "name": "bash -n scripts/build-mac.sh scripts/install-mac.sh",
+          "status": "passed",
+          "exit_code": 0
+        },
+        {
+          "index": 7,
+          "name": "python3 -m py_compile scripts/package-mac.py scripts/benchmark-firefox-video.py scripts/run-firefox-gpu.py tests/integration/mac-environments.py tests/integration/mac-packages.py tests/integration/mac-systemd.py tests/integration/mac-cli.py tests/integration/mac-channels.py tests/integration/mac-background.py tests/integration/mac-exec.py",
+          "status": "passed",
+          "exit_code": 0
+        },
+        {
+          "index": 8,
+          "name": "bash tests/native/task-stream.sh",
+          "status": "passed",
+          "exit_code": 0
+        }
+      ]
+    },
+    "installed_dev_async": {
+      "passed": true,
+      "case_count": 15,
+      "runner_sha256": "eb077cbac2bd67cddefe69c51a733bc2fa0e847fa7547e7a4a9aa44aab8f8605",
+      "rows": [
+        {
+          "case": "abi-1",
+          "metrics": {
+            "cohort_rounds": 0,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.01774,
+          "host_wall_seconds": 0.029844541999999998
+        },
+        {
+          "case": "tcp4-1",
+          "metrics": {
+            "cohort_rounds": 0,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.005810000000000002,
+          "host_wall_seconds": 0.066635417
+        },
+        {
+          "case": "tcp4-pressure-1",
+          "metrics": {
+            "cohort_rounds": 0,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.009870999999999998,
+          "host_wall_seconds": 0.16182929199999999
+        },
+        {
+          "case": "tcp6-1",
+          "metrics": {
+            "cohort_rounds": 0,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.015040999999999999,
+          "host_wall_seconds": 0.07995254100000004
+        },
+        {
+          "case": "tcp6-pressure-1",
+          "metrics": {
+            "cohort_rounds": 0,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.017301999999999988,
+          "host_wall_seconds": 0.170076
+        },
+        {
+          "case": "abi-4",
+          "metrics": {
+            "cohort_rounds": 2,
+            "service_requests": 0,
+            "worker_uring_syscalls": 707,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.02602000000000001,
+          "host_wall_seconds": 0.04375225000000005
+        },
+        {
+          "case": "tcp4-4",
+          "metrics": {
+            "cohort_rounds": 1,
+            "service_requests": 0,
+            "worker_uring_syscalls": 3,
+            "worker_poll_syscalls": 2
+          },
+          "host_child_cpu_seconds": 0.015384999999999989,
+          "host_wall_seconds": 0.08870183300000001
+        },
+        {
+          "case": "tcp4-pressure-4",
+          "metrics": {
+            "cohort_rounds": 1,
+            "service_requests": 0,
+            "worker_uring_syscalls": 11,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.016887999999999993,
+          "host_wall_seconds": 0.17944649999999995
+        },
+        {
+          "case": "tcp6-4",
+          "metrics": {
+            "cohort_rounds": 1,
+            "service_requests": 0,
+            "worker_uring_syscalls": 3,
+            "worker_poll_syscalls": 2
+          },
+          "host_child_cpu_seconds": 0.020722000000000004,
+          "host_wall_seconds": 0.08509
+        },
+        {
+          "case": "tcp6-pressure-4",
+          "metrics": {
+            "cohort_rounds": 1,
+            "service_requests": 0,
+            "worker_uring_syscalls": 11,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.01183200000000001,
+          "host_wall_seconds": 0.17150491599999995
+        },
+        {
+          "case": "abi-12",
+          "metrics": {
+            "cohort_rounds": 2,
+            "service_requests": 0,
+            "worker_uring_syscalls": 707,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.025878999999999992,
+          "host_wall_seconds": 0.04432362499999987
+        },
+        {
+          "case": "tcp4-12",
+          "metrics": {
+            "cohort_rounds": 1,
+            "service_requests": 0,
+            "worker_uring_syscalls": 3,
+            "worker_poll_syscalls": 2
+          },
+          "host_child_cpu_seconds": 0.009263999999999994,
+          "host_wall_seconds": 0.071673125
+        },
+        {
+          "case": "tcp4-pressure-12",
+          "metrics": {
+            "cohort_rounds": 1,
+            "service_requests": 0,
+            "worker_uring_syscalls": 11,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.008818000000000006,
+          "host_wall_seconds": 0.17118245899999995
+        },
+        {
+          "case": "tcp6-12",
+          "metrics": {
+            "cohort_rounds": 1,
+            "service_requests": 0,
+            "worker_uring_syscalls": 3,
+            "worker_poll_syscalls": 2
+          },
+          "host_child_cpu_seconds": 0.014995000000000008,
+          "host_wall_seconds": 0.08384837499999986
+        },
+        {
+          "case": "tcp6-pressure-12",
+          "metrics": {
+            "cohort_rounds": 1,
+            "service_requests": 0,
+            "worker_uring_syscalls": 11,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.016987999999999948,
+          "host_wall_seconds": 0.18087529200000008
+        }
+      ]
+    }
+  },
+  "process_acceptance": {
+    "mac_passed": 384,
+    "linux_passed": 384,
+    "ignored_per_host": 2,
+    "linux_outer_test_threads": 1
+  },
+  "ipad_compile": [
+    {
+      "target": "aarch64-apple-ios",
+      "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+      "code": 0
+    },
+    {
+      "target": "aarch64-apple-ios-sim",
+      "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk",
+      "code": 0
+    }
+  ],
+  "guest_workflows": [
+    {
+      "name": "final-interpreter-io-uring",
+      "passed": true,
+      "runner_sha256": "d35c9f5a9d97f739c30945509f54ac7ce715d30a10d6df796aeac4b93410af30",
+      "fixture_sha256": "e5b622e50281ce8a5ac5c29153ff4395156cf6e839469cb3050152f130076f37",
+      "rows": [
+        {
+          "case": "abi-1",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.012454999999999999,
+          "host_wall_seconds": 0.451339709
+        },
+        {
+          "case": "tcp4-1",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.006310999999999999,
+          "host_wall_seconds": 0.061086707999999934
+        },
+        {
+          "case": "tcp6-1",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.006234000000000002,
+          "host_wall_seconds": 0.06729912500000002
+        },
+        {
+          "case": "abi-4",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 12,
+            "worker_poll_syscalls": 1
+          },
+          "host_child_cpu_seconds": 0.010433999999999999,
+          "host_wall_seconds": 0.022791832999999984
+        },
+        {
+          "case": "tcp4-4",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.0061169999999999974,
+          "host_wall_seconds": 0.07579775
+        },
+        {
+          "case": "tcp6-4",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.005523,
+          "host_wall_seconds": 0.076460042
+        },
+        {
+          "case": "abi-12",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 12,
+            "worker_poll_syscalls": 1
+          },
+          "host_child_cpu_seconds": 0.00909,
+          "host_wall_seconds": 0.02554075
+        },
+        {
+          "case": "tcp4-12",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.005827000000000006,
+          "host_wall_seconds": 0.07521212499999996
+        },
+        {
+          "case": "tcp6-12",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.006455999999999993,
+          "host_wall_seconds": 0.07455741699999996
+        }
+      ]
+    },
+    {
+      "name": "final-interpreter-io-uring-extended",
+      "passed": true,
+      "runner_sha256": "d35c9f5a9d97f739c30945509f54ac7ce715d30a10d6df796aeac4b93410af30",
+      "fixture_sha256": "91b15fb76e4f5dee256bafbaa19e2584c51041d9fe795868456a21f7036cbb9a",
+      "rows": [
+        {
+          "case": "abi-1",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.007668999999999999,
+          "host_wall_seconds": 0.016513166000000003
+        },
+        {
+          "case": "abi-4",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 35,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.007882,
+          "host_wall_seconds": 0.016353000000000006
+        },
+        {
+          "case": "abi-12",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 35,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.009741000000000003,
+          "host_wall_seconds": 0.01789187500000001
+        }
+      ]
+    },
+    {
+      "name": "final-interpreter-io-uring-multishot",
+      "passed": true,
+      "runner_sha256": "d35c9f5a9d97f739c30945509f54ac7ce715d30a10d6df796aeac4b93410af30",
+      "fixture_sha256": "d9496836c98c56d211b347673a23a5387983239712f4466944cd447ed41b5c0e",
+      "rows": [
+        {
+          "case": "abi-1",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.009505,
+          "host_wall_seconds": 0.011156333000000004
+        },
+        {
+          "case": "tcp4-1",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.007512999999999999,
+          "host_wall_seconds": 0.062167999999999994
+        },
+        {
+          "case": "tcp6-1",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.008611,
+          "host_wall_seconds": 0.07497754200000001
+        },
+        {
+          "case": "abi-4",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 69,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.006849000000000003,
+          "host_wall_seconds": 0.00801516699999999
+        },
+        {
+          "case": "tcp4-4",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 4,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.006364000000000002,
+          "host_wall_seconds": 0.07713745800000002
+        },
+        {
+          "case": "tcp6-4",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 4,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.0059640000000000006,
+          "host_wall_seconds": 0.06855333400000002
+        },
+        {
+          "case": "abi-12",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 69,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.0075879999999999975,
+          "host_wall_seconds": 0.008540667000000002
+        },
+        {
+          "case": "tcp4-12",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 4,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.006212000000000002,
+          "host_wall_seconds": 0.07119616700000003
+        },
+        {
+          "case": "tcp6-12",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 4,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.006147999999999994,
+          "host_wall_seconds": 0.07435429199999999
+        }
+      ]
+    },
+    {
+      "name": "final-interpreter-io-uring-worker",
+      "passed": true,
+      "runner_sha256": "d35c9f5a9d97f739c30945509f54ac7ce715d30a10d6df796aeac4b93410af30",
+      "fixture_sha256": "95a1ba92f8d11d16fa78b49977e1e91e86099fd35e4b60526d9b3caf7e5847de",
+      "rows": [
+        {
+          "case": "abi-1",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.009645999999999998,
+          "host_wall_seconds": 0.011466041
+        },
+        {
+          "case": "tcp4-1",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.005987000000000001,
+          "host_wall_seconds": 0.072273083
+        },
+        {
+          "case": "tcp6-1",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.006105,
+          "host_wall_seconds": 0.064830583
+        },
+        {
+          "case": "abi-4",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 280,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.009334000000000004,
+          "host_wall_seconds": 0.010121041999999997
+        },
+        {
+          "case": "tcp4-4",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 4,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.0063709999999999965,
+          "host_wall_seconds": 0.07392741600000002
+        },
+        {
+          "case": "tcp6-4",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 4,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.006786,
+          "host_wall_seconds": 0.07461062499999999
+        },
+        {
+          "case": "abi-12",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 280,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.008443999999999998,
+          "host_wall_seconds": 0.009425667000000026
+        },
+        {
+          "case": "tcp4-12",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 4,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.006865999999999997,
+          "host_wall_seconds": 0.073381625
+        },
+        {
+          "case": "tcp6-12",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 4,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.006560999999999997,
+          "host_wall_seconds": 0.074311709
+        }
+      ]
+    },
+    {
+      "name": "final-interpreter-io-uring-worker-async",
+      "passed": true,
+      "runner_sha256": "d35c9f5a9d97f739c30945509f54ac7ce715d30a10d6df796aeac4b93410af30",
+      "fixture_sha256": "7f99ca1f10b6f8b32c51cf4123483d7a1baa9649c101252b02a1a37230923b33",
+      "rows": [
+        {
+          "case": "abi-1",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.016544,
+          "host_wall_seconds": 0.028484959
+        },
+        {
+          "case": "tcp4-1",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.006114999999999999,
+          "host_wall_seconds": 0.068982375
+        },
+        {
+          "case": "tcp4-pressure-1",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.006871000000000001,
+          "host_wall_seconds": 0.158129458
+        },
+        {
+          "case": "tcp6-1",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.005434999999999997,
+          "host_wall_seconds": 0.07057587500000001
+        },
+        {
+          "case": "tcp6-pressure-1",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.006210999999999998,
+          "host_wall_seconds": 0.15738649999999998
+        },
+        {
+          "case": "abi-4",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 707,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.008743999999999995,
+          "host_wall_seconds": 0.020303082999999944
+        },
+        {
+          "case": "tcp4-4",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 3,
+            "worker_poll_syscalls": 2
+          },
+          "host_child_cpu_seconds": 0.0058460000000000005,
+          "host_wall_seconds": 0.07510008300000004
+        },
+        {
+          "case": "tcp4-pressure-4",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 11,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.006820000000000007,
+          "host_wall_seconds": 0.1667711249999999
+        },
+        {
+          "case": "tcp6-4",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 3,
+            "worker_poll_syscalls": 2
+          },
+          "host_child_cpu_seconds": 0.007330999999999994,
+          "host_wall_seconds": 0.07073583299999997
+        },
+        {
+          "case": "tcp6-pressure-4",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 11,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.007629999999999994,
+          "host_wall_seconds": 0.16833337500000012
+        },
+        {
+          "case": "abi-12",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 707,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.011890999999999995,
+          "host_wall_seconds": 0.024793999999999983
+        },
+        {
+          "case": "tcp4-12",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 3,
+            "worker_poll_syscalls": 2
+          },
+          "host_child_cpu_seconds": 0.009715999999999995,
+          "host_wall_seconds": 0.07104291699999998
+        },
+        {
+          "case": "tcp4-pressure-12",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 11,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.008407999999999992,
+          "host_wall_seconds": 0.16266570899999988
+        },
+        {
+          "case": "tcp6-12",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 3,
+            "worker_poll_syscalls": 2
+          },
+          "host_child_cpu_seconds": 0.0070320000000000035,
+          "host_wall_seconds": 0.07053358300000001
+        },
+        {
+          "case": "tcp6-pressure-12",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 11,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.007166000000000006,
+          "host_wall_seconds": 0.16136083300000004
+        }
+      ]
+    },
+    {
+      "name": "final-interpreter-io-uring-worker-registered",
+      "passed": true,
+      "runner_sha256": "d35c9f5a9d97f739c30945509f54ac7ce715d30a10d6df796aeac4b93410af30",
+      "fixture_sha256": "3044e828bc5f15f2bac7294fecee623037be2fcb28383c6a44190fd4b3e658d3",
+      "rows": [
+        {
+          "case": "abi-1",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.010255999999999998,
+          "host_wall_seconds": 0.011735541999999998
+        },
+        {
+          "case": "tcp4-1",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.0057220000000000005,
+          "host_wall_seconds": 0.06558575
+        },
+        {
+          "case": "tcp6-1",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.006006000000000001,
+          "host_wall_seconds": 0.07453062499999999
+        },
+        {
+          "case": "abi-4",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 129,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.008125999999999998,
+          "host_wall_seconds": 0.008410833000000006
+        },
+        {
+          "case": "tcp4-4",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 5,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.0067719999999999985,
+          "host_wall_seconds": 0.074374458
+        },
+        {
+          "case": "tcp6-4",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 5,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.006478999999999999,
+          "host_wall_seconds": 0.06617295900000003
+        },
+        {
+          "case": "abi-12",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 129,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.008109999999999997,
+          "host_wall_seconds": 0.008540082999999976
+        },
+        {
+          "case": "tcp4-12",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 5,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.006552999999999996,
+          "host_wall_seconds": 0.07348045800000003
+        },
+        {
+          "case": "tcp6-12",
+          "metrics": {
+            "runtime_error": null,
+            "service_requests": 0,
+            "worker_uring_syscalls": 5,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.008182000000000005,
+          "host_wall_seconds": 0.06762554199999998
+        }
+      ]
+    },
+    {
+      "name": "final-mac-io-uring",
+      "passed": true,
+      "runner_sha256": "3f6b3fbcf4a3d0a1b531bb146a8cdc1018fe6a2f8742a3395d0361d30ba17b70",
+      "fixture_sha256": "e5b622e50281ce8a5ac5c29153ff4395156cf6e839469cb3050152f130076f37",
+      "rows": [
+        {
+          "case": "abi-1",
+          "metrics": {
+            "cohort_rounds": 0,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.009163999999999999,
+          "host_wall_seconds": 0.020975833
+        },
+        {
+          "case": "tcp4-1",
+          "metrics": {
+            "cohort_rounds": 0,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.006457,
+          "host_wall_seconds": 0.068741792
+        },
+        {
+          "case": "tcp6-1",
+          "metrics": {
+            "cohort_rounds": 0,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.006253999999999999,
+          "host_wall_seconds": 0.061382167
+        },
+        {
+          "case": "abi-4",
+          "metrics": {
+            "cohort_rounds": 2,
+            "service_requests": 0,
+            "worker_uring_syscalls": 12,
+            "worker_poll_syscalls": 1
+          },
+          "host_child_cpu_seconds": 0.009935999999999997,
+          "host_wall_seconds": 0.023008167000000024
+        },
+        {
+          "case": "tcp4-4",
+          "metrics": {
+            "cohort_rounds": 1,
+            "service_requests": 0,
+            "worker_uring_syscalls": 1,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.007267999999999997,
+          "host_wall_seconds": 0.06155708300000001
+        },
+        {
+          "case": "tcp6-4",
+          "metrics": {
+            "cohort_rounds": 0,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.007212000000000003,
+          "host_wall_seconds": 0.06881512500000003
+        },
+        {
+          "case": "abi-12",
+          "metrics": {
+            "cohort_rounds": 2,
+            "service_requests": 0,
+            "worker_uring_syscalls": 12,
+            "worker_poll_syscalls": 1
+          },
+          "host_child_cpu_seconds": 0.009534,
+          "host_wall_seconds": 0.02595012499999999
+        },
+        {
+          "case": "tcp4-12",
+          "metrics": {
+            "cohort_rounds": 0,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.007505000000000001,
+          "host_wall_seconds": 0.06817116699999998
+        },
+        {
+          "case": "tcp6-12",
+          "metrics": {
+            "cohort_rounds": 1,
+            "service_requests": 0,
+            "worker_uring_syscalls": 1,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.007006999999999999,
+          "host_wall_seconds": 0.07055574999999997
+        }
+      ]
+    },
+    {
+      "name": "final-mac-io-uring-extended",
+      "passed": true,
+      "runner_sha256": "3f6b3fbcf4a3d0a1b531bb146a8cdc1018fe6a2f8742a3395d0361d30ba17b70",
+      "fixture_sha256": "91b15fb76e4f5dee256bafbaa19e2584c51041d9fe795868456a21f7036cbb9a",
+      "rows": [
+        {
+          "case": "abi-1",
+          "metrics": {
+            "cohort_rounds": 0,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.007201999999999999,
+          "host_wall_seconds": 0.016725249999999997
+        },
+        {
+          "case": "abi-4",
+          "metrics": {
+            "cohort_rounds": 1,
+            "service_requests": 0,
+            "worker_uring_syscalls": 35,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.007129000000000002,
+          "host_wall_seconds": 0.015985082999999997
+        },
+        {
+          "case": "abi-12",
+          "metrics": {
+            "cohort_rounds": 1,
+            "service_requests": 0,
+            "worker_uring_syscalls": 35,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.007513,
+          "host_wall_seconds": 0.016468541999999996
+        }
+      ]
+    },
+    {
+      "name": "final-mac-io-uring-multishot",
+      "passed": true,
+      "runner_sha256": "3f6b3fbcf4a3d0a1b531bb146a8cdc1018fe6a2f8742a3395d0361d30ba17b70",
+      "fixture_sha256": "d9496836c98c56d211b347673a23a5387983239712f4466944cd447ed41b5c0e",
+      "rows": [
+        {
+          "case": "abi-1",
+          "metrics": {
+            "cohort_rounds": 0,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.007202999999999999,
+          "host_wall_seconds": 0.008790291000000002
+        },
+        {
+          "case": "tcp4-1",
+          "metrics": {
+            "cohort_rounds": 0,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.005998000000000002,
+          "host_wall_seconds": 0.072810542
+        },
+        {
+          "case": "tcp6-1",
+          "metrics": {
+            "cohort_rounds": 0,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.006382,
+          "host_wall_seconds": 0.069562708
+        },
+        {
+          "case": "abi-4",
+          "metrics": {
+            "cohort_rounds": 2,
+            "service_requests": 0,
+            "worker_uring_syscalls": 69,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.007574999999999998,
+          "host_wall_seconds": 0.00919937500000001
+        },
+        {
+          "case": "tcp4-4",
+          "metrics": {
+            "cohort_rounds": 1,
+            "service_requests": 0,
+            "worker_uring_syscalls": 4,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.006565999999999999,
+          "host_wall_seconds": 0.07343616700000002
+        },
+        {
+          "case": "tcp6-4",
+          "metrics": {
+            "cohort_rounds": 1,
+            "service_requests": 0,
+            "worker_uring_syscalls": 4,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.0069149999999999975,
+          "host_wall_seconds": 0.07448845799999998
+        },
+        {
+          "case": "abi-12",
+          "metrics": {
+            "cohort_rounds": 2,
+            "service_requests": 0,
+            "worker_uring_syscalls": 69,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.0077610000000000005,
+          "host_wall_seconds": 0.00922937500000004
+        },
+        {
+          "case": "tcp4-12",
+          "metrics": {
+            "cohort_rounds": 1,
+            "service_requests": 0,
+            "worker_uring_syscalls": 4,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.006964999999999999,
+          "host_wall_seconds": 0.07873075000000002
+        },
+        {
+          "case": "tcp6-12",
+          "metrics": {
+            "cohort_rounds": 1,
+            "service_requests": 0,
+            "worker_uring_syscalls": 4,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.00680699999999999,
+          "host_wall_seconds": 0.07428999999999997
+        }
+      ]
+    },
+    {
+      "name": "final-mac-io-uring-worker",
+      "passed": true,
+      "runner_sha256": "3f6b3fbcf4a3d0a1b531bb146a8cdc1018fe6a2f8742a3395d0361d30ba17b70",
+      "fixture_sha256": "95a1ba92f8d11d16fa78b49977e1e91e86099fd35e4b60526d9b3caf7e5847de",
+      "rows": [
+        {
+          "case": "abi-1",
+          "metrics": {
+            "cohort_rounds": 0,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.010402,
+          "host_wall_seconds": 0.012460208
+        },
+        {
+          "case": "tcp4-1",
+          "metrics": {
+            "cohort_rounds": 0,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.006486000000000001,
+          "host_wall_seconds": 0.078064542
+        },
+        {
+          "case": "tcp6-1",
+          "metrics": {
+            "cohort_rounds": 0,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.0063840000000000025,
+          "host_wall_seconds": 0.074396209
+        },
+        {
+          "case": "abi-4",
+          "metrics": {
+            "cohort_rounds": 1,
+            "service_requests": 0,
+            "worker_uring_syscalls": 280,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.008934000000000001,
+          "host_wall_seconds": 0.010282874999999997
+        },
+        {
+          "case": "tcp4-4",
+          "metrics": {
+            "cohort_rounds": 1,
+            "service_requests": 0,
+            "worker_uring_syscalls": 4,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.007214999999999999,
+          "host_wall_seconds": 0.07271008299999998
+        },
+        {
+          "case": "tcp6-4",
+          "metrics": {
+            "cohort_rounds": 1,
+            "service_requests": 0,
+            "worker_uring_syscalls": 4,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.007300000000000001,
+          "host_wall_seconds": 0.07482933399999997
+        },
+        {
+          "case": "abi-12",
+          "metrics": {
+            "cohort_rounds": 1,
+            "service_requests": 0,
+            "worker_uring_syscalls": 280,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.010021999999999996,
+          "host_wall_seconds": 0.011610958000000005
+        },
+        {
+          "case": "tcp4-12",
+          "metrics": {
+            "cohort_rounds": 1,
+            "service_requests": 0,
+            "worker_uring_syscalls": 4,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.008628000000000004,
+          "host_wall_seconds": 0.08083441699999999
+        },
+        {
+          "case": "tcp6-12",
+          "metrics": {
+            "cohort_rounds": 1,
+            "service_requests": 0,
+            "worker_uring_syscalls": 4,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.008054999999999996,
+          "host_wall_seconds": 0.08241591700000006
+        }
+      ]
+    },
+    {
+      "name": "final-mac-io-uring-worker-async",
+      "passed": true,
+      "runner_sha256": "3f6b3fbcf4a3d0a1b531bb146a8cdc1018fe6a2f8742a3395d0361d30ba17b70",
+      "fixture_sha256": "7f99ca1f10b6f8b32c51cf4123483d7a1baa9649c101252b02a1a37230923b33",
+      "rows": [
+        {
+          "case": "abi-1",
+          "metrics": {
+            "cohort_rounds": 0,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.018298,
+          "host_wall_seconds": 0.030824958000000003
+        },
+        {
+          "case": "tcp4-1",
+          "metrics": {
+            "cohort_rounds": 0,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.00738,
+          "host_wall_seconds": 0.07131199999999999
+        },
+        {
+          "case": "tcp4-pressure-1",
+          "metrics": {
+            "cohort_rounds": 0,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.008328999999999996,
+          "host_wall_seconds": 0.16028850000000003
+        },
+        {
+          "case": "tcp6-1",
+          "metrics": {
+            "cohort_rounds": 0,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.008527999999999997,
+          "host_wall_seconds": 0.07697979100000002
+        },
+        {
+          "case": "tcp6-pressure-1",
+          "metrics": {
+            "cohort_rounds": 0,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.009087999999999999,
+          "host_wall_seconds": 0.16023454199999998
+        },
+        {
+          "case": "abi-4",
+          "metrics": {
+            "cohort_rounds": 2,
+            "service_requests": 0,
+            "worker_uring_syscalls": 707,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.010865,
+          "host_wall_seconds": 0.026455166999999946
+        },
+        {
+          "case": "tcp4-4",
+          "metrics": {
+            "cohort_rounds": 1,
+            "service_requests": 0,
+            "worker_uring_syscalls": 3,
+            "worker_poll_syscalls": 2
+          },
+          "host_child_cpu_seconds": 0.009181000000000002,
+          "host_wall_seconds": 0.06388304200000006
+        },
+        {
+          "case": "tcp4-pressure-4",
+          "metrics": {
+            "cohort_rounds": 1,
+            "service_requests": 0,
+            "worker_uring_syscalls": 11,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.008996,
+          "host_wall_seconds": 0.16142004100000007
+        },
+        {
+          "case": "tcp6-4",
+          "metrics": {
+            "cohort_rounds": 1,
+            "service_requests": 0,
+            "worker_uring_syscalls": 3,
+            "worker_poll_syscalls": 2
+          },
+          "host_child_cpu_seconds": 0.007952000000000004,
+          "host_wall_seconds": 0.07400920799999999
+        },
+        {
+          "case": "tcp6-pressure-4",
+          "metrics": {
+            "cohort_rounds": 1,
+            "service_requests": 0,
+            "worker_uring_syscalls": 11,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.010071999999999998,
+          "host_wall_seconds": 0.17122237500000004
+        },
+        {
+          "case": "abi-12",
+          "metrics": {
+            "cohort_rounds": 2,
+            "service_requests": 0,
+            "worker_uring_syscalls": 707,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.009965999999999996,
+          "host_wall_seconds": 0.024339749999999993
+        },
+        {
+          "case": "tcp4-12",
+          "metrics": {
+            "cohort_rounds": 1,
+            "service_requests": 0,
+            "worker_uring_syscalls": 3,
+            "worker_poll_syscalls": 2
+          },
+          "host_child_cpu_seconds": 0.008042000000000007,
+          "host_wall_seconds": 0.07438808399999997
+        },
+        {
+          "case": "tcp4-pressure-12",
+          "metrics": {
+            "cohort_rounds": 1,
+            "service_requests": 0,
+            "worker_uring_syscalls": 11,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.00792699999999999,
+          "host_wall_seconds": 0.16781316599999996
+        },
+        {
+          "case": "tcp6-12",
+          "metrics": {
+            "cohort_rounds": 1,
+            "service_requests": 0,
+            "worker_uring_syscalls": 3,
+            "worker_poll_syscalls": 2
+          },
+          "host_child_cpu_seconds": 0.0078060000000000004,
+          "host_wall_seconds": 0.06997854200000009
+        },
+        {
+          "case": "tcp6-pressure-12",
+          "metrics": {
+            "cohort_rounds": 1,
+            "service_requests": 0,
+            "worker_uring_syscalls": 11,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.007682999999999995,
+          "host_wall_seconds": 0.162332833
+        }
+      ]
+    },
+    {
+      "name": "final-mac-io-uring-worker-registered",
+      "passed": true,
+      "runner_sha256": "3f6b3fbcf4a3d0a1b531bb146a8cdc1018fe6a2f8742a3395d0361d30ba17b70",
+      "fixture_sha256": "3044e828bc5f15f2bac7294fecee623037be2fcb28383c6a44190fd4b3e658d3",
+      "rows": [
+        {
+          "case": "abi-1",
+          "metrics": {
+            "cohort_rounds": 0,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.012816999999999999,
+          "host_wall_seconds": 0.014591416999999999
+        },
+        {
+          "case": "tcp4-1",
+          "metrics": {
+            "cohort_rounds": 0,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.007326000000000002,
+          "host_wall_seconds": 0.075549958
+        },
+        {
+          "case": "tcp6-1",
+          "metrics": {
+            "cohort_rounds": 0,
+            "service_requests": 0,
+            "worker_uring_syscalls": 0,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.007767999999999999,
+          "host_wall_seconds": 0.074476083
+        },
+        {
+          "case": "abi-4",
+          "metrics": {
+            "cohort_rounds": 1,
+            "service_requests": 0,
+            "worker_uring_syscalls": 129,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.011757999999999996,
+          "host_wall_seconds": 0.012880417000000005
+        },
+        {
+          "case": "tcp4-4",
+          "metrics": {
+            "cohort_rounds": 1,
+            "service_requests": 0,
+            "worker_uring_syscalls": 5,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.008715,
+          "host_wall_seconds": 0.069889375
+        },
+        {
+          "case": "tcp6-4",
+          "metrics": {
+            "cohort_rounds": 1,
+            "service_requests": 0,
+            "worker_uring_syscalls": 5,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.009147000000000002,
+          "host_wall_seconds": 0.08044024999999999
+        },
+        {
+          "case": "abi-12",
+          "metrics": {
+            "cohort_rounds": 1,
+            "service_requests": 0,
+            "worker_uring_syscalls": 129,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.010327999999999993,
+          "host_wall_seconds": 0.011652125000000013
+        },
+        {
+          "case": "tcp4-12",
+          "metrics": {
+            "cohort_rounds": 1,
+            "service_requests": 0,
+            "worker_uring_syscalls": 5,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.008717000000000013,
+          "host_wall_seconds": 0.07392475000000004
+        },
+        {
+          "case": "tcp6-12",
+          "metrics": {
+            "cohort_rounds": 1,
+            "service_requests": 0,
+            "worker_uring_syscalls": 5,
+            "worker_poll_syscalls": 0
+          },
+          "host_child_cpu_seconds": 0.007747999999999998,
+          "host_wall_seconds": 0.07026187500000003
+        }
+      ]
+    }
+  ],
+  "guest_case_count": 108,
+  "performance": {
+    "medians": [
+      {
+        "case": "nop",
+        "workers": 1,
+        "before_worker_ms": 49.320542,
+        "before_wall_ms": 56.542708000000054,
+        "after_worker_ms": 49.658417,
+        "after_wall_ms": 56.946583,
+        "speedup": 0.9931960175049479,
+        "native_linux_worker_ms": 1.233279
+      },
+      {
+        "case": "nop",
+        "workers": 2,
+        "before_worker_ms": 7.849709,
+        "before_wall_ms": 15.183207999999837,
+        "after_worker_ms": 7.74375,
+        "after_wall_ms": 15.122624999999834,
+        "speedup": 1.0136831638418078,
+        "native_linux_worker_ms": 1.27957
+      },
+      {
+        "case": "nop",
+        "workers": 4,
+        "before_worker_ms": 8.991667,
+        "before_wall_ms": 17.344666999999923,
+        "after_worker_ms": 8.882208,
+        "after_wall_ms": 17.55979200000013,
+        "speedup": 1.012323399767265,
+        "native_linux_worker_ms": 1.300986
+      },
+      {
+        "case": "register",
+        "workers": 1,
+        "before_worker_ms": 19.739125,
+        "before_wall_ms": 26.279417000000027,
+        "after_worker_ms": 19.502708,
+        "after_wall_ms": 26.29499999999996,
+        "speedup": 1.012122265277212,
+        "native_linux_worker_ms": 1.984645
+      },
+      {
+        "case": "register",
+        "workers": 2,
+        "before_worker_ms": 12.735125,
+        "before_wall_ms": 19.827625000000015,
+        "after_worker_ms": 12.764125,
+        "after_wall_ms": 20.00891700000018,
+        "speedup": 0.9977280072077013,
+        "native_linux_worker_ms": 2.010395
+      },
+      {
+        "case": "register",
+        "workers": 4,
+        "before_worker_ms": 15.025375,
+        "before_wall_ms": 23.671750000000102,
+        "after_worker_ms": 15.238417,
+        "after_wall_ms": 23.642124999999847,
+        "speedup": 0.9860194139588121,
+        "native_linux_worker_ms": 2.132811
+      },
+      {
+        "case": "statx",
+        "workers": 1,
+        "before_worker_ms": 60.256708,
+        "before_wall_ms": 67.55395900000005,
+        "after_worker_ms": 60.4145,
+        "after_wall_ms": 67.45041699999987,
+        "speedup": 0.9973881766794397,
+        "native_linux_worker_ms": 69.266677
+      },
+      {
+        "case": "statx",
+        "workers": 2,
+        "before_worker_ms": 24.164709,
+        "before_wall_ms": 31.950208000000035,
+        "after_worker_ms": 23.895625,
+        "after_wall_ms": 31.966917000000095,
+        "speedup": 1.011260806109905,
+        "native_linux_worker_ms": 93.755125
+      },
+      {
+        "case": "statx",
+        "workers": 4,
+        "before_worker_ms": 39.822291,
+        "before_wall_ms": 48.796000000000284,
+        "after_worker_ms": 39.219708,
+        "after_wall_ms": 48.0328339999998,
+        "speedup": 1.0153642908305183,
+        "native_linux_worker_ms": 95.590563
+      }
+    ],
+    "notes": [
+      "Five counterbalanced Mac samples; 5000 valid operations per worker; compilation and Linux CI stopped.",
+      "Three native ARM64 Linux samples in the dedicated Lima CI environment on this Mac. Native kernel io_uring is not a macOS API.",
+      "General ABI fixtures deliberately reject SQPOLL as unsupported in Trames and are not native conformance oracles."
+    ]
+  },
+  "remaining": [
+    "Missing typed proc/path provider or original execution capability",
+    "Genuinely unavailable native wait subscription after source progress/rearm",
+    "Excluded descriptor/resource body or unsupported structural pinning",
+    "Missing layout/signal embedding capability, tracing, solo/host administration"
+  ],
+  "scope": {
+    "update": "Mac Dev and shared source; physical iPad unchanged",
+    "stable_version": "1.5.4",
+    "stable_installed_sha256_expected": "8fc21435034e8c041632e2e50419da9d2123bf790aedb0a1499286fc8367e614",
+    "business_environments_restarted": false,
+    "installed_dev_sha256": "eb077cbac2bd67cddefe69c51a733bc2fa0e847fa7547e7a4a9aa44aab8f8605",
+    "stable_installed_sha256_actual": "8fc21435034e8c041632e2e50419da9d2123bf790aedb0a1499286fc8367e614"
+  },
+  "notes": [
+    "The general ABI fixture intentionally expects SQPOLL rejection in Trames, so its unmodified native execution is not an applicable Linux oracle. Native benchmarks use only common supported operations.",
+    "Ubuntu user headers omit newer operation names; static fixture compilation defines existing ABI operation numbers 55/56/57 without modifying system headers.",
+    "Final source keeps the normal shared lookup fast path; final Mac/Linux CI and real backend cases are rerun after that change."
+  ],
+  "source_hashes_verified_against_linux_ci": true,
+  "ipad_baseline_revision": "595c259468f831ea2461b2b1857c698bc42d0496",
+  "fixture_sources": [
+    {
+      "path": "tests/fixtures/io-uring-extended.c",
+      "sha256": "e8a2c6986fa3519315ee014e5a266315c8b3610afac835ad7149de4b0a346987"
+    },
+    {
+      "path": "tests/fixtures/io-uring-multishot.c",
+      "sha256": "a9d2d04e52e55465be65fc42bda4fe1b574dc9c2b343ec96ff33d88bfc99a0a3"
+    },
+    {
+      "path": "tests/fixtures/io-uring-subsystem.c",
+      "sha256": "cbabad84ae4babd30712318fd1cfc2475c9ca98a2450f07e37b7056bd64e096c"
+    },
+    {
+      "path": "tests/fixtures/io-uring-worker-async.c",
+      "sha256": "ea2731ee0b0b671516068aabc9dd8769d44cd2a5a5df34ef30bd357d55501f3b"
+    },
+    {
+      "path": "tests/fixtures/io-uring-worker-registered.c",
+      "sha256": "ed14d8e69ca462e83c9a02d2f892b6004b4047226470821b67d22af91faf672e"
+    },
+    {
+      "path": "tests/fixtures/io-uring-worker.c",
+      "sha256": "534b5a95dab16934dc5e3c3088584105323cf4e65f4848f07fcf66f6d4468b52"
+    },
+    {
+      "path": "tests/fixtures/io-uring.c",
+      "sha256": "7fb602345e6d9654cd0561128f55d0acce12881579c0ce0b489f65c6922249d7"
+    }
+  ]
+}
