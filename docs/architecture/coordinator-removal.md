@@ -2,6 +2,24 @@
 
 ## Current status — 2026-11-09
 
+Stage 78 removes the **live host pause/resume join**. An explicit pause keeps
+original jobs, CPU state, execution Views, translations and accepted waits in the
+same cohort. Existing execution leases stop active CPUs and close the pre-entry
+race. The queue suspends guest dispatch while existing workers can still finish
+accepted backing/lifecycle work. Resume reuses those jobs and starts only needed
+cold affinity slots. No new service thread, guest memory check, fence or
+per-instruction pause check is introduced.
+
+Host pause is separate from guest STOP/CONT, cgroup freezing and actual mapping
+quiescence. Cancel, host deadlines/shutdown, final teardown, missing/excluded
+resources and generic/legacy dispatch still retain their recorded boundaries.
+The overall coordinator-removal goal remains active. See the
+[validation record](../validation/host-pause-20261109.json).
+Only Mac Dev is updated; stable 1.5.4, business environments and physical iPad
+installs retain their existing versions.
+
+### Stage 77 native-device closure (historical)
+
 Stage 77 moves native special-device pathname/OFD operations and
 `/dev/trames-bridge` bytes/readiness onto original source resources. Device
 opens, aliases and metadata use the original shared pseudo-node cache. Accepted
@@ -71,7 +89,7 @@ records source/executable hashes, original joined behavior, reuse proof and fina
 installed acceptance. Only Mac Dev is updated; stable 1.5.4, business environments
 and physical iPad installs remain unchanged.
 
-### Remaining boundaries after stage 77
+### Remaining boundaries after stage 78
 
 **The coordinator still exists.** io_uring's remaining `owner_required` setters
 are the two actual source-maintenance failures: unavailable wait capability or an
@@ -83,13 +101,13 @@ not rename those remaining cases or claim the whole goal is finished.
 The remaining triggers group into four boundaries, rather than one category per
 row in the coverage inventory below:
 
-1. Actual host administration and lifecycle/teardown events.
+1. Actual host cancellation/deadline/shutdown and final teardown events.
 2. Missing embedding capabilities or excluded resources, including io_uring's two
    actual source-maintenance failures.
 3. Last-resort known-resource/subcommand and unhandled HLT/fault dispatch.
 4. Initial/legacy admission and solo orchestration; solo is not itself a syscall RPC.
 
-Native special-device/Bridge pathname, byte and readiness dependencies are removed by stage 77. Host transfer/timezone/FileProvider commands are removed from joined execution by stage 76. Mac memory-pressure reclamation is removed by stage 75.
+Live host pause/resume is removed from joined execution by stage 78. Native special-device/Bridge pathname, byte and readiness dependencies are removed by stage 77. Host transfer/timezone/FileProvider commands are removed from joined execution by stage 76. Mac memory-pressure reclamation is removed by stage 75.
 Init notification/graceful-stop supervision was removed by stage 74. Diagnostic syscall tracing was removed by stage 73. Stage 72 removed
 the independent embedding terminal-ID-0 execution category. Normal subsystem names
 below describe coverage and do not imply another coordinator dependency.
@@ -118,7 +136,8 @@ below describe coverage and do not imply another coordinator dependency.
 | Diagnostic syscall tracing | Optional original-task metadata follows source/solo execution, parked waits, signals and lifecycle scopes; existing executors emit complete lines | No logging-only execution exclusion remains. Actual stderr writes can block their caller; this does not add guest ptrace support |
 | Cold process observation and source ownership | Original body custody/current PID identity; queue membership orders later exit observation | Accepted source Handles retain their original authority. Actual excluded/legacy actors remain explicit |
 | Host process and native terminal lifecycle | Host task creation/admission, original group control and UI native terminal open/close/input/resize/hangup progress on original resources and existing execution/disk workers | One-time product terminal initialization and genuinely missing/excluded providers remain explicit; terminal ID 0 transport no longer requests a join |
-| Host administration and generic dispatch fallback | Unknown syscall numbers finish locally using generated entry recognition; actual administration retains its own route | Pause/cancel, admin/deadline/shutdown; accepted filesystem commands use original resources and the existing disk pool; known SVC resources/subcommands and HLT/fault exits not completed, parked or scoped on the worker still reach the joined fallback |
+| Live host pause/resume | Original cohort, execution leases, shared pause flag and existing queue/workers | No pause-only join; initial/solo and legacy stopped-hook invocation retain their separate route |
+| Host administration and generic dispatch fallback | Unknown syscall numbers finish locally using generated entry recognition; actual administration retains its own route | Cancel, admin/deadline/shutdown; accepted filesystem commands use original resources and the existing disk pool; known SVC resources/subcommands and HLT/fault exits not completed, parked or scoped on the worker still reach the joined fallback |
 
 The last row is an important coverage gap: the remaining owner work is **not
 limited to a fixed set of rare controls**. The final worker-dispatch fallback is
@@ -127,7 +146,7 @@ the owner; ordinary epoch-member migration, parking, wakeup and child/replacemen
 admission already use the live execution queue. Single-CPU/solo execution retains
 its coordinated caller path, which does not by itself imply an extra RPC.
 
-The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/a1b09affb1be790ee1588e34fba7440d098451bf/docs/architecture/coordination-boundaries.md)
+The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/04ec423f35a222642a2bcbde3b93a568d7f9968a/docs/architecture/coordination-boundaries.md)
 records scopes, actual admission gates and source locations. Earlier sections
 below are historical records and do not override this inventory.
 
@@ -4750,3 +4769,58 @@ io_uring enter, CQ polling and background pumps retain pre-pump deadlines as
 well as newly established ones. Due requests do not create a repeated past-time
 wake after the worker has observed them. Ready ordinary byte calls gain no extra
 resource scan, and ordinary guest memory access is unchanged.
+
+## 78. Original live host pause/resume — 2026-11-09
+
+A live embedding pause no longer requests a stopped control hook. The iPad FFI
+adapter continues original host queue, notification and transfer processing while
+paused. Actual cancellation still requests the original stopped hook and reports
+its existing result; pause cannot swallow cancellation or errors. Legacy adapters
+may still request their explicitly stopped callback.
+
+One original relaxed atomic pause flag is retained by the cohort and every
+original/new execution domain. The existing queue mutex publishes suspension and
+resume. On pause, existing domain interrupt registries mark their original active
+leases and kick their backend. An entry before publication is found and kicked;
+an entry after the original domain lock sees the published flag and cannot run.
+Interpreter/native loops use their existing lease pending bit; no ordinary byte
+check, native-call lock, new fence or per-instruction atomic is added. A native
+body already entered may finish before the pause settles.
+
+Guest dispatch stops without destroying jobs, CPU/translation state, Views, wait
+subscriptions or accepted I/O. New tasks can be admitted while paused and inherit
+the same original flag. Actual mapped-backing checkpoints and accepted scoped
+work can progress on existing workers; their optional guest instruction batches
+start with a pending lease and cannot execute. Host pause does not alter guest
+STOP/CONT, cgroup freezing or the mapping-pause bit. Resume cannot clear those
+independent causes. Suspended cohorts are not classified as idle completion.
+
+Resume wakes the original queue and starts only CPU slots required by its actual
+ready affinity/load. A resource wake during pause cannot start a new execution
+slot. Cancellation wakes sleeping dispatchers and uses normal teardown/drain.
+There is no resource service, new pool, polling message bus or coordinator RPC.
+
+Conformance covers three pause/resume cycles with 4/12 logical CPUs and a single
+physical execution slot, original job/View identity, pre-entry/late interrupt
+binding, new-task/cold-affinity admission, cancellation, idle pipe reads retained
+through FD close/reuse and a wake arriving while paused. Mapped host exports still
+complete on 4/12 CPUs while guest execution is suspended. The signed Mac hardware
+fixture uses native CLONE_THREAD peers and raw aligned ARM64 counter stores, so
+its pause check does not depend on guest syscalls. The baseline runtime keeps
+executing after the live pause request and fails to settle.
+
+Actual cancel/deadline/shutdown, final teardown, missing/excluded resources,
+known-resource/HLT/fault fallback and initial/legacy/solo orchestration remain.
+No overall coordinator-removal completion or browser/throughput speedup is claimed.
+
+Both complete local runtime workflows pass. macOS and ARM64 Linux each pass 412
+process tests (two intentionally ignored) and all 10 FFI tests. Strict core/FFI
+lint and iPad device/simulator SDK compiles pass. A removed unnecessary `mut` in a
+FFI test binding changes no production behavior; only affected FFI checks are
+repeated. Product hardware and installed evidence are recorded in the consumer's
+[validation record](https://github.com/kb5000/trames-ipad/blob/main/docs/validation/host-pause-20261109.json).
+
+A focused regression reproduced an ignored paused Idle notification preventing
+idle completion after resume. Resume now clears that original notification latch
+before waking dispatchers. The full affected process suite and strict core lint
+are rerun on both hosts; unchanged CPU/Linux/VFS/runtime checks are reused.

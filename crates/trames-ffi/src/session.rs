@@ -1287,9 +1287,7 @@ impl GuestOutput for Adapter {
         )
     }
     fn poll_control(&mut self, vfs: &Vfs) -> io::Result<bool> {
-        if self.session.cancelled.load(Ordering::Acquire)
-            || self.session.paused.load(Ordering::Acquire)
-        {
+        if self.session.cancelled.load(Ordering::Acquire) {
             return Ok(true);
         }
         if let Some(init) = &mut self.init_monitor {
@@ -1497,8 +1495,19 @@ mod memory_tests {
         job.run(admission);
     }
     #[test]
-    fn filesystem_commands_keep_source_execution_and_paused_completion() {
+    fn paused_live_control_keeps_cancellation_distinct() {
         let mut vfs = Vfs::default();
+        let mut adapter = test_adapter(None);
+        adapter.session.paused.store(true, Ordering::Relaxed);
+        assert!(adapter.paused());
+        assert!(!adapter.poll_control(&vfs).unwrap());
+        adapter.session.cancelled.store(true, Ordering::Relaxed);
+        assert!(adapter.poll_control(&vfs).unwrap());
+        assert!(!adapter.control(&mut vfs).unwrap());
+    }
+    #[test]
+    fn filesystem_commands_keep_source_execution_and_paused_completion() {
+        let vfs = Vfs::default();
         let mut adapter = test_adapter(None);
         let disk = disk(&mut adapter);
         let path = std::env::temp_dir().join(format!("trames-host-command-{}", std::process::id()));
@@ -1549,7 +1558,7 @@ mod memory_tests {
             }))
             .unwrap();
         adapter.session.paused.store(true, Ordering::Relaxed);
-        assert!(adapter.control(&mut vfs).unwrap());
+        assert!(!adapter.poll_control(&vfs).unwrap());
         assert!(adapter.paused());
         run_host(&adapter, &disk);
         assert_ne!(result.recv().unwrap().unwrap(), inode);
@@ -1645,7 +1654,8 @@ mod memory_tests {
             );
         }
         session.paused.store(true, Ordering::Relaxed);
-        assert!(adapter.poll_control(&vfs).unwrap());
+        assert!(!adapter.poll_control(&vfs).unwrap());
+        assert!(adapter.paused());
     }
 
     #[test]

@@ -1,0 +1,252 @@
+{
+  "stage": 78,
+  "date": "2026-11-09",
+  "overall_goal": "active",
+  "runtime_revision": "04ec423f35a222642a2bcbde3b93a568d7f9968a",
+  "execution_revision": "5ae4812d5b18e122c834a6d54e6a56f6e57279da",
+  "scope": "Live host pause/resume, original job/View/wait lifetime, new task admission, accepted backing completion, idle notification and cancellation boundaries.",
+  "architecture": {
+    "authority": "One original cohort AtomicBool shared by its execution domains; the existing queue mutex publishes scheduling changes.",
+    "execution": "Existing leases interrupt active CPUs and close late entry. Existing pending checks are reused; no new instruction/guest-memory check, fence, service thread or pool.",
+    "pause": "Guest dispatch is suspended while original CPU state, Views, translations and accepted waits remain retained. Original workers can finish accepted backing/lifecycle work; optional scoped guest batches stay pending.",
+    "independence": "Host pause does not change guest STOP/CONT, cgroup freeze or mapping pause. Entered native bodies may finish before pause settles.",
+    "resume": "Original jobs and accepted OFDs resume; cold slots start only for actual ready affinity/load. Resume reannounces idle state ignored while paused.",
+    "remaining": "Actual cancellation/final teardown and missing/excluded/legacy/generic boundaries remain. No full coordinator removal or throughput claim."
+  },
+  "checks": {
+    "runtime_macos": {
+      "complete_workflow_passed": true,
+      "steps": 7,
+      "artifact": "target/host-pause-subsystem/runtime-mac/summary.json",
+      "scoped_followup_reuse": {
+        "scope": "Only the source queue changed after both complete runtime workflows: resume resets idle_notified, with one new regression. Both affected full process suites, core lint, iPad checks and affected release builds rerun; unchanged runtime crates/tests reused.",
+        "workflow_queue_sha256": "e4c843e10338fc123e933f489396a759590fb8df6dcfc66e71b5bfb02cde02a5",
+        "final_queue_sha256": "4ae3242ccf82b4f66f2b58f1f42a60bee187754fb7b7d50f98597bf91a5e96df",
+        "export_fixture": "Only cfg(test) code changed: guest pipe acknowledgment replaces a timing assumption; production process_file_io.rs prefix is byte-identical to the baseline.",
+        "export_tested_sha256": "1d774c6dada6acdd44e3087bf225216c7d617f9683b2805696f868cf575c8c27",
+        "export_final_sha256": "152ddf5befdc92b37c2f4b00f4fdd4ecab30b09f873d424c1f4380957830f0d9"
+      }
+    },
+    "runtime_linux": {
+      "complete_workflow_passed": true,
+      "artifact": "target/local-ci/io/host-pause-subsystem/runtime-linux-ci/summary.json",
+      "affected_final_release": true
+    },
+    "process": {
+      "macos": 412,
+      "linux": 412,
+      "ignored_each": 2,
+      "linux_final_scope": "411 passing cases reused after a test-only export handshake correction; the sole failed export case rerun and passed. Final core lint/release also pass.",
+      "mac_final_artifact": "target/host-pause-subsystem/kernel-conformance-final.log",
+      "linux_raw_checks": [
+        {
+          "name": "process-all",
+          "code": 0,
+          "seconds": 53.571549926
+        },
+        {
+          "name": "ffi-all",
+          "code": 0,
+          "seconds": 12.097962730000006
+        },
+        {
+          "name": "core-clippy",
+          "code": 0,
+          "seconds": 4.670302083999999
+        },
+        {
+          "name": "runtime-ci",
+          "code": 0,
+          "seconds": 53.388702952
+        },
+        {
+          "name": "ffi-all-final",
+          "code": 0,
+          "seconds": 6.222458542999959
+        },
+        {
+          "name": "ffi-clippy",
+          "code": 0,
+          "seconds": 0.8324969810000198
+        },
+        {
+          "name": "process-all-final",
+          "code": 101,
+          "seconds": 54.367917053999975
+        },
+        {
+          "name": "host-export-final",
+          "code": 0,
+          "seconds": 8.103448180999976
+        },
+        {
+          "name": "core-clippy-final",
+          "code": 0,
+          "seconds": 1.729953309999928
+        },
+        {
+          "name": "session-release-final",
+          "code": 0,
+          "seconds": 6.412660117000087
+        }
+      ]
+    },
+    "ffi": {
+      "macos": 10,
+      "linux": 10,
+      "strict_lint": true,
+      "coverage": [
+        "paused live control retains cancellation",
+        "conditional writeback completes through live paused poll",
+        "systemd notification control remains live while paused"
+      ]
+    },
+    "ipad": [
+      {
+        "target": "aarch64-apple-ios",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+        "code": 0
+      },
+      {
+        "target": "aarch64-apple-ios-sim",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk",
+        "code": 0
+      }
+    ],
+    "hardware": {
+      "passed": true,
+      "runtime_revision": "5ae4812d5b18e122c834a6d54e6a56f6e57279da",
+      "rows": [
+        {
+          "target": "trames-mac-run",
+          "executable_sha256": "be7b03110bc85642c0c2cbcf16c5c6eb93c73ed5850ca59fb873836bcd42b9ca",
+          "exit": 0,
+          "passed_tests": 3
+        },
+        {
+          "target": "trames_hvf",
+          "executable_sha256": "1add378b8251cc1470a6c3b76360e4889758a6153bb4ce51f3d613fca848fdc2",
+          "exit": 0,
+          "passed_tests": 52
+        }
+      ]
+    },
+    "hardware_pause": {
+      "cpus": [
+        4,
+        12
+      ],
+      "cycles_each": 3,
+      "cohorts_each": 1,
+      "guest": "Native CLONE_THREAD peers and aligned raw ARM64 counter stores; no guest syscall needed for observed progress."
+    },
+    "product": {
+      "applicable_steps": 8,
+      "passed": true,
+      "stable_packaging": "Outside Dev-only scope"
+    },
+    "installed": {
+      "version": "Trames Dev 1.5.4 (dev) runtime 5ae4812d5b18e122c834a6d54e6a56f6e57279da",
+      "runner_sha256": "f0f81af91525a459e8f0056cc046e31271661d1bd9c9bf4143e49f38b1e4705d",
+      "stable_sha256": "8fc21435034e8c041632e2e50419da9d2123bf790aedb0a1499286fc8367e614",
+      "stable_unchanged": true,
+      "checks": [
+        {
+          "name": "init",
+          "code": 0,
+          "seconds": 3.254098292
+        },
+        {
+          "name": "host",
+          "code": 0,
+          "seconds": 0.9340265830000005
+        },
+        {
+          "name": "tracing",
+          "code": 0,
+          "seconds": 0.25244666700000007
+        }
+      ]
+    },
+    "metadata_refresh": {
+      "version": "Trames Dev 1.5.4 (dev) runtime 04ec423f35a222642a2bcbde3b93a568d7f9968a",
+      "runner_sha256": "d64caba01f53edda8e6c7120e368ebdf0455408366a134ae9d108569442a4bad",
+      "stable_sha256": "8fc21435034e8c041632e2e50419da9d2123bf790aedb0a1499286fc8367e614",
+      "stable_unchanged": true,
+      "signature_verified": true,
+      "executable_source_revision": "5ae4812d5b18e122c834a6d54e6a56f6e57279da",
+      "only_changed_runtime_file": "docs/architecture/coordination-boundaries.md"
+    }
+  },
+  "regressions": {
+    "interpreter_cpus": [
+      4,
+      12,
+      4
+    ],
+    "interpreter_slots": [
+      4,
+      12,
+      1
+    ],
+    "pause_cycles_each": 3,
+    "cohorts_each": 1,
+    "service_requests_each": 0,
+    "coverage": [
+      "original Box/View identity through suspension",
+      "pre-entry and late interrupt binding",
+      "accepted mapping scope cannot batch guest instructions",
+      "new task and cold-affinity admission during pause",
+      "idle pipe wakes after FD close/reuse stay retained while paused",
+      "paused mapped export progresses after explicit guest write acknowledgment",
+      "cancellation wakes suspended dispatchers",
+      "resume reannounces a paused idle notification"
+    ]
+  },
+  "baseline": {
+    "runtime_revision": "a1b09affb1be790ee1588e34fba7440d098451bf",
+    "exit": 101,
+    "expected_failure": true
+  },
+  "validation_recovery": [
+    "Sandboxed Mac process rerun denied loopback sockets; final affected suite rerun outside sandbox and passed.",
+    "An idle-resume regression reproduced a missing notification latch reset and passes after correction.",
+    "Linux caught an export-fixture timing assumption. Guest now acknowledges its first mapped store through an original pipe before pause/export. Other passing cases reused.",
+    "Late runtime inventory correction changes documentation only; all executable-code checks reused and Dev pin/version/signature refreshed."
+  ],
+  "changed_runtime_sha256": {
+    "crates/trames-session/src/process_file_io.rs": "152ddf5befdc92b37c2f4b00f4fdd4ecab30b09f873d424c1f4380957830f0d9",
+    "crates/trames-session/src/process_vm.rs": "3063c1a5348d1ecf4f5735b91013c17f4239b0238c168ecfca0e50ccec1da950",
+    "crates/trames-session/src/run_queue.rs": "4ae3242ccf82b4f66f2b58f1f42a60bee187754fb7b7d50f98597bf91a5e96df",
+    "crates/trames-session/src/run_queue/domains.rs": "ceef8f1825fc25607100734629096e61c399e1a6e2867f4f9e0f4ad6ee80942f",
+    "crates/trames-session/src/workers.rs": "31f341de4382923cf9301eff02c2f2c085639fd17bafd33a2a63c1df2e788121",
+    "docs/architecture/coordination-boundaries.md": "d53f8e234814466074d1c4295ef34d0f59f0bd1195b451ffb32c26a470a13b2e"
+  },
+  "ffi_source_sha256": "86b28feb87f20c67a67c2423bcdad191f775b01d1013983dea63e611da64e6d8",
+  "mac_hardware_fixture_sha256": "46a67f5b62366a0123598e7d980cbb050b4cafcce3d032b8a9410e0ab58128e6",
+  "deployment": {
+    "app": "/Users/main/Applications/Trames Dev.app",
+    "version": "Trames Dev 1.5.4 (dev) runtime 04ec423f35a222642a2bcbde3b93a568d7f9968a",
+    "runner_sha256": "d64caba01f53edda8e6c7120e368ebdf0455408366a134ae9d108569442a4bad",
+    "stable_unchanged": true,
+    "stable_sha256": "8fc21435034e8c041632e2e50419da9d2123bf790aedb0a1499286fc8367e614",
+    "physical_ipad": "unchanged; both SDK compile checks pass",
+    "business_environments": "unchanged"
+  },
+  "remaining": [
+    "Actual cancel/deadline/admin/shutdown and final teardown",
+    "Missing typed embedding capabilities and excluded resources; two io_uring maintenance escalations",
+    "Known-resource/subcommand and unhandled HLT/fault final dispatch",
+    "Initial/legacy admission and solo orchestration"
+  ],
+  "artifacts_sha256": {
+    "runtime-mac/summary.json": "119a7ad359310612fb54f66ea67490afcc4dcf970ef159e20b722981ecc42ecf",
+    "local-checks.json": "bf2472b871135dbd8a711e3773d23a0742cc101d5b7f1df47f99393ffb6259d9",
+    "hardware/results.json": "fc60be7e2ba61273aedf753594404b093404d5fb1c1ec0256497e0165d7aa57c",
+    "hardware-baseline.json": "65fab02f12e57cae08962dbffb41f1335aef6be6b15646fa69c1c2378773884f",
+    "workflow-reuse.json": "15f66f33525e23ba0668d0555b7ebb7fcd4ffe3fb45ae1670316581cf9c4f841",
+    "documentation-only-pin.json": "30619a875d4a22a11d0a056acd856934668d2be333348c2f237dde13db78c309",
+    "installed-checks.json": "0814eadc16fd94bc26226787f7d6041a58f0e1729db6c2a7618facde3bb8a269",
+    "metadata-refresh.json": "96bf09d5e1e35068e64267755cc9beaba638f74fe6ba5bf22083ea3a72ef9131"
+  }
+}
