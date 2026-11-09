@@ -2,35 +2,36 @@
 
 ## Current status — 2026-11-09
 
-Through stage 89 the broad remaining count is **four**, unchanged from stage 88.
+Through stage 90 the broad remaining count is **four**, unchanged from stage 89.
 This counts actual boundary classes, not historical subsystem headings.
 
 | Remaining class | Current boundary | Concrete change this round |
 | --- | --- | --- |
 | Host control and final teardown | Actual cancellation/deadline/shutdown, native-event failure and final CPU/session drain | Unchanged |
-| Missing capabilities and excluded resources | Original absent providers/excluded bodies; two submitter-scoped io_uring maintenance setters remain | Unchanged; the native dormant fixture still exposes its actual legacy proc provider |
-| Final execution dispatch | SVC/HLT/fault not completed, parked or accepted by a source scope | gettimeofday, including its real vDSO SVC, completes on the caller; all implemented time observations share their source/solo ABI |
+| Missing capabilities and excluded resources | Original absent providers/excluded bodies; two submitter-scoped io_uring maintenance setters remain | Published global proc/sys metadata now retains its actual original resource without requiring a typed live ProcSource |
+| Final execution dispatch | SVC/HLT/fault not completed, parked or accepted by a source scope | Old global metadata OFDs support ordinary FileWork reads, io_uring and existing namespace errors on the caller |
 | Initial/legacy orchestration | Initial admission and standalone/capability-less scheduling | Normal dormant Futex/Sleep admission stays source-owned |
 
-Stage 89 closes the implemented time-observation family. clock_gettime,
-clock_getres and gettimeofday use the shared Linux ABI on their original
-executor. Realtime remains live host wall time; the immutable monotonic vDSO
-calibration is not reused as an inaccurate wall-clock copy. Its gettimeofday
-entry retains an SVC/backend exit, now without a coordinator handoff. No clock
-service, recurring polling, new lock, unsafe block or ordinary-memory fence is
-added. Existing null/error/overlap order and seccomp admission are preserved.
+Stage 90 closes the original published global proc/sys resource dependency.
+Private legacy resolvers retain the same synchronized publication; file descriptions
+use the common FileWork path for reads. Later publication/provider updates, original
+OFD identity, registered/linked io_uring, completion/cancellation and last close are
+covered together. No copied owner VFS/Files table, resource service, polling bus,
+new unsafe trait implementation or ordinary guest-memory fence is added.
 
-The signed four-CPU baseline uses ten cohorts and sixteen returned gettimeofday
-calls. Final four/twelve-CPU runs use one cohort with zero returned syscall or
-service, including the actual vDSO export. The dormant native fixture still
-retains its one explicit legacy proc read and cold-admission coverage.
+The signed four-CPU baseline uses five cohorts and four returned preads. Final
+four/twelve-CPU runs use one cohort with zero returned syscall or service. The cold
+native fixture still retains its one real read from an explicitly unavailable source
+provider, preserving its two-cohort setup/wake coverage.
 
 The [shared inventory](../../runtime/docs/architecture/coordination-boundaries.md#current-remaining-categories)
-and [stage 89 record](../validation/time-observations-20261109.json) are current.
-Mac and ARM64 Linux each pass 440 process regressions (two intentionally ignored),
+and [stage 90 record](../validation/published-proc-20261109.json) are current.
+Mac and ARM64 Linux each pass 441 process regressions (two intentionally ignored),
 both complete runtime workflows pass, and iPad device/simulator compilation passes.
 Mac Dev alone is updated; stable 1.5.4, business environments and physical iPad
-installations retain their versions. The overall removal goal remains active.
+installations retain their versions. The io_uring subsystem is not fully closed:
+both maintenance escalation sites remain for actual missing/excluded capabilities.
+The overall removal goal remains active.
 
 ### Stage 81 read-only memory observations (historical)
 
@@ -5476,3 +5477,67 @@ Four broad categories still remain. This removes implemented time observation
 from final joined dispatch. Actual host cancellation/final teardown, genuinely
 missing/excluded capabilities (including both io_uring maintenance escalation
 setters), other final dispatch and initial/legacy orchestration remain active.
+
+
+## 90. Original published global proc/sys resource capabilities — 2026-11-09
+
+Runtime `667c9cd31b901286c241fe5563c800ebf62cc1bb` removes an actual io_uring
+resource dependency: global proc/sys data published through set_runtime_info.
+Those fields already have an original synchronized owner, so lacking a typed live
+ProcSource no longer makes their ordinary reads, metadata traversal and existing
+read-only namespace errors coordinator work. This is a connected resource migration,
+not deletion of either io_uring maintenance escalation setter.
+
+Private legacy resolvers retain the original publication and flatten repeated
+projection capture to the same root. An opened global file retains a provider over
+that resource through the existing type-erased ProcSource boundary. Ordinary and
+io_uring reads share common FileWork and the original OFD. No copied owner VFS,
+Files root, service thread, polling bus, new unsafe block/trait implementation,
+increased recursion limit or ordinary guest-memory check/fence is added. Typed
+live proc providers retain their existing path and guest-mm ownership model.
+
+Later publications and a subsequently installed live provider remain visible;
+provider callbacks run outside the original publication lock. Resource tests verify
+source/solo agreement for version, cpuinfo, meminfo, uptime, stat and CPU sysfs
+metadata. They also check retained-file updates, provider replacement, survival
+across owner/table close and release of the publication on last accepted close.
+The original root has no projection back-reference; existing open/PID observation
+bindings retain their original weak capabilities.
+
+This does not invent live process bytes from old metadata. Numeric PID/mm paths,
+argv, environment, maps and auxv keep their real typed resource requirements.
+Explicit provider unavailability still defers before effects. Earlier blanket
+exclusion tests are split into positive global-resource checks and genuine
+unavailable-provider checks, retaining original errno, OFD and namespace assertions.
+
+A linked io_uring metadata read waits behind its original eventfd, survives close
+and FD reuse, then observes updated publication fields. Another submitting task
+continues independently. Cancellation returns both accepted completions without
+copyout and does not force a new completion order. The connected process fixture
+combines ordinary pread with a registered fixed-file io_uring read after the original
+FD is closed/reused. Four/twelve CPUs, one execution slot and seccomp ALLOW complete
+in one cohort with no returned syscall, service or mapping checkpoint. Prior
+production stops at its first pread before the completion marker.
+
+The signed native fixture checks per-thread pread bytes, io_uring bytes and actual
+CQEs. Prior four-CPU execution exits correctly but needs five cohorts, four returned
+preads and two returned clones. Final four/twelve-CPU execution exits in one cohort
+with no returned syscall or service. No twelve-CPU before measurement or controlled
+throughput improvement is claimed. The dormant native fixture uses a working original
+global read with an explicitly unavailable source provider; both prior/final runtime
+retain two cohorts, one original mm scope and one returned read at four/twelve CPUs.
+
+Both full local runtime workflows pass. macOS and ARM64 Linux each pass 441 process
+regressions (two intentionally ignored) and ten FFI cases. Strict lint, both iPad SDK
+targets, Mac product development gates, 52 signed HVF and thirteen signed product
+cases pass. Installed Dev passes init supervision at one/four/twelve CPUs and
+host-control/tracing acceptance at twelve CPUs. Source/binary fingerprints and all
+boundaries are in the [validation record](../validation/published-proc-20261109.json).
+Only Mac Dev is updated; stable 1.5.4, business environments and physical iPad
+installations retain their versions.
+
+Four broad categories remain. Both actual io_uring maintenance escalation sites
+remain for missing native wait capability and an original body still excluded by
+its actual provider. Actual host cancellation/final teardown, other final dispatch
+and initial/legacy orchestration remain. The next io_uring work must address those
+real resources and waits; this stage does not relabel them as source completion.

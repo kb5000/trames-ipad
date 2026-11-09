@@ -1,0 +1,266 @@
+{
+  "stage": 90,
+  "date": "2026-11-09",
+  "overall_goal": "active",
+  "runtime_revision": "667c9cd31b901286c241fe5563c800ebf62cc1bb",
+  "prior_runtime": "0c736ffe1efb13c2bd504eb9b2f9391b931d0c18",
+  "scope": "Connected original published global proc/sys resource subsystem: traversal and metadata refresh, ordinary/FileWork reads, existing read-only namespace rejection, fixed/linked io_uring, original OFD/publication lifetime, close/reuse, completion and cancellation.",
+  "architecture": {
+    "publication": "Private legacy query projections retain the original synchronized global publication. Projection capture is flattened to the same root; there is no copied owner VFS or Files authority.",
+    "files": "Opened descriptions retain the original global publication through the existing type-erased ProcSource boundary and common FileWork. Numeric PID/mm payloads retain their real typed capability checks.",
+    "updates": "Later publications and a subsequently bound live provider remain visible. Provider callbacks run outside the publication lock. Root/global data, weak open/PID bindings and original UTS/network/cgroup resources are retained without a Files-root cycle.",
+    "lifetime": "Retained file work survives original owner/table close and releases the global root after last accepted description. io_uring links and registrations retain the original OFD across FD reuse; the original submitter owns copyout/cancellation.",
+    "no_new": [
+      "coordinator/resource/service thread",
+      "polling bus",
+      "global native/algorithm lock",
+      "production unsafe trait implementation or block",
+      "higher trait recursion limit",
+      "ordinary guest memory check/fence",
+      "fake live argv/environment/maps capability"
+    ]
+  },
+  "baselines": {
+    "shared": {
+      "runtime_revision": "0c736ffe1efb13c2bd504eb9b2f9391b931d0c18",
+      "checks": [
+        {
+          "name": "process",
+          "code": 101,
+          "seconds": 18.988249083,
+          "output": "warning: unused workspace dependency `trames-native`\n  --> Cargo.toml:17:1\n   |\n17 | trames-native = { path = \"runtime/crates/trames-native\" }\n   | ^^^^^^^^^^^^^\n   |\n   = note: `cargo::unused_workspace_dependencies` is set to `warn` by default\nhelp: consider removing the workspace dependency `trames-native`\nwarning: workspace (manifest) generated 1 warning\n   Compiling trames-session v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-session)\n   Compiling trames-vfs v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-vfs)\n   Compiling trames-kernel v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-kernel)\n   Compiling trames-linux v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-linux)\n   Compiling trames-core v1.5.4 (/Users/main/dev/trames/crates/trames-core)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 18.20s\n     Running ../../runtime/crates/trames-session/src/lib.rs (target/debug/build/trames-core/73ea467a4920ade2/out/kernel_conformance-73ea467a4920ade2)\n\nrunning 1 test\ntest process::published_proc_tests::published_global_metadata_and_registered_uring_complete_in_the_original_cohort ... published CPUs=4 slots=4 filtered=false marker=[0, 0, 0, 0] cohorts=1 returned={67: 1}\n\nthread 'process::published_proc_tests::published_global_metadata_and_registered_uring_complete_in_the_original_cohort' (27787760) panicked at crates/trames-core/../../runtime/crates/trames-session/src/process_published_proc_tests.rs:114:9:\nassertion `left == right` failed\n  left: [0, 0, 0, 0]\n right: [1, 0, 0, 0]\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\nFAILED\n\nfailures:\n\nfailures:\n    process::published_proc_tests::published_global_metadata_and_registered_uring_complete_in_the_original_cohort\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 442 filtered out; finished in 0.02s\n\nerror: test failed, to rerun pass `-p trames-core --test kernel-conformance`\n"
+        }
+      ]
+    },
+    "signed_native": {
+      "runtime_revision": "0c736ffe1efb13c2bd504eb9b2f9391b931d0c18",
+      "code": 101,
+      "output": "\nrunning 1 test\ntest session::tests::published_global_metadata_and_uring_complete_on_original_native_workers ... hardware published CPUs=4 exit=0 cohorts=5 returned={67: 4, 220: 2}\n\nthread 'session::tests::published_global_metadata_and_uring_complete_on_original_native_workers' (27785836) panicked at crates/trames-mac/src/session.rs:1346:13:\nassertion failed: runtime.metrics.cohort_return_syscalls.is_empty()\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\nFAILED\n\nfailures:\n\nfailures:\n    session::tests::published_global_metadata_and_uring_complete_on_original_native_workers\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 33 filtered out; finished in 0.03s\n\n"
+    },
+    "signed_dormant": {
+      "runtime_revision": "0c736ffe1efb13c2bd504eb9b2f9391b931d0c18",
+      "code": 0,
+      "output": "\nrunning 1 test\ntest session::tests::dormant_shared_futex_child_resumes_without_another_joined_native_cohort ... hardware dormant CPUs=4 exit=0 marker=[1, 0, 0, 0] cohorts=2 scopes=1 returned={63: 1}\nhardware dormant CPUs=12 exit=0 marker=[1, 0, 0, 0] cohorts=2 scopes=1 returned={63: 1}\nok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 33 filtered out; finished in 0.02s\n\n"
+    }
+  },
+  "checks": {
+    "workflows": {
+      "runtime_macos": {
+        "passed": 7,
+        "total": 7,
+        "sha256": "74be3d64d6c25712986a6c54b29de033027a6cf5fbad594fb358065681f86b02"
+      },
+      "runtime_linux": {
+        "passed": 7,
+        "total": 7,
+        "sha256": "f0b7e19dccbd4b9aa7e095783a09e1ff170094ff044ab2a5dfab932e5dce5528"
+      },
+      "mac_product": {
+        "passed": 8,
+        "total": 12,
+        "sha256": "5aa9bdff6bb9bcd68b5e6d19c935d8976ceb1960a2118009bfc6254406a35061"
+      }
+    },
+    "macos": [
+      {
+        "name": "runtime-mac",
+        "code": 0,
+        "seconds": 36.656732541
+      },
+      {
+        "name": "kernel-conformance",
+        "code": 0,
+        "seconds": 32.872652625
+      },
+      {
+        "name": "ffi",
+        "code": 0,
+        "seconds": 10.448212542000007
+      },
+      {
+        "name": "core-clippy",
+        "code": 0,
+        "seconds": 9.250162291999999
+      },
+      {
+        "name": "ffi-clippy",
+        "code": 0,
+        "seconds": 0.6714982919999954
+      },
+      {
+        "name": "ipad-compile",
+        "code": 0,
+        "seconds": 11.055035290999996
+      }
+    ],
+    "linux": [
+      {
+        "name": "process-all",
+        "code": 0,
+        "seconds": 80.463172673
+      },
+      {
+        "name": "ffi-all",
+        "code": 0,
+        "seconds": 15.281414769999998
+      },
+      {
+        "name": "core-clippy",
+        "code": 0,
+        "seconds": 7.777068510999982
+      },
+      {
+        "name": "runtime-ci",
+        "code": 0,
+        "seconds": 55.402257976000016
+      }
+    ],
+    "process": {
+      "macos": {
+        "passed": 441,
+        "ignored": 2,
+        "sha256": "939db3283e2dacf60b46fffdb66068869fd3a2c7bb2930dd9c736f272ed9442d"
+      },
+      "linux": {
+        "passed": 441,
+        "ignored": 2,
+        "sha256": "d006951b1c44c94a0d0573411b34c10e21d0b72040078740d444f9ba19154c13"
+      }
+    },
+    "ffi": {
+      "macos": {
+        "passed": 10,
+        "ignored": 0,
+        "sha256": "cecc942bf3f22bf165f51600ee20681954dfc6b69c80c8497296aa67dba2f729"
+      },
+      "linux": {
+        "passed": 10,
+        "ignored": 0,
+        "sha256": "39ba10aa0fc4c12bb28f999686ef046c6c0686f050d3f283282f87b4522c4ab5"
+      }
+    },
+    "ipad": [
+      {
+        "target": "aarch64-apple-ios",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+        "code": 0
+      },
+      {
+        "target": "aarch64-apple-ios-sim",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk",
+        "code": 0
+      }
+    ],
+    "hardware": {
+      "passed": true,
+      "runtime_revision": "667c9cd31b901286c241fe5563c800ebf62cc1bb",
+      "rows": [
+        {
+          "target": "trames-mac-run",
+          "executable_sha256": "4ace7c2645f29a3264dfa571a66b7c6f7fcc38286024a245c9599f0ab837c49f",
+          "exit": 0,
+          "passed_tests": 13
+        },
+        {
+          "target": "trames_hvf",
+          "executable_sha256": "4db0dd18bde5071872bd4b8811aa0db885114dc31d30e03a2b35d4a886dc172a",
+          "exit": 0,
+          "passed_tests": 52
+        }
+      ]
+    },
+    "native_published": {
+      "cpus": [
+        4,
+        12
+      ],
+      "exit": 0,
+      "cohorts": 1,
+      "returned_syscalls": {}
+    },
+    "native_dormant": {
+      "cpus": [
+        4,
+        12
+      ],
+      "cohorts": 2,
+      "scoped_mms": 1,
+      "returned_read": 1
+    },
+    "native_log_sha256": "b9d57737bb896b7388c141fb595aa87860560fb1063f4158ab776d7ed8614c65",
+    "installed": {
+      "version": "Trames Dev 1.5.4 (dev) runtime 667c9cd31b901286c241fe5563c800ebf62cc1bb",
+      "runner_sha256": "a72fb7b24b6730c0e3b59de6a7690d23c69ed0b1f9a1f6f91c68abfe7a76aa72",
+      "stable_sha256": "8fc21435034e8c041632e2e50419da9d2123bf790aedb0a1499286fc8367e614",
+      "stable_unchanged": true,
+      "checks": [
+        {
+          "name": "init",
+          "code": 0,
+          "seconds": 3.321145667
+        },
+        {
+          "name": "host",
+          "code": 0,
+          "seconds": 0.9530145839999999
+        },
+        {
+          "name": "tracing",
+          "code": 0,
+          "seconds": 0.3065556669999996
+        }
+      ]
+    },
+    "new_process_regression": "published_global_metadata_and_registered_uring_complete_in_the_original_cohort",
+    "shared_regressions": [
+      "all_published_global_metadata_uses_the_original_resource_on_source",
+      "retained_global_file_observes_publication_and_live_provider_without_files_cycle",
+      "published_metadata_does_not_invent_live_pid_memory_or_override_explicit_exclusion",
+      "linked_published_metadata_observes_original_updates_and_releases_on_cancel_or_completion",
+      "published_global_readonly_namespace_rejection_completes_on_source",
+      "explicitly_unavailable_provider_has_no_namespace_effect_before_retained_handoff"
+    ]
+  },
+  "source_sha256": {
+    "runtime/crates/trames-linux/src/direct/uring.rs": "0051930c0f100c87e152d7d4c18746cd74310653d42317edbec66d89c445367c",
+    "runtime/crates/trames-linux/src/direct/uring/scope_tests.rs": "71d93358950a94321fccba7f2efd24bbc1f703fcf896b31624dfbb7e99fe7ea2",
+    "runtime/crates/trames-linux/src/direct/uring/subsystem_tests.rs": "3af5e745d4110ea20e4bbdcf2a9237ad0cecafbd9c2a2106c1760394aa0c4d57",
+    "runtime/crates/trames-session/src/process.rs": "0d6282cedd1ab6a487cbafe58037b8c7004697ccd21448a95ec0573886c6dc77",
+    "runtime/crates/trames-session/src/process_published_proc_tests.rs": "70293b98a727fbe45096256461c8e92a8ae2c60b2a2fef43abb15d699c704281",
+    "runtime/crates/trames-vfs/src/namespace_work.rs": "fb2fce6ba3cbd8c9bf72bd4809857694bfbe27da888cf2c33ffadf60ffbef493",
+    "runtime/crates/trames-vfs/src/path_queries.rs": "0aaca2bd48159d0334df88a03f4da69e1e75463a5da84a524aef50608f4f1577",
+    "runtime/crates/trames-vfs/src/proc_file.rs": "1dbe336d88589268041f1a6e631bcf649df00f14583d13ec8a5629cf981592ae",
+    "runtime/crates/trames-vfs/src/proc_source.rs": "c4326ff02b70575fc517819a17ff6dbb0f9aa05d91c30848855610a34afcc42a",
+    "runtime/crates/trames-vfs/src/pseudo.rs": "0a56f6067b6294e7925a3a291780cafed417b7fb40a79df72adf86c6b1934f55"
+  },
+  "mac_native_fixture_sha256": "d1f3b686c0fb2c1ad7e2923005f14af5aa09609f19c616fb7773315754483cff",
+  "deployment": {
+    "channel": "Mac Dev only",
+    "runner": "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+    "signature_verified": true,
+    "stable_unchanged": true,
+    "physical_ipad_unchanged": true,
+    "business_environments_unchanged": true
+  },
+  "validation_notes": [
+    "The new connected process fixture fails against the prior runtime at pread, before its completion marker. Final four/twelve-CPU, one-slot and seccomp ALLOW cases finish pread plus a fixed-file io_uring request in one cohort with zero returned syscall, service or mapping checkpoint.",
+    "The signed native prior four-CPU workload completes functionally but needs five cohorts, four returned preads and two returned clones. Final four/twelve-CPU workloads use one cohort with no returned syscall or service; per-thread data and actual CQEs are verified. No twelve-CPU before measurement or throughput speedup is claimed.",
+    "The linked io_uring fixture retains a global metadata OFD across close/reuse, reads a later publication after its eventfd dependency completes, keeps another submitter running and tests cancellation without copyout. Cancellation CQE order follows existing concurrency semantics; the test compares the completion set.",
+    "Global metadata now supports source namespace/metadata lookup and canonical read-only EROFS rejection. Earlier tests that blanket-excluded /sys or /proc are split into positive published-resource checks and explicit provider-unavailable negative checks, preserving original errors and before-effects assertions.",
+    "The dormant native fixture uses a readable original global OFD opened with an explicitly unavailable source provider, rather than a fake errno. Both old/final runtimes keep its real setup join and subsequent cold-wake coverage.",
+    "During construction, a concrete enum reference to PseudoFs exceeded an existing auto-trait solver depth in a dependent test. The final original publication provider uses the existing type-erased ProcSource boundary and passes strict lint with no new unsafe Send/Sync implementation or increased recursion limit.",
+    "The new fixed-file process test initially called the Kernel-only syscall helper for io_uring_register; its final setup uses the real Linux ABI dispatch. A test-only Duration import and capability/traversal fixture expectations were corrected before final checks.",
+    "Final changed Rust fingerprints match ARM Linux CI and the paired Mac checkout. Complete runtime workflows and Mac development gates 1-8 of 12 pass; stable packaging and physical iPad installation are outside this round."
+  ],
+  "remaining": [
+    "Both submitter-scoped io_uring maintenance escalation sites: genuinely absent native wait capability and an original body still excluded by its actual provider.",
+    "Actual host cancellation/deadline/shutdown and final backend/session teardown.",
+    "Other final SVC/HLT/fault dispatch.",
+    "Actual initial/standalone/capability-less orchestration."
+  ],
+  "limits": [
+    "Four broad remaining categories remain. This closes the original published-global-provider dependency, not the entire io_uring removal goal.",
+    "Numeric PID/mm resources, explicit unavailable providers and other excluded original objects keep their actual boundaries.",
+    "No new compatibility API, per-operation throughput gain or complete coordinator-removal claim is made."
+  ]
+}
