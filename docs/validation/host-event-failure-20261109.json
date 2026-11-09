@@ -1,0 +1,289 @@
+{
+  "stage": 83,
+  "date": "2026-11-09",
+  "overall_goal": "active",
+  "runtime_revision": "43cdaa92f94c867e12f4a9ec0d1afd0039d7f414",
+  "prior_runtime": "bee1f006ca0ee30941834f96a968ecca7937b1e1",
+  "scope": "Connected native host-event capability/error and accepted-request closure across shared readiness, TCP/retained sockets, stream/file waits, io_uring enter/CQ poll/background maintenance, source execution and elected idle executor.",
+  "architecture": {
+    "authority": "Original IoSignal weak target, HostEvents poller Result and wait-scoped original transport/OFD leases. Duplicate weak target fields in io_uring wait/background/poll actors are removed.",
+    "api": "IoWake::host_events returns Result<Option<Arc<HostEvents>>>. Ok(None) is missing capability; Err is the original host error. IoSignal::subscribe_host shares that selection and original FD registration.",
+    "errors": "Readiness retains the original creation/duplicate/attach/dynamic/registration failure, preserving kind, message and raw OS code when present. IoAttempt::HostError and RuntimeError::HostIo never fabricate a guest errno.",
+    "publication": "The original Epoch publishes its first immutable Arc<io::Error> once through OnceLock. Normal guest execution gains no error mutex, memory fence or per-instruction check.",
+    "completion": "Subscribe-before-retry remains. A ready/cancelled stale interest can finish without needing a native backend. Already completed guest effects are neither replayed nor rolled back.",
+    "cleanup": "Source/idle executor stops and notifies actual CPU actors. After actor/View drain, accepted original task/mm io_uring requests cancel through existing CQ and dependency cleanup. There is no owner syscall pump or new service.",
+    "legacy": "Capability-less bootstrap embeddings preserve their explicit route; terminal bootstrap now handles HostError explicitly rather than reaching its checkpoint-only assertion.",
+    "no_new": [
+      "coordinator/resource/service thread",
+      "polling bus",
+      "global native-function lock",
+      "ordinary guest memory fence/check",
+      "production failure-injection check",
+      "artificial OS resource limit"
+    ]
+  },
+  "checks": {
+    "workflows": {
+      "runtime_macos": {
+        "passed_steps": 7,
+        "total_steps": 7,
+        "summary": "target/host-event-subsystem/runtime-mac-final/summary.json",
+        "sha256": "d3fa0f475fd6c6e932124284e48226648d1ba3bcdc092cb3bec52c577a4112e9"
+      },
+      "runtime_linux": {
+        "passed_steps": 7,
+        "total_steps": 7,
+        "summary": "target/local-ci/io/host-event-subsystem-final/runtime-linux-ci/summary.json",
+        "sha256": "f5b5a472a2a276a3cab7c05d4b989513856553257997456a0e89061ef3c79f1e"
+      },
+      "mac_product": {
+        "passed_steps": 8,
+        "total_steps": 12,
+        "summary": "target/host-event-subsystem/mac-product-ci/summary.json",
+        "sha256": "b0465b97e16a0279afbecea5354d07296ba29fab76657bf8a313dd189262d352"
+      }
+    },
+    "macos": [
+      {
+        "name": "runtime-mac",
+        "code": 0,
+        "seconds": 16.008382125
+      },
+      {
+        "name": "kernel-conformance",
+        "code": 0,
+        "seconds": 20.215606958000002
+      },
+      {
+        "name": "ffi",
+        "code": 0,
+        "seconds": 7.238822124999999
+      },
+      {
+        "name": "core-clippy",
+        "code": 0,
+        "seconds": 2.898430042000001
+      },
+      {
+        "name": "ffi-clippy",
+        "code": 0,
+        "seconds": 0.2594475000000003
+      },
+      {
+        "name": "ipad-compile",
+        "code": 0,
+        "seconds": 2.5401105830000006
+      }
+    ],
+    "macos_final_bootstrap": [
+      {
+        "name": "kernel-conformance-final",
+        "code": 0,
+        "seconds": 15.234605208
+      },
+      {
+        "name": "core-clippy-final",
+        "code": 0,
+        "seconds": 1.826882041000001
+      },
+      {
+        "name": "ipad-compile",
+        "code": 0,
+        "seconds": 1.530670624999999
+      }
+    ],
+    "linux": [
+      {
+        "name": "process-all",
+        "code": 0,
+        "seconds": 52.63144344800003
+      },
+      {
+        "name": "ffi-all",
+        "code": 0,
+        "seconds": 9.404398920999995
+      },
+      {
+        "name": "core-clippy",
+        "code": 0,
+        "seconds": 3.887134273000015
+      },
+      {
+        "name": "runtime-ci",
+        "code": 0,
+        "seconds": 54.50308034799997
+      },
+      {
+        "name": "process-final",
+        "code": 0,
+        "seconds": 43.948113863
+      },
+      {
+        "name": "core-clippy-final",
+        "code": 0,
+        "seconds": 1.4659695459999966
+      }
+    ],
+    "process": {
+      "macos": {
+        "passed": 427,
+        "ignored": 2,
+        "log": "target/host-event-subsystem/kernel-conformance-final.log",
+        "sha256": "ea3a25402184ed1afc88f1f0dbda469e534b15bc99b021b6b4072eea0ce3e269"
+      },
+      "linux": {
+        "passed": 427,
+        "ignored": 2,
+        "log": "target/local-ci/io/host-event-subsystem-final/process-final.log",
+        "sha256": "369de457dd234558b3ab339e10e4a631eeb7132dbeb667f7f7efe4a29a624197"
+      }
+    },
+    "ffi": {
+      "macos": {
+        "passed": 10,
+        "ignored": 0,
+        "log": "target/host-event-subsystem/ffi.log",
+        "sha256": "f86f51d0b4dc26c9678e3f03cb34ce977d8d54772603797b4a24519e838a2700"
+      },
+      "linux": {
+        "passed": 10,
+        "ignored": 0,
+        "log": "target/local-ci/io/host-event-subsystem-final/ffi-all.log",
+        "sha256": "f3176b1fa7b38174bac206b83ab96ecc43ead421c4f50990cb2f7049bbd38058"
+      }
+    },
+    "ipad": [
+      {
+        "target": "aarch64-apple-ios",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+        "code": 0
+      },
+      {
+        "target": "aarch64-apple-ios-sim",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk",
+        "code": 0
+      }
+    ],
+    "hardware": {
+      "passed": true,
+      "runtime_revision": "43cdaa92f94c867e12f4a9ec0d1afd0039d7f414",
+      "rows": [
+        {
+          "target": "trames-mac-run",
+          "executable_sha256": "2adf28377b7c78c2b279d15f6352b770fb0d015a9e738ce99de66d43bf682781",
+          "exit": 0,
+          "passed_tests": 7
+        },
+        {
+          "target": "trames_hvf",
+          "executable_sha256": "0ab23936153bb9cf06ef0f05ebd3926826d881ae4beaf850e93263fe87b5f574",
+          "exit": 0,
+          "passed_tests": 52
+        }
+      ]
+    },
+    "installed": {
+      "version": "Trames Dev 1.5.4 (dev) runtime 43cdaa92f94c867e12f4a9ec0d1afd0039d7f414",
+      "runner_sha256": "b761889799bf8612cbd02b4520ca2d02d70d21bd6df45d8b85c2dfeacfef0a9a",
+      "stable_sha256": "8fc21435034e8c041632e2e50419da9d2123bf790aedb0a1499286fc8367e614",
+      "stable_unchanged": true,
+      "checks": [
+        {
+          "name": "init",
+          "code": 0,
+          "seconds": 3.291675166
+        },
+        {
+          "name": "host",
+          "code": 0,
+          "seconds": 0.9870400839999998
+        },
+        {
+          "name": "tracing",
+          "code": 0,
+          "seconds": 0.254667875
+        }
+      ]
+    }
+  },
+  "failure_injection": {
+    "cpu_backend": "Shared interpreter conformance with real native host TCP/event resources on both macOS and ARM64 Linux",
+    "execution_slots": [
+      1,
+      4
+    ],
+    "modes": [
+      "native read",
+      "retained socket recvfrom",
+      "native input splice",
+      "epoll wait",
+      "ppoll wait",
+      "io_uring enter",
+      "already-accepted io_uring background I/O"
+    ],
+    "configurations": 14,
+    "assertions": [
+      "Original host kind and message survive to HostIo.",
+      "Every actual CPU actor acknowledges stop; no owner service/VM dispatch event is required.",
+      "The failing SVC does not publish a fabricated x0, retire a syscall or execute its following marker.",
+      "The failed read/payload output remains untouched.",
+      "Accepted requests cancel, original CQ publishes exactly one ECANCELED, and owner_required stays false for backend failure.",
+      "Original TCP transport reaches final EOF after source capture/subscription release."
+    ],
+    "idle": "A native producer appears after an ordinary eventfd parked. The elected existing idle executor reports original hub failure without losing its wake or requesting owner replay."
+  },
+  "shared_regressions": [
+    "Missing native capability is distinct from failed backend creation and does not acquire an FD.",
+    "Descriptor duplication, driver attach and dynamic source errors preserve their original cause.",
+    "Real registration ID exhaustion releases native FD/resource leases outside the registry lock through the shared source subscription API.",
+    "Repeated subscription rearm preserves the original raw OS code.",
+    "An accepted io_uring native request preserves its original identity after a failed backend; explicit retry completes once when ready, or cancellation leaves payload untouched.",
+    "Normal native rearm/alias/partial-read/EOF/cancellation and original source wait/lifecycle regressions remain passing."
+  ],
+  "source_sha256": {
+    "runtime/crates/trames-linux/src/direct.rs": "9ea03a6e998a6758c22221edc28a90d6ae39aff194b21d6fa46c9d671b3c4c17",
+    "runtime/crates/trames-linux/src/direct/file.rs": "f03cf07696cd71980d47d43d7f20df13213b0cb97925c30b4214c5c7a340591c",
+    "runtime/crates/trames-linux/src/direct/socket_wait.rs": "20b2b9df46415e971249ee6f8a35e25e17be8c551ff749e4e645298583b0367e",
+    "runtime/crates/trames-linux/src/direct/uring.rs": "440b6a11d69192dee68f1aa87a4eb310b0f915d02d335c380fd7e2f6f5a9484b",
+    "runtime/crates/trames-linux/src/direct/uring/background.rs": "1a42ef9814c8a6929b8ba67cbf33d68c907658c976cbdb28e999ca4f56922e8f",
+    "runtime/crates/trames-linux/src/direct/uring/poll.rs": "31381da2199a404b06d7950ae6c72a2d48391f6bca73be7583c778e6747bbbb4",
+    "runtime/crates/trames-linux/src/direct/uring/subsystem_tests.rs": "babbd91e1486fcc2d22f38014bd3e235cb07212af1ceb150a790ee3f1d79bdf4",
+    "runtime/crates/trames-linux/src/direct/uring/wait.rs": "ae5e52be51deb113addbde7fbeb3df84213b26c3cc5cd143bfd6b042e457471e",
+    "runtime/crates/trames-linux/src/direct/uring/wait_tests.rs": "2a9016df592c7dce912175109d8e25554a0bf2f1e01d89bc5f6f876904f455b8",
+    "runtime/crates/trames-session/src/lib.rs": "3e551db0ef08c79c2e2d370fa74a37684aabedf29ee0867481456cbe4c5d14e5",
+    "runtime/crates/trames-session/src/process.rs": "8783d27241127850c38844e5a63190b28a166f6b1b230c2602e0466c51071693",
+    "runtime/crates/trames-session/src/process_host_io_tests.rs": "f03e363066b3295015cd38ce0ccd072aebdc8362cea174914a1e0508bc56e64e",
+    "runtime/crates/trames-session/src/run_queue.rs": "256335564cab0aefaab110532fe51b670139e674cd52cbb688fb5164af493713",
+    "runtime/crates/trames-session/src/workers.rs": "05274ad04ac8f7b5b7ab039db62f445f0824772f2fb10736f6c027a52fcb2930",
+    "runtime/crates/trames-shared/src/host_events.rs": "6bae7dcf34664acbf52a53551f43f8f0d5ef0fa9ef48d5a6d8c8b428bfe5868b",
+    "runtime/crates/trames-shared/src/readiness.rs": "df5cc5ebfc39bbf63a7d9e6342ef71c6cc2df2a409be65d07496a6568001f1ce",
+    "runtime/crates/trames-vfs/src/hostfs/interop_tests.rs": "e802fb75112e6403048ae7fc0a25c47150a347bc4c062b5151f6245409a20517",
+    "runtime/crates/trames-vfs/src/ipc/native.rs": "82d551370fa9ca675e8a92b869993a2074aec7ee3d272a337090d4001baaf464"
+  },
+  "deployment": {
+    "channel": "Mac Dev only",
+    "runner": "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+    "signature_verified": true,
+    "stable_unchanged": true,
+    "physical_ipad_unchanged": true,
+    "business_environments_unchanged": true
+  },
+  "validation_notes": [
+    "Full workflows pass on immutable original-error ownership. A final explicit legacy terminal HostError arm is checked by the affected complete process suite, core lint and iPad compilation; unchanged full runtime/FFI results are reused. Linux records its prior workflow source hashes separately.",
+    "Initial new test setup used a wrong epoll helper/private Linux entry and fixed CQ offsets; it now uses the actual kernel entry and original CQ accessors before verification.",
+    "The injected backend cache is compiled only for interpreter conformance; production code has no injection branch."
+  ],
+  "limits": [
+    "Native infrastructure failure terminates the current runtime run after original actor/request drain; no automatic coordinator/raw-poll recovery is added.",
+    "Ordinary filesystem/network operation errors retain their existing guest ABI.",
+    "Signed HVF/product regressions cover normal native execution; the new backend-failure injection runs in the shared interpreter suite, not an injected HVF machine.",
+    "No controlled throughput or total coordinator-removal claim is made.",
+    "Mac product development workflow steps 1-8 of 12 pass; release packaging steps are outside this Dev-only batch."
+  ],
+  "remaining": [
+    "Actual host cancellation/deadline/shutdown and final backend/session teardown.",
+    "Genuine missing capabilities/excluded resources, including two io_uring wait-capability/body maintenance escalation call sites.",
+    "Final SVC/HLT/fault catch-all dispatch.",
+    "Initial/legacy admission and capability-less embedding orchestration; solo execution alone is not a cross-thread RPC."
+  ]
+}

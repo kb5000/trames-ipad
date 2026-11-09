@@ -5053,3 +5053,50 @@ the two io_uring maintenance failures, generic final dispatch, initial/legacy
 orchestration and actual host cancel/teardown remain. Necessary original
 mm/backing synchronization is distinct from a whole-cohort coordinator handoff.
 Only Mac Dev is updated; the overall coordinator-removal goal remains active.
+
+## 83. Native host-event failure and accepted-request closure — 2026-11-09
+
+Native event capability absence and real backend errors are now distinct across
+the connected source-wait subsystem: Readiness, TCP/retained sockets, stream/file
+waits, io_uring enter/CQ observers and background maintenance. Creation, descriptor,
+attach, registration, rearm and elected idle-wait errors retain their original
+host cause. They do not become an owner syscall retry or a fabricated guest EIO.
+Ordinary data/endpoint errors keep their existing guest ABI.
+
+The source Epoch publishes its first terminal host error once as an immutable
+original object. Actual CPU actors stop and drain; original task/mm io_uring
+requests cancel through their existing CQ and lifetime cleanup, then Runtime
+returns HostIo. It does not replay guest work on the coordinator. Shared native
+subscription code retains original error kinds, messages and raw OS codes, while
+genuinely capability-less embeddings still return their explicit missing result.
+
+The subscribe-before-retry protocol remains: ready or cancelled requests can
+remove a stale failed interest and complete without a host subscription. A failed
+background actor can retry its original requests if its explicit caller chooses;
+an OS failure alone never sets owner_required. Duplicate weak target fields are
+removed from io_uring actors because their original IoSignal already owns that
+weak target. No service thread, polling bus, ordinary guest-memory check/fence
+or global native-function lock is added.
+
+Failure injection exercises native read, recvfrom, splice, epoll, ppoll,
+io_uring enter and already-accepted background I/O on one/four execution slots.
+It verifies no fabricated guest return/following marker or service request,
+original host cause, drained CPUs, untouched failed payload, one cancelled CQ
+and final TCP close. A late-native-source test covers idle-executor failure
+after an ordinary eventfd was already parked. Shared regressions cover actual
+registration failure/unlocked lease destruction, descriptor/attach/dynamic
+failures, raw OS cause preservation and retry-to-completion/cancellation.
+
+Full local runtime/kernel, product/hardware and installed Dev evidence is in the
+[source-bound validation record](../validation/host-event-failure-20261109.json).
+Both complete runtime workflows pass. Each host passes 427 process regressions
+(two intentionally ignored) and ten FFI cases; strict lint and both iPad SDK
+compile targets pass. Mac product development gates and 52 signed HVF plus seven
+signed product cases pass. Installed Dev passes init supervision at one/four/
+twelve CPUs and host lifecycle/tracing at twelve CPUs; stable's runner hash is
+unchanged. Failure injection runs in the shared interpreter suite with real host
+I/O; the signed hardware regressions verify normal native execution.
+This removes native-infrastructure-to-owner replay, while the two genuine
+io_uring capability/body maintenance setters, excluded resources, final generic
+dispatch, initial/legacy orchestration and actual host cancel/teardown remain.
+Only Mac Dev is updated; the overall coordinator-removal goal remains active.
