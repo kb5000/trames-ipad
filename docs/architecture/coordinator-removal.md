@@ -2,7 +2,7 @@
 
 ## Current status — 2026-11-10
 
-Through stage 96 the broad remaining count is **four**, unchanged from stage 90.
+Through stage 97 the broad remaining count is **four**, unchanged from stage 90.
 Concrete dependencies have been removed inside those classes; the class count
 alone does not measure that progress. It is not an exhaustive count of remaining
 syscalls, providers or actual production fallback frequency.
@@ -11,7 +11,7 @@ syscalls, providers or actual production fallback frequency.
 | --- | --- | --- |
 | Host control and final teardown | Actual cancellation/deadline/shutdown, native-event failure and final CPU/session drain | Still present; ordinary pause/resume, supervision and guest exit are already source-owned |
 | Missing capabilities and excluded resources | Original absent providers/excluded bodies; two submitter-scoped io_uring maintenance setters remain | Stages 90–91 close original global metadata and accepted request-body resource dependencies; genuine missing waits/providers remain |
-| Final execution dispatch | SVC or cold native-resource operation not completed, parked or accepted by a source scope | Stages 92–96 close recognized guest faults, residual FD status/seals/errors, blocking file locks/deadlock relations, anonymous memory-file creation and mapped-memory msync/writeback |
+| Final execution dispatch | SVC or cold native-resource operation not completed, parked or accepted by a source scope | Stages 92–97 close recognized guest faults, residual FD status/seals/errors, blocking file locks/deadlock relations, anonymous memory-file creation, mapped-memory msync/writeback and file-cache advice |
 | Initial/legacy orchestration | Initial admission and standalone/capability-less scheduling | Still present; ordinary live and dormant member admission no longer depends on it |
 
 Recent signed native fixtures demonstrate concrete path removal. Each old
@@ -24,27 +24,30 @@ These are separate workloads, not cumulative or comparable throughput scores.
 | File locks, blocking waits and deadlock relations (94) | 23 / 19 fcntls, 11 flocks and one clone | 1 / none |
 | Anonymous memory-file creation and lifetime (95) | 8 / 8 memfd_create and one clone | 1 / none |
 | Mapped-memory msync/writeback (96) | 10 / 16 msync and one munmap | 1 / none |
+| File-cache advice and descriptor metadata (97) | 32 / 8 readahead, 32 fadvise64, 3 mmap and 3 munmap | 1 / none |
 
 Actual mapping/backing mutation still synchronizes its affected original readers
-and is not counted as a removed scope. The final native msync fixture records
-sixteen such scopes at four CPUs and 42 at twelve CPUs. The explicitly
-unavailable-provider dormant fixture still returns its real read.
+and is not counted as a removed scope. This round's native fixture includes a
+memfd/seal/mapping lifecycle and retains seven such scopes at four CPUs and 20
+at twelve CPUs. The connected advice/FD-replacement process fixture has zero
+mapping scopes. The explicitly unavailable-provider dormant fixture still returns
+its real read.
 
-Stage 96 removes the concrete msync (AArch64 syscall 227) target identified by
-the preceding audit, including native writeback, original resources through
-unmap/handoff, multi-backing error/cancellation and publication lifetime. Existing
-workers admit only actual backing readers and existing disk workers run native
-persistence; no joined Linux body, service thread or pointer replay is needed.
-Cross-filesystem deduplication now uses the existing globally unique original
-inode identity, avoiding guest inode-number collisions. Generic custom providers
-without actual original layout admission retain their capability boundary.
-The generic fallback and both io_uring maintenance escalation sites remain.
+Stage 97 closes readahead/fadvise64, including their original metadata/type
+validation and live descriptor membership. Source and solo share the same body;
+O_PATH, range/advice and descriptor/native-stat errors retain their existing order.
+The existing optional cache-hint policy remains: no forced prefetch, eviction,
+data/position/metadata update, page-in or resident charge is introduced. These
+short calls need no disk task, guest byte access, mapping checkpoint or owner
+service. Missing actual original metadata bindings retain their before-effects
+capability boundary. The generic fallback and both io_uring maintenance
+escalation sites remain.
 
 The [shared inventory](https://github.com/kb5000/trames-runtime/blob/main/docs/architecture/coordination-boundaries.md#current-remaining-categories)
-and [stage 96 record](../validation/memory-sync-20261110.json) carry current
+and [stage 97 record](../validation/file-advice-20261110.json) carry current
 boundaries and evidence. Both local runtime workflows pass all seven steps.
-Mac and ARM64 Linux each pass 450 process regressions (two intentionally ignored)
-and ten FFI cases; both iPad SDKs compile. All 71 signed native cases and Mac
+Mac and ARM64 Linux each pass 451 process regressions (two intentionally ignored)
+and ten FFI cases; both iPad SDKs compile. All 72 signed native cases and Mac
 development gates 1–8 pass. Mac Dev alone is updated; stable 1.5.4, business
 environments and physical iPad installations retain their versions.
 The overall removal goal remains active.
@@ -5948,3 +5951,55 @@ Only Mac Dev is updated; stable 1.5.4, business environments and physical iPad
 installs retain their versions. Four broad categories and both actual io_uring
 maintenance escalation sites remain. Supported msync/writeback is removed from
 final joined dispatch; the full coordinator-removal objective is still active.
+
+
+## 97. Original file-cache advice and live descriptor metadata — 2026-11-10
+
+Runtime `652fbbe53a82a2abb4862ffa4673871f80ff43e6` closes the existing
+readahead/fadvise64 family. It previously returned to joined Linux dispatch to
+query FD metadata and validate its arguments, despite requiring no data operation.
+Source, solo and owned-session calls now share one original-stat/type/range/advice
+body. Actual native metadata and stat errors remain; no cached FD/type guess
+replaces the query. Source metadata accepts one original descriptor from live
+Files for the entire query. Later close/reuse is visible to later calls, while
+unrelated or detached Files tables cannot donate their numeric FD.
+
+FD/native-stat errors and regular-file type retain precedence over offset/length/
+advice errors. Existing O_PATH behavior, low-32-bit FD interpretation, all six
+advice values, zero lengths and unused readahead operands remain. Success keeps
+the previous optional cache-hint policy: no speculative prefetch, eviction, data
+transfer, position/metadata update, byte page-in or resident charge is added.
+These short bodies complete on their calling worker with no disk task, mapping
+checkpoint, new resource/service thread, polling bus, native global lock, unsafe
+block or ordinary guest-memory check/fence. Actual absent metadata bindings defer
+before effects; no fabricated success/error suppresses that boundary.
+
+Three common regressions compare source/solo/owned/direct entry, all hint and
+range/flag/type/FD errors, unused unmapped operands, original shared membership,
+detached Files and unrelated numeric collisions. Original bytes, offset, metadata
+and residency remain unchanged. The connected guest fixture also closes/reuses a
+regular FD as a directory and back with dup3, while an alias retains the original
+OFD. Prior production returns its first fadvise64 before the completion marker.
+Final four/twelve-CPU, one-slot and seccomp ALLOW cases finish in one cohort with
+no returned syscall/service and no mapping checkpoint.
+
+The signed native baseline produces every correct per-thread syscall result and
+DCBAoad bytes, then fails only its one-cohort assertion. Four CPUs need **32
+cohorts**, returning **eight readahead, 32 fadvise64, three mmap and three munmap**.
+Final four/twelve-CPU execution uses **one cohort and no returned syscall/service**.
+The surrounding memfd/seal/mapping lifecycle retains seven/20 actual original
+scopes; advice itself introduces none. No twelve-CPU baseline, production fallback
+frequency, controlled throughput or Firefox latency gain is claimed.
+
+Both local runtime workflows pass all seven steps on their first full run with
+matching final Rust fingerprints. Mac and ARM64 Linux each pass 451 process
+regressions (two intentionally ignored), ten FFI cases and strict lint; both iPad
+SDK targets compile. Mac development gates 1–8 and 72 signed hardware cases pass.
+Separate Dev build/install/signature and installed init at one/four/twelve CPUs
+plus host control/tracing at twelve CPUs pass. Source/binary fingerprints and
+actual before/after paths are in the
+[validation record](../validation/file-advice-20261110.json).
+
+Only Mac Dev is updated. Stable 1.5.4, business environments and physical iPad
+installs retain their versions. Four broad categories and both actual io_uring
+maintenance escalation sites remain; the full coordinator-removal goal is active.

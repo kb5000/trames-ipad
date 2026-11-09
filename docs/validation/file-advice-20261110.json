@@ -1,0 +1,287 @@
+{
+  "stage": 97,
+  "date": "2026-11-10",
+  "overall_goal": "active",
+  "runtime_revision": "652fbbe53a82a2abb4862ffa4673871f80ff43e6",
+  "prior_runtime": "fc59b7b38f3de0428798cf942efd7a6d52fce8d5",
+  "scope": "Complete implemented file-cache advice family: readahead/fadvise64, original live FD/stat acceptance, common source/solo/owned ABI, type/range/advice/error ordering, aliases and shared/detached Files lifetime.",
+  "architecture": {
+    "import_": "One common body validates actual original stat result, regular-file type, signed offset/length and advice. Original FD/native-stat errors precede arguments. Low-32-bit descriptor interpretation, O_PATH behavior and unused operands remain unchanged.",
+    "resources": "Calling-worker PathQueries stat performs one live original Files lookup and retains that descriptor for the entire query. Close/reuse is observed by future calls; independent/detached tables cannot donate an FD. The same stat implementation preserves actual native metadata and errors.",
+    "execution": "Both supported hints complete on their calling worker, without a native disk task, guest byte access, CPU-slot wait, mapping checkpoint or owner request. Owned session calls and Linux state use the same original common body.",
+    "policy": "Existing cache advice is optional: success performs no speculative prefetch/eviction, data/position/metadata update, byte page-in or physical charge. No native fadvise syscall is blindly forwarded and no new cache policy is advertised.",
+    "no_new": [
+      "coordinator/resource/service thread",
+      "polling bus",
+      "disk task",
+      "global native execution lock",
+      "production unsafe block",
+      "ordinary guest-memory permission/check/fence",
+      "fabricated capability or errno"
+    ]
+  },
+  "baselines": {
+    "process": {
+      "runtime_revision": "fc59b7b38f3de0428798cf942efd7a6d52fce8d5",
+      "checks": [
+        {
+          "name": "process",
+          "code": 101,
+          "seconds": 5.810769458,
+          "output": "warning: unused workspace dependency `trames-native`\n  --> Cargo.toml:17:1\n   |\n17 | trames-native = { path = \"runtime/crates/trames-native\" }\n   | ^^^^^^^^^^^^^\n   |\n   = note: `cargo::unused_workspace_dependencies` is set to `warn` by default\nhelp: consider removing the workspace dependency `trames-native`\nwarning: workspace (manifest) generated 1 warning\n   Compiling trames-session v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-session)\n   Compiling trames-linux v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-linux)\n   Compiling trames-core v1.5.4 (/Users/main/dev/trames/crates/trames-core)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.05s\n     Running ../../runtime/crates/trames-session/src/lib.rs (target/debug/build/trames-core/73ea467a4920ade2/out/kernel_conformance-73ea467a4920ade2)\n\nrunning 1 test\ntest process::file_advice_tests::guest_file_cache_advice_and_live_fd_replacement_complete_on_source ... file-advice CPUs=4 slots=4 filter=false cohorts=1 returned={223: 1} scopes=0\n\nthread 'process::file_advice_tests::guest_file_cache_advice_and_live_fd_replacement_complete_on_source' (28247461) panicked at crates/trames-core/../../runtime/crates/trames-session/src/process_file_advice_tests.rs:118:13:\nassertion `left == right` failed: pid 1\n  left: [0, 0, 0, 0]\n right: [1, 0, 0, 0]\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\nFAILED\n\nfailures:\n\nfailures:\n    process::file_advice_tests::guest_file_cache_advice_and_live_fd_replacement_complete_on_source\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 452 filtered out; finished in 0.01s\n\nerror: test failed, to rerun pass `-p trames-core --test kernel-conformance`\n"
+        }
+      ]
+    },
+    "signed_native": {
+      "runtime_revision": "fc59b7b38f3de0428798cf942efd7a6d52fce8d5",
+      "code": 101,
+      "output": "\nrunning 1 test\ntest session::tests::guest_file_cache_advice_completes_on_original_native_workers ... hardware file-advice CPUs=4 exit=0 cohorts=32 returned={213: 8, 215: 3, 222: 3, 223: 32} scopes=4\n\nthread 'session::tests::guest_file_cache_advice_completes_on_original_native_workers' (28246208) panicked at crates/trames-mac/src/session.rs:2208:13:\nassertion `left == right` failed\n  left: 32\n right: 1\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\nFAILED\n\nfailures:\n\nfailures:\n    session::tests::guest_file_cache_advice_completes_on_original_native_workers\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 40 filtered out; finished in 0.05s\n\n"
+    }
+  },
+  "checks": {
+    "workflows": {
+      "runtime_macos": {
+        "passed": 7,
+        "total": 7,
+        "sha256": "519a994b53569e1f772c5419988d8c66c0d998512ce7d9f14ee575fa8c7cbdd5"
+      },
+      "runtime_linux": {
+        "passed": 7,
+        "total": 7,
+        "sha256": "c8fa753bff30f744dec78bc0fb51b8939b01e18a9b699cc8e6af5a29d22f47f4"
+      },
+      "mac_product": {
+        "passed": 8,
+        "total": 12,
+        "sha256": "aec32571ea398d6e3503bbe854aa453a49da4ffb885150c4dd570d703c0addbd"
+      }
+    },
+    "macos": [
+      {
+        "name": "runtime-mac",
+        "code": 0,
+        "seconds": 21.694318208000002
+      },
+      {
+        "name": "kernel-conformance",
+        "code": 0,
+        "seconds": 18.214316459
+      },
+      {
+        "name": "ffi",
+        "code": 0,
+        "seconds": 4.3419591250000025
+      },
+      {
+        "name": "core-clippy",
+        "code": 0,
+        "seconds": 4.226126207999997
+      },
+      {
+        "name": "ffi-clippy",
+        "code": 0,
+        "seconds": 0.28107362499999766
+      },
+      {
+        "name": "ipad-compile",
+        "code": 0,
+        "seconds": 4.220611082999994
+      }
+    ],
+    "linux": [
+      {
+        "name": "process-all",
+        "code": 0,
+        "seconds": 60.400544151999995
+      },
+      {
+        "name": "ffi-all",
+        "code": 0,
+        "seconds": 6.036448003000004
+      },
+      {
+        "name": "core-clippy",
+        "code": 0,
+        "seconds": 4.518145959999998
+      },
+      {
+        "name": "runtime-ci",
+        "code": 0,
+        "seconds": 54.734722997999995
+      }
+    ],
+    "process": {
+      "macos": {
+        "passed": 451,
+        "ignored": 2,
+        "sha256": "3aa84b83b94d7e0668c7097dba8f656fae4b247f590bb3ed4c2c8977db1c5401"
+      },
+      "linux": {
+        "passed": 451,
+        "ignored": 2,
+        "sha256": "ba025ca2ee7ffde21873882833eada1d99269abf5e841bee27136265a641f17c"
+      }
+    },
+    "ffi": {
+      "macos": {
+        "passed": 10,
+        "ignored": 0,
+        "sha256": "bc1d0d8e91084d252d8c91eec392fe13e7800784faa2a4110d279b40e745ccd7"
+      },
+      "linux": {
+        "passed": 10,
+        "ignored": 0,
+        "sha256": "0d1af76f3ba76ccd198728a907598e4df562e1fa438d1ebf2e4820fb5d92b39b"
+      }
+    },
+    "ipad": [
+      {
+        "target": "aarch64-apple-ios",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+        "code": 0
+      },
+      {
+        "target": "aarch64-apple-ios-sim",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk",
+        "code": 0
+      }
+    ],
+    "hardware": {
+      "passed": true,
+      "runtime_revision": "652fbbe53a82a2abb4862ffa4673871f80ff43e6",
+      "rows": [
+        {
+          "target": "trames-mac-run",
+          "executable_sha256": "d24f89f0864b330ee45efae8196c754ab3ff80a19d724dd80613c298780c0c39",
+          "exit": 0,
+          "passed_tests": 20
+        },
+        {
+          "target": "trames_hvf",
+          "executable_sha256": "f2224f739a5452916ed6b19b07d9cc8b1e2dae96bd70e56090996bf8821e18c2",
+          "exit": 0,
+          "passed_tests": 52
+        }
+      ]
+    },
+    "process_regression": "guest_file_cache_advice_and_live_fd_replacement_complete_on_source",
+    "common_regressions": [
+      "source_and_solo_file_advice_share_fd_type_range_and_unused_operand_precedence",
+      "source_file_advice_observes_original_live_files_and_detached_membership",
+      "owned_and_direct_file_advice_need_no_memory_or_native_executor"
+    ],
+    "process_final": {
+      "configurations": [
+        {
+          "cpus": 4,
+          "slots": 4,
+          "seccomp_allow": false
+        },
+        {
+          "cpus": 12,
+          "slots": 12,
+          "seccomp_allow": false
+        },
+        {
+          "cpus": 4,
+          "slots": 1,
+          "seccomp_allow": false
+        },
+        {
+          "cpus": 4,
+          "slots": 1,
+          "seccomp_allow": true
+        }
+      ],
+      "cohorts": 1,
+      "returned_syscalls": {},
+      "mm_scopes": 0
+    },
+    "native_prior": {
+      "cpus": 4,
+      "cohorts": 32,
+      "returned_syscalls": {
+        "213": 8,
+        "215": 3,
+        "222": 3,
+        "223": 32
+      },
+      "mm_scopes": 4,
+      "guest_results_correct": true
+    },
+    "native_final": {
+      "cpus": [
+        4,
+        12
+      ],
+      "cohorts": 1,
+      "returned_syscalls": {},
+      "mm_scopes": {
+        "4": 7,
+        "12": 20
+      },
+      "guest_results_correct": true
+    },
+    "native_log_sha256": "0da877949ad5b0c8e8edc5ba94499ff5b4b581c4111fe141f4304f779d88dc82",
+    "installed": {
+      "version": "Trames Dev 1.5.4 (dev) runtime 652fbbe53a82a2abb4862ffa4673871f80ff43e6",
+      "runner_sha256": "1e427ea6fa8ffc5fd8fa815f26eef96ccf2de4c51c0e4cd3193a11ef75b7c1c2",
+      "stable_sha256": "8fc21435034e8c041632e2e50419da9d2123bf790aedb0a1499286fc8367e614",
+      "stable_unchanged": true,
+      "checks": [
+        {
+          "name": "init",
+          "code": 0,
+          "seconds": 3.270470417
+        },
+        {
+          "name": "host",
+          "code": 0,
+          "seconds": 0.8753447919999999
+        },
+        {
+          "name": "tracing",
+          "code": 0,
+          "seconds": 0.2654830840000004
+        }
+      ]
+    }
+  },
+  "source_sha256": {
+    "runtime/crates/trames-linux/src/direct.rs": "d1229dd7b7a6f0175b7105303f5530fe576a40d90c66d9bcc2f5dfa491c2c812",
+    "runtime/crates/trames-linux/src/direct/file.rs": "81f37e2c0fd7761405f6d78eedd6e5494e2e5d8fd44e8d829d0309acc142c470",
+    "runtime/crates/trames-linux/src/file_advice.rs": "293ac781ec912c960ebfc5494a1fdf913f25cedb54f8d9c2dfa4b0bec7a1e863",
+    "runtime/crates/trames-linux/src/file_advice_tests.rs": "9ed565b42cda6991a3227c9f3d4d054dbdbd9fbafe391629e7013fc0e05e7d4e",
+    "runtime/crates/trames-linux/src/file_calls.rs": "21d83115f5b9ec5ec1278d8810b8039a383797f0f16195c1b8627864f564d97c",
+    "runtime/crates/trames-linux/src/lib.rs": "a8bbb0ce891e4c800f68caa296bb45b5bb50a52176a126b383db587f87938ae7",
+    "runtime/crates/trames-session/src/process.rs": "fdf7ac012bd49c5ff47151f578e9d238f3db032ea969eb92f5a18099d08a7029",
+    "runtime/crates/trames-session/src/process_file_advice_tests.rs": "99ea31796a99ebed66e5858ff1ccd6f1b23a3dd9f93e331cbda60c0d2b8271f0"
+  },
+  "mac_native_fixture_sha256": "f8da358810189eb362ccdd0b73c719eef90c05e555e9dc67832ea215e7029c09",
+  "deployment": {
+    "channel": "Mac Dev only",
+    "runner": "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+    "signature_verified": true,
+    "stable_unchanged": true,
+    "physical_ipad_unchanged": true,
+    "business_environments_unchanged": true
+  },
+  "validation_notes": [
+    "Both final local runtime workflows pass all seven steps on their first full run. Mac and ARM64 Linux each pass 451 process regressions (two intentionally ignored), ten FFI cases and strict lint. Both iPad SDK targets compile. Final Rust fingerprints match both workflows, Linux integration inputs and the Mac runtime source.",
+    "Common cases compare source/solo errors and all six advice values, negative/oversized operands, O_PATH/nonregular/bad descriptors and ignored unmapped operands. Shared close/reuse, detached Files and unrelated numeric collisions use actual original metadata; bytes, offsets, metadata and residency stay unchanged.",
+    "The connected guest fixture combines advice, aliases and live regular-to-directory-to-regular close/dup3 replacement in two original mms. Prior production returns its first fadvise64 before completion. Final four/twelve-CPU, one-slot and seccomp ALLOW cases finish in one cohort without returned syscall/service or mapping checkpoint.",
+    "The signed native prior four-CPU fixture produces all correct per-thread results and DCBAoad bytes, then fails only its one-cohort assertion: 32 cohorts, eight returned readahead, 32 returned fadvise64, three returned mmap and three returned munmap. Final four/twelve-CPU fixtures complete one cohort with no returned syscall/service. The surrounding memfd/seal/mapping lifecycle retains seven/20 original scopes; advice itself introduces none.",
+    "Mac development gates 1-8 and 72 signed hardware cases pass. Separate Dev build/install/signature and installed init at one/four/twelve CPUs plus host control/tracing at twelve CPUs pass. Stable build/package gates and physical iPad installation are outside this coordinator round."
+  ],
+  "remaining": [
+    "Other final cold SVC/native-resource dispatch not completed or parked by a source scope.",
+    "Genuinely absent original resource/wait bindings, including both retained io_uring maintenance escalation sites.",
+    "Actual host cancellation/deadline/shutdown and final backend/session teardown.",
+    "Initial/standalone/capability-less orchestration."
+  ],
+  "limits": [
+    "Four broad categories remain; this is not a completed coordinator-removal goal or an exhaustive count of concrete residual triggers.",
+    "Supported file-cache advice no longer needs a joined owner. An embedding lacking actual original stat/Files resources defers before effects; existing owned/solo calls remain on their original caller.",
+    "No twelve-CPU baseline, production fallback frequency, Firefox latency or controlled throughput improvement is claimed."
+  ]
+}
