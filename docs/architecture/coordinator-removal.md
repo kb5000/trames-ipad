@@ -2,6 +2,24 @@
 
 ## Current status — 2026-11-09
 
+Stage 77 moves native special-device pathname/OFD operations and
+`/dev/trames-bridge` bytes/readiness onto original source resources. Device
+opens, aliases and metadata use the original shared pseudo-node cache. Accepted
+Bridge I/O retains its original connection across close/FD reuse; passive
+snapshots and subscriptions cannot delay last close. The existing broker mutex
+still protects its protocol. Notifications run after that mutex is released, and
+queue readiness observation is pure. No new coordinator/resource thread, polling
+bus, ordinary guest-memory check or fence is added.
+
+This closes the supported native-device/Bridge resource group. io_uring's two
+actual maintenance-failure setters remain: absent wait capability and an original
+body that cannot run on the source. The four remaining broad boundaries below
+have not yet reached zero. See the [validation record](../validation/native-devices-20261109.json).
+Only Mac Dev is updated; stable 1.5.4, business environments and physical iPad
+installs keep their existing versions.
+
+### Stage 76 host filesystem closure (historical)
+
 Stage 76 moves **host filesystem commands** off joined execution: streaming
 imports/exports, conditional FileProvider saves and timezone updates use the
 existing disk pool and original shared resources. Accepted mapped byte consumers
@@ -53,7 +71,7 @@ records source/executable hashes, original joined behavior, reuse proof and fina
 installed acceptance. Only Mac Dev is updated; stable 1.5.4, business environments
 and physical iPad installs remain unchanged.
 
-### Remaining boundaries after stage 76
+### Remaining boundaries after stage 77
 
 **The coordinator still exists.** io_uring's remaining `owner_required` setters
 are the two actual source-maintenance failures: unavailable wait capability or an
@@ -71,7 +89,7 @@ row in the coverage inventory below:
 3. Last-resort known-resource/subcommand and unhandled HLT/fault dispatch.
 4. Initial/legacy admission and solo orchestration; solo is not itself a syscall RPC.
 
-Host transfer/timezone/FileProvider commands are removed from joined execution by stage 76. Mac memory-pressure reclamation is removed by stage 75.
+Native special-device/Bridge pathname, byte and readiness dependencies are removed by stage 77. Host transfer/timezone/FileProvider commands are removed from joined execution by stage 76. Mac memory-pressure reclamation is removed by stage 75.
 Init notification/graceful-stop supervision was removed by stage 74. Diagnostic syscall tracing was removed by stage 73. Stage 72 removed
 the independent embedding terminal-ID-0 execution category. Normal subsystem names
 below describe coverage and do not imply another coordinator dependency.
@@ -85,6 +103,7 @@ below describe coverage and do not imply another coordinator dependency.
 | Exit/group/default-fatal termination, STOP/CONT and vfork release | Source resources and original group/family notifications | Returned CPU/statistics and cold cleanup complete on existing workers; the actual shared mm may still need its byte checkpoint. Outside-cohort/solo and capability-less embeddings remain separate |
 | fork/clone/vfork and execve/execveat | Existing workers handle pure and mixed mapping scopes, nonleader rekey and original-mm retirement; existing disk pool prepares native images without retaining a CPU slot | Affected actors still pause; actual capability-less embeddings and solo invocation remain distinct |
 | Mapping topology, pins and mapped-file layout | Supported brk/mmap/munmap/mremap/mprotect/msync/madvise and buffer-registration checkpoints publish on an existing worker; additive anonymous mmap is direct | Proc/cold-mm checkpoints and supported mapped-file layout transactions now run on existing workers; excluded backing/lifetime/policy and capability-less embeddings retain explicit boundaries |
+| Native special-device paths and Bridge bytes/readiness | Calling worker, original pseudo nodes/OFDs/connections and original readiness | No supported-device/Bridge-only join remains; unavailable providers and unsupported driver APIs retain their existing route/result |
 | Native libc/GPU/video/audio | Normal bodies, resource waits and admitted mapping/entry checkpoints use calling/shared-resource execution; exceptional access reuses original task/mm custody | Capability-less embeddings and actual platform/host lifecycle remain; AppKit affinity, device/disk pools and local fallback are not extra coordinators |
 | Dynamic proc/sys and proc pathname/FD consumers | Calling worker and original PID/mm/Files/fs/namespace resources | First cross-mm byte export and invalidation activate on an existing worker at the original task/mm boundary; legacy providers retain explicit fallback |
 | Mount topology administration | Original namespace/fs resources on the caller; existing disk pool for host-backed paths; contention releases the CPU slot | Genuinely excluded pathname controls retain their explicit boundary |
@@ -108,7 +127,7 @@ the owner; ordinary epoch-member migration, parking, wakeup and child/replacemen
 admission already use the live execution queue. Single-CPU/solo execution retains
 its coordinated caller path, which does not by itself imply an extra RPC.
 
-The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/e3e94de96f47d74115b3084fb3d43c15ff72ed21/docs/architecture/coordination-boundaries.md)
+The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/a1b09affb1be790ee1588e34fba7440d098451bf/docs/architecture/coordination-boundaries.md)
 records scopes, actual admission gates and source locations. Earlier sections
 below are historical records and do not override this inventory.
 
@@ -4670,3 +4689,64 @@ their own boundary. The owner-selected policy still submits FileProvider saves o
 returning to Trames. All applicable local checks pass; only Mac Dev deployment is
 included. See the [validation record](../validation/host-files-20261109.json).
 The overall coordinator-removal goal remains active.
+
+## 77. Original native-device namespace and Bridge resource closure — 2026-11-09
+
+Supported native device opens no longer depend on terminal-only capability or a
+joined VFS body. `/dev/dri`, virtual block nodes/aliases, kmsg and Bridge resolve
+through the same shared pseudo-node cache and original Files/credentials. Cached
+pseudo-node identity is resolved before the missing-identity escalation. Video
+device availability is an original shared atomic flag rather than a frozen
+worker projection. Guest device nodes never open a host device.
+
+Stateless/error-only device bytes call the existing device implementation.
+Sequential empty reads preserve the original VFS early completion, while
+positioned calls retain their original device/offset errors. The regression
+matrix compares scalar, vector and positioned read/write and seek against the
+original Linux ABI with read-only/write-only/read-write/O_PATH opens, empty
+buffers and invalid offsets. Existing driver functionality is unchanged.
+
+Bridge DirectFd snapshots use a weak original connection. Accepted DirectFd/OFD
+work retains that connection; closing and reusing its descriptor number cannot
+redirect a pending reply. The original broker lock protects framing, bounded
+input/output, pending requests, cancellation and consent-based host replies.
+A fixed notification array collects changed original connections under that lock
+and wakes subscribers only after unlocking. No new lock serializes unrelated
+native calls, and notifications allocate no per-frame registry.
+
+Readiness observation never expires requests or emits callbacks while the run
+queue holds its metadata lock. Due requests are lazily readable; actual body/host
+operations materialize the same timeout response. Only future deadlines are
+armed, preventing a past-deadline retry loop under output/CQ backpressure.
+Dynamic external readiness keeps a host-reply waiter alive. Draining the original
+output wakes blocked writers; read/write epochs follow that original stream.
+Passive snapshots and subscriptions cannot retain the final connection.
+
+Conformance covers source SQE opens, pending Bridge CQ completion after FD
+close/reuse, reentrant host-reply wake after unlock, backpressure, timeout,
+cancellation, original permissions and live video availability. A real guest
+opens the Bridge and blocks on a read while peers execute. The 4-CPU, 12-CPU and
+4-CPU/one-execution-slot cases require one cohort, zero returned syscalls and
+zero coordinator service requests.
+
+The two io_uring maintenance escalation sites are deliberately unchanged.
+Genuinely absent typed/wait capabilities, excluded resources/bodies, actual host
+administration, final dispatch and initial/legacy orchestration remain open.
+This batch does not claim the overall coordinator-removal goal is complete.
+
+Both local runtime workflows pass all seven steps. The complete process suite
+passes 408 tests with two intentionally ignored on macOS and ARM64 Linux; all
+nine FFI tests pass on both hosts. Strict core/FFI lint and iPad device/simulator
+SDK checks pass. macOS and Linux reuse unchanged results after the two obsolete
+device-deferral test expectations were corrected; a later source-comment/doc
+correction changes no executable behavior. Product hardware and installed
+acceptance are recorded by the consumer's
+[validation record](https://github.com/kb5000/trames-ipad/blob/main/docs/validation/native-devices-20261109.json).
+
+The expiry follow-up marks only future native requests as external producers.
+Accepted wait retries capture their existing resource deadline before the final
+level check, so crossing a lazy expiry before parking cannot discard that wake.
+io_uring enter, CQ polling and background pumps retain pre-pump deadlines as
+well as newly established ones. Due requests do not create a repeated past-time
+wake after the worker has observed them. Ready ordinary byte calls gain no extra
+resource scan, and ordinary guest memory access is unchanged.

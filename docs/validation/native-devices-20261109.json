@@ -1,0 +1,198 @@
+{
+  "stage": 77,
+  "date": "2026-11-09",
+  "runtime_revision": "a1b09affb1be790ee1588e34fba7440d098451bf",
+  "overall_goal": "active",
+  "scope": "Original native special-device namespace/OFD and Bridge bytes, readiness, deadlines, backpressure and lifetime.",
+  "architecture": {
+    "execution": "Calling worker; original pseudo-node cache, credentials, Files/OFDs, connections and readiness. No new coordinator, resource thread or polling bus.",
+    "availability": "Original shared relaxed atomic video-availability scalar replaces a frozen worker copy.",
+    "bridge": "Original protocol mutex and limits; fixed bounded notification array wakes subscribers only after unlock. Pure readiness observation and lazy expiry.",
+    "lifetime": "Accepted I/O retains its original OFD/connection through close and FD reuse; passive weak snapshots and subscriptions cannot postpone last close.",
+    "deadlines": "Only future pending native requests count as external producers. Existing wait-deadline capture precedes the final level check; io_uring retains pre-pump plus newly established deadlines.",
+    "memory": "No additional ordinary guest byte checks, fences or native-call locks.",
+    "limits": "No new device API or browser/throughput speedup claim; the two io_uring maintenance-failure setters remain."
+  },
+  "checks": {
+    "runtime_macos": {
+      "steps": 7,
+      "passed": true,
+      "artifact": "target/native-device-subsystem/runtime-mac/summary.json"
+    },
+    "linux": {
+      "checks": [
+        {
+          "name": "process-all",
+          "code": 0,
+          "seconds": 54.175293561000046
+        },
+        {
+          "name": "ffi-all",
+          "code": 0,
+          "seconds": 7.46349459999999
+        },
+        {
+          "name": "core-clippy",
+          "code": 0,
+          "seconds": 3.4347696559999576
+        },
+        {
+          "name": "runtime-ci",
+          "code": 0,
+          "seconds": 53.827962402000026
+        }
+      ],
+      "passed": true,
+      "artifact": "target/local-ci/io/native-device-subsystem/final-results.json"
+    },
+    "process": {
+      "macos": 408,
+      "linux": 408,
+      "ignored_each": 2,
+      "source_bridge_guest": {
+        "backend": "AArch64 interpreter conformance",
+        "execution_cpus": [
+          4,
+          12,
+          4
+        ],
+        "host_slots": [
+          4,
+          12,
+          1
+        ],
+        "cohorts_each": 1,
+        "returned_syscalls_each": 0,
+        "service_requests_each": 0
+      }
+    },
+    "ffi": {
+      "macos": 9,
+      "linux": 9
+    },
+    "regressions": [
+      "source SQE device opens and pending Bridge CQ completion after FD close/reuse",
+      "scalar/vector/positioned ABI against original Linux with access modes, O_PATH, empty buffers and invalid offsets",
+      "original permissions and live shared device availability",
+      "host-reply reentrancy after unlock, pure timeout observation, backpressure and original stream epochs",
+      "accepted original OFD versus weak snapshot/subscription last close",
+      "timer rearm/disarm, event waits and io_uring deadline/lifecycle conformance"
+    ],
+    "ipad": [
+      {
+        "target": "aarch64-apple-ios",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+        "code": 0
+      },
+      {
+        "target": "aarch64-apple-ios-sim",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk",
+        "code": 0
+      }
+    ],
+    "product": {
+      "applicable_steps": 8,
+      "passed": true,
+      "stable_packaging_steps": "9-12 outside Dev-only deployment scope",
+      "artifact": "target/native-device-subsystem/mac-product-ci/summary.json"
+    },
+    "hardware": {
+      "passed": true,
+      "runtime_revision": "a1b09affb1be790ee1588e34fba7440d098451bf",
+      "rows": [
+        {
+          "target": "trames-mac-run",
+          "executable_sha256": "490514e05c19f9211f534d177fb0b9ddd11a5c3a5101239f140093b6e532ec56",
+          "exit": 0,
+          "passed_tests": 2
+        },
+        {
+          "target": "trames_hvf",
+          "executable_sha256": "1add378b8251cc1470a6c3b76360e4889758a6153bb4ce51f3d613fca848fdc2",
+          "exit": 0,
+          "passed_tests": 52
+        }
+      ]
+    },
+    "installed": {
+      "version": "Trames Dev 1.5.4 (dev) runtime a1b09affb1be790ee1588e34fba7440d098451bf",
+      "runner_sha256": "041ac95049de44d1d6a85b7688a400e47bd14b1ba58e18c0a0c5f418b3c2d273",
+      "stable_sha256": "8fc21435034e8c041632e2e50419da9d2123bf790aedb0a1499286fc8367e614",
+      "stable_unchanged": true,
+      "checks": [
+        {
+          "name": "init",
+          "code": 0,
+          "seconds": 3.165484084
+        },
+        {
+          "name": "host",
+          "code": 0,
+          "seconds": 0.8574662079999995
+        },
+        {
+          "name": "tracing",
+          "code": 0,
+          "seconds": 0.3260354579999998
+        }
+      ],
+      "init": {
+        "passed": true,
+        "artifact": "target/native-device-subsystem/installed-init/results.json"
+      },
+      "host_12": {
+        "passed": true,
+        "artifact": "target/native-device-subsystem/installed-host-12/results.json"
+      },
+      "tracing_12": {
+        "passed": true,
+        "artifact": "target/native-device-subsystem/installed-tracing-12/results.json"
+      }
+    }
+  },
+  "build_recovery": "One Linux link attempt encountered ENOSPC. Removed only its 22GiB Rust incremental cache and resumed failed steps; the final correction was subsequently checked with both complete runtime workflows.",
+  "changed_runtime_sha256": {
+    "Cargo.lock": "66ad8387eb2981bbc9eebc76cb3f7dd9250ea62fda66e7a9bea27d008d7c8036",
+    "crates/trames-bridge/Cargo.toml": "45f4af04cb3a91aa2913f9da2e76aac6a5f3f741205ba53d61207e143ef5147a",
+    "crates/trames-bridge/src/lib.rs": "662b40d984afc17583f7d8d1d7584aa39b00c30e7f9b47f0caa84956dbedb801",
+    "crates/trames-linux/src/direct.rs": "edfff1b1e4c3e8aa473bf62b3f4f5a1397e9c6e2713601ca46879dfe13be33e6",
+    "crates/trames-linux/src/direct/uring.rs": "c092bc32848ec0bf7f514182aff767fcf840d8dc4d07168d8f1d5349293313eb",
+    "crates/trames-linux/src/direct/uring/background.rs": "74214fb35b37678e9787ca75e77154ddf3389a0e83063318eb950451aec91763",
+    "crates/trames-linux/src/direct/uring/poll.rs": "8df7d62a5f72aa8bb7e5ec3f1fad0f7a06b11f48ec261bafc91a61575abc43c3",
+    "crates/trames-linux/src/direct/uring/subsystem_tests.rs": "e7a43f072440be94ef0da9bf5c74bb6ea6481d77d2f1dc7ccd03192cd133501b",
+    "crates/trames-session/src/process_vm.rs": "f24de292fb899dabd578152754ad071f6f5eba9d8b5ad89f85fdd523746e5068",
+    "crates/trames-vfs/src/direct_io.rs": "a6b93abb1572ac939c855f9f3b26d34431db91590fcf7ee0f0efb640b64d2a56",
+    "crates/trames-vfs/src/events.rs": "c4dba1958bb22e9044f26bf1f18a988481a4550a80b4939c8c8272334cd47c3c",
+    "crates/trames-vfs/src/lib.rs": "486d76cc833f976cac2216f5632c8d783a37b24085aeb6ead34da77e5f9aa840",
+    "crates/trames-vfs/src/mounts.rs": "306716502fd82c5033d4f4e78e2da51fc311e0cc2a77c6f8bf49185f36c4e6ee",
+    "crates/trames-vfs/src/path_queries.rs": "f380c92b4438998b1ebcc1868c5bd8db3a61b4dd812278db9d650dccef5d676c",
+    "crates/trames-vfs/src/proc_file.rs": "6a88c25fb63483a21f969fe99019259a1d8e65dacdd1ed28254472b7c907a233",
+    "crates/trames-vfs/src/pseudo.rs": "75fd38704ff4e95ce9a74154dd1bdddb7f7286501e5037409bf3fc98910196b7",
+    "crates/trames-vfs/src/shared_control_tests.rs": "ddaf6b747fbc06d9dca763d94c461979f7318f2e94d083d911222feb3d409fbb",
+    "crates/trames-vfs/src/simple_device.rs": "3c9607bf11d24122f6f5ca76f4bf6e8e300472c1843f273b4b855ca037b83706",
+    "docs/architecture/coordination-boundaries.md": "c5732aa7a6d945f9191b0d6891a74b7752720d794d5243a893855566d24d98d6"
+  },
+  "deployment": {
+    "scope": "Mac Dev only",
+    "app": "/Users/main/Applications/Trames Dev.app",
+    "runner_sha256": "041ac95049de44d1d6a85b7688a400e47bd14b1ba58e18c0a0c5f418b3c2d273",
+    "stable_sha256": "8fc21435034e8c041632e2e50419da9d2123bf790aedb0a1499286fc8367e614",
+    "stable_unchanged": true,
+    "physical_ipad": "unchanged; both SDK compiles verified",
+    "business_environments": "unchanged"
+  },
+  "remaining": [
+    "Actual pause/cancel and final host shutdown/deadlines",
+    "Missing typed embedding capabilities and excluded resources; two io_uring maintenance escalations",
+    "Known-resource/subcommand and unhandled HLT/fault final dispatch",
+    "Initial/legacy admission and solo orchestration"
+  ],
+  "artifacts_sha256": {
+    "local-checks.json": "3eed392afa9327a01b9a12cea58b332d067960df20acacc593a21eba67f8293b",
+    "runtime-mac/summary.json": "7951d3849600eab38c5326546082d94bbbafaa8b854f708399d63bcdeda782c8",
+    "ipad-checks.json": "cdc8829a61446e15f8a3a168e6c6e4c907eb956b4b40394ac49c89534faaab14",
+    "mac-product-ci/summary.json": "2c64171019e806feaad09b9697989793ecc94bbb840efef35415e3c2f6e3b72d",
+    "hardware/results.json": "a4538dbfffcb5591c7f5d1b9450cbe2b6a96201d6326cda4c6d85de1deaed3d4",
+    "installed-checks.json": "c95d192df0e3b0271e4c81177b425da29994ae73d011c6e954499b73eca8bc05"
+  }
+}
