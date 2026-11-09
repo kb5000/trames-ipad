@@ -2,6 +2,22 @@
 
 ## Current status — 2026-11-09
 
+Stage 81 moves **read-only memory observations** onto original executor
+metadata. get_mempolicy, mincore and implemented non-discard madvise share one
+source/solo ABI and no longer require a joined call or an mm mutation checkpoint.
+Mapping existence includes PROT_NONE and live additions. Residency observes the
+existing original charge/backing model without loading target bytes or creating
+sparse Frame metadata. Huge untouched ranges validate by interval ends.
+
+Actual discard and structural mappings keep their necessary mutation scope.
+No host-pager scan, ordinary memory check/fence, per-instruction hook, service
+thread or polling bus is added. The overall goal remains active. See the
+[validation record](../validation/memory-observation-20261109.json).
+Only Mac Dev deployment is included; stable 1.5.4, business environments and
+physical iPad installs keep their versions.
+
+### Stage 80 original guest power control (historical)
+
 Stage 80 moves supported **guest halt/poweroff** onto original lifecycle
 resources. Source/solo share authority, magic, command and namespace validation.
 The initial root publication retains its original group control across later
@@ -125,7 +141,7 @@ records source/executable hashes, original joined behavior, reuse proof and fina
 installed acceptance. Only Mac Dev is updated; stable 1.5.4, business environments
 and physical iPad installs remain unchanged.
 
-### Remaining boundaries after stage 80
+### Remaining boundaries after stage 81
 
 **The coordinator still exists.** io_uring's remaining `owner_required` setters
 are the two actual source-maintenance failures: unavailable wait capability or an
@@ -143,7 +159,7 @@ row in the coverage inventory below:
 3. Last-resort known-resource/subcommand and unhandled HLT/fault dispatch.
 4. Initial/legacy admission and solo orchestration; solo is not itself a syscall RPC.
 
-Supported guest halt/poweroff syscall execution is removed by stage 80. Supported sysinfo/system-accounting refresh is removed by stage 79. Live host pause/resume is removed from joined execution by stage 78. Native special-device/Bridge pathname, byte and readiness dependencies are removed by stage 77. Host transfer/timezone/FileProvider commands are removed from joined execution by stage 76. Mac memory-pressure reclamation is removed by stage 75.
+Read-only memory observations and implemented non-discard advice are removed by stage 81. Supported guest halt/poweroff syscall execution is removed by stage 80. Supported sysinfo/system-accounting refresh is removed by stage 79. Live host pause/resume is removed from joined execution by stage 78. Native special-device/Bridge pathname, byte and readiness dependencies are removed by stage 77. Host transfer/timezone/FileProvider commands are removed from joined execution by stage 76. Mac memory-pressure reclamation is removed by stage 75.
 Init notification/graceful-stop supervision was removed by stage 74. Diagnostic syscall tracing was removed by stage 73. Stage 72 removed
 the independent embedding terminal-ID-0 execution category. Normal subsystem names
 below describe coverage and do not imply another coordinator dependency.
@@ -159,6 +175,7 @@ below describe coverage and do not imply another coordinator dependency.
 | Mapping topology, pins and mapped-file layout | Supported brk/mmap/munmap/mremap/mprotect/msync/madvise and buffer-registration checkpoints publish on an existing worker; additive anonymous mmap is direct | Proc/cold-mm checkpoints and supported mapped-file layout transactions now run on existing workers; excluded backing/lifetime/policy and capability-less embeddings retain explicit boundaries |
 | Native special-device paths and Bridge bytes/readiness | Calling worker, original pseudo nodes/OFDs/connections and original readiness | No supported-device/Bridge-only join remains; unavailable providers and unsupported driver APIs retain their existing route/result |
 | Native libc/GPU/video/audio | Normal bodies, resource waits and admitted mapping/entry checkpoints use calling/shared-resource execution; exceptional access reuses original task/mm custody | Capability-less embeddings and actual platform/host lifecycle remain; AppKit affinity, device/disk pools and local fallback are not extra coordinators |
+| Read-only VM observations and implemented non-discard advice | Original admitted VMA/reservation intervals and shared resident metadata on the caller; common source/solo ABI | No observation-only join or mapping checkpoint. Absent custom observation capabilities retain before-effects fallback; actual discard/structural mapping edits retain mutation admission |
 | Guest halt/poweroff | Calling executor and original root/caller group lifecycle, with shared source/solo validation | No supported power-control-only join. Actual CPU drain/backend teardown and missing original control/exit capabilities retain their scope; restart/kexec/nested behavior stays unsupported |
 | System statistics and live CPU accounting | sysinfo and proc use original task/mm/host resources; active assignments expose time directly | No supported-statistics-only join. Missing real statistics/host capabilities retain legacy execution; observer-sampled load and wall-assignment time remain approximations |
 | Dynamic proc/sys and proc pathname/FD consumers | Calling worker and original PID/mm/Files/fs/namespace resources | First cross-mm byte export and invalidation activate on an existing worker at the original task/mm boundary; legacy providers retain explicit fallback |
@@ -177,10 +194,9 @@ below describe coverage and do not imply another coordinator dependency.
 | Live host pause/resume | Original cohort, execution leases, shared pause flag and existing queue/workers | No pause-only join; initial/solo and legacy stopped-hook invocation retain their separate route |
 | Host administration and generic dispatch fallback | Unknown syscall numbers finish locally using generated entry recognition; actual administration retains its own route | Cancel, admin/deadline/shutdown; accepted filesystem commands use original resources and the existing disk pool; known SVC resources/subcommands and HLT/fault exits not completed, parked or scoped on the worker still reach the joined fallback |
 
-A concrete remaining supported call is `get_mempolicy(236)`: its address-policy
-query still reads original owner `Memory::regions()`. It is an actual final
-known-call boundary, rather than an unimplemented-number diagnostic. Future
-memory-placement work must include that mapping-existence dependency.
+Stage 81 closes the previously identified get_mempolicy(236) mapping-existence
+boundary together with mincore and non-discard advice. Other final dispatch
+coverage still needs auditing against actual resources and subcommands.
 
 The last row is an important coverage gap: the remaining owner work is **not
 limited to a fixed set of rare controls**. The final worker-dispatch fallback is
@@ -189,7 +205,7 @@ the owner; ordinary epoch-member migration, parking, wakeup and child/replacemen
 admission already use the live execution queue. Single-CPU/solo execution retains
 its coordinated caller path, which does not by itself imply an extra RPC.
 
-The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/75b9edadad2bf34884d8475765b7e3ab842f5044/docs/architecture/coordination-boundaries.md)
+The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/f5e613b0de1847d06a26ec15e77372c4ccf54a16/docs/architecture/coordination-boundaries.md)
 records scopes, actual admission gates and source locations. Earlier sections
 below are historical records and do not override this inventory.
 
@@ -4946,3 +4962,48 @@ syscall handoff. Host cancellation/deadline/shutdown/final teardown, other
 missing/excluded capabilities, other final SVC/HLT/fault dispatch and
 initial/legacy/solo orchestration remain. Only Mac Dev is updated, and the overall
 coordinator-removal goal remains active.
+
+## 81. Original read-only memory observations — 2026-11-09
+
+The connected observation path now covers get_mempolicy(236), mincore(232) and
+currently implemented non-discard madvise(233), including their mapping-existence
+and original per-page residency dependencies. Original Memory and executing
+Views share one ABI. Inaccessible reservations count as mappings, huge untouched
+ranges validate by interval ends, and live additions/other actors' writes use the
+same original sparse store. Queries do not load pages, create sparse Frame
+metadata or quiesce the mm merely to inspect it.
+
+The original single-node policy, per-page charged/backing-validity residency
+model and no-op non-discard advice behavior are retained. This does not add host
+pager sampling or implement previously unsupported placement/advice APIs.
+Actual MADV_DONTNEED and mapping edits retain original mutation admission.
+Output aliases, full preflight/error order, ABI widths, holes and existing guest
+byte permission/TBI rules are shared. Missing custom observation capabilities
+can defer before effects; supported Memory/View queries complete locally.
+
+Conformance covers owner/View ABI parity, untouched 64 GiB VMA validation,
+PROT_NONE, other actor/live-map visibility, deferred file page-in, overlapping
+mincore output and seccomp ALLOW/ERRNO. Shared-mm 4/12 logical CPU and one-slot
+actors each query once and park on original futex readiness, avoiding a timing
+assumption about all tasks running before a global budget. No observation-only
+mapping checkpoint or returned syscall remains in those cases.
+
+The previous native fixture uses five cohorts on four CPUs, returns
+get_mempolicy four times and takes three mincore plus three non-discard advice
+mapping checkpoints. It also records the associated startup/retirement fallout;
+not all returns are attributed solely to the observation body. Final checks and
+exact source/executable hashes are in the
+[validation record](../validation/memory-observation-20261109.json).
+
+Both complete local runtime workflows pass. Each host passes 424 process
+regressions (two intentionally ignored) and all 10 FFI cases, strict lint and
+both iPad SDK compile targets. Mac product checks, 52 signed HVF and six signed
+product hardware cases pass. The native four/twelve-CPU query fixture now uses
+one cohort, with no returned syscall or observation mapping checkpoint. Only
+actual structural work retains its scope; the fixture's clone/exit fallout also
+disappears. These are functional/path results, not a throughput comparison.
+
+No new service/coordinator thread, polling bus, ordinary memory check/fence or
+per-instruction hook is introduced. Actual cancellation/final teardown,
+missing/excluded resources, other generic dispatch and initial/legacy/solo
+orchestration remain. Only Mac Dev is updated; the overall goal stays active.
