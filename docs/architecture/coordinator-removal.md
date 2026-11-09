@@ -2,27 +2,32 @@
 
 ## Current status — 2026-11-09
 
-Through stage 86 the broad remaining count is **four**, unchanged from stage 85.
+Through stage 87 the broad remaining count is **four**, unchanged from stage 86.
 This counts actual remaining boundary classes, not historical subsystem headings.
 
 | Remaining class | Current boundary | Concrete change this round |
 | --- | --- | --- |
 | Host control and final teardown | Actual cancellation/deadline/shutdown, native-event backend failure and final CPU/session drain | No class removed |
-| Missing capabilities and excluded resources | Original absent providers/excluded request bodies; two submitter-scoped io_uring maintenance escalation setters remain | No setter removed; stages 84–85 close original authority and maintenance lifetime dependencies |
-| Final execution dispatch | SVC/HLT/fault not completed, parked or accepted by a source scope | The native regression's setup-only unsupported ioctl still uses this route |
-| Initial/legacy orchestration | Initial admission and standalone/capability-less scheduling | Normal preexisting Kernel Futex/Sleep adoption no longer joins the whole cohort |
+| Missing capabilities and excluded resources | Original absent providers/excluded request bodies; two submitter-scoped io_uring maintenance escalation setters remain | No setter removed |
+| Final execution dispatch | SVC/HLT/fault not completed, parked or accepted by a source scope | Shared-FD ioctl discovery, implemented interface controls and unsupported-command errors now complete on the caller |
+| Initial/legacy orchestration | Initial admission and standalone/capability-less scheduling | No further class removed; stage 86's normal dormant Futex/Sleep admission remains source-owned |
 
-Stage 86 registers original cold waiters with metadata only. Wake/requeue,
-timeout, signals and freezer/thaw use the same live queue; existing workers
-prepare only the needed original mm. The signed native reproduction falls from
-three cohorts before the change to two at four/twelve CPUs, including its retained
-setup-only fallback. Each final run needs one original-mm preparation and no
-service request. This is a path result, not a throughput comparison.
+Stage 87 closes residual shared-descriptor ioctl control. Namespace type, virtual
+render discovery, implemented network-interface queries/link changes and ordinary
+unsupported commands use one source/solo ABI over the accepted original OFD.
+Close/reuse cannot redirect it; existing private alias cleanup survives unwind.
+PTY job controls and FIONBIO/FIOASYNC keep their existing source implementations.
+Genuine legacy OFDs and absent providers retain before-effects fallback.
+
+The signed four-CPU baseline completes correctly but uses eight cohorts and
+fourteen returned ioctls. Final four/twelve-CPU runs use one cohort, zero returned
+syscalls and zero services. The dormant fixture retains one explicit unsupported
+prctl setup boundary so it still tests actual cold-wait admission.
 
 The [shared inventory](../../runtime/docs/architecture/coordination-boundaries.md#current-remaining-categories)
-and [stage 86 record](../validation/dormant-wait-admission-20261109.json) are current.
-Mac and ARM64 Linux each pass 435 process regressions (two intentionally ignored),
-both full runtime workflows pass, and iPad device/simulator SDK compilation passes.
+and [stage 87 record](../validation/descriptor-ioctl-20261109.json) are current.
+Mac and ARM64 Linux each pass 436 process regressions (two intentionally ignored),
+both complete runtime workflows pass, and iPad device/simulator compilation passes.
 Mac Dev alone is updated; stable 1.5.4, business environments and physical iPad
 installations retain their versions. The overall removal goal remains active.
 
@@ -5287,3 +5292,61 @@ cancel/final teardown remain explicit. Required original mm/backing synchronizat
 is distinct from stopping every job to execute a syscall on the coordinator.
 Only Mac Dev is updated; stable 1.5.4, business environments and physical iPad
 installations are unchanged. The overall goal remains active.
+
+
+## 87. Original shared descriptor ioctl discovery and control — 2026-11-09
+
+Runtime `a77aaf162a5c0575e5b1f1ef259282f9713646d7` removes the remaining
+shared-descriptor discovery/control family from joined syscall dispatch. The
+original canonical ioctl body now serves both source and solo execution. It
+covers namespace type, the existing virtual render DRM_VERSION ABI, all
+implemented interface controls and ordinary unsupported requests. It adds no
+new driver API and preserves original errors, privilege checks and guest-output
+ordering, including partial render writes before a later fault.
+
+The existing source resolver accepts one original shared OFD and uses its private
+retained-descriptor scope for the operation. Descriptor close/reuse cannot retarget
+that capability; normal and panic exits restore the private alias. No descriptor
+is installed in the guest table. Original network topology/credentials and existing
+PTY, flag and async-signal mechanisms remain the authorities. Ordinary native and
+byte operations gain no extra check, fence or synchronization. There is no Kernel
+copy, new coordinator/resource thread, polling bus or global algorithm lock.
+
+Integration caught two filtered-dispatch omissions: residual controls were not
+initially included in the retained policy-decision path, and terminal-job request
+numbers on non-terminals still skipped the residual route. The final code uses
+the existing accepted seccomp decision and distinguishes actual PTY execution
+from a pipe's original ENOTTY. Unsupported commands are not replaced with a new
+guest error merely to avoid a fallback. Actual legacy OFDs still defer before
+effects when their source capability is absent.
+
+Four new shared regressions cover twenty descriptor/request combinations,
+source/solo output and error agreement, invalid FD/pointer/O_PATH, partial output,
+live original network state/permissions, and original OFD close/reuse/unwind.
+The connected process fixture runs seven controls before its final futex wait on
+four/twelve CPUs and one execution slot, including an allowed seccomp filter.
+Final runs use one cohort with no returned syscall, service or mapping checkpoint;
+the old runtime stops before the next marker.
+
+The signed native four-CPU baseline completes correctly but uses eight cohorts,
+returns ioctl fourteen times and clone twice. Final four/twelve-CPU execution
+uses one cohort with no returned syscall or service. The earlier dormant-wait
+fixture's setup pipe ioctl now executes on the source as intended. Its setup is
+changed to the still-unsupported PR_GET_UNALIGN prctl, preserving an actual cold
+waiter before a fresh cohort. That scenario passes on both prior and final runtime
+at four/twelve CPUs with two cohorts, one affected mm and one returned prctl.
+
+Both complete local runtime workflows pass. Mac and ARM64 Linux each pass 436
+process regressions (two intentionally ignored) and ten FFI cases. Strict lint,
+iPad device/simulator compilation, Mac product development gates, 52 signed HVF
+and ten signed product cases pass. Installed Dev checks and exact source/binary
+hashes are in the [validation record](../validation/descriptor-ioctl-20261109.json).
+Only Mac Dev is updated; stable 1.5.4, business environments and physical iPad
+installations are unchanged. These are functional/path results, not a controlled
+throughput comparison.
+
+The four broad remaining categories stay active. Both io_uring maintenance
+escalation setters, genuine missing/excluded providers and legacy OFDs, other
+final execution dispatch, actual initial orchestration and host cancel/final
+teardown remain. Shared-FD ioctl control is a concrete removed trigger within
+the final-dispatch category; the overall coordinator-removal goal is not complete.

@@ -1,0 +1,293 @@
+{
+  "stage": 87,
+  "date": "2026-11-09",
+  "overall_goal": "active",
+  "runtime_revision": "a77aaf162a5c0575e5b1f1ef259282f9713646d7",
+  "prior_runtime": "f35cfc111bac200190f3d2083e838bcbfdd186b6",
+  "scope": "Residual shared descriptor ioctl discovery/control: original OFD acceptance, namespace type, virtual render discovery, implemented interface queries/link changes, unsupported-command errors, source/solo ABI, policy and lifetime.",
+  "architecture": {
+    "common_abi": "The original canonical ioctl body is shared by solo and source. Network and render routines accept the same CpuMemory; no duplicate device ABI is introduced.",
+    "acceptance": "The existing per-task sealed PathQueries resolver accepts one original shared OFD. Its existing private retained-descriptor scope supplies all accesses and restores the alias even on unwind. No guest-visible descriptor is installed.",
+    "resources": "Original Files, namespace/network topology and credentials. PTY job controls and FIONBIO/FIOASYNC retain their existing accepted endpoint/status/signal execution.",
+    "errors": "Unsupported controls preserve canonical ENOTTY, missing/O_PATH descriptors preserve EBADF, and original guest copyout/partial-write/privilege ordering is retained. Missing legacy providers remain before-effects fallback.",
+    "performance": "Only residual controls use this route; ordinary byte/native paths gain no check, fence, thread, global lock or queue. It reuses the captured resolver and actual shared resources.",
+    "policy": "New controls participate in the existing retained seccomp decision route; excluded resources keep their entry token before fallback."
+  },
+  "baselines": {
+    "shared": {
+      "runtime_revision": "f35cfc111bac200190f3d2083e838bcbfdd186b6",
+      "checks": [
+        {
+          "name": "process",
+          "code": 101,
+          "seconds": 11.377116874999999,
+          "output": "warning: unused workspace dependency `trames-native`\n  --> Cargo.toml:17:1\n   |\n17 | trames-native = { path = \"runtime/crates/trames-native\" }\n   | ^^^^^^^^^^^^^\n   |\n   = note: `cargo::unused_workspace_dependencies` is set to `warn` by default\nhelp: consider removing the workspace dependency `trames-native`\nwarning: workspace (manifest) generated 1 warning\n   Compiling trames-session v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-session)\n   Compiling trames-vfs v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-vfs)\n   Compiling trames-linux v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-linux)\n   Compiling trames-kernel v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-kernel)\n   Compiling trames-core v1.5.4 (/Users/main/dev/trames/crates/trames-core)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 10.62s\n     Running ../../runtime/crates/trames-session/src/lib.rs (target/debug/build/trames-core/73ea467a4920ade2/out/kernel_conformance-73ea467a4920ade2)\n\nrunning 1 test\ntest process::ioctl_tests::descriptor_ioctl_family_finishes_on_source_workers_without_joined_dispatch ... ioctl CPUs=4 slots=4 filtered=false marker=[0, 0, 0, 0] cohorts=1 scopes=0 returned={29: 1}\n\nthread 'process::ioctl_tests::descriptor_ioctl_family_finishes_on_source_workers_without_joined_dispatch' (27569513) panicked at crates/trames-core/../../runtime/crates/trames-session/src/process_ioctl_tests.rs:112:9:\nassertion `left == right` failed\n  left: [0, 0, 0, 0]\n right: [1, 0, 0, 0]\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\nFAILED\n\nfailures:\n\nfailures:\n    process::ioctl_tests::descriptor_ioctl_family_finishes_on_source_workers_without_joined_dispatch\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 437 filtered out; finished in 0.02s\n\nerror: test failed, to rerun pass `-p trames-core --test kernel-conformance`\n"
+        },
+        {
+          "name": "shared",
+          "code": 101,
+          "seconds": 3.5059600829999997,
+          "output": "warning: unused field `repository` in `workspace.package`\n  --> Cargo.toml:30:1\n   |\n30 | repository = \"https://github.com/kb5000/trames-runtime\"\n   | ^^^^^^^^^^\n   |\n   = note: `cargo::unused_workspace_package_fields` is set to `warn` by default\nhelp: consider removing the field `workspace.package.repository`\nwarning: workspace (manifest) generated 1 warning\n   Compiling trames-vfs v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-vfs)\n   Compiling trames-linux v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-linux)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.64s\n     Running unittests src/lib.rs (target/debug/build/trames-linux/79936f2dc6cf625d/out/trames_linux-79936f2dc6cf625d)\n\nrunning 3 tests\ntest direct::ioctl_tests::descriptor_discovery_and_unsupported_ioctl_share_the_complete_source_solo_abi ... FAILED\ntest direct::ioctl_tests::interface_controls_observe_live_original_network_and_credentials ... FAILED\ntest direct::ioctl_tests::ioctl_rejections_and_partial_render_outputs_preserve_error_precedence ... FAILED\n\nfailures:\n\n---- direct::ioctl_tests::descriptor_discovery_and_unsupported_ioctl_share_the_complete_source_solo_abi stdout ----\n\nthread 'direct::ioctl_tests::descriptor_discovery_and_unsupported_ioctl_share_the_complete_source_solo_abi' (27570190) panicked at crates/trames-linux/src/direct/ioctl_tests.rs:99:22:\noriginal descriptor control\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n---- direct::ioctl_tests::interface_controls_observe_live_original_network_and_credentials stdout ----\n\nthread 'direct::ioctl_tests::interface_controls_observe_live_original_network_and_credentials' (27570195) panicked at crates/trames-linux/src/direct/ioctl_tests.rs:164:9:\nassertion `left == right` failed\n  left: None\n right: Some(Ok(0))\n\n---- direct::ioctl_tests::ioctl_rejections_and_partial_render_outputs_preserve_error_precedence stdout ----\n\nthread 'direct::ioctl_tests::ioctl_rejections_and_partial_render_outputs_preserve_error_precedence' (27570200) panicked at crates/trames-linux/src/direct/ioctl_tests.rs:137:58:\ncalled `Option::unwrap()` on a `None` value\n\n\nfailures:\n    direct::ioctl_tests::descriptor_discovery_and_unsupported_ioctl_share_the_complete_source_solo_abi\n    direct::ioctl_tests::interface_controls_observe_live_original_network_and_credentials\n    direct::ioctl_tests::ioctl_rejections_and_partial_render_outputs_preserve_error_precedence\n\ntest result: FAILED. 0 passed; 3 failed; 0 ignored; 0 measured; 278 filtered out; finished in 0.02s\n\nerror: test failed, to rerun pass `-p trames-linux --lib`\n"
+        }
+      ]
+    },
+    "signed_native": {
+      "runtime_revision": "f35cfc111bac200190f3d2083e838bcbfdd186b6",
+      "executable_sha256": "93a2a27ec6d74cec31b59120d643bf80434f6a16bc89c6f853bc3fcbe4a9fe96",
+      "checks": [
+        {
+          "name": "dormant_shared_futex_child_resumes_without_another_joined_native_cohort",
+          "code": 0,
+          "seconds": 0.7800365829999998,
+          "output": "\nrunning 1 test\nhardware dormant CPUs=4 exit=0 marker=[1, 0, 0, 0] cohorts=2 scopes=1 returned={167: 1}\nhardware dormant CPUs=12 exit=0 marker=[1, 0, 0, 0] cohorts=2 scopes=1 returned={167: 1}\ntest session::tests::dormant_shared_futex_child_resumes_without_another_joined_native_cohort ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 30 filtered out; finished in 0.03s\n\n"
+        },
+        {
+          "name": "descriptor_discovery_controls_use_original_native_workers_without_ioctl_joins",
+          "code": 101,
+          "seconds": 0.019995959000000063,
+          "output": "\nrunning 1 test\nhardware ioctl CPUs=4 exit=0 cohorts=8 returned={29: 14, 220: 2}\n\nthread 'session::tests::descriptor_discovery_controls_use_original_native_workers_without_ioctl_joins' (27572807) panicked at crates/trames-mac/src/session.rs:1080:13:\nassertion `left == right` failed\n  left: Some(14)\n right: None\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\ntest session::tests::descriptor_discovery_controls_use_original_native_workers_without_ioctl_joins ... FAILED\n\nfailures:\n\nfailures:\n    session::tests::descriptor_discovery_controls_use_original_native_workers_without_ioctl_joins\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 30 filtered out; finished in 0.01s\n\n"
+        }
+      ]
+    }
+  },
+  "defects_caught": {
+    "filtered_nonterminal_job_request": {
+      "code": 101,
+      "seconds": 4.220383708,
+      "output": "warning: unused workspace dependency `trames-native`\n  --> Cargo.toml:17:1\n   |\n17 | trames-native = { path = \"runtime/crates/trames-native\" }\n   | ^^^^^^^^^^^^^\n   |\n   = note: `cargo::unused_workspace_dependencies` is set to `warn` by default\nhelp: consider removing the workspace dependency `trames-native`\nwarning: workspace (manifest) generated 1 warning\n   Compiling trames-session v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-session)\n   Compiling trames-core v1.5.4 (/Users/main/dev/trames/crates/trames-core)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.29s\n     Running ../../runtime/crates/trames-session/src/lib.rs (target/debug/build/trames-core/73ea467a4920ade2/out/kernel_conformance-73ea467a4920ade2)\n\nrunning 1 test\ntest process::ioctl_tests::descriptor_ioctl_family_finishes_on_source_workers_without_joined_dispatch ... ioctl CPUs=4 slots=4 filtered=false marker=[1, 0, 0, 0] cohorts=1 scopes=0 returned={}\nioctl CPUs=12 slots=12 filtered=false marker=[1, 0, 0, 0] cohorts=1 scopes=0 returned={}\nioctl CPUs=4 slots=1 filtered=false marker=[1, 0, 0, 0] cohorts=1 scopes=0 returned={}\nioctl CPUs=4 slots=1 filtered=true marker=[0, 0, 0, 0] cohorts=1 scopes=0 returned={29: 1}\n\nthread 'process::ioctl_tests::descriptor_ioctl_family_finishes_on_source_workers_without_joined_dispatch' (27585684) panicked at crates/trames-core/../../runtime/crates/trames-session/src/process_ioctl_tests.rs:114:9:\nassertion `left == right` failed\n  left: [0, 0, 0, 0]\n right: [1, 0, 0, 0]\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\nFAILED\n\nfailures:\n\nfailures:\n    process::ioctl_tests::descriptor_ioctl_family_finishes_on_source_workers_without_joined_dispatch\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 437 filtered out; finished in 0.02s\n\nerror: test failed, to rerun pass `-p trames-core --test kernel-conformance`\n"
+    }
+  },
+  "checks": {
+    "workflows": {
+      "runtime_macos": {
+        "passed_steps": 7,
+        "total_steps": 7,
+        "summary": "target/ioctl-subsystem/runtime-mac/summary.json",
+        "sha256": "ca1fe8ed16fc7e47bb493ba36097769e1fb13da7c89403afb95d365c4b51da50"
+      },
+      "runtime_linux": {
+        "passed_steps": 7,
+        "total_steps": 7,
+        "summary": "target/local-ci/io/ioctl-subsystem/runtime-linux-ci/summary.json",
+        "sha256": "f87024dc36f0911cb92e2c7c85e6620c210f6bd4d199d19643a608ee16be998f"
+      },
+      "mac_product": {
+        "passed_steps": 8,
+        "total_steps": 12,
+        "summary": "target/ioctl-subsystem/mac-product-ci/summary.json",
+        "sha256": "14fd8a6037a2d49c2bbd69848fa0e8ece1aeff3d493e381b104974e46f1e439e"
+      }
+    },
+    "macos": [
+      {
+        "name": "runtime-mac",
+        "code": 0,
+        "seconds": 21.309496624999998
+      },
+      {
+        "name": "kernel-conformance",
+        "code": 0,
+        "seconds": 10.922726250000004
+      },
+      {
+        "name": "ffi",
+        "code": 0,
+        "seconds": 4.599943875000001
+      },
+      {
+        "name": "core-clippy",
+        "code": 0,
+        "seconds": 3.246427041000004
+      },
+      {
+        "name": "ffi-clippy",
+        "code": 0,
+        "seconds": 0.27945179199999615
+      },
+      {
+        "name": "ipad-compile",
+        "code": 0,
+        "seconds": 3.223469333000004
+      }
+    ],
+    "linux": [
+      {
+        "name": "process-all",
+        "code": 0,
+        "seconds": 56.40666749899998
+      },
+      {
+        "name": "ffi-all",
+        "code": 0,
+        "seconds": 5.739597576000023
+      },
+      {
+        "name": "core-clippy",
+        "code": 0,
+        "seconds": 3.6065683850000028
+      },
+      {
+        "name": "runtime-ci",
+        "code": 0,
+        "seconds": 54.47012586699998
+      }
+    ],
+    "process": {
+      "macos": {
+        "passed": 436,
+        "ignored": 2,
+        "log": "target/ioctl-subsystem/kernel-conformance.log",
+        "sha256": "5cead3d276191c7112962341fda27cc06dce893d8040b6a305065a10b55d077e"
+      },
+      "linux": {
+        "passed": 436,
+        "ignored": 2,
+        "log": "target/local-ci/io/ioctl-subsystem/process-all.log",
+        "sha256": "d374d43fe5b22617aff852852e59dae72c7d00fb38fa567920db4720bcc12402"
+      }
+    },
+    "ffi": {
+      "macos": {
+        "passed": 10,
+        "ignored": 0,
+        "log": "target/ioctl-subsystem/ffi.log",
+        "sha256": "5c8d37dea02ac0f67a7d10c001202619784b1898efc9137984772a1ee10990fc"
+      },
+      "linux": {
+        "passed": 10,
+        "ignored": 0,
+        "log": "target/local-ci/io/ioctl-subsystem/ffi-all.log",
+        "sha256": "9c4811f0045083a4b0ad10aaafbbdba51646e25de0a89922f0f1d4cdee899724"
+      }
+    },
+    "ipad": [
+      {
+        "target": "aarch64-apple-ios",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+        "code": 0
+      },
+      {
+        "target": "aarch64-apple-ios-sim",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk",
+        "code": 0
+      }
+    ],
+    "hardware": {
+      "passed": true,
+      "runtime_revision": "a77aaf162a5c0575e5b1f1ef259282f9713646d7",
+      "rows": [
+        {
+          "target": "trames-mac-run",
+          "executable_sha256": "ad1f60b332c7cc3f626618e98b2ab6bfb02860552b4892c7c9aee1709f267fab",
+          "exit": 0,
+          "passed_tests": 10
+        },
+        {
+          "target": "trames_hvf",
+          "executable_sha256": "63248984cad2be58fc56cb0e40a5126e3648aaf3deb2bcd0139fe1ece04baba4",
+          "exit": 0,
+          "passed_tests": 52
+        }
+      ]
+    },
+    "native_ioctl": [
+      {
+        "cpus": 4,
+        "exit": 0,
+        "cohorts": 1,
+        "returned_syscalls": {}
+      },
+      {
+        "cpus": 12,
+        "exit": 0,
+        "cohorts": 1,
+        "returned_syscalls": {}
+      }
+    ],
+    "native_dormant_setup": {
+      "cpus": [
+        4,
+        12
+      ],
+      "cohorts": 2,
+      "scoped_mms": 1,
+      "returned_prctl": 1
+    },
+    "native_log_sha256": "939b4abcb01caa2f92a89836b3d2e3d2308820810cb4abe9229818fd5f2984ba",
+    "installed": {
+      "version": "Trames Dev 1.5.4 (dev) runtime a77aaf162a5c0575e5b1f1ef259282f9713646d7",
+      "runner_sha256": "eb281e7500dc86ea7af17da1eefb5a5d865a136d428edbd3664e77f021c409ef",
+      "stable_sha256": "8fc21435034e8c041632e2e50419da9d2123bf790aedb0a1499286fc8367e614",
+      "stable_unchanged": true,
+      "checks": [
+        {
+          "name": "init",
+          "code": 0,
+          "seconds": 3.266288417
+        },
+        {
+          "name": "host",
+          "code": 0,
+          "seconds": 0.9389055000000002
+        },
+        {
+          "name": "tracing",
+          "code": 0,
+          "seconds": 0.3156975830000004
+        }
+      ]
+    },
+    "new_process_regressions": [
+      "descriptor_ioctl_family_finishes_on_source_workers_without_joined_dispatch"
+    ],
+    "new_shared_regressions": [
+      "descriptor_discovery_and_unsupported_ioctl_share_the_complete_source_solo_abi",
+      "ioctl_rejections_and_partial_render_outputs_preserve_error_precedence",
+      "interface_controls_observe_live_original_network_and_credentials",
+      "accepted_control_keeps_original_ofd_across_close_reuse_and_panic"
+    ]
+  },
+  "source_sha256": {
+    "runtime/crates/trames-linux/src/direct.rs": "17554c6bcb90b95c29d45a688a53cb8b2334b1669ccd6d5f82b687a12384294c",
+    "runtime/crates/trames-linux/src/direct/ioctl_tests.rs": "5a9ea11efb238cd102af98f9b425d8e44964187d4cf9cd2b3c019de15d1c80bb",
+    "runtime/crates/trames-linux/src/ioctl.rs": "a6b18e48769b1f590ad278b9bbe583eb2ecff58ce0bef421ed64749a4b7800e5",
+    "runtime/crates/trames-linux/src/lib.rs": "1091a6eba1085b055d282a6bea24c9bdab80e3bcda6858117c357ca065822685",
+    "runtime/crates/trames-linux/src/network.rs": "20f1522ea39e3abd8781f8c5a071aeb63e46652990c9fb4c2d3ac2573d9ceb2f",
+    "runtime/crates/trames-linux/src/render.rs": "7d2581690c5b0f6b150bb19ea337dc79441fca7e1365db2a0058997c3c204d33",
+    "runtime/crates/trames-linux/src/state.rs": "671fef389ef684d7173d16471c8352eab9c1562011330cba3cbb68493c45aaf6",
+    "runtime/crates/trames-session/src/process.rs": "ed592704e01cbbbc76f39fbc97960b2794f9b7509bb9b7c0aee18215668d2779",
+    "runtime/crates/trames-session/src/process_ioctl_tests.rs": "0be234cf11c6d3d10cab2d7929e934816e908157a328ba7544a1a6f2884d99dc",
+    "runtime/crates/trames-session/src/worker_syscalls.rs": "f4c2566925be070edf03fc6ba69b359745a7801dbc12c3f8566846510aefd870",
+    "runtime/crates/trames-session/src/workers.rs": "6c429b6b6fa5489b4412f69b13b5e4a7f7c915f3b2883f7a802bb9425f2c18dc",
+    "runtime/crates/trames-vfs/src/path_queries.rs": "4b18c4a9edfdd9e1de50f55d7daf79b4c6b0b247b40fd3a57a50eb72c156dc03"
+  },
+  "mac_native_fixture_sha256": "816ad8e3431e93a8a510fb524569664f7d7b52610e256278819914a3e950ce53",
+  "deployment": {
+    "channel": "Mac Dev only",
+    "runner": "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+    "signature_verified": true,
+    "stable_unchanged": true,
+    "physical_ipad_unchanged": true,
+    "business_environments_unchanged": true
+  },
+  "validation_notes": [
+    "Baseline shared tests use prior production source with only new test-module hooks. The new shared comparisons fail before the fix, and the process fixture stops before its marker.",
+    "Signed native four-CPU baseline completes correctly but takes eight cohorts and returns ioctl fourteen times (plus two clone returns). Final four/twelve-CPU fixtures complete in one cohort with no returned syscall or service. No twelve-CPU before measurement is claimed.",
+    "Twenty descriptor/request combinations compare source/solo outputs and errors. Error cases include invalid FD/pointer/O_PATH and partial render copyout. Original OFD close/reuse and private-alias unwind restoration are covered.",
+    "One connected process regression runs four/twelve CPUs and one execution slot, including an allowed seccomp filter and non-terminal TCSETS. Initial filtered routing omissions were found and fixed before final checks.",
+    "Test setup initially omitted render opt-in and namespace process metadata, and attempted unsupported root-loopback down controls. These fixtures now use actual opt-in/original namespace metadata and an isolated network namespace. Initial Mac network creation needed explicit Loopback mode. These are test setup failures, not production findings.",
+    "The earlier dormant fixture used an unknown pipe ioctl during setup. That control now correctly remains source-owned. Its setup is changed to the genuinely unsupported PR_GET_UNALIGN prctl; the retained cold-wait scenario passes on both prior and final runtime at four/twelve CPUs.",
+    "Final source hashes match ARM Linux CI and the paired Mac checkout. Only documentation/evidence edits follow passing source checks. Product development gates 1-8 of 12 pass; stable release packaging is outside this Dev-only round."
+  ],
+  "remaining": [
+    "Actual host cancellation/deadline/shutdown and final backend/session teardown.",
+    "Genuine missing capabilities/excluded resources and two original-submitter io_uring maintenance escalation setters with their actual stop/join boundary.",
+    "Other final SVC/HLT/fault dispatch, including the retained unsupported prctl setup. Shared-FD ioctl discovery/control and unsupported-command errors no longer need that boundary.",
+    "Actual initial/standalone/capability-less orchestration; normal dormant Futex/Sleep adoption remains source-owned."
+  ],
+  "limits": [
+    "Four broad categories still remain.",
+    "Legacy OFDs and absent original control providers still have before-effects fallback.",
+    "No controlled throughput improvement, additional driver functionality or complete coordinator removal is claimed."
+  ]
+}
