@@ -2,16 +2,16 @@
 
 ## Current status — 2026-11-10
 
-Through stage 99 the broad remaining count is **four**. The latest batch closes
-the connected io_uring maintenance resource graph: original context, event
-subscriptions, native source selection, cancellation and retirement. The umbrella count is not a syscall count or a
+Through stage 100 the broad remaining count is **four**. The latest batch closes
+the original per-task memory-observation resource family and its metadata,
+byte/vector, io_uring, lifetime and host-accounting dependencies. The umbrella count is not a syscall count or a
 measurement of production fallback frequency; the generic catch-all is still an
 audit target.
 
 | Remaining class | Current boundary | Recent concrete progress |
 | --- | --- | --- |
 | Host control and final teardown | Actual cancellation/deadline/shutdown, native-event failure and final CPU/session drain | Ordinary supervision, guest exit and controls are source-owned |
-| Missing capabilities and excluded resources | Genuinely absent original providers/bodies; two submitter-scoped io_uring maintenance setters remain | Compatibility io_uring capture retains original execution resources; a missing HostEvents hub uses original read/write interests. Actual absent typed providers remain |
+| Missing capabilities and excluded resources | Genuinely absent original providers/bodies; two submitter-scoped io_uring maintenance setters remain | Task RSS/layout observations no longer depend on optional host-global statistics; io_uring retains its real sources. Actual absent global/typed providers remain |
 | Final execution dispatch | SVC or cold native-resource operation not completed, parked or accepted by a source scope | Stage 98 closes canonical FD/error admission, the complete original epoll/poll/select graph, current-offset vector transports and residual setup/validation entries; the catch-all is not proven unreachable |
 | Initial/legacy orchestration | Initial admission and standalone/capability-less scheduling | Typed cold waits and compatibility io_uring retain original sources; genuinely missing providers retain their actual deadlines |
 
@@ -27,6 +27,7 @@ separate workloads, not cumulative or comparable throughput scores.
 | Mapped-memory msync/writeback (96) | 10 / 16 msync and one munmap | 1 / none |
 | File-cache advice and descriptor metadata (97) | 32 / 8 readahead, 32 fadvise64, 3 mmap and 3 munmap | 1 / none |
 | Original descriptor/event graph and vector transports (98) | 27 / 24 epoll_ctl, 4 pselect, 8 ppoll, 4 preadv2, 4 pwritev2 | 1 / none |
+| Original task-memory observations and global accounting (100) | 11 / 12 openat, 12 read, 2 clone; 25 host samples | 1 / none; one startup host sample |
 
 Actual mapping/backing mutation still synchronizes its affected original readers.
 The stage 98 native fixture retains two such scopes at four CPUs and ten at twelve;
@@ -43,27 +44,27 @@ post-write sync use their original resources. Stable socket data/backpressure
 retries emit no structural wake. No coordinator, resource-service thread or
 polling message bus is introduced. Full details are in [section 98](#98-original-descriptor-admission-and-the-complete-event-subsystem--2026-11-10).
 
-Stage 99 connects background maintenance, GETEVENTS, CQ poll/epoll, original
-execution context and source lifetime. Nested graph and dynamic socket changes
-refresh original subscriptions before deciding to park again. Generic native
-identities cannot alias replaced branches; observer leases permit actual close.
-Available original bodies no longer lack context merely because a compatibility
-builder omits paths/factory. Production worker capture reuses its existing bindings.
-Final idle scopes release subscriptions and deadlines immediately.
+Stage 100 separates task/mm RSS/layout resources from global host/quota
+accounting. Status/stat/statm and existing maps observations can use their actual
+original task resources even when a legacy adapter provides only synchronous host
+statistics. Metadata, byte/vector and io_uring paths share that admission. Supplied
+adapters also avoid host-global queries for per-task reads; host-managed meminfo
+uses its original host provider without scanning unused task/mm resources.
 
-The two actual missing-provider/body setters and four broad categories remain;
-this batch does not assert universal provider coverage or remove final-dispatch
-catch-alls. The [shared inventory](https://github.com/kb5000/trames-runtime/blob/main/docs/architecture/coordination-boundaries.md#current-remaining-categories)
-and [stage 99 validation](../validation/uring-maintenance-20261110.json) carry exact
-bounds and final source-bound checks. Mac Dev alone is the deployment target;
-stable 1.5.4, business environments and physical iPad versions are unchanged.
-Both local runtime workflows pass seven steps. Mac and ARM64 Linux each pass
-453 process regressions (two intentionally ignored) and ten FFI cases; both iPad
-SDK targets compile. All 74 signed native cases and Mac development gates 1–8
-pass. The new native event-graph fixture completes one cohort at four/twelve CPUs
-with no returned syscall/service, retaining two/ten actual mapping-reader scopes
-from clone_vm setup. Installed Dev initialization, host lifecycle and tracing
-checks pass; stable's runner hash remains unchanged. The overall goal stays active.
+Original FD/PID identity, live residency and final retirement remain intact.
+Genuine missing global memory providers keep their explicit boundary; the two
+actual io_uring guards and four broad categories are not declared removed. The
+[shared inventory](https://github.com/kb5000/trames-runtime/blob/main/docs/architecture/coordination-boundaries.md#current-remaining-categories)
+and [stage 100 validation](../validation/task-proc-resources-20261110.json) carry
+source-bound checks and native before/after evidence. Mac Dev alone is updated;
+stable 1.5.4, business environments and physical iPad installs retain their versions.
+Both runtime workflows pass seven local steps. Mac and ARM64 Linux each pass
+456 process regressions (two intentionally ignored) and ten FFI cases; both iPad
+SDK targets compile. All 75 signed native cases and Mac development gates 1–8
+pass. Native four/twelve-CPU task observations finish one cohort with no returned
+syscall/service and one startup host sample, retaining two/ten actual mapping
+scopes. Installed Dev init, host lifecycle, tracing and real meminfo/cpuinfo/status
+checks pass. Stable's runner hash is unchanged. The overall goal stays active.
 
 ### Stage 81 read-only memory observations (historical)
 
@@ -6122,3 +6123,36 @@ original bodies. Binding-less worker embeddings retain before-effect admission;
 live PID/mm data is not fabricated from global publication. The broad count remains
 four and the overall objective stays active. No throughput or production fallback
 frequency improvement is claimed from these finite fixtures.
+
+
+## 100. Original per-task memory observations and global accounting — 2026-11-10
+
+This batch closes the resource dependency for task status/stat/statm, existing
+mapping views, their metadata, scalar/vector read and io_uring bodies, original
+FD/PID lifetime, and global host/quota accounting. Residency previously required
+a host-global callback even when an original task's MemoryReport supplied all
+needed bytes/metadata. A typed HostMemory qualifier now belongs only to global
+meminfo/full accounting; lookup and merged aliases preserve actual dependencies.
+
+Per-task reads do not sample host-global memory. Host-managed meminfo reads its
+original provider directly without task enumeration, native per-mm RSS sampling
+or unused CPU/load/process projections. Quota-backed global memory still counts
+unique original mm charges. Sysinfo retains the resources it actually consumes.
+No copied global provider, new service/coordinator thread, polling bus, memory
+quota, byte-access layer or ordinary memory fence is introduced.
+
+The common four/twelve-CPU and single-slot fixture exercises open/stat/statx,
+read/pread/seek/readv, close and io_uring through self/thread-self aliases. Accepted
+status/statm reads track new residency after FD close/reuse, preserve the dead
+original PID through reuse and release task/Files lifetimes. Unimplemented smaps
+paths retain existing ENOENT/EBADF/CQ errors; no unsupported file is fabricated.
+Existing live image, namespace, unrelated-mm and original page-read tests remain
+in the connected regression closure.
+
+The common baseline stops at its first openat. Native baseline guest results are
+correct but require eleven cohorts, twelve returned openat/twelve read/two clone
+calls and 25 host-memory samples at four CPUs. Final measurements and exact
+cross-platform verification are in the [validation record](../validation/task-proc-resources-20261110.json).
+Actual mapping-reader synchronization, genuine absent global providers and both
+io_uring maintenance guards remain. Four broad categories and the overall goal
+stay open; these fixtures are not a throughput/fallback-frequency claim.

@@ -1,0 +1,343 @@
+{
+  "date": "2026-11-10",
+  "stage": 100,
+  "subsystem": "Original task/mm memory observation resources, metadata, scalar/vector and io_uring bodies, lifetime and global host/quota accounting",
+  "status": "Validated and installed to Mac Dev only; overall coordinator-removal goal remains active",
+  "baseline_runtime": "796981af99a03add75eb70abd332767dd1ee9122",
+  "runtime_revision": "789f4de84e83b3dcd83a3b18b1ebac9606406b8f",
+  "workflows": {
+    "runtime_macos": {
+      "passed": 7,
+      "total": 7,
+      "sha256": "35fb93d47013546076d53739cd499ee9eeb10c47961adff42a18dd6501f24a6b"
+    },
+    "runtime_linux": {
+      "passed": 7,
+      "total": 7,
+      "sha256": "c82f6d57e9b30b1f7c26492970ca6d81fea47c72623b70909bbd575aa7d03537"
+    },
+    "mac_product": {
+      "passed": 8,
+      "total": 12,
+      "sha256": "2d676ac9149caa11343f5be8fe0ed51e6a8713f964e7517e761072eea19d2fa1"
+    }
+  },
+  "process": {
+    "macos": {
+      "passed": 456,
+      "ignored": 2,
+      "sha256": "fb1fa400a1f9b4fb0cd9fd7ed85f352756a032476fb3937a66c7ccc4207d13f8"
+    },
+    "linux": {
+      "passed": 456,
+      "ignored": 2,
+      "sha256": "0d5befa148fa80cf6aa89e8b98251377a5eaf4219c10070d044aec1fbff15135"
+    }
+  },
+  "ffi": {
+    "macos": {
+      "passed": 10,
+      "ignored": 0,
+      "sha256": "e65e336468428152ea56c55747ba379d1fb7747ee41b120c156c1c521f93f1df"
+    },
+    "linux": {
+      "passed": 10,
+      "ignored": 0,
+      "sha256": "dcbd0613bf84205fb10786b768084c79a444fbb676610f4dc859cdfabf995521"
+    }
+  },
+  "apple_sdk_checks": [
+    {
+      "name": "aarch64-apple-ios",
+      "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+      "code": 0
+    },
+    {
+      "name": "aarch64-apple-ios-sim",
+      "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk",
+      "code": 0
+    }
+  ],
+  "native_hardware": {
+    "passed": true,
+    "runtime_revision": "789f4de84e83b3dcd83a3b18b1ebac9606406b8f",
+    "rows": [
+      {
+        "target": "trames-mac-run",
+        "executable_sha256": "2d0bab8e76b1fd481976cee6025e9abb257c46b021e3cb7a15dd041994328ba8",
+        "exit": 0,
+        "passed_tests": 23
+      },
+      {
+        "target": "trames_hvf",
+        "executable_sha256": "cf1cdc9103113bf0f84adf3108ced6e6f80a353ef53fa04fc8469ac6de7f6a46",
+        "exit": 0,
+        "passed_tests": 52
+      }
+    ]
+  },
+  "original_scope_counts": {
+    "4": 2,
+    "12": 10
+  },
+  "source_sha256": {
+    "runtime/crates/trames-session/src/proc_views.rs": "09b6656e19f2771fccd0dabaea0938ba19773cd8b8121da9fc4bca2add9cbbca",
+    "runtime/crates/trames-session/src/process.rs": "6c92610059af10cfdf6756065933294f000e518afe0dee267a79b85711650a4e",
+    "runtime/crates/trames-session/src/process_proc.rs": "ebc67f748347867e2a257f1ff04e8724908cb32a21b9c264189f33013446e02e",
+    "runtime/crates/trames-session/src/process_proc_resources_tests.rs": "be2e75ae45052e7e09102b2464e17ae2c57f0e858fb02b10e7cdc5288c79c7c8",
+    "runtime/crates/trames-session/src/process_statistics_tests.rs": "a664a7ded956cb7ea49f302be4e5ede27a782db81b8447e23e8e062d3e67fb05",
+    "runtime/crates/trames-vfs/src/lib.rs": "90e38fd5fb8000d004e8e8b0e1af0d9262f19e4433ce60c9256badb23f3e2f4a",
+    "runtime/crates/trames-vfs/src/pseudo.rs": "3d775215b8eed1de2075a22b2b90611d5e4acb5c357eeef4164676672cd641db"
+  },
+  "mac_fixture_sha256": "caf46e669b19810fed564928819757423f718e6fbb5532eacb8134c6ae5db5b4",
+  "installed": {
+    "version": "Trames Dev 1.5.4 (dev) runtime 789f4de84e83b3dcd83a3b18b1ebac9606406b8f",
+    "runner_sha256": "fb07ae0873bf784b8284d2b2e8d8a917dc073bd5169ee19a551e6032b1c3beae",
+    "stable_sha256": "8fc21435034e8c041632e2e50419da9d2123bf790aedb0a1499286fc8367e614",
+    "stable_unchanged": true,
+    "checks": [
+      {
+        "name": "init",
+        "code": 0,
+        "seconds": 3.316531667
+      },
+      {
+        "name": "host",
+        "code": 0,
+        "seconds": 0.9214197919999996
+      },
+      {
+        "name": "tracing",
+        "code": 0,
+        "seconds": 0.31069937500000044
+      }
+    ]
+  },
+  "installed_proc": {
+    "passed": true,
+    "runner_sha256": "fb07ae0873bf784b8284d2b2e8d8a917dc073bd5169ee19a551e6032b1c3beae",
+    "cpus": 4,
+    "guest_total_equals_host": true,
+    "output_sha256": "6cc889c66dc2d45f4a89d9c2050fdb67adf8c75ef59610e9d2641a04085d643f",
+    "stderr_sha256": "56aae50d380fa3caabfdf6fbcaf9004b8bc72a73aada8bf6f9f880fba648bf41",
+    "checks": [
+      "Host-managed meminfo total equals the live Mac physical size",
+      "Free and available are bounded by total",
+      "Following cpuinfo still reports all four guest CPUs",
+      "Following self/status renders actual task RSS"
+    ]
+  },
+  "local_checks": [
+    {
+      "name": "process-all",
+      "code": 0,
+      "seconds": 21.516639833
+    },
+    {
+      "name": "ffi",
+      "code": 0,
+      "seconds": 4.101225666000001
+    },
+    {
+      "name": "core-clippy",
+      "code": 0,
+      "seconds": 5.347270083999998
+    },
+    {
+      "name": "ffi-clippy",
+      "code": 0,
+      "seconds": 0.3788368749999975
+    },
+    {
+      "name": "aarch64-apple-ios",
+      "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+      "code": 0
+    },
+    {
+      "name": "aarch64-apple-ios-sim",
+      "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk",
+      "code": 0
+    }
+  ],
+  "linux_checks": [
+    {
+      "name": "process-all",
+      "code": 0,
+      "seconds": 58.14902770500001
+    },
+    {
+      "name": "ffi-all",
+      "code": 0,
+      "seconds": 6.7109156699999915
+    },
+    {
+      "name": "core-clippy",
+      "code": 0,
+      "seconds": 4.825707773999994
+    },
+    {
+      "name": "runtime-ci",
+      "code": 0,
+      "seconds": 57.89022555400001
+    }
+  ],
+  "mac_checks": [
+    {
+      "name": "runtime-fetch",
+      "code": 0,
+      "seconds": 0.25999937500000003
+    },
+    {
+      "name": "runtime-checkout",
+      "code": 0,
+      "seconds": 0.022483582999999974
+    },
+    {
+      "name": "mac-product-ci",
+      "code": 0,
+      "seconds": 20.783177332999998
+    },
+    {
+      "name": "hardware",
+      "code": 0,
+      "seconds": 7.100169749999999
+    },
+    {
+      "name": "dev-build",
+      "code": 0,
+      "seconds": 20.777584667
+    },
+    {
+      "name": "dev-install",
+      "code": 0,
+      "seconds": 0.08179249999999882
+    },
+    {
+      "name": "dev-signature",
+      "code": 0,
+      "seconds": 0.04267354199999929
+    },
+    {
+      "name": "installed",
+      "code": 0,
+      "seconds": 5.152832874999998
+    }
+  ],
+  "concentrated_checks": {
+    "proc_runtime": {
+      "passed": 26,
+      "ignored": 0,
+      "sha256": "f9ee561240f80c53aedf5b49bf404de443c743f799a69f87ddc6ce3abfb477cf"
+    },
+    "vfs_proc": {
+      "passed": 62,
+      "ignored": 0,
+      "sha256": "bdc6e7aaed61cf3ae0590869862acac4481a60eef73bda1f9951df84ba6161c5"
+    }
+  },
+  "common_fixture": {
+    "cpus": [
+      4,
+      12
+    ],
+    "slots": [
+      1,
+      4,
+      12
+    ],
+    "cohorts": 1,
+    "returned_calls": {},
+    "service_requests": 0,
+    "mapping_scopes": 0,
+    "operations": [
+      "open",
+      "stat",
+      "statx",
+      "read",
+      "pread",
+      "seek",
+      "readv",
+      "close",
+      "io_uring READ"
+    ],
+    "paths": [
+      "self/status",
+      "1/stat",
+      "1/statm",
+      "thread-self/maps"
+    ],
+    "canonical_unsupported_paths": [
+      "1/smaps",
+      "1/smaps_rollup"
+    ]
+  },
+  "common_baseline": {
+    "first_returned_syscall": 56,
+    "completion_marker": false,
+    "log_sha256": "178be7886a9c247638fc4e2de695051e3d8e7839775d907f338fab725e36eb49"
+  },
+  "native_baseline": {
+    "runtime_revision": "796981af99a03add75eb70abd332767dd1ee9122",
+    "cpus": 4,
+    "cohorts": 11,
+    "returned_syscalls": {
+      "openat": 12,
+      "read": 12,
+      "clone": 2
+    },
+    "host_samples": 25,
+    "mapping_scopes": 0,
+    "all_guest_results_verified_before_cohort_assertion": true,
+    "binary_sha256": "bcc5fde4600f13abe0e05295e999f1418e9aaee19fdb92fb9a3f9f6af1d64ffc",
+    "fixture_sha256": "caf46e669b19810fed564928819757423f718e6fbb5532eacb8134c6ae5db5b4",
+    "log_sha256": "d9d08df63d8e4bb5a1a9fc33937981c14200f9a29005a727b55e49e94a78eac6"
+  },
+  "native_final": {
+    "cpus": [
+      4,
+      12
+    ],
+    "cohorts": 1,
+    "returned_calls": {},
+    "service_requests": 0,
+    "host_samples": 1,
+    "host_sample_purpose": "Runtime startup validates the real synchronous host memory adapter",
+    "actual_mapping_scopes_retained": true
+  },
+  "observation_scope": {
+    "per_task_host_global_samples": 0,
+    "host_managed_global_text": "One original host report; no task enumeration, per-mm pager or unused CPU/load/process projection",
+    "bounded_global_memory": "Unique original mm residency; no host sample",
+    "absent_host_global_source": "Actual meminfo/sysinfo boundary retained"
+  },
+  "validation_provenance": [
+    "Final changed Rust fingerprints match both runtime workflows, Linux copy and Mac product gates",
+    "Common baseline ends its first task status openat before the marker; final runs complete the entire connected syscall family",
+    "Native baseline and final use identical guest/test source; correct guest results precede the baseline one-cohort assertion failure",
+    "The native fixture uses the real synchronous Mac memory adapter without a worker callback; Runtime startup adapter validation is unchanged",
+    "Per-task source callback counters remain zero with a supplied callback; host-managed meminfo samples only the real global provider",
+    "Status/statm accepted FileWork follows live RSS after numeric FD reuse, then reports the dead original PID rather than a replacement and releases task/Files lifetime",
+    "Existing unimplemented smaps paths retain canonical ENOENT/EBADF/CQ results; no file or live PID/mm authority is synthesized",
+    "Native source clone retains actual mapping-reader scopes at four/twelve CPUs; these are not returned coordinator calls",
+    "Installed isolated Alpine checks verify real host MemTotal, bounded free/available and subsequent independent cpuinfo and self/status rendering",
+    "Successful unchanged full suites were reused for documentation/evidence updates"
+  ],
+  "remaining": {
+    "broad_categories": 4,
+    "uring_maintenance_escalation_sites": 2,
+    "genuine_host_global_or_typed_missing_provider_boundary_retained": true,
+    "generic_dispatch_catch_all_not_proven_unreachable": true,
+    "overall_goal_complete": false
+  },
+  "unchanged": [
+    "Stable 1.5.4 installed runner",
+    "Business environments",
+    "Physical iPad installations"
+  ],
+  "limitations": [
+    "No controlled wall-clock throughput or Firefox benchmark",
+    "No twelve-CPU old native baseline",
+    "No new smaps or smaps_rollup implementation",
+    "No claim of universal custom provider coverage or overall objective completion"
+  ]
+}
