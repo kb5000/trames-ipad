@@ -1,0 +1,292 @@
+{
+  "stage": 88,
+  "date": "2026-11-09",
+  "overall_goal": "active",
+  "runtime_revision": "3d91b02ae28766f4307c0a4691bab8162b412896",
+  "prior_runtime": "a77aaf162a5c0575e5b1f1ef259282f9713646d7",
+  "scope": "Connected residual prctl subsystem: original per-thread comm, parent-death/subreaper controls, SME configuration, original unsupported-command errors, guest copyout/import, proc/diagnostics observations, fork/exec and namespace lifetime.",
+  "architecture": {
+    "dispatch": "One residual source/solo ABI. Already migrated credential and seccomp controls retain their original routes. Genuine missing parent/family capabilities defer before effects; missing backend SME support preserves EINVAL.",
+    "name": "One original sixteen-byte TaskName, retained by source execution, proc and diagnostics. Only actual name updates/observations take its short object-local mutex, outside guest memory access.",
+    "memory": "SET_NAME imports at most fifteen bytes using the original NUL/fault order before committing; GET_NAME validates its full sixteen-byte output. No new guest permission policy, ordinary-memory check/fence, per-instruction hook or global algorithm lock.",
+    "lifetime": "Every task clone/fork copies the original comm value, including shared-mm threads. Initial load/exec seed the actual image name and structural publication binds it. Namespace/Files resource replacement preserves the original name identity.",
+    "observations": "Proc reads the live original name before cohort drain. Production images no longer store a duplicate command vector; capability-less legacy views retain their old payload. Retained diagnostics read a stack copy of the current original name only when emitting.",
+    "no_new": [
+      "coordinator/resource/service thread",
+      "polling bus",
+      "production unsafe block",
+      "per-byte/per-instruction check",
+      "normal CPU/native-call name lookup"
+    ]
+  },
+  "baselines": {
+    "shared": {
+      "runtime_revision": "a77aaf162a5c0575e5b1f1ef259282f9713646d7",
+      "checks": [
+        {
+          "name": "process",
+          "code": 101,
+          "seconds": 16.928070708,
+          "output": "warning: unused workspace dependency `trames-native`\n  --> Cargo.toml:17:1\n   |\n17 | trames-native = { path = \"runtime/crates/trames-native\" }\n   | ^^^^^^^^^^^^^\n   |\n   = note: `cargo::unused_workspace_dependencies` is set to `warn` by default\nhelp: consider removing the workspace dependency `trames-native`\nwarning: workspace (manifest) generated 1 warning\n   Compiling trames-session v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-session)\n   Compiling trames-vfs v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-vfs)\n   Compiling trames-kernel v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-kernel)\n   Compiling trames-linux v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-linux)\n   Compiling trames-core v1.5.4 (/Users/main/dev/trames/crates/trames-core)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 16.15s\n     Running ../../runtime/crates/trames-session/src/lib.rs (target/debug/build/trames-core/73ea467a4920ade2/out/kernel_conformance-73ea467a4920ade2)\n\nrunning 3 tests\ntest process::prctl_tests::faulting_source_setname_keeps_the_original_comm_and_completes_once ... \nthread 'process::prctl_tests::faulting_source_setname_keeps_the_original_comm_and_completes_once' (27630234) panicked at crates/trames-core/../../runtime/crates/trames-session/src/process_prctl_tests.rs:206:5:\nassertion `left == right` failed\n  left: 0\n right: 18446744073709551602\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\nFAILED\ntest process::prctl_tests::residual_prctl_family_runs_without_join_and_proc_observes_name_before_drain ... prctl CPUs=4 slots=4 filtered=false marker=[0, 0, 0, 0] cohorts=1 returned={167: 1} live_name=false\n\nthread 'process::prctl_tests::residual_prctl_family_runs_without_join_and_proc_observes_name_before_drain' (27630236) panicked at crates/trames-core/../../runtime/crates/trames-session/src/process_prctl_tests.rs:138:9:\nassertion `left == right` failed\n  left: [0, 0, 0, 0]\n right: [1, 0, 0, 0]\nFAILED\ntest process::prctl_tests::task_comm_forks_by_value_and_proc_namespace_rebinding_preserves_live_name ... \nthread 'process::prctl_tests::task_comm_forks_by_value_and_proc_namespace_rebinding_preserves_live_name' (27630239) panicked at crates/trames-core/../../runtime/crates/trames-session/src/process_prctl_tests.rs:253:5:\nassertion `left == right` failed\n  left: [112, 97, 114, 101, 110, 116]\n right: [114, 101, 110, 97, 109, 101, 100, 45, 112, 97, 114, 101, 110, 116]\nFAILED\n\nfailures:\n\nfailures:\n    process::prctl_tests::faulting_source_setname_keeps_the_original_comm_and_completes_once\n    process::prctl_tests::residual_prctl_family_runs_without_join_and_proc_observes_name_before_drain\n    process::prctl_tests::task_comm_forks_by_value_and_proc_namespace_rebinding_preserves_live_name\n\ntest result: FAILED. 0 passed; 3 failed; 0 ignored; 0 measured; 438 filtered out; finished in 0.02s\n\nerror: test failed, to rerun pass `-p trames-core --test kernel-conformance`\n"
+        }
+      ]
+    },
+    "signed_native": {
+      "runtime_revision": "a77aaf162a5c0575e5b1f1ef259282f9713646d7",
+      "code": 101,
+      "seconds": 0.7619139590000001,
+      "executable_sha256": "9f5f2b381a423e593f3568a4bc7a4e3cbd40d852f8a61c62fb6b8e85af575ae2",
+      "output": "\nrunning 1 test\nhardware prctl CPUs=4 SME=true exit=0 cohorts=16 returned={167: 24, 220: 2}\n\nthread 'session::tests::prctl_names_and_sme_configuration_complete_on_original_native_workers' (27634552) panicked at crates/trames-mac/src/session.rs:1160:13:\nassertion `left == right` failed\n  left: Some(24)\n right: None\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\ntest session::tests::prctl_names_and_sme_configuration_complete_on_original_native_workers ... FAILED\n\nfailures:\n\nfailures:\n    session::tests::prctl_names_and_sme_configuration_complete_on_original_native_workers\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 31 filtered out; finished in 0.02s\n\n"
+    },
+    "dormant_legacy_provider": {
+      "runtime_revision": "a77aaf162a5c0575e5b1f1ef259282f9713646d7",
+      "code": 0,
+      "seconds": 0.7501944999999997,
+      "executable_sha256": "78de5533adcc98f895662cc1f84d5f4172a816ffdbd9904af8ec17caa41fb31d",
+      "output": "\nrunning 1 test\nhardware dormant CPUs=4 exit=0 marker=[1, 0, 0, 0] cohorts=2 scopes=1 returned={63: 1}\nhardware dormant CPUs=12 exit=0 marker=[1, 0, 0, 0] cohorts=2 scopes=1 returned={63: 1}\ntest session::tests::dormant_shared_futex_child_resumes_without_another_joined_native_cohort ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 30 filtered out; finished in 0.02s\n\n"
+    }
+  },
+  "checks": {
+    "workflows": {
+      "runtime_macos": {
+        "passed_steps": 7,
+        "total_steps": 7,
+        "summary": "target/prctl-subsystem/runtime-mac/summary.json",
+        "sha256": "4d28cde1c1fe28bb2e64732b9f0a0d6e7f7ba9acbe9382d697849d76dfefed89"
+      },
+      "runtime_linux": {
+        "passed_steps": 7,
+        "total_steps": 7,
+        "summary": "target/local-ci/io/prctl-subsystem/runtime-linux-ci/summary.json",
+        "sha256": "52506283570978c9c8a83f28e8452c7924ce86eb0a9ffd6d730c75fdb860d687"
+      },
+      "mac_product": {
+        "passed_steps": 8,
+        "total_steps": 12,
+        "summary": "target/prctl-subsystem/mac-product-ci/summary.json",
+        "sha256": "d7d1faca7fcea751cfab73141a041c482804f00cd42ec99b4a0316ec9e7710b7"
+      }
+    },
+    "macos": [
+      {
+        "name": "runtime-mac",
+        "code": 0,
+        "seconds": 36.987290958
+      },
+      {
+        "name": "kernel-conformance",
+        "code": 0,
+        "seconds": 27.008644333000007
+      },
+      {
+        "name": "ffi",
+        "code": 0,
+        "seconds": 9.616030625000008
+      },
+      {
+        "name": "core-clippy",
+        "code": 0,
+        "seconds": 4.991380708000008
+      },
+      {
+        "name": "ffi-clippy",
+        "code": 0,
+        "seconds": 0.38538900000000353
+      },
+      {
+        "name": "ipad-compile",
+        "code": 0,
+        "seconds": 6.383266833999997
+      }
+    ],
+    "linux": [
+      {
+        "name": "process-all",
+        "code": 0,
+        "seconds": 75.26369078200003
+      },
+      {
+        "name": "ffi-all",
+        "code": 0,
+        "seconds": 14.352086964000023
+      },
+      {
+        "name": "core-clippy",
+        "code": 0,
+        "seconds": 4.52515383399998
+      },
+      {
+        "name": "runtime-ci",
+        "code": 0,
+        "seconds": 54.62689792100002
+      }
+    ],
+    "process": {
+      "macos": {
+        "passed": 439,
+        "ignored": 2,
+        "log": "target/prctl-subsystem/kernel-conformance.log",
+        "sha256": "26d4d010b09b7a8f0d4628041d53cedcba78f219683c3b0cfd1c7587e6152875"
+      },
+      "linux": {
+        "passed": 439,
+        "ignored": 2,
+        "log": "target/local-ci/io/prctl-subsystem/process-all.log",
+        "sha256": "08c8bcad9b9f0818e101f425433d56c073d87d4109c5861f4e66259e830333e7"
+      }
+    },
+    "ffi": {
+      "macos": {
+        "passed": 10,
+        "ignored": 0,
+        "log": "target/prctl-subsystem/ffi.log",
+        "sha256": "ad880a4d09aebacd0d2ef35353b0bcb9298a56807aec6889e16430c02f1fef19"
+      },
+      "linux": {
+        "passed": 10,
+        "ignored": 0,
+        "log": "target/local-ci/io/prctl-subsystem/ffi-all.log",
+        "sha256": "e806679ed5f96131c55dbbcec90aa8e53f92226c6ea10820534c18a4bcc6bdbd"
+      }
+    },
+    "ipad": [
+      {
+        "target": "aarch64-apple-ios",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+        "code": 0
+      },
+      {
+        "target": "aarch64-apple-ios-sim",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk",
+        "code": 0
+      }
+    ],
+    "hardware": {
+      "passed": true,
+      "runtime_revision": "3d91b02ae28766f4307c0a4691bab8162b412896",
+      "rows": [
+        {
+          "target": "trames-mac-run",
+          "executable_sha256": "a6ad639caedc24026713e6b96937bff96adcfb7edb82a6bbae547c1dac765627",
+          "exit": 0,
+          "passed_tests": 11
+        },
+        {
+          "target": "trames_hvf",
+          "executable_sha256": "434e61a7fb77d6ce7b157151a0061b448b02bb3bde8c9d10ad9231dc2b06aa52",
+          "exit": 0,
+          "passed_tests": 52
+        }
+      ]
+    },
+    "native_prctl": [
+      {
+        "cpus": 4,
+        "sme": true,
+        "exit": 0,
+        "cohorts": 1,
+        "returned_syscalls": {}
+      },
+      {
+        "cpus": 12,
+        "sme": true,
+        "exit": 0,
+        "cohorts": 1,
+        "returned_syscalls": {}
+      }
+    ],
+    "native_dormant_setup": {
+      "cpus": [
+        4,
+        12
+      ],
+      "cohorts": 2,
+      "scoped_mms": 1,
+      "returned_read": 1,
+      "read_result": 8
+    },
+    "native_log_sha256": "7ac8ad4d74fcf6c763a87339fe1da05bb2bbbb5d764a4aaf64a91ff3ec1d0d2d",
+    "installed": {
+      "version": "Trames Dev 1.5.4 (dev) runtime 3d91b02ae28766f4307c0a4691bab8162b412896",
+      "runner_sha256": "6d2b5ca8ca15271674dc3325023c7dab42665ac5196ad2f8830a3e7cdc2d28b0",
+      "stable_sha256": "8fc21435034e8c041632e2e50419da9d2123bf790aedb0a1499286fc8367e614",
+      "stable_unchanged": true,
+      "checks": [
+        {
+          "name": "init",
+          "code": 0,
+          "seconds": 3.30082475
+        },
+        {
+          "name": "host",
+          "code": 0,
+          "seconds": 0.8985091670000003
+        },
+        {
+          "name": "tracing",
+          "code": 0,
+          "seconds": 0.2570083329999999
+        }
+      ]
+    },
+    "new_process_regressions": [
+      "residual_prctl_family_runs_without_join_and_proc_observes_name_before_drain",
+      "faulting_source_setname_keeps_the_original_comm_and_completes_once",
+      "task_comm_forks_by_value_and_proc_namespace_rebinding_preserves_live_name"
+    ],
+    "new_shared_regressions": [
+      "comm_abi_stops_at_nul_or_fifteen_bytes_and_faults_before_publication",
+      "accepted_diagnostics_observe_the_original_name_after_a_later_rename"
+    ]
+  },
+  "source_sha256": {
+    "runtime/crates/trames-linux/src/lib.rs": "b0db59abd01aada54130dde382a41083a4225e1d6fa6a1506ead8902761491d1",
+    "runtime/crates/trames-linux/src/state.rs": "17c7f2660b19c22ebaae7f54568c88e6cf829740f37da02ef0b67f8cce0070b2",
+    "runtime/crates/trames-linux/src/syscall_diagnostics.rs": "45aaae42738da49835858652abde045cb3aad564ee88dca7cc8b9d6fa5749eaf",
+    "runtime/crates/trames-linux/src/task_name.rs": "e27915f93749b0b3e1d9ba183af65d12cf55bec1d6033c9eca6a3aac40928b42",
+    "runtime/crates/trames-session/src/lib.rs": "0aaf0a739e5c3f5a5279808134a5010f13497c3b4b779f54da0c8e82db9b41c1",
+    "runtime/crates/trames-session/src/process.rs": "e774a56c4b0b969a94d0c74804b66003aa2936ec6ffea53ecc429dba5c81c6e3",
+    "runtime/crates/trames-session/src/process_birth.rs": "89e88f8097f9f171d6238adc8e5acce2005c44c31267c25671bdb0f998a3762b",
+    "runtime/crates/trames-session/src/process_dispatch.rs": "ebb03982ea400a098ed65883ef6a7a7e7430347a18ff8edf5512472aab4e93ab",
+    "runtime/crates/trames-session/src/process_exec.rs": "69fc6d83342a1dea6a846b9a1e80cfc625bd9a16962ed325bd0bd413bcc4d1d4",
+    "runtime/crates/trames-session/src/process_prctl.rs": "9a5846c99869eb5fbbcef4108f74967a2b065a6bbd82539f0d859af12cb5ac4f",
+    "runtime/crates/trames-session/src/process_prctl_tests.rs": "b468d77862b9db579e5e070f900394a9b85f64fb6f36b8957924eb4b66259013",
+    "runtime/crates/trames-session/src/process_proc.rs": "63d7a2d3e5b565bfb7eb9bce0827d17adc77b2e50e324f44ce3680cbbee7420e",
+    "runtime/crates/trames-session/src/process_seccomp.rs": "bedf963cb576cebc146bbb9b8a167af83544787a2dd32124beea18e34cd79ac0",
+    "runtime/crates/trames-session/src/worker_syscalls.rs": "bd0f9cab3214180eb65f742e91009af7263e5c5f9504f59ef2895b06b1617907",
+    "runtime/crates/trames-session/src/workers.rs": "10a697f78484402e5cda691929e3c9982b5c5ffa206e0a0cc6c64a25cd8531fa",
+    "runtime/crates/trames-session/src/workers_uring_tests.rs": "315def8fd7eb799e945708f57930fa22af16f3b6621b6fdea951b3c26ba93356",
+    "runtime/crates/trames-vfs/src/lib.rs": "6750de553713a56af91a17248e4fa4a3a8e36dd0e27038f8fe534cd0b4d69165",
+    "runtime/crates/trames-vfs/src/proc_source.rs": "63751ee09f70da1a350e51764d90c5328ccc9ecbd4025dccae55f08c5ec8d488",
+    "runtime/crates/trames-vfs/src/task_name.rs": "c38c020fa211875567c4c0cf6902b0449465be11cb70978eb7ffe8efe2938e7e"
+  },
+  "mac_native_fixture_sha256": "8a2da9476c457d43b5307e7dafef9dda460c435abd3925c73047c1ac1bdf2523",
+  "deployment": {
+    "channel": "Mac Dev only",
+    "runner": "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+    "signature_verified": true,
+    "stable_unchanged": true,
+    "physical_ipad_unchanged": true,
+    "business_environments_unchanged": true
+  },
+  "validation_notes": [
+    "All three new process regressions fail against prior production code with only their test-module hook added. Final four/twelve-CPU and one-slot runs retain one cohort and a live proc observation before CPU drain.",
+    "The signed four-CPU baseline completes correctly but takes sixteen cohorts, returns prctl twenty-four times and clone twice. Final four/twelve-CPU runs use one cohort with no returned syscall or service. No twelve-CPU before measurement is claimed.",
+    "The native fixture uses distinct per-thread input/output and a guest atomic naming barrier: every thread renames before any thread reads its comm. Actual backend SME get/set/inheritance flags are checked.",
+    "The dormant fixture setup is a real eight-byte legacy proc read, because its previous unsupported prctl now completes on source. Both prior/final runtimes preserve cold admission coverage and explicitly retain the missing typed payload-provider boundary.",
+    "During test construction, the live proc observer initially used a bounded epoch that could drain before a host-control observation; the fixture now uses the existing persistent epoch. Compile-only fixes covered helper visibility/imports, the GuestOutput write callback and a test-only u32 helper. These are not production failures.",
+    "The duplicate production proc command-vector payload was removed before final source checks. Unchanged earlier checks were not used as proof for that final source hash.",
+    "Final Rust source hashes match Linux CI and the paired Mac checkout. Only documentation/evidence changes follow passing source checks. Mac development gates 1-8 of 12 pass; stable packaging and physical iPad installation are outside this round."
+  ],
+  "remaining": [
+    "Actual host cancellation/deadline/shutdown and final backend/session teardown.",
+    "Genuine missing/excluded providers, including the retained legacy proc payload and two original-submitter io_uring maintenance escalation setters with their actual stop/join boundary.",
+    "Other final SVC/HLT/fault dispatch. Production residual prctl controls and unsupported-command errors no longer need that boundary.",
+    "Actual initial/standalone/capability-less orchestration. Normal dormant Futex/Sleep admission stays source-owned."
+  ],
+  "limits": [
+    "Four broad categories still remain.",
+    "Genuine missing parent/family and legacy providers retain explicit before-effects fallback.",
+    "No additional prctl/SME feature, controlled throughput gain or complete coordinator-removal claim is made."
+  ]
+}

@@ -2,32 +2,33 @@
 
 ## Current status — 2026-11-09
 
-Through stage 87 the broad remaining count is **four**, unchanged from stage 86.
-This counts actual remaining boundary classes, not historical subsystem headings.
+Through stage 88 the broad remaining count is **four**, unchanged from stage 87.
+This counts actual boundary classes, not historical subsystem headings.
 
 | Remaining class | Current boundary | Concrete change this round |
 | --- | --- | --- |
-| Host control and final teardown | Actual cancellation/deadline/shutdown, native-event backend failure and final CPU/session drain | No class removed |
-| Missing capabilities and excluded resources | Original absent providers/excluded request bodies; two submitter-scoped io_uring maintenance escalation setters remain | No setter removed |
-| Final execution dispatch | SVC/HLT/fault not completed, parked or accepted by a source scope | Shared-FD ioctl discovery, implemented interface controls and unsupported-command errors now complete on the caller |
-| Initial/legacy orchestration | Initial admission and standalone/capability-less scheduling | No further class removed; stage 86's normal dormant Futex/Sleep admission remains source-owned |
+| Host control and final teardown | Actual cancellation/deadline/shutdown, native-event failure and final CPU/session drain | No class removed |
+| Missing capabilities and excluded resources | Original absent providers/excluded bodies; two submitter-scoped io_uring maintenance setters remain | The cold-wait native fixture explicitly retains a legacy proc-payload provider boundary |
+| Final execution dispatch | SVC/HLT/fault not completed, parked or accepted by a source scope | Residual prctl name/SME controls and canonical unsupported-command errors now complete on the caller |
+| Initial/legacy orchestration | Initial admission and standalone/capability-less scheduling | Normal dormant Futex/Sleep admission stays source-owned; no additional class removed |
 
-Stage 87 closes residual shared-descriptor ioctl control. Namespace type, virtual
-render discovery, implemented network-interface queries/link changes and ordinary
-unsupported commands use one source/solo ABI over the accepted original OFD.
-Close/reuse cannot redirect it; existing private alias cleanup survives unwind.
-PTY job controls and FIONBIO/FIOASYNC keep their existing source implementations.
-Genuine legacy OFDs and absent providers retain before-effects fallback.
+Stage 88 closes the residual prctl family and its name-observation dependencies.
+Original per-thread comm is shared by calling execution, proc and diagnostics;
+clone/fork copies its value, while namespace rebinding preserves its identity.
+Source and solo share the parent-death/subreaper/name/SME/error ABI. Already
+migrated credential and seccomp controls keep their existing original resources.
+No rename requires a cold owner refresh, and production proc images no longer
+carry a duplicate command vector.
 
-The signed four-CPU baseline completes correctly but uses eight cohorts and
-fourteen returned ioctls. Final four/twelve-CPU runs use one cohort, zero returned
-syscalls and zero services. The dormant fixture retains one explicit unsupported
-prctl setup boundary so it still tests actual cold-wait admission.
+The signed four-CPU baseline uses sixteen cohorts and twenty-four returned prctls.
+Final four/twelve-CPU runs use one cohort, with zero returned syscall or service,
+correct independent thread names and actual SME configuration. The dormant native
+fixture retains one explicit legacy proc read, so it still tests cold admission.
 
 The [shared inventory](../../runtime/docs/architecture/coordination-boundaries.md#current-remaining-categories)
-and [stage 87 record](../validation/descriptor-ioctl-20261109.json) are current.
-Mac and ARM64 Linux each pass 436 process regressions (two intentionally ignored),
-both complete runtime workflows pass, and iPad device/simulator compilation passes.
+and [stage 88 record](../validation/task-prctl-20261109.json) are current. Mac and
+ARM64 Linux each pass 439 process regressions (two intentionally ignored), both
+complete runtime workflows pass, and iPad device/simulator compilation passes.
 Mac Dev alone is updated; stable 1.5.4, business environments and physical iPad
 installations retain their versions. The overall removal goal remains active.
 
@@ -5350,3 +5351,65 @@ escalation setters, genuine missing/excluded providers and legacy OFDs, other
 final execution dispatch, actual initial orchestration and host cancel/final
 teardown remain. Shared-FD ioctl control is a concrete removed trigger within
 the final-dispatch category; the overall coordinator-removal goal is not complete.
+
+
+## 88. Original task prctl controls and live per-thread comm — 2026-11-09
+
+Runtime `3d91b02ae28766f4307c0a4691bab8162b412896` closes the residual prctl
+family: parent-death signal, child-subreaper, per-thread name, existing backend SME
+configuration, and original unsupported-command errors. Source/solo share that
+ABI; duplicate bodies are removed. Credential/dumpable/capability/no-new-privs and
+seccomp operations retain their already migrated source implementations. Missing
+parent/family providers still defer before effects, while absent backend SME
+support preserves its existing EINVAL.
+
+Comm now has one original TaskName object with sixteen bytes. Execution, proc and
+diagnostic capabilities retain that resource. Only name updates/observers use its
+short object-local mutex; guest memory access runs outside it. SET_NAME imports
+at most fifteen bytes with the original NUL/fault order before publication.
+GET_NAME validates the full output. Failed input leaves the old name intact.
+Every clone/fork, including a shared-mm thread, starts with a separate copy of
+the original value. Initial load/exec seed the actual image name; structural proc
+publication binds that resource. Namespace/Files replacement preserves it.
+
+Proc observes live comm before CPU drain, without an owner refresh or duplicate
+production name vector. Legacy embeddings without this capability retain their
+existing snapshot payload. Diagnostics accepted before a rename now observe the
+original task's current name when emitting the actual message, using a stack copy
+without an extra name allocation. Ordinary CPU/native/memory access gains no
+extra check, fence, per-instruction hook, global lock, service or polling thread.
+
+All three new process regressions fail against the prior runtime. Final cases
+cover eleven controls at four/twelve CPUs and one execution slot, with an allowed
+filter; the cohort completes its marker and proc observes the new name while it
+is live. Faulting source SET_NAME commits no prefix. Real CLONE_THREAD names are
+independent, and namespace rebinding preserves live observation. Two shared ABI/
+diagnostic cases cover page boundaries, NUL/length limits, complete output
+validation and diagnostics accepted before rename.
+
+The signed native fixture gives every thread a distinct input/output and uses an
+actual guest atomic barrier: all threads rename before any reads its name. The
+prior four-CPU runtime completes correctly but uses sixteen cohorts, twenty-four
+returned prctls and two clone returns. Final four/twelve-CPU execution uses one
+cohort with no returned syscall or service; independent names and backend SME
+get/set/inheritance flags are correct. No twelve-CPU before measurement or
+controlled throughput gain is claimed.
+
+The earlier dormant native fixture's setup prctl now correctly stays on the
+source. Its setup is a real eight-byte read from an OFD opened through legacy
+runtime information with no typed source proc payload provider. That scenario
+passes on both prior/final runtime at four/twelve CPUs, preserving two cohorts,
+one affected mm, one returned read and the actual data result. The remaining
+capability boundary is explicit, rather than dropping dormant admission coverage.
+
+Both complete local runtime workflows pass. Each host passes 439 process
+regressions (two intentionally ignored) and ten FFI cases. Strict lint, both iPad
+SDK targets, Mac product development gates, 52 signed HVF and eleven signed
+product cases pass. Exact source/binary hashes and installed Dev checks are in
+the [validation record](../validation/task-prctl-20261109.json). Only Mac Dev is
+updated; stable 1.5.4, business environments and physical iPad installs are unchanged.
+
+Four broad categories remain, including both io_uring maintenance escalation
+setters, actual missing/legacy providers, other final execution dispatch, actual
+initial orchestration and host cancel/final teardown. This removes residual prctl
+as a joined-dispatch subsystem; it does not complete the overall removal goal.
