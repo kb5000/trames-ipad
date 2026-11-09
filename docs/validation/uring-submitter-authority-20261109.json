@@ -1,0 +1,262 @@
+{
+  "stage": 84,
+  "date": "2026-11-09",
+  "overall_goal": "active",
+  "runtime_revision": "3c8f555bd74952ce38d38edea341cada6750f8e4",
+  "prior_runtime": "43cdaa92f94c867e12f4a9ec0d1afd0039d7f414",
+  "scope": "Connected original io_uring submitter authority across solo import, observer capture, source handoff, future context changes, completion, cancellation and resource release.",
+  "architecture": {
+    "acceptance": "Execution retains the original DirectFds capability. Task-sensitive byte resources bind once from the accepted original OFD and submitter; no numeric FD lookup is repeated on retry.",
+    "observers": "Only matching original mm/task capture may bind legacy requests that have no execution lease. Foreign CQ observers cannot donate their signal reader.",
+    "context_changes": "Consuming DirectSyscalls setters invalidate the future Execution cache; existing requests retain their immutable original Arc. Explicit signal-reader configuration survives incoming ring snapshots independent of builder order.",
+    "lifetime": "Fixed OFDs, vector/fixed-buffer reads and polls retain their original reader through close/reuse and source handoff. Completion/cancellation releases the original request lease; cancellation leaves payload untouched.",
+    "signals": "An accepted delayed native-file size failure notifies its original task; later requests use a newly configured task signal sink.",
+    "no_new": [
+      "coordinator/resource/service thread",
+      "polling bus",
+      "production unsafe block",
+      "ordinary guest-memory check/fence",
+      "global native-function lock",
+      "per-retry authority policy"
+    ]
+  },
+  "baseline": {
+    "shared_solo": {
+      "runtime_revision": "43cdaa92f94c867e12f4a9ec0d1afd0039d7f414",
+      "exit": 101,
+      "output": "warning: unused field `repository` in `workspace.package`\n  --> Cargo.toml:30:1\n   |\n30 | repository = \"https://github.com/kb5000/trames-runtime\"\n   | ^^^^^^^^^^\n   |\n   = note: `cargo::unused_workspace_package_fields` is set to `warn` by default\nhelp: consider removing the field `workspace.package.repository`\nwarning: workspace (manifest) generated 1 warning\n   Compiling trames-linux v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-linux)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.70s\n     Running unittests src/lib.rs (/Users/main/dev/trames/target/debug/build/trames-linux/79936f2dc6cf625d/out/trames_linux-79936f2dc6cf625d)\n\nrunning 1 test\n\nthread 'direct::uring::owned_tests::solo_accepted_signalfd_keeps_original_reader_across_foreign_capture_and_source_pump' (27361241) panicked at crates/trames-linux/src/direct/uring/owned_tests.rs:100:13:\nassertion `left == right` failed: solo import must retain signal authority: op=22\n  left: 0\n right: 1\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\ntest direct::uring::owned_tests::solo_accepted_signalfd_keeps_original_reader_across_foreign_capture_and_source_pump ... FAILED\n\nfailures:\n\nfailures:\n    direct::uring::owned_tests::solo_accepted_signalfd_keeps_original_reader_across_foreign_capture_and_source_pump\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 269 filtered out; finished in 0.01s\n\nerror: test failed, to rerun pass `-p trames-linux --lib`\n"
+    },
+    "future_context": {
+      "stage": "Descriptor binding fix applied; before future-context invalidation",
+      "exit": 101,
+      "source_sha256": {
+        "runtime/crates/trames-linux/src/direct.rs": "9ea03a6e998a6758c22221edc28a90d6ae39aff194b21d6fa46c9d671b3c4c17",
+        "runtime/crates/trames-linux/src/direct/uring.rs": "32c400771c176d823eed6e07773d3c1ef20b537b86ceb0e148a5e13fdb6db87d",
+        "runtime/crates/trames-linux/src/direct/uring/actor.rs": "079e39818cfba5298b964f8409d595332471bece7f0aed15e44cedbe0f2c9d08"
+      },
+      "output": "warning: unused field `repository` in `workspace.package`\n  --> Cargo.toml:30:1\n   |\n30 | repository = \"https://github.com/kb5000/trames-runtime\"\n   | ^^^^^^^^^^\n   |\n   = note: `cargo::unused_workspace_package_fields` is set to `warn` by default\nhelp: consider removing the field `workspace.package.repository`\nwarning: workspace (manifest) generated 1 warning\n   Compiling trames-linux v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-linux)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.74s\n     Running unittests src/lib.rs (/Users/main/dev/trames/target/debug/build/trames-linux/79936f2dc6cf625d/out/trames_linux-79936f2dc6cf625d)\n\nrunning 1 test\n\nthread 'direct::uring::subsystem_tests::fixed_file_size_failure_keeps_original_submitter_signal_when_another_context_pumps' (27370343) panicked at crates/trames-linux/src/direct/uring/subsystem_tests.rs:1054:5:\nassertion `left == right` failed\n  left: 2\n right: 1\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\ntest direct::uring::subsystem_tests::fixed_file_size_failure_keeps_original_submitter_signal_when_another_context_pumps ... FAILED\n\nfailures:\n\nfailures:\n    direct::uring::subsystem_tests::fixed_file_size_failure_keeps_original_submitter_signal_when_another_context_pumps\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 270 filtered out; finished in 0.04s\n\nerror: test failed, to rerun pass `-p trames-linux --lib`\n"
+    },
+    "native_solo": {
+      "runtime_revision": "43cdaa92f94c867e12f4a9ec0d1afd0039d7f414",
+      "exit": 101,
+      "seconds": 3.512503958,
+      "executable_sha256": "f5d2968b01aac5f62adf9a04f4db9ed42353f6591fdc9bd2e9d3dc8d767e95d7",
+      "output": "\nrunning 1 test\ntest session::tests::uring_signal_requests_keep_original_native_submitters_in_solo_and_live_cohorts ... hardware uring-authority CPUs=1 exit=255 cq=[-95] cohorts=0 returned={}\n\nthread 'session::tests::uring_signal_requests_keep_original_native_submitters_in_solo_and_live_cohorts' (27387702) panicked at crates/trames-mac/src/session.rs:1004:13:\nassertion `left == right` failed\n  left: 255\n right: 0\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\nFAILED\n\nfailures:\n\nfailures:\n    session::tests::uring_signal_requests_keep_original_native_submitters_in_solo_and_live_cohorts\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 28 filtered out; finished in 0.01s\n\n"
+    }
+  },
+  "checks": {
+    "workflows": {
+      "runtime_macos": {
+        "passed_steps": 7,
+        "total_steps": 7,
+        "summary": "target/uring-authority-subsystem/runtime-mac/summary.json",
+        "sha256": "728d0e98784834f789694afb8a034610cd528d01e30b20458c6d7b1b2fd8afe4"
+      },
+      "runtime_linux": {
+        "passed_steps": 7,
+        "total_steps": 7,
+        "summary": "target/local-ci/io/uring-authority-subsystem/runtime-linux-ci/summary.json",
+        "sha256": "43540bafb50c02e402a6d30a1c4d36d87494a7e000e90b74fe660f885cb2d386"
+      },
+      "mac_product": {
+        "passed_steps": 8,
+        "total_steps": 12,
+        "summary": "target/uring-authority-subsystem/mac-product-ci/summary.json",
+        "sha256": "be353548a9f3a548844d635bb128e24e2a58b46cb850eecf0d2ed2b76e500e44"
+      }
+    },
+    "macos": [
+      {
+        "name": "runtime-mac",
+        "code": 0,
+        "seconds": 19.53197125
+      },
+      {
+        "name": "kernel-conformance",
+        "code": 0,
+        "seconds": 9.864002958
+      },
+      {
+        "name": "ffi",
+        "code": 0,
+        "seconds": 9.082967166
+      },
+      {
+        "name": "core-clippy",
+        "code": 0,
+        "seconds": 0.19811720799999932
+      },
+      {
+        "name": "ffi-clippy",
+        "code": 0,
+        "seconds": 0.2614540000000005
+      },
+      {
+        "name": "ipad-compile",
+        "code": 0,
+        "seconds": 5.270546500000002
+      }
+    ],
+    "linux": [
+      {
+        "name": "process-all",
+        "code": 0,
+        "seconds": 56.039908028000006
+      },
+      {
+        "name": "ffi-all",
+        "code": 0,
+        "seconds": 11.956674413999991
+      },
+      {
+        "name": "core-clippy",
+        "code": 0,
+        "seconds": 5.206026131999991
+      },
+      {
+        "name": "runtime-ci",
+        "code": 0,
+        "seconds": 53.363502939
+      }
+    ],
+    "process": {
+      "macos": {
+        "passed": 428,
+        "ignored": 2,
+        "log": "target/uring-authority-subsystem/kernel-conformance.log",
+        "sha256": "c82c4377b3146c313d2284c6f74bdcc7a3de8c26e010f94525a1ccef6d15d035"
+      },
+      "linux": {
+        "passed": 428,
+        "ignored": 2,
+        "log": "target/local-ci/io/uring-authority-subsystem/process-all.log",
+        "sha256": "fcac576e36eb480a50110c1b2e19b680b65c9c7a8eaac055a2a1827331fd9a73"
+      }
+    },
+    "ffi": {
+      "macos": {
+        "passed": 10,
+        "ignored": 0,
+        "log": "target/uring-authority-subsystem/ffi.log",
+        "sha256": "4c2195ab5359e33ec0326d36475cbdb669f268fa1fafa3d30a38ebb4534989a6"
+      },
+      "linux": {
+        "passed": 10,
+        "ignored": 0,
+        "log": "target/local-ci/io/uring-authority-subsystem/ffi-all.log",
+        "sha256": "18db4e55190853d6e6d52471468bbcdd187716fe1772de90fa017843ded5c5b2"
+      }
+    },
+    "ipad": [
+      {
+        "target": "aarch64-apple-ios",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+        "code": 0
+      },
+      {
+        "target": "aarch64-apple-ios-sim",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk",
+        "code": 0
+      }
+    ],
+    "hardware": {
+      "passed": true,
+      "runtime_revision": "3c8f555bd74952ce38d38edea341cada6750f8e4",
+      "rows": [
+        {
+          "target": "trames-mac-run",
+          "executable_sha256": "8f712fd8fe698369b03a093d68d0c2d99bab1adfe5a7e9e8bc094b47e8ad0538",
+          "exit": 0,
+          "passed_tests": 8
+        },
+        {
+          "target": "trames_hvf",
+          "executable_sha256": "e833844fe831b2847658fd7705be6ed47a8c915dfa9717a373a356990e2c6f20",
+          "exit": 0,
+          "passed_tests": 52
+        }
+      ]
+    },
+    "installed": {
+      "version": "Trames Dev 1.5.4 (dev) runtime 3c8f555bd74952ce38d38edea341cada6750f8e4",
+      "runner_sha256": "0faa85e657c7014db20ef4fd618cb461cbae121114fe39e2e89284ad53978bc3",
+      "stable_sha256": "8fc21435034e8c041632e2e50419da9d2123bf790aedb0a1499286fc8367e614",
+      "stable_unchanged": true,
+      "checks": [
+        {
+          "name": "init",
+          "code": 0,
+          "seconds": 3.2924772499999997
+        },
+        {
+          "name": "host",
+          "code": 0,
+          "seconds": 0.8801376660000004
+        },
+        {
+          "name": "tracing",
+          "code": 0,
+          "seconds": 0.25762008299999994
+        }
+      ]
+    }
+  },
+  "shared_regressions": [
+    "Solo accepted scalar/vector/registered-buffer signalfd reads and poll retain the original submitting reader.",
+    "An unrelated CQ capture cannot fill another task original resource.",
+    "A wrong reader cannot wake/consume the original request, and a later submission uses its own reader.",
+    "Original numeric FD close/reuse does not change the accepted OFD.",
+    "Cancellation leaves the destination sentinel untouched and releases the reader; normal completion releases it too.",
+    "A task asleep on an original infinite futex can complete its already accepted async read after a peer sends a real private signal, on 4/12 logical CPUs and one execution slot.",
+    "A delayed native-file failure uses the old signal sink while a subsequent request uses the updated sink."
+  ],
+  "native": {
+    "cpu_counts": [
+      1,
+      4,
+      12
+    ],
+    "baseline": "Original native solo signalfd SQE completes with -95; the guest detects that wrong result and exits 255.",
+    "final": "All original read CQ results are 128 and each guest actor verifies signal data. Native 4/12 CPU cases use one cohort, zero returned syscalls and zero services.",
+    "log": "target/uring-authority-subsystem/hardware/trames-mac-run.log",
+    "log_sha256": "d4a210a8780b3ebd1f96c1577dc47d8b17da133a07c1ac3e798fb9e12972a04f"
+  },
+  "source_sha256": {
+    "runtime/crates/trames-linux/src/direct.rs": "3e446b6bad5ae07cb0b26e0876f5e1eb886ab922b1bd7d225f2cfccedcfd8667",
+    "runtime/crates/trames-linux/src/direct/uring.rs": "48034b6ea9e75b6009bd8434bdc84b0ad849f8131b268b99ae6a027d2c9d4da7",
+    "runtime/crates/trames-linux/src/direct/uring/actor.rs": "8f9e694493fdf346d9a7dbca4bd960161e9729b8f74a392241ac431d1fd51070",
+    "runtime/crates/trames-linux/src/direct/uring/owned_tests.rs": "9f604bca9598a67522e1f9fcd0a85aee24be343b525d63aaf55647b692177abf",
+    "runtime/crates/trames-linux/src/direct/uring/subsystem_tests.rs": "17300cf4dad5e6bd4f3343e87d47d42afdbf1e4bc9730501f5df850e266cff29",
+    "runtime/crates/trames-linux/src/uring.rs": "d76f23e8b4a68b1029fd3f4e3d88d95a8237fe575d3cc96de7f706625409de26",
+    "runtime/crates/trames-session/src/process.rs": "9d4958bc0ae2407be69cc50526387935c90295452cc2809947b570175e8c821c",
+    "runtime/crates/trames-session/src/process_uring_authority_tests.rs": "bf148df244acbb92ec76cabf2b3abe7f7592a606f122a0dcdd8367b08b5db2ee"
+  },
+  "mac_test_source_sha256": "deeefa31cc7b9690c1ceb6e5d2ec5d885887f020025ca42fb4c4f205605eb7f4",
+  "deployment": {
+    "channel": "Mac Dev only",
+    "runner": "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+    "signature_verified": true,
+    "stable_unchanged": true,
+    "physical_ipad_unchanged": true,
+    "business_environments_unchanged": true
+  },
+  "validation_notes": [
+    "The future-context baseline is explicitly after the descriptor-binding correction and before cache invalidation; it is not described as an untouched prior revision.",
+    "Initial test setup corrections are not production failures: the valid solo enter min-complete-zero return is (1,true); legacy import uses the common importer; the real peer fixture shares its original signal task directory.",
+    "The native helper now omits cloning only for the one-CPU fixture; its multi-CPU clone sequence is unchanged. An initial Mac lint failure was a redundant test-only CpuMemory import; it was removed before rerunning failed product gates.",
+    "The file-size regression uses a PID-qualified temporary directory to avoid deterministic collisions after failed baseline runs.",
+    "All changed Rust sources match the Linux checks and paired Mac runtime checkout. Only documentation/evidence changes follow passing code checks."
+  ],
+  "limits": [
+    "This fixes original request authority and lifetime; neither genuine io_uring maintenance fallback setter has been deleted.",
+    "The four broad remaining categories are unchanged; only concrete triggers/dependencies inside them have been removed or repaired.",
+    "No controlled throughput or overall coordinator-removal claim is made.",
+    "Mac product development gates 1-8 of 12 pass; stable release packaging is outside this Dev-only batch."
+  ],
+  "remaining": [
+    "Actual host cancellation/deadline/shutdown and final backend/session teardown.",
+    "Genuine missing capabilities/excluded resources, including two io_uring wait-capability/body maintenance escalation call sites.",
+    "Final SVC/HLT/fault catch-all dispatch.",
+    "Initial/legacy admission and capability-less embedding orchestration; solo execution alone is not a cross-thread RPC."
+  ]
+}

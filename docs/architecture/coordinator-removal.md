@@ -5100,3 +5100,58 @@ This removes native-infrastructure-to-owner replay, while the two genuine
 io_uring capability/body maintenance setters, excluded resources, final generic
 dispatch, initial/legacy orchestration and actual host cancel/teardown remain.
 Only Mac Dev is updated; the overall coordinator-removal goal remains active.
+
+
+## 84. Original io_uring submitter authority across source handoff — 2026-11-09
+
+Runtime `3c8f555bd74952ce38d38edea341cada6750f8e4` closes the connected request-authority path:
+solo SQE import, original task-sensitive byte resource binding, foreign CQ capture,
+source pumping, future context changes, completion/cancellation and final reader
+release. An accepted request uses its original retained OFD and submitting reader;
+a later observer cannot donate its authority or resolve a reused numeric FD.
+The signalfd mask stays an OFD property; each submission has its own reader.
+
+Previously, a solo-imported signalfd request lacked its reader and completed as
+`-95`. The signed native baseline observes exactly that CQ value and guest exit
+255. A separate regression, after descriptor binding but before context-cache
+invalidation, shows later native-file failures still notifying the previous task
+signal sink. These two baselines are recorded separately.
+
+Execution now retains the original DirectFds capability before acceptance. Only
+matching original mm/task capture may bind an unbound legacy request; foreign
+capture leaves it alone. Already accepted requests keep their original execution
+lease through FD close/reuse and later source captures. Consuming DirectSyscalls
+configuration changes invalidate only future acceptance, including reader, paths,
+factory/files, signal sink, disk executor and file-layout context. Explicit reader
+configuration survives incoming ring snapshots independent of builder order.
+This adds no per-retry policy check or extra synchronization layer.
+
+Shared tests exercise scalar/vector/fixed-buffer reads and polling, original and
+foreign signal queues, close/reuse, cancellation with untouched payload, subsequent
+requests using the new reader and final release of the old reader. A delayed file
+failure signals its original submitter while a later request signals the updated
+one. A live-cohort regression keeps the submitting guest asleep on an infinite
+futex while the accepted async request completes from a peer's real signal on
+four/twelve logical CPUs and one execution slot, without service requests,
+returned syscalls or mapping checkpoints.
+
+Both complete local runtime workflows pass. Each host passes 428 process
+regressions (two intentionally ignored) and ten FFI cases; strict lint and both
+iPad SDK compile targets pass. Mac product development gates and 52 signed HVF
+plus eight signed product cases pass. Native signalfd requests complete with
+128-byte records at one/four/twelve CPUs; the multi-CPU cases use one cohort and
+have zero returned syscalls or services. The
+[source-bound validation record](../validation/uring-submitter-authority-20261109.json)
+retains baseline/final output, source hashes and installed Dev checks. These are
+functional/path results, not a throughput comparison.
+
+**The broad remaining category count is still four.** This closes request
+identity and lifetime dependencies inside the missing/excluded-resource category;
+it does not delete either io_uring maintenance setter. Actual host controls/final
+teardown, genuine missing capabilities/excluded resources, final SVC/HLT/fault
+dispatch and initial/legacy orchestration remain. Recent concrete reductions are
+read-only memory queries (stage 81), the implemented mqueue filesystem (stage 82)
+and erroneous native-event-to-owner replay (stage 83). Required original
+mm/backing synchronization is distinct from joining all workers for a syscall.
+Only Mac Dev is updated; stable 1.5.4, business environments and physical iPad
+installations are unchanged. The overall coordinator-removal goal stays active.
