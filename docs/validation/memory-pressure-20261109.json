@@ -1,0 +1,1148 @@
+{
+  "stage": 75,
+  "date": "2026-11-09",
+  "scope": "Original Mac host memory-pressure reclamation without cohort joins",
+  "runtime_before": "effa704003797f610f0608cd8b3ff73fd787d621",
+  "runtime_after": "649150055edaeebc9aab9f9168ae9bd3d0ab5143",
+  "mac_before": "a1732faefcfa77b2decdd33b5260ecc454df8490",
+  "source_sha256": {
+    "trames-mac/crates/trames-hvf/src/machine.rs": "5a6dd6936d7e9694153108fcb41982c3f460e699c294bda2f1768f00a64ddb33",
+    "trames-mac/crates/trames-hvf/src/macos.rs": "5b9eb91a0fab65a7633955468e544bcc3c117dc62b4f35edc54173d66b523442",
+    "trames-mac/crates/trames-hvf/src/hardware_tests.rs": "5383d1f468a840b3672a96077672d1de30620bdb40f792d2ae67dcb1033cda17",
+    "trames-mac/crates/trames-hvf/src/reclaim_tests.rs": "4103376a6357765e05b5129f062a4f76c1434a8df103e49d77b77ac22fb18591",
+    "trames-mac/crates/trames-mac/src/session.rs": "254978cd465984ebdf16617c67e2bb708095fc6e1d0917d9fa3250f066eaf2f5"
+  },
+  "mechanism": [
+    "Existing OS dispatch callback remains a metadata latch; no new worker, resource service or polling bus",
+    "Original Machine retains each finite request; pressure no longer returns true from product poll_control solely for reclamation",
+    "Warning/critical pressure consumes an initial 25%/75% amount once; active refaults do not make it a moving RAM quota",
+    "Each step selects at most 64 weak mapping records; physical eviction is an 8 MiB batch rounded to original extents, outside registry custody",
+    "Original per-mapping gates and hv_vm_unmap synchronize stage-two withdrawal; non-destructive Darwin advice retains stable VA and all contents",
+    "Borrowed original mappings wait on existing HardwareWait release readiness without rescanning or duplicate subscription; cancellation retains no VM cycle",
+    "Immediate explicit reclaim skips borrowed mappings without unused subscriptions; optional resident-limit policy reads the live shared mapped counter"
+  ],
+  "before_behavior": {
+    "test": "session::tests::pressure_notification_only_latches_until_joined_control_reclaims",
+    "log": "target/reclaim-subsystem/before-joined-control.log",
+    "passed": true,
+    "executable_sha256": "5af4faeee2e4c8a07e7facc5c3b1223529318430558edf916254aef1c38c46ff",
+    "source": "Exact previously compiled canonical product test from stage 74, copied and ad-hoc signed for this check",
+    "assertions": [
+      "poll_control returns true for pressure",
+      "mapped bytes remain unchanged until stopped control",
+      "stopped control reclaims and the following hardware access restores contents"
+    ]
+  },
+  "hardware": {
+    "path": "target/reclaim-subsystem/canonical-hardware/results.json",
+    "passed": true,
+    "runtime_revision": "effa704003797f610f0608cd8b3ff73fd787d621",
+    "rows": [
+      {
+        "target": "trames-mac-run",
+        "executable_sha256": "cfe6932ad53b3760f31fdc0d12e24fb6754b354728d444111f3ddb1d7d4d1784",
+        "exit": 0,
+        "passed_tests": 2
+      },
+      {
+        "target": "trames_hvf",
+        "executable_sha256": "0066f8e828051f5ecfd6a881b949b4162d4d6c13130560b0e01e73eef7636398",
+        "exit": 0,
+        "passed_tests": 52
+      }
+    ]
+  },
+  "live_linux_cohorts": [
+    {
+      "cpus": 4,
+      "peak_cpus": 4,
+      "cohorts": 1,
+      "deactivated_binding_bytes": 16384,
+      "page_ins": 1
+    },
+    {
+      "cpus": 12,
+      "peak_cpus": 12,
+      "cohorts": 1,
+      "deactivated_binding_bytes": 16384,
+      "page_ins": 1
+    }
+  ],
+  "concurrent_dirty_bytes": [
+    {
+      "cpus": 4,
+      "slices": 52,
+      "deactivated_binding_bytes": 524288,
+      "page_ins": 32
+    },
+    {
+      "cpus": 12,
+      "slices": 631,
+      "deactivated_binding_bytes": 1572864,
+      "page_ins": 96
+    }
+  ],
+  "hardware_coverage": [
+    "Real 4/12-vCPU monotonically growing counters and unchanged sentinel bytes during repeated evict/refault",
+    "Real userspace Linux peak 4/12 execution, one cohort, no returned SVC/service request during pressure",
+    "At most 64 mapping records per progress call",
+    "8 MiB native-range byte batches, stable reservation and preserved writes",
+    "Original borrowed-byte release readiness; repeated waiting adds no subscriptions",
+    "Cancelled request releases VM ownership; immediate API registers no unused wait",
+    "Concurrent native range growth/retirement/reclaim with correct terminal accounting",
+    "Existing shared-file pixels, retained roots/code protections, sparse native fork and explicit resident-target cases"
+  ],
+  "mac_product_ci": {
+    "path": "target/reclaim-subsystem/mac-product-ci/summary.json",
+    "passed_prefix": 8,
+    "complete_release_workflow": false,
+    "scope": "Applicable local product checks 1-8 passed; stable packaging/upload steps 9-12 were not requested. Dev is built and installed separately.",
+    "all_modified_implementation_inputs_match": true,
+    "after_ci_metadata_only_delta": {
+      "runtime-version.json": {
+        "checked_sha256": "5674fa71c3b337a2d5c27a50e2b029584f334e2bffadf3a9aae0a9c0763d9305",
+        "final_sha256": "bd7f03b3891b21bb989bb4b732ca8e277ff0de40481b84fa56baf5257f1ac47e"
+      }
+    },
+    "metadata_validation": "Boundary checks, final build/signing/version and targeted installed smoke tests",
+    "steps": [
+      {
+        "index": 1,
+        "name": "rustup show",
+        "status": "passed",
+        "exit_code": 0,
+        "seconds": 0.028052091598510742,
+        "reused": true
+      },
+      {
+        "index": 2,
+        "name": "python3 scripts/check-execution-boundaries.py",
+        "status": "passed",
+        "exit_code": 0,
+        "seconds": 0.09996914863586426
+      },
+      {
+        "index": 3,
+        "name": "cargo fmt --all --check",
+        "status": "passed",
+        "exit_code": 0,
+        "seconds": 1.1343998908996582
+      },
+      {
+        "index": 4,
+        "name": "cargo clippy --workspace --all-targets --all-features --locked -- -D warnings",
+        "status": "passed",
+        "exit_code": 0,
+        "seconds": 0.8480570316314697
+      },
+      {
+        "index": 5,
+        "name": "cargo test --workspace --all-features --locked",
+        "status": "passed",
+        "exit_code": 0,
+        "seconds": 4.466078996658325
+      },
+      {
+        "index": 6,
+        "name": "bash -n scripts/build-mac.sh scripts/install-mac.sh",
+        "status": "passed",
+        "exit_code": 0,
+        "seconds": 0.03518319129943848
+      },
+      {
+        "index": 7,
+        "name": "python3 -m py_compile scripts/package-mac.py scripts/benchmark-firefox-video.py scripts/run-firefox-gpu.py tests/integration/mac-environments.py tests/integration/mac-packages.py tests/integration/mac-systemd.py tests/integration/mac-cli.py tests/integration/mac-channels.py tests/integration/mac-background.py tests/integration/mac-exec.py tests/integration/mac-host-lifecycle.py",
+        "status": "passed",
+        "exit_code": 0,
+        "seconds": 0.1869208812713623
+      },
+      {
+        "index": 8,
+        "name": "bash tests/native/task-stream.sh",
+        "status": "passed",
+        "exit_code": 0,
+        "seconds": 3.246351957321167,
+        "reused": true
+      }
+    ]
+  },
+  "common_validation_reuse": {
+    "scope": "No common Linux/iPad Rust change. Runtime pins differ only in the architecture audit; unchanged complete runtime and SDK checks are reused.",
+    "runtime_changed_files": [
+      "docs/architecture/coordination-boundaries.md"
+    ],
+    "proof": {
+      "mac": {
+        "completed": true,
+        "path": "target/systemd-control/runtime-mac-ci/summary.json",
+        "matching_source_build_inputs": 489,
+        "input_map_sha256": "f91e9bc429aca340f017b8a1f29413432a434d1ae39a6296dde1dadf09916c70",
+        "archive_appledouble_metadata_excluded": 0
+      },
+      "linux": {
+        "completed": true,
+        "path": "target/local-ci/io/systemd-control/runtime-linux-ci/summary.json",
+        "matching_source_build_inputs": 489,
+        "input_map_sha256": "f91e9bc429aca340f017b8a1f29413432a434d1ae39a6296dde1dadf09916c70",
+        "archive_appledouble_metadata_excluded": 436
+      }
+    },
+    "ffi": {
+      "path": "crates/trames-ffi/src/session.rs",
+      "unchanged_sha256": "5ee9cc7042805472d0a658e83b8769be6d20d2eaaa4f709a2732aba4c16956d3",
+      "tests": 8
+    },
+    "ipad": [
+      {
+        "target": "aarch64-apple-ios",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+        "code": 0
+      },
+      {
+        "target": "aarch64-apple-ios-sim",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk",
+        "code": 0
+      }
+    ],
+    "sdk_scope": "SDK checks were executed at stage 74. Common runtime/FFI source is unchanged; later runtime pin changes only audit/version metadata. No physical iPad install or new SDK execution in this Mac-only batch."
+  },
+  "installed_acceptance": {
+    "installed-init": {
+      "backend": "hvf",
+      "fixture_sha256": "2e130367ebc56e8886d865ac1bb27058d782ab3e41ad8aa30761bc1ceb05bb5d",
+      "passed": true,
+      "cases": [
+        {
+          "cpus": 1,
+          "host_stop_seconds": 0.14664787499999998,
+          "code": 143,
+          "elapsed_seconds": 2.13864225,
+          "measurement": {
+            "passed": true,
+            "pid": 1,
+            "signal": 37,
+            "signal_count": 1,
+            "progress": 242156
+          },
+          "metrics": {
+            "cohort_rounds": 0,
+            "cohort_stop_us": 0,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 394,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 0,
+            "worker_fd_syscalls": 0,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 0,
+            "worker_task_resumes": 0,
+            "worker_uring_syscalls": 0
+          },
+          "cohort_return_syscalls": []
+        },
+        {
+          "cpus": 4,
+          "host_stop_seconds": 0.07807825000000035,
+          "code": 143,
+          "elapsed_seconds": 0.4872657920000001,
+          "measurement": {
+            "passed": true,
+            "pid": 1,
+            "signal": 37,
+            "signal_count": 1,
+            "progress": 135995
+          },
+          "metrics": {
+            "cohort_rounds": 1,
+            "cohort_stop_us": 0,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 445,
+            "vm_local_syscalls": 7,
+            "worker_direct_syscalls": 89,
+            "worker_fd_syscalls": 164,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 139,
+            "worker_futex_wakes": 5,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 82,
+            "worker_syscalls": 425,
+            "worker_task_resumes": 139,
+            "worker_uring_syscalls": 0
+          },
+          "cohort_return_syscalls": []
+        },
+        {
+          "cpus": 12,
+          "host_stop_seconds": 0.07962729200000007,
+          "code": 143,
+          "elapsed_seconds": 0.48670237500000013,
+          "measurement": {
+            "passed": true,
+            "pid": 1,
+            "signal": 37,
+            "signal_count": 1,
+            "progress": 135544
+          },
+          "metrics": {
+            "cohort_rounds": 1,
+            "cohort_stop_us": 0,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 445,
+            "vm_local_syscalls": 7,
+            "worker_direct_syscalls": 89,
+            "worker_fd_syscalls": 164,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 140,
+            "worker_futex_wakes": 5,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 82,
+            "worker_syscalls": 425,
+            "worker_task_resumes": 140,
+            "worker_uring_syscalls": 0
+          },
+          "cohort_return_syscalls": []
+        }
+      ],
+      "runner_sha256": "f83098dfccb2e278f46f472f75c65dc1f2b5a185159e4fb2b694766a821120e9"
+    },
+    "installed-tracing": {
+      "backend": "hvf",
+      "fixture_sha256": "f577e2e1ad57c0ac94100a473b651a26fced8818555447db0593f9d81278b7a4",
+      "passed": true,
+      "cases": [
+        {
+          "cpus": 1,
+          "mode": "queries",
+          "traced": false,
+          "code": 0,
+          "measurement": {
+            "mode": "queries",
+            "threads": 4,
+            "rounds": 20,
+            "pid": 1,
+            "signals": 0,
+            "failure": 0,
+            "elapsed_ns": 346375
+          },
+          "metrics": {
+            "cohort_rounds": 0,
+            "cohort_stop_us": 0,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 128,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 0,
+            "worker_fd_syscalls": 0,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 0,
+            "worker_task_resumes": 0,
+            "worker_uring_syscalls": 0
+          },
+          "cohort_return_syscalls": []
+        },
+        {
+          "cpus": 1,
+          "mode": "queries",
+          "traced": true,
+          "code": 0,
+          "measurement": {
+            "mode": "queries",
+            "threads": 4,
+            "rounds": 20,
+            "pid": 1,
+            "signals": 0,
+            "failure": 0,
+            "elapsed_ns": 555833
+          },
+          "verified_marked_calls": 80,
+          "verified_handler_calls": 0,
+          "verified_metadata_calls": 0,
+          "restart_records": 0,
+          "metrics": {
+            "cohort_rounds": 0,
+            "cohort_stop_us": 0,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 128,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 0,
+            "worker_fd_syscalls": 0,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 0,
+            "worker_task_resumes": 0,
+            "worker_uring_syscalls": 0
+          },
+          "cohort_return_syscalls": []
+        },
+        {
+          "cpus": 1,
+          "mode": "mixed",
+          "traced": false,
+          "code": 0,
+          "measurement": {
+            "mode": "mixed",
+            "threads": 4,
+            "rounds": 20,
+            "pid": 1,
+            "signals": 2,
+            "failure": 0,
+            "elapsed_ns": 55295833
+          },
+          "metrics": {
+            "cohort_rounds": 0,
+            "cohort_stop_us": 0,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 280,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 0,
+            "worker_fd_syscalls": 0,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 0,
+            "worker_task_resumes": 0,
+            "worker_uring_syscalls": 0
+          },
+          "cohort_return_syscalls": []
+        },
+        {
+          "cpus": 1,
+          "mode": "mixed",
+          "traced": true,
+          "code": 0,
+          "measurement": {
+            "mode": "mixed",
+            "threads": 4,
+            "rounds": 20,
+            "pid": 1,
+            "signals": 2,
+            "failure": 0,
+            "elapsed_ns": 56018458
+          },
+          "verified_marked_calls": 80,
+          "verified_handler_calls": 2,
+          "verified_metadata_calls": 8,
+          "restart_records": 1,
+          "metrics": {
+            "cohort_rounds": 0,
+            "cohort_stop_us": 0,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 280,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 0,
+            "worker_fd_syscalls": 0,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 0,
+            "worker_task_resumes": 0,
+            "worker_uring_syscalls": 0
+          },
+          "cohort_return_syscalls": []
+        },
+        {
+          "cpus": 4,
+          "mode": "queries",
+          "traced": false,
+          "code": 0,
+          "measurement": {
+            "mode": "queries",
+            "threads": 4,
+            "rounds": 20,
+            "pid": 1,
+            "signals": 0,
+            "failure": 0,
+            "elapsed_ns": 1172292
+          },
+          "metrics": {
+            "cohort_rounds": 1,
+            "cohort_stop_us": 0,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 136,
+            "vm_local_syscalls": 10,
+            "worker_direct_syscalls": 2,
+            "worker_fd_syscalls": 0,
+            "worker_file_syscalls": 1,
+            "worker_futex_waits": 6,
+            "worker_futex_wakes": 11,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 128,
+            "worker_task_resumes": 7,
+            "worker_uring_syscalls": 0
+          },
+          "cohort_return_syscalls": []
+        },
+        {
+          "cpus": 4,
+          "mode": "queries",
+          "traced": true,
+          "code": 0,
+          "measurement": {
+            "mode": "queries",
+            "threads": 4,
+            "rounds": 20,
+            "pid": 1,
+            "signals": 0,
+            "failure": 0,
+            "elapsed_ns": 1695667
+          },
+          "verified_marked_calls": 80,
+          "verified_handler_calls": 0,
+          "verified_metadata_calls": 0,
+          "restart_records": 0,
+          "metrics": {
+            "cohort_rounds": 1,
+            "cohort_stop_us": 0,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 132,
+            "vm_local_syscalls": 10,
+            "worker_direct_syscalls": 2,
+            "worker_fd_syscalls": 0,
+            "worker_file_syscalls": 1,
+            "worker_futex_waits": 5,
+            "worker_futex_wakes": 9,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 124,
+            "worker_task_resumes": 6,
+            "worker_uring_syscalls": 0
+          },
+          "cohort_return_syscalls": []
+        },
+        {
+          "cpus": 4,
+          "mode": "mixed",
+          "traced": false,
+          "code": 0,
+          "measurement": {
+            "mode": "mixed",
+            "threads": 4,
+            "rounds": 20,
+            "pid": 1,
+            "signals": 2,
+            "failure": 0,
+            "elapsed_ns": 72771167
+          },
+          "metrics": {
+            "cohort_rounds": 1,
+            "cohort_stop_us": 0,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 272,
+            "vm_local_syscalls": 28,
+            "worker_direct_syscalls": 38,
+            "worker_fd_syscalls": 22,
+            "worker_file_syscalls": 25,
+            "worker_futex_waits": 12,
+            "worker_futex_wakes": 16,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 8,
+            "worker_syscalls": 264,
+            "worker_task_resumes": 17,
+            "worker_uring_syscalls": 0
+          },
+          "cohort_return_syscalls": []
+        },
+        {
+          "cpus": 4,
+          "mode": "mixed",
+          "traced": true,
+          "code": 0,
+          "measurement": {
+            "mode": "mixed",
+            "threads": 4,
+            "rounds": 20,
+            "pid": 1,
+            "signals": 2,
+            "failure": 0,
+            "elapsed_ns": 70700916
+          },
+          "verified_marked_calls": 80,
+          "verified_handler_calls": 2,
+          "verified_metadata_calls": 8,
+          "restart_records": 1,
+          "metrics": {
+            "cohort_rounds": 1,
+            "cohort_stop_us": 0,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 270,
+            "vm_local_syscalls": 28,
+            "worker_direct_syscalls": 38,
+            "worker_fd_syscalls": 22,
+            "worker_file_syscalls": 25,
+            "worker_futex_waits": 11,
+            "worker_futex_wakes": 15,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 8,
+            "worker_syscalls": 262,
+            "worker_task_resumes": 16,
+            "worker_uring_syscalls": 0
+          },
+          "cohort_return_syscalls": []
+        },
+        {
+          "cpus": 12,
+          "mode": "queries",
+          "traced": false,
+          "code": 0,
+          "measurement": {
+            "mode": "queries",
+            "threads": 4,
+            "rounds": 20,
+            "pid": 1,
+            "signals": 0,
+            "failure": 0,
+            "elapsed_ns": 1619750
+          },
+          "metrics": {
+            "cohort_rounds": 1,
+            "cohort_stop_us": 0,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 136,
+            "vm_local_syscalls": 10,
+            "worker_direct_syscalls": 2,
+            "worker_fd_syscalls": 0,
+            "worker_file_syscalls": 1,
+            "worker_futex_waits": 4,
+            "worker_futex_wakes": 11,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 128,
+            "worker_task_resumes": 5,
+            "worker_uring_syscalls": 0
+          },
+          "cohort_return_syscalls": []
+        },
+        {
+          "cpus": 12,
+          "mode": "queries",
+          "traced": true,
+          "code": 0,
+          "measurement": {
+            "mode": "queries",
+            "threads": 4,
+            "rounds": 20,
+            "pid": 1,
+            "signals": 0,
+            "failure": 0,
+            "elapsed_ns": 2437750
+          },
+          "verified_marked_calls": 80,
+          "verified_handler_calls": 0,
+          "verified_metadata_calls": 0,
+          "restart_records": 0,
+          "metrics": {
+            "cohort_rounds": 1,
+            "cohort_stop_us": 3,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 130,
+            "vm_local_syscalls": 10,
+            "worker_direct_syscalls": 2,
+            "worker_fd_syscalls": 0,
+            "worker_file_syscalls": 1,
+            "worker_futex_waits": 3,
+            "worker_futex_wakes": 9,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 122,
+            "worker_task_resumes": 4,
+            "worker_uring_syscalls": 0
+          },
+          "cohort_return_syscalls": []
+        },
+        {
+          "cpus": 12,
+          "mode": "mixed",
+          "traced": false,
+          "code": 0,
+          "measurement": {
+            "mode": "mixed",
+            "threads": 4,
+            "rounds": 20,
+            "pid": 1,
+            "signals": 2,
+            "failure": 0,
+            "elapsed_ns": 73295708
+          },
+          "metrics": {
+            "cohort_rounds": 1,
+            "cohort_stop_us": 0,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 276,
+            "vm_local_syscalls": 28,
+            "worker_direct_syscalls": 38,
+            "worker_fd_syscalls": 22,
+            "worker_file_syscalls": 25,
+            "worker_futex_waits": 15,
+            "worker_futex_wakes": 17,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 8,
+            "worker_syscalls": 268,
+            "worker_task_resumes": 20,
+            "worker_uring_syscalls": 0
+          },
+          "cohort_return_syscalls": []
+        },
+        {
+          "cpus": 12,
+          "mode": "mixed",
+          "traced": true,
+          "code": 0,
+          "measurement": {
+            "mode": "mixed",
+            "threads": 4,
+            "rounds": 20,
+            "pid": 1,
+            "signals": 2,
+            "failure": 0,
+            "elapsed_ns": 78522375
+          },
+          "verified_marked_calls": 80,
+          "verified_handler_calls": 2,
+          "verified_metadata_calls": 8,
+          "restart_records": 1,
+          "metrics": {
+            "cohort_rounds": 1,
+            "cohort_stop_us": 1,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 273,
+            "vm_local_syscalls": 28,
+            "worker_direct_syscalls": 38,
+            "worker_fd_syscalls": 22,
+            "worker_file_syscalls": 25,
+            "worker_futex_waits": 13,
+            "worker_futex_wakes": 15,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 8,
+            "worker_syscalls": 265,
+            "worker_task_resumes": 18,
+            "worker_uring_syscalls": 0
+          },
+          "cohort_return_syscalls": []
+        }
+      ],
+      "runner_sha256": "f83098dfccb2e278f46f472f75c65dc1f2b5a185159e4fb2b694766a821120e9"
+    },
+    "installed-final-init": {
+      "backend": "hvf",
+      "fixture_sha256": "2e130367ebc56e8886d865ac1bb27058d782ab3e41ad8aa30761bc1ceb05bb5d",
+      "passed": true,
+      "cases": [
+        {
+          "cpus": 1,
+          "host_stop_seconds": 1.0556095,
+          "code": 143,
+          "elapsed_seconds": 3.0482166250000002,
+          "measurement": {
+            "passed": true,
+            "pid": 1,
+            "signal": 37,
+            "signal_count": 1,
+            "progress": 240977
+          },
+          "metrics": {
+            "cohort_rounds": 0,
+            "cohort_stop_us": 0,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 394,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 0,
+            "worker_fd_syscalls": 0,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 0,
+            "worker_task_resumes": 0,
+            "worker_uring_syscalls": 0
+          },
+          "cohort_return_syscalls": []
+        },
+        {
+          "cpus": 4,
+          "host_stop_seconds": 0.07808204200000013,
+          "code": 143,
+          "elapsed_seconds": 0.48440012500000007,
+          "measurement": {
+            "passed": true,
+            "pid": 1,
+            "signal": 37,
+            "signal_count": 1,
+            "progress": 135363
+          },
+          "metrics": {
+            "cohort_rounds": 1,
+            "cohort_stop_us": 0,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 445,
+            "vm_local_syscalls": 7,
+            "worker_direct_syscalls": 89,
+            "worker_fd_syscalls": 164,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 139,
+            "worker_futex_wakes": 5,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 82,
+            "worker_syscalls": 425,
+            "worker_task_resumes": 139,
+            "worker_uring_syscalls": 0
+          },
+          "cohort_return_syscalls": []
+        },
+        {
+          "cpus": 12,
+          "host_stop_seconds": 0.07960600000000007,
+          "code": 143,
+          "elapsed_seconds": 0.4870483750000001,
+          "measurement": {
+            "passed": true,
+            "pid": 1,
+            "signal": 37,
+            "signal_count": 1,
+            "progress": 135838
+          },
+          "metrics": {
+            "cohort_rounds": 1,
+            "cohort_stop_us": 0,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 445,
+            "vm_local_syscalls": 7,
+            "worker_direct_syscalls": 89,
+            "worker_fd_syscalls": 164,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 140,
+            "worker_futex_wakes": 5,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 82,
+            "worker_syscalls": 425,
+            "worker_task_resumes": 140,
+            "worker_uring_syscalls": 0
+          },
+          "cohort_return_syscalls": []
+        }
+      ],
+      "runner_sha256": "6803714c5961ed6d50662855509a1a910cabeec31da88270948a076d9a4dfbc1"
+    },
+    "installed-final-tracing-12": {
+      "backend": "hvf",
+      "fixture_sha256": "f577e2e1ad57c0ac94100a473b651a26fced8818555447db0593f9d81278b7a4",
+      "passed": true,
+      "cases": [
+        {
+          "cpus": 12,
+          "mode": "queries",
+          "traced": false,
+          "code": 0,
+          "measurement": {
+            "mode": "queries",
+            "threads": 4,
+            "rounds": 20,
+            "pid": 1,
+            "signals": 0,
+            "failure": 0,
+            "elapsed_ns": 862833
+          },
+          "metrics": {
+            "cohort_rounds": 1,
+            "cohort_stop_us": 4,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 136,
+            "vm_local_syscalls": 10,
+            "worker_direct_syscalls": 2,
+            "worker_fd_syscalls": 0,
+            "worker_file_syscalls": 1,
+            "worker_futex_waits": 6,
+            "worker_futex_wakes": 12,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 128,
+            "worker_task_resumes": 7,
+            "worker_uring_syscalls": 0
+          },
+          "cohort_return_syscalls": []
+        },
+        {
+          "cpus": 12,
+          "mode": "queries",
+          "traced": true,
+          "code": 0,
+          "measurement": {
+            "mode": "queries",
+            "threads": 4,
+            "rounds": 20,
+            "pid": 1,
+            "signals": 0,
+            "failure": 0,
+            "elapsed_ns": 1282416
+          },
+          "verified_marked_calls": 80,
+          "verified_handler_calls": 0,
+          "verified_metadata_calls": 0,
+          "restart_records": 0,
+          "metrics": {
+            "cohort_rounds": 1,
+            "cohort_stop_us": 0,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 132,
+            "vm_local_syscalls": 10,
+            "worker_direct_syscalls": 2,
+            "worker_fd_syscalls": 0,
+            "worker_file_syscalls": 1,
+            "worker_futex_waits": 4,
+            "worker_futex_wakes": 10,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 124,
+            "worker_task_resumes": 5,
+            "worker_uring_syscalls": 0
+          },
+          "cohort_return_syscalls": []
+        },
+        {
+          "cpus": 12,
+          "mode": "mixed",
+          "traced": false,
+          "code": 0,
+          "measurement": {
+            "mode": "mixed",
+            "threads": 4,
+            "rounds": 20,
+            "pid": 1,
+            "signals": 2,
+            "failure": 0,
+            "elapsed_ns": 65376834
+          },
+          "metrics": {
+            "cohort_rounds": 1,
+            "cohort_stop_us": 0,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 274,
+            "vm_local_syscalls": 28,
+            "worker_direct_syscalls": 38,
+            "worker_fd_syscalls": 22,
+            "worker_file_syscalls": 25,
+            "worker_futex_waits": 13,
+            "worker_futex_wakes": 16,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 8,
+            "worker_syscalls": 266,
+            "worker_task_resumes": 18,
+            "worker_uring_syscalls": 0
+          },
+          "cohort_return_syscalls": []
+        },
+        {
+          "cpus": 12,
+          "mode": "mixed",
+          "traced": true,
+          "code": 0,
+          "measurement": {
+            "mode": "mixed",
+            "threads": 4,
+            "rounds": 20,
+            "pid": 1,
+            "signals": 2,
+            "failure": 0,
+            "elapsed_ns": 74422291
+          },
+          "verified_marked_calls": 80,
+          "verified_handler_calls": 2,
+          "verified_metadata_calls": 8,
+          "restart_records": 1,
+          "metrics": {
+            "cohort_rounds": 1,
+            "cohort_stop_us": 0,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 270,
+            "vm_local_syscalls": 28,
+            "worker_direct_syscalls": 38,
+            "worker_fd_syscalls": 22,
+            "worker_file_syscalls": 25,
+            "worker_futex_waits": 10,
+            "worker_futex_wakes": 15,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 8,
+            "worker_syscalls": 262,
+            "worker_task_resumes": 15,
+            "worker_uring_syscalls": 0
+          },
+          "cohort_return_syscalls": []
+        }
+      ],
+      "runner_sha256": "6803714c5961ed6d50662855509a1a910cabeec31da88270948a076d9a4dfbc1"
+    },
+    "host_12": {
+      "passed": true,
+      "cpus": 12,
+      "runner_sha256": "f83098dfccb2e278f46f472f75c65dc1f2b5a185159e4fb2b694766a821120e9",
+      "exec_16_elapsed_ns": 134182000,
+      "metrics": {
+        "cohort_rounds": 1,
+        "cohort_stop_us": 614,
+        "service_caller_wait_us": 0,
+        "service_requests": 0,
+        "serviced_syscalls": 0,
+        "syscalls": 3695,
+        "vm_local_syscalls": 393,
+        "worker_direct_syscalls": 1543,
+        "worker_fd_syscalls": 506,
+        "worker_file_syscalls": 264,
+        "worker_futex_waits": 9,
+        "worker_futex_wakes": 39,
+        "worker_gpu_calls": 0,
+        "worker_gpu_waits": 0,
+        "worker_poll_syscalls": 415,
+        "worker_socket_syscalls": 0,
+        "worker_syscalls": 3622,
+        "worker_task_resumes": 98,
+        "worker_uring_syscalls": 0
+      },
+      "checks": [
+        "live_exec",
+        "native_terminal_open",
+        "initial_size",
+        "live_resize",
+        "early_close_before_slave_open",
+        "master_close",
+        "busy_peer_survives",
+        "no_service_requests"
+      ]
+    }
+  },
+  "runners": {
+    "before": {
+      "sha256": "b58ae1c306777041602c39a3839bb252200df350b35f2f47364b9c9a983aaf9b",
+      "role": "Exact previously installed Dev at runtime effa704 before pressure removal"
+    },
+    "implementation_acceptance": {
+      "sha256": "f83098dfccb2e278f46f472f75c65dc1f2b5a185159e4fb2b694766a821120e9",
+      "role": "Final implementation at audit pin 7055d12; only audit/version metadata subsequently changed"
+    }
+  },
+  "deployment": {
+    "channel": "dev",
+    "state": "installed-and-accepted",
+    "version": "Trames Dev 1.5.4 (dev) runtime 649150055edaeebc9aab9f9168ae9bd3d0ab5143",
+    "runner_sha256": "6803714c5961ed6d50662855509a1a910cabeec31da88270948a076d9a4dfbc1",
+    "signing_verified": true,
+    "stable_runner_sha256": "8fc21435034e8c041632e2e50419da9d2123bf790aedb0a1499286fc8367e614",
+    "stable_unchanged": true,
+    "business_environments_unchanged": true,
+    "physical_ipad_unchanged": true,
+    "build_log": "target/reclaim-subsystem/dev-final-build.log",
+    "install_log": "target/reclaim-subsystem/dev-final-install.log"
+  },
+  "limits": [
+    "Process-local test injection never generates system-wide macOS pressure; no product CLI/IPC injection interface was added.",
+    "Mapped/deactivated binding counters are not host RSS. Darwin may compress/page original memory; reclaim does not discard data or release native VA ownership.",
+    "Bounded work rounds at physical mapping granularity. Active vCPUs may refault immediately; a completed request never becomes a residency quota.",
+    "Host-byte borrowers cannot be evicted until release. The request retains original readiness and identities, not a coordinator or busy-waiting bus.",
+    "The optional explicit resident target retains its existing sorting heuristic; bounded registry traversal replaces the pressure path, not every cold backend policy.",
+    "These are correctness/concurrency/cohort checks, not a Firefox/Geekbench speedup or native OS throughput comparison.",
+    "Late runtime revisions update architecture documentation/version metadata only; all changed implementation inputs match the checked canonical source. Full CPU/Linux/network/graphics checks are not rerun for those edits.",
+    "Actual pause/cancel, FileProvider writeback/transfer, shutdown, missing/excluded resources, initial/legacy/solo orchestration and generic last-resort dispatch remain. The overall goal is active."
+  ],
+  "mac_after": "3ba2f4ac78ea3e1d086b139e4af042f9d14a4365"
+}
