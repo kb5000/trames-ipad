@@ -2,6 +2,27 @@
 
 ## Current status — 2026-11-09
 
+Stage 76 moves **host filesystem commands** off joined execution: streaming
+imports/exports, conditional FileProvider saves and timezone updates use the
+existing disk pool and original shared resources. Accepted mapped byte consumers
+use original backing admission, keeping unrelated execution in the same cohort.
+Imports stage unpublished objects. Conditional compare/replace retains conflict,
+metadata, hardlink, old-OFD, retry and failure cleanup behavior. Explicit pause
+still stops guest execution; it now lets the original driver complete accepted
+I/O and backing work. No new service thread or ordinary guest-memory check is
+added. A cold editor hash can still block its original filesystem observers, and
+actual mapping dependants still quiesce.
+
+Both local runtime workflows, 407 process tests on each host, 9 FFI tests on each
+host, 52 signed HVF plus 2 product hardware tests, the 8 applicable Mac product
+checks and both iPad SDK compiles pass. The mapped export fixture completes in one
+cohort on 4/12 CPUs, including explicit pause. These are conformance results, not
+a browser or throughput speedup claim. See the [validation record](../validation/host-files-20261109.json).
+Only Mac Dev is updated; stable 1.5.4, business environments and physical iPad
+installs retain their existing versions.
+
+### Stage 75 memory-pressure closure (historical)
+
 Stage 75 closes **Mac host memory-pressure reclamation**. The existing host
 adapter advances one original-VM request while vCPUs continue. The pressure-only
 cohort join and stopped-only reclamation body are deleted. There is no new thread,
@@ -32,6 +53,8 @@ records source/executable hashes, original joined behavior, reuse proof and fina
 installed acceptance. Only Mac Dev is updated; stable 1.5.4, business environments
 and physical iPad installs remain unchanged.
 
+### Remaining boundaries after stage 76
+
 **The coordinator still exists.** io_uring's remaining `owner_required` setters
 are the two actual source-maintenance failures: unavailable wait capability or an
 unpumpable original body. Missing layout/signal capability is no longer a trigger.
@@ -48,7 +71,7 @@ row in the coverage inventory below:
 3. Last-resort known-resource/subcommand and unhandled HLT/fault dispatch.
 4. Initial/legacy admission and solo orchestration; solo is not itself a syscall RPC.
 
-Mac memory-pressure reclamation is removed from joined execution by stage 75.
+Host transfer/timezone/FileProvider commands are removed from joined execution by stage 76. Mac memory-pressure reclamation is removed by stage 75.
 Init notification/graceful-stop supervision was removed by stage 74. Diagnostic syscall tracing was removed by stage 73. Stage 72 removed
 the independent embedding terminal-ID-0 execution category. Normal subsystem names
 below describe coverage and do not imply another coordinator dependency.
@@ -76,7 +99,7 @@ below describe coverage and do not imply another coordinator dependency.
 | Diagnostic syscall tracing | Optional original-task metadata follows source/solo execution, parked waits, signals and lifecycle scopes; existing executors emit complete lines | No logging-only execution exclusion remains. Actual stderr writes can block their caller; this does not add guest ptrace support |
 | Cold process observation and source ownership | Original body custody/current PID identity; queue membership orders later exit observation | Accepted source Handles retain their original authority. Actual excluded/legacy actors remain explicit |
 | Host process and native terminal lifecycle | Host task creation/admission, original group control and UI native terminal open/close/input/resize/hangup progress on original resources and existing execution/disk workers | One-time product terminal initialization and genuinely missing/excluded providers remain explicit; terminal ID 0 transport no longer requests a join |
-| Host administration and generic dispatch fallback | Unknown syscall numbers finish locally using generated entry recognition; actual administration retains its own route | Pause/cancel, transfer/timezone/writeback, admin/deadline/shutdown; known SVC resources/subcommands and HLT/fault exits not completed, parked or scoped on the worker still reach the joined fallback |
+| Host administration and generic dispatch fallback | Unknown syscall numbers finish locally using generated entry recognition; actual administration retains its own route | Pause/cancel, admin/deadline/shutdown; accepted filesystem commands use original resources and the existing disk pool; known SVC resources/subcommands and HLT/fault exits not completed, parked or scoped on the worker still reach the joined fallback |
 
 The last row is an important coverage gap: the remaining owner work is **not
 limited to a fixed set of rare controls**. The final worker-dispatch fallback is
@@ -85,7 +108,7 @@ the owner; ordinary epoch-member migration, parking, wakeup and child/replacemen
 admission already use the live execution queue. Single-CPU/solo execution retains
 its coordinated caller path, which does not by itself imply an extra RPC.
 
-The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/649150055edaeebc9aab9f9168ae9bd3d0ab5143/docs/architecture/coordination-boundaries.md)
+The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/e3e94de96f47d74115b3084fb3d43c15ff72ed21/docs/architecture/coordination-boundaries.md)
 records scopes, actual admission gates and source locations. Earlier sections
 below are historical records and do not override this inventory.
 
@@ -4625,3 +4648,25 @@ This closes a source-ownership dependency, not every remaining joined execution
 category. Actual host administration, legacy terminal ID 0, solo dispatch,
 tracing/excluded providers and the final generic fallback remain audit targets.
 Only Mac Dev is deployed, and the overall coordinator-removal goal stays active.
+
+
+## 76. Original host filesystem command closure — 2026-11-09
+
+Streaming imports, exports, conditional FileProvider saves and timezone commands
+now submit accepted original-resource work to the existing disk pool. The adapter
+retains FIFO completion without pausing unrelated CPUs. Original inode exports and
+conditional edits share the existing mapped-backing driver; the original task's
+pending namespace publication is observed without consuming/retiring its task
+ownership. Anonymous staging avoids guest-visible temporary input that another
+guest task could modify. Original filesystem/inode/byte transactions retain the
+conditional content check through namespace replacement, including failed-manifest
+rollback and retry with no spare staging quota. Ordinary guest byte access gains
+no synchronization.
+
+Explicit user pause remains intentional, while disk and backing completions
+continue on the existing driver. Root teardown drains accepted work. Actual
+cancellation/final backend teardown and genuinely capability-less embeddings keep
+their own boundary. The owner-selected policy still submits FileProvider saves on
+returning to Trames. All applicable local checks pass; only Mac Dev deployment is
+included. See the [validation record](../validation/host-files-20261109.json).
+The overall coordinator-removal goal remains active.

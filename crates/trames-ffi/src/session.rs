@@ -738,6 +738,8 @@ fn run(
         terminals: native_terminals,
         init_monitor,
         pending: None,
+        host_files: None,
+        host_active: None,
     };
     io.snapshot(&runtime.linux.vfs);
     session
@@ -761,32 +763,114 @@ struct Adapter {
     snapshot_at: Instant,
     terminals: Option<crate::terminals::NativeTerminals>,
     pending: Option<Command>,
+    host_files: Option<Arc<trames_linux::FileLayouts>>,
+    host_active: Option<Arc<AtomicBool>>,
     init_monitor: Option<trames_distro::systemd::Monitor>,
 }
 impl Adapter {
+    // Legacy capability-less callers retain their explicit stopped boundary.
+    fn progress_commands(&mut self, vfs: &Vfs) -> io::Result<bool> {
+        if self
+            .host_active
+            .as_ref()
+            .is_some_and(|done| !done.load(Ordering::Acquire))
+        {
+            return Ok(false);
+        }
+        self.host_active = None;
+        if self.pending.is_none() {
+            self.pending = self.commands.try_recv().ok();
+        }
+        let Some(command) = self.pending.take() else {
+            return Ok(false);
+        };
+        if self.host_files.is_none() {
+            self.pending = Some(command);
+            return Ok(true);
+        }
+        let context = vfs.host_files_context();
+        let export = match &command {
+            Command::Transfer(t) if t.options.export => {
+                match context.host_export(t.options.guest.as_bytes()) {
+                    Ok(export) => Some(export),
+                    Err(error) => {
+                        fail_command(command, error.to_string());
+                        return Ok(false);
+                    }
+                }
+            }
+            _ => None,
+        };
+        let edit = match &command {
+            Command::Transfer(t) if !t.options.export && t.options.expected.is_some() => {
+                match context.host_edit(t.options.guest.as_bytes()) {
+                    Ok(edit) => Some(edit),
+                    Err(error) => {
+                        fail_command(
+                            command,
+                            match error.0 {
+                                18 => "edited path is covered by another filesystem; copy retained"
+                                    .into(),
+                                21 => {
+                                    "edited Linux path is no longer a regular file; copy retained"
+                                        .into()
+                                }
+                                _ => error.to_string(),
+                            },
+                        );
+                        return Ok(false);
+                    }
+                }
+            }
+            _ => None,
+        };
+        let done = Arc::new(AtomicBool::new(false));
+        self.host_active = Some(done.clone());
+        self.host_files
+            .as_ref()
+            .unwrap()
+            .submit_host(Box::new(HostCommand {
+                vfs: context,
+                command,
+                access: HostAccess {
+                    export,
+                    edit,
+                    admission: None,
+                },
+                completion: HostCompletion {
+                    session: self.session.clone(),
+                    done,
+                    wake: std::thread::current(),
+                },
+            }));
+        Ok(false)
+    }
     fn command(&mut self, vfs: &mut Vfs, command: Command) {
+        Self::execute(&self.session, vfs, command, HostAccess::default());
+    }
+    fn execute(session: &Session, vfs: &mut Vfs, command: Command, access: HostAccess) {
         match command {
             Command::Transfer(command) => {
-                let result = self.transfer(vfs, command.options, &command.cancelled);
-                self.snapshot(vfs);
+                let result =
+                    Self::transfer(session, vfs, command.options, &command.cancelled, access);
+                Self::snapshot_session(session, vfs);
                 let _ = command.result.send(result);
             }
             Command::Timezone(timezone, response) => {
                 let result =
                     trames_distro::synchronize_timezone(vfs, &timezone.identifier, &timezone.data)
                         .map_err(|e| e.to_string());
-                self.snapshot(vfs);
+                Self::snapshot_session(session, vfs);
                 let _ = response.send(result);
             }
         }
     }
     fn snapshot(&self, vfs: &Vfs) {
+        Self::snapshot_session(&self.session, vfs);
+    }
+    fn snapshot_session(session: &Session, vfs: &Vfs) {
         let capacity = vfs.capacity();
-        let mut b = self
-            .session
-            .buffers
-            .lock()
-            .unwrap_or_else(|p| p.into_inner());
+        let mut b = session.buffers.lock().unwrap_or_else(|p| p.into_inner());
         b.status.budget_bytes = capacity.budget_bytes;
         b.status.used_bytes = capacity.used_bytes;
         b.status.available_bytes = capacity.available_bytes;
@@ -794,38 +878,37 @@ impl Adapter {
         b.status.nodes_used = capacity.nodes_used;
     }
     fn transfer(
-        &self,
+        session: &Session,
         vfs: &mut Vfs,
         o: TransferOptions,
         cancelled: &AtomicBool,
+        access: HostAccess,
     ) -> Result<u64, String> {
-        if cancelled.load(Ordering::Acquire) || self.session.cancelled.load(Ordering::Acquire) {
+        if cancelled.load(Ordering::Acquire) || session.cancelled.load(Ordering::Acquire) {
             return Err("transfer cancelled".into());
         }
         if o.export {
-            if let Some(maximum) = o.maximum_bytes {
-                let stat = vfs
-                    .stat_at(trames_vfs::AT_FDCWD, o.guest.as_bytes())
-                    .map_err(|e| e.to_string())?;
-                let size = u64::from_le_bytes(stat[48..56].try_into().expect("stat size"));
-                if size > maximum {
-                    return Err("guest file exceeds transfer size limit".into());
-                }
+            let export = access
+                .export
+                .map_or_else(|| vfs.host_export(o.guest.as_bytes()), Ok)
+                .map_err(|e| e.to_string())?;
+            if o.maximum_bytes
+                .is_some_and(|maximum| export.len() > maximum)
+            {
+                return Err("guest file exceeds transfer size limit".into());
             }
             let mut file = OpenOptions::new()
                 .write(true)
                 .create_new(true)
                 .open(&o.host)
                 .map_err(|e| e.to_string())?;
-            let result = vfs
-                .export_writer(
-                    o.guest.as_bytes(),
-                    &mut CancelWriter {
-                        file: &mut file,
-                        session: &self.session.cancelled,
-                        cancelled,
-                    },
-                )
+            let result = export
+                .write_to(&mut CancelWriter {
+                    file: &mut file,
+                    session: &session.cancelled,
+                    cancelled,
+                    remaining: o.maximum_bytes.unwrap_or(u64::MAX),
+                })
                 .map_err(|e| e.to_string());
             if result.is_err() {
                 let _ = fs::remove_file(o.host);
@@ -844,13 +927,64 @@ impl Adapter {
                 if !o.replace {
                     return Err("conditional transfer requires replacement".into());
                 }
+                if let Some(edit) = access.edit {
+                    verify_saved_edit(&mut file, expected, || {
+                        cancelled.load(Ordering::Acquire)
+                            || session.cancelled.load(Ordering::Acquire)
+                    })?;
+                    let mut reader = CancelReader {
+                        file,
+                        session: &session.cancelled,
+                        cancelled,
+                        remaining: o.maximum_bytes.unwrap_or(u64::MAX),
+                    };
+                    let admission = access
+                        .admission
+                        .as_ref()
+                        .ok_or("missing original edit admission")?;
+                    return edit
+                        .replace(vfs, admission, &mut reader, |inode, bytes| {
+                            let mut digest = Sha256::new();
+                            let mut buffer = [0; 65536];
+                            loop {
+                                if cancelled.load(Ordering::Acquire)
+                                    || session.cancelled.load(Ordering::Acquire)
+                                {
+                                    return Err(trames_vfs::Errno(4));
+                                }
+                                let count = bytes.read(&mut buffer).map_err(|e| {
+                                    trames_vfs::Errno(e.raw_os_error().unwrap_or(5) as u32)
+                                })?;
+                                if count == 0 {
+                                    break;
+                                }
+                                digest.update(&buffer[..count]);
+                            }
+                            let current = format!("{:x}", digest.finalize());
+                            if current == expected.replacement_sha256 {
+                                return Ok(true);
+                            }
+                            if inode != expected.inode || current != expected.sha256 {
+                                return Err(trames_vfs::Errno(116));
+                            }
+                            Ok(false)
+                        })
+                        .map_err(|error| {
+                            if error.0 == 116 {
+                                "Linux file changed since it was opened; edited copy retained"
+                                    .into()
+                            } else {
+                                error.to_string()
+                            }
+                        });
+                }
                 if check_edit_version(vfs, o.guest.as_bytes(), &mut file, expected)? {
                     return file_inode(vfs, o.guest.as_bytes()); // Retry after a completed commit.
                 }
             }
             let mut reader = CancelReader {
                 file,
-                session: &self.session.cancelled,
+                session: &session.cancelled,
                 cancelled,
                 remaining: o.maximum_bytes.unwrap_or(u64::MAX),
             };
@@ -864,20 +998,74 @@ impl Adapter {
         }
     }
 }
+struct HostCompletion {
+    session: Arc<Session>,
+    done: Arc<AtomicBool>,
+    wake: std::thread::Thread,
+}
+impl Drop for HostCompletion {
+    fn drop(&mut self) {
+        self.done.store(true, Ordering::Release);
+        self.session.console_readiness.notify_locked();
+        self.wake.unpark();
+    }
+}
+#[derive(Default)]
+struct HostAccess {
+    export: Option<trames_vfs::HostExport>,
+    edit: Option<trames_vfs::HostEdit>,
+    admission: Option<trames_linux::HostFileAdmission>,
+}
+struct HostCommand {
+    vfs: Vfs,
+    command: Command,
+    access: HostAccess,
+    completion: HostCompletion,
+}
+impl trames_linux::HostFileTask for HostCommand {
+    fn layout(&self) -> Option<Arc<trames_linux::HostFileLayout>> {
+        self.access
+            .export
+            .as_ref()
+            .map(|export| export.layout())
+            .or_else(|| self.access.edit.as_ref().map(|edit| edit.layout()))
+    }
+    fn run(self: Box<Self>, exclusive: Option<trames_linux::HostFileAdmission>) {
+        let Self {
+            mut vfs,
+            command,
+            mut access,
+            completion,
+        } = *self;
+        access.admission = exclusive;
+        Adapter::execute(&completion.session, &mut vfs, command, access);
+    }
+    fn fail(self: Box<Self>) {
+        fail_command(self.command, "host filesystem executor closed".into());
+    }
+}
+fn fail_command(command: Command, error: String) {
+    match command {
+        Command::Transfer(t) => {
+            let _ = t.result.send(Err(error));
+        }
+        Command::Timezone(_, reply) => {
+            let _ = reply.send(Err(error));
+        }
+    }
+}
+
 fn file_inode(vfs: &Vfs, path: &[u8]) -> Result<u64, String> {
     let stat = vfs
         .stat_at_flags(trames_vfs::AT_FDCWD, path, true)
         .map_err(|e| e.to_string())?;
     Ok(u64::from_le_bytes(stat[8..16].try_into().unwrap()))
 }
-/// Cold, explicit editor commit. The coordinator owns the VFS throughout the
-/// comparison and atomic replacement; ordinary guest I/O gains no checks.
-fn check_edit_version(
-    vfs: &Vfs,
-    path: &[u8],
+fn verify_saved_edit(
     replacement: &mut File,
     expected: &TransferVersion,
-) -> Result<bool, String> {
+    cancelled: impl Fn() -> bool,
+) -> Result<(), String> {
     if [
         expected.sha256.as_str(),
         expected.replacement_sha256.as_str(),
@@ -890,6 +1078,9 @@ fn check_edit_version(
     let mut source = Sha256::new();
     let mut buffer = [0; 65536];
     loop {
+        if cancelled() {
+            return Err("transfer cancelled".into());
+        }
         let count = replacement.read(&mut buffer).map_err(|e| e.to_string())?;
         if count == 0 {
             break;
@@ -900,6 +1091,17 @@ fn check_edit_version(
     if format!("{:x}", source.finalize()) != expected.replacement_sha256 {
         return Err("saved edit checksum mismatch; copy retained".into());
     }
+    Ok(())
+}
+/// Legacy capability-less stopped caller. Production edits use HostEdit
+/// original-file admission and a combined compare/replace transaction.
+fn check_edit_version(
+    vfs: &Vfs,
+    path: &[u8],
+    replacement: &mut File,
+    expected: &TransferVersion,
+) -> Result<bool, String> {
+    verify_saved_edit(replacement, expected, || false)?;
     let stat = vfs
         .stat_at_flags(trames_vfs::AT_FDCWD, path, true)
         .map_err(|e| e.to_string())?;
@@ -972,19 +1174,52 @@ struct CancelWriter<'a> {
     file: &'a mut File,
     session: &'a AtomicBool,
     cancelled: &'a AtomicBool,
+    remaining: u64,
 }
 impl Write for CancelWriter<'_> {
     fn write(&mut self, bytes: &[u8]) -> io::Result<usize> {
         if self.cancelled.load(Ordering::Acquire) || self.session.load(Ordering::Acquire) {
             return Err(io::ErrorKind::Interrupted.into());
         }
-        self.file.write(bytes)
+        if !bytes.is_empty() && self.remaining == 0 {
+            return Err(io::Error::new(
+                io::ErrorKind::FileTooLarge,
+                "guest file exceeds transfer size limit",
+            ));
+        }
+        let count = bytes
+            .len()
+            .min(self.remaining.min(usize::MAX as u64) as usize);
+        let count = self.file.write(&bytes[..count])?;
+        self.remaining -= count as u64;
+        Ok(count)
     }
     fn flush(&mut self) -> io::Result<()> {
         self.file.flush()
     }
 }
 impl GuestOutput for Adapter {
+    fn bind_host_files(
+        &mut self,
+        _: Arc<dyn trames_linux::FileExecutor>,
+        layouts: Arc<trames_linux::FileLayouts>,
+    ) {
+        self.host_files = Some(layouts);
+    }
+    fn paused(&self) -> bool {
+        self.session.paused.load(Ordering::Acquire)
+    }
+    fn flush_output(&mut self) -> io::Result<bool> {
+        if self.pending.is_none() {
+            self.pending = self.commands.try_recv().ok();
+        }
+        Ok(self.pending.is_none()
+            && self
+                .host_active
+                .as_ref()
+                .is_none_or(|done| done.load(Ordering::Acquire)))
+    }
+
     fn source_console(&mut self) -> Arc<dyn trames_vfs::ConsoleIo> {
         let input = self.session.clone();
         let output = self.session.clone();
@@ -1061,10 +1296,7 @@ impl GuestOutput for Adapter {
             init.control(false)
                 .map_err(|e| io::Error::other(e.to_string()))?;
         }
-        if self.pending.is_none() {
-            self.pending = self.commands.try_recv().ok();
-        }
-        if self.pending.is_some() {
+        if self.progress_commands(vfs)? {
             return Ok(true);
         }
         {
@@ -1112,26 +1344,13 @@ impl GuestOutput for Adapter {
                 .expect("initialized")
                 .pump(&mut buffers.terminals);
         }
-        if let Some(command) = self
-            .pending
-            .take()
-            .or_else(|| self.commands.try_recv().ok())
-        {
+        if self.progress_commands(vfs)? {
+            let command = self.pending.take().expect("legacy stopped host command");
             self.command(vfs, command);
         }
         if self.snapshot_at.elapsed() >= Duration::from_secs(1) {
             self.snapshot(vfs);
             self.snapshot_at = Instant::now();
-        }
-        while self.session.paused.load(Ordering::Acquire) {
-            if self.session.cancelled.load(Ordering::Acquire) {
-                return Ok(false);
-            }
-            match self.commands.recv_timeout(Duration::from_millis(10)) {
-                Ok(command) => self.command(vfs, command),
-                Err(mpsc::RecvTimeoutError::Timeout) => {}
-                Err(mpsc::RecvTimeoutError::Disconnected) => return Ok(false),
-            }
         }
         Ok(true)
     }
@@ -1205,21 +1424,7 @@ impl GuestOutput for Adapter {
 #[cfg(test)]
 mod memory_tests {
     use super::*;
-    #[test]
-    fn init_notifications_progress_without_requesting_a_stopped_callback() {
-        let mut vfs = Vfs::default();
-        vfs.import_reader(
-            b"/usr/lib/systemd/systemd",
-            &mut b"init endpoint fixture".as_slice(),
-            true,
-        )
-        .unwrap();
-        for path in [b"/run".as_slice(), b"/sys", b"/dev"] {
-            if vfs.stat_at(trames_vfs::AT_FDCWD, path).is_err() {
-                vfs.mkdir_at(trames_vfs::AT_FDCWD, path, 0o755).unwrap();
-            }
-        }
-        let monitor = trames_distro::systemd::prepare(&mut vfs).unwrap();
+    fn test_adapter(init_monitor: Option<trames_distro::systemd::Monitor>) -> Adapter {
         let (commands, receiver) = mpsc::sync_channel(8);
         let session = Arc::new(Session {
             display: Default::default(),
@@ -1249,14 +1454,173 @@ mod memory_tests {
             transfers: Mutex::new(BTreeMap::new()),
             next_transfer: AtomicU64::new(1),
         });
-        let mut adapter = Adapter {
+        Adapter {
             session: session.clone(),
             commands: receiver,
             snapshot_at: Instant::now(),
             terminals: None,
             pending: None,
-            init_monitor: Some(monitor),
-        };
+            host_files: None,
+            host_active: None,
+            init_monitor,
+        }
+    }
+    type HostJob = (
+        Box<dyn trames_linux::HostFileTask>,
+        Option<trames_linux::HostFileAdmission>,
+    );
+    struct TestDisk(mpsc::Sender<HostJob>);
+    impl trames_linux::FileExecutor for TestDisk {
+        fn submit_file(&self, _: trames_vfs::FileWork, _: Arc<trames_linux::FileResult>) {
+            panic!("host fixture submits no guest disk work")
+        }
+        fn submit_host(
+            &self,
+            job: Box<dyn trames_linux::HostFileTask>,
+            admission: Option<trames_linux::HostFileAdmission>,
+        ) {
+            self.0.send((job, admission)).unwrap();
+        }
+    }
+    fn disk(adapter: &mut Adapter) -> mpsc::Receiver<HostJob> {
+        let (send, receive) = mpsc::channel();
+        let executor = Arc::new(TestDisk(send));
+        adapter.bind_host_files(executor.clone(), trames_linux::FileLayouts::new(executor));
+        receive
+    }
+    fn run_host(adapter: &Adapter, disk: &mpsc::Receiver<HostJob>) {
+        let layouts = adapter.host_files.as_ref().unwrap();
+        for request in layouts.take_owner() {
+            assert!(layouts.try_submit(request).is_ok());
+        }
+        let (job, admission) = disk.recv_timeout(Duration::from_secs(3)).unwrap();
+        job.run(admission);
+    }
+    #[test]
+    fn filesystem_commands_keep_source_execution_and_paused_completion() {
+        let mut vfs = Vfs::default();
+        let mut adapter = test_adapter(None);
+        let disk = disk(&mut adapter);
+        let path = std::env::temp_dir().join(format!("trames-host-command-{}", std::process::id()));
+        fs::write(&path, b"original").unwrap();
+        let (reply, result) = mpsc::sync_channel(1);
+        adapter
+            .session
+            .commands
+            .send(Command::Transfer(Transfer {
+                options: TransferOptions {
+                    guest: "/file".into(),
+                    host: path.clone(),
+                    export: false,
+                    token: 0,
+                    maximum_bytes: None,
+                    replace: false,
+                    expected: None,
+                },
+                result: reply,
+                cancelled: Arc::new(AtomicBool::new(false)),
+            }))
+            .unwrap();
+        assert!(!adapter.poll_control(&vfs).unwrap());
+        assert!(!adapter.flush_output().unwrap());
+        run_host(&adapter, &disk);
+        let inode = result.recv().unwrap().unwrap();
+        fs::write(&path, b"edited").unwrap();
+        let (reply, result) = mpsc::sync_channel(1);
+        adapter
+            .session
+            .commands
+            .send(Command::Transfer(Transfer {
+                options: TransferOptions {
+                    guest: "/file".into(),
+                    host: path.clone(),
+                    export: false,
+                    token: 0,
+                    maximum_bytes: None,
+                    replace: true,
+                    expected: Some(TransferVersion {
+                        inode,
+                        sha256: format!("{:x}", Sha256::digest(b"original")),
+                        replacement_sha256: format!("{:x}", Sha256::digest(b"edited")),
+                    }),
+                },
+                result: reply,
+                cancelled: Arc::new(AtomicBool::new(false)),
+            }))
+            .unwrap();
+        adapter.session.paused.store(true, Ordering::Relaxed);
+        assert!(adapter.control(&mut vfs).unwrap());
+        assert!(adapter.paused());
+        run_host(&adapter, &disk);
+        assert_ne!(result.recv().unwrap().unwrap(), inode);
+        let mut bytes = Vec::new();
+        vfs.export_writer(b"/file", &mut bytes).unwrap();
+        assert_eq!(bytes, b"edited");
+        adapter.session.paused.store(false, Ordering::Relaxed);
+        let (reply, result) = mpsc::sync_channel(1);
+        adapter
+            .session
+            .commands
+            .send(Command::Timezone(
+                HostTimezone {
+                    identifier: "UTC".into(),
+                    data: {
+                        let mut tz = vec![0; 44];
+                        tz[..4].copy_from_slice(b"TZif");
+                        tz
+                    },
+                },
+                reply,
+            ))
+            .unwrap();
+        assert!(!adapter.poll_control(&vfs).unwrap());
+        run_host(&adapter, &disk);
+        result.recv().unwrap().unwrap();
+        let output = path.with_extension("export");
+        let _ = fs::remove_file(&output);
+        let (reply, result) = mpsc::sync_channel(1);
+        adapter
+            .session
+            .commands
+            .send(Command::Transfer(Transfer {
+                options: TransferOptions {
+                    guest: "/file".into(),
+                    host: output.clone(),
+                    export: true,
+                    token: 0,
+                    maximum_bytes: None,
+                    replace: false,
+                    expected: None,
+                },
+                result: reply,
+                cancelled: Arc::new(AtomicBool::new(false)),
+            }))
+            .unwrap();
+        assert!(!adapter.poll_control(&vfs).unwrap());
+        run_host(&adapter, &disk);
+        result.recv().unwrap().unwrap();
+        assert_eq!(fs::read(&output).unwrap(), b"edited");
+        assert!(adapter.flush_output().unwrap());
+        fs::remove_file(path).unwrap();
+        fs::remove_file(output).unwrap();
+    }
+    #[test]
+    fn init_notifications_progress_without_requesting_a_stopped_callback() {
+        let mut vfs = Vfs::default();
+        vfs.import_reader(
+            b"/usr/lib/systemd/systemd",
+            &mut b"init endpoint fixture".as_slice(),
+            true,
+        )
+        .unwrap();
+        for path in [b"/run".as_slice(), b"/sys", b"/dev"] {
+            if vfs.stat_at(trames_vfs::AT_FDCWD, path).is_err() {
+                vfs.mkdir_at(trames_vfs::AT_FDCWD, path, 0o755).unwrap();
+            }
+        }
+        let monitor = trames_distro::systemd::prepare(&mut vfs).unwrap();
+        let mut adapter = test_adapter(Some(monitor));
+        let session = adapter.session.clone();
         let sender = vfs.local_create(2, 0).unwrap();
         let sender = vfs.local_socket(sender).unwrap().unwrap();
         for round in 0..2 {
