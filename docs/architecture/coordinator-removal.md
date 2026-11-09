@@ -5601,3 +5601,66 @@ underlying providers. The resource-backed cold body no longer needs the current
 owner task, but no capability-less embedding or missing guest-mm reader is
 relabelled as successful source execution. Actual host cancellation/final teardown,
 final execution-dispatch fallback and initial/legacy orchestration remain open.
+
+
+## 92. Original synchronous faults and complete signal-frame delivery — 2026-11-09
+
+Runtime `ec5a407eaf30d4c8ba757695863a47717ebbd958` closes recognized guest-fault delivery as a connected source
+subsystem: memory permission/unmapped/file-backing faults, illegal instructions,
+breakpoints, rejected native-call entries, caught handlers, frame construction,
+restored context and terminal frame failures. The shared classifier and common
+forced-thread-fault policy remain the authority. Host transport errors stay host
+errors; embeddings without source state keep their actual boundary.
+
+A precise thread fault replaces that thread's earlier asynchronous info of the
+same number. KILL retains first priority, then a synchronous thread fault, then
+ordinary pending signals. The idle source selector reads the existing two pending
+bitsets without an action/pending/context lock. Active queue/action/frame access
+uses original object synchronization. No new task-wide/global native lock,
+resource/service thread, polling bus, production unsafe block, per-instruction hook
+or ordinary guest-memory check/fence is introduced.
+
+Handlers run on the original caller View with the shared signal-frame ABI. Guest
+PC edits, general/vector/SME state, masks, alternate stack and restorer retain
+existing validation and restoration. Failed sigreturn preserves its source path's
+existing errno and pending SIGSEGV, now without joined retry. Failed frame writing
+or nesting exhaustion retires the original group with SIGSEGV. A fault during a
+handler retains blocked synchronous-fault termination. Caught diagnostics use the
+original bounded log and live task name; fatal diagnostics keep final retirement
+publication. Errors are not manufactured to avoid a fallback.
+
+The connected process test exercises 48 caught-fault combinations across four/
+twelve CPUs, one execution slot, an allowed seccomp policy and normal/alternate
+stacks. It checks precise signal/code/address, guest-edited PC, register/SP/mask/
+frame restoration, original logging and one-cohort completion. Five terminal
+frame/return/nested-fault scenarios verify an unrelated root actor continues
+while the affected ordinary child exits. Both tests fail against prior production.
+The failure fixture raises its signal after source admission; prequeued signals
+would instead test bootstrap delivery. It uses an ordinary child because PID 1
+exit legitimately ends the session.
+
+Both platforms complete local runtime validation and pass 444 process regressions
+(two intentionally ignored), ten FFI cases, strict lint and both iPad SDK builds.
+The original macOS workspace-test log preserves one unchanged IPv6 readiness
+timeout. Its targeted retry passes; already passing packages are reused, then
+unreached package/integration/doc targets and the remaining workflow steps pass.
+The record reports this coverage recovery explicitly rather than presenting the
+raw interrupted runner as a pristine seven-step pass. ARM64 Linux passes all
+seven runtime workflow steps.
+
+The signed native fixture installs the real guest handler and uses a separate
+16 KiB stack interval for each thread, preventing overlapping 4,688-byte signal
+frames. Actual guest-edited native context resumes every thread after its fault,
+with exact siginfo bytes and completion markers. Prior four-CPU execution needs
+five cohorts with two returned clones. Final four/twelve-CPU execution uses one
+cohort with no returned syscall/native/service. No twelve-CPU baseline or controlled
+throughput gain is claimed. All 52 HVF plus fifteen product hardware cases pass;
+the prior dormant/read boundary and io_uring handoff regression remain covered.
+
+Installed Dev acceptance and fingerprints are in the
+[validation record](../validation/source-faults-20261109.json). Only Mac Dev is
+updated; stable 1.5.4, business environments and physical iPad installs retain
+their versions. Four broad categories remain, but recognized guest faults and
+signal-frame failures no longer belong to the final joined-dispatch subsystem.
+Remaining work includes cold syscall/native-resource dispatch, actual missing
+providers/native waits, host cancel/final teardown and initial/legacy orchestration.

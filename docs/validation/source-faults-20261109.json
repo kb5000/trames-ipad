@@ -1,0 +1,309 @@
+{
+  "stage": 92,
+  "date": "2026-11-09",
+  "overall_goal": "active",
+  "runtime_revision": "ec5a407eaf30d4c8ba757695863a47717ebbd958",
+  "prior_runtime": "79b3c44139eb5f65296161c945e03c55c0d233e5",
+  "scope": "Recognized guest CPU/native fault delivery through original thread signal resources, precise forced siginfo, handler entry/return, terminal frame failures, nested faults and original diagnostics.",
+  "architecture": {
+    "faults": "Source and solo share classification and forced-thread-fault queue policy. Memory/unmapped/protected/file-SIGBUS, instruction/trap and rejected-native faults complete on the original executor with its existing View. Host failures remain host failures.",
+    "signals": "KILL then precise private fault then ordinary pending signals. A prior asynchronous signal of the same number is replaced only in the original thread inbox; shared signal info is retained. Blocked/ignored/default synchronous faults terminate the original group.",
+    "frames": "The same ABI handles PC/register/SP/mask/alternate stack and SME records. Invalid sigreturn preserves its existing source errno plus pending SIGSEGV. Failed frame entry/nesting terminates the original group without stopping an unrelated actor.",
+    "diagnostics": "Caught faults use the existing bounded original log and live task name. Fatal diagnostics keep final retirement publication. The idle source selector reads the existing two pending bitsets without taking signal locks.",
+    "no_new": [
+      "coordinator/resource/service thread",
+      "polling bus",
+      "task-wide/global native lock",
+      "production unsafe block or trait override",
+      "ordinary guest memory checks/fences",
+      "per-instruction hook",
+      "fake guest errno or host-fault-to-guest-signal conversion"
+    ]
+  },
+  "baselines": {
+    "process": {
+      "runtime_revision": "79b3c44139eb5f65296161c945e03c55c0d233e5",
+      "checks": [
+        {
+          "name": "process",
+          "code": 101,
+          "seconds": 12.223347875,
+          "output": "warning: unused workspace dependency `trames-native`\n  --> Cargo.toml:17:1\n   |\n17 | trames-native = { path = \"runtime/crates/trames-native\" }\n   | ^^^^^^^^^^^^^\n   |\n   = note: `cargo::unused_workspace_dependencies` is set to `warn` by default\nhelp: consider removing the workspace dependency `trames-native`\nwarning: workspace (manifest) generated 1 warning\n   Compiling trames-session v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-session)\n   Compiling trames-vfs v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-vfs)\n   Compiling trames-kernel v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-kernel)\n   Compiling trames-linux v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-linux)\n   Compiling trames-core v1.5.4 (/Users/main/dev/trames/crates/trames-core)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 11.36s\n     Running ../../runtime/crates/trames-session/src/lib.rs (target/debug/build/trames-core/73ea467a4920ade2/out/kernel_conformance-73ea467a4920ade2)\n\nrunning 2 tests\ntest process::source_fault_tests::caught_cpu_and_rejected_native_faults_restore_the_original_frame_on_source ... source-fault CPUs=4 slots=4 filter=false alt=false kind=0 cohorts=1 marker=[0, 0, 0, 0] returned={}\n\nthread 'process::source_fault_tests::caught_cpu_and_rejected_native_faults_restore_the_original_frame_on_source' (27953306) panicked at crates/trames-core/../../runtime/crates/trames-session/src/process_source_fault_tests.rs:130:17:\nassertion `left == right` failed\n  left: [0, 0, 0, 0]\n right: [1, 0, 0, 0]\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\nFAILED\ntest process::source_fault_tests::signal_frame_failures_and_bad_sigreturn_finish_on_source_without_stopping_peer ... \nthread 'process::source_fault_tests::signal_frame_failures_and_bad_sigreturn_finish_on_source_without_stopping_peer' (27953308) panicked at crates/trames-core/../../runtime/crates/trames-session/src/process_source_fault_tests.rs:225:13:\nassertion `left == right` failed\n  left: None\n right: Some(11)\nFAILED\n\nfailures:\n\nfailures:\n    process::source_fault_tests::caught_cpu_and_rejected_native_faults_restore_the_original_frame_on_source\n    process::source_fault_tests::signal_frame_failures_and_bad_sigreturn_finish_on_source_without_stopping_peer\n\ntest result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 444 filtered out; finished in 0.02s\n\nerror: test failed, to rerun pass `-p trames-core --test kernel-conformance`\n"
+        }
+      ]
+    },
+    "signed_native": {
+      "runtime_revision": "79b3c44139eb5f65296161c945e03c55c0d233e5",
+      "code": 101,
+      "output": "\nrunning 1 test\ntest session::tests::caught_native_cpu_faults_and_signal_frames_complete_on_original_workers ... hardware source-fault CPUs=4 exit=0 cohorts=5 returned={220: 2}\n\nthread 'session::tests::caught_native_cpu_faults_and_signal_frames_complete_on_original_workers' (27954962) panicked at crates/trames-mac/src/session.rs:1550:13:\nassertion `left == right` failed\n  left: 5\n right: 1\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\nFAILED\n\nfailures:\n\nfailures:\n    session::tests::caught_native_cpu_faults_and_signal_frames_complete_on_original_workers\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 35 filtered out; finished in 0.03s\n\n"
+    }
+  },
+  "checks": {
+    "workflows": {
+      "runtime_macos": {
+        "completed": true,
+        "raw_prefix_passed": 4,
+        "raw_step_5": "interrupted by one unchanged IPv6 readiness timeout",
+        "recovery": {
+          "completed": true,
+          "input_key": "6f55d64398041891a66fac1ae1354a9f77a1940067acda74c0cba97a58596982",
+          "initial_summary_sha256": "628b0de531e78d249471a875965e679a87fa363e04cefcffeab2a8f8f3dac2e1",
+          "initial_failure": "root_routing_tests::ipv6_defaults_are_dual_stack_for_native_and_guest_tcp_udp",
+          "initial_test_log_sha256": "dbf83bd2ac83298b29ab7c8531e6c42f0a9de947bd7942c73d10f55fea30a54e",
+          "failed_case_retry_sha256": "717ebaa323b9f1c88a84358fa115ccdd84be27ca30c515a95f61c89a534bb9c1",
+          "reused_libtest_packages": [
+            "trames-accel",
+            "trames-audio",
+            "trames-bridge",
+            "trames-distro",
+            "trames-elf",
+            "trames-engine",
+            "trames-execution",
+            "trames-graphics",
+            "trames-kernel",
+            "trames-linux",
+            "trames-memory",
+            "trames-native",
+            "trames-net"
+          ],
+          "remaining_packages": [
+            "trames-session",
+            "trames-shared",
+            "trames-vfs",
+            "trames-video",
+            "trames-vulkan",
+            "trames-wayland"
+          ],
+          "checks": [
+            {
+              "name": "runtime-remaining-packages",
+              "code": 0,
+              "seconds": 4.188738000000001
+            },
+            {
+              "name": "runtime-net-virtual",
+              "code": 0,
+              "seconds": 3.991906666000001
+            },
+            {
+              "name": "runtime-remaining-docs",
+              "code": 0,
+              "seconds": 5.667888
+            },
+            {
+              "name": "runtime-mac-tail",
+              "code": 0,
+              "seconds": 8.0148905
+            }
+          ],
+          "scope": "Original workspace test coverage completed by retaining passing lib/integration targets, rerunning only the failed net case and running the unreached package/integration/doc targets; original failed CI log is preserved. Steps 6 and 7 pass separately."
+        },
+        "tail_steps_passed": [
+          6,
+          7
+        ]
+      },
+      "runtime_linux": {
+        "passed": 7,
+        "total": 7,
+        "sha256": "2427d47d13d811ff755667ebb701ec11838e24d63fee81b8450fae07a9bbd746"
+      },
+      "mac_product": {
+        "passed": 8,
+        "total": 12,
+        "sha256": "ba2a693dc459c3f30aa029c6f6c32121c28cfb66f39671b97b3bf6446cc4bcc8"
+      }
+    },
+    "macos": [
+      {
+        "name": "runtime-mac",
+        "code": 0,
+        "seconds": 22.031059666999997
+      },
+      {
+        "name": "kernel-conformance",
+        "code": 0,
+        "seconds": 23.571957833
+      },
+      {
+        "name": "ffi",
+        "code": 0,
+        "seconds": 8.369961499999995
+      },
+      {
+        "name": "core-clippy",
+        "code": 0,
+        "seconds": 4.394654166000002
+      },
+      {
+        "name": "ffi-clippy",
+        "code": 0,
+        "seconds": 0.316336917000001
+      },
+      {
+        "name": "ipad-compile",
+        "code": 0,
+        "seconds": 4.941681792000004
+      }
+    ],
+    "linux": [
+      {
+        "name": "process-all",
+        "code": 0,
+        "seconds": 56.772442396
+      },
+      {
+        "name": "ffi-all",
+        "code": 0,
+        "seconds": 13.956087158000003
+      },
+      {
+        "name": "core-clippy",
+        "code": 0,
+        "seconds": 5.1846732110000175
+      },
+      {
+        "name": "runtime-ci",
+        "code": 0,
+        "seconds": 54.363044426000016
+      }
+    ],
+    "process": {
+      "macos": {
+        "passed": 444,
+        "ignored": 2,
+        "sha256": "5aad83120c85f378b515a513c2ba025081b941ea3f0d01d79fedf674155db220"
+      },
+      "linux": {
+        "passed": 444,
+        "ignored": 2,
+        "sha256": "746b6ecbf53b7ef4adc5dbeebe5696d37cbbe5c419c170dedaf03b8bb9904cd4"
+      }
+    },
+    "ffi": {
+      "macos": {
+        "passed": 10,
+        "ignored": 0,
+        "sha256": "ced486b97d1a720aa0c78823984e228be250f34d76f0f32c922fbd129b13c8a0"
+      },
+      "linux": {
+        "passed": 10,
+        "ignored": 0,
+        "sha256": "d56df1209bf71edca4fb87eca15ff9aeae9ab4f38ccd5a9da9fe4f7acb46f6e1"
+      }
+    },
+    "ipad": [
+      {
+        "target": "aarch64-apple-ios",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+        "code": 0
+      },
+      {
+        "target": "aarch64-apple-ios-sim",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk",
+        "code": 0
+      }
+    ],
+    "hardware": {
+      "passed": true,
+      "runtime_revision": "ec5a407eaf30d4c8ba757695863a47717ebbd958",
+      "rows": [
+        {
+          "target": "trames-mac-run",
+          "executable_sha256": "713c1aae183684a23d05d2617dd98e39249f714456bef2be36ea40391161e41d",
+          "exit": 0,
+          "passed_tests": 15
+        },
+        {
+          "target": "trames_hvf",
+          "executable_sha256": "2a8b0e244168a1a720e5453ade0bec2645f78cc0c13d7ceabd5f3bef7df6eb26",
+          "exit": 0,
+          "passed_tests": 52
+        }
+      ]
+    },
+    "process_regressions": [
+      "caught_cpu_and_rejected_native_faults_restore_the_original_frame_on_source",
+      "signal_frame_failures_and_bad_sigreturn_finish_on_source_without_stopping_peer"
+    ],
+    "common_regression": "original_fault_replaces_only_its_thread_info_and_has_delivery_priority",
+    "native_source_faults": {
+      "cpus": [
+        4,
+        12
+      ],
+      "cohorts": 1,
+      "returned_syscalls": {},
+      "actual_siginfo_and_each_thread_marker": true
+    },
+    "native_prior": {
+      "cpus": 4,
+      "cohorts": 5,
+      "returned_syscalls": {
+        "220": 2
+      }
+    },
+    "native_log_sha256": "8391f8eb077f3d0545c22f03602a64fa8869326299e030b1953c044cc603b605",
+    "installed": {
+      "version": "Trames Dev 1.5.4 (dev) runtime ec5a407eaf30d4c8ba757695863a47717ebbd958",
+      "runner_sha256": "35debdcd6c3556e4908f29c6fe54c7aa2300c9edf4dc3fa6f02de4f6a6ff3940",
+      "stable_sha256": "8fc21435034e8c041632e2e50419da9d2123bf790aedb0a1499286fc8367e614",
+      "stable_unchanged": true,
+      "checks": [
+        {
+          "name": "init",
+          "code": 0,
+          "seconds": 3.3049812079999996
+        },
+        {
+          "name": "host",
+          "code": 0,
+          "seconds": 0.924351583
+        },
+        {
+          "name": "tracing",
+          "code": 0,
+          "seconds": 0.26236312500000025
+        }
+      ]
+    }
+  },
+  "source_sha256": {
+    "runtime/crates/trames-kernel/src/signal/fault.rs": "408050c0d5306b4e04bbb51384547c2d4c681259dc7a3634dae99500b4e04b2e",
+    "runtime/crates/trames-kernel/src/signal/io.rs": "2a71a0f7655d77d5e180bbeb97dc434904036503c1b01fd150122ccc9a240fb2",
+    "runtime/crates/trames-linux/src/syscall_diagnostics.rs": "0167271c1a22bfc5d32085a7c356fe64ad88ddf105729b9e8ea2afccd940a536",
+    "runtime/crates/trames-session/src/process.rs": "91a9657e3a8afb7a478f3caae7089ac5fb0383cf20bd7da7206204d1b13b3fed",
+    "runtime/crates/trames-session/src/process_source_fault_tests.rs": "d1bd2dd0d42f422d32c4f5837c69dd15f9c4a9456c56b5d568132b56b8bc1004",
+    "runtime/crates/trames-session/src/worker_syscalls.rs": "43b7912aa9cbf4f1494d97bc9be7c349deed654984c34c582954aa7a97ea3269",
+    "runtime/crates/trames-session/src/workers.rs": "45238ce72f3aac4cbc489828325524d84433467b0b2168f478276f7d461363a0",
+    "runtime/crates/trames-vfs/src/kernel_log.rs": "e0f60bc4378cac4b6e29a2541c5eb9d9214ba131c916acedaf82059bda2ce155"
+  },
+  "mac_native_fixture_sha256": "da88beaee666b55b35280d3786abb8a7fba1ad2cfb043f157711b3e2ea55880b",
+  "deployment": {
+    "channel": "Mac Dev only",
+    "runner": "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+    "signature_verified": true,
+    "stable_unchanged": true,
+    "physical_ipad_unchanged": true,
+    "business_environments_unchanged": true
+  },
+  "validation_notes": [
+    "The two new connected process tests both fail against prior production. Final caught-fault coverage spans 48 combinations of six fault kinds, normal/alternate signal stacks and four CPU/slot/filter configurations; terminal coverage spans five failure/nested cases at four/twelve CPUs and one slot.",
+    "The failure fixture signals itself after source admission. A prequeued handler instead exercises bootstrap delivery. An ordinary child is used for terminal cases, because exiting PID 1 legitimately ends the session.",
+    "The native fixture uses the real guest rt_sigaction and rt_sigreturn ABI on every thread, exact siginfo and edited native PC. Each thread has a 16 KiB stack interval: 4 KiB would overlap live 4,688-byte signal frames. Prior four-CPU execution needs five cohorts and two returned clones. Final four/twelve-CPU runs finish in one cohort. No twelve-CPU baseline or controlled throughput gain is claimed.",
+    "The macOS runtime workspace initially passed targets through memory/native and 82 network cases, then one unchanged IPv6 readiness case timed out. The failed case passes targeted retry. Passing packages were retained, remaining package/integration/doc targets and workflow steps 6/7 pass; original failed logs and exact recovery coverage are preserved. No network code was changed.",
+    "All changed Rust fingerprints match ARM64 Linux CI and paired Mac checkout. Both iPad SDK targets compile; physical installation is outside this coordinator round.",
+    "To complete builds without disk exhaustion, 99 root debug Cargo unit caches were removed only when every file and invocation was older than three hours. Current units, app/guest data, release installations and validation records were preserved. Logical bytes and paths are in the local build-cache-cleanup record."
+  ],
+  "remaining": [
+    "Final cold SVC/native-resource dispatch not completed/parked by a source resource scope.",
+    "Actual missing/excluded providers or native wait capabilities, including both retained io_uring maintenance escalation sites.",
+    "Actual host cancellation/deadline/shutdown and final backend/session teardown.",
+    "Initial/standalone/capability-less orchestration."
+  ],
+  "limits": [
+    "Four broad categories remain. Recognized source guest faults and signal-frame failures are removed from final joined dispatch; this is not complete coordinator removal.",
+    "Host transport errors and genuinely absent source state keep their actual failure/admission boundaries.",
+    "No broad application throughput or Firefox latency improvement is inferred from cohort counts."
+  ]
+}
