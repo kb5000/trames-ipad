@@ -2,6 +2,23 @@
 
 ## Current status — 2026-11-09
 
+Stage 80 moves supported **guest halt/poweroff** onto original lifecycle
+resources. Source/solo share authority, magic, command and namespace validation.
+The initial root publication retains its original group control across later
+admission/rekey/retirement. A source power request exits that original root and
+the caller's group using existing execution leases, waits and cleanup. No PID
+lookup, host power API, new service thread, ordinary memory check/fence or
+per-instruction check is added.
+
+This removes the power syscall handoff; final session/backend teardown still
+stops and drains actual CPU actors. Missing real shutdown/exit capabilities,
+other final dispatch and host/legacy boundaries remain. The overall goal is
+active. See the [validation record](../validation/guest-power-20261109.json).
+Only Mac Dev deployment is included; stable 1.5.4, business environments and
+physical iPad installs retain their versions.
+
+### Stage 79 original system statistics (historical)
+
 Stage 79 moves the supported **system statistics subsystem** onto original
 shared resources. `sysinfo` and proc observations use the same original task
 directory, unique-mm residency reports and host-memory callback. Both source and
@@ -108,7 +125,7 @@ records source/executable hashes, original joined behavior, reuse proof and fina
 installed acceptance. Only Mac Dev is updated; stable 1.5.4, business environments
 and physical iPad installs remain unchanged.
 
-### Remaining boundaries after stage 79
+### Remaining boundaries after stage 80
 
 **The coordinator still exists.** io_uring's remaining `owner_required` setters
 are the two actual source-maintenance failures: unavailable wait capability or an
@@ -126,7 +143,7 @@ row in the coverage inventory below:
 3. Last-resort known-resource/subcommand and unhandled HLT/fault dispatch.
 4. Initial/legacy admission and solo orchestration; solo is not itself a syscall RPC.
 
-Supported sysinfo/system-accounting refresh is removed by stage 79. Live host pause/resume is removed from joined execution by stage 78. Native special-device/Bridge pathname, byte and readiness dependencies are removed by stage 77. Host transfer/timezone/FileProvider commands are removed from joined execution by stage 76. Mac memory-pressure reclamation is removed by stage 75.
+Supported guest halt/poweroff syscall execution is removed by stage 80. Supported sysinfo/system-accounting refresh is removed by stage 79. Live host pause/resume is removed from joined execution by stage 78. Native special-device/Bridge pathname, byte and readiness dependencies are removed by stage 77. Host transfer/timezone/FileProvider commands are removed from joined execution by stage 76. Mac memory-pressure reclamation is removed by stage 75.
 Init notification/graceful-stop supervision was removed by stage 74. Diagnostic syscall tracing was removed by stage 73. Stage 72 removed
 the independent embedding terminal-ID-0 execution category. Normal subsystem names
 below describe coverage and do not imply another coordinator dependency.
@@ -142,6 +159,7 @@ below describe coverage and do not imply another coordinator dependency.
 | Mapping topology, pins and mapped-file layout | Supported brk/mmap/munmap/mremap/mprotect/msync/madvise and buffer-registration checkpoints publish on an existing worker; additive anonymous mmap is direct | Proc/cold-mm checkpoints and supported mapped-file layout transactions now run on existing workers; excluded backing/lifetime/policy and capability-less embeddings retain explicit boundaries |
 | Native special-device paths and Bridge bytes/readiness | Calling worker, original pseudo nodes/OFDs/connections and original readiness | No supported-device/Bridge-only join remains; unavailable providers and unsupported driver APIs retain their existing route/result |
 | Native libc/GPU/video/audio | Normal bodies, resource waits and admitted mapping/entry checkpoints use calling/shared-resource execution; exceptional access reuses original task/mm custody | Capability-less embeddings and actual platform/host lifecycle remain; AppKit affinity, device/disk pools and local fallback are not extra coordinators |
+| Guest halt/poweroff | Calling executor and original root/caller group lifecycle, with shared source/solo validation | No supported power-control-only join. Actual CPU drain/backend teardown and missing original control/exit capabilities retain their scope; restart/kexec/nested behavior stays unsupported |
 | System statistics and live CPU accounting | sysinfo and proc use original task/mm/host resources; active assignments expose time directly | No supported-statistics-only join. Missing real statistics/host capabilities retain legacy execution; observer-sampled load and wall-assignment time remain approximations |
 | Dynamic proc/sys and proc pathname/FD consumers | Calling worker and original PID/mm/Files/fs/namespace resources | First cross-mm byte export and invalidation activate on an existing worker at the original task/mm boundary; legacy providers retain explicit fallback |
 | Mount topology administration | Original namespace/fs resources on the caller; existing disk pool for host-backed paths; contention releases the CPU slot | Genuinely excluded pathname controls retain their explicit boundary |
@@ -159,6 +177,11 @@ below describe coverage and do not imply another coordinator dependency.
 | Live host pause/resume | Original cohort, execution leases, shared pause flag and existing queue/workers | No pause-only join; initial/solo and legacy stopped-hook invocation retain their separate route |
 | Host administration and generic dispatch fallback | Unknown syscall numbers finish locally using generated entry recognition; actual administration retains its own route | Cancel, admin/deadline/shutdown; accepted filesystem commands use original resources and the existing disk pool; known SVC resources/subcommands and HLT/fault exits not completed, parked or scoped on the worker still reach the joined fallback |
 
+A concrete remaining supported call is `get_mempolicy(236)`: its address-policy
+query still reads original owner `Memory::regions()`. It is an actual final
+known-call boundary, rather than an unimplemented-number diagnostic. Future
+memory-placement work must include that mapping-existence dependency.
+
 The last row is an important coverage gap: the remaining owner work is **not
 limited to a fixed set of rare controls**. The final worker-dispatch fallback is
 still reachable for known resources and actual host/backend events. Initial admission and legacy/control rescheduling also involve
@@ -166,7 +189,7 @@ the owner; ordinary epoch-member migration, parking, wakeup and child/replacemen
 admission already use the live execution queue. Single-CPU/solo execution retains
 its coordinated caller path, which does not by itself imply an extra RPC.
 
-The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/3054664/docs/architecture/coordination-boundaries.md)
+The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/75b9edadad2bf34884d8475765b7e3ab842f5044/docs/architecture/coordination-boundaries.md)
 records scopes, actual admission gates and source locations. Earlier sections
 below are historical records and do not override this inventory.
 
@@ -4880,3 +4903,46 @@ This closes the connected supported statistics subsystem. Actual cancellation,
 deadline/shutdown/final teardown, missing/excluded resources, other final
 SVC/HLT/fault dispatch and initial/legacy/solo orchestration remain. Only Mac Dev
 is deployed, and the overall coordinator-removal goal stays active.
+
+## 80. Original guest power control and group completion — 2026-11-09
+
+Supported halt/poweroff no longer returns to the owner syscall handler before
+requesting process exit. Common policy preserves live SYS_BOOT permission,
+int-width magic/command validation, unsupported commands and nested namespace
+rejection. One original root group is captured at root publication and retained
+across later task/exec admission, retirement and numeric replacement. Source
+execution requests root and caller group exit on those original controls.
+
+Existing execution leases, dormant wait subscriptions, first-status arbitration,
+original Files/namespace/native cleanup and final CPU return are reused. Accepted
+native/disk work retains its actual drain requirements. The caller never executes
+the instruction following successful reboot(142). This is a guest-only operation;
+no host power API is invoked.
+
+Errors complete locally before absent capabilities can defer. Seccomp ALLOW/ERRNO
+is evaluated once before group effects. Valid legacy embeddings without original
+shutdown/exit capabilities retain their explicit before-effects boundary. No
+coordinator/service thread, polling bus, ordinary memory check/fence or new
+per-instruction check is introduced.
+
+The full shared fixture exercises halt/poweroff from root, root nonleader,
+independent child and child nonleader at 4/12 CPUs and with one physical slot.
+Additional coverage checks route lifetime/replacement, changing live credentials,
+error ordering, namespace isolation, capability absence and seccomp. A signed
+native CLONE_THREAD fixture reproduces reboot(142)'s joined return on the exact
+previous runtime. Source-bound final checks are in the
+[validation record](../validation/guest-power-20261109.json).
+
+Both complete local runtime workflows pass, with 422 process cases (two
+intentionally ignored) and all 10 FFI cases on each host, strict lint and both
+iPad SDK compiles. Mac product checks, 52 signed HVF and five signed product
+hardware tests pass. The installed Dev also passes disposable Alpine BusyBox
+poweroff on 1/4/12 CPUs, plus init, native host terminals/exec and tracing.
+Single-CPU execution keeps its existing solo caller path; those results do not
+claim it has moved to worker orchestration.
+
+Actual final teardown still drains CPU actors; this removes the preceding guest
+syscall handoff. Host cancellation/deadline/shutdown/final teardown, other
+missing/excluded capabilities, other final SVC/HLT/fault dispatch and
+initial/legacy/solo orchestration remain. Only Mac Dev is updated, and the overall
+coordinator-removal goal remains active.

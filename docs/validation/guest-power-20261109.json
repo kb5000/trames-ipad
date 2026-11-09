@@ -1,0 +1,332 @@
+{
+  "stage": 80,
+  "date": "2026-11-09",
+  "overall_goal": "active",
+  "runtime_revision": "75b9edadad2bf34884d8475765b7e3ab842f5044",
+  "baseline_runtime": "30546645a3a2170200162a4b5b06383590f49055",
+  "scope": "Supported Linux halt/poweroff, live authority and common command/namespace validation, original root/caller group control, seccomp and existing group completion/teardown dependencies.",
+  "architecture": {
+    "authority": "The first original root publication retains its actual Group in a session OnceLock. Every later source/child/exec dispatch retains that authority; no numeric PID relookup or task-body borrow.",
+    "policy": "One execution-independent kernel power policy for source and solo. Live original SYS_BOOT, int-width magic/command arguments, unsupported commands and nested namespace results retain the original order.",
+    "execution": "Calling executor requests original root and caller group exit. Existing active leases, dormant waits, first terminal status, native/disk completion, Files/namespace cleanup and CPU return are reused.",
+    "legacy": "Errors complete locally even without original shutdown/exit capabilities. A valid missing-capability call defers before changing either group.",
+    "host": "No host reboot, signal or power API is invoked.",
+    "no_new": [
+      "coordinator/resource/service thread",
+      "polling message bus",
+      "ordinary guest-memory check or fence",
+      "per-instruction check"
+    ]
+  },
+  "checks": {
+    "workflows": {
+      "runtime_macos": {
+        "passed_steps": 7,
+        "total_steps": 7,
+        "summary": "target/power-subsystem/runtime-mac/summary.json",
+        "sha256": "2a32484c78b2ec26ed223ddb0a0dee50f203d52c7cfe485eca7f7aca8b7b0ddf"
+      },
+      "runtime_linux": {
+        "passed_steps": 7,
+        "total_steps": 7,
+        "summary": "target/local-ci/io/power-subsystem/runtime-linux-ci/summary.json",
+        "sha256": "017056ce9981b61a94f20c55d6f9f4ac886a84a6cae6cae053a2704fd8a4ce79"
+      },
+      "mac_product": {
+        "passed_steps": 8,
+        "total_steps": 12,
+        "summary": "target/power-subsystem/mac-product-ci/summary.json",
+        "sha256": "38ffba402b13c501ecba3896c6421dad217b1890ec8a064a75d5fe1c07bc10fd"
+      }
+    },
+    "macos": [
+      {
+        "name": "runtime-mac",
+        "code": 0,
+        "seconds": 20.419299833
+      },
+      {
+        "name": "kernel-conformance",
+        "code": 0,
+        "seconds": 11.621311541
+      },
+      {
+        "name": "ffi",
+        "code": 0,
+        "seconds": 8.345962749999998
+      },
+      {
+        "name": "core-clippy",
+        "code": 0,
+        "seconds": 4.709564125
+      },
+      {
+        "name": "ffi-clippy",
+        "code": 0,
+        "seconds": 0.3013820420000002
+      },
+      {
+        "name": "ipad-compile",
+        "code": 0,
+        "seconds": 3.9791319579999964
+      }
+    ],
+    "linux": [
+      {
+        "name": "process-all",
+        "code": 0,
+        "seconds": 55.498274794
+      },
+      {
+        "name": "ffi-all",
+        "code": 0,
+        "seconds": 11.998256085999998
+      },
+      {
+        "name": "core-clippy",
+        "code": 0,
+        "seconds": 5.170568691
+      },
+      {
+        "name": "runtime-ci",
+        "code": 0,
+        "seconds": 52.66874785900001
+      }
+    ],
+    "process": {
+      "macos": {
+        "passed": 422,
+        "ignored": 2,
+        "log": "target/power-subsystem/kernel-conformance.log",
+        "sha256": "aef51cc19fda4bf45324565bb3624ee82b616e832d094697e04eca616bca0251"
+      },
+      "linux": {
+        "passed": 422,
+        "ignored": 2,
+        "log": "target/local-ci/io/power-subsystem/process-all.log",
+        "sha256": "a93b69c0fb14addf1008ecf4e74180180bb60dca4c496cd4f5671fe0b373e9d1"
+      }
+    },
+    "ffi": {
+      "macos": {
+        "passed": 10,
+        "ignored": 0,
+        "log": "target/power-subsystem/ffi.log",
+        "sha256": "70c459097aed798eb2d170254cec7f860152e18786c0e34398973f3900e5f38c"
+      },
+      "linux": {
+        "passed": 10,
+        "ignored": 0,
+        "log": "target/local-ci/io/power-subsystem/ffi-all.log",
+        "sha256": "aedcdd6cdbdc0088cf97fce3d49b8e719a6d5ee9629f6a4263d4acbdff62afa6"
+      }
+    },
+    "ipad": [
+      {
+        "target": "aarch64-apple-ios",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+        "code": 0
+      },
+      {
+        "target": "aarch64-apple-ios-sim",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk",
+        "code": 0
+      }
+    ],
+    "hardware": {
+      "passed": true,
+      "runtime_revision": "75b9edadad2bf34884d8475765b7e3ab842f5044",
+      "rows": [
+        {
+          "target": "trames-mac-run",
+          "executable_sha256": "d239b5d40cec3bdb25d83e0582fbf30e9a91e68e19d43387f1ffec24d364ceaf",
+          "exit": 0,
+          "passed_tests": 5
+        },
+        {
+          "target": "trames_hvf",
+          "executable_sha256": "681bac8623899416041b3da632cf7f420f7b57e27accfbcacf7b09b24897c9a0",
+          "exit": 0,
+          "passed_tests": 52
+        }
+      ]
+    },
+    "power_hvf": [
+      {
+        "cpus": 4,
+        "cohorts": 1,
+        "returned": "{}"
+      },
+      {
+        "cpus": 12,
+        "cohorts": 1,
+        "returned": "{}"
+      }
+    ],
+    "installed": {
+      "version": "Trames Dev 1.5.4 (dev) runtime 75b9edadad2bf34884d8475765b7e3ab842f5044",
+      "runner_sha256": "7e058824e4bbacad111166add73769a1f4645544e7a5ae7e1b82174617b178e5",
+      "stable_sha256": "8fc21435034e8c041632e2e50419da9d2123bf790aedb0a1499286fc8367e614",
+      "stable_unchanged": true,
+      "checks": [
+        {
+          "name": "init",
+          "code": 0,
+          "seconds": 3.280441583
+        },
+        {
+          "name": "host",
+          "code": 0,
+          "seconds": 0.922211334
+        },
+        {
+          "name": "tracing",
+          "code": 0,
+          "seconds": 0.3134895000000002
+        }
+      ]
+    },
+    "installed_busybox_poweroff": {
+      "passed": true,
+      "runner_sha256": "7e058824e4bbacad111166add73769a1f4645544e7a5ae7e1b82174617b178e5",
+      "cases": [
+        {
+          "cpus": 1,
+          "code": 0,
+          "metrics": {
+            "cohort_rounds": 0,
+            "cohort_stop_us": 0,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 76,
+            "vm_local_syscalls": 0,
+            "worker_direct_syscalls": 0,
+            "worker_fd_syscalls": 0,
+            "worker_file_syscalls": 0,
+            "worker_futex_waits": 0,
+            "worker_futex_wakes": 0,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 0,
+            "worker_syscalls": 0,
+            "worker_task_resumes": 0,
+            "worker_uring_syscalls": 0
+          },
+          "cohort_return_syscalls": []
+        },
+        {
+          "cpus": 4,
+          "code": 0,
+          "metrics": {
+            "cohort_rounds": 1,
+            "cohort_stop_us": 478,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 60,
+            "vm_local_syscalls": 4,
+            "worker_direct_syscalls": 4,
+            "worker_fd_syscalls": 3,
+            "worker_file_syscalls": 3,
+            "worker_futex_waits": 2,
+            "worker_futex_wakes": 2,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 1,
+            "worker_syscalls": 35,
+            "worker_task_resumes": 4,
+            "worker_uring_syscalls": 0
+          },
+          "cohort_return_syscalls": []
+        },
+        {
+          "cpus": 12,
+          "code": 0,
+          "metrics": {
+            "cohort_rounds": 1,
+            "cohort_stop_us": 456,
+            "service_caller_wait_us": 0,
+            "service_requests": 0,
+            "serviced_syscalls": 0,
+            "syscalls": 60,
+            "vm_local_syscalls": 4,
+            "worker_direct_syscalls": 4,
+            "worker_fd_syscalls": 3,
+            "worker_file_syscalls": 3,
+            "worker_futex_waits": 2,
+            "worker_futex_wakes": 2,
+            "worker_gpu_calls": 0,
+            "worker_gpu_waits": 0,
+            "worker_poll_syscalls": 0,
+            "worker_socket_syscalls": 1,
+            "worker_syscalls": 35,
+            "worker_task_resumes": 4,
+            "worker_uring_syscalls": 0
+          },
+          "cohort_return_syscalls": []
+        }
+      ]
+    }
+  },
+  "regressions": [
+    "Both halt and poweroff from original root, root nonleader, independent child and child nonleader at 4/12 logical CPUs and one execution slot; one cohort, no returned syscalls/service work.",
+    "Successful calls never execute the following guest instruction. Original root completion retains status zero.",
+    "Original route survives task-body retirement and cannot target a numeric PID replacement.",
+    "Live credentials after capture, authority before malformed magic, unsupported commands, unused pointers and nested PID namespace rejection.",
+    "Absent original shutdown/exit capabilities defer valid calls before effects; policy errors still complete locally.",
+    "Seccomp ALLOW/ERRNO decisions occur once and before original group effects; allowed final exit and denied poweroff retain their actual results.",
+    "Signed raw AArch64 CLONE_THREAD peers retire through original group lifecycle at 4/12 CPUs."
+  ],
+  "baseline": {
+    "result": {
+      "runtime_revision": "30546645a3a2170200162a4b5b06383590f49055",
+      "exit": 101,
+      "seconds": 3.075121167,
+      "executable_sha256": "25d1ea203e34fa8596cbb27306b8dc4b1904a6d64467c94a0f4f1a2a676b9a31",
+      "output": "\nrunning 1 test\ntest session::tests::guest_poweroff_retires_original_native_group_without_returned_syscall ... hardware poweroff CPUs=4 cohorts=1 returned={142: 1}\n\nthread 'session::tests::guest_poweroff_retires_original_native_group_without_returned_syscall' (27130891) panicked at crates/trames-mac/src/session.rs:1008:13:\nassertion failed: runtime.metrics.cohort_return_syscalls.is_empty()\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\nFAILED\n\nfailures:\n\nfailures:\n    session::tests::guest_poweroff_retires_original_native_group_without_returned_syscall\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 25 filtered out; finished in 0.01s\n\n"
+    },
+    "log_sha256": "f13b974f10b2d3118a2d10cde130f215fc51156a14e18602fffe06c5f7fdd61c",
+    "fixture_source": "trames-mac/crates/trames-mac/src/session.rs::tests::guest_poweroff_retires_original_native_group_without_returned_syscall",
+    "interpretation": "The identical signed fixture on baseline finishes the guest but returns reboot(142) once to joined dispatch, failing the no-return assertion. Final finishes with no returned syscalls at 4/12 CPUs. Both include one final cohort; this is conformance, not a throughput speedup."
+  },
+  "source_sha256": {
+    "runtime/crates/trames-kernel/src/lib.rs": "143d5ff2d76a027d7d347b29bc18812c5452e79fd232c22523ec52815a93e079",
+    "runtime/crates/trames-kernel/src/power.rs": "974998a490537459480fd9e942d8c8ce2e0fa949bdadc41cc0246e660e1e2ac5",
+    "runtime/crates/trames-linux/src/direct.rs": "8f485fb15c46598775a79d4f1593b816708880f543f34ce7b2535a63bde08bca",
+    "runtime/crates/trames-session/src/process.rs": "a109a35eef836a6ef24f855274d3c6e36a06ff1c7f58bbcc320524c77eb3e0ff",
+    "runtime/crates/trames-session/src/process_compat.rs": "31d1a15f935c31af41d67f2822ff31f2b15775e98b5fffaa63593a097bd9ecab",
+    "runtime/crates/trames-session/src/process_dispatch.rs": "84c9b8f97e9c8eefcffc7e41b0c0b42c1ab809015e24c75f66d3b3a858d9c7cb",
+    "runtime/crates/trames-session/src/process_power_tests.rs": "6e3227c9ca7b6850c6df019d8e8637ad70f243ce7e3f66a5eae58b32d61df280",
+    "runtime/crates/trames-session/src/process_seccomp.rs": "55ce4f75b9430e284e79e05652cf572e4542a3b2ae98b8aa2f0d0dcf7c321ed9",
+    "runtime/crates/trames-session/src/worker_syscalls.rs": "a6e3883e4376dbb01adbb59ca78af1f22525063dbd1fb901e5b9de1abff9520d",
+    "runtime/crates/trames-session/src/workers.rs": "185d0605defa73341a681c0f351aecca75c33501215f7c324eaa60acc6b791f8",
+    "tests/integration/guest-power.py": "5425bcdc04be039f0b5934592d4813967f4bf243bf7166b0218008f51339f3ee"
+  },
+  "deployment": {
+    "channel": "Mac Dev only",
+    "runner": "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+    "stable_unchanged": true,
+    "physical_ipad_unchanged": true,
+    "business_environments_unchanged": true,
+    "signature_verified": true
+  },
+  "limits": [
+    "Actual final session/backend teardown still stops and drains its real CPU actors; this removes the preceding syscall handoff.",
+    "Existing restart/kexec/suspend and nested PID namespace power behavior remains unsupported with its original errors.",
+    "Accepted native/disk work and original task/byte custody retain their real drain requirements.",
+    "No whole coordinator removal or Firefox/Geekbench/throughput improvement is claimed."
+  ],
+  "remaining": [
+    "Actual host cancel/deadline/shutdown and final teardown.",
+    "Missing embedding capabilities/excluded resources, including two io_uring source-maintenance escalation sites.",
+    "Other known-resource/subcommand and unhandled HLT/fault final dispatch.",
+    "Initial/legacy admission and solo orchestration."
+  ],
+  "validation_corrections": [
+    "New BusyBox harness initially expected a different metrics prefix; the guest already exited successfully. The parser was corrected to the existing execution-path/cohort-return formats and all three configurations passed. No production code changed after common CI."
+  ],
+  "remaining_known_call_example": "get_mempolicy(236) still uses original owner Memory::regions() for its address-existence check."
+}
