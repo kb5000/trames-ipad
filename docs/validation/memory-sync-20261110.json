@@ -1,0 +1,317 @@
+{
+  "stage": 96,
+  "date": "2026-11-10",
+  "overall_goal": "active",
+  "runtime_revision": "fc59b7b38f3de0428798cf942efd7a6d52fce8d5",
+  "prior_runtime": "3a5a0e2b27a724e73258c4c39083cceb48de9b7e",
+  "scope": "Original mapped-memory msync/writeback: common source/solo ABI and range capture, actual mapped-backing admission, chained native persistence, accepted completion/cancellation, original inode deduplication and final resource lifetime.",
+  "architecture": {
+    "import_": "Source/solo share alignment/flag/length validation and original Memory/View range selection. All mappings are checked before callback effects. Owned original providers survive unmap/replacement and wake-target handoff; no guest pointer or numeric FD is reimported at completion.",
+    "selection": "The cold snapshot backing index retains only original MAP_SHARED providers requiring writeback. Anonymous/imported/shared-zero/no-op private-host providers avoid jobs, page reads and physical charges. No field/lookup is added to CPU frames or byte translations.",
+    "execution": "Existing FileLayouts admission quiesces actual readers of one original backing and publishes dirty/copied bytes. HostFileTask chains persistence on the existing disk pool, releasing each ticket before accepting the next. Waiting returns the CPU slot; unrelated mms keep their Views.",
+    "identity": "FileMapping sync deduplication uses the existing globally unique immutable original inode identity, not a guest inode number local to a filesystem. It adds no identity counter or lock.",
+    "completion": "Existing FileResult/FilePending retain original completion across queue/cohort handoff. Errors stop the unattempted suffix. Weak layout-queue references avoid owner/request cycles. Callback unwind, closed pools and dropped owners release admissions/resources and complete the accepted wait.",
+    "semantics": "Existing flag behavior is retained: admitted supported flags use the same original synchronization body. This does not newly implement lazy MS_ASYNC, page invalidation or mlock semantics. Custom providers lacking real original layout admission defer before effects; solo dispatch remains on its original caller.",
+    "no_new": [
+      "coordinator/resource/service thread",
+      "polling bus",
+      "global native execution lock",
+      "production unsafe block",
+      "ordinary guest-memory permission/check/fence",
+      "fabricated capability or errno"
+    ]
+  },
+  "baselines": {
+    "process": {
+      "runtime_revision": "3a5a0e2b27a724e73258c4c39083cceb48de9b7e",
+      "checks": [
+        {
+          "name": "process",
+          "code": 101,
+          "seconds": 17.784431040999998,
+          "output": "warning: unused workspace dependency `trames-native`\n  --> Cargo.toml:17:1\n   |\n17 | trames-native = { path = \"runtime/crates/trames-native\" }\n   | ^^^^^^^^^^^^^\n   |\n   = note: `cargo::unused_workspace_dependencies` is set to `warn` by default\nhelp: consider removing the workspace dependency `trames-native`\nwarning: workspace (manifest) generated 1 warning\n   Compiling trames-memory v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-memory)\n   Compiling trames-session v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-session)\n   Compiling trames-vfs v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-vfs)\n   Compiling trames-elf v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-elf)\n   Compiling trames-engine v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-engine)\n   Compiling trames-audio v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-audio)\n   Compiling trames-accel v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-accel)\n   Compiling trames-vulkan v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-vulkan)\n   Compiling trames-video v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-video)\n   Compiling trames-cpu v1.5.4 (/Users/main/dev/trames/crates/trames-cpu)\n   Compiling trames-linux v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-linux)\n   Compiling trames-kernel v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-kernel)\n   Compiling trames-core v1.5.4 (/Users/main/dev/trames/crates/trames-core)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 16.91s\n     Running ../../runtime/crates/trames-session/src/lib.rs (target/debug/build/trames-core/73ea467a4920ade2/out/kernel_conformance-73ea467a4920ade2)\n\nrunning 1 test\ntest process::memory_sync_tests::guest_msync_shared_aliases_private_and_unrelated_mms_complete_on_source ... msync CPUs=4 slots=4 filter=false cohorts=1 returned={227: 1} scopes=0\n\nthread 'process::memory_sync_tests::guest_msync_shared_aliases_private_and_unrelated_mms_complete_on_source' (28191779) panicked at crates/trames-core/../../runtime/crates/trames-session/src/process_memory_sync_tests.rs:131:13:\nassertion `left == right` failed: pid 1\n  left: [0, 0, 0, 0]\n right: [1, 0, 0, 0]\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\nFAILED\n\nfailures:\n\nfailures:\n    process::memory_sync_tests::guest_msync_shared_aliases_private_and_unrelated_mms_complete_on_source\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 451 filtered out; finished in 0.02s\n\nerror: test failed, to rerun pass `-p trames-core --test kernel-conformance`\n"
+        }
+      ]
+    },
+    "signed_native": {
+      "runtime_revision": "3a5a0e2b27a724e73258c4c39083cceb48de9b7e",
+      "code": 101,
+      "output": "\nrunning 1 test\ntest session::tests::guest_msync_shared_backings_complete_on_original_native_workers ... hardware msync CPUs=4 exit=0 cohorts=10 returned={215: 1, 227: 16} scopes=8\n\nthread 'session::tests::guest_msync_shared_backings_complete_on_original_native_workers' (28192466) panicked at crates/trames-mac/src/session.rs:2065:13:\nassertion `left == right` failed\n  left: 10\n right: 1\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\nFAILED\n\nfailures:\n\nfailures:\n    session::tests::guest_msync_shared_backings_complete_on_original_native_workers\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 39 filtered out; finished in 0.03s\n\n"
+    }
+  },
+  "checks": {
+    "workflows": {
+      "runtime_macos": {
+        "passed": 7,
+        "total": 7,
+        "sha256": "3cda23d3b1fe848eca788cd5a108b7a3f93c3809c660053eab47cb2fad41b150"
+      },
+      "runtime_linux": {
+        "passed": 7,
+        "total": 7,
+        "sha256": "0b17be70a33b1b5afeef55907b6322a5b4d1c406890a2b2792d76cda4d6c3cca"
+      },
+      "mac_product": {
+        "passed": 8,
+        "total": 12,
+        "sha256": "e533d0be413bc30c5fbf8ecb6420508620bbed30445d0c89404e1d96fe9066f8"
+      }
+    },
+    "macos": [
+      {
+        "name": "runtime-mac",
+        "code": 0,
+        "seconds": 35.797899416999996
+      },
+      {
+        "name": "kernel-conformance",
+        "code": 0,
+        "seconds": 15.810647583000005
+      },
+      {
+        "name": "ffi",
+        "code": 0,
+        "seconds": 3.3173690000000065
+      },
+      {
+        "name": "core-clippy",
+        "code": 0,
+        "seconds": 3.0333714589999943
+      },
+      {
+        "name": "ffi-clippy",
+        "code": 0,
+        "seconds": 0.37068408300000044
+      },
+      {
+        "name": "ipad-compile",
+        "code": 0,
+        "seconds": 3.406873541000003
+      }
+    ],
+    "linux": [
+      {
+        "name": "process-all",
+        "code": 0,
+        "seconds": 62.482190549999984
+      },
+      {
+        "name": "ffi-all",
+        "code": 0,
+        "seconds": 5.567773998999996
+      },
+      {
+        "name": "core-clippy",
+        "code": 0,
+        "seconds": 3.1033761639999966
+      },
+      {
+        "name": "runtime-ci",
+        "code": 0,
+        "seconds": 54.97995980799999
+      }
+    ],
+    "process": {
+      "macos": {
+        "passed": 450,
+        "ignored": 2,
+        "sha256": "4c978b7021e8c6ecdce1b9de16ca5a340a4430002c9fefd8e95b9f3d03f959db"
+      },
+      "linux": {
+        "passed": 450,
+        "ignored": 2,
+        "sha256": "9e079c816660df0e68e4d7efb03b7787239eda6111ff9548fef9f80bc261cddd"
+      }
+    },
+    "ffi": {
+      "macos": {
+        "passed": 10,
+        "ignored": 0,
+        "sha256": "41b0634b7d70d8498767ef229e3f480a4f9b0bd14dd6263b35267b71f8023c41"
+      },
+      "linux": {
+        "passed": 10,
+        "ignored": 0,
+        "sha256": "097038f79f88ad47ca8062b34f0df2c7cf117102091ceae2a455c6c1dfda8946"
+      }
+    },
+    "ipad": [
+      {
+        "target": "aarch64-apple-ios",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+        "code": 0
+      },
+      {
+        "target": "aarch64-apple-ios-sim",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk",
+        "code": 0
+      }
+    ],
+    "hardware": {
+      "passed": true,
+      "runtime_revision": "fc59b7b38f3de0428798cf942efd7a6d52fce8d5",
+      "rows": [
+        {
+          "target": "trames-mac-run",
+          "executable_sha256": "3b66697daadfc9db4aa8faa43dcced9f3b42bda419fca9da9d89bb1f95580364",
+          "exit": 0,
+          "passed_tests": 19
+        },
+        {
+          "target": "trames_hvf",
+          "executable_sha256": "dcf37f17100434597b2911d8eb2264ae238e7051dbfef1fa6c08d2d8b30ad072",
+          "exit": 0,
+          "passed_tests": 52
+        }
+      ]
+    },
+    "process_regression": "guest_msync_shared_aliases_private_and_unrelated_mms_complete_on_source",
+    "common_regressions": [
+      "mapped_sync_retains_original_resources_and_completion_across_unmap_and_handoff",
+      "mapped_sync_error_unwind_and_closed_pool_release_admissions_and_stop_the_suffix",
+      "mapped_sync_cancelled_wait_and_dropped_layout_owner_do_not_form_a_resource_cycle",
+      "msync_source_solo_errors_and_noop_ranges_share_one_import_without_native_work",
+      "msync_missing_original_layout_capability_defers_before_callback_effects",
+      "writeback_capture_retains_original_shared_backings_across_unmap_and_replacement",
+      "writeback_selection_preflights_holes_and_never_materializes_anonymous_or_private_bytes",
+      "mapped_writeback_does_not_merge_equal_reported_inodes_from_distinct_filesystems"
+    ],
+    "process_final": {
+      "configurations": [
+        {
+          "cpus": 4,
+          "slots": 4,
+          "seccomp_allow": false
+        },
+        {
+          "cpus": 12,
+          "slots": 12,
+          "seccomp_allow": false
+        },
+        {
+          "cpus": 4,
+          "slots": 1,
+          "seccomp_allow": false
+        },
+        {
+          "cpus": 4,
+          "slots": 1,
+          "seccomp_allow": true
+        }
+      ],
+      "cohorts": 1,
+      "returned_syscalls": {},
+      "mm_scopes": 16
+    },
+    "native_prior": {
+      "cpus": 4,
+      "cohorts": 10,
+      "returned_syscalls": {
+        "215": 1,
+        "227": 16
+      },
+      "mm_scopes": 8,
+      "guest_results_correct": true
+    },
+    "native_final": {
+      "cpus": [
+        4,
+        12
+      ],
+      "cohorts": 1,
+      "returned_syscalls": {},
+      "mm_scopes": {
+        "4": 16,
+        "12": 42
+      },
+      "guest_results_correct": true
+    },
+    "native_log_sha256": "c2bb299b2dc7b021bc5732e550e22bb5316c75bea7fa371512b55a8dc29f44e7",
+    "installed": {
+      "version": "Trames Dev 1.5.4 (dev) runtime fc59b7b38f3de0428798cf942efd7a6d52fce8d5",
+      "runner_sha256": "346cabd312943764dd7ce3da23e5ba04e31223dd1f5eacc64c5b7c62405c3523",
+      "stable_sha256": "8fc21435034e8c041632e2e50419da9d2123bf790aedb0a1499286fc8367e614",
+      "stable_unchanged": true,
+      "checks": [
+        {
+          "name": "init",
+          "code": 0,
+          "seconds": 3.29107425
+        },
+        {
+          "name": "host",
+          "code": 0,
+          "seconds": 0.9237925419999997
+        },
+        {
+          "name": "tracing",
+          "code": 0,
+          "seconds": 0.24627445800000025
+        }
+      ]
+    }
+  },
+  "retry_provenance": {
+    "first_runs": {
+      "mac_lint": {
+        "failed_step": 4,
+        "reason": "cfg(test) fixture identity-op lint",
+        "sha256": "4eba84911d68ec7b5299fa65a9100b0d3806afc53f872df7e32cde9e2d6c7f2d"
+      },
+      "mac_sandbox": {
+        "failed_step": 5,
+        "reason": "24 loopback network tests denied EPERM by the shell sandbox; resumed with the existing required local-network permission",
+        "sha256": "6587ddb729f410fee846ff18b859cdcdd672b2c3b0dd8957fe4daf16883aca30"
+      }
+    },
+    "note": "Initial cfg(test) identity-op lint was corrected. A subsequent sandboxed workspace run denied loopback sockets in 24 network tests; it resumed with the same previously required local-network permission. Both first full workflows passed. Final review then found filesystem-local inode-key collision and added a real below-cache storage regression; affected final checks were rerun on both hosts, and all final Rust fingerprints match."
+  },
+  "source_sha256": {
+    "runtime/crates/trames-linux/src/direct.rs": "bb5093b58ffdb8ea0be99781adca255e712e0f8b13b39695971c918427ee83bb",
+    "runtime/crates/trames-linux/src/direct/file.rs": "ac7a67edd96808c8d0f34fec860ce2d9003c0029f1dc816e314a4b66c11601f0",
+    "runtime/crates/trames-linux/src/direct/memory_sync.rs": "aea6037acef6361b15dd7c237b0e1c18158d5314737523c869f0bb663c32d22c",
+    "runtime/crates/trames-linux/src/direct/memory_sync_tests.rs": "1dde412259e352399a064d8b37a87888c05f2d8c3627999bdc616b867291e08e",
+    "runtime/crates/trames-linux/src/lib.rs": "82e00416e16969db21153c0eb6ab2e394fc04b4974f69ca81fd40d3afac6c4bb",
+    "runtime/crates/trames-linux/src/memory_sync.rs": "28801cffca57aa9e8d3073f33625caeb5c6d0f12a11dea4029e85c088c2a07a6",
+    "runtime/crates/trames-linux/src/state.rs": "21bfe59de3cbfdbbbf73f4febe931d9a9feaaff01c13b14b126012bba9b0b2e6",
+    "runtime/crates/trames-memory/src/backing.rs": "b12bbdef199319818212dfb6874862c08857f4639a8729362d8ae39e20f2362d",
+    "runtime/crates/trames-memory/src/cpu_memory.rs": "22c93e61f4c2203ffd62a2316242c7d6ab2f22fe07d5b210aa812b0b52a11a38",
+    "runtime/crates/trames-memory/src/imported.rs": "3fc5d554b6c699d1de4080afcb51bc090e3b056d0c38766de08a48fd21bff743",
+    "runtime/crates/trames-memory/src/lib.rs": "fa956a5a1c90fa3d595e144e3863847d799713f935f9eaaa2a55e1ffc6ea6be9",
+    "runtime/crates/trames-memory/src/parallel.rs": "2a8845127ccc77bd1a7bbd6f3bff617a828aaf15cc04157f850f5e3ed4c9272b",
+    "runtime/crates/trames-memory/src/parallel/layout_tests.rs": "dd76e46d194710517d3ee2ce3da69b53149f61caf50fdcc092db2b03f8a4e682",
+    "runtime/crates/trames-memory/src/parallel/observation.rs": "1a5e2ae1a407494006f23370cb94bca6604a1e663ebc9a51e86d5848ff9d1de7",
+    "runtime/crates/trames-memory/src/parallel/snapshot.rs": "2ff99e28b3b105f307d6aac672cb98d7be1ff225f79616db5182e285e900f494",
+    "runtime/crates/trames-session/src/process.rs": "3068567b2138fdec8aa683685d90cc6c21a72690aa0f44bf386c670d4e7d69a9",
+    "runtime/crates/trames-session/src/process_memory_sync_tests.rs": "d8f485e92e5ae025ce1253b6b0a6ac70335cb5ca20205e1b737a301dd8e809fb",
+    "runtime/crates/trames-vfs/src/hostfs/private_map.rs": "eb7b2dcbef6e39a8d23501fb0ed1d519e2e7cfdd89d44d701f0ddb3eca33b78f",
+    "runtime/crates/trames-vfs/src/mapped.rs": "da9ad8733481194d3d588cf5cf141a26a67679c0662a699a7ba17d10989a2de8"
+  },
+  "mac_native_fixture_sha256": "6a7c2cd416e629ebbfe862804a48cf51146129679a8ee5d0c3d220b8b11dab0e",
+  "deployment": {
+    "channel": "Mac Dev only",
+    "runner": "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+    "signature_verified": true,
+    "stable_unchanged": true,
+    "physical_ipad_unchanged": true,
+    "business_environments_unchanged": true
+  },
+  "validation_notes": [
+    "Both final runtime workflows pass all seven steps. Mac and ARM64 Linux each pass 450 process regressions (two intentionally ignored), ten FFI cases and strict lint. Both iPad SDK targets compile.",
+    "The connected process fixture runs two distinct mms sharing one file and an independent mm. It checks invalid flags/alignment/ranges, anonymous/private no-op cases, supported sync flags, shared writes and original FD data. Prior production returns the first msync before completion. Final four/twelve-CPU, one-slot and seccomp ALLOW cases finish in one cohort with no returned syscall/service; sixteen real backing-reader scopes remain.",
+    "The signed native prior four-CPU fixture finishes correct per-thread syscall results and DCBAoad bytes, then fails only the one-cohort assertion: ten cohorts, sixteen returned msync and one returned munmap. Final four/twelve-CPU fixtures finish in one cohort with no returned syscall/service and sixteen/42 actual mapping/backing scopes. No twelve-CPU baseline or controlled application throughput gain is claimed.",
+    "Original multi-backing identity, alias deduplication, unmapped/replaced addresses, accepted wake-target handoff, error/unwind/closed-pool suffix cancellation and dropped-owner cycle cleanup are tested. A separate cross-filesystem test reads original storage below mapping caches before automatic VFS teardown sync can hide missed persistence.",
+    "Mac development gates 1-8 and 71 signed hardware cases pass. Separate Dev build/install/signature and installed init at one/four/twelve CPUs plus host control/tracing at twelve CPUs pass. Stable build/package gates and physical iPad installation are outside this coordinator round."
+  ],
+  "remaining": [
+    "Other final cold SVC/native-resource dispatch not completed or parked by a source scope.",
+    "Genuinely absent original resource/wait bindings, including both retained io_uring maintenance escalation sites and custom writeback providers without layout admission.",
+    "Actual host cancellation/deadline/shutdown and final backend/session teardown.",
+    "Initial/standalone/capability-less orchestration."
+  ],
+  "limits": [
+    "Four broad categories remain; this is not a completed coordinator-removal goal or an exhaustive count of concrete residual triggers.",
+    "Supported mapped-memory msync/writeback no longer needs a joined owner. Actual affected backing readers still synchronize; their measured scopes are preserved in this record.",
+    "No production fallback-frequency, Firefox latency or throughput improvement is inferred from cohort counts."
+  ]
+}

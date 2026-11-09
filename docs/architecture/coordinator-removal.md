@@ -2,16 +2,16 @@
 
 ## Current status — 2026-11-10
 
-Through stage 95 the broad remaining count is **four**, unchanged from stage 90.
+Through stage 96 the broad remaining count is **four**, unchanged from stage 90.
 Concrete dependencies have been removed inside those classes; the class count
 alone does not measure that progress. It is not an exhaustive count of remaining
 syscalls, providers or actual production fallback frequency.
 
-| Remaining class | Current boundary | Concrete change this round |
+| Remaining class | Current boundary | Recent concrete progress |
 | --- | --- | --- |
 | Host control and final teardown | Actual cancellation/deadline/shutdown, native-event failure and final CPU/session drain | Still present; ordinary pause/resume, supervision and guest exit are already source-owned |
 | Missing capabilities and excluded resources | Original absent providers/excluded bodies; two submitter-scoped io_uring maintenance setters remain | Stages 90–91 close original global metadata and accepted request-body resource dependencies; genuine missing waits/providers remain |
-| Final execution dispatch | SVC or cold native-resource operation not completed, parked or accepted by a source scope | Stages 92–95 close recognized guest faults, residual FD status/seals/errors, blocking file locks/deadlock relations and anonymous memory-file creation |
+| Final execution dispatch | SVC or cold native-resource operation not completed, parked or accepted by a source scope | Stages 92–96 close recognized guest faults, residual FD status/seals/errors, blocking file locks/deadlock relations, anonymous memory-file creation and mapped-memory msync/writeback |
 | Initial/legacy orchestration | Initial admission and standalone/capability-less scheduling | Still present; ordinary live and dormant member admission no longer depends on it |
 
 Recent signed native fixtures demonstrate concrete path removal. Each old
@@ -23,24 +23,28 @@ These are separate workloads, not cumulative or comparable throughput scores.
 | FD status, authority and inode seals (93) | 38 / 60 fcntls and one clone | 1 / none |
 | File locks, blocking waits and deadlock relations (94) | 23 / 19 fcntls, 11 flocks and one clone | 1 / none |
 | Anonymous memory-file creation and lifetime (95) | 8 / 8 memfd_create and one clone | 1 / none |
+| Mapped-memory msync/writeback (96) | 10 / 16 msync and one munmap | 1 / none |
 
-Actual mapping/backing mutation still synchronizes its affected original mm and
-is not counted as a removed scope. The final native memfd fixture records seven
-such scopes at four CPUs and 21 at twelve CPUs; its guest mmap/unmap work remains.
-The explicitly unavailable-provider dormant fixture still returns its real read.
+Actual mapping/backing mutation still synchronizes its affected original readers
+and is not counted as a removed scope. The final native msync fixture records
+sixteen such scopes at four CPUs and 42 at twelve CPUs. The explicitly
+unavailable-provider dormant fixture still returns its real read.
 
-A concrete remaining final-dispatch audit target is msync (AArch64 syscall 227):
-the implemented body is in Linux state dispatch and is not admitted by the
-worker's vm/custody classification. Its connected mapped-backing/writeback
-dependencies have not been migrated or validated by stage 95. The generic
-fallback and two io_uring maintenance escalation sites remain reachable; neither
-has been renamed away to reduce the count.
+Stage 96 removes the concrete msync (AArch64 syscall 227) target identified by
+the preceding audit, including native writeback, original resources through
+unmap/handoff, multi-backing error/cancellation and publication lifetime. Existing
+workers admit only actual backing readers and existing disk workers run native
+persistence; no joined Linux body, service thread or pointer replay is needed.
+Cross-filesystem deduplication now uses the existing globally unique original
+inode identity, avoiding guest inode-number collisions. Generic custom providers
+without actual original layout admission retain their capability boundary.
+The generic fallback and both io_uring maintenance escalation sites remain.
 
-The [shared inventory](../../runtime/docs/architecture/coordination-boundaries.md#current-remaining-categories)
-and [stage 95 record](../validation/memfd-source-20261110.json) carry current
+The [shared inventory](https://github.com/kb5000/trames-runtime/blob/main/docs/architecture/coordination-boundaries.md#current-remaining-categories)
+and [stage 96 record](../validation/memory-sync-20261110.json) carry current
 boundaries and evidence. Both local runtime workflows pass all seven steps.
-Mac and ARM64 Linux each pass 449 process regressions (two intentionally ignored)
-and ten FFI cases; both iPad SDKs compile. All 70 signed native cases and Mac
+Mac and ARM64 Linux each pass 450 process regressions (two intentionally ignored)
+and ten FFI cases; both iPad SDKs compile. All 71 signed native cases and Mac
 development gates 1–8 pass. Mac Dev alone is updated; stable 1.5.4, business
 environments and physical iPad installations retain their versions.
 The overall removal goal remains active.
@@ -5881,3 +5885,66 @@ installs retain their versions. Four broad categories and both actual io_uring
 maintenance escalation sites remain. The current-status table now names recent
 concrete removals separately from the unchanged umbrella count and identifies
 mapped-file msync/writeback as an actual remaining final-dispatch audit target.
+
+
+## 96. Original mapped-memory writeback and accepted sync lifetime — 2026-11-10
+
+Runtime `fc59b7b38f3de0428798cf942efd7a6d52fce8d5` migrates the connected
+msync/writeback unit identified in stage 95. Source and solo share flag, alignment,
+length and mapping validation, then retain the actual original MAP_SHARED
+providers. A cold snapshot index supplies those resources without adding a field,
+check, lock or fence to CPU frames or ordinary memory translation. Selection does
+not fault in bytes or charge sparse pages. Anonymous/private/no-op cases complete
+inline; actual writeback parks without retaining a CPU slot.
+
+Existing FileLayouts publication admits only the selected backing's readers,
+including other original mms mapping that file. Their dirty/copied bytes publish
+before persistence; unrelated mms continue. Existing HostFileTask/disk execution
+chains one backing at a time and releases each ticket before accepting the next.
+FileResult/FilePending retain completion across target/cohort handoff. Guest unmap,
+address replacement or FD reuse cannot redirect accepted work. Errors stop the
+unattempted suffix. Weak queue references avoid owner/request cycles; native
+failure, callback unwind, closed pools and dropped queue owners release tickets
+and original resources and complete accepted waits.
+
+The common selection also fixes a real identity error: guest inode numbers are
+local to their filesystem, so they cannot deduplicate writeback across independent
+filesystems. File mappings now use the inode object's existing globally unique
+immutable identity, with no new counter or inode lock. A regression writes to
+same-numbered inodes from two filesystems and reads the original storage below
+mapping caches before automatic teardown sync can hide a missed persistence.
+Other tests cover duplicate aliases, huge sparse/private no-ops, original resource
+capture through unmap/replacement/handoff, argument precedence, multi-backing
+completion and error/unwind/cancellation/queue-owner lifetime.
+
+The connected guest fixture runs two distinct mms sharing a file and one
+independent mm. Prior production returns its first msync before completion.
+Final four/twelve-CPU, one-slot and seccomp ALLOW cases complete in one cohort
+with no returned syscall/service and sixteen real backing-reader scopes. Shared
+bytes, private views, original FD reads and all expected syscall results match.
+The supported flag behavior stays the existing synchronous backing body; this
+stage does not add lazy MS_ASYNC, invalidation or mlock semantics. Genuine custom
+providers lacking original layout admission still defer before effects.
+
+The signed native baseline completes correct per-thread results and exact
+DCBAoad bytes but requires **ten cohorts, sixteen returned msync and one returned
+munmap** at four CPUs. Final four/twelve-CPU runs use **one cohort and no returned
+syscall/service**. Actual mapping/backing scopes remain: sixteen at four CPUs and
+42 at twelve CPUs. No twelve-CPU baseline, production fallback frequency or
+controlled throughput/Firefox latency gain is claimed.
+
+Both final local runtime workflows pass seven steps. Mac and ARM64 Linux each
+pass 450 process regressions (two intentionally ignored), ten FFI cases and strict
+lint; both iPad SDK targets compile. Initial Mac fixture lint and sandbox loopback
+EPERM failures are retained in the validation provenance. Both first full workflows
+passed; after the inode-identity correction, affected final checks were rerun on
+both hosts with matching final Rust fingerprints. Mac development gates 1–8 and
+71 signed hardware cases pass. Dev build/install/signature and installed init at
+one/four/twelve CPUs plus host control/tracing at twelve CPUs pass. Exact source,
+binary and retry evidence is in the
+[validation record](../validation/memory-sync-20261110.json).
+
+Only Mac Dev is updated; stable 1.5.4, business environments and physical iPad
+installs retain their versions. Four broad categories and both actual io_uring
+maintenance escalation sites remain. Supported msync/writeback is removed from
+final joined dispatch; the full coordinator-removal objective is still active.
