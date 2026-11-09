@@ -1,0 +1,263 @@
+{
+  "stage": 93,
+  "date": "2026-11-09",
+  "overall_goal": "active",
+  "runtime_revision": "76f91c36976fbdc95cf1f5790427d311be629898",
+  "prior_runtime": "ec5a407eaf30d4c8ba757695863a47717ebbd958",
+  "scope": "Residual original FD status/NOATIME authority, memfd seals with native mapped-backing waits and canonical unknown fcntl completion. Existing dup/record-lock/async-owner routes retain their actual resource requirements.",
+  "architecture": {
+    "status": "One original full OFD retains status, descriptor-local CLOEXEC, live inode ownership and async endpoint. Future controls use refreshed original fsuid/FOWNER after credential changes. Existing per-OFD update synchronization is retained; numeric FD reuse cannot retarget an accepted control.",
+    "seals": "Source/solo share seals_description over the actual original inode. Queries and ordinary changes run inline; live mapped WRITE-seal flushes park on existing FileWork/disk execution. Writable/VM_MAYWRITE leases still reject WRITE with EBUSY. Cancellation after disk acceptance may leave the original effect, never a replacement-FD effect.",
+    "errors": "Short source/solo ABI rejects O_PATH nonpermitted commands before unused argument inspection. This intentionally unifies the old session interception and Linux body error precedence. Unknown raw commands preserve EINVAL/EBADF and do not read unused guest pointers.",
+    "no_new": [
+      "coordinator/resource/service thread",
+      "polling bus",
+      "task-wide/global native lock",
+      "production unsafe block",
+      "ordinary guest-memory check/fence",
+      "new mapping checkpoint for seals",
+      "fake resource or errno to hide deferral"
+    ]
+  },
+  "baselines": {
+    "process": {
+      "runtime_revision": "ec5a407eaf30d4c8ba757695863a47717ebbd958",
+      "checks": [
+        {
+          "name": "process",
+          "code": 101,
+          "seconds": 16.635564792,
+          "output": "warning: unused workspace dependency `trames-native`\n  --> Cargo.toml:17:1\n   |\n17 | trames-native = { path = \"runtime/crates/trames-native\" }\n   | ^^^^^^^^^^^^^\n   |\n   = note: `cargo::unused_workspace_dependencies` is set to `warn` by default\nhelp: consider removing the workspace dependency `trames-native`\nwarning: workspace (manifest) generated 1 warning\n   Compiling trames-session v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-session)\n   Compiling trames-vfs v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-vfs)\n   Compiling trames-kernel v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-kernel)\n   Compiling trames-linux v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-linux)\n   Compiling trames-core v1.5.4 (/Users/main/dev/trames/crates/trames-core)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 15.52s\n     Running ../../runtime/crates/trames-session/src/lib.rs (target/debug/build/trames-core/73ea467a4920ade2/out/kernel_conformance-73ea467a4920ade2)\n\nrunning 1 test\ntest process::fcntl_tests::complete_fd_control_uses_original_credentials_and_seals_without_joined_dispatch ... fcntl CPUs=4 slots=4 filter=false cohorts=1 returned={25: 1} marker=[0, 0, 0, 0]\n\nthread 'process::fcntl_tests::complete_fd_control_uses_original_credentials_and_seals_without_joined_dispatch' (28021865) panicked at crates/trames-core/../../runtime/crates/trames-session/src/process_fcntl_tests.rs:139:9:\nassertion `left == right` failed\n  left: [0, 0, 0, 0]\n right: [1, 0, 0, 0]\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\nFAILED\n\nfailures:\n\nfailures:\n    process::fcntl_tests::complete_fd_control_uses_original_credentials_and_seals_without_joined_dispatch\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 446 filtered out; finished in 0.01s\n\nerror: test failed, to rerun pass `-p trames-core --test kernel-conformance`\n"
+        }
+      ]
+    },
+    "signed_native": {
+      "runtime_revision": "ec5a407eaf30d4c8ba757695863a47717ebbd958",
+      "code": 101,
+      "output": "\nrunning 1 test\ntest session::tests::original_fd_status_and_memfd_seals_complete_without_joined_native_dispatch ... hardware fcntl CPUs=4 exit=0 cohorts=38 returned={25: 60, 220: 1}\n\nthread 'session::tests::original_fd_status_and_memfd_seals_complete_without_joined_native_dispatch' (28034790) panicked at crates/trames-mac/src/session.rs:1680:13:\nassertion `left == right` failed\n  left: 38\n right: 1\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\nFAILED\n\nfailures:\n\nfailures:\n    session::tests::original_fd_status_and_memfd_seals_complete_without_joined_native_dispatch\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 36 filtered out; finished in 0.04s\n\n"
+    }
+  },
+  "checks": {
+    "workflows": {
+      "runtime_macos": {
+        "passed": 7,
+        "total": 7,
+        "sha256": "03ebf744acc77234230f1676281c59afda87d5a8a21ed5b105a7613c1d513501"
+      },
+      "runtime_linux": {
+        "passed": 7,
+        "total": 7,
+        "sha256": "0f6c5c8349c6a20766f0fd98f24e9918db4bb5f46e72f5fb92858a6e62ef5b66"
+      },
+      "mac_product": {
+        "passed": 8,
+        "total": 12,
+        "sha256": "ad2ab156c322beae957b3bac3a1306d752b0ce79f84fa51a9cafe82d0fe8c4a7"
+      }
+    },
+    "macos": [
+      {
+        "name": "runtime-mac",
+        "code": 0,
+        "seconds": 33.889350042000004
+      },
+      {
+        "name": "kernel-conformance",
+        "code": 0,
+        "seconds": 32.164268041999996
+      },
+      {
+        "name": "ffi",
+        "code": 0,
+        "seconds": 11.616209957999999
+      },
+      {
+        "name": "core-clippy",
+        "code": 0,
+        "seconds": 7.267606666000006
+      },
+      {
+        "name": "ffi-clippy",
+        "code": 0,
+        "seconds": 0.5068738749999966
+      },
+      {
+        "name": "ipad-compile",
+        "code": 0,
+        "seconds": 8.954642915999997
+      }
+    ],
+    "linux": [
+      {
+        "name": "process-all",
+        "code": 0,
+        "seconds": 79.479893411
+      },
+      {
+        "name": "ffi-all",
+        "code": 0,
+        "seconds": 13.356640464000009
+      },
+      {
+        "name": "core-clippy",
+        "code": 0,
+        "seconds": 7.310069294999991
+      },
+      {
+        "name": "runtime-ci",
+        "code": 0,
+        "seconds": 56.393011607999995
+      }
+    ],
+    "process": {
+      "macos": {
+        "passed": 445,
+        "ignored": 2,
+        "sha256": "d705a402aab9ba26733633e8889bed732086d259b04ffe76113e793c4989af00"
+      },
+      "linux": {
+        "passed": 445,
+        "ignored": 2,
+        "sha256": "93909e71c68e82d5c2c38e76c80a1b4333706f2afa285164ad8019c2f3fcd26b"
+      }
+    },
+    "ffi": {
+      "macos": {
+        "passed": 10,
+        "ignored": 0,
+        "sha256": "e430a67d4dac462143daab7296ad6eab3ecbbc0a8fc483bf779b703b4b5fb4c6"
+      },
+      "linux": {
+        "passed": 10,
+        "ignored": 0,
+        "sha256": "245b68c8dc1e701e0fd86624fb2b0d29003abd6c83399b4d1f9e0a5029dfe671"
+      }
+    },
+    "ipad": [
+      {
+        "target": "aarch64-apple-ios",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+        "code": 0
+      },
+      {
+        "target": "aarch64-apple-ios-sim",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk",
+        "code": 0
+      }
+    ],
+    "hardware": {
+      "passed": true,
+      "runtime_revision": "76f91c36976fbdc95cf1f5790427d311be629898",
+      "rows": [
+        {
+          "target": "trames-mac-run",
+          "executable_sha256": "0d6bd13235002a0bda5ba685bb2ab05c52272ca95786090c92ebb3edbd0d02cd",
+          "exit": 0,
+          "passed_tests": 16
+        },
+        {
+          "target": "trames_hvf",
+          "executable_sha256": "ea80b10195d5f85caa3ef984f2a6cf0297dd54966822cb98287b0b601782a871",
+          "exit": 0,
+          "passed_tests": 52
+        }
+      ]
+    },
+    "process_regressions": [
+      "complete_fd_control_uses_original_credentials_and_seals_without_joined_dispatch"
+    ],
+    "common_regressions": [
+      "accepted_status_control_uses_live_inode_permission_and_survives_fd_reuse",
+      "short_control_preserves_path_invalid_command_and_validation_precedence",
+      "accepted_status_control_keeps_the_original_async_endpoint_after_fd_reuse",
+      "source_and_solo_short_control_share_errors_and_never_read_unused_arguments",
+      "mapped_write_seal_parks_and_keeps_its_original_inode_through_close_and_fd_reuse"
+    ],
+    "native_prior": {
+      "cpus": 4,
+      "cohorts": 38,
+      "returned_syscalls": {
+        "25": 60,
+        "220": 1
+      },
+      "guest_results_and_original_bytes_correct": true
+    },
+    "native_final": {
+      "cpus": [
+        4,
+        12
+      ],
+      "cohorts": 1,
+      "returned_syscalls": {},
+      "guest_results_and_original_bytes_correct": true
+    },
+    "native_log_sha256": "1fd9ca74ad4adfefeb1b1f4fce26a3219813db1409c1b42b4d3ebebf67d85c1b",
+    "installed": {
+      "version": "Trames Dev 1.5.4 (dev) runtime 76f91c36976fbdc95cf1f5790427d311be629898",
+      "runner_sha256": "6287c981b0082e52d177221091ee405f93d187e69afe996e2115177b1792897f",
+      "stable_sha256": "8fc21435034e8c041632e2e50419da9d2123bf790aedb0a1499286fc8367e614",
+      "stable_unchanged": true,
+      "checks": [
+        {
+          "name": "init",
+          "code": 0,
+          "seconds": 3.277364
+        },
+        {
+          "name": "host",
+          "code": 0,
+          "seconds": 0.9561362909999995
+        },
+        {
+          "name": "tracing",
+          "code": 0,
+          "seconds": 0.3741197920000001
+        }
+      ]
+    }
+  },
+  "source_sha256": {
+    "runtime/crates/trames-linux/src/direct.rs": "4616f76b733ad06211685fe1e67dbe8b8becb5b84468e86ba4104eeb9c387f70",
+    "runtime/crates/trames-linux/src/direct/file.rs": "f50ab5acad3c7291d4e565a2c5ed015f16c9ea4aff5b11db576f99caec8dfdf2",
+    "runtime/crates/trames-linux/src/direct/file_tests.rs": "a353b66eac57d9c8d1c1e33b4a79d9612374d061598dcd82bea308da2969f8e3",
+    "runtime/crates/trames-linux/src/fcntl.rs": "dfbed946b531db7cdf8dc7e1ea1106068e749e39662b82a048165ac2155aa347",
+    "runtime/crates/trames-linux/src/lib.rs": "12aeb16427fde12943a9db94a7116f4c081a5e8e41f4e6389d06c38e37602443",
+    "runtime/crates/trames-linux/src/state.rs": "04346dfa04ee0cc167150fcf1d93e84de5b34c710d98fe22fe8477a18541efcd",
+    "runtime/crates/trames-session/src/process.rs": "3a269405ba257c0880c2670a019316fa1b6447ba1b38faecd2a2694dccf618d9",
+    "runtime/crates/trames-session/src/process_fcntl_tests.rs": "ed6579e3aa397ffa35a5688ef93f50e23a29aabaa860531906d69f9da8a5bd70",
+    "runtime/crates/trames-session/src/worker_syscalls.rs": "1590a7f0770ebcbe3f968ccfc37d101d151618022206775f3cbce61913350500",
+    "runtime/crates/trames-session/src/workers.rs": "38f9d094edfd376edfec708616225a81df45f0a55674316772ed18f8a0e9860a",
+    "runtime/crates/trames-vfs/src/async_io.rs": "c60027724e9927d13ff68caf4e4b038817473ac1796ff31f17e5865fc01866d2",
+    "runtime/crates/trames-vfs/src/fd_status.rs": "182ac33d7abeb597d0b17eae9bfee2087a2436393a4f3abf90cbe5f9d53fc431",
+    "runtime/crates/trames-vfs/src/file_work.rs": "4fbe31cddc638c816848f53ef5a718522493d26f025cd18cef89304d9e5d8c29",
+    "runtime/crates/trames-vfs/src/lib.rs": "e6e3f4fb6ca4cb72621d70fc179dd17f90fb3b38a44267238267caa2571b108d",
+    "runtime/crates/trames-vfs/src/memfd.rs": "9ce44a0c1c4700deebf110190f6d1846ec02c692f092b5a1ba1cec8ed538113e"
+  },
+  "mac_native_fixture_sha256": "ea87c6932900f10a0d0f0b4ea5b4d60cb2e9108bd2cf773c9ecc6961eecd8afd",
+  "deployment": {
+    "channel": "Mac Dev only",
+    "runner": "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+    "signature_verified": true,
+    "stable_unchanged": true,
+    "physical_ipad_unchanged": true,
+    "business_environments_unchanged": true
+  },
+  "validation_notes": [
+    "Both runtime workflows pass all seven steps on unchanged final Rust inputs. Each host passes 445 process regressions (two intentionally ignored), ten FFI cases and strict lint. Both iPad SDKs compile; no physical iPad installation is part of this coordinator round.",
+    "The connected process fixture fails against prior production before its completion marker. Final four/twelve-CPU, one-slot and seccomp ALLOW configurations run status authority, credential changes, canonical errors and mapped seals in one cohort with no returned syscall, service or mapping checkpoint.",
+    "The signed native baseline completes correct per-thread results and verifies original inode bytes before failing only its one-cohort assertion. It needs 38 cohorts, 60 returned fcntls and one returned clone at four CPUs. Final four/twelve-CPU execution needs one cohort without returned syscalls. No twelve-CPU baseline or controlled throughput gain is claimed.",
+    "The native fixture retains an independent observation Files table over original OFDs for post-exit checks because the guest legitimately closes its Files at final exit. This is test observation only, not a production resource copy.",
+    "Mac product gates 1-8 and 68 signed hardware cases pass; Dev build/install/signature and installed init/host/tracing checks pass separately. Stable build/package workflow steps are deliberately not run for a Dev-only coordinator round."
+  ],
+  "remaining": [
+    "Final cold SVC/native-resource dispatch not completed or parked by a source resource scope.",
+    "Genuinely absent original Files/lock/path/wait providers and both retained io_uring maintenance escalation sites.",
+    "Actual host cancellation/deadline/shutdown and final backend/session teardown.",
+    "Initial/standalone/capability-less orchestration."
+  ],
+  "limits": [
+    "Four broad categories remain; the overall coordinator-removal objective is not complete.",
+    "Existing supported dup, record locks and async-owner routes remain, with real missing resource/embedding boundaries. Unsupported fcntl extensions are not advertised.",
+    "No application throughput, production fallback frequency or Firefox latency improvement is inferred from cohort counts."
+  ]
+}

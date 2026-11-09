@@ -5664,3 +5664,70 @@ their versions. Four broad categories remain, but recognized guest faults and
 signal-frame failures no longer belong to the final joined-dispatch subsystem.
 Remaining work includes cold syscall/native-resource dispatch, actual missing
 providers/native waits, host cancel/final teardown and initial/legacy orchestration.
+
+
+## 93. Original FD status authority and memfd seals — 2026-11-09
+
+Runtime `76f91c36976fbdc95cf1f5790427d311be629898` closes the residual FD-control
+unit: F_SETFL including O_NOATIME, GET/ADD_SEALS and canonical unknown fcntl
+command completion. Source and solo share short-control validation and the
+original inode seal body. Existing duplication, descriptor queries, record-lock
+waits and async owner/signal routes retain their actual shared resources.
+
+A control captures one original full OFD before permission/status work. NOATIME
+uses live inode ownership and the original caller's current fsuid/FOWNER, only
+when newly enabled. A later credential change refreshes future authority. Async
+subscription updates keep the same endpoint through close/reuse; CLOEXEC remains
+local to the accepted descriptor. The existing per-OFD update lock protects that
+multi-field invariant. No ordinary flag read, guest memory access or byte I/O
+acquires an extra check, lock or fence.
+
+Source/solo now consistently reject disallowed O_PATH commands before unused
+argument inspection. This intentionally removes the old discrepancy where the
+joined session's F_SETFL intercept checked NOATIME before O_PATH but the Linux
+body used the reverse ordering. Unknown raw command values, absent descriptors
+and unused guest pointers retain canonical EINVAL/EBADF. A flag-only embedding
+can still change ordinary status; missing original NOATIME authority is not
+replaced by a fabricated success/error.
+
+Seals operate directly on the accepted inode, without installing a temporary
+numeric FD in another task's Files. Ordinary controls complete inline. A WRITE
+seal that must flush live mapped backing parks through existing FileWork/disk
+execution, releasing the CPU slot. Original writable/VM_MAYWRITE leases preserve
+EBUSY, including shared O_RDWR mappings with currently read-only permissions.
+Accepted work and cancellation cannot apply to a replacement FD. No service
+thread, polling bus, production unsafe block or whole-cohort seal checkpoint is
+added.
+
+The connected process fixture covers status authority, aliases, credential
+changes, multiple-error ordering, unknown commands, O_PATH and mapped seals at
+four/twelve CPUs, one slot and seccomp ALLOW. Prior production stops before its
+completion marker. Final runs complete one cohort with zero returned syscalls,
+services or mapping checkpoints. Unit tests additionally cover live chown,
+close/reuse, descriptor-local CLOEXEC, async subscription release and native seal
+completion/cancellation against the original inode.
+
+The signed native baseline completes correct per-thread results and original
+bytes but uses **38 cohorts, 60 returned fcntls and one returned clone** on four
+CPUs. Final four/twelve-CPU execution completes in **one cohort with no returned
+syscall or service**. The fixture retains a test observation table over original
+OFDs because normal guest exit closes its Files; production creates no such
+copy. No twelve-CPU baseline, production fallback frequency or controlled
+throughput improvement is claimed.
+
+Both complete local runtime workflows pass seven steps. macOS and ARM64 Linux
+each pass 445 process regressions (two intentionally ignored), ten FFI cases and
+strict lint; both iPad SDK targets compile. Mac development gates 1–8, 52 signed
+HVF and sixteen product hardware cases pass. Dev build/install/signature and
+installed init supervision at one/four/twelve CPUs plus host control/tracing at
+twelve CPUs pass. Stable-build/package gates are outside this Dev-only round.
+The [validation record](../validation/fcntl-source-20261109.json) records the exact
+source/binary fingerprints, old/new path evidence and deployment boundary.
+
+Mac Dev is updated. Stable 1.5.4, business environments and physical iPad installs
+remain unchanged. Four broad categories still remain: actual host cancel/final
+teardown, genuinely absent resource/wait capabilities, other final cold dispatch
+and initial/legacy orchestration. Both actual io_uring maintenance escalation
+sites remain. Status, seals and canonical unknown fcntl errors no longer belong
+to final dispatch for the admitted original resource graph; this is not a claim
+that every excluded legacy FD/lock/path embedding is now admitted.
