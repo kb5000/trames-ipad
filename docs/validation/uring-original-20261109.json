@@ -1,0 +1,266 @@
+{
+  "stage": 91,
+  "date": "2026-11-09",
+  "overall_goal": "active",
+  "runtime_revision": "79b3c44139eb5f65296161c945e03c55c0d233e5",
+  "prior_runtime": "667c9cd31b901286c241fe5563c800ebf62cc1bb",
+  "scope": "Original accepted io_uring resource-body completion, cold resolver authority, full OFD FileWork capability, original global publication, async file/layout dependencies, completion/cancellation and source handoff.",
+  "architecture": {
+    "resources": "The accepted resolver retains original Files, fs/mount/namespace resources, credentials and device policy. It never borrows a current Task/Linux projection or imports an observer authority.",
+    "cold_body": "Shared fast bodies remain first. Before-effect misses use the same canonical body in a scoped resolver over the original resources and caller View; no SQE metadata replay or FD re-resolution.",
+    "publication": "Every context retains the original global publication. Cold rendering uses a private cache from that resource; unavailable global observation can read original publication. Numeric PID/mm bytes still need their real provider.",
+    "files": "An accepted full OFD exposes only its actual FileWork data target even if other controls remain opaque. Native disk staging, PreparedOpen, mapped backing/layout waits and selected buffer leases retain the existing asynchronous path.",
+    "lifetime": "Scoped restoration covers Files, source observation, private admission, reader and signal state on return/unwind. Signal readers are borrowed per operation; original SIGXFSZ delivery occurs after the resolver mutex is released. Last-close tests reject a root/Files cycle.",
+    "no_new": [
+      "task-wide or global native lock",
+      "resource/coordinator/service thread",
+      "polling bus",
+      "production unsafe block or trait override",
+      "ordinary guest memory checks or fences",
+      "fake live PID/mm authority"
+    ]
+  },
+  "baseline": {
+    "process": {
+      "runtime_revision": "667c9cd31b901286c241fe5563c800ebf62cc1bb",
+      "checks": [
+        {
+          "name": "process",
+          "code": 101,
+          "seconds": 17.020362417,
+          "output": "warning: unused workspace dependency `trames-native`\n  --> Cargo.toml:17:1\n   |\n17 | trames-native = { path = \"runtime/crates/trames-native\" }\n   | ^^^^^^^^^^^^^\n   |\n   = note: `cargo::unused_workspace_dependencies` is set to `warn` by default\nhelp: consider removing the workspace dependency `trames-native`\nwarning: workspace (manifest) generated 1 warning\n   Compiling trames-session v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-session)\n   Compiling trames-vfs v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-vfs)\n   Compiling trames-kernel v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-kernel)\n   Compiling trames-linux v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-linux)\n   Compiling trames-core v1.5.4 (/Users/main/dev/trames/crates/trames-core)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 15.89s\n     Running ../../runtime/crates/trames-session/src/lib.rs (target/debug/build/trames-core/73ea467a4920ade2/out/kernel_conformance-73ea467a4920ade2)\n\nrunning 1 test\ntest process::uring_original_tests::original_uring_body_uses_its_task_and_view_without_a_join_in_blocking_and_async_enter ... original-uring CPUs=4 slots=4 filtered=false flags=0 marker=[0, 0, 0, 0] cohorts=1 returned={}\n\nthread 'process::uring_original_tests::original_uring_body_uses_its_task_and_view_without_a_join_in_blocking_and_async_enter' (27884056) panicked at crates/trames-core/../../runtime/crates/trames-session/src/process_uring_original_tests.rs:121:13:\nassertion `left == right` failed\n  left: [0, 0, 0, 0]\n right: [1, 0, 0, 0]\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\nFAILED\n\nfailures:\n\nfailures:\n    process::uring_original_tests::original_uring_body_uses_its_task_and_view_without_a_join_in_blocking_and_async_enter\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 443 filtered out; finished in 0.02s\n\nerror: test failed, to rerun pass `-p trames-core --test kernel-conformance`\n"
+        }
+      ]
+    },
+    "signed_native": {
+      "runtime_revision": "667c9cd31b901286c241fe5563c800ebf62cc1bb",
+      "code": 101,
+      "output": "\nrunning 1 test\ntest session::tests::retained_original_uring_bodies_complete_without_a_join_on_native_workers ... hardware original-uring CPUs=4 exit=0 cohorts=2 returned={}\n\nthread 'session::tests::retained_original_uring_bodies_complete_without_a_join_on_native_workers' (27917907) panicked at crates/trames-mac/src/session.rs:1482:13:\nassertion `left == right` failed\n  left: 2\n right: 1\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\nFAILED\n\nfailures:\n\nfailures:\n    session::tests::retained_original_uring_bodies_complete_without_a_join_on_native_workers\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 34 filtered out; finished in 0.03s\n\n"
+    }
+  },
+  "checks": {
+    "workflows": {
+      "runtime_macos": {
+        "passed": 7,
+        "total": 7,
+        "sha256": "db793884c8c1aae69175f0ed0edaf4ce7d2d4e54140d887a60d634a45beb9d05"
+      },
+      "runtime_linux": {
+        "passed": 7,
+        "total": 7,
+        "sha256": "e712f1642dc6c1769cb442bbf748c953347b276270cda5979d87bb0ac758a94e"
+      },
+      "mac_product": {
+        "passed": 8,
+        "total": 12,
+        "sha256": "623545e7d3db9732b7a2aa85225969e53f08a118bd0cb98449e95c3c5cfac0c8"
+      }
+    },
+    "macos": [
+      {
+        "name": "runtime-mac",
+        "code": 0,
+        "seconds": 33.462291666
+      },
+      {
+        "name": "kernel-conformance",
+        "code": 0,
+        "seconds": 28.7662975
+      },
+      {
+        "name": "ffi",
+        "code": 0,
+        "seconds": 9.335509582999997
+      },
+      {
+        "name": "core-clippy",
+        "code": 0,
+        "seconds": 5.72819324999999
+      },
+      {
+        "name": "ffi-clippy",
+        "code": 0,
+        "seconds": 0.37732574999999713
+      },
+      {
+        "name": "ipad-compile",
+        "code": 0,
+        "seconds": 6.934826041999997
+      }
+    ],
+    "linux": [
+      {
+        "name": "process-all",
+        "code": 0,
+        "seconds": 61.787979437999994
+      },
+      {
+        "name": "ffi-all",
+        "code": 0,
+        "seconds": 13.388564256999985
+      },
+      {
+        "name": "core-clippy",
+        "code": 0,
+        "seconds": 6.055536044000007
+      },
+      {
+        "name": "runtime-ci",
+        "code": 0,
+        "seconds": 55.10218935900002
+      }
+    ],
+    "process": {
+      "macos": {
+        "passed": 442,
+        "ignored": 2,
+        "sha256": "7892ea003095aca5f736ac6dfef773fad2ef9e9548d6c08f0c03bb41e257838c"
+      },
+      "linux": {
+        "passed": 442,
+        "ignored": 2,
+        "sha256": "b856a280c1d3a64b8caf0b1b00ec28de2606988d58c0162f704d1cc52550b326"
+      }
+    },
+    "ffi": {
+      "macos": {
+        "passed": 10,
+        "ignored": 0,
+        "sha256": "e2812c06b3caf9d1bd674a8e53db509e2e8ddcfcdd1d880771a7e2c8b91aa586"
+      },
+      "linux": {
+        "passed": 10,
+        "ignored": 0,
+        "sha256": "212423165d93620effc1da36ca56784679759d30a35ad1854ea1aa91647a660e"
+      }
+    },
+    "ipad": [
+      {
+        "target": "aarch64-apple-ios",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+        "code": 0
+      },
+      {
+        "target": "aarch64-apple-ios-sim",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk",
+        "code": 0
+      }
+    ],
+    "hardware": {
+      "passed": true,
+      "runtime_revision": "79b3c44139eb5f65296161c945e03c55c0d233e5",
+      "rows": [
+        {
+          "target": "trames-mac-run",
+          "executable_sha256": "e754d6aab6f5a362a2ac1d7cac8a8780e2883fc6a49b46a3d528b928686280b5",
+          "exit": 0,
+          "passed_tests": 14
+        },
+        {
+          "target": "trames_hvf",
+          "executable_sha256": "cde82bbea0bf3dbcb4a2b84e2f0ccb0c0a736b9e58ac4598ba82f798a09c9a7e",
+          "exit": 0,
+          "passed_tests": 52
+        }
+      ]
+    },
+    "native_original": {
+      "cpus": [
+        4,
+        12
+      ],
+      "cohorts": 1,
+      "returned_syscalls": {},
+      "actual_bytes_and_two_cqes": true
+    },
+    "native_dormant": {
+      "cpus": [
+        4,
+        12
+      ],
+      "cohorts": 2,
+      "scoped_mms": 1,
+      "returned_read": 1
+    },
+    "native_log_sha256": "4bc5aa44d03ae955311b5a41ae097e35f543ebb301e4ed000246d4847c8c6c51",
+    "installed": {
+      "version": "Trames Dev 1.5.4 (dev) runtime 79b3c44139eb5f65296161c945e03c55c0d233e5",
+      "runner_sha256": "7c1fc36ef4b8913507307ab6d203e808e96114920f4bfad5f1112fb2e750866f",
+      "stable_sha256": "8fc21435034e8c041632e2e50419da9d2123bf790aedb0a1499286fc8367e614",
+      "stable_unchanged": true,
+      "checks": [
+        {
+          "name": "init",
+          "code": 0,
+          "seconds": 3.3194952499999997
+        },
+        {
+          "name": "host",
+          "code": 0,
+          "seconds": 0.9505865419999999
+        },
+        {
+          "name": "tracing",
+          "code": 0,
+          "seconds": 0.2535947080000005
+        }
+      ]
+    },
+    "process_regression": "original_uring_body_keeps_accepted_resources_without_a_join_in_blocking_and_async_enter",
+    "shared_regressions": [
+      "original_uring_context_keeps_files_credentials_namespace_and_private_admission",
+      "original_uring_context_unwind_restores_policy_files_reader_and_signal_state",
+      "opaque_registration_capture_and_source_query_retain_full_original_after_close_reuse",
+      "original_body_completion_does_not_disable_another_submitters_live_maintenance",
+      "shared_volatile_registered_file_completes_its_original_body_on_source",
+      "capability_less_embedding_defers_before_import_and_original_caller_can_complete",
+      "mapped_layout_sqe_uses_source_resource_and_keeps_accepted_work_after_cancellation",
+      "fixed_file_size_failure_keeps_original_submitter_signal_when_another_context_pumps",
+      "queued_file_read_reserves_its_selected_buffer_and_copies_out_on_the_source",
+      "missing_native_wait_capability_only_escalates_its_original_submitter"
+    ]
+  },
+  "source_sha256": {
+    "runtime/crates/trames-linux/src/direct/uring/actor.rs": "dd9ec6ae2595a9b6a14481d6e92c8fbd4af210ed745acad69a080be136cebd9f",
+    "runtime/crates/trames-linux/src/direct/uring/actor_file.rs": "1a57b177c1d15a3830cfc43022cac444964d4da9b3cff0f06dc8fea35b17a226",
+    "runtime/crates/trames-linux/src/direct/uring/scope_tests.rs": "73486c75b6dcb938d4bde66dfe14188746372dc440e7a5e024d0c2eee54b692d",
+    "runtime/crates/trames-linux/src/direct/uring/subsystem_tests.rs": "bd8abb88e024e709531762575ae61d612bb87dea9ee2dfdbd33062f92ca9c5ce",
+    "runtime/crates/trames-session/src/process.rs": "d67e08fc68340812cd86000d3d7fe3f3b990c973c6a3a948a5b99ba150d36ded",
+    "runtime/crates/trames-session/src/process_uring_original_tests.rs": "cddbb8a5e95f0ed3362c44a30a024d1b30b10c2e2548f460d1125ab2473905de",
+    "runtime/crates/trames-vfs/src/lib.rs": "594e366389e83e896e2030299bdb0ed19e2e07213c965436aad90a286082729e",
+    "runtime/crates/trames-vfs/src/path_queries.rs": "1b571ced233a08654409ca7250cc01f44fae291af24b9e7d1caaf9eec614e9d2",
+    "runtime/crates/trames-vfs/src/proc_source.rs": "8bae702372f1b07bc25ae683e11a660f5db9e0a8a785e433593db233f491469a",
+    "runtime/crates/trames-vfs/src/pseudo.rs": "1e34b895cae6b71e24171e42559796410a40f2ac7a6cb1627dfb82e5405e05eb",
+    "runtime/crates/trames-vfs/src/uring.rs": "d91bb32f1ea4db4362a904a85d519174b4e57e1abc9cad64c6bbb802e9825ed0",
+    "runtime/crates/trames-vfs/src/uring_context_tests.rs": "658b7b49a0b1a9559eec63a20ad4ef9dcda7acab32993ec7c64fdc2e74843c95"
+  },
+  "mac_native_fixture_sha256": "87e158597260540626b7fde92fe88c2a9057477c83276262fd9dc4f3999bf7aa",
+  "deployment": {
+    "channel": "Mac Dev only",
+    "runner": "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+    "signature_verified": true,
+    "stable_unchanged": true,
+    "business_environments_unchanged": true,
+    "physical_ipad_unchanged": true
+  },
+  "validation_notes": [
+    "The connected process case fails before its marker on prior production. The final 4/12-CPU, one-slot and allowed-filter cases exercise blocking/asynchronous enter and fixed files after FD close/reuse in one cohort with no returned syscall, service or mapping checkpoint.",
+    "The native baseline accepts an eventfd-linked global read before live Kernel source capture. Guest code releases the dependency; peers use a real guest atomic. Prior four-CPU execution completes correctly but needs two cohorts with an empty returned-syscall map. Final four/twelve-CPU runs use one cohort and verify both CQEs and bytes. No twelve-CPU before or controlled throughput gain is claimed.",
+    "A preliminary native metadata fixture was already one cohort on prior production, so it was not used as evidence of a removed maintenance join. A host-managed test variant initially lacked its required host adapter; it was replaced by the actual accepted-context handoff fixture. An initial two-SQE fixture omitted its second SQ-array index and waited twice on eventfd; corrected before baseline/final acceptance.",
+    "Network tests initially returned sandbox EPERM and pass with local loopback permission. No network implementation was changed.",
+    "Full source fingerprints match ARM64 Linux CI and the paired Mac runtime. Mac development gates are 8 of 12; stable packaging and physical iPad installation are outside this coordinator round.",
+    "The first process baseline predates a cosmetic test-function rename; its body and assertions are unchanged. Previous passing checks were reused for docs-only edits.",
+    "With no cargo/rustc active, stale rebuildable incremental caches older than three hours were removed when disk free space fell below 1 GB. Apps, guest environments and validation records were preserved."
+  ],
+  "remaining": [
+    "Both submitter-scoped io_uring maintenance escalation sites remain for genuinely missing native event capability, absent original execution root or a genuinely missing/excluded underlying provider.",
+    "Actual host cancellation/deadline/shutdown and final backend/session teardown.",
+    "Final SVC/HLT/fault dispatch not completed or parked by a source scope.",
+    "Actual initial/standalone/capability-less orchestration."
+  ],
+  "limits": [
+    "Four broad categories remain; this is not complete coordinator removal.",
+    "Global publication does not grant a live numeric PID/mm reader, and missing capabilities are not replaced by guest errors to hide joins.",
+    "No broad Firefox/server throughput improvement is inferred from functional path counts."
+  ]
+}

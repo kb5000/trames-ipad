@@ -5541,3 +5541,63 @@ remain for missing native wait capability and an original body still excluded by
 its actual provider. Actual host cancellation/final teardown, other final dispatch
 and initial/legacy orchestration remain. The next io_uring work must address those
 real resources and waits; this stage does not relabel them as source completion.
+
+
+## 91. Original accepted io_uring bodies and resource context — 2026-11-09
+
+Runtime `79b3c44139eb5f65296161c945e03c55c0d233e5` moves the remaining resource-backed cold io_uring body into
+its original accepted context on the executing worker. It preserves the original
+Files, credentials, fs/mount/namespace resources, device policy, original OFD and
+guest View. It does not borrow the current task's Linux or let another CQ observer
+donate a reader or resource root. Shared fast paths remain first; an actual cold
+admission miss enters the common canonical body with a scoped private resolver.
+
+The resolver retains the actual original publication through subsequent provider
+replacement. Its rendering cache is initialized from that resource; it is not a
+copied owner VFS. Scoped restoration covers normal return and unwind, Files,
+reader authority, cached observation, ordinary admission and file-size signal
+state. SIGXFSZ is delivered through the original submitter after releasing the
+resolver lock. No task-wide/global lock, resource thread, polling bus, production
+unsafe block or ordinary guest-memory check/fence is added.
+
+Opaque full OFDs can now supply their actual existing FileWork data target
+without publishing their namespace/anonymous controls as a complete shared FD.
+Native disk staging, selected-buffer ownership, mapped-backing/layout waits and
+cancellation retain the existing asynchronous machinery. Open admission keeps
+PreparedOpen instead of replaying accepted work as a synchronous host operation.
+Global accounting may use its real original publication without an available old
+observer. Numeric PID/mm content still needs its real provider; old metadata does
+not become a live argv/environment/maps reader.
+
+Both complete local runtime workflows pass on macOS and ARM64 Linux. Each host
+passes 442 process regressions (two intentionally ignored) and ten FFI cases;
+strict lint and both iPad SDK targets pass. The connected process regression fails
+against prior production before its completion marker. Final four/twelve-CPU,
+one-slot and seccomp-allowed runs exercise blocking/asynchronous enter and a
+registered file after close/reuse in one cohort without returned syscall, service
+or mapping checkpoint. Common tests verify original Files/credentials/root after
+replacement, private admission restoration, signal-state unwind, last-close
+release, independent submitters and genuine capability-less admission.
+
+The signed native fixture accepts a linked eventfd/global read before source
+admission, closes/reuses the original FD, then releases the dependency from guest
+code while peer threads wait on a real guest atomic. Prior four-CPU execution
+returns correct bytes and CQEs but requires two cohorts with an empty returned
+syscall map. Final four/twelve-CPU runs use one cohort with correct data, both
+CQEs and no returned syscall/service. This catches a maintenance join that the
+historical service/syscall counters alone missed. No twelve-CPU before measurement
+or controlled throughput improvement is claimed. The existing dormant native
+fixture still uses two cohorts and its actual ordinary legacy read boundary.
+
+Mac development gates and all 52 HVF plus fourteen product hardware cases pass.
+Installed Dev acceptance, fingerprints and deployment boundaries are recorded in
+[the validation record](../validation/uring-original-20261109.json). Only Mac Dev
+is updated; stable 1.5.4, business environments and physical iPad installations
+retain their versions.
+
+Four broad categories remain. Both actual maintenance escalation sites remain
+for genuine missing native waits, absent execution roots or missing/excluded
+underlying providers. The resource-backed cold body no longer needs the current
+owner task, but no capability-less embedding or missing guest-mm reader is
+relabelled as successful source execution. Actual host cancellation/final teardown,
+final execution-dispatch fallback and initial/legacy orchestration remain open.
