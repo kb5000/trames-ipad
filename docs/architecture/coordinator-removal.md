@@ -5155,3 +5155,55 @@ and erroneous native-event-to-owner replay (stage 83). Required original
 mm/backing synchronization is distinct from joining all workers for a syscall.
 Only Mac Dev is updated; stable 1.5.4, business environments and physical iPad
 installations are unchanged. The overall coordinator-removal goal stays active.
+
+
+## 85. Original io_uring maintenance scopes and retirement — 2026-11-09
+
+Runtime `4064df29b4288adabea520dfa13dfdf217884af2` removes actor-wide active, revision
+and legacy-required state. Kernel admission, background maintenance, native-file
+external classification, completion, cancellation and legacy escalation now use
+an original (mm, task) scope. Foreign CQ visibility cannot create another task's
+background, and one source's completion or excluded body cannot disable another
+source's maintenance.
+
+Three before-fix regressions fail against `3c8f555`: completing one submitter
+retires another source; foreign capture gets a background for somebody else's
+request; and one excluded body disables another submitter's ordinary progress.
+Additional coverage includes real TCP missing-wait-capability retry/cancellation,
+independent eventfd I/O, delayed native-file work, stale idle/progress versus new
+publication, same task IDs in different mms, canonical reactivation and final
+retirement of 1,022 secondary origins. The excluded proc body still completes
+through its existing legacy route; no working request is replaced with a guest
+error merely to remove a fallback count.
+
+One relaxed atomic status word holds a scope's pending/legacy flags and issue
+generation. A stale idle or legacy-progress acknowledgement cannot erase a newer
+accepted issue. Original ring/resource locks still publish actual contents.
+File work retains its original mm/task for external-work classification. Scope
+records retain no guest task, memory, Files root or strong ring, and final cleanup
+runs outside the registry lock.
+
+Normal production Linux cloning already uses separate actors, so these shared
+multi-origin regressions principally cover reuse and embedding boundaries. They
+do not prove a frequent production bottleneck or a throughput gain. The ordinary
+one-origin case uses one retained scope without a new registry lock or tree
+lookup. Only secondary origins use an object-local cold registry; inactive
+observer identity survives reactivation and disappears at last release. There is
+no new thread, polling bus, ordinary-memory fence, production unsafe block,
+per-byte/per-instruction check or global algorithm/native-function lock.
+
+Both complete local runtime workflows pass; each host passes 428 process
+regressions (two intentionally ignored) and ten FFI cases. All seven new shared
+regressions, strict lint and both iPad SDK compile targets pass. Mac product
+development gates and 52 signed HVF plus eight signed product cases pass.
+Installed Dev validation and exact source/binary hashes are in the
+[source-bound record](../validation/uring-maintenance-scope-20261109.json).
+Only Mac Dev is updated; stable 1.5.4, business environments and physical iPad
+installations are unchanged.
+
+The two real io_uring maintenance escalation setters remain, now affecting only
+their original submitter. Their actual worker stop/join boundary is still present.
+The broad category count remains four: host control/final teardown, genuine
+missing/excluded capabilities/resources, final execution dispatch and initial/
+legacy orchestration. This closes maintenance-state ownership/lifetime coupling;
+it does not complete the overall coordinator-removal goal.

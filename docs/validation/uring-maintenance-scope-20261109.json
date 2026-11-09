@@ -1,0 +1,234 @@
+{
+  "stage": 85,
+  "date": "2026-11-09",
+  "overall_goal": "active",
+  "runtime_revision": "4064df29b4288adabea520dfa13dfdf217884af2",
+  "prior_runtime": "3c8f555bd74952ce38d38edea341cada6750f8e4",
+  "scope": "Connected io_uring maintenance-state ownership: original mm/task admission, pending publication, background progress, waits, external work classification, legacy escalation, cancellation and retirement.",
+  "architecture": {
+    "identity": "Original (Memory instruction owner, task) scope, independent of shared ring FD numbers and foreign CQ visibility.",
+    "state": "Actor-wide active/revision/owner-required fields are removed. One relaxed atomic per scope holds pending, legacy-required and publication generation. Original ring/resource locks still publish request bytes.",
+    "stale_publication": "Idle or legacy-progress acknowledgement compares the observed generation. A later pending publication cannot be erased by an old completion.",
+    "production": "Linux clone_with_resources already creates a separate actor per task. These multi-origin regressions cover reused/embedding actors and do not establish a common-workload global-actor bottleneck.",
+    "fast_path": "One origin uses a retained OnceLock scope, without a registry lock or tree lookup. Only secondary origins use the object-local cold registry. No per-SQE body lock, per-byte/per-instruction check, new guest fence or algorithm-level serialization is added.",
+    "lifetime": "Pending work pins a secondary scope; retained observers preserve its identity across reactivation. Last inactive observer drop removes its weak registry entry. The first scalar scope lives until its actor retires. Scopes retain no Files, guest memory/task or strong ring.",
+    "external": "Accepted FileIo records original owner/task; pending native jobs classify only that submitter as external. Poll/enter/background paths use the same identity.",
+    "legacy": "Both real missing-native-wait and deferred-body escalation setters remain and now mark their original scope. The actual worker stop/join boundary remains; it has not been renamed as removed.",
+    "no_new": [
+      "coordinator/resource/service thread",
+      "polling bus",
+      "production unsafe block",
+      "ordinary guest-memory fence/check",
+      "global algorithm/native-function lock"
+    ]
+  },
+  "baseline": {
+    "runtime_revision": "3c8f555bd74952ce38d38edea341cada6750f8e4",
+    "exit": 101,
+    "seconds": 2.331924708,
+    "output": "warning: unused field `repository` in `workspace.package`\n  --> Cargo.toml:30:1\n   |\n30 | repository = \"https://github.com/kb5000/trames-runtime\"\n   | ^^^^^^^^^^\n   |\n   = note: `cargo::unused_workspace_package_fields` is set to `warn` by default\nhelp: consider removing the field `workspace.package.repository`\nwarning: workspace (manifest) generated 1 warning\n   Compiling trames-linux v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-linux)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.67s\n     Running unittests src/lib.rs (/Users/main/dev/trames/target/debug/build/trames-linux/79936f2dc6cf625d/out/trames_linux-79936f2dc6cf625d)\n\nrunning 3 tests\ntest direct::uring::scope_tests::body_deferral_does_not_disable_another_submitters_live_maintenance ... FAILED\ntest direct::uring::scope_tests::completing_one_submitter_keeps_other_original_scope_active ... FAILED\ntest direct::uring::scope_tests::foreign_background_does_not_adopt_another_submitters_pending_request ... FAILED\n\nfailures:\n\n---- direct::uring::scope_tests::body_deferral_does_not_disable_another_submitters_live_maintenance stdout ----\n\nthread 'direct::uring::scope_tests::body_deferral_does_not_disable_another_submitters_live_maintenance' (27423185) panicked at crates/trames-linux/src/direct/uring/scope_tests.rs:80:5:\na real excluded body cannot disable another source\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n---- direct::uring::scope_tests::completing_one_submitter_keeps_other_original_scope_active stdout ----\n\nthread 'direct::uring::scope_tests::completing_one_submitter_keeps_other_original_scope_active' (27423186) panicked at crates/trames-linux/src/direct/uring/scope_tests.rs:43:5:\nanother task's completion must not retire this source\n\n---- direct::uring::scope_tests::foreign_background_does_not_adopt_another_submitters_pending_request stdout ----\n\nthread 'direct::uring::scope_tests::foreign_background_does_not_adopt_another_submitters_pending_request' (27423187) panicked at crates/trames-linux/src/direct/uring/scope_tests.rs:60:5:\nCQ visibility does not grant another task's maintenance ownership\n\n\nfailures:\n    direct::uring::scope_tests::body_deferral_does_not_disable_another_submitters_live_maintenance\n    direct::uring::scope_tests::completing_one_submitter_keeps_other_original_scope_active\n    direct::uring::scope_tests::foreign_background_does_not_adopt_another_submitters_pending_request\n\ntest result: FAILED. 0 passed; 3 failed; 0 ignored; 0 measured; 271 filtered out; finished in 0.02s\n\nerror: test failed, to rerun pass `-p trames-linux --lib`\n"
+  },
+  "checks": {
+    "workflows": {
+      "runtime_macos": {
+        "passed_steps": 7,
+        "total_steps": 7,
+        "summary": "target/uring-scope-subsystem/runtime-mac/summary.json",
+        "sha256": "46fbe914a33650de088ca669968b7bee8c4f562d3a2c1c8e929397675b41f8bf"
+      },
+      "runtime_linux": {
+        "passed_steps": 7,
+        "total_steps": 7,
+        "summary": "target/local-ci/io/uring-scope-subsystem/runtime-linux-ci/summary.json",
+        "sha256": "efbba5ed1c2a08429bee15569b2801975058370cc0246996ed16ae8f787b7901"
+      },
+      "mac_product": {
+        "passed_steps": 8,
+        "total_steps": 12,
+        "summary": "target/uring-scope-subsystem/mac-product-ci/summary.json",
+        "sha256": "ba65b7d7d8d6328d27e0466e4df7c2f0b46fbae90dec660e61da3f7e540ad5a5"
+      }
+    },
+    "macos": [
+      {
+        "name": "runtime-mac",
+        "code": 0,
+        "seconds": 21.100125375
+      },
+      {
+        "name": "kernel-conformance",
+        "code": 0,
+        "seconds": 25.343391375000003
+      },
+      {
+        "name": "ffi",
+        "code": 0,
+        "seconds": 10.248576916999994
+      },
+      {
+        "name": "core-clippy",
+        "code": 0,
+        "seconds": 5.336467833
+      },
+      {
+        "name": "ffi-clippy",
+        "code": 0,
+        "seconds": 0.3469187500000004
+      },
+      {
+        "name": "ipad-compile",
+        "code": 0,
+        "seconds": 5.3245003749999995
+      }
+    ],
+    "linux": [
+      {
+        "name": "process-all",
+        "code": 0,
+        "seconds": 68.368189488
+      },
+      {
+        "name": "ffi-all",
+        "code": 0,
+        "seconds": 12.368611421999987
+      },
+      {
+        "name": "core-clippy",
+        "code": 0,
+        "seconds": 5.611322711000014
+      },
+      {
+        "name": "runtime-ci",
+        "code": 0,
+        "seconds": 53.11649169200001
+      }
+    ],
+    "process": {
+      "macos": {
+        "passed": 428,
+        "ignored": 2,
+        "log": "target/uring-scope-subsystem/kernel-conformance.log",
+        "sha256": "69555d244b8ff85074f0f0bcfa702f39345535bf525994f9fd7f25ffc4c305de"
+      },
+      "linux": {
+        "passed": 428,
+        "ignored": 2,
+        "log": "target/local-ci/io/uring-scope-subsystem/process-all.log",
+        "sha256": "3aebb3e736f0cbfc42a846993f98b801804708aa75999a25c9214d2cea1c91fd"
+      }
+    },
+    "ffi": {
+      "macos": {
+        "passed": 10,
+        "ignored": 0,
+        "log": "target/uring-scope-subsystem/ffi.log",
+        "sha256": "15416a621fb8e34d2a9e52b1dc78399e1cbab5249040839fea1359834a40298b"
+      },
+      "linux": {
+        "passed": 10,
+        "ignored": 0,
+        "log": "target/local-ci/io/uring-scope-subsystem/ffi-all.log",
+        "sha256": "461fcb68e40115823f0d8c317d44f0cab7e8dd1865d03f4d7e038cd9f8c3312c"
+      }
+    },
+    "ipad": [
+      {
+        "target": "aarch64-apple-ios",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+        "code": 0
+      },
+      {
+        "target": "aarch64-apple-ios-sim",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk",
+        "code": 0
+      }
+    ],
+    "hardware": {
+      "passed": true,
+      "runtime_revision": "4064df29b4288adabea520dfa13dfdf217884af2",
+      "rows": [
+        {
+          "target": "trames-mac-run",
+          "executable_sha256": "c714f11079c5bb115890c18bea98740f6e4ec239b8c5eaf9dcfe52312b748759",
+          "exit": 0,
+          "passed_tests": 8
+        },
+        {
+          "target": "trames_hvf",
+          "executable_sha256": "b191dc537b06ddf15ff1cadc3459a314a0e0e8faec6004fd5250ec732a5c56ea",
+          "exit": 0,
+          "passed_tests": 52
+        }
+      ]
+    },
+    "installed": {
+      "version": "Trames Dev 1.5.4 (dev) runtime 4064df29b4288adabea520dfa13dfdf217884af2",
+      "runner_sha256": "d4357e7d2591a60e9eaa0967f6fd837d23fc979a75a3605352052a19f2b98f7c",
+      "stable_sha256": "8fc21435034e8c041632e2e50419da9d2123bf790aedb0a1499286fc8367e614",
+      "stable_unchanged": true,
+      "checks": [
+        {
+          "name": "init",
+          "code": 0,
+          "seconds": 3.3026931250000002
+        },
+        {
+          "name": "host",
+          "code": 0,
+          "seconds": 0.921614667
+        },
+        {
+          "name": "tracing",
+          "code": 0,
+          "seconds": 0.2554495000000001
+        }
+      ]
+    },
+    "new_shared_regressions": [
+      "completing_one_submitter_keeps_other_original_scope_active",
+      "foreign_background_does_not_adopt_another_submitters_pending_request",
+      "body_deferral_does_not_disable_another_submitters_live_maintenance",
+      "missing_native_wait_capability_only_escalates_its_original_submitter",
+      "queued_file_work_is_external_only_to_its_original_submitter",
+      "stale_idle_and_legacy_progress_cannot_erase_new_pending_publication",
+      "secondary_origins_are_canonical_until_last_drop_without_retaining_history"
+    ]
+  },
+  "source_sha256": {
+    "runtime/crates/trames-linux/src/direct/uring.rs": "b2918cb76839a5654e295dc881ab5fa056076bcf1fdf0d39025952d2dab21b64",
+    "runtime/crates/trames-linux/src/direct/uring/actor.rs": "e9c910ae9fdf5a12d5e082b1210555f984fbad5ee17d9c01d1a722c6e6fbfbf0",
+    "runtime/crates/trames-linux/src/direct/uring/background.rs": "2eac6c130420d1c23886f7c44af39befa2abbeeb4328d4d509143dfc6c3771a4",
+    "runtime/crates/trames-linux/src/direct/uring/poll.rs": "dcc51ec78051e9ea5402bc66cec45e3eae48c3d81224f48de92453ad57b30e61",
+    "runtime/crates/trames-linux/src/direct/uring/scope.rs": "d93a2b7103a48f6142c67e37cfd8d3c7ab1e6fba17fac8b0c4ffdc9b2e4224b2",
+    "runtime/crates/trames-linux/src/direct/uring/scope_tests.rs": "011b1c45db543021ae33c8853fb675bcf1da2d6b21fb056548a66b02f27fa83b",
+    "runtime/crates/trames-linux/src/uring.rs": "c5594668426ce91a9974686a3960cb05ece257e4b698181da0470e6001a05cb6",
+    "runtime/crates/trames-session/src/process.rs": "649b92c1d7e99643c9d281de63f3bf5358cd7f8e0e1c91bb716c4385959f5958"
+  },
+  "deployment": {
+    "channel": "Mac Dev only",
+    "runner": "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+    "signature_verified": true,
+    "stable_unchanged": true,
+    "physical_ipad_unchanged": true,
+    "business_environments_unchanged": true
+  },
+  "validation_notes": [
+    "The seven new shared regressions run on both macOS and ARM64 Linux. The first three fail against the prior runtime.",
+    "A test-only queued-sync fixture initially used a missing /tmp parent; its file now lives under the existing root. This setup failure was corrected before final checks.",
+    "Initial Rust module visibility and deprecated atomic-helper spelling were corrected during compilation; no production failure is inferred from those build diagnostics.",
+    "Unchanged Mac product hardware fixtures validate normal native execution; no new failing HVF baseline or controlled throughput comparison is claimed.",
+    "Only documentation/evidence changes follow passing final Rust source checks. Source hashes match Linux and the paired Mac runtime checkout."
+  ],
+  "remaining": [
+    "Actual host cancellation/deadline/shutdown and final backend/session teardown.",
+    "Genuine missing capabilities/excluded resources, including two submitter-scoped io_uring wait-capability/body maintenance escalation call sites and their actual stop/join boundary.",
+    "Final SVC/HLT/fault catch-all dispatch.",
+    "Initial/legacy admission and capability-less embedding orchestration; solo execution alone is not a cross-thread RPC."
+  ],
+  "limits": [
+    "The four broad remaining categories are unchanged.",
+    "This removes actor-wide maintenance-state coupling, not either genuine legacy escalation entry.",
+    "No production frequency, throughput gain or total coordinator-removal claim is made.",
+    "Mac product development gates 1-8 of 12 pass; stable release packaging is outside this Dev-only batch."
+  ]
+}
