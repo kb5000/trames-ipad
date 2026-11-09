@@ -1,0 +1,278 @@
+{
+  "stage": 86,
+  "date": "2026-11-09",
+  "overall_goal": "active",
+  "runtime_revision": "f35cfc111bac200190f3d2083e838bcbfdd186b6",
+  "prior_runtime": "4064df29b4288adabea520dfa13dfdf217884af2",
+  "scope": "Connected original dormant Futex/Sleep admission: wake/requeue, deadline, signal, freezer, task/mm custody contention, cancellation and first byte/hardware View preparation.",
+  "architecture": {
+    "admission": "Normal Kernel captures all remaining original Futex/Sleep actors, including frozen tasks, into the same Epoch with actual memory identity and no byte/hardware View.",
+    "demand": "Only an actual wake, expiry, signal or control prepares the original mm. Existing execution workers acquire original custody; unrelated executing mms retain their Views. Metadata still allocates.",
+    "custody": "Busy original task/mm custody parks on original resource readiness and returns the CPU slot. No new coordinator/resource/service thread or polling bus.",
+    "deadlines": "Admitted waiters use changing queue deadlines. Cold Process projections cannot force zero-time host-control polling; actual unowned legacy waits still bound the host-control interval.",
+    "ordering": "Existing timer/sleeper expiry publishes scopes before that executor claims lifecycle source work, so the sole executor cannot sleep with its own newly prepared work unclaimed.",
+    "cancellation": "Stop before preparation retains original wait identity and accepted wake without constructing byte Views. Frozen wake remains pending until original cgroup thaw.",
+    "no_new": [
+      "production unsafe block",
+      "ordinary guest-memory check/fence",
+      "global algorithm/native-function lock",
+      "resource thread",
+      "per-instruction hook"
+    ]
+  },
+  "baselines": {
+    "shared": {
+      "runtime_revision": "4064df29b4288adabea520dfa13dfdf217884af2",
+      "exit": 101,
+      "seconds": 4.93460825,
+      "output": "warning: unused workspace dependency `trames-native`\n  --> Cargo.toml:17:1\n   |\n17 | trames-native = { path = \"runtime/crates/trames-native\" }\n   | ^^^^^^^^^^^^^\n   |\n   = note: `cargo::unused_workspace_dependencies` is set to `warn` by default\nhelp: consider removing the workspace dependency `trames-native`\nwarning: workspace (manifest) generated 1 warning\n   Compiling trames-session v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-session)\n   Compiling trames-core v1.5.4 (/Users/main/dev/trames/crates/trames-core)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.06s\n     Running ../../runtime/crates/trames-session/src/lib.rs (target/debug/build/trames-core/73ea467a4920ade2/out/kernel_conformance-73ea467a4920ade2)\n\nrunning 1 test\ntest process::dormant_tests::cross_mm_shared_futex_wake_admits_the_original_dormant_task_without_joining_peers ... dormant CPUs=4 slots=4 root_x0=1 root_x19=0 marker=[0, 0, 0, 0] cohorts=1 scopes=0 returned={}\n\nthread 'process::dormant_tests::cross_mm_shared_futex_wake_admits_the_original_dormant_task_without_joining_peers' (27475298) panicked at crates/trames-core/../../runtime/crates/trames-session/src/process_dormant_tests.rs:37:9:\nassertion `left == right` failed: the original cold mm must continue before this cohort drains\n  left: [0, 0, 0, 0]\n right: [1, 0, 0, 0]\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\nFAILED\n\nfailures:\n\nfailures:\n    process::dormant_tests::cross_mm_shared_futex_wake_admits_the_original_dormant_task_without_joining_peers\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 430 filtered out; finished in 0.02s\n\nerror: test failed, to rerun pass `-p trames-core --test kernel-conformance`\n"
+    },
+    "signed_native": {
+      "runtime_revision": "4064df29b4288adabea520dfa13dfdf217884af2",
+      "exit": 101,
+      "seconds": 2.91157675,
+      "executable_sha256": "71271c7ad03a72cc65b78b01efffff931856170038eec03e3fa2e2442ec0509c",
+      "output": "\nrunning 1 test\ntest session::tests::dormant_shared_futex_child_resumes_without_another_joined_native_cohort ... hardware dormant CPUs=4 exit=0 marker=[1, 0, 0, 0] cohorts=3 scopes=0 returned={29: 1}\n\nthread 'session::tests::dormant_shared_futex_child_resumes_without_another_joined_native_cohort' (27490869) panicked at crates/trames-mac/src/session.rs:1030:13:\nassertion `left == right` failed: one setup dispatch, then the original live queue\n  left: 3\n right: 2\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\nFAILED\n\nfailures:\n\nfailures:\n    session::tests::dormant_shared_futex_child_resumes_without_another_joined_native_cohort\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 29 filtered out; finished in 0.03s\n\n"
+    }
+  },
+  "defects_caught": {
+    "stale_projection_control_poll": {
+      "process": [
+        "4555",
+        "4519",
+        "10:22",
+        "/Users/main/dev/trames/target/debug/build/trames-core/73ea467a4920ade2/out/kernel_conformance-73ea467a4920ade2 dormant_tests --test-threads=1 --nocapture"
+      ],
+      "source_sha256": "4226141ab8f2b68c66b1478421bddbf79e7ebf3b68ec45917373dc6e8863e5d2",
+      "cause": "Persistent control still scans the old cold Sleep/Futex projection after its deadline expired. The worker owns the new wait, but parallel_timeout returns zero forever before event_timeout can collect Idle."
+    },
+    "expired_work_after_source_claim": {
+      "process": [
+        "4828",
+        "4785",
+        "04:54",
+        "0.7",
+        "/Users/main/dev/trames/target/debug/build/trames-core/73ea467a4920ade2/out/kernel_conformance-73ea467a4920ade2 dormant_tests --test-threads=1 --nocapture"
+      ],
+      "source_sha256": "e3aa2c8c4f146077fbd019e199cd41e746d0ec5af19ee5b74dd1379c680e839c",
+      "cause": "After fixing stale owner timeout polling, the sole executor sleeps: expired parked work publishes a new source checkpoint after the current pass already checked checkpoints."
+    }
+  },
+  "checks": {
+    "workflows": {
+      "runtime_macos": {
+        "passed_steps": 7,
+        "total_steps": 7,
+        "summary": "target/dormant-subsystem/runtime-mac/summary.json",
+        "sha256": "c581394eee8769dca92726c9a41307bde247868de39731c68cfcdc5abe698eef"
+      },
+      "runtime_linux": {
+        "passed_steps": 7,
+        "total_steps": 7,
+        "summary": "target/local-ci/io/dormant-subsystem/runtime-linux-ci/summary.json",
+        "sha256": "f8db58ea7bfa16520712297a96021a5196d871dc133e0a54fc5c5d3d1e25788c"
+      },
+      "mac_product": {
+        "passed_steps": 8,
+        "total_steps": 12,
+        "summary": "target/dormant-subsystem/mac-product-ci/summary.json",
+        "sha256": "1c787ad942040fa2053f0e3b526480aa220004982b008adbc5e1fd614c6a437a"
+      }
+    },
+    "macos": [
+      {
+        "name": "runtime-mac",
+        "code": 0,
+        "seconds": 15.518187458
+      },
+      {
+        "name": "kernel-conformance",
+        "code": 0,
+        "seconds": 10.182480416999999
+      },
+      {
+        "name": "ffi",
+        "code": 0,
+        "seconds": 5.487212374999999
+      },
+      {
+        "name": "core-clippy",
+        "code": 0,
+        "seconds": 3.302274708999999
+      },
+      {
+        "name": "ffi-clippy",
+        "code": 0,
+        "seconds": 0.24975283299999518
+      },
+      {
+        "name": "ipad-compile",
+        "code": 0,
+        "seconds": 2.916391500000003
+      }
+    ],
+    "linux": [
+      {
+        "name": "process-all",
+        "code": 0,
+        "seconds": 54.25039756799998
+      },
+      {
+        "name": "ffi-all",
+        "code": 0,
+        "seconds": 7.589776787000005
+      },
+      {
+        "name": "core-clippy",
+        "code": 0,
+        "seconds": 4.261808716000019
+      },
+      {
+        "name": "runtime-ci",
+        "code": 0,
+        "seconds": 53.20888321000001
+      }
+    ],
+    "process": {
+      "macos": {
+        "passed": 435,
+        "ignored": 2,
+        "log": "target/dormant-subsystem/kernel-conformance.log",
+        "sha256": "7f0a0056bbbabaf412d1ceab7171c73bc36140777d407d2c22c25d5497673c77"
+      },
+      "linux": {
+        "passed": 435,
+        "ignored": 2,
+        "log": "target/local-ci/io/dormant-subsystem/process-all.log",
+        "sha256": "7dfaf95e2c516c9022bd9cddc051fcca620189e5754952828694fbab801f1626"
+      }
+    },
+    "ffi": {
+      "macos": {
+        "passed": 10,
+        "ignored": 0,
+        "log": "target/dormant-subsystem/ffi.log",
+        "sha256": "3567a1af754262a36ca267b1018586f2a6029031ea2404d8988b49658ff3bb19"
+      },
+      "linux": {
+        "passed": 10,
+        "ignored": 0,
+        "log": "target/local-ci/io/dormant-subsystem/ffi-all.log",
+        "sha256": "9ad0a220f74266ed72683dfe2e23fc5abd177c3e1efd5d7ea5c35bca9d18dd4a"
+      }
+    },
+    "ipad": [
+      {
+        "target": "aarch64-apple-ios",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+        "code": 0
+      },
+      {
+        "target": "aarch64-apple-ios-sim",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk",
+        "code": 0
+      }
+    ],
+    "hardware": {
+      "passed": true,
+      "runtime_revision": "f35cfc111bac200190f3d2083e838bcbfdd186b6",
+      "rows": [
+        {
+          "target": "trames-mac-run",
+          "executable_sha256": "eac5fe8093ef48f2a3a582dc4e272240098c61e5b0f2ca8a060416c7d32170b1",
+          "exit": 0,
+          "passed_tests": 9
+        },
+        {
+          "target": "trames_hvf",
+          "executable_sha256": "b191dc537b06ddf15ff1cadc3459a314a0e0e8faec6004fd5250ec732a5c56ea",
+          "exit": 0,
+          "passed_tests": 52
+        }
+      ]
+    },
+    "native_dormant": [
+      {
+        "cpus": 4,
+        "exit": 0,
+        "cohorts": 2,
+        "scoped_mms": 1,
+        "setup_returned_ioctl": 1
+      },
+      {
+        "cpus": 12,
+        "exit": 0,
+        "cohorts": 2,
+        "scoped_mms": 1,
+        "setup_returned_ioctl": 1
+      }
+    ],
+    "native_log_sha256": "47640b1d08a9bd6b7a1981e1e1151e2af4ccd37701a76ed0e0c5e1c6da32e52c",
+    "installed": {
+      "version": "Trames Dev 1.5.4 (dev) runtime f35cfc111bac200190f3d2083e838bcbfdd186b6",
+      "runner_sha256": "aa7c28b9beb7f92a849183b693870c86c60f68748b2fa1b942537f6fcb230c48",
+      "stable_sha256": "8fc21435034e8c041632e2e50419da9d2123bf790aedb0a1499286fc8367e614",
+      "stable_unchanged": true,
+      "checks": [
+        {
+          "name": "init",
+          "code": 0,
+          "seconds": 3.261274625
+        },
+        {
+          "name": "host",
+          "code": 0,
+          "seconds": 0.878950584
+        },
+        {
+          "name": "tracing",
+          "code": 0,
+          "seconds": 0.24767854099999997
+        }
+      ]
+    },
+    "new_shared_regressions": [
+      "cross_mm_shared_futex_wake_admits_the_original_dormant_task_without_joining_peers",
+      "cold_futex_timeout_and_sleep_deadline_resume_on_the_original_queue",
+      "caught_and_fatal_signals_reach_cold_futex_tasks_without_owner_adoption",
+      "dormant_cancellation_preserves_original_waits_without_preparing_byte_views",
+      "cold_task_custody_wait_releases_the_slot_and_wakes_on_its_original_resource",
+      "enrolled_deadlines_do_not_poll_stale_projections_or_hide_legacy_waits",
+      "initially_frozen_cold_futex_preserves_its_wake_until_source_thaw"
+    ]
+  },
+  "source_sha256": {
+    "runtime/crates/trames-session/src/process.rs": "78e5e56e0b2dbc53e48bec132884386ed8befb9bc566eee169eefb6132abc4a6",
+    "runtime/crates/trames-session/src/process_dispatch.rs": "4a8aaf020c2a84ff70c8a730e3c64f73f04276eff6685ecb98c4fd7c20de7c91",
+    "runtime/crates/trames-session/src/process_dormant_tests.rs": "dc5f6e83e46e8cadbfe558d9335c15196dc33cac5cf7005a1c2869d9b539b975",
+    "runtime/crates/trames-session/src/run_queue.rs": "c853d56feca080fc13f278d79da50fe1ab343d526081252f7bee53067cf87aab"
+  },
+  "mac_native_fixture_sha256": "672384cd762590f95500986841c040a89e047fe7a9ab13d4d745d88307798b28",
+  "deployment": {
+    "channel": "Mac Dev only",
+    "runner": "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+    "signature_verified": true,
+    "stable_unchanged": true,
+    "physical_ipad_unchanged": true,
+    "business_environments_unchanged": true
+  },
+  "validation_notes": [
+    "The seven new shared tests pass on both macOS and ARM64 Linux. The shared baseline proves an accepted wake stops before the following caller instruction and cold marker.",
+    "The native fixture deliberately returns one unsupported pipe ioctl during setup. Old four-CPU execution uses three cohorts; final four/twelve-CPU execution uses two, including the same retained setup boundary. Only the later dormant-wake join is removed.",
+    "The two prototype scheduling defects were isolated by inspecting the exact live test processes. Those tests were explicitly terminated before final passing checks; they are not hidden as timeouts or successful results.",
+    "Test-only setup corrections included a generic Process helper, disjoint RX code and signal stack pages, a persistent epoch for 100 ms deadlines, and the correct Mac Registers import. These do not establish production defects.",
+    "Mac product development gates 1-8 of 12 pass. Stable release packaging and physical iPad installation are outside this Dev-only batch.",
+    "Final Rust source hashes match Linux CI and the paired Mac runtime checkout. Documentation/evidence changes do not rerun unchanged passing checks."
+  ],
+  "remaining": [
+    "Actual host cancellation/deadline/shutdown, terminal backend failure, and final backend/session teardown.",
+    "Genuine missing capabilities/excluded resources, including two original-submitter io_uring maintenance escalation setters and their actual stop/join boundary.",
+    "Final SVC/HLT/fault catch-all dispatch, including the native fixture setup ioctl.",
+    "Initial/standalone/capability-less orchestration. Normal preexisting Kernel Futex/Sleep adoption no longer joins; the standalone legacy futex-publication mechanism remains. Solo execution alone is not a cross-thread RPC."
+  ],
+  "limits": [
+    "The broad category count is still four.",
+    "This removes a concrete normal dormant-wait adoption join, not all initial/legacy scheduling.",
+    "No controlled throughput gain or full coordinator-removal claim is made."
+  ]
+}

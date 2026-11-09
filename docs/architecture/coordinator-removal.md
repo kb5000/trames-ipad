@@ -2,6 +2,32 @@
 
 ## Current status — 2026-11-09
 
+Through stage 86 the broad remaining count is **four**, unchanged from stage 85.
+This counts actual remaining boundary classes, not historical subsystem headings.
+
+| Remaining class | Current boundary | Concrete change this round |
+| --- | --- | --- |
+| Host control and final teardown | Actual cancellation/deadline/shutdown, native-event backend failure and final CPU/session drain | No class removed |
+| Missing capabilities and excluded resources | Original absent providers/excluded request bodies; two submitter-scoped io_uring maintenance escalation setters remain | No setter removed; stages 84–85 close original authority and maintenance lifetime dependencies |
+| Final execution dispatch | SVC/HLT/fault not completed, parked or accepted by a source scope | The native regression's setup-only unsupported ioctl still uses this route |
+| Initial/legacy orchestration | Initial admission and standalone/capability-less scheduling | Normal preexisting Kernel Futex/Sleep adoption no longer joins the whole cohort |
+
+Stage 86 registers original cold waiters with metadata only. Wake/requeue,
+timeout, signals and freezer/thaw use the same live queue; existing workers
+prepare only the needed original mm. The signed native reproduction falls from
+three cohorts before the change to two at four/twelve CPUs, including its retained
+setup-only fallback. Each final run needs one original-mm preparation and no
+service request. This is a path result, not a throughput comparison.
+
+The [shared inventory](../../runtime/docs/architecture/coordination-boundaries.md#current-remaining-categories)
+and [stage 86 record](../validation/dormant-wait-admission-20261109.json) are current.
+Mac and ARM64 Linux each pass 435 process regressions (two intentionally ignored),
+both full runtime workflows pass, and iPad device/simulator SDK compilation passes.
+Mac Dev alone is updated; stable 1.5.4, business environments and physical iPad
+installations retain their versions. The overall removal goal remains active.
+
+### Stage 81 read-only memory observations (historical)
+
 Stage 81 moves **read-only memory observations** onto original executor
 metadata. get_mempolicy, mincore and implemented non-discard madvise share one
 source/solo ABI and no longer require a joined call or an mm mutation checkpoint.
@@ -5207,3 +5233,57 @@ The broad category count remains four: host control/final teardown, genuine
 missing/excluded capabilities/resources, final execution dispatch and initial/
 legacy orchestration. This closes maintenance-state ownership/lifetime coupling;
 it does not complete the overall coordinator-removal goal.
+
+
+## 86. Original dormant waiters and demand byte preparation — 2026-11-09
+
+Runtime `f35cfc111bac200190f3d2083e838bcbfdd186b6` removes normal Kernel
+nonmember Futex/Sleep adoption from joined execution. A prior cohort can leave a
+valid sleeping actor in an mm with no runnable CPU at the next admission. Its
+original wait is now registered in that queue without a byte/hardware View.
+Actual shared-futex wake/requeue, timeout, signal or control prepares the original
+mm on existing executors; unrelated domains keep executing with their Views.
+Original task-custody waits yield the CPU slot. No service/resource thread,
+polling bus, per-instruction hook, ordinary guest-memory check/fence, production
+unsafe block or global algorithm lock is introduced.
+
+The connected path retains original accepted wait identity, absolute deadlines,
+caught/fatal signal delivery, cgroup freeze/thaw and cancellation. Untouched
+sleepers do not prepare byte Views, while a wake accepted just before cancellation
+still resumes the original wait correctly. Multiple cold siblings expiring in one
+mm share its preparation scope rather than stealing or losing one another's
+accepted result.
+
+Integration exposed two scheduling defects and fixes. Cold Process deadlines
+could remain expired after queue-owned execution resumed, making host control
+poll without collecting events. Admitted waiters now use queue deadlines, while
+actual unowned legacy deadlines still bound control. The sole executor could also
+publish an expiry-driven preparation scope after already checking source work,
+then sleep. Existing timer/sleeper expiry now precedes source claim; no added
+polling or coordinator transport is needed.
+
+Seven new shared regressions pass on macOS and ARM64 Linux, covering four/twelve
+logical CPUs, one execution slot, wake/requeue, two simultaneous expirations in
+one mm, signals, cancellation, real custody contention, deadline ownership and
+initial freezer/thaw. In the old shared baseline, wake succeeds but the cohort
+stops before the next caller instruction and cold task marker. Final runs finish
+both in one cohort with one affected mm, zero services and zero returned syscalls.
+
+The signed native fixture deliberately uses one unsupported pipe ioctl during
+setup, so the original child is dormant before a fresh cohort starts. Old
+four-CPU execution uses three cohorts. Final four/twelve-CPU execution uses two,
+including that unchanged setup boundary, with one scoped mm and zero services.
+Only the additional dormant-wake join is removed. Both complete local runtime
+workflows pass; each host passes 435 process regressions (two intentionally
+ignored) and ten FFI cases. Strict lint, iPad device/simulator compilation, Mac
+product development gates, 52 signed HVF and nine signed product cases pass.
+Installed Dev evidence and source/binary hashes are retained in the
+[source-bound record](../validation/dormant-wait-admission-20261109.json).
+
+The remaining category count is still four. Actual initial orchestration,
+standalone/capability-less waiter publication, genuine missing/excluded resources
+and both io_uring maintenance setters, final SVC/HLT/fault dispatch and host
+cancel/final teardown remain explicit. Required original mm/backing synchronization
+is distinct from stopping every job to execute a syscall on the coordinator.
+Only Mac Dev is updated; stable 1.5.4, business environments and physical iPad
+installations are unchanged. The overall goal remains active.
