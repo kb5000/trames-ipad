@@ -2,6 +2,25 @@
 
 ## Current status — 2026-11-09
 
+Stage 79 moves the supported **system statistics subsystem** onto original
+shared resources. `sysinfo` and proc observations use the same original task
+directory, unique-mm residency reports and host-memory callback. Both source and
+legacy calls share the AArch64 ABI and destination preflight. Active task/CPU time
+is visible before an assignment returns; load and idle no longer wait for the
+owner drive loop to copy a snapshot. No statistics thread, message bus, extra
+ordinary guest-memory check/fence or per-instruction/native-fast-call clock is
+introduced.
+
+Load remains the existing five-second exponential approximation, sampled by
+actual aggregate observations. CPU time retains wall-assignment accounting.
+The missing-provider, final dispatch, actual cancel/deadline/shutdown and
+initial/legacy/solo boundaries remain. The overall coordinator-removal goal
+stays active. See the [validation record](../validation/system-statistics-20261109.json).
+Only Mac Dev deployment is included; stable 1.5.4, business environments and
+physical iPad installs keep their versions.
+
+### Stage 78 live host pause/resume (historical)
+
 Stage 78 removes the **live host pause/resume join**. An explicit pause keeps
 original jobs, CPU state, execution Views, translations and accepted waits in the
 same cohort. Existing execution leases stop active CPUs and close the pre-entry
@@ -89,7 +108,7 @@ records source/executable hashes, original joined behavior, reuse proof and fina
 installed acceptance. Only Mac Dev is updated; stable 1.5.4, business environments
 and physical iPad installs remain unchanged.
 
-### Remaining boundaries after stage 78
+### Remaining boundaries after stage 79
 
 **The coordinator still exists.** io_uring's remaining `owner_required` setters
 are the two actual source-maintenance failures: unavailable wait capability or an
@@ -107,7 +126,7 @@ row in the coverage inventory below:
 3. Last-resort known-resource/subcommand and unhandled HLT/fault dispatch.
 4. Initial/legacy admission and solo orchestration; solo is not itself a syscall RPC.
 
-Live host pause/resume is removed from joined execution by stage 78. Native special-device/Bridge pathname, byte and readiness dependencies are removed by stage 77. Host transfer/timezone/FileProvider commands are removed from joined execution by stage 76. Mac memory-pressure reclamation is removed by stage 75.
+Supported sysinfo/system-accounting refresh is removed by stage 79. Live host pause/resume is removed from joined execution by stage 78. Native special-device/Bridge pathname, byte and readiness dependencies are removed by stage 77. Host transfer/timezone/FileProvider commands are removed from joined execution by stage 76. Mac memory-pressure reclamation is removed by stage 75.
 Init notification/graceful-stop supervision was removed by stage 74. Diagnostic syscall tracing was removed by stage 73. Stage 72 removed
 the independent embedding terminal-ID-0 execution category. Normal subsystem names
 below describe coverage and do not imply another coordinator dependency.
@@ -123,6 +142,7 @@ below describe coverage and do not imply another coordinator dependency.
 | Mapping topology, pins and mapped-file layout | Supported brk/mmap/munmap/mremap/mprotect/msync/madvise and buffer-registration checkpoints publish on an existing worker; additive anonymous mmap is direct | Proc/cold-mm checkpoints and supported mapped-file layout transactions now run on existing workers; excluded backing/lifetime/policy and capability-less embeddings retain explicit boundaries |
 | Native special-device paths and Bridge bytes/readiness | Calling worker, original pseudo nodes/OFDs/connections and original readiness | No supported-device/Bridge-only join remains; unavailable providers and unsupported driver APIs retain their existing route/result |
 | Native libc/GPU/video/audio | Normal bodies, resource waits and admitted mapping/entry checkpoints use calling/shared-resource execution; exceptional access reuses original task/mm custody | Capability-less embeddings and actual platform/host lifecycle remain; AppKit affinity, device/disk pools and local fallback are not extra coordinators |
+| System statistics and live CPU accounting | sysinfo and proc use original task/mm/host resources; active assignments expose time directly | No supported-statistics-only join. Missing real statistics/host capabilities retain legacy execution; observer-sampled load and wall-assignment time remain approximations |
 | Dynamic proc/sys and proc pathname/FD consumers | Calling worker and original PID/mm/Files/fs/namespace resources | First cross-mm byte export and invalidation activate on an existing worker at the original task/mm boundary; legacy providers retain explicit fallback |
 | Mount topology administration | Original namespace/fs resources on the caller; existing disk pool for host-backed paths; contention releases the CPU slot | Genuinely excluded pathname controls retain their explicit boundary |
 | Task namespace membership and Files/fs detachment | Supported unshare/setns/close_range run on the caller, refresh future consumers and preserve accepted async operations | Capability-less embeddings remain; clone creation still uses creator-mm custody; unsupported user/time namespaces are not added |
@@ -146,7 +166,7 @@ the owner; ordinary epoch-member migration, parking, wakeup and child/replacemen
 admission already use the live execution queue. Single-CPU/solo execution retains
 its coordinated caller path, which does not by itself imply an extra RPC.
 
-The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/04ec423f35a222642a2bcbde3b93a568d7f9968a/docs/architecture/coordination-boundaries.md)
+The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/3054664/docs/architecture/coordination-boundaries.md)
 records scopes, actual admission gates and source locations. Earlier sections
 below are historical records and do not override this inventory.
 
@@ -4824,3 +4844,39 @@ A focused regression reproduced an ignored paused Idle notification preventing
 idle completion after resume. Resume now clears that original notification latch
 before waking dispatchers. The full affected process suite and strict core lint
 are rerun on both hosts; unchanged CPU/Linux/VFS/runtime checks are reused.
+
+## 79. Original system statistics and live execution accounting — 2026-11-09
+
+Supported sysinfo no longer returns a running cohort to read owner-private
+statistics. One typed capability reuses the original proc Source; source/solo
+share the complete AArch64 formatter and preflight. Original live mm reports
+are deduplicated, untouched VA consumes no resident budget, and host-managed
+sysinfo directly samples the original host callback without scanning irrelevant
+mm residency. Original task membership supplies process count.
+
+Task and physical execution-slot time include the active assignment through one
+relaxed atomic word. Original actors own begin/finish; cold observations cannot
+overwrite a running total. Existing timestamps cover source, native/scoped and
+solo execution without a new clock or atomic on each ordinary instruction,
+syscall or native fast call. Idle derives from configured CPU capacity minus
+live execution time. The original shared load sample advances only for aggregate
+observers; drive-loop load/idle projection copies are deleted.
+
+This preserves approximate wall-assignment CPU accounting. Five-second load
+sampling uses current runnable state when observed and does not reconstruct
+unobserved history. No new statistics service, resource thread, polling bus,
+whole-cohort refresh, ordinary memory check or fence is introduced.
+
+Conformance covers full destination/error ordering, ABI padding, missing
+providers, changing host reports, shared-mm residency, unused mappings, task
+lifetime, live CPU time/migration, load decay and exactly one seccomp decision.
+4/12 logical CPUs and a single physical slot retain one cohort and zero returned
+sysinfo/service work. Both complete local runtime workflows, 418 process tests
+per host, all 10 FFI tests, strict lint and both iPad SDK compile targets pass.
+Consumer hardware and installed acceptance are recorded in the
+[validation record](../validation/system-statistics-20261109.json).
+
+This closes the connected supported statistics subsystem. Actual cancellation,
+deadline/shutdown/final teardown, missing/excluded resources, other final
+SVC/HLT/fault dispatch and initial/legacy/solo orchestration remain. Only Mac Dev
+is deployed, and the overall coordinator-removal goal stays active.

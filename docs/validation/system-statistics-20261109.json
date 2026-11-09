@@ -1,0 +1,256 @@
+{
+  "stage": 79,
+  "date": "2026-11-09",
+  "overall_goal": "active",
+  "runtime_revision": "30546645a3a2170200162a4b5b06383590f49055",
+  "baseline_runtime": "04ec423f35a222642a2bcbde3b93a568d7f9968a",
+  "scope": "Supported sysinfo, original task/mm/host accounting, live task/CPU time, aggregate proc load and idle, shared source/solo ABI and legacy capability boundaries.",
+  "architecture": {
+    "authority": "Original proc Source/directory, unique original MemoryReport identities and original host callback; no task-table copy or owner statistics RPC.",
+    "execution": "Calling executor; actual destination preflight precedes provider/host sampling. Missing actual statistics/host providers preserve explicit legacy deferral.",
+    "accounting": "One relaxed packed time word per original task/CPU slot; begin/finish only at existing assignment/scoped/solo boundaries using existing timestamps. Cold publication cannot overwrite a running interval.",
+    "load": "One original shared load object. Aggregate observers advance the existing five-second exponential sample from current runnable state. No unobserved history is reconstructed.",
+    "idle": "Elapsed configured CPU capacity minus original live execution-slot time, saturating at zero.",
+    "memory": "Untouched mappings consume no residency. Finite limits deduplicate shared live mm reports. Host-managed sysinfo directly samples original host memory and omits irrelevant residency scans.",
+    "no_new": [
+      "statistics/coordinator/resource thread",
+      "polling message bus",
+      "ordinary guest memory check or fence",
+      "per-instruction/syscall/native-fast-call clock or atomic"
+    ]
+  },
+  "limits": [
+    "CPU time retains approximate wall-assignment accounting, not precise host thread CPU time.",
+    "Load remains observer-sampled approximation; no periodic history is collected between actual observations.",
+    "Packed nanosecond total/offset range is approximately 73 years.",
+    "Concurrent membership/residency/time fields are approximate resource observations, not one global transaction.",
+    "No Firefox/Geekbench/general throughput speedup or complete coordinator removal is claimed."
+  ],
+  "checks": {
+    "workflows": {
+      "runtime_macos": {
+        "passed_steps": 7,
+        "total_steps": 7,
+        "summary": "target/statistics-subsystem/runtime-mac/summary.json",
+        "sha256": "6f668e35276ff6fe3533087ab863b9786fa5cf3b873c8ef29f212c6b1f710d67"
+      },
+      "runtime_linux": {
+        "passed_steps": 7,
+        "total_steps": 7,
+        "summary": "target/local-ci/io/statistics-subsystem/runtime-linux-ci/summary.json",
+        "sha256": "853dd95e8c309b204550ced01023aeccf941f3708595be40609e76fe4871024b"
+      },
+      "mac_product": {
+        "passed_steps": 8,
+        "total_steps": 12,
+        "summary": "target/statistics-subsystem/mac-product-ci/summary.json",
+        "sha256": "23c43f0bb70a7759690c14dfb30dc808669a06605979948a91af9762e58885c2"
+      }
+    },
+    "macos": [
+      {
+        "name": "runtime-mac",
+        "code": 0,
+        "seconds": 31.944438166
+      },
+      {
+        "name": "kernel-conformance",
+        "code": 0,
+        "seconds": 9.625935624999997
+      },
+      {
+        "name": "ffi",
+        "code": 0,
+        "seconds": 9.321718584000003
+      },
+      {
+        "name": "core-clippy",
+        "code": 0,
+        "seconds": 6.6581385
+      },
+      {
+        "name": "ffi-clippy",
+        "code": 0,
+        "seconds": 0.49308758299999766
+      },
+      {
+        "name": "ipad-compile",
+        "code": 0,
+        "seconds": 8.067274916999992
+      }
+    ],
+    "linux": [
+      {
+        "name": "process-all",
+        "code": 0,
+        "seconds": 62.31337621200001
+      },
+      {
+        "name": "ffi-all",
+        "code": 0,
+        "seconds": 12.385233604999996
+      },
+      {
+        "name": "core-clippy",
+        "code": 0,
+        "seconds": 7.038809764000007
+      },
+      {
+        "name": "runtime-ci",
+        "code": 0,
+        "seconds": 52.93650378799998
+      }
+    ],
+    "process": {
+      "macos": {
+        "passed": 418,
+        "ignored": 2,
+        "log": "target/statistics-subsystem/kernel-conformance.log",
+        "sha256": "dc7e59112b94466da943357ec9207a9f3dd6c416ac0e8476d8747c0338053d55"
+      },
+      "linux": {
+        "passed": 418,
+        "ignored": 2,
+        "log": "target/local-ci/io/statistics-subsystem/process-all.log",
+        "sha256": "25117af0a2e79ce61a49222bb46a804def10c6dbaee8857f300c5f3ac2616c13"
+      }
+    },
+    "ffi": {
+      "macos": {
+        "passed": 10,
+        "ignored": 0,
+        "log": "target/statistics-subsystem/ffi.log",
+        "sha256": "82f0c30c098f26b69bb62f4a633a0c106f179dbf0f9598a4bc33158bee758c14"
+      },
+      "linux": {
+        "passed": 10,
+        "ignored": 0,
+        "log": "target/local-ci/io/statistics-subsystem/ffi-all.log",
+        "sha256": "68ee6b50a8983c541598c1b3e0e149910a8a8dcccf5704e24c5e9fb7ed367a04"
+      }
+    },
+    "ipad": [
+      {
+        "target": "aarch64-apple-ios",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+        "code": 0
+      },
+      {
+        "target": "aarch64-apple-ios-sim",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk",
+        "code": 0
+      }
+    ],
+    "hardware": {
+      "passed": true,
+      "runtime_revision": "30546645a3a2170200162a4b5b06383590f49055",
+      "rows": [
+        {
+          "target": "trames-mac-run",
+          "executable_sha256": "4c6dbfcb7d53f9159eb09ce096f05891f67d7c61dbb77371a1ce870b97336c77",
+          "exit": 0,
+          "passed_tests": 4
+        },
+        {
+          "target": "trames_hvf",
+          "executable_sha256": "01a486a76ed1f86dcd922f169f2abd3f90bfe91cbe2e302a8168d55129d2b281",
+          "exit": 0,
+          "passed_tests": 52
+        }
+      ]
+    },
+    "sysinfo_hvf": [
+      {
+        "cpus": 4,
+        "completed": 101681,
+        "cohorts": 1,
+        "returned": "{}"
+      },
+      {
+        "cpus": 12,
+        "completed": 56986,
+        "cohorts": 1,
+        "returned": "{}"
+      }
+    ],
+    "installed": {
+      "version": "Trames Dev 1.5.4 (dev) runtime 30546645a3a2170200162a4b5b06383590f49055",
+      "runner_sha256": "8f7bb4506f077e5e544f6925dfc1950fb7e1ff6073c92c253aaf6c817c8764d8",
+      "stable_sha256": "8fc21435034e8c041632e2e50419da9d2123bf790aedb0a1499286fc8367e614",
+      "stable_unchanged": true,
+      "checks": [
+        {
+          "name": "init",
+          "code": 0,
+          "seconds": 3.3094990409999996
+        },
+        {
+          "name": "host",
+          "code": 0,
+          "seconds": 0.8782812500000001
+        },
+        {
+          "name": "tracing",
+          "code": 0,
+          "seconds": 0.37144962499999945
+        }
+      ]
+    }
+  },
+  "regressions": [
+    "Full 112-byte destination preflight before provider deferral or host samples; original EFAULT and no partial invalid writes.",
+    "Original ABI fixed-point loads, task field width, zero padding and mem_unit.",
+    "Original mm residency deduplication across CLONE_VM, untouched VA, original task exit and final weak directory lifetime.",
+    "Original host reports change live; absence remains explicit; proc and sysinfo agree on host memory.",
+    "Live time sampled before assignment returns, original CPU migration, cold publication and load decay.",
+    "Source sysinfo with 4/12 logical CPUs and one physical slot: one cohort, no returned sysinfo or service requests.",
+    "Valid provider-less legacy call still returns its original explicit boundary; invalid destination finishes locally.",
+    "Seccomp ALLOW/ERRNO and destination faults: exactly one decision per entry."
+  ],
+  "baseline": {
+    "result": {
+      "runtime_revision": "04ec423f35a222642a2bcbde3b93a568d7f9968a",
+      "exit": 101,
+      "seconds": 16.185629291,
+      "executable_sha256": "7dde15735965730a6b8d8d22c792ed41b125eb8a51b67dc144b1b4eaf304a942",
+      "output": "\nrunning 1 test\ntest session::tests::sysinfo_preserves_one_hardware_cohort_with_four_and_twelve_cpus ... \nthread 'session::tests::sysinfo_preserves_one_hardware_cohort_with_four_and_twelve_cpus' (27094934) panicked at crates/trames-mac/src/session.rs:1002:17:\nhardware sysinfo failed to progress\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\nFAILED\n\nfailures:\n\nfailures:\n    session::tests::sysinfo_preserves_one_hardware_cohort_with_four_and_twelve_cpus\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 24 filtered out; finished in 10.25s\n\n",
+      "interpretation": "The identical signed HVF fixture on runtime 04ec423 fails its five-second progress guard. No baseline throughput or cohort count was obtained. The final fixture passes on both 4 and 12 CPUs; completion counts are conformance data, not a controlled throughput benchmark."
+    },
+    "log_sha256": "244dbc08011b6a66f3877855649e5c856a306221d1e7d8ff9e84def9291f949b",
+    "fixture_source": "trames-mac/crates/trames-mac/src/session.rs::tests::sysinfo_preserves_one_hardware_cohort_with_four_and_twelve_cpus",
+    "interpretation": "The identical signed hardware fixture fails its five-second progress guard on baseline. Final passes at 4/12 CPUs. No baseline throughput/cohort count was obtained; final completion counts are conformance observations, not a controlled benchmark."
+  },
+  "source_sha256": {
+    "runtime/crates/trames-linux/src/direct.rs": "602e3bf7de9e70512a8e28a39a32cc07a9685364f06df0eb879f78bbb780352b",
+    "runtime/crates/trames-linux/src/lib.rs": "59c6c2abcb14a26b23c87fb8e4577d380667719bc3dfb2de8086aff4e7ba1f88",
+    "runtime/crates/trames-linux/src/system_info.rs": "e663e025e2a44d57aa60c074007b1c53762a1a38cb582eadb6361c7d64e27a7f",
+    "runtime/crates/trames-session/src/proc_views.rs": "6f55fa6c0e27336c48f133fdf941204f22c161dd3ee1368d45b5f122aabc6630",
+    "runtime/crates/trames-session/src/process.rs": "6315cece87c612de08a27c47c3a8c033a3e9c5f024e62aeb5074da3b456d6474",
+    "runtime/crates/trames-session/src/process_dispatch.rs": "f60c6b0f42021ffef9171f027d4f68891a0add0519f180af2c39a8f6a6ad4d43",
+    "runtime/crates/trames-session/src/process_lifecycle_mapping.rs": "13d163443a21c1a4f52424ea63d45ae3a676af76f1aea3e07f63d925661bdb6f",
+    "runtime/crates/trames-session/src/process_lifecycle_native.rs": "28b7cd43f3d45d1df30f245ac8b4ab74180d11dc0df51b3175379cb59e183c6b",
+    "runtime/crates/trames-session/src/process_proc.rs": "cddde61967568fbc0d29cff6b376a4c7128236f72d8b309f8aa1919b9c431b3f",
+    "runtime/crates/trames-session/src/process_seccomp.rs": "77077b1c5b0872dfb48840def77d937023a5001fdcc7a1b9ef1231e2de096efb",
+    "runtime/crates/trames-session/src/process_statistics_tests.rs": "16e6d1547c11fc36c793fbcd1b23b8eaaecab3172fb670d4ea9c4e0a923a9300",
+    "runtime/crates/trames-session/src/process_vm.rs": "5decc514ea12af5d26f2f6c1fca9f39b51431fda0b3f26169342836b2df4db59",
+    "runtime/crates/trames-session/src/worker_syscalls.rs": "6f9a7c0cf361ab77c44cd09f8852f071f1bd32c14e58fc44ca56fe4d752bf2d2",
+    "runtime/crates/trames-session/src/workers.rs": "618110896b43bcbe4dacede7ac67557ec30bbacd8350ea99bbdf6812271fa3bb",
+    "runtime/crates/trames-vfs/src/lib.rs": "554c3a59344ceba33ac720e31b4b807a3c4a73b371d9b3c9cb59daa4dcb7481f",
+    "runtime/crates/trames-vfs/src/proc_source.rs": "9b56d8c0fa297432789d5544271a8296dd5140b2bbafd24a3fdf060e1b6d8464",
+    "runtime/crates/trames-vfs/src/proc_time.rs": "dca5ebcb06272dd1f72b31bf47ad8663178d69efd34a31b0c23a40e64d5daafb"
+  },
+  "deployment": {
+    "channel": "Mac Dev only",
+    "runner": "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+    "stable_unchanged": true,
+    "physical_ipad_unchanged": true,
+    "business_environments_unchanged": true,
+    "signature_verified": true
+  },
+  "remaining": [
+    "Actual host cancel/deadline/shutdown and final teardown.",
+    "Missing embedding capabilities/excluded resources, including two io_uring source-maintenance escalation sites.",
+    "Other known-resource/subcommand and unhandled HLT/fault final dispatch.",
+    "Initial/legacy admission and solo orchestration."
+  ]
+}
