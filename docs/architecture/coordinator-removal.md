@@ -2,21 +2,22 @@
 
 ## Current status — 2026-11-10
 
-Through stage 97 the broad remaining count is **four**, unchanged from stage 90.
-Concrete dependencies have been removed inside those classes; the class count
-alone does not measure that progress. It is not an exhaustive count of remaining
-syscalls, providers or actual production fallback frequency.
+Through stage 98 the broad remaining count is **four**. The latest batch closes
+one connected descriptor/event subsystem with its control, lifetime, subscription
+and transport dependencies. The umbrella count is not a syscall count or a
+measurement of production fallback frequency; the generic catch-all is still an
+audit target.
 
 | Remaining class | Current boundary | Recent concrete progress |
 | --- | --- | --- |
-| Host control and final teardown | Actual cancellation/deadline/shutdown, native-event failure and final CPU/session drain | Still present; ordinary pause/resume, supervision and guest exit are already source-owned |
-| Missing capabilities and excluded resources | Original absent providers/excluded bodies; two submitter-scoped io_uring maintenance setters remain | Stages 90–91 close original global metadata and accepted request-body resource dependencies; genuine missing waits/providers remain |
-| Final execution dispatch | SVC or cold native-resource operation not completed, parked or accepted by a source scope | Stages 92–97 close recognized guest faults, residual FD status/seals/errors, blocking file locks/deadlock relations, anonymous memory-file creation, mapped-memory msync/writeback and file-cache advice |
-| Initial/legacy orchestration | Initial admission and standalone/capability-less scheduling | Still present; ordinary live and dormant member admission no longer depends on it |
+| Host control and final teardown | Actual cancellation/deadline/shutdown, native-event failure and final CPU/session drain | Ordinary supervision, guest exit and controls are source-owned |
+| Missing capabilities and excluded resources | Genuinely absent original providers/bodies; two submitter-scoped io_uring maintenance setters remain | Original FD errors are no longer mistaken for missing capabilities; nested epoll and ordinary native/virtual socket event sources are admitted |
+| Final execution dispatch | SVC or cold native-resource operation not completed, parked or accepted by a source scope | Stage 98 closes canonical FD/error admission, the complete original epoll/poll/select graph, current-offset vector transports and residual setup/validation entries; the catch-all is not proven unreachable |
+| Initial/legacy orchestration | Initial admission and standalone/capability-less scheduling | Pselect and typed cold event waits adopt original sources; genuinely missing providers retain their actual deadlines |
 
-Recent signed native fixtures demonstrate concrete path removal. Each old
-baseline below is four CPUs; each final fixture passes at both four and twelve.
-These are separate workloads, not cumulative or comparable throughput scores.
+Recent signed native fixtures demonstrate concrete path removal. Each baseline
+below is four CPUs; each final fixture passes at both four and twelve. These are
+separate workloads, not cumulative or comparable throughput scores.
 
 | Connected subsystem | Prior cohorts / returned calls | Final cohorts / returned calls |
 | --- | --- | --- |
@@ -25,32 +26,30 @@ These are separate workloads, not cumulative or comparable throughput scores.
 | Anonymous memory-file creation and lifetime (95) | 8 / 8 memfd_create and one clone | 1 / none |
 | Mapped-memory msync/writeback (96) | 10 / 16 msync and one munmap | 1 / none |
 | File-cache advice and descriptor metadata (97) | 32 / 8 readahead, 32 fadvise64, 3 mmap and 3 munmap | 1 / none |
+| Original descriptor/event graph and vector transports (98) | 27 / 24 epoll_ctl, 4 pselect, 8 ppoll, 4 preadv2, 4 pwritev2 | 1 / none |
 
-Actual mapping/backing mutation still synchronizes its affected original readers
-and is not counted as a removed scope. This round's native fixture includes a
-memfd/seal/mapping lifecycle and retains seven such scopes at four CPUs and 20
-at twelve CPUs. The connected advice/FD-replacement process fixture has zero
-mapping scopes. The explicitly unavailable-provider dormant fixture still returns
-its real read.
+Actual mapping/backing mutation still synchronizes its affected original readers.
+The latest native fixture retains two such scopes at four CPUs and ten at twelve;
+it does not remove them or infer a throughput gain. The connected dispatch/error
+fixture has zero mapping scopes and completes at four/twelve CPUs, one CPU slot
+and seccomp ALLOW. The explicitly missing legacy-console provider still keeps its
+real owner-side deadline.
 
-Stage 97 closes readahead/fadvise64, including their original metadata/type
-validation and live descriptor membership. Source and solo share the same body;
-O_PATH, range/advice and descriptor/native-stat errors retain their existing order.
-The existing optional cache-hint policy remains: no forced prefetch, eviction,
-data/position/metadata update, page-in or resident charge is introduced. These
-short calls need no disk task, guest byte access, mapping checkpoint or owner
-service. Missing actual original metadata bindings retain their before-effects
-capability boundary. The generic fallback and both io_uring maintenance
-escalation sites remain.
+Stage 98 replaces the split owner/shared epoll tables with one original interest
+index and topology. Nested changes propagate revisions and rebuild original
+subscriptions without resolving reused numeric FDs. Poll/select, caller signalfd
+context, generic native/virtual sockets, weak TCP poll lifetime, byte leases and
+post-write sync use their original resources. Stable socket data/backpressure
+retries emit no structural wake. No coordinator, resource-service thread or
+polling message bus is introduced. Full details are in [section 98](#98-original-descriptor-admission-and-the-complete-event-subsystem--2026-11-10).
 
 The [shared inventory](https://github.com/kb5000/trames-runtime/blob/main/docs/architecture/coordination-boundaries.md#current-remaining-categories)
-and [stage 97 record](../validation/file-advice-20261110.json) carry current
-boundaries and evidence. Both local runtime workflows pass all seven steps.
-Mac and ARM64 Linux each pass 451 process regressions (two intentionally ignored)
-and ten FFI cases; both iPad SDKs compile. All 72 signed native cases and Mac
-development gates 1–8 pass. Mac Dev alone is updated; stable 1.5.4, business
-environments and physical iPad installations retain their versions.
-The overall removal goal remains active.
+and [stage 98 record](../validation/fd-admission-20261110.json) carry current
+boundaries and evidence. Both local runtime workflows pass seven steps. Mac and
+ARM64 Linux each pass 452 process regressions (two intentionally ignored) and ten
+FFI cases; both iPad SDKs compile. All 73 signed native cases and Mac development
+gates 1–8 pass. Mac Dev alone is updated; stable 1.5.4, business environments and
+physical iPad installations retain their versions. The overall goal remains active.
 
 ### Stage 81 read-only memory observations (historical)
 
@@ -6003,3 +6002,70 @@ actual before/after paths are in the
 Only Mac Dev is updated. Stable 1.5.4, business environments and physical iPad
 installs retain their versions. Four broad categories and both actual io_uring
 maintenance escalation sites remain; the full coordinator-removal goal is active.
+
+
+## 98. Original descriptor admission and the complete event subsystem — 2026-11-10
+
+Runtime `4169330c9e9696eafeb2919ad1f23f06eddde8a9` closes one large connected batch rather than individual
+syscall fast paths. Typed admission preserves original FD errors separately from
+missing capabilities. Scalar/positioned/vector file work, transfer preludes,
+timerfd/inotify controls and non-data descriptor byte operations share canonical
+validation and execution. Cold two-role bindings retain original OFDs/errors
+through close/reuse without a copied Files table or guest-visible aliases. The
+normal prepared-file path adds no second OFD lookup or clone.
+
+Epoll now owns one original interest index, capacity and cursor. The legacy
+owner/shared split is gone. Actual OFD identity distinguishes aliases, closed and
+reused numbers, and foreign transferred descriptors with colliding local IDs.
+Nested topology transactions enforce the existing cycle/depth rules and join
+original graph domains with ordered locks. Flat controls, readiness, data I/O and
+CPU execution take no topology gate. Weak interests and parents preserve endpoint
+lifetime. Parent state unlocks before visiting children; bounded traversal handles
+concurrent retired snapshots without recursive locks or invented guest errors.
+
+Epoll, ppoll and pselect retain original waits through executor handoff and root
+FD close/reuse. Child-interest revisions wake parents and refresh their actual
+subscriptions before a deciding retry. Caller signalfd readers do not become
+creator authority. Connected TCP polling stays weak, so final close/FIN is not
+held by a watch; accepted byte operations retain their transport. Generic native,
+UDP, netlink and virtual/hybrid sockets use original native observers and existing
+packet-stack deadlines. Stable sends, no-op publication and EAGAIN retries do not
+emit structural self-wakes. Endpoint replacement and route selection still do.
+Actual native registration errors preserve their host cause.
+
+Current-offset preadv2/pwritev2 reuses pipe, Unix stream/packet, signalfd, TCP and
+raw-IP bodies with their existing ABI rules, timeouts and cancellation. Blocking
+work returns CPU slots. RWF sync follows real bytes on the original OFD. A truly
+missing post-write provider retains the terminal message result, so a handoff
+cannot send those bytes twice. Existing io_uring setup, ioprio task presence,
+personality and nonwaiting futex validation also complete on source. Cold legacy
+event classification now checks actual typed providers, retaining deadlines only
+for real missing providers rather than driving the owner on stale metadata.
+
+Regression coverage includes opposite concurrent nested ADD across independent
+original graphs, DEL/reverse-ADD/MOD/wait churn, depth/cycles/dup/shared capacity,
+ET/ONESHOT/EXCLUSIVE, close/reuse, caller signal context, late interest wakeup,
+executor handoff, cancellation, native failures, virtual stack deadlines and
+post-write sync/no replay. The prior interpreter fixture returns its first epoll
+wait before reaching its completion marker. Final four/twelve-CPU, one-slot and
+seccomp ALLOW cases complete in one cohort with no returned call/service and no
+mapping scope. Finite invalid-operand probes are diagnostic evidence only.
+
+The prior signed four-CPU hardware fixture produces correct results but needs
+**27 cohorts**, returning **24 epoll_ctl, four pselect, eight ppoll, four preadv2
+and four pwritev2**. Final four/twelve-CPU runs need **one cohort and no returned
+syscall/service**, retaining two/ten actual mapping scopes. No twelve-CPU baseline,
+production fallback frequency or controlled throughput gain is claimed.
+
+Concentrated local validation passes both seven-step runtime workflows, 452
+process regressions and ten FFI cases on each host, strict lint, both iPad SDKs,
+Mac gates 1–8 and 73 signed hardware cases. Initial control-dispatch, epoch and
+fixture failures were corrected within this batch. A late socket-source review
+removed spurious structural notification; affected checks were repeated while
+unchanged passed checks were reused. Exact fingerprints, retries, hardware and
+installed acceptance are in the [validation record](../validation/fd-admission-20261110.json).
+
+Only Mac Dev is updated. Stable 1.5.4, business environments and physical iPad
+installs retain their versions. Four broad categories and both actual io_uring
+maintenance escalations remain; this batch does not declare the final generic
+catch-all unreachable or the overall coordinator-removal objective complete.

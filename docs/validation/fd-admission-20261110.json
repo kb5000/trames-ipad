@@ -1,0 +1,311 @@
+{
+  "date": "2026-11-10",
+  "stage": 98,
+  "scope": "One connected original descriptor/event subsystem and all identified dependencies, with concentrated validation",
+  "status": "Validated and installed to Mac Dev only; overall coordinator-removal goal remains active",
+  "baseline_runtime": "652fbbe53a82a2abb4862ffa4673871f80ff43e6",
+  "runtime_revision": "4169330c9e9696eafeb2919ad1f23f06eddde8a9",
+  "runtime_commits": [
+    "d3c09fdc5c99e05d1bf54ad9c2a61843076964c6",
+    "4169330c9e9696eafeb2919ad1f23f06eddde8a9"
+  ],
+  "workflows": {
+    "runtime_macos": {
+      "passed": 7,
+      "total": 7,
+      "sha256": "fc2aa3510b4307be7214dabc8ad560d158d869e00366ac0182ce630cab9ee2d1"
+    },
+    "runtime_linux": {
+      "passed": 7,
+      "total": 7,
+      "sha256": "088e6a7c964233f5d45db41b4d76e0eef3b72076a33fbbc56c083eb27ea0d9c0"
+    },
+    "mac_product": {
+      "passed": 8,
+      "total": 12,
+      "sha256": "91ed15e79da3fb6d6a261edfa411c6d9f9feaba9343dd529dc8de3756ab133f8"
+    }
+  },
+  "process": {
+    "macos": {
+      "passed": 452,
+      "ignored": 2,
+      "sha256": "21595554743eba4b18e233a5f5837fbd45ea3bbd08944ed11751356d79692ce4"
+    },
+    "linux": {
+      "passed": 452,
+      "ignored": 2,
+      "sha256": "3e8894ea836b049f229e86df7880e187c2dfb862c92285a1c8b321649344dc3d"
+    }
+  },
+  "ffi": {
+    "macos": {
+      "passed": 10,
+      "ignored": 0,
+      "sha256": "263d9c13a75c58bedd89e164c5f4da201dd3145815a97b196c93d7e7f5c97372"
+    },
+    "linux": {
+      "passed": 10,
+      "ignored": 0,
+      "sha256": "27e8ffd2032096d47179c8cbc7194b6833825b7cba3cb8991b1c84e610637be3"
+    }
+  },
+  "apple_sdk_checks": [
+    {
+      "name": "aarch64-apple-ios",
+      "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+      "code": 0
+    },
+    {
+      "name": "aarch64-apple-ios-sim",
+      "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk",
+      "code": 0
+    }
+  ],
+  "native_hardware": {
+    "passed": true,
+    "runtime_revision": "4169330c9e9696eafeb2919ad1f23f06eddde8a9",
+    "rows": [
+      {
+        "target": "trames-mac-run",
+        "executable_sha256": "4059ebd94c94cfae93681d934e5148ad80bad05fdca3200570bb8bf05a1861ce",
+        "exit": 0,
+        "passed_tests": 21
+      },
+      {
+        "target": "trames_hvf",
+        "executable_sha256": "50b68e174429821461a38c40e4644303dab2d9a30affe7179315a8e3f4b05f5c",
+        "exit": 0,
+        "passed_tests": 52
+      }
+    ]
+  },
+  "original_scope_counts": {
+    "4": 2,
+    "12": 10
+  },
+  "source_sha256": {
+    "runtime/crates/trames-kernel/src/scheduling.rs": "988a5b8e2540285e35fa88961dd75cec041d6fc2eb0f4cf2bd0334532f2f52dc",
+    "runtime/crates/trames-kernel/src/signal/io_scheduling.rs": "e9ac6c3e03830205a20fe8c263a180280f26900d3b58b71759138ffe2be1cf65",
+    "runtime/crates/trames-linux/src/direct.rs": "1195d8bc12065fcdbf26465711f4d49e273d32ab0dfdfcec1320dee6caa2f109",
+    "runtime/crates/trames-linux/src/direct/event_tests.rs": "7043efc1dbc5b2cdadb75c6f617ce25ebf8027821d5d166d2654d087d647d398",
+    "runtime/crates/trames-linux/src/direct/file.rs": "a66190a7c6733196bb0c46baa396534eb755f91463048eb9506aa0e5153869c7",
+    "runtime/crates/trames-linux/src/direct/file_tests.rs": "36885900b07d7d4ffc47ad9bd9e9f7587b0473444202521a35ecd03bced71be6",
+    "runtime/crates/trames-linux/src/direct/local_message.rs": "41e3b7b6dda5b07e052c9ec4afbe9d32863190ce16c9dd2173775d301c9de803",
+    "runtime/crates/trames-linux/src/direct/socket_wait.rs": "d7521836eef66923327bea99330206df220bf5ea262a8fd5eadb0951f2c6f98f",
+    "runtime/crates/trames-linux/src/event_wait.rs": "c0d152193dca5ab068aebb8dbfbcfd94924f2d7590ba8098b9b3f64d450e8d5f",
+    "runtime/crates/trames-linux/src/file_calls.rs": "7b970bbb0fb5258d15b6920081273735baa7fb68e3c81c3e9b7c5ffa3805a3a0",
+    "runtime/crates/trames-linux/src/network.rs": "3b59e1731736d097db56b5b82fe3ca6941ac72be450b3faea47746b3a72d603c",
+    "runtime/crates/trames-linux/src/poll.rs": "51386c4972eb61cd6efe0b2ad60535cc7d3eb67e5a73c65a71d8f6d64a563fe8",
+    "runtime/crates/trames-linux/src/state.rs": "3c3c456cfd34f1854cbb4ba16070120e534d46b9021c020c62aa0ee1c0d95258",
+    "runtime/crates/trames-net/src/hybrid.rs": "93b315edf9893725200154ba5c95634d56c17998687b32a8bf71725d92e66941",
+    "runtime/crates/trames-net/src/lib.rs": "792dac328689b84d7bc996fdf3c4e37f76f18e6fef2b5ba189ad93590f691f44",
+    "runtime/crates/trames-net/src/root_routing_tests.rs": "b556ccf324262f7651f27abab8d0d02b341a8aa80b37f62e1efb5f6e092415a4",
+    "runtime/crates/trames-session/src/process.rs": "4ed008863748fff7dfe84157275a28606338cbc7219ac89f8d13e7c419154e67",
+    "runtime/crates/trames-session/src/process_compat.rs": "37553d5a73246c3b83ec423bba94441313aea5a4ecae6fc6cd3a863318667281",
+    "runtime/crates/trames-session/src/process_dispatch_tests.rs": "5fa60c11cf1c22b81044dd5181039831217f5f0d1f946db4fe7af00df1726f5a",
+    "runtime/crates/trames-session/src/process_dormant_tests.rs": "6d90b5c44903130f3328980c48b13ae6d676b23194d0f4f5b3356447ba1ad9ef",
+    "runtime/crates/trames-session/src/process_seccomp.rs": "3ac63b98bd38b18b8bcd5c6059a32abe76921c5a1af30e993dbdca50e979d69b",
+    "runtime/crates/trames-session/src/worker_syscalls.rs": "da1c47f65e4b7fe84610ad5f13f5b1f9d1dc3ad11570d78bf8584d84e4ca7370",
+    "runtime/crates/trames-vfs/src/descriptor_factory.rs": "a563fc09efb5d127eed2cffc7b922f895049a2182f2043bb4b851be088843697",
+    "runtime/crates/trames-vfs/src/direct_io.rs": "bd005fb9997e1a7915169184b1844baa41bf185985ac2dadb397665ac1663ae6",
+    "runtime/crates/trames-vfs/src/epoll.rs": "4b2a21687935bbc2bf725b32e201352e39e2094830cad9f54686f592a33df3d9",
+    "runtime/crates/trames-vfs/src/epoll_graph.rs": "ddbbe2e73bf9ac3fa3a00f207e29caeebdae8cc86d9d7ce5a4b1ed0c2f7380eb",
+    "runtime/crates/trames-vfs/src/epoll_graph_tests.rs": "723999a17f1ad3e08e0738cc53c3735a4dd5fb07703fa6a0e2f9511c17ee409d",
+    "runtime/crates/trames-vfs/src/events.rs": "4d9e54b7dec8d163a6cf6f325cc83060e58907471fef34a572dc0376dc08f011",
+    "runtime/crates/trames-vfs/src/fd_table.rs": "0ca33b9a9a976fefe605f79068f07178b9e21441625e84659ed6b2c9cd867836",
+    "runtime/crates/trames-vfs/src/file_io.rs": "4841ae335bab879c6c06f7737c81d32d4431830f8b2190c6abf8f54481e98673",
+    "runtime/crates/trames-vfs/src/file_work.rs": "d607c6ed0dab8ba36373688cded3b71b37dc1b1a58defad0ca77a38175bff867",
+    "runtime/crates/trames-vfs/src/ipc/native.rs": "35a755f2b9f967a87749ff4bb5cbf92d1559331d28b68760792d3e08ce26bcf5",
+    "runtime/crates/trames-vfs/src/lib.rs": "14d3869e71122da881900aec341143e98cbce5f9bd6546bad05f09a1dd8e5e1b",
+    "runtime/crates/trames-vfs/src/memfd.rs": "86ebfc485617c7b98a7622e851f2e107d718d391607f3db78205a9892e220e9c",
+    "runtime/crates/trames-vfs/src/network.rs": "dc46faddaf3db36618ed1909f796eb87af918ef8feaa47996dd0c36a7189b3ce",
+    "runtime/crates/trames-vfs/src/network_io.rs": "ec413e33b7dc574f9b01c844de3ae6280ae2394db371c61010bf4bce183f0bdb",
+    "runtime/crates/trames-vfs/src/open_handle.rs": "0630ed82b67d2bd4b29a2da208ef6ca1e26957e019435b1a84d56710c79873c0",
+    "runtime/crates/trames-vfs/src/path_queries.rs": "419a9cf8c29cd2a4a8f32f722d10926b6886ebc25065a6e92f97269e369a6e9a",
+    "runtime/crates/trames-vfs/src/uring.rs": "0fb239823e66651bd5779d5f6f8666b5f76dd1e63f9cded64abf32c63db27be4"
+  },
+  "mac_fixture_sha256": "f6d0f9690ff58ce63446a7f4642552ef0405ebdc96f0503d6093e7af1e41a554",
+  "installed": {
+    "version": "Trames Dev 1.5.4 (dev) runtime 4169330c9e9696eafeb2919ad1f23f06eddde8a9",
+    "runner_sha256": "9a1bb1a2001e71ce244d37fdf5a13b49bba23f182b94dededb7075c637b1ad09",
+    "stable_sha256": "8fc21435034e8c041632e2e50419da9d2123bf790aedb0a1499286fc8367e614",
+    "stable_unchanged": true,
+    "checks": [
+      {
+        "name": "init",
+        "code": 0,
+        "seconds": 3.31623125
+      },
+      {
+        "name": "host",
+        "code": 0,
+        "seconds": 0.8962283750000002
+      },
+      {
+        "name": "tracing",
+        "code": 0,
+        "seconds": 0.25639091599999997
+      }
+    ]
+  },
+  "local_checks": [
+    {
+      "name": "process-all",
+      "code": 0,
+      "seconds": 28.250974749999997
+    },
+    {
+      "name": "ffi",
+      "code": 0,
+      "seconds": 9.332580374999996
+    },
+    {
+      "name": "core-clippy",
+      "code": 0,
+      "seconds": 5.5755695
+    },
+    {
+      "name": "ffi-clippy",
+      "code": 0,
+      "seconds": 0.37227791700000523
+    },
+    {
+      "name": "aarch64-apple-ios",
+      "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+      "code": 0
+    },
+    {
+      "name": "aarch64-apple-ios-sim",
+      "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk",
+      "code": 0
+    }
+  ],
+  "linux_checks": [
+    {
+      "name": "process-all",
+      "code": 0,
+      "seconds": 64.71121954399996
+    },
+    {
+      "name": "ffi-all",
+      "code": 0,
+      "seconds": 19.331014882999966
+    },
+    {
+      "name": "core-clippy",
+      "code": 0,
+      "seconds": 6.053420420000066
+    },
+    {
+      "name": "runtime-ci",
+      "code": 0,
+      "seconds": 49.434211979999986
+    }
+  ],
+  "mac_checks": [
+    {
+      "name": "runtime-fetch",
+      "code": 0,
+      "seconds": 0.258014667
+    },
+    {
+      "name": "runtime-checkout",
+      "code": 0,
+      "seconds": 0.020141542000000012
+    },
+    {
+      "name": "mac-product-ci",
+      "code": 0,
+      "seconds": 19.185895625
+    },
+    {
+      "name": "hardware",
+      "code": 0,
+      "seconds": 14.801422500000001
+    },
+    {
+      "name": "dev-build",
+      "code": 0,
+      "seconds": 22.128490834
+    },
+    {
+      "name": "dev-install",
+      "code": 0,
+      "seconds": 0.08322645799999862
+    },
+    {
+      "name": "dev-signature",
+      "code": 0,
+      "seconds": 0.041116416999997796
+    },
+    {
+      "name": "installed",
+      "code": 0,
+      "seconds": 5.093159542000002
+    }
+  ],
+  "native_baseline": {
+    "cpus": 4,
+    "cohorts": 27,
+    "returned_calls": {
+      "epoll_ctl": 24,
+      "pselect": 4,
+      "ppoll": 8,
+      "preadv2": 4,
+      "pwritev2": 4
+    },
+    "mapping_scopes": 2,
+    "log_sha256": "fd891a6f7fbf017507dd730f71a96a2d971e3e29f001d08ccceeeda60d17b5b5",
+    "all_results_correct_before_one_cohort_assertion": true
+  },
+  "native_final": {
+    "cpus": [
+      4,
+      12
+    ],
+    "cohorts": 1,
+    "returned_calls": {},
+    "service_requests": 0
+  },
+  "interpreter_baseline": {
+    "first_returned_syscall": 22,
+    "completion_marker": false,
+    "log_sha256": "0cf2038965e994b1eae5abb13cc6dba01b144d41a05360e86a4b532431a5eb2c"
+  },
+  "diagnostic_probe": {
+    "initial_known_syscalls": 211,
+    "initial_invalid_argument_returning_entries": 23,
+    "extended_operand_samples": 1055,
+    "edge_operand_samples": 120,
+    "initial_edge_epoll_returns": 3,
+    "limits": "Finite diagnostic probes are not exhaustive compatibility or production-frequency evidence"
+  },
+  "validation_provenance": [
+    "Final production and test Rust fingerprints match both runtime workflows and the Mac checkout",
+    "Initial broad timer/inotify admission intercepted ioctl; fixed guard and full process tests passed",
+    "Unified solo/source cgroup polling initially disagreed on its epoch; canonical epoch corrected and full runtime tests passed",
+    "Previous tests assumed nested epoll and pselect were excluded; fixtures now retain real missing-provider deadline coverage",
+    "Actual socket/source review found spurious structural notification; source-selection/endpoint revision removes self-wakes",
+    "Final Linux cfg(test)-only Debug fix reused successful unchanged process/FFI/lint results, then passed affected runtime workflow",
+    "No full CPU/Linux/network/graphics acceptance repeated solely for documentation or record changes"
+  ],
+  "remaining": {
+    "broad_categories": 4,
+    "uring_maintenance_escalation_sites": 2,
+    "generic_dispatch_catch_all_not_proven_unreachable": true,
+    "actual_mapping_scopes_retained": true,
+    "custom_missing_provider_boundaries_retained": true
+  },
+  "unchanged": [
+    "Stable 1.5.4 installed runner",
+    "Business environments",
+    "Physical iPad installations"
+  ],
+  "limitations": [
+    "No 12-CPU old-native baseline",
+    "No controlled throughput or Firefox latency comparison",
+    "No claim that every custom embedding has a source provider",
+    "No claim that the overall coordinator-removal goal is complete"
+  ]
+}
