@@ -5007,3 +5007,49 @@ No new service/coordinator thread, polling bus, ordinary memory check/fence or
 per-instruction hook is introduced. Actual cancellation/final teardown,
 missing/excluded resources, other generic dispatch and initial/legacy/solo
 orchestration remain. Only Mac Dev is updated; the overall goal stays active.
+
+## 82. Original mounted-filesystem resolution and mqueue closure — 2026-11-09
+
+Filesystem-kind-based source deferral is deleted. Every implemented mount kind
+already retains original synchronized namespace, filesystem and inode resources;
+the old whitelist only excluded mqueue. The original resolver now pins its mount
+and applies actual node/provider admission. No query authority is disabled, and
+no copied owner graph or new service is introduced.
+
+The complete currently supported mqueue filesystem path is source-owned:
+mount/namespace identity, stat/statx/statfs, open and relative dirfds, access,
+directory cursor/read/seek, existing mutation errors and detached mount lifetime.
+Two mounts in one IPC namespace share the original filesystem. A new namespace
+uses its own filesystem; already accepted contexts and mounts keep their original
+identity. This does not implement unsupported POSIX message-queue syscalls.
+
+io_uring requests retain the original directory through drain, close, FD reuse
+and mount replacement. Completion observes that accepted inode; new pathname
+operations see the replacement. Cancellation has no output effects and uses the
+existing request cleanup. Independent cancellation completions gain no imposed
+ordering. Read-only/permission and pointer preflight behavior are preserved.
+
+The shared-mm regression exercises four/twelve logical CPUs and one execution
+slot, with finite calls followed by an original infinite futex wait. It covers
+path metadata, namespace queries, directory operations and errors without joined
+returns, service requests or mapping checkpoints. The native fixture runs raw
+AArch64 on every CLONE_THREAD actor. Its four-CPU baseline uses six cohorts and
+returns stat/statfs/open four times each; final hardware and integration results
+are retained in the [source-bound validation record](../validation/mqueue-filesystem-20261109.json).
+
+Final native four/twelve-CPU runs both use one cohort, with zero returned
+syscalls, service requests and mapping checkpoints. Both full local runtime
+workflows pass; each host passes 425 process regressions (two intentionally
+ignored) and ten FFI cases. Strict lint and both iPad SDK compile targets pass.
+Mac product development gates and 52 signed HVF plus seven signed product cases
+pass. The signed Mac Dev installation passes init supervision at one/four/twelve
+CPUs and host lifecycle/tracing at twelve CPUs. Stable's runner hash is unchanged.
+These are path/conformance results, not a controlled throughput comparison.
+
+The [shared inventory](../../runtime/docs/architecture/coordination-boundaries.md#current-remaining-categories)
+now separates four actual remaining categories from completed subsystems. This
+batch removes one entire excluded filesystem path, while missing capabilities,
+the two io_uring maintenance failures, generic final dispatch, initial/legacy
+orchestration and actual host cancel/teardown remain. Necessary original
+mm/backing synchronization is distinct from a whole-cohort coordinator handoff.
+Only Mac Dev is updated; the overall coordinator-removal goal remains active.

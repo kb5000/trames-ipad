@@ -1,0 +1,274 @@
+{
+  "stage": 82,
+  "date": "2026-11-09",
+  "overall_goal": "active",
+  "runtime_revision": "bee1f006ca0ee30941834f96a968ecca7937b1e1",
+  "baseline_runtime": "f5e613b0de1847d06a26ec15e77372c4ccf54a16",
+  "scope": "Complete implemented mqueue filesystem source path, original mount/IPC namespace/inode/OFD identity, directory operations and accepted io_uring dependencies. Delete filesystem-kind-based source deferral for all implemented mount kinds.",
+  "architecture": {
+    "authority": "Original synchronized mount topology, original IPC namespace OnceLock filesystem, inode, shared Files and OFD cursor. Actual node/provider exclusion remains in the sealed resolver.",
+    "execution": "Calling executor and existing namespace/file actors. io_uring retains its original accepted dirfd/context across drain, close, descriptor reuse and mount replacement.",
+    "lifetime": "Detached mounts remain accessible through accepted OFDs. Future pathname calls observe the replacement. Cancellation uses original accepted request cleanup, no output effects or imposed independent CQ order.",
+    "policy": "Existing read-only, mutation EPERM, directory cursor and preflight rules are preserved. No POSIX mq syscall implementation or extra guest policy is introduced.",
+    "removed": [
+      "ordinary_mount filesystem-kind whitelist",
+      "host_mount whitelist helpers",
+      "Vfs::node filesystem-kind-based query defer"
+    ],
+    "no_new": [
+      "coordinator/resource/service thread",
+      "polling bus",
+      "global or object lock",
+      "unsafe production code",
+      "ordinary guest memory check/fence"
+    ]
+  },
+  "checks": {
+    "workflows": {
+      "runtime_macos": {
+        "passed_steps": 7,
+        "total_steps": 7,
+        "summary": "target/mqueue-subsystem/runtime-mac/summary.json",
+        "sha256": "06391b7127d91b25216954ec9394b2688932d8c3695643a8acf67fa0cb68cfe8"
+      },
+      "runtime_linux": {
+        "passed_steps": 7,
+        "total_steps": 7,
+        "summary": "target/local-ci/io/mqueue-subsystem/runtime-linux-ci/summary.json",
+        "sha256": "97030d5e74d4039c1b8870673c5576b949e0084294dd118db24fe5840a08d64f"
+      },
+      "mac_product": {
+        "passed_steps": 8,
+        "total_steps": 12,
+        "summary": "target/mqueue-subsystem/mac-product-ci/summary.json",
+        "sha256": "254ab69baaa5053d6d4bb1910eab8e4ac014593091d7fbc61b03cfd7e7a9f930"
+      }
+    },
+    "macos": [
+      {
+        "name": "runtime-mac",
+        "code": 0,
+        "seconds": 36.704517875
+      },
+      {
+        "name": "kernel-conformance",
+        "code": 0,
+        "seconds": 12.824444208000003
+      },
+      {
+        "name": "ffi",
+        "code": 0,
+        "seconds": 5.957796916999996
+      },
+      {
+        "name": "core-clippy",
+        "code": 0,
+        "seconds": 3.666356999999998
+      },
+      {
+        "name": "ffi-clippy",
+        "code": 0,
+        "seconds": 0.3772188340000042
+      },
+      {
+        "name": "ipad-compile",
+        "code": 0,
+        "seconds": 4.2458110829999995
+      }
+    ],
+    "linux": [
+      {
+        "name": "process-all",
+        "code": 0,
+        "seconds": 60.019980991000004
+      },
+      {
+        "name": "ffi-all",
+        "code": 0,
+        "seconds": 10.117023949
+      },
+      {
+        "name": "core-clippy",
+        "code": 0,
+        "seconds": 4.778467544999998
+      },
+      {
+        "name": "runtime-ci",
+        "code": 0,
+        "seconds": 53.40466326499998
+      }
+    ],
+    "process": {
+      "macos": {
+        "passed": 425,
+        "ignored": 2,
+        "log": "target/mqueue-subsystem/kernel-conformance.log",
+        "sha256": "1ed98f9d941bcd27c231f992206c907b31ea508f1ab87c26574af615ecca5899"
+      },
+      "linux": {
+        "passed": 425,
+        "ignored": 2,
+        "log": "target/local-ci/io/mqueue-subsystem/process-all.log",
+        "sha256": "4178121ad1e3837068b39a17086c29e12b9cccd984fc8da1a762efed4ecd9866"
+      }
+    },
+    "ffi": {
+      "macos": {
+        "passed": 10,
+        "ignored": 0,
+        "log": "target/mqueue-subsystem/ffi.log",
+        "sha256": "69dba203900832c3bf74ecc5837060207683d85214059b21b01ce66d45228c1d"
+      },
+      "linux": {
+        "passed": 10,
+        "ignored": 0,
+        "log": "target/local-ci/io/mqueue-subsystem/ffi-all.log",
+        "sha256": "6bb89814b4bd9ff4c8196c24b0be936067d44881664062e6b161395e603702ed"
+      }
+    },
+    "ipad": [
+      {
+        "target": "aarch64-apple-ios",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+        "code": 0
+      },
+      {
+        "target": "aarch64-apple-ios-sim",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk",
+        "code": 0
+      }
+    ],
+    "hardware": {
+      "passed": true,
+      "runtime_revision": "bee1f006ca0ee30941834f96a968ecca7937b1e1",
+      "rows": [
+        {
+          "target": "trames-mac-run",
+          "executable_sha256": "dffd3e51a33f0039f512fe66c299f2110e7d09fa32da8a2089ca1ae69c0dee5b",
+          "exit": 0,
+          "passed_tests": 7
+        },
+        {
+          "target": "trames_hvf",
+          "executable_sha256": "7fa1469b6a84879546dddd87c784e258de5743217e0248c983397bdd56472a3a",
+          "exit": 0,
+          "passed_tests": 52
+        }
+      ]
+    },
+    "mqueue_hvf": [
+      {
+        "cpus": 4,
+        "cohorts": 1,
+        "returned": "{}",
+        "mapping": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "cpus": 12,
+        "cohorts": 1,
+        "returned": "{}",
+        "mapping": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ],
+    "installed": {
+      "version": "Trames Dev 1.5.4 (dev) runtime bee1f006ca0ee30941834f96a968ecca7937b1e1",
+      "runner_sha256": "41db6f4552546910e69857e56c9ccd95c907fce1e65a635bdd3196709686ecb4",
+      "stable_sha256": "8fc21435034e8c041632e2e50419da9d2123bf790aedb0a1499286fc8367e614",
+      "stable_unchanged": true,
+      "checks": [
+        {
+          "name": "init",
+          "code": 0,
+          "seconds": 3.3152035
+        },
+        {
+          "name": "host",
+          "code": 0,
+          "seconds": 0.899180833
+        },
+        {
+          "name": "tracing",
+          "code": 0,
+          "seconds": 0.25564358299999945
+        }
+      ]
+    }
+  },
+  "regressions": [
+    "Already captured source resolvers see new original mounts without owner refresh.",
+    "Same-IPC mounts share filesystem identity while mount IDs stay distinct; new IPC namespace uses another filesystem; accepted old context and original mounts retain old identity.",
+    "Source stat/statx/statfs, open/O_PATH/dirfd/access, getdents/lseek and preflight share original resources and cursors.",
+    "EPERM on regular creation/mkdir and EROFS after remount retain existing behavior.",
+    "Detach and replace a mount: old dirfd still addresses the accepted original; new pathname addresses replacement; final close invalidates the original numeric descriptor.",
+    "Accepted io_uring drain survives FD close/reuse and mount replacement; original completion vs new pathname; cancellation leaves output untouched and future requests remain usable.",
+    "Shared-mm four/twelve logical CPU and one-slot tests use finite calls then original infinite futex waits; no returned syscall, service request or mapping checkpoint.",
+    "Native CLONE_THREAD actors each stat/statfs/open/read/seek/close a directory and publish completion/error results; same fixture reduces six baseline cohorts to one on four/twelve CPUs."
+  ],
+  "baseline": {
+    "result": {
+      "runtime_revision": "f5e613b0de1847d06a26ec15e77372c4ccf54a16",
+      "exit": 101,
+      "seconds": 2.585541,
+      "executable_sha256": "8a3b1e2b7a6ce9747d668b01afc9db20a1dd66c5f5f8b904820db47a6910d9ec",
+      "output": "\nrunning 1 test\ntest session::tests::mqueue_paths_and_directories_run_without_joined_native_dispatch ... hardware mqueue CPUs=4 cohorts=6 returned={43: 4, 56: 4, 79: 4, 220: 2} mapping=[0, 0, 0, 0, 0, 0, 0, 0, 0]\n\nthread 'session::tests::mqueue_paths_and_directories_run_without_joined_native_dispatch' (27226728) panicked at crates/trames-mac/src/session.rs:1043:13:\nassertion `left == right` failed\n  left: 6\n right: 1\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\nFAILED\n\nfailures:\n\nfailures:\n    session::tests::mqueue_paths_and_directories_run_without_joined_native_dispatch\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 27 filtered out; finished in 0.02s\n\n"
+    },
+    "log_sha256": "d89ec7e4da130665e36abe0e9905bd35c3464d50844276fcd2867aa486d59f1c",
+    "fixture": "trames-mac/crates/trames-mac/src/session.rs::tests::mqueue_paths_and_directories_run_without_joined_native_dispatch",
+    "interpretation": "Four-CPU baseline passes guest results and actor-completion checks, then fails the one-cohort assertion. It returns stat/statfs/open four times each and records two clone returns. Final four/twelve-CPU cases return no syscalls. These are functional path results, not a throughput comparison."
+  },
+  "source_sha256": {
+    "runtime/crates/trames-linux/src/direct/uring/subsystem_tests.rs": "844f63c40e79b7b5f133beccca2100258912161702307f46e5d41b387f5b9e19",
+    "runtime/crates/trames-session/src/process.rs": "8dcac5e7aecb0b7f8f047ae96ec3d83548caadade498bb0801d22c262bb6ebef",
+    "runtime/crates/trames-session/src/process_mqueue_tests.rs": "946e3914c49bb00151df15a54f854ab13bb7bd4e032a7c6485fbb78e3037f919",
+    "runtime/crates/trames-vfs/src/lib.rs": "20f3c0f12e12235959dc27301c5500c3128cbaebc0ddcf9ddfeaead8148dca21",
+    "runtime/crates/trames-vfs/src/path_queries.rs": "305a6b73ffc03fe260b266b449adf55835d244ebb2c3202d2dff37d45b672f4a",
+    "runtime/crates/trames-vfs/src/path_queries/mqueue_tests.rs": "735698b3ebf9d029deb03c9317ed06327ed9c83d84c20c7bc283ba55471dad2f"
+  },
+  "mac_fixture_sha256": "141f08b058c512660bb19a8be0be5ee00a94f64f65b810951c28c9c77e582bbb",
+  "deployment": {
+    "channel": "Mac Dev only",
+    "runner": "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+    "signature_verified": true,
+    "stable_unchanged": true,
+    "physical_ipad_unchanged": true,
+    "business_environments_unchanged": true
+  },
+  "validation_corrections": [
+    "Initial new fixtures used the x86 O_DIRECTORY value rather than the existing AArch64 constant; corrected before integration.",
+    "The multi-actor fixture initially used the path string as its expected-zero futex storage; moved the original infinite wait to separate zeroed bytes so every actor completes without a timing/fairness assumption.",
+    "Test expectations now distinguish dynamic open descriptors from EPERM and do not impose order on independent cancellation completions.",
+    "Linux process/FFI/lint passes are reused after two formatting-only test-file changes; the failed formatting gate and unrun runtime steps pass on the final source."
+  ],
+  "limits": [
+    "Currently implemented mqueue is an empty filesystem namespace, not POSIX message-queue send/receive.",
+    "No broad throughput or complete coordinator-removal claim.",
+    "Mac product workflow runs development steps 1-8 of 12; packaging/release steps are outside this Dev-only batch.",
+    "Actual mm/backing edits and external byte borrowers retain necessary scoped synchronization."
+  ],
+  "remaining": [
+    "Actual host cancellation/deadline/shutdown and final backend/session teardown.",
+    "Missing capabilities/excluded original resources; two io_uring source-maintenance escalation call sites remain.",
+    "Final SVC/HLT/fault catch-all dispatch.",
+    "Initial/legacy admission and capability-less embedding orchestration; solo execution alone is not a cross-thread RPC."
+  ]
+}
