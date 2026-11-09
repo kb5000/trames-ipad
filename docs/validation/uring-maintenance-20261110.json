@@ -1,0 +1,299 @@
+{
+  "date": "2026-11-10",
+  "stage": 99,
+  "subsystem": "Connected original io_uring maintenance contexts, waits, native event selection, cancellation and retirement",
+  "status": "Validated and installed to Mac Dev only; overall coordinator-removal goal remains active",
+  "baseline_runtime": "4169330c9e9696eafeb2919ad1f23f06eddde8a9",
+  "runtime_revision": "796981af99a03add75eb70abd332767dd1ee9122",
+  "workflows": {
+    "runtime_macos": {
+      "passed": 7,
+      "total": 7,
+      "sha256": "083832fc0cc331a8cad0a65d4fdb874de0853778dca5d51d28d02684fc5c110c"
+    },
+    "runtime_linux": {
+      "passed": 7,
+      "total": 7,
+      "sha256": "d0e2e6f02fd3190a0f9efa019529b4f59b3a71de574ce6ea8b534dd5d5860471"
+    },
+    "mac_product": {
+      "passed": 8,
+      "total": 12,
+      "sha256": "842239bbe049f66a68eceeda79dcbdb01e48ab5697e0c8b6cc7d2040bc643fb7"
+    }
+  },
+  "process": {
+    "macos": {
+      "passed": 453,
+      "ignored": 2,
+      "sha256": "c4e37258479247be35cbe62a16e5d07170915207e7c3ede983df687eb0be99e2"
+    },
+    "linux": {
+      "passed": 453,
+      "ignored": 2,
+      "sha256": "eb7c8579afc23534c0e827860833932653f1f424b2c758567c30def5f19eb39c"
+    }
+  },
+  "ffi": {
+    "macos": {
+      "passed": 10,
+      "ignored": 0,
+      "sha256": "00c33a5cea82dc555c0dd587ab202105fd82ccc6bbf28fa32d21538850171524"
+    },
+    "linux": {
+      "passed": 10,
+      "ignored": 0,
+      "sha256": "33f187d3c06aabd442964da81878d8ca09a576d27f6266803b905f429bcd47df"
+    }
+  },
+  "apple_sdk_checks": [
+    {
+      "name": "aarch64-apple-ios",
+      "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+      "code": 0
+    },
+    {
+      "name": "aarch64-apple-ios-sim",
+      "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk",
+      "code": 0
+    }
+  ],
+  "native_hardware": {
+    "passed": true,
+    "runtime_revision": "796981af99a03add75eb70abd332767dd1ee9122",
+    "rows": [
+      {
+        "target": "trames-mac-run",
+        "executable_sha256": "7bf0294a49ad3e9f4b6657669941c7c4f89d2a98d315b3f4ef23f706723508eb",
+        "exit": 0,
+        "passed_tests": 22
+      },
+      {
+        "target": "trames_hvf",
+        "executable_sha256": "3211098a85f0992affab37cd459262f79b4f44c964a85b86a4821700ae8f3ffb",
+        "exit": 0,
+        "passed_tests": 52
+      }
+    ]
+  },
+  "original_scope_counts": {
+    "4": 2,
+    "12": 10
+  },
+  "source_sha256": {
+    "runtime/crates/trames-linux/src/direct.rs": "6ca41caa4c107a52a8b215aa49dbaba7bad4d48cebbd27c51be0069b9762b9ec",
+    "runtime/crates/trames-linux/src/direct/event_tests.rs": "612148d819dbaf4446715e8e36f7a679d4d4c51869fc1afbe5c994030b18f5f7",
+    "runtime/crates/trames-linux/src/direct/uring.rs": "67de25f952910c7bc4e2661427e9c7c138d950dace5a772e6984c47820b8f769",
+    "runtime/crates/trames-linux/src/direct/uring/background.rs": "603817a9d0045a9652a479d533507574f17e4b79c2687fa3ed4afd6a9fc4ac1d",
+    "runtime/crates/trames-linux/src/direct/uring/maintenance_tests.rs": "dec3846c691a1d8394ec7c978d3ceb9595d030514108befca0fd5de0cd819636",
+    "runtime/crates/trames-linux/src/direct/uring/poll.rs": "6dc200fe929a9b0116e3ea9d9986c99db6d01c7afc2a99a953904c0949e85e49",
+    "runtime/crates/trames-linux/src/direct/uring/scope_tests.rs": "cc36f0e13761857b4044a05bd5847d836659e37a4f440462d612b6fba846e8f4",
+    "runtime/crates/trames-linux/src/direct/uring/subsystem_tests.rs": "b91fdc6f61a387d6c9d900898063c3b3397ba1b0384745a58cdeaa38f985cf20",
+    "runtime/crates/trames-linux/src/direct/uring/wait.rs": "2f0941b1f90ad10dd1ec4ea54a439a0df194791163ce4bb8eeee5c18edcf35ee",
+    "runtime/crates/trames-net/src/hybrid.rs": "886441979e170f7744b37db10eec964c96e00e779bd6b342c7bff08c820a021d",
+    "runtime/crates/trames-net/src/lib.rs": "0b89a12bd784e88c4bd3346ece7fd3131a37f3a2c8f355497af756188154ebee",
+    "runtime/crates/trames-session/src/process_dispatch.rs": "4c80ade7162b188578a266ecdc1b5e5b40c85ed890aa830a23de4d8c29d81674",
+    "runtime/crates/trames-session/src/process_uring_original_tests.rs": "39f2e48180ce1c08bd006f4bf0f243796539f0319292cd78cd6ac53068b190f2",
+    "runtime/crates/trames-shared/src/host_events.rs": "7451e86e66f7d93aae61c676f5296d5e8da84b840585c6d5419b6732c791a111",
+    "runtime/crates/trames-shared/src/readiness.rs": "8d70bcd5d093805754a8104d80a131fdc975954f160a9c57e0ff302f7f1178aa",
+    "runtime/crates/trames-vfs/src/uring.rs": "6c88a9b8825339df17ed51f8529dbd9a2b3a52ae2a2760e5804e35ef26f52f44"
+  },
+  "mac_fixture_sha256": "554a3535da869adf1e0672a063232e68b5b3f32b4c5a8e005db1bd585bd8ec4f",
+  "installed": {
+    "version": "Trames Dev 1.5.4 (dev) runtime 796981af99a03add75eb70abd332767dd1ee9122",
+    "runner_sha256": "ead33121409fbc3d65ce3670011ccb75359ac366063bc71138cadb11ca37f93a",
+    "stable_sha256": "8fc21435034e8c041632e2e50419da9d2123bf790aedb0a1499286fc8367e614",
+    "stable_unchanged": true,
+    "checks": [
+      {
+        "name": "init",
+        "code": 0,
+        "seconds": 3.2987772090000003
+      },
+      {
+        "name": "host",
+        "code": 0,
+        "seconds": 0.9216330419999998
+      },
+      {
+        "name": "tracing",
+        "code": 0,
+        "seconds": 0.2588951660000003
+      }
+    ]
+  },
+  "local_checks": [
+    {
+      "name": "process-all",
+      "code": 0,
+      "seconds": 10.913420375
+    },
+    {
+      "name": "ffi",
+      "code": 0,
+      "seconds": 10.339783542000001
+    },
+    {
+      "name": "core-clippy",
+      "code": 0,
+      "seconds": 8.005711458999997
+    },
+    {
+      "name": "ffi-clippy",
+      "code": 0,
+      "seconds": 0.5425324160000002
+    },
+    {
+      "name": "aarch64-apple-ios",
+      "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+      "code": 0
+    },
+    {
+      "name": "aarch64-apple-ios-sim",
+      "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk",
+      "code": 0
+    }
+  ],
+  "linux_checks": [
+    {
+      "name": "process-all",
+      "code": 0,
+      "seconds": 81.913872983
+    },
+    {
+      "name": "ffi-all",
+      "code": 0,
+      "seconds": 13.862558381
+    },
+    {
+      "name": "core-clippy",
+      "code": 0,
+      "seconds": 8.082151795000001
+    },
+    {
+      "name": "runtime-ci",
+      "code": 0,
+      "seconds": 54.685181441
+    }
+  ],
+  "mac_checks": [
+    {
+      "name": "runtime-fetch",
+      "code": 0,
+      "seconds": 0.3264475
+    },
+    {
+      "name": "runtime-checkout",
+      "code": 0,
+      "seconds": 0.022817209000000005
+    },
+    {
+      "name": "mac-product-ci",
+      "code": 0,
+      "seconds": 22.853178375,
+      "log": "mac-product-ci-retry.log",
+      "results": "mac-product-ci/summary.json"
+    },
+    {
+      "name": "hardware",
+      "code": 0,
+      "seconds": 16.964431292000004,
+      "log": "hardware-retry.log",
+      "results": "hardware/results.json",
+      "initial_failure": "new fixture incorrectly required zero clone_vm mapping scopes; production unchanged"
+    },
+    {
+      "name": "dev-build",
+      "code": 0,
+      "seconds": 22.603059290999997
+    },
+    {
+      "name": "dev-install",
+      "code": 0,
+      "seconds": 0.08728804200000084
+    },
+    {
+      "name": "dev-signature",
+      "code": 0,
+      "seconds": 0.04552754099999845
+    },
+    {
+      "name": "installed",
+      "code": 0,
+      "seconds": 4.977881624999998
+    }
+  ],
+  "concentrated_tests": {
+    "linux": 315,
+    "net": 84,
+    "readiness": 24,
+    "vfs": 606,
+    "total": 1029,
+    "ignored": 2,
+    "log_sha256": "401ab7e07132564fa0608b9398c430406e9e85332cb963cce47840437f3a110d"
+  },
+  "common_fixture": {
+    "cpus": [
+      4,
+      12
+    ],
+    "slots": [
+      1,
+      4,
+      12
+    ],
+    "enter_modes": [
+      "async",
+      "GETEVENTS"
+    ],
+    "cohorts": 1,
+    "returned_calls": {},
+    "service_requests": 0,
+    "mapping_scopes": 0
+  },
+  "native_fixture": {
+    "cpus": [
+      4,
+      12
+    ],
+    "cohorts": 1,
+    "returned_calls": {},
+    "service_requests": 0,
+    "actual_mapping_scopes_retained": true
+  },
+  "wait_front_doors": [
+    "original background maintenance",
+    "io_uring_enter GETEVENTS",
+    "CQ ppoll",
+    "CQ epoll"
+  ],
+  "validation_provenance": [
+    "Final changed Rust fingerprints match both local runtime workflows, Linux copy and Mac product gates",
+    "Builder context refresh preserves caller disk/layout/signal services; accepted work keeps the original context",
+    "Compatibility fast byte/file requests retain their previous staging policy",
+    "Native vector fixture now allows legitimate early readiness hints and waits for actual original receive completion",
+    "The ring-cycle fixture correctly drops actual guest mappings before requiring final ring release",
+    "Initial new native fixture falsely assumed zero mapping scopes; only that test assumption changed, affected Mac gates and signed hardware were repeated",
+    "Common fixture preconstructs tasks and has zero mapping scopes; native clone_vm setup retains actual 2/10 scopes, which are not coordinator returns",
+    "No complete CPU/Linux/network/graphics suite was repeated for architecture documentation or evidence-only changes"
+  ],
+  "remaining": {
+    "broad_categories": 4,
+    "uring_maintenance_escalation_sites": 2,
+    "actual_typed_missing_provider_boundary_retained": true,
+    "original_body_without_live_pid_mm_provider_boundary_retained": true,
+    "generic_dispatch_catch_all_not_proven_unreachable": true,
+    "overall_goal_complete": false
+  },
+  "unchanged": [
+    "Stable 1.5.4 installed runner",
+    "Business environments",
+    "Physical iPad installations"
+  ],
+  "limitations": [
+    "No controlled throughput, Firefox latency or production fallback-frequency comparison",
+    "No claim that every custom embedding supplies a live PID/mm provider",
+    "The two genuine missing-provider/body maintenance guards are preserved",
+    "No claim that actual mapping-reader synchronization can be removed"
+  ]
+}

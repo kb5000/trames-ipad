@@ -2,18 +2,18 @@
 
 ## Current status — 2026-11-10
 
-Through stage 98 the broad remaining count is **four**. The latest batch closes
-one connected descriptor/event subsystem with its control, lifetime, subscription
-and transport dependencies. The umbrella count is not a syscall count or a
+Through stage 99 the broad remaining count is **four**. The latest batch closes
+the connected io_uring maintenance resource graph: original context, event
+subscriptions, native source selection, cancellation and retirement. The umbrella count is not a syscall count or a
 measurement of production fallback frequency; the generic catch-all is still an
 audit target.
 
 | Remaining class | Current boundary | Recent concrete progress |
 | --- | --- | --- |
 | Host control and final teardown | Actual cancellation/deadline/shutdown, native-event failure and final CPU/session drain | Ordinary supervision, guest exit and controls are source-owned |
-| Missing capabilities and excluded resources | Genuinely absent original providers/bodies; two submitter-scoped io_uring maintenance setters remain | Original FD errors are no longer mistaken for missing capabilities; nested epoll and ordinary native/virtual socket event sources are admitted |
+| Missing capabilities and excluded resources | Genuinely absent original providers/bodies; two submitter-scoped io_uring maintenance setters remain | Compatibility io_uring capture retains original execution resources; a missing HostEvents hub uses original read/write interests. Actual absent typed providers remain |
 | Final execution dispatch | SVC or cold native-resource operation not completed, parked or accepted by a source scope | Stage 98 closes canonical FD/error admission, the complete original epoll/poll/select graph, current-offset vector transports and residual setup/validation entries; the catch-all is not proven unreachable |
-| Initial/legacy orchestration | Initial admission and standalone/capability-less scheduling | Pselect and typed cold event waits adopt original sources; genuinely missing providers retain their actual deadlines |
+| Initial/legacy orchestration | Initial admission and standalone/capability-less scheduling | Typed cold waits and compatibility io_uring retain original sources; genuinely missing providers retain their actual deadlines |
 
 Recent signed native fixtures demonstrate concrete path removal. Each baseline
 below is four CPUs; each final fixture passes at both four and twelve. These are
@@ -29,7 +29,7 @@ separate workloads, not cumulative or comparable throughput scores.
 | Original descriptor/event graph and vector transports (98) | 27 / 24 epoll_ctl, 4 pselect, 8 ppoll, 4 preadv2, 4 pwritev2 | 1 / none |
 
 Actual mapping/backing mutation still synchronizes its affected original readers.
-The latest native fixture retains two such scopes at four CPUs and ten at twelve;
+The stage 98 native fixture retains two such scopes at four CPUs and ten at twelve;
 it does not remove them or infer a throughput gain. The connected dispatch/error
 fixture has zero mapping scopes and completes at four/twelve CPUs, one CPU slot
 and seccomp ALLOW. The explicitly missing legacy-console provider still keeps its
@@ -43,13 +43,27 @@ post-write sync use their original resources. Stable socket data/backpressure
 retries emit no structural wake. No coordinator, resource-service thread or
 polling message bus is introduced. Full details are in [section 98](#98-original-descriptor-admission-and-the-complete-event-subsystem--2026-11-10).
 
-The [shared inventory](https://github.com/kb5000/trames-runtime/blob/main/docs/architecture/coordination-boundaries.md#current-remaining-categories)
-and [stage 98 record](../validation/fd-admission-20261110.json) carry current
-boundaries and evidence. Both local runtime workflows pass seven steps. Mac and
-ARM64 Linux each pass 452 process regressions (two intentionally ignored) and ten
-FFI cases; both iPad SDKs compile. All 73 signed native cases and Mac development
-gates 1–8 pass. Mac Dev alone is updated; stable 1.5.4, business environments and
-physical iPad installations retain their versions. The overall goal remains active.
+Stage 99 connects background maintenance, GETEVENTS, CQ poll/epoll, original
+execution context and source lifetime. Nested graph and dynamic socket changes
+refresh original subscriptions before deciding to park again. Generic native
+identities cannot alias replaced branches; observer leases permit actual close.
+Available original bodies no longer lack context merely because a compatibility
+builder omits paths/factory. Production worker capture reuses its existing bindings.
+Final idle scopes release subscriptions and deadlines immediately.
+
+The two actual missing-provider/body setters and four broad categories remain;
+this batch does not assert universal provider coverage or remove final-dispatch
+catch-alls. The [shared inventory](https://github.com/kb5000/trames-runtime/blob/main/docs/architecture/coordination-boundaries.md#current-remaining-categories)
+and [stage 99 validation](../validation/uring-maintenance-20261110.json) carry exact
+bounds and final source-bound checks. Mac Dev alone is the deployment target;
+stable 1.5.4, business environments and physical iPad versions are unchanged.
+Both local runtime workflows pass seven steps. Mac and ARM64 Linux each pass
+453 process regressions (two intentionally ignored) and ten FFI cases; both iPad
+SDK targets compile. All 74 signed native cases and Mac development gates 1–8
+pass. The new native event-graph fixture completes one cohort at four/twelve CPUs
+with no returned syscall/service, retaining two/ten actual mapping-reader scopes
+from clone_vm setup. Installed Dev initialization, host lifecycle and tracing
+checks pass; stable's runner hash remains unchanged. The overall goal stays active.
 
 ### Stage 81 read-only memory observations (historical)
 
@@ -6069,3 +6083,42 @@ Only Mac Dev is updated. Stable 1.5.4, business environments and physical iPad
 installs retain their versions. Four broad categories and both actual io_uring
 maintenance escalations remain; this batch does not declare the final generic
 catch-all unreachable or the overall coordinator-removal objective complete.
+
+
+## 99. Connected io_uring maintenance resources — 2026-11-10
+
+The complete original wait/context/lifetime graph is handled as one batch rather
+than separate syscall shortcuts. Background maintenance, GETEVENTS, CQ ppoll and
+CQ epoll retain their original SQEs/OFDs, caller reader, native sources, file/layout
+dependencies and cancellation. Nested interest changes invalidate subscription
+proof; dynamic native branches beneath unchanged interests also refresh. A second
+park cannot continue listening only to an old leaf after late ADD and numeric reuse.
+
+Native sets are keyed by original allocation identity, not vector index. Weak
+identity leases prevent key reuse while allowing real endpoint/UDP binding release.
+Hubless caller loops receive fallible interests with actual read/write directions;
+registered callers reuse their existing hub. Backend errors preserve their actual
+host cause. Compatibility capture carries the original resolver/factory; normal
+worker capture supplies existing bindings without another resolver. Future context
+refresh preserves disk/layout/signal services and never changes accepted work's
+source. Stable byte/file fast paths retain their previous staging policy.
+
+Epoll's original weak-watch graph can be retained for SQEs without a ring ownership
+cycle. The ring may still be retained by actual guest mappings until unmap. Final
+completion/cancellation releases maintenance subscriptions and deadlines immediately.
+No coordinator/resource thread, polling message bus, copied Files table, global
+native-call lock, ordinary memory fence or guest permission layer is introduced.
+
+Connected unit and common execution tests cover all four wait front doors, FD
+close/reuse, late graph changes, cross-submitter cancellation, immediate listener
+retirement, original bodies, selected buffers, file/layout staging, native direction,
+source replacement and weak transport lifetime. The common four/twelve-CPU and
+single-slot matrix completes in one cohort with no returned syscall/service and no
+mapping scope. Final Mac native and cross-platform evidence is in the
+[validation record](../validation/uring-maintenance-20261110.json).
+
+Two actual maintenance guards remain for genuinely unavailable typed providers or
+original bodies. Binding-less worker embeddings retain before-effect admission;
+live PID/mm data is not fabricated from global publication. The broad count remains
+four and the overall objective stays active. No throughput or production fallback
+frequency improvement is claimed from these finite fixtures.
