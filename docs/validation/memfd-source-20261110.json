@@ -1,0 +1,282 @@
+{
+  "stage": 95,
+  "date": "2026-11-10",
+  "overall_goal": "active",
+  "runtime_revision": "3a5a0e2b27a724e73258c4c39083cceb48de9b7e",
+  "prior_runtime": "8b4c97bfac5d086c2868db9a7c4f2f6d4e88f36d",
+  "scope": "Original anonymous memory-file creation: common source/solo ABI, original FD reservation and inode admission, native backing creation outside the filesystem lock, retained completion/cancellation and sparse/lifetime accounting.",
+  "architecture": {
+    "import_": "MemfdParameters owns one imported name and flags. Source/solo share validation and canonical name-access/length/flag/FD/inode error order. Completion never rereads guest name memory.",
+    "resources": "Existing FileWork retains original Files, filesystem, credentials and shared budget. It needs no pathname operands, mount administration, copied Files or owner-task projection.",
+    "construction": "Reserve the actual shared FD, register a real unpublished inode against its live limit, release the filesystem guard, create anonymous native backing on the existing disk pool, then install under the private inode guard. Failure/unwind drops the inode, descriptor reservation and backing.",
+    "accounting": "Empty and one-GiB sparse anonymous files retain the existing physical-budget policy. Writes/mappings charge actual backing; accepted OFD and final inode release retain original lifetime.",
+    "uring": "Already caller-owned io_uring backing creation shares the same filesystem-lock split. This is not a newly migrated io_uring setup path.",
+    "no_new": [
+      "coordinator/resource/service thread",
+      "polling bus",
+      "global native execution lock",
+      "production unsafe block",
+      "ordinary guest-memory permission/check/fence",
+      "fabricated capability or errno"
+    ]
+  },
+  "baselines": {
+    "process": {
+      "runtime_revision": "8b4c97bfac5d086c2868db9a7c4f2f6d4e88f36d",
+      "checks": [
+        {
+          "name": "process",
+          "code": 101,
+          "seconds": 17.630432917,
+          "output": "warning: unused workspace dependency `trames-native`\n  --> Cargo.toml:17:1\n   |\n17 | trames-native = { path = \"runtime/crates/trames-native\" }\n   | ^^^^^^^^^^^^^\n   |\n   = note: `cargo::unused_workspace_dependencies` is set to `warn` by default\nhelp: consider removing the workspace dependency `trames-native`\nwarning: workspace (manifest) generated 1 warning\n   Compiling trames-session v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-session)\n   Compiling trames-vfs v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-vfs)\n   Compiling trames-linux v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-linux)\n   Compiling trames-kernel v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-kernel)\n   Compiling trames-core v1.5.4 (/Users/main/dev/trames/crates/trames-core)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 16.88s\n     Running ../../runtime/crates/trames-session/src/lib.rs (target/debug/build/trames-core/73ea467a4920ade2/out/kernel_conformance-73ea467a4920ade2)\n\nrunning 1 test\ntest process::memfd_tests::guest_memfd_creation_sparse_mapping_seals_aliases_and_reuse_stay_on_source ... memfd CPUs=4 slots=4 filter=false cohorts=1 returned={279: 1} scopes=0\n\nthread 'process::memfd_tests::guest_memfd_creation_sparse_mapping_seals_aliases_and_reuse_stay_on_source' (28128222) panicked at crates/trames-core/../../runtime/crates/trames-session/src/process_memfd_tests.rs:111:13:\nassertion `left == right` failed\n  left: [0, 0, 0, 0]\n right: [1, 0, 0, 0]\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\nFAILED\n\nfailures:\n\nfailures:\n    process::memfd_tests::guest_memfd_creation_sparse_mapping_seals_aliases_and_reuse_stay_on_source\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 450 filtered out; finished in 0.02s\n\nerror: test failed, to rerun pass `-p trames-core --test kernel-conformance`\n"
+        }
+      ]
+    },
+    "signed_native": {
+      "runtime_revision": "8b4c97bfac5d086c2868db9a7c4f2f6d4e88f36d",
+      "code": 101,
+      "output": "\nrunning 1 test\ntest session::tests::guest_memfd_lifecycle_completes_on_original_native_workers ... hardware memfd CPUs=4 exit=0 cohorts=8 returned={220: 1, 279: 8} scopes=5\n\nthread 'session::tests::guest_memfd_lifecycle_completes_on_original_native_workers' (28127577) panicked at crates/trames-mac/src/session.rs:1932:13:\nassertion `left == right` failed\n  left: 8\n right: 1\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\nFAILED\n\nfailures:\n\nfailures:\n    session::tests::guest_memfd_lifecycle_completes_on_original_native_workers\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 38 filtered out; finished in 0.02s\n\n"
+    }
+  },
+  "checks": {
+    "workflows": {
+      "runtime_macos": {
+        "passed": 7,
+        "total": 7,
+        "sha256": "c9c35a2c607be77d09464c1d4a87aa51f6e04001b3bc039ba0f5ae288b037528"
+      },
+      "runtime_linux": {
+        "passed": 7,
+        "total": 7,
+        "sha256": "f9dc67414cf926996234a0e2a8abc8c845ad9c655c13aaf2cddea67733dabc8f"
+      },
+      "mac_product": {
+        "passed": 8,
+        "total": 12,
+        "sha256": "9063b70d846ffa51e4f640880f1b57d70ad616e28831b91c6923f08df5f8afd3"
+      }
+    },
+    "macos": [
+      {
+        "name": "runtime-mac",
+        "code": 0,
+        "seconds": 32.187965667
+      },
+      {
+        "name": "kernel-conformance",
+        "code": 0,
+        "seconds": 37.965552833
+      },
+      {
+        "name": "ffi",
+        "code": 0,
+        "seconds": 12.163780458999994
+      },
+      {
+        "name": "core-clippy",
+        "code": 0,
+        "seconds": 8.832533999999995
+      },
+      {
+        "name": "ffi-clippy",
+        "code": 0,
+        "seconds": 0.4854644579999956
+      },
+      {
+        "name": "ipad-compile",
+        "code": 0,
+        "seconds": 8.516433000000006
+      }
+    ],
+    "linux": [
+      {
+        "name": "process-all",
+        "code": 0,
+        "seconds": 59.961699659999994
+      },
+      {
+        "name": "ffi-all",
+        "code": 0,
+        "seconds": 12.711392380000007
+      },
+      {
+        "name": "core-clippy",
+        "code": 0,
+        "seconds": 7.385896377999998
+      },
+      {
+        "name": "runtime-ci",
+        "code": 0,
+        "seconds": 60.32869894299995
+      }
+    ],
+    "process": {
+      "macos": {
+        "passed": 449,
+        "ignored": 2,
+        "sha256": "dcb543b5f99ccf0bf6b67d617ac373ba4f3f6d92de2b8056b548ea74ac0c9cd2"
+      },
+      "linux": {
+        "passed": 449,
+        "ignored": 2,
+        "sha256": "9cd701d40177fe52f699c3e41f6940191ce6eb00ab075f227de31f05ad3c0828"
+      }
+    },
+    "ffi": {
+      "macos": {
+        "passed": 10,
+        "ignored": 0,
+        "sha256": "0c19f2626a3582ae8fc0c54017683c8f5b8905e80e694a4d1892e7e0503dd641"
+      },
+      "linux": {
+        "passed": 10,
+        "ignored": 0,
+        "sha256": "2e097068a21f07c4545872318bdc8074e1189036608dae04439644d57b1c95d3"
+      }
+    },
+    "ipad": [
+      {
+        "target": "aarch64-apple-ios",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+        "code": 0
+      },
+      {
+        "target": "aarch64-apple-ios-sim",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk",
+        "code": 0
+      }
+    ],
+    "hardware": {
+      "passed": true,
+      "runtime_revision": "3a5a0e2b27a724e73258c4c39083cceb48de9b7e",
+      "rows": [
+        {
+          "target": "trames-mac-run",
+          "executable_sha256": "01d340c293266761738389e5c20557e7a3e92126efc285b9e1fe10ec10cc4cac",
+          "exit": 0,
+          "passed_tests": 18
+        },
+        {
+          "target": "trames_hvf",
+          "executable_sha256": "7c2563079247c56400d0e6dfb2d72e7a7a8be1c2bd58a387fc4257d6028e8705",
+          "exit": 0,
+          "passed_tests": 52
+        }
+      ]
+    },
+    "process_regression": "guest_memfd_creation_sparse_mapping_seals_aliases_and_reuse_stay_on_source",
+    "common_regressions": [
+      "native_memfd_creation_reserves_original_inode_and_fd_without_holding_fs_lock",
+      "concurrent_original_memfd_workers_obey_live_inode_and_fd_limits",
+      "retained_memfd_uses_original_files_credentials_budget_flags_and_last_close_lifetime",
+      "native_memfd_creation_retains_original_name_files_credentials_and_handoff",
+      "memfd_source_solo_import_and_allocation_errors_share_original_ordering"
+    ],
+    "native_prior": {
+      "cpus": 4,
+      "cohorts": 8,
+      "returned_syscalls": {
+        "220": 1,
+        "279": 8
+      },
+      "mm_scopes": 5,
+      "guest_results_correct": true
+    },
+    "native_final": {
+      "cpus": [
+        4,
+        12
+      ],
+      "cohorts": 1,
+      "returned_syscalls": {},
+      "mm_scopes": {
+        "4": 7,
+        "12": 21
+      },
+      "guest_results_correct": true
+    },
+    "native_log_sha256": "92d8bcbea8b45ffda893b02c7ea63434466f90ad2d407bcb29e231025ab3bacf",
+    "installed": {
+      "version": "Trames Dev 1.5.4 (dev) runtime 3a5a0e2b27a724e73258c4c39083cceb48de9b7e",
+      "runner_sha256": "c50bac370406fbdc073e7010ac0172d100972e118ad64d61b74886349f77b6e6",
+      "stable_sha256": "8fc21435034e8c041632e2e50419da9d2123bf790aedb0a1499286fc8367e614",
+      "stable_unchanged": true,
+      "checks": [
+        {
+          "name": "init",
+          "code": 0,
+          "seconds": 3.333995208
+        },
+        {
+          "name": "host",
+          "code": 0,
+          "seconds": 0.9242162079999998
+        },
+        {
+          "name": "tracing",
+          "code": 0,
+          "seconds": 0.25463633300000055
+        }
+      ]
+    }
+  },
+  "retry_provenance": {
+    "first_runs": {
+      "mac": {
+        "failed_step": 4,
+        "reason": "cfg(test) VFS fixture initialization style",
+        "summary_sha256": "901e5b8ce27a6a0cd0a5ebec477f66f931df29c88457e5153353e11e8ae3c678"
+      },
+      "linux": {
+        "failed_step": 4,
+        "reason": "cfg(test) VFS fixture initialization style",
+        "summary_sha256": "02c928d74e434221513d180bd32874c2d92ba5809c4f7d996f29924c3488af4b"
+      }
+    },
+    "linux_reused_checks": [
+      "process-all",
+      "ffi-all",
+      "core-clippy"
+    ],
+    "linux_retry_reason": "Only cfg(test) VFS fixture initialization style changed after a strict lint failure. Production/core/FFI inputs are unchanged.",
+    "note": "Only a cfg(test) VFS fixture initialization changed after strict lint. Final runtime workflows pass all seven steps; unchanged passing Linux process/core/FFI checks are reused. Initial logs are retained."
+  },
+  "source_sha256": {
+    "runtime/crates/trames-linux/src/direct/file_tests.rs": "45a4945a82b7d4e6be7163535a0a06d1ae748a393f8a137c93fb31c5c33be8aa",
+    "runtime/crates/trames-linux/src/direct/namespace.rs": "4105efe71841aa2bea74e40e8e81c3919163627b4eade1fb7faf36124df801fb",
+    "runtime/crates/trames-linux/src/state.rs": "3d0715e70166a546eb8f085024234abe4dd5f7d52c98b3f68394f25a6352e6ea",
+    "runtime/crates/trames-session/src/process.rs": "9460268f95a2a968883ae2aa1c531206e583d1fdd08c9e160378bd9614a5aa39",
+    "runtime/crates/trames-session/src/process_memfd_tests.rs": "ea74b4867e676d9fbd3ba11a7addaf374ee09b673dc17070f97aefbd954d2472",
+    "runtime/crates/trames-vfs/src/lib.rs": "631b69c72febe11cea176924d68a59632f8bf70abcfbe5fffa199e3f6dc7aa40",
+    "runtime/crates/trames-vfs/src/memfd.rs": "0e1743078dd6a3cc79d7d522da519dc6b853e4c6d9e85a698973094b1627fd07",
+    "runtime/crates/trames-vfs/src/memfd_source_tests.rs": "445d519c462817cf5bb4c59968ba79522d01a052277f2a3ff2c1711301623e7d",
+    "runtime/crates/trames-vfs/src/namespace_work.rs": "bbb0f12c9254bb792c8424aaae3ea88375726034e2abc3fb38ed92476cd977ab"
+  },
+  "mac_native_fixture_sha256": "53430cdf6e3c14e2bdaa03a025da04c02a05a70afe2a9e960a2bf3ae345b07b5",
+  "deployment": {
+    "channel": "Mac Dev only",
+    "runner": "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+    "signature_verified": true,
+    "stable_unchanged": true,
+    "physical_ipad_unchanged": true,
+    "business_environments_unchanged": true
+  },
+  "validation_notes": [
+    "Both local runtime workflows pass seven steps. Each host passes 449 process regressions (two intentionally ignored), ten FFI cases and strict lint. Both iPad SDK targets compile.",
+    "The prior connected process fixture returns its first memfd_create before its completion marker. Final four/twelve-CPU, one-slot and seccomp ALLOW configurations finish in one cohort with no returned syscall/service and exactly two real mmap/unmap scopes.",
+    "The signed native prior four-CPU fixture produces correct per-thread results and exact DCBAoad bytes, then fails only its one-cohort assertion: eight cohorts, eight returned memfd_create and one returned clone. Final four/twelve-CPU cases finish in one cohort with no returned syscall/service; actual scoped mmap/unmap coordination remains and is recorded, not hidden.",
+    "Original FD reuse, credentials/name capture through handoff, concurrent real inode/FD limits, native failure/unwind, sparse accounting, seals, aliases, raw guest mapped stores and last-close lifetime are covered together.",
+    "Mac development gates 1-8 and 70 signed hardware cases pass. Separate Dev build/install/signature and installed init at one/four/twelve CPUs plus host control/tracing at twelve CPUs pass. Stable build/package gates and physical iPad installation are outside this round."
+  ],
+  "remaining": [
+    "Other final cold SVC/native-resource dispatch not completed or parked by a source scope.",
+    "Genuinely absent original resource/wait bindings, including both retained io_uring maintenance escalation sites.",
+    "Actual host cancellation/deadline/shutdown and final backend/session teardown.",
+    "Initial/standalone/capability-less orchestration."
+  ],
+  "limits": [
+    "Four broad categories remain; this is not a completed coordinator-removal goal or an exhaustive count of concrete residual triggers.",
+    "Anonymous memory-file creation no longer requires a joined owner on the admitted original resource graph. Actual mapping/backing mutation keeps its affected mm scopes.",
+    "No twelve-CPU baseline, production fallback frequency, application throughput or Firefox latency improvement is claimed."
+  ]
+}

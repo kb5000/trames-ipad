@@ -1,36 +1,48 @@
 # Coordinator dependency audit
 
-## Current status — 2026-11-09
+## Current status — 2026-11-10
 
-Through stage 90 the broad remaining count is **four**, unchanged from stage 89.
-This counts actual boundary classes, not historical subsystem headings.
+Through stage 95 the broad remaining count is **four**, unchanged from stage 90.
+Concrete dependencies have been removed inside those classes; the class count
+alone does not measure that progress. It is not an exhaustive count of remaining
+syscalls, providers or actual production fallback frequency.
 
 | Remaining class | Current boundary | Concrete change this round |
 | --- | --- | --- |
-| Host control and final teardown | Actual cancellation/deadline/shutdown, native-event failure and final CPU/session drain | Unchanged |
-| Missing capabilities and excluded resources | Original absent providers/excluded bodies; two submitter-scoped io_uring maintenance setters remain | Published global proc/sys metadata now retains its actual original resource without requiring a typed live ProcSource |
-| Final execution dispatch | SVC/HLT/fault not completed, parked or accepted by a source scope | Old global metadata OFDs support ordinary FileWork reads, io_uring and existing namespace errors on the caller |
-| Initial/legacy orchestration | Initial admission and standalone/capability-less scheduling | Normal dormant Futex/Sleep admission stays source-owned |
+| Host control and final teardown | Actual cancellation/deadline/shutdown, native-event failure and final CPU/session drain | Still present; ordinary pause/resume, supervision and guest exit are already source-owned |
+| Missing capabilities and excluded resources | Original absent providers/excluded bodies; two submitter-scoped io_uring maintenance setters remain | Stages 90–91 close original global metadata and accepted request-body resource dependencies; genuine missing waits/providers remain |
+| Final execution dispatch | SVC or cold native-resource operation not completed, parked or accepted by a source scope | Stages 92–95 close recognized guest faults, residual FD status/seals/errors, blocking file locks/deadlock relations and anonymous memory-file creation |
+| Initial/legacy orchestration | Initial admission and standalone/capability-less scheduling | Still present; ordinary live and dormant member admission no longer depends on it |
 
-Stage 90 closes the original published global proc/sys resource dependency.
-Private legacy resolvers retain the same synchronized publication; file descriptions
-use the common FileWork path for reads. Later publication/provider updates, original
-OFD identity, registered/linked io_uring, completion/cancellation and last close are
-covered together. No copied owner VFS/Files table, resource service, polling bus,
-new unsafe trait implementation or ordinary guest-memory fence is added.
+Recent signed native fixtures demonstrate concrete path removal. Each old
+baseline below is four CPUs; each final fixture passes at both four and twelve.
+These are separate workloads, not cumulative or comparable throughput scores.
 
-The signed four-CPU baseline uses five cohorts and four returned preads. Final
-four/twelve-CPU runs use one cohort with zero returned syscall or service. The cold
-native fixture still retains its one real read from an explicitly unavailable source
-provider, preserving its two-cohort setup/wake coverage.
+| Connected subsystem | Prior cohorts / returned calls | Final cohorts / returned calls |
+| --- | --- | --- |
+| FD status, authority and inode seals (93) | 38 / 60 fcntls and one clone | 1 / none |
+| File locks, blocking waits and deadlock relations (94) | 23 / 19 fcntls, 11 flocks and one clone | 1 / none |
+| Anonymous memory-file creation and lifetime (95) | 8 / 8 memfd_create and one clone | 1 / none |
+
+Actual mapping/backing mutation still synchronizes its affected original mm and
+is not counted as a removed scope. The final native memfd fixture records seven
+such scopes at four CPUs and 21 at twelve CPUs; its guest mmap/unmap work remains.
+The explicitly unavailable-provider dormant fixture still returns its real read.
+
+A concrete remaining final-dispatch audit target is msync (AArch64 syscall 227):
+the implemented body is in Linux state dispatch and is not admitted by the
+worker's vm/custody classification. Its connected mapped-backing/writeback
+dependencies have not been migrated or validated by stage 95. The generic
+fallback and two io_uring maintenance escalation sites remain reachable; neither
+has been renamed away to reduce the count.
 
 The [shared inventory](../../runtime/docs/architecture/coordination-boundaries.md#current-remaining-categories)
-and [stage 90 record](../validation/published-proc-20261109.json) are current.
-Mac and ARM64 Linux each pass 441 process regressions (two intentionally ignored),
-both complete runtime workflows pass, and iPad device/simulator compilation passes.
-Mac Dev alone is updated; stable 1.5.4, business environments and physical iPad
-installations retain their versions. The io_uring subsystem is not fully closed:
-both maintenance escalation sites remain for actual missing/excluded capabilities.
+and [stage 95 record](../validation/memfd-source-20261110.json) carry current
+boundaries and evidence. Both local runtime workflows pass all seven steps.
+Mac and ARM64 Linux each pass 449 process regressions (two intentionally ignored)
+and ten FFI cases; both iPad SDKs compile. All 70 signed native cases and Mac
+development gates 1–8 pass. Mac Dev alone is updated; stable 1.5.4, business
+environments and physical iPad installations retain their versions.
 The overall removal goal remains active.
 
 ### Stage 81 read-only memory observations (historical)
@@ -5807,3 +5819,65 @@ Only Mac Dev is updated. Stable 1.5.4, business environments and physical iPad
 installs retain their versions. Four broad categories remain, including both
 actual io_uring maintenance escalation sites; supported file locking is removed
 from final joined execution, not every genuinely absent provider or legacy route.
+
+
+## 95. Original anonymous memory-file construction and publication — 2026-11-10
+
+Runtime `3a5a0e2b27a724e73258c4c39083cceb48de9b7e` closes memfd_create,
+whose data, mapping, seal and alias consumers were already source-owned while
+creation still returned to joined Linux dispatch. This connected unit includes
+original Files publication, live inode/descriptor limits, native backing creation,
+accepted completion/cancellation and final backing lifetime.
+
+Source and solo share owned name/flags import and canonical error ordering.
+Invalid guest inputs finish before native scheduling. Accepted FileWork retains
+the actual original Files, filesystem, credentials and shared budget, with no
+path operands, mount-administration lease or temporary owner task. Guest name
+unmapping, credential changes, FD reuse and handoff cannot redirect completion.
+
+One shared descriptor reservation and a real unpublished inode enforce original
+live limits. The filesystem guard is released before native create/unlink/stat;
+only the private inode is locked to install its completed backing. Native work
+parks on the existing disk pool and returns the execution slot. Failure/unwind
+releases the inode, reservation and backing. Concurrent creations cannot admit
+against stale snapshots or overwrite the same FD. The already caller-owned
+io_uring backing constructor shares this lock split; this stage does not claim
+a new io_uring setup migration. Empty and one-GiB sparse files retain the existing
+physical accounting; writes and last-close release use original backing lifetime.
+No coordinator/resource thread, polling bus, global native lock, production unsafe
+block or ordinary guest-memory check/fence is added.
+
+The connected guest test covers invalid/valid creation, sparse truncate,
+write/pread, shared mmap, raw guest ARM store, unmap, seals, dup, close and FD reuse,
+then verifies exact DCBAoad bytes, original alias identity and anonymous inode
+release. The old runtime returns its first creation before the marker. Final
+four/twelve-CPU, one-slot and seccomp ALLOW configurations complete in one cohort
+with no returned syscall/service and two real original-mm mmap/unmap scopes.
+An independent actor also completes. Unit coverage includes concurrent live limits,
+name/credential capture through handoff, sparse accounting, final accepted-OFD
+release, backend failure and unwind. The backing callback verifies the filesystem
+lock is available while the original reserved resources remain accounted.
+
+The signed native baseline completes correct per-thread results but needs
+**eight cohorts, eight returned memfd_create and one returned clone** on four CPUs.
+Final four/twelve-CPU execution completes in **one cohort with no returned syscall
+or service**. Actual mapping scopes remain: seven at four CPUs and 21 at twelve.
+These counts are recorded rather than treating scoped mmap/unmap as eliminated.
+There is no twelve-CPU baseline or measured application throughput claim.
+
+Both local runtime workflows pass seven steps. Mac and ARM64 Linux each pass
+449 process regressions (two intentionally ignored), ten FFI cases and strict
+lint; both iPad SDK targets compile. Initial strict lint on each host found only
+a new cfg(test) fixture initialization-style issue. Initial logs are retained;
+the fixture was corrected, final runtime workflows pass, and unchanged Linux
+process/core/FFI results are reused. Mac development gates 1–8 and 70 signed
+hardware cases pass. Separate Dev build/install/signature and installed init at
+one/four/twelve CPUs plus host control/tracing at twelve CPUs pass. Full source,
+binary and retry provenance is in the
+[validation record](../validation/memfd-source-20261110.json).
+
+Only Mac Dev is updated. Stable 1.5.4, business environments and physical iPad
+installs retain their versions. Four broad categories and both actual io_uring
+maintenance escalation sites remain. The current-status table now names recent
+concrete removals separately from the unchanged umbrella count and identifies
+mapped-file msync/writeback as an actual remaining final-dispatch audit target.
