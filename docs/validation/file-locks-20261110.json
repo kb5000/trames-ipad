@@ -1,0 +1,274 @@
+{
+  "stage": 94,
+  "date": "2026-11-10",
+  "overall_goal": "active",
+  "runtime_revision": "8b4c97bfac5d086c2868db9a7c4f2f6d4e88f36d",
+  "prior_runtime": "76f91c36976fbdc95cf1f5790427d311be629898",
+  "scope": "Complete original file-lock execution: POSIX/OFD range control and blocking waits, whole-file/directory flock, common ABI, original inode notifications, accepted range/lifetime, source/solo deadlock relations and cold waiter admission.",
+  "audit_correction": "Stage 93 wording about existing record-lock waits was too broad. Nonblocking controls were source-owned, but F_SETLKW/F_OFD_SETLKW still retried through Kernel and POSIX deadlock detection scanned its process map. Stage 94 removes this actual connected owner dependency.",
+  "architecture": {
+    "resources": "RecordFile retains the original shared OFD, registry and PID visibility. Source/solo control/preparation share one ABI. Existing prepared regular-file queries/updates retain their fast data route; SEEK_CUR reads the same committed original position as solo without waiting for unrelated byte I/O.",
+    "waits": "Imported normalized ranges and original inode/OFD survive guest input mutation, numeric FD reuse and cohort handoff. Existing source workers subscribe then retry; inode unlock/downgrade/process release/final OFD release notify after resource locks. Readiness is lazy per actual waiting inode; no CPU slot is held while waiting.",
+    "deadlock": "Only contended POSIX waits publish weak original range/inode edges. Registration and cycle detection use the original shared registry graph, including source/solo callers and multiple waiting threads per process. Cancellation removes exactly its accepted edge. Normal lock operations never take the graph mutex. OFD waits do not enter POSIX deadlock detection.",
+    "flock": "Directory/opaque descriptions use their actual shared flock owner and full original OFD rather than regular-file data eligibility. Native subscriptions and canonical FD/operation/error ordering remain. Already accepted owner-style descriptions retain their own shared lifetime.",
+    "no_new": [
+      "coordinator/resource/service thread",
+      "polling bus",
+      "global native execution lock",
+      "production unsafe block",
+      "ordinary guest-memory permission/check/fence",
+      "fake errno or capability to suppress a fallback"
+    ]
+  },
+  "baselines": {
+    "process": {
+      "runtime_revision": "76f91c36976fbdc95cf1f5790427d311be629898",
+      "checks": [
+        {
+          "name": "process",
+          "code": 101,
+          "seconds": 19.47997725,
+          "output": "warning: unused workspace dependency `trames-native`\n  --> Cargo.toml:17:1\n   |\n17 | trames-native = { path = \"runtime/crates/trames-native\" }\n   | ^^^^^^^^^^^^^\n   |\n   = note: `cargo::unused_workspace_dependencies` is set to `warn` by default\nhelp: consider removing the workspace dependency `trames-native`\nwarning: workspace (manifest) generated 1 warning\n   Compiling trames-session v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-session)\n   Compiling trames-vfs v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-vfs)\n   Compiling trames-linux v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-linux)\n   Compiling trames-kernel v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-kernel)\n   Compiling trames-core v1.5.4 (/Users/main/dev/trames/crates/trames-core)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 18.63s\n     Running ../../runtime/crates/trames-session/src/lib.rs (target/debug/build/trames-core/73ea467a4920ade2/out/kernel_conformance-73ea467a4920ade2)\n\nrunning 2 tests\ntest process::lock_tests::posix_deadlock_graph_spans_original_workers_and_releases_the_surviving_waiter ... file-lock CPUs=4 slots=4 filter=false cohorts=1 returned={25: 1}\n\nthread 'process::lock_tests::posix_deadlock_graph_spans_original_workers_and_releases_the_surviving_waiter' (28078049) panicked at crates/trames-core/../../runtime/crates/trames-session/src/process_lock_tests.rs:67:9:\nassertion `left == right` failed\n  left: [0, 0, 0, 0]\n right: [1, 0, 0, 0]\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\nFAILED\ntest process::lock_tests::posix_ofd_and_directory_flock_contention_completes_on_original_source_workers ... file-lock CPUs=4 slots=4 filter=false cohorts=1 returned={25: 1}\n\nthread 'process::lock_tests::posix_ofd_and_directory_flock_contention_completes_on_original_source_workers' (28078051) panicked at crates/trames-core/../../runtime/crates/trames-session/src/process_lock_tests.rs:67:9:\nassertion `left == right` failed\n  left: [0, 0, 0, 0]\n right: [1, 0, 0, 0]\nFAILED\n\nfailures:\n\nfailures:\n    process::lock_tests::posix_deadlock_graph_spans_original_workers_and_releases_the_surviving_waiter\n    process::lock_tests::posix_ofd_and_directory_flock_contention_completes_on_original_source_workers\n\ntest result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 447 filtered out; finished in 0.02s\n\nerror: test failed, to rerun pass `-p trames-core --test kernel-conformance`\n"
+        }
+      ]
+    },
+    "signed_native": {
+      "runtime_revision": "76f91c36976fbdc95cf1f5790427d311be629898",
+      "code": 101,
+      "output": "\nrunning 1 test\ntest session::tests::original_posix_ofd_and_directory_locks_complete_without_joined_native_dispatch ... hardware file-lock CPUs=4 exit=0 cohorts=23 returned={25: 19, 32: 11, 220: 1}\n\nthread 'session::tests::original_posix_ofd_and_directory_locks_complete_without_joined_native_dispatch' (28075126) panicked at crates/trames-mac/src/session.rs:1803:13:\nassertion `left == right` failed\n  left: 23\n right: 1\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\nFAILED\n\nfailures:\n\nfailures:\n    session::tests::original_posix_ofd_and_directory_locks_complete_without_joined_native_dispatch\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 37 filtered out; finished in 0.03s\n\n"
+    }
+  },
+  "checks": {
+    "workflows": {
+      "runtime_macos": {
+        "passed": 7,
+        "total": 7,
+        "sha256": "5830aae0b01fdbdd768af131b69c1531ac4b5d71713e2fbd4caa6aec07161cd9"
+      },
+      "runtime_linux": {
+        "passed": 7,
+        "total": 7,
+        "sha256": "10c4c4a67e05a40bfd18d508b60c5e4774eab8b2ac0f98fe1d115e7ba41eac45"
+      },
+      "mac_product": {
+        "passed": 8,
+        "total": 12,
+        "sha256": "c9df53b04b9d86c21003a7a97ca6d75efff9bebfb04505348df18bbe96a015ba"
+      }
+    },
+    "macos": [
+      {
+        "name": "runtime-mac",
+        "code": 0,
+        "seconds": 23.847693917
+      },
+      {
+        "name": "kernel-conformance",
+        "code": 0,
+        "seconds": 29.919480958
+      },
+      {
+        "name": "ffi",
+        "code": 0,
+        "seconds": 12.734888958999996
+      },
+      {
+        "name": "core-clippy",
+        "code": 0,
+        "seconds": 8.127531000000005
+      },
+      {
+        "name": "ffi-clippy",
+        "code": 0,
+        "seconds": 0.6475815000000011
+      },
+      {
+        "name": "ipad-compile",
+        "code": 0,
+        "seconds": 10.804683834000002
+      }
+    ],
+    "linux": [
+      {
+        "name": "process-all",
+        "code": 0,
+        "seconds": 71.767627074
+      },
+      {
+        "name": "ffi-all",
+        "code": 0,
+        "seconds": 15.311499506999994
+      },
+      {
+        "name": "core-clippy",
+        "code": 0,
+        "seconds": 8.303352504000003
+      },
+      {
+        "name": "runtime-ci",
+        "code": 0,
+        "seconds": 58.010150241000005
+      }
+    ],
+    "process": {
+      "macos": {
+        "passed": 448,
+        "ignored": 2,
+        "sha256": "1c9fd5acb33ff076acf44a1b76fb6d2460cb55d3217926621cd75db83f97d193"
+      },
+      "linux": {
+        "passed": 448,
+        "ignored": 2,
+        "sha256": "9f332dc714f3780ad7c9fd0d65358378b1b2ce837e064eccf4a5d1046674df8c"
+      }
+    },
+    "ffi": {
+      "macos": {
+        "passed": 10,
+        "ignored": 0,
+        "sha256": "aea343c84cc635168ce6ab263ad2513d1d4c793a6c55c9860348882fdeb246fd"
+      },
+      "linux": {
+        "passed": 10,
+        "ignored": 0,
+        "sha256": "83eaae0bb41bafa7240e6b7e8f80f8f4b2721deedcefa4605cfda3869e0d8822"
+      }
+    },
+    "ipad": [
+      {
+        "target": "aarch64-apple-ios",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+        "code": 0
+      },
+      {
+        "target": "aarch64-apple-ios-sim",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk",
+        "code": 0
+      }
+    ],
+    "hardware": {
+      "passed": true,
+      "runtime_revision": "8b4c97bfac5d086c2868db9a7c4f2f6d4e88f36d",
+      "rows": [
+        {
+          "target": "trames-mac-run",
+          "executable_sha256": "8e3e3ee7207e160a537a0c313072e17a1ec5f982676be4331323363134a50253",
+          "exit": 0,
+          "passed_tests": 17
+        },
+        {
+          "target": "trames_hvf",
+          "executable_sha256": "e298b8717aea2e65d78ad23adc95590331c61f9779bb7517809c31ff8583ed4d",
+          "exit": 0,
+          "passed_tests": 52
+        }
+      ]
+    },
+    "process_regressions": [
+      "posix_ofd_and_directory_flock_contention_completes_on_original_source_workers",
+      "posix_deadlock_graph_spans_original_workers_and_releases_the_surviving_waiter",
+      "one_runnable_actor_admits_an_original_record_wait_and_releases_it_on_source"
+    ],
+    "common_regressions": [
+      "posix_wait_graph_detects_cycles_and_cancellation_removes_only_its_original_edge",
+      "concurrent_posix_wait_registration_cannot_publish_both_sides_of_a_cycle",
+      "original_record_wait_wakes_on_downgrade_close_and_release_without_fd_relookup",
+      "ofd_waits_keep_the_original_description_and_do_not_enter_posix_deadlock_detection",
+      "accepted_record_wait_keeps_its_original_range_file_and_owner_across_handoff",
+      "original_source_and_solo_waits_share_one_deadlock_graph",
+      "all_range_lock_commands_preserve_source_solo_error_and_pointer_precedence",
+      "worker_conflict_pid_and_faults_match_owner_without_partial_effects"
+    ],
+    "native_prior": {
+      "cpus": 4,
+      "cohorts": 23,
+      "returned_syscalls": {
+        "25": 19,
+        "32": 11,
+        "220": 1
+      },
+      "guest_results_correct": true
+    },
+    "native_final": {
+      "cpus": [
+        4,
+        12
+      ],
+      "cohorts": 1,
+      "returned_syscalls": {},
+      "guest_results_correct": true
+    },
+    "native_log_sha256": "8d63734eab905fb6603f182253ebf0aefe1a595a1cbed675125a2608ebc8df23",
+    "installed": {
+      "version": "Trames Dev 1.5.4 (dev) runtime 8b4c97bfac5d086c2868db9a7c4f2f6d4e88f36d",
+      "runner_sha256": "81a9e4be4004a0ed2e55486887e5610533d1cee205480eda06a31c171ef67717",
+      "stable_sha256": "8fc21435034e8c041632e2e50419da9d2123bf790aedb0a1499286fc8367e614",
+      "stable_unchanged": true,
+      "checks": [
+        {
+          "name": "init",
+          "code": 0,
+          "seconds": 3.324269166
+        },
+        {
+          "name": "host",
+          "code": 0,
+          "seconds": 0.8324395410000003
+        },
+        {
+          "name": "tracing",
+          "code": 0,
+          "seconds": 0.3138844589999996
+        }
+      ]
+    }
+  },
+  "source_sha256": {
+    "runtime/crates/trames-linux/src/direct.rs": "0af16028be0dc42d03fe4018975fae1980b9439e2d2c5d266f84c00b76ca3e68",
+    "runtime/crates/trames-linux/src/direct/aio.rs": "a04b66abf6424c493b3e350eed9f1b9dc308283a642fa3e44ff1f7b16d82a999",
+    "runtime/crates/trames-linux/src/direct/file.rs": "98daf03cbcb92b00f61c39416605dea5c8e87e3fcbe3f89f77ead223b69e83b3",
+    "runtime/crates/trames-linux/src/direct/lock_tests.rs": "79a78579634c5c531bdf218c965201f6139292765f12fe8f725aa95bc23abb73",
+    "runtime/crates/trames-linux/src/direct/locks.rs": "ad00a0ae3a4e55bbb134bd129050743954b756031688b3ec32fbb47327d340b1",
+    "runtime/crates/trames-linux/src/direct/socket_wait.rs": "0a021f035bd921653fe04a7652409b8d91877ffb8a7312e32e0d084a2c472ae2",
+    "runtime/crates/trames-linux/src/direct/uring.rs": "8e89f83a9e2bab8583623561b6eddf558e9e1992764398c33597af510ba32423",
+    "runtime/crates/trames-linux/src/record_locks.rs": "87c9f57c3581a43d85b6ac37020a9e8cd1de79cb05733bd1052d013427b31336",
+    "runtime/crates/trames-linux/src/state.rs": "b7765e5da70d6d741a2810c5fc48e028effb65327e5f3f4890021facffed073c",
+    "runtime/crates/trames-session/src/process.rs": "7735ac416adc7ddcfef940a3b7be29f147e78a6be8418444245418d4ca1c8bb1",
+    "runtime/crates/trames-session/src/process_dispatch.rs": "a82d29d4227c11989bef840380b0b18ada7387afbd0208280eeb38f7e3b37bb9",
+    "runtime/crates/trames-session/src/process_lock_tests.rs": "e40f42d46e5d6cc42689a5c20d387ae3a200a136525771c7a8563fb549553640",
+    "runtime/crates/trames-session/src/run_queue.rs": "d2111b44b83e86e9d6543883e5010c6b480e47402fdb10a0befefa9dc928d22f",
+    "runtime/crates/trames-session/src/workers.rs": "2b6c36bcbb4e4caf054934def7b01a26e24c91c4bd219c9e29d385359cebfd1b",
+    "runtime/crates/trames-vfs/src/file_io.rs": "9a27505e81802cae24d2bc8bf765862366d6e97276cae6b5044af31311598a68",
+    "runtime/crates/trames-vfs/src/flock.rs": "1da29d597ce05a0bafc5e63a88e60d493c463f8bc8728bab9359886d4fc78029",
+    "runtime/crates/trames-vfs/src/lib.rs": "8bb85eb4bdcf6fbfff089de130850e0d03551cb81cc63dcc772a0fa8124a0dc7",
+    "runtime/crates/trames-vfs/src/lock_wait_tests.rs": "dd15102c61e2a21da2a09300407a5708dae03f7f15e3714df10ae9e67389e52e",
+    "runtime/crates/trames-vfs/src/locks.rs": "42824cca1ff1a5b4e5b3dd1d27db7a25772e36b740650a3b03ebcf10c23dc479"
+  },
+  "mac_native_fixture_sha256": "45c1c940782c149bcfce01b3aa247eba7e04d4d148a6a8980614cbab909a141c",
+  "deployment": {
+    "channel": "Mac Dev only",
+    "runner": "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+    "signature_verified": true,
+    "stable_unchanged": true,
+    "physical_ipad_unchanged": true,
+    "business_environments_unchanged": true
+  },
+  "validation_notes": [
+    "Both runtime workflows pass all seven steps with matching final Rust fingerprints. Each host passes 448 process regressions (two intentionally ignored), ten FFI cases and strict lint. Both iPad SDKs compile.",
+    "Both connected process tests fail against prior production before completion markers. Final POSIX/OFD/directory flock contention and real cross-process deadlock cases cover four/twelve CPUs, one slot and seccomp ALLOW in one cohort without returned syscalls, services or mapping checkpoints. A separate single-runnable-actor fixture admits a previously blocked original record wait.",
+    "The signed native baseline completes correct guest results, then fails only its one-cohort assertion: four CPUs use 23 cohorts, 19 returned fcntls, 11 returned flocks and one returned clone. Final four/twelve-CPU execution uses one cohort and no returned syscall. It checks all range families, directory flock, canonical invalid cases and original post-exit inode observations. Native contention/lifetime also retains the existing product and shared process coverage. No twelve-CPU baseline or controlled throughput gain is claimed.",
+    "The initial macOS runtime run found one historical assertion explicitly requiring supports_call(F_SETLKW) to be false. It is replaced by positive real blocked-record and EFAULT checks plus an explicit genuine missing-registry boundary check. Initial failure logs are retained; the final runtime workflow passes all seven steps on the final source.",
+    "Mac development gates 1-8 and 69 signed hardware cases pass; Dev build/install/signature and installed init/host/tracing acceptance pass separately. Stable build/package gates and physical iPad installation are outside this Dev-only coordinator round."
+  ],
+  "remaining": [
+    "Other final cold SVC/native-resource dispatch not completed or parked by a source scope.",
+    "Genuinely absent original resource/wait bindings, including both retained io_uring maintenance escalation sites.",
+    "Actual host cancellation/deadline/shutdown and final backend/session teardown.",
+    "Initial/standalone/capability-less orchestration."
+  ],
+  "limits": [
+    "Four broad categories remain; the full coordinator-removal objective is active.",
+    "Supported file-lock execution no longer needs a joined owner, but genuinely absent lock/Files capabilities retain their before-effects boundary. Solo dispatch runs on its existing calling executor.",
+    "No application throughput, production fallback frequency or Firefox latency improvement is inferred from cohort counts."
+  ]
+}

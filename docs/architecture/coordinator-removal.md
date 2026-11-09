@@ -5731,3 +5731,79 @@ and initial/legacy orchestration. Both actual io_uring maintenance escalation
 sites remain. Status, seals and canonical unknown fcntl errors no longer belong
 to final dispatch for the admitted original resource graph; this is not a claim
 that every excluded legacy FD/lock/path embedding is now admitted.
+
+
+## 94. Original file locks, blocking range waits and deadlock relations — 2026-11-10
+
+Runtime `8b4c97bfac5d086c2868db9a7c4f2f6d4e88f36d` migrates the connected
+file-lock subsystem: POSIX/OFD range controls and blocking waits, whole-file and
+directory flock, original accepted ranges, inode wakeups, cancellation/lifetime,
+cold waiter admission and source/solo deadlock relations.
+
+The audit corrects stage 93's broad wording about existing record-lock waits.
+Only nonblocking range controls were source-owned then. F_SETLKW and
+F_OFD_SETLKW still returned to Kernel, retried through Process and, for POSIX
+deadlocks, scanned the coordinator's process map. That real dependency is now
+removed rather than reclassified as a missing generic capability.
+
+One original shared OFD and its lock registry/PID visibility supply source and
+solo through a common control/preparation ABI. Pointer access, lock kind/ranges,
+access mode, O_PATH, FD errors, OFD ownership and visible conflict PIDs retain
+canonical ordering. Prepared regular-file queries/updates keep their existing
+fast data path; SEEK_CUR observes the same original committed offset as solo,
+without joining merely because another byte operation is pending. Ordinary guest
+memory access receives no new policy, borrow, lock or fence.
+
+Contended waits retain the imported normalized range, original OFD and inode.
+They subscribe before retrying, release the execution slot and rebind only their
+wake target across handoff. Guest input edits, FD close/reuse and namespace
+projection changes cannot redirect the accepted operation. Unlock, downgrade,
+process-lock release and final OFD release notify after dropping resource locks.
+Inode readiness is allocated only for an actual waiter. A previously blocked
+record request can join the existing execution queue beside a related runnable
+actor; it no longer requires an owner retry before that actor can release it.
+
+Only contended POSIX waits enter the original shared deadlock graph. Weak edges
+name actual inode/range requests, so cancellation removes exactly one accepted
+wait and holder changes are read live. Multiple waiting threads per process are
+retained. Registration and cycle checking share the graph mutex, preventing two
+opposing source requests from both missing their cycle. OFD waits do not enter
+POSIX detection. Uncontended lock operations, queries and release never acquire
+that mutex. No new coordinator/resource thread, global native execution lock,
+polling bus or production unsafe block is added.
+
+Directory/opaque flock now consumes its full original OFD independently of
+regular-file data eligibility. Native lock subscriptions and invalid operation/FD
+ordering remain shared. Accepted owner-style descriptions retain their actual
+shared file lifetime rather than relying on a separate stopped owner lease.
+Genuine missing original lock/Files capabilities still defer before effects.
+
+Two connected process regressions fail against prior production. Final tests
+exercise POSIX/OFD competition, directory flock and a real cross-process deadlock
+at four/twelve CPUs, one slot and seccomp ALLOW, finishing in one cohort with no
+returned syscall, service or mapping checkpoint. Additional tests cover cold
+wait admission, concurrent deadlock registration, multiple waits per process,
+source/solo mixed cycles, cancellation, range/offset mutation, FD reuse,
+downgrade/last-close release and all range commands' error/pointer precedence.
+
+The signed native baseline returns correct results but requires **23 cohorts,
+19 returned fcntls, 11 returned flocks and one returned clone** at four CPUs.
+Final four/twelve-CPU runs need **one cohort and no returned syscall or service**.
+No twelve-CPU baseline, production fallback frequency or controlled throughput
+improvement is claimed. Existing native contention and lifetime coverage remains.
+
+Both local runtime workflows pass all seven steps. macOS and ARM64 Linux each
+pass 448 process regressions (two intentionally ignored), ten FFI cases and
+strict lint; both iPad SDK targets compile. The first macOS workspace run found
+one historical assertion requiring blocking fcntl admission to be false. It now
+checks real blocked-record behavior, EFAULT and genuine missing-registry
+admission; initial failure logs are retained and final validation passes.
+Mac development gates 1–8, 52 signed HVF and seventeen product hardware cases
+pass. Dev build/install/signature and installed init at one/four/twelve CPUs plus
+host control/tracing at twelve CPUs pass. Exact fingerprints and boundaries are
+in the [validation record](../validation/file-locks-20261110.json).
+
+Only Mac Dev is updated. Stable 1.5.4, business environments and physical iPad
+installs retain their versions. Four broad categories remain, including both
+actual io_uring maintenance escalation sites; supported file locking is removed
+from final joined execution, not every genuinely absent provider or legacy route.
