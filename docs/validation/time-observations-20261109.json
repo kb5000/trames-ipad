@@ -1,0 +1,360 @@
+{
+  "stage": 89,
+  "date": "2026-11-09",
+  "overall_goal": "active",
+  "runtime_revision": "0c736ffe1efb13c2bd504eb9b2f9391b931d0c18",
+  "prior_runtime": "3d91b02ae28766f4307c0a4691bab8162b412896",
+  "scope": "Complete implemented time observation family: gettimeofday, clock_gettime and clock_getres; source/solo ABI, source seccomp admission, guest output fault/null/overlap ordering and actual native vDSO realtime entry.",
+  "architecture": {
+    "execution": "Short time observations execute on the original calling worker. The standalone dispatch uses the same Linux ABI bodies; no joined syscall is required for gettimeofday, including its vDSO SVC.",
+    "clocks": "Realtime remains live host SystemTime. Session monotonic/raw/coarse epochs and boottime are unchanged. Immutable hardware-counter calibration is used only by the existing monotonic vDSO fast path; no stale extrapolated realtime page or recurring clock service is introduced.",
+    "memory": "The original Linux address limit and two-buffer preflight are retained for gettimeofday. Its seconds/microseconds/timezone write order, overlapping outputs, null destinations and existing errors are unchanged. Clock IDs retain their low-32-bit ABI and original preflight/null-resolution behavior.",
+    "no_new": [
+      "coordinator/resource/service thread",
+      "polling bus",
+      "global or per-time-call lock",
+      "production unsafe block",
+      "ordinary guest memory check/fence",
+      "new time-setting/accounting API"
+    ]
+  },
+  "baselines": {
+    "shared": {
+      "runtime_revision": "3d91b02ae28766f4307c0a4691bab8162b412896",
+      "checks": [
+        {
+          "name": "process",
+          "code": 101,
+          "seconds": 6.723936417,
+          "output": "warning: unused workspace dependency `trames-native`\n  --> Cargo.toml:17:1\n   |\n17 | trames-native = { path = \"runtime/crates/trames-native\" }\n   | ^^^^^^^^^^^^^\n   |\n   = note: `cargo::unused_workspace_dependencies` is set to `warn` by default\nhelp: consider removing the workspace dependency `trames-native`\nwarning: workspace (manifest) generated 1 warning\n   Compiling trames-session v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-session)\n   Compiling trames-linux v1.3.0 (/Users/main/dev/trames/runtime/crates/trames-linux)\n   Compiling trames-core v1.5.4 (/Users/main/dev/trames/crates/trames-core)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.97s\n     Running ../../runtime/crates/trames-session/src/lib.rs (target/debug/build/trames-core/73ea467a4920ade2/out/kernel_conformance-73ea467a4920ade2)\n\nrunning 1 test\ntest process::time_tests::time_observations_complete_on_source_with_faults_nulls_overlap_and_filter ... time CPUs=4 slots=4 filtered=false marker=[0, 0, 0, 0] cohorts=1 returned={169: 1}\n\nthread 'process::time_tests::time_observations_complete_on_source_with_faults_nulls_overlap_and_filter' (27683305) panicked at crates/trames-core/../../runtime/crates/trames-session/src/process_time_tests.rs:91:9:\nassertion `left == right` failed\n  left: [0, 0, 0, 0]\n right: [1, 0, 0, 0]\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\nFAILED\n\nfailures:\n\nfailures:\n    process::time_tests::time_observations_complete_on_source_with_faults_nulls_overlap_and_filter\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 441 filtered out; finished in 0.02s\n\nerror: test failed, to rerun pass `-p trames-core --test kernel-conformance`\n"
+        }
+      ]
+    },
+    "signed_native": {
+      "runtime_revision": "3d91b02ae28766f4307c0a4691bab8162b412896",
+      "code": 101,
+      "output": "\nrunning 1 test\ntest session::tests::time_observations_and_vdso_realtime_complete_on_original_native_workers ... hardware time CPUs=4 exit=0 cohorts=10 returned={169: 16, 220: 2}\n\nthread 'session::tests::time_observations_and_vdso_realtime_complete_on_original_native_workers' (27686458) panicked at crates/trames-mac/src/session.rs:1249:13:\nassertion failed: runtime.metrics.cohort_return_syscalls.is_empty()\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\nFAILED\n\nfailures:\n\nfailures:\n    session::tests::time_observations_and_vdso_realtime_complete_on_original_native_workers\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 32 filtered out; finished in 0.03s\n\n"
+    }
+  },
+  "checks": {
+    "workflows": {
+      "runtime_macos": {
+        "passed": 7,
+        "total": 7,
+        "sha256": "a80a33a9edf22b2aeeaeb745e44d07a8fa52c243acaffa9852510d8c327587b7"
+      },
+      "runtime_linux": {
+        "passed": 7,
+        "total": 7,
+        "sha256": "439641a596c366522cfff68c7352f422e2d60966ddaed38ab3ded098170964cc"
+      },
+      "mac_product": {
+        "passed": 8,
+        "total": 12,
+        "sha256": "0a4ce04563cfb24c94df31d9f1acfe720112ec93f17f6a40bd07eab2565ccfb8"
+      }
+    },
+    "macos": [
+      {
+        "name": "runtime-mac",
+        "code": 0,
+        "seconds": 17.048798584
+      },
+      {
+        "name": "kernel-conformance",
+        "code": 0,
+        "seconds": 10.792947583
+      },
+      {
+        "name": "ffi",
+        "code": 0,
+        "seconds": 3.947524625
+      },
+      {
+        "name": "core-clippy",
+        "code": 0,
+        "seconds": 1.6270454580000013
+      },
+      {
+        "name": "ffi-clippy",
+        "code": 0,
+        "seconds": 0.2393216249999952
+      },
+      {
+        "name": "ipad-compile",
+        "code": 0,
+        "seconds": 1.1426820000000006
+      }
+    ],
+    "linux": [
+      {
+        "name": "process-all",
+        "code": 0,
+        "seconds": 53.806024594000064
+      },
+      {
+        "name": "ffi-all",
+        "code": 0,
+        "seconds": 5.610485867999955
+      },
+      {
+        "name": "core-clippy",
+        "code": 0,
+        "seconds": 2.609004710000022
+      },
+      {
+        "name": "runtime-ci",
+        "code": 0,
+        "seconds": 55.16606294200005
+      }
+    ],
+    "process": {
+      "macos": {
+        "passed": 440,
+        "ignored": 2,
+        "sha256": "5a7234b8d2ab2bf1579db215823a899fa830a03c5724907abbcf4d8480f0b8c6"
+      },
+      "linux": {
+        "passed": 440,
+        "ignored": 2,
+        "sha256": "fb04e674d2c11e4fcf8ca231760ffa7f22764a08889d952bdb04eab87ad46d30"
+      }
+    },
+    "ffi": {
+      "macos": {
+        "passed": 10,
+        "ignored": 0,
+        "sha256": "7d1b68a595a3cad17124f7d9498bff57f219183d487a8458aac2c5b51c6df733"
+      },
+      "linux": {
+        "passed": 10,
+        "ignored": 0,
+        "sha256": "55136bba8175f48ec202e3925d9ecf49244a594545553e40a15e4e80513d13ce"
+      }
+    },
+    "ipad": [
+      {
+        "target": "aarch64-apple-ios",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+        "code": 0
+      },
+      {
+        "target": "aarch64-apple-ios-sim",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk",
+        "code": 0
+      }
+    ],
+    "hardware": {
+      "passed": true,
+      "runtime_revision": "0c736ffe1efb13c2bd504eb9b2f9391b931d0c18",
+      "rows": [
+        {
+          "target": "trames-mac-run",
+          "executable_sha256": "7910a2f8f6e51b1e68c9820e4540a5531e67707245aec3c379d6d1f2df2158c5",
+          "exit": 0,
+          "passed_tests": 12
+        },
+        {
+          "target": "trames_hvf",
+          "executable_sha256": "fd7a2c20cc6d0852543c12e2ee26ccbf3492e139023e020a4df035174ef9c772",
+          "exit": 0,
+          "passed_tests": 52
+        }
+      ]
+    },
+    "native_time": {
+      "cpus": [
+        4,
+        12
+      ],
+      "exit": 0,
+      "cohorts": 1,
+      "returned_syscalls": {},
+      "native_log_sha256": "171b01aefa20a764d9832d172eac82177f2e7955179f8393b465d9c38daf8d90"
+    },
+    "installed": {
+      "version": "Trames Dev 1.5.4 (dev) runtime 0c736ffe1efb13c2bd504eb9b2f9391b931d0c18",
+      "runner_sha256": "45a59a7c2c98f109cdca5067eb0392e29fe9000d7647668eb713b127779d1fcd",
+      "stable_sha256": "8fc21435034e8c041632e2e50419da9d2123bf790aedb0a1499286fc8367e614",
+      "stable_unchanged": true,
+      "checks": [
+        {
+          "name": "init",
+          "code": 0,
+          "seconds": 3.27506175
+        },
+        {
+          "name": "host",
+          "code": 0,
+          "seconds": 0.945549083
+        },
+        {
+          "name": "tracing",
+          "code": 0,
+          "seconds": 0.2568632089999996
+        }
+      ]
+    },
+    "new_process_regression": "time_observations_complete_on_source_with_faults_nulls_overlap_and_filter",
+    "new_shared_abi_regression": "realtime_preflights_both_buffers_and_preserves_overlap_and_null_abi",
+    "mqueue_bounded_repetitions": [
+      {
+        "iteration": 0,
+        "code": 0
+      },
+      {
+        "iteration": 1,
+        "code": 0
+      },
+      {
+        "iteration": 2,
+        "code": 0
+      },
+      {
+        "iteration": 3,
+        "code": 0
+      },
+      {
+        "iteration": 4,
+        "code": 0
+      },
+      {
+        "iteration": 5,
+        "code": 0
+      },
+      {
+        "iteration": 6,
+        "code": 0
+      },
+      {
+        "iteration": 7,
+        "code": 0
+      },
+      {
+        "iteration": 8,
+        "code": 0
+      },
+      {
+        "iteration": 9,
+        "code": 0
+      },
+      {
+        "iteration": 10,
+        "code": 0
+      },
+      {
+        "iteration": 11,
+        "code": 0
+      },
+      {
+        "iteration": 12,
+        "code": 0
+      },
+      {
+        "iteration": 13,
+        "code": 0
+      },
+      {
+        "iteration": 14,
+        "code": 0
+      },
+      {
+        "iteration": 15,
+        "code": 0
+      },
+      {
+        "iteration": 16,
+        "code": 0
+      },
+      {
+        "iteration": 17,
+        "code": 0
+      },
+      {
+        "iteration": 18,
+        "code": 0
+      },
+      {
+        "iteration": 19,
+        "code": 0
+      },
+      {
+        "iteration": 20,
+        "code": 0
+      },
+      {
+        "iteration": 21,
+        "code": 0
+      },
+      {
+        "iteration": 22,
+        "code": 0
+      },
+      {
+        "iteration": 23,
+        "code": 0
+      },
+      {
+        "iteration": 24,
+        "code": 0
+      },
+      {
+        "iteration": 25,
+        "code": 0
+      },
+      {
+        "iteration": 26,
+        "code": 0
+      },
+      {
+        "iteration": 27,
+        "code": 0
+      },
+      {
+        "iteration": 28,
+        "code": 0
+      },
+      {
+        "iteration": 29,
+        "code": 0
+      }
+    ]
+  },
+  "source_sha256": {
+    "runtime/crates/trames-linux/src/lib.rs": "e226e12f7b201c8bf11252d27686c8fa4769cf81e408895ac722b5e222ed0581",
+    "runtime/crates/trames-linux/src/state.rs": "d9825a7d62d866fe4eec4cdb7aefb76fcd0b1ab9694f9d4c5113c91f02a8f266",
+    "runtime/crates/trames-linux/src/time_read.rs": "88ac27ee73426258c0faf3952cfaf18c84e0403c53350eb93a5d3fb0b23ade8f",
+    "runtime/crates/trames-session/src/process.rs": "5a187ec28b0300fd9c09b7d8add10cfa5abb0924c3a20dcd7f7729f9ea2917c3",
+    "runtime/crates/trames-session/src/process_mqueue_tests.rs": "14a168ff20936dda790c4966a4aaf198db4f674157802edf8602797223e45f4e",
+    "runtime/crates/trames-session/src/process_time_tests.rs": "e069fe7f5675cb0316b43806b77b5edd946d17bf25eb8ba02843d959f22129b0",
+    "runtime/crates/trames-session/src/worker_syscalls.rs": "bc3a72fa90d34b7adc81952922637f900ed4b5ee48586629a9ed0bea440b162f"
+  },
+  "mac_native_fixture_sha256": "da9e5880996be2576e6e8622d67d880997e9c21718f6e0314f3ead75d5f38bb1",
+  "deployment": {
+    "channel": "Mac Dev only",
+    "runner": "/Users/main/Applications/Trames Dev.app/Contents/MacOS/trames-mac-run",
+    "signature_verified": true,
+    "stable_unchanged": true,
+    "physical_ipad_unchanged": true,
+    "business_environments_unchanged": true
+  },
+  "validation_notes": [
+    "The new interpreter regression fails against prior production code at its first gettimeofday, before the completion marker. Final four/twelve-CPU, one-slot and allowed-seccomp cases retain one cohort with zero returned syscall, service or mm checkpoint.",
+    "The native fixture resolves the actual __kernel_gettimeofday ELF export and also exercises raw realtime/clock syscalls and a faulting timezone output for every thread. Old four-CPU execution exits successfully but requires ten cohorts and sixteen returned gettimeofday calls; final four/twelve-CPU execution has one cohort and zero returned syscalls. No throughput speedup or twelve-CPU before measurement is claimed.",
+    "Initial sandboxed runtime tests could not create existing TCP/UDP sockets (EPERM). The unchanged tests pass outside that socket restriction.",
+    "One complete process run and bounded repetitions exposed the old mqueue fixture budget assumption: at twelve CPUs an untouched actor remained at PC 0x4000 with only seventeen total syscalls, rather than having returned an empty directory. Twelve simultaneous 16,384-credit reservations exceed its old 100,000 budget. The fixture now has a bounded 1,000,000 budget, keeps every functional/cohort assertion, records useful failing CPU/slot information and passes thirty repetitions. Production instruction-budget accounting is unchanged.",
+    "A test-construction seccomp ALLOW instruction initially omitted one byte. It was corrected before baseline/final source checks. The production accepted-policy path is unchanged apart from admitting syscall 169.",
+    "Final changed Rust hashes match Linux CI and the paired Mac runtime. Mac development gates 1-8 of 12 pass; stable packaging and physical iPad installation are outside this round."
+  ],
+  "remaining": [
+    "Actual host cancellation/deadline/shutdown and final backend/session teardown.",
+    "Genuine missing/excluded providers and both original-submitter io_uring maintenance escalation setters.",
+    "Other final SVC/HLT/fault dispatch. All currently implemented time observations now complete on source.",
+    "Actual initial/standalone/capability-less orchestration."
+  ],
+  "limits": [
+    "Four broad categories remain; no complete coordinator-removal claim.",
+    "Realtime vDSO still incurs its existing SVC/backend exit, now on the original worker. Removing that exit requires a separate accurate host-wall-clock mechanism, not an immutable calibration copy.",
+    "Unimplemented time-setting or process-accounting APIs retain their existing generated unsupported-call behavior."
+  ]
+}

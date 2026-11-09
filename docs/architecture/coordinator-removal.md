@@ -2,33 +2,33 @@
 
 ## Current status — 2026-11-09
 
-Through stage 88 the broad remaining count is **four**, unchanged from stage 87.
+Through stage 89 the broad remaining count is **four**, unchanged from stage 88.
 This counts actual boundary classes, not historical subsystem headings.
 
 | Remaining class | Current boundary | Concrete change this round |
 | --- | --- | --- |
-| Host control and final teardown | Actual cancellation/deadline/shutdown, native-event failure and final CPU/session drain | No class removed |
-| Missing capabilities and excluded resources | Original absent providers/excluded bodies; two submitter-scoped io_uring maintenance setters remain | The cold-wait native fixture explicitly retains a legacy proc-payload provider boundary |
-| Final execution dispatch | SVC/HLT/fault not completed, parked or accepted by a source scope | Residual prctl name/SME controls and canonical unsupported-command errors now complete on the caller |
-| Initial/legacy orchestration | Initial admission and standalone/capability-less scheduling | Normal dormant Futex/Sleep admission stays source-owned; no additional class removed |
+| Host control and final teardown | Actual cancellation/deadline/shutdown, native-event failure and final CPU/session drain | Unchanged |
+| Missing capabilities and excluded resources | Original absent providers/excluded bodies; two submitter-scoped io_uring maintenance setters remain | Unchanged; the native dormant fixture still exposes its actual legacy proc provider |
+| Final execution dispatch | SVC/HLT/fault not completed, parked or accepted by a source scope | gettimeofday, including its real vDSO SVC, completes on the caller; all implemented time observations share their source/solo ABI |
+| Initial/legacy orchestration | Initial admission and standalone/capability-less scheduling | Normal dormant Futex/Sleep admission stays source-owned |
 
-Stage 88 closes the residual prctl family and its name-observation dependencies.
-Original per-thread comm is shared by calling execution, proc and diagnostics;
-clone/fork copies its value, while namespace rebinding preserves its identity.
-Source and solo share the parent-death/subreaper/name/SME/error ABI. Already
-migrated credential and seccomp controls keep their existing original resources.
-No rename requires a cold owner refresh, and production proc images no longer
-carry a duplicate command vector.
+Stage 89 closes the implemented time-observation family. clock_gettime,
+clock_getres and gettimeofday use the shared Linux ABI on their original
+executor. Realtime remains live host wall time; the immutable monotonic vDSO
+calibration is not reused as an inaccurate wall-clock copy. Its gettimeofday
+entry retains an SVC/backend exit, now without a coordinator handoff. No clock
+service, recurring polling, new lock, unsafe block or ordinary-memory fence is
+added. Existing null/error/overlap order and seccomp admission are preserved.
 
-The signed four-CPU baseline uses sixteen cohorts and twenty-four returned prctls.
-Final four/twelve-CPU runs use one cohort, with zero returned syscall or service,
-correct independent thread names and actual SME configuration. The dormant native
-fixture retains one explicit legacy proc read, so it still tests cold admission.
+The signed four-CPU baseline uses ten cohorts and sixteen returned gettimeofday
+calls. Final four/twelve-CPU runs use one cohort with zero returned syscall or
+service, including the actual vDSO export. The dormant native fixture still
+retains its one explicit legacy proc read and cold-admission coverage.
 
 The [shared inventory](../../runtime/docs/architecture/coordination-boundaries.md#current-remaining-categories)
-and [stage 88 record](../validation/task-prctl-20261109.json) are current. Mac and
-ARM64 Linux each pass 439 process regressions (two intentionally ignored), both
-complete runtime workflows pass, and iPad device/simulator compilation passes.
+and [stage 89 record](../validation/time-observations-20261109.json) are current.
+Mac and ARM64 Linux each pass 440 process regressions (two intentionally ignored),
+both complete runtime workflows pass, and iPad device/simulator compilation passes.
 Mac Dev alone is updated; stable 1.5.4, business environments and physical iPad
 installations retain their versions. The overall removal goal remains active.
 
@@ -5413,3 +5413,66 @@ Four broad categories remain, including both io_uring maintenance escalation
 setters, actual missing/legacy providers, other final execution dispatch, actual
 initial orchestration and host cancel/final teardown. This removes residual prctl
 as a joined-dispatch subsystem; it does not complete the overall removal goal.
+
+
+## 89. Original time observations and real vDSO syscall completion — 2026-11-09
+
+Runtime `0c736ffe1efb13c2bd504eb9b2f9391b931d0c18` closes the complete currently
+implemented time-observation family. gettimeofday(169) now completes on its
+original executor, with its existing seccomp decision. clock_gettime(113) and
+clock_getres(114) retain their source execution and share their ABI implementation
+with standalone dispatch in the Linux crate. Duplicate time output bodies are
+removed; no new time-setting or process-accounting API is introduced.
+
+Realtime is read from live host SystemTime on that executor. Monotonic/raw/coarse
+epochs, boottime and sleep/timer deadline ownership remain unchanged. The existing
+vDSO monotonic hardware-counter calibration is immutable; extrapolating realtime
+from it would miss host wall-clock changes. __kernel_gettimeofday therefore
+retains its SVC/backend exit, but the SVC now completes without ending the cohort.
+No recurring clock updater, resource service, polling bus, lock, production unsafe
+block or ordinary guest-memory check/fence is added.
+
+gettimeofday preserves the original Linux address limit, complete two-buffer
+preflight before any output, seconds/microseconds/timezone store order, overlap,
+null pointers and original errors. Clock IDs retain their low-32-bit ABI;
+clock_getres(NULL), bad-ID/output-fault precedence and coarse epochs are retained.
+The new shared ABI test brackets live time and covers cross-page faults, nullable
+and overlapping buffers. The connected process regression checks all supported
+clock epochs and both success/error outputs before parking, at four/twelve CPUs,
+one execution slot and seccomp ALLOW. It fails against prior production code at
+the first gettimeofday, with one returned syscall and no completion marker. Final
+execution completes in one cohort with zero returned syscall, service or mapping
+checkpoint.
+
+The signed native fixture gives each thread its own output and resolves the real
+__kernel_gettimeofday export from the installed vDSO ELF symbols. It exercises
+that function, raw time syscalls, a null-output call and faulting timezone output.
+Prior four-CPU execution exits correctly but requires ten cohorts, sixteen
+returned gettimeofday calls and two returned clones. Final four/twelve-CPU runs
+exit correctly in one cohort with no returned syscall or service. These are
+functional/path counts, not a controlled throughput measurement. The existing
+cold-wait native fixture still retains two cohorts, one original mm scope and
+one returned legacy proc read at four/twelve CPUs.
+
+Full local runtime workflows pass on macOS and ARM64 Linux. Each host passes 440
+process regressions (two intentionally ignored) and ten FFI cases. Strict lint,
+both iPad SDK targets, Mac product development gates, 52 signed HVF and twelve
+signed product cases pass. Installed Dev passes init supervision at one/four/
+twelve CPUs and host-control/tracing acceptance at twelve CPUs. Exact source and
+binary hashes are in the [validation record](../validation/time-observations-20261109.json).
+Only Mac Dev is updated; stable 1.5.4, business environments and physical iPad
+installations retain their versions.
+
+The process suite exposed an older mqueue fixture budget assumption. At twelve
+CPUs, an untouched actor could remain at its initial PC after other workers
+reserved the 100,000 instruction budget; its register zero was not an empty
+getdents result. Twelve 16,384-credit reservations exceed that budget. The fixture
+now uses a bounded million instructions, retains every functional/cohort assertion
+and passes thirty repetitions. Production instruction-budget accounting is
+unchanged. Initial sandbox-only socket EPERM failures pass outside that sandbox's
+network restriction; no network implementation is changed.
+
+Four broad categories still remain. This removes implemented time observation
+from final joined dispatch. Actual host cancellation/final teardown, genuinely
+missing/excluded capabilities (including both io_uring maintenance escalation
+setters), other final dispatch and initial/legacy orchestration remain active.
