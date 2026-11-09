@@ -1057,8 +1057,9 @@ impl GuestOutput for Adapter {
         {
             return Ok(true);
         }
-        if self.init_monitor.as_ref().is_some_and(|i| i.pending(false)) {
-            return Ok(true);
+        if let Some(init) = &mut self.init_monitor {
+            init.control(false)
+                .map_err(|e| io::Error::other(e.to_string()))?;
         }
         if self.pending.is_none() {
             self.pending = self.commands.try_recv().ok();
@@ -1204,6 +1205,85 @@ impl GuestOutput for Adapter {
 #[cfg(test)]
 mod memory_tests {
     use super::*;
+    #[test]
+    fn init_notifications_progress_without_requesting_a_stopped_callback() {
+        let mut vfs = Vfs::default();
+        vfs.import_reader(
+            b"/usr/lib/systemd/systemd",
+            &mut b"init endpoint fixture".as_slice(),
+            true,
+        )
+        .unwrap();
+        for path in [b"/run".as_slice(), b"/sys", b"/dev"] {
+            if vfs.stat_at(trames_vfs::AT_FDCWD, path).is_err() {
+                vfs.mkdir_at(trames_vfs::AT_FDCWD, path, 0o755).unwrap();
+            }
+        }
+        let monitor = trames_distro::systemd::prepare(&mut vfs).unwrap();
+        let (commands, receiver) = mpsc::sync_channel(8);
+        let session = Arc::new(Session {
+            display: Default::default(),
+            wayland: Mutex::new(None),
+            bridge: Default::default(),
+            buffers: Mutex::new(Buffers {
+                terminals: BTreeMap::from([(1, Default::default())]),
+                status: Status {
+                    phase: "running",
+                    error: None,
+                    exit_code: None,
+                    budget_bytes: 0,
+                    used_bytes: 0,
+                    available_bytes: 0,
+                    volume_total_bytes: 0,
+                    node_limit: 0,
+                    nodes_used: 0,
+                },
+            }),
+            console_revision: Default::default(),
+            console_readiness: Arc::default(),
+            cancelled: AtomicBool::new(false),
+            paused: AtomicBool::new(false),
+            multiple_terminals: false,
+            next_terminal: AtomicU64::new(2),
+            commands,
+            transfers: Mutex::new(BTreeMap::new()),
+            next_transfer: AtomicU64::new(1),
+        });
+        let mut adapter = Adapter {
+            session: session.clone(),
+            commands: receiver,
+            snapshot_at: Instant::now(),
+            terminals: None,
+            pending: None,
+            init_monitor: Some(monitor),
+        };
+        let sender = vfs.local_create(2, 0).unwrap();
+        let sender = vfs.local_socket(sender).unwrap().unwrap();
+        for round in 0..2 {
+            vfs.local_send_credentials(
+                &sender,
+                b"READY=1\nX_SYSTEMD_SIGNALS_LEVEL=2",
+                0,
+                Some(b"\x01\x00/run/host/notify\x00"),
+                Default::default(),
+                [1, 0, 0],
+            )
+            .unwrap();
+            assert!(!adapter.poll_control(&vfs).unwrap());
+            assert_eq!(
+                adapter
+                    .init_monitor
+                    .as_mut()
+                    .unwrap()
+                    .control(true)
+                    .unwrap(),
+                if round == 0 { Some(37) } else { None }
+            );
+        }
+        session.paused.store(true, Ordering::Relaxed);
+        assert!(adapter.poll_control(&vfs).unwrap());
+    }
+
     #[test]
     fn runtime_tmpfs_is_fresh_after_cold_disk_reopen() {
         let path = std::env::temp_dir().join(format!(
