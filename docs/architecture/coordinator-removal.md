@@ -26,7 +26,7 @@ retains its own retirement and completes it on its actual lease-unlock/fence
 notifications; it cannot hold unrelated session completion hostage.
 
 See [stage 103](#103-one-way-source-session-completion--2026-11-10) and the
-[validation record](../validation/session-completion-20261110.json). Final local acceptance passes both seven-step runtime workflows, 470 process
+[validation record](../validation/session-completion-20261110.json). Final local acceptance passes both seven-step runtime workflows, 471 process
 regressions and ten FFI cases on macOS and ARM64 Linux, both iPad SDK targets,
 78 signed hardware cases and Mac development gates 1–8. The installed Dev init,
 host lifecycle and tracing checks pass; stable's runner hash is unchanged.
@@ -6271,7 +6271,9 @@ reply has no task, CPU or syscall payload. Its subsequent work is diagnostic
 collection, host-output flushing and returning/moving the completed root runtime.
 A pending, already-accounted CPU trap is retained across a resumable budget return,
 then consumes the original continuation and accepted policy decision on its next
-executor, without filtering the accepted call again.
+executor, without filtering the accepted call again. This retained root CPU,
+memory and policy continuation is not a general process-tree or blocked-I/O
+checkpoint.
 
 Single-CPU Mac/iPad execution now uses the same source session path. Old standalone
 cohort fixtures retain their explicit bounded-handoff contract, and custom legacy
@@ -6306,3 +6308,11 @@ not an absent capability. `/dev/tty` now uses the same original source open body
 for embedding and ordinary PTYs. The existing twelve-CPU host lifecycle test
 retains its one-cohort/zero-return requirement; no bootstrap boundary is hidden
 or removed from the accounting.
+
+Finite instruction budgets are also owned by the existing queue's quiescence
+boundary. Zero unallocated credit can still be reserved by an active CPU. An
+executor without credit yields its slot and waits on the existing queue; refunds
+are published before returning that assignment. Terminal budget completion waits
+until no CPU or scoped executor owns such work. Unlimited sessions bypass the
+additional atomic credit probe. A deterministic reservation/refund regression
+covers the boundary without relying on thread timing or a joined caller retry.

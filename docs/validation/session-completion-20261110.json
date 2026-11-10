@@ -3,19 +3,20 @@
   "stage": 103,
   "title": "One-way source session completion and connected original-resource dependencies",
   "runtime_base": "287fddcce660276c984b45f2d123562ddf1cccc5",
-  "runtime_revision": "633906b8f7d388693aa13a2cff0e9df1749e5a05",
+  "runtime_revision": "bfa2cc071ed6f8142eceb8b98f9c5059bae64ecf",
   "commits": [
     "9322b3c501c57aa273b72cec886564bf1d02ccc6",
     "9f441d20bed8ee1b67a96acd3267dc8ec9d6e50d",
     "980fe6069cb51a4c82f236d7b8f1aae953b3edeb",
-    "633906b8f7d388693aa13a2cff0e9df1749e5a05"
+    "633906b8f7d388693aa13a2cff0e9df1749e5a05",
+    "bfa2cc071ed6f8142eceb8b98f9c5059bae64ecf"
   ],
   "source_sha256": {
     "runtime/crates/trames-linux/src/lib.rs": "08b54d6788b744a993902ff03e6003e58a0c7a575dfe5f5dbca40bf43222bca5",
-    "runtime/crates/trames-session/src/execution_control.rs": "04f33fa8767faedc1877f09e3dbc347f8b0d8ea286a6abca607f083fc7805264",
+    "runtime/crates/trames-session/src/execution_control.rs": "2c21061395e153937705f3f532bf62da2ac9354d8b9b2a07e944f338de6dae31",
     "runtime/crates/trames-session/src/lib.rs": "74c855b6571c095cbc5577144fe5fc63c7bd5653c921c2f1cc3e380fc9753966",
     "runtime/crates/trames-session/src/process.rs": "a49be4ecf5e2f3df64845a8b0dbdd9d97c136f390d7d040ce717ddcc8a132c04",
-    "runtime/crates/trames-session/src/process_completion_tests.rs": "e8969d4714bd3098a0352a5bedda84607552b17a211690dd3f9de75ad672d0c5",
+    "runtime/crates/trames-session/src/process_completion_tests.rs": "0dba598b74386a3a7097e8daa5a08e2c423a5cf15f9b324c10dfaffa9133481d",
     "runtime/crates/trames-session/src/process_dispatch.rs": "51ba7eb5cdfced7b5c0ce232c5e6267549c077f84b9bc21684c7aac3f9917b3c",
     "runtime/crates/trames-session/src/process_host_io_tests.rs": "25fe200131dbaf042b9cc01049787c2de1223b0fd13449c6ab4868b5af5b5c73",
     "runtime/crates/trames-session/src/process_lifecycle.rs": "3d7c8e7b6d1e64c4362b7570ccbd7c645d13dc023839cda7f34a3aa4f26c329d",
@@ -28,9 +29,9 @@
     "runtime/crates/trames-session/src/process_seccomp.rs": "7c6e7b523d5ed8d1541819e860db303b01adc67f4c1166c9d4a6cdc2ef1849eb",
     "runtime/crates/trames-session/src/process_tasks.rs": "71199210c9dde95edccdc50051473d474f8be735e300ac1ae03592760b627bd5",
     "runtime/crates/trames-session/src/process_vm.rs": "32e9886de5d9af2ea67cfee4a934b3ee6389829079ed9cf10dc91a369af693c8",
-    "runtime/crates/trames-session/src/run_queue.rs": "82825bff0571047a16b75912694cb6b943ba7130ba7bb71e434833a2cedeec24",
+    "runtime/crates/trames-session/src/run_queue.rs": "f6581cab83f9b45562874d0e82ef42cae844303b130f6cbbae9030ab647f1301",
     "runtime/crates/trames-session/src/terminal.rs": "0926a7441ce723daeb713ae98a590ade969d03b4398bd423d3ecb8606293d9f0",
-    "runtime/crates/trames-session/src/workers.rs": "fe02a90d7e36f05bd02163c16152b709cd750eb70156cd16dd926da2f8a4a83a",
+    "runtime/crates/trames-session/src/workers.rs": "8445a4a85a8e3ce3d87d41faca0199a567f564b45a4cbeb9b6a673087e2fdc0c",
     "runtime/crates/trames-vfs/src/lib.rs": "55ffc354417ee40ccf4bba9d14595d1aa52914bcff385cef13f1a68833933b13",
     "runtime/crates/trames-vfs/src/pseudo.rs": "7c93546b7808965a6bf9750d112e020a064aaa1e4f029d3e2e26eda0ba459487",
     "runtime/crates/trames-vulkan/src/context.rs": "5717ec7f4f6120f0eb30d13f7241cac04f6599530a4ca3c8f1f61ba658322c70",
@@ -43,41 +44,41 @@
     "runtime_macos": {
       "passed": 7,
       "total": 7,
-      "sha256": "9483d8fb3ca22b1fc5c4874bd08fd7ddd1be9668ea6d742304ef7703603f3261"
+      "sha256": "e370f19d3a33e29e1af8f1b1614e36a6dde9cc138c100b6bd057cd0557b7daa1"
     },
     "runtime_linux": {
       "passed": 7,
       "total": 7,
-      "sha256": "6adf18c304a81c99ebabd36896d0f05aa1fde3e9e7817f7d2e99065d0cdf3f06"
+      "sha256": "49a145d1d981e2ae74c1fb94d18931aa1ee1e22ec41dbe08e051e9fa4675fcd5"
     },
     "mac_product": {
       "passed": 8,
       "total": 12,
-      "sha256": "ba14aaa00c92e1f0f573a5b0801219db5c5c857af3693b9daf93ed8a7b994a70"
+      "sha256": "4f11bb1152c19ddf195cbeaacbbad6f093c1fdcfe28eaf183cf0dd3c3530f9b1"
     }
   },
   "process_tests": {
     "macos": {
-      "passed": 470,
+      "passed": 471,
       "ignored": 2,
-      "sha256": "9ad0dd95b9b199c37243133bb803a6257dd1b991fbb0dd3cc92f6217177580e2"
+      "sha256": "b645a1433bc757274def6a1028277c5fcf5f5ce1ad0543446ad67b7191e248b6"
     },
     "linux": {
-      "passed": 470,
+      "passed": 471,
       "ignored": 2,
-      "sha256": "6f1cb34af5feb3b44eec1ee69b628e3500ec8509200679af813d9c6de581e20f"
+      "sha256": "75e705a633963ee52a4ace5bc6d53d495117b5ad70c14de84594c3a726e575d9"
     }
   },
   "ffi_tests": {
     "macos": {
       "passed": 10,
       "ignored": 0,
-      "sha256": "60b5178dc3ab42e7545002a2b7b0852414d06fcd251a501695bf007a376cdecf"
+      "sha256": "022bc8ad30dadbdf2ff85a956f761748e719ce669eb3d7f8078c48082d22cc4a"
     },
     "linux": {
       "passed": 10,
       "ignored": 0,
-      "sha256": "61513bb8008ae005bb6509d907dec458e23df3c8ff7b858fd63d030fe96420f4"
+      "sha256": "1a58bfeb3719f0defaff19e561768f64ebe6ba69133c3cb343bedcd856ee8517"
     }
   },
   "ipad_sdk_targets": [
@@ -86,11 +87,11 @@
   ],
   "hardware": {
     "passed": true,
-    "runtime_revision": "633906b8f7d388693aa13a2cff0e9df1749e5a05",
+    "runtime_revision": "bfa2cc071ed6f8142eceb8b98f9c5059bae64ecf",
     "rows": [
       {
         "target": "trames-mac-run",
-        "executable_sha256": "8654106389ae90101fe5427322033b1f4fce18c495cd9817dc54acbaa1e07cf6",
+        "executable_sha256": "9feb36c42f696bd613643008dc35655381f25f48c0d214e8e35b9c2cc196c5ce",
         "exit": 0,
         "passed_tests": 26
       },
@@ -103,52 +104,52 @@
     ]
   },
   "installed_dev": {
-    "version": "Trames Dev 1.5.4 (dev) runtime 633906b8f7d388693aa13a2cff0e9df1749e5a05",
-    "runner_sha256": "1c8ea663268a991ec14d74c495669ecc74d395b42f3c5893559794971d052779",
+    "version": "Trames Dev 1.5.4 (dev) runtime bfa2cc071ed6f8142eceb8b98f9c5059bae64ecf",
+    "runner_sha256": "aabb67784ff41384ad25f803bb61d98042b4cb5a1b78698a99155a7f55b98713",
     "stable_sha256": "8fc21435034e8c041632e2e50419da9d2123bf790aedb0a1499286fc8367e614",
     "stable_unchanged": true,
     "checks": [
       {
         "name": "init",
         "code": 0,
-        "seconds": 2.1698852090000003
+        "seconds": 2.1262679159999998
       },
       {
         "name": "host",
         "code": 0,
-        "seconds": 0.8883778339999999
+        "seconds": 0.9860040830000001
       },
       {
         "name": "tracing",
         "code": 0,
-        "seconds": 0.30841200000000013
+        "seconds": 0.24936666699999988
       }
     ]
   },
   "installed_host_lifecycle": {
     "passed": true,
     "cpus": 12,
-    "runner_sha256": "1c8ea663268a991ec14d74c495669ecc74d395b42f3c5893559794971d052779",
-    "exec_16_elapsed_ns": 136412125,
+    "runner_sha256": "aabb67784ff41384ad25f803bb61d98042b4cb5a1b78698a99155a7f55b98713",
+    "exec_16_elapsed_ns": 137460791,
     "metrics": {
       "cohort_rounds": 1,
-      "cohort_stop_us": 67,
+      "cohort_stop_us": 95,
       "service_caller_wait_us": 0,
       "service_requests": 0,
       "serviced_syscalls": 0,
-      "syscalls": 3488,
-      "vm_local_syscalls": 371,
-      "worker_direct_syscalls": 1516,
-      "worker_fd_syscalls": 467,
-      "worker_file_syscalls": 232,
-      "worker_futex_waits": 8,
-      "worker_futex_wakes": 41,
+      "syscalls": 3326,
+      "vm_local_syscalls": 342,
+      "worker_direct_syscalls": 1457,
+      "worker_fd_syscalls": 452,
+      "worker_file_syscalls": 195,
+      "worker_futex_waits": 9,
+      "worker_futex_wakes": 36,
       "worker_gpu_calls": 0,
       "worker_gpu_waits": 0,
-      "worker_poll_syscalls": 424,
+      "worker_poll_syscalls": 422,
       "worker_socket_syscalls": 0,
-      "worker_syscalls": 3488,
-      "worker_task_resumes": 94,
+      "worker_syscalls": 3326,
+      "worker_task_resumes": 95,
       "worker_uring_syscalls": 0
     },
     "checks": [
@@ -168,12 +169,14 @@
     "workload_source_sha256": "6d611212b33bda9dd826ba4db2c700f72ccf716d1500ce956766d5d05e6fd872",
     "guest_workload_unchanged": true,
     "final_repetitions": 100,
-    "final_executable_sha256": "8654106389ae90101fe5427322033b1f4fce18c495cd9817dc54acbaa1e07cf6",
-    "log_sha256": "0090eef4d288aebd9f0385c797895f865d52f9e53bc4792230ed2d9b78f68d11"
+    "final_executable_sha256": "9feb36c42f696bd613643008dc35655381f25f48c0d214e8e35b9c2cc196c5ce",
+    "log_sha256": "035d57938da27336ddc86e19313aea3f0e209a2ea1385caad91b32a322dd5859"
   },
   "architecture": {
     "terminal_lifecycle_category_removed_from_production": true,
     "single_cpu_products_use_source_session": true,
+    "finite_budgets_close_only_at_actual_executor_quiescence": true,
+    "unused_reserved_credit_is_refunded_before_assignment_return": true,
     "first_terminal_cause_is_one_way": true,
     "host_completion_reply": "()",
     "source_cpu_trace_wait_publication": true,
@@ -212,6 +215,7 @@
     "Physical iPad installations"
   ],
   "limitations": [
+    "Instruction-budget errors end the current session; arbitrary suspended process-tree or blocked-I/O checkpoints are not implemented",
     "Legacy mutable embedding contracts and the existing generic handoff are still explicitly tracked",
     "No claim that every unsupported/custom source provider has acquired an implementation",
     "No controlled Firefox latency or throughput measurement",
