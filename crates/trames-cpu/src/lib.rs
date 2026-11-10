@@ -922,7 +922,6 @@ impl trames_engine::Cpu for Cpu {
         hwcap2: HWCAP2,
     };
     const FEATURE_NAMES: &'static str = FEATURE_NAMES;
-    const PARALLEL: bool = true;
     const EXACT_INSTRUCTIONS: bool = true;
     fn new(pc: u64, sp: u64) -> Self {
         Self::new(pc, sp)

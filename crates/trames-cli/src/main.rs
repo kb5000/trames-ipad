@@ -76,8 +76,8 @@ impl GuestOutput for HostOutput {
     fn source_console(&mut self) -> std::sync::Arc<dyn trames_vfs::ConsoleIo> {
         self.source.clone()
     }
-    fn poll_control(&mut self, _: &trames_vfs::Vfs) -> io::Result<bool> {
-        Ok(false)
+    fn poll_host(&mut self, _: &trames_vfs::Vfs) -> io::Result<trames_linux::HostState> {
+        Ok(trames_linux::HostState::Running)
     }
     fn stdin_ready(&mut self) -> io::Result<bool> {
         Ok(trames_vfs::ConsoleIo::poll(&*self.source, trames_vfs::ConsoleStream::Input, 1).0 != 0)

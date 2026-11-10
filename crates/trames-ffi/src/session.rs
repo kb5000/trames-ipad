@@ -768,25 +768,25 @@ struct Adapter {
     init_monitor: Option<trames_distro::systemd::Monitor>,
 }
 impl Adapter {
-    // Legacy capability-less callers retain their explicit stopped boundary.
-    fn progress_commands(&mut self, vfs: &Vfs) -> io::Result<bool> {
+    // Accepted host work uses the already bound original file executor.
+    fn progress_commands(&mut self, vfs: &Vfs) -> io::Result<()> {
         if self
             .host_active
             .as_ref()
             .is_some_and(|done| !done.load(Ordering::Acquire))
         {
-            return Ok(false);
+            return Ok(());
         }
         self.host_active = None;
         if self.pending.is_none() {
             self.pending = self.commands.try_recv().ok();
         }
         let Some(command) = self.pending.take() else {
-            return Ok(false);
+            return Ok(());
         };
         if self.host_files.is_none() {
             self.pending = Some(command);
-            return Ok(true);
+            return Err(io::Error::other("host file executor is not bound"));
         }
         let context = vfs.host_files_context();
         let export = match &command {
@@ -795,7 +795,7 @@ impl Adapter {
                     Ok(export) => Some(export),
                     Err(error) => {
                         fail_command(command, error.to_string());
-                        return Ok(false);
+                        return Ok(());
                     }
                 }
             }
@@ -818,7 +818,7 @@ impl Adapter {
                                 _ => error.to_string(),
                             },
                         );
-                        return Ok(false);
+                        return Ok(());
                     }
                 }
             }
@@ -843,10 +843,7 @@ impl Adapter {
                     wake: std::thread::current(),
                 },
             }));
-        Ok(false)
-    }
-    fn command(&mut self, vfs: &mut Vfs, command: Command) {
-        Self::execute(&self.session, vfs, command, HostAccess::default());
+        Ok(())
     }
     fn execute(session: &Session, vfs: &mut Vfs, command: Command, access: HostAccess) {
         match command {
@@ -1289,72 +1286,41 @@ impl GuestOutput for Adapter {
     fn cancellation_requested(&self) -> bool {
         self.session.cancelled.load(Ordering::Acquire)
     }
-    fn poll_control(&mut self, vfs: &Vfs) -> io::Result<bool> {
-        if self.session.cancelled.load(Ordering::Acquire) {
-            return Ok(true);
+    fn initialize(&mut self, vfs: &mut Vfs) -> io::Result<()> {
+        if self.session.multiple_terminals && self.terminals.is_none() {
+            self.terminals =
+                Some(crate::terminals::NativeTerminals::new(vfs).map_err(io::Error::other)?);
         }
-        if let Some(init) = &mut self.init_monitor {
-            init.control(false)
-                .map_err(|e| io::Error::other(e.to_string()))?;
-        }
-        if self.progress_commands(vfs)? {
-            return Ok(true);
-        }
-        {
-            let mut buffers = self
-                .session
-                .buffers
-                .lock()
-                .map_err(|_| io::Error::other("session lock failed"))?;
-            if self.session.multiple_terminals {
-                let Some(terminals) = self.terminals.as_mut() else {
-                    return Ok(true);
-                };
-                // Open/close, input, resize and hangup use original PTY resources.
-                terminals.pump(&mut buffers.terminals);
-            } else if buffers.terminals.get(&1).is_some_and(|b| b.size.is_some()) {
-                return Ok(true);
-            }
-        }
-        if self.snapshot_at.elapsed() >= Duration::from_secs(1) {
-            self.snapshot(vfs);
-            self.snapshot_at = Instant::now();
-        }
-        Ok(false)
+        Ok(())
     }
-    fn control(&mut self, vfs: &mut Vfs) -> io::Result<bool> {
-        if self.session.cancelled.load(Ordering::Acquire) {
-            return Ok(false);
+    fn poll_host(&mut self, vfs: &Vfs) -> io::Result<trames_linux::HostState> {
+        if self.cancellation_requested() {
+            return Ok(trames_linux::HostState::Cancelled);
         }
         if let Some(init) = &mut self.init_monitor {
             init.control(false)
                 .map_err(|e| io::Error::other(e.to_string()))?;
         }
+        self.progress_commands(vfs)?;
         if self.session.multiple_terminals {
-            if self.terminals.is_none() {
-                self.terminals =
-                    Some(crate::terminals::NativeTerminals::new(vfs).map_err(io::Error::other)?);
-            }
+            let terminals = self
+                .terminals
+                .as_mut()
+                .ok_or_else(|| io::Error::other("host terminals are not initialized"))?;
             let mut buffers = self
                 .session
                 .buffers
                 .lock()
                 .map_err(|_| io::Error::other("session lock failed"))?;
-            self.terminals
-                .as_mut()
-                .expect("initialized")
-                .pump(&mut buffers.terminals);
-        }
-        if self.progress_commands(vfs)? {
-            let command = self.pending.take().expect("legacy stopped host command");
-            self.command(vfs, command);
+            terminals.pump(&mut buffers.terminals);
         }
         if self.snapshot_at.elapsed() >= Duration::from_secs(1) {
             self.snapshot(vfs);
             self.snapshot_at = Instant::now();
         }
-        Ok(true)
+        Ok(trames_linux::HostState::Running)
     }
+
     fn write(&mut self, _: OutputFd, bytes: &[u8]) -> io::Result<usize> {
         let mut b = self
             .session
@@ -1499,14 +1465,40 @@ mod memory_tests {
     }
     #[test]
     fn paused_live_control_keeps_cancellation_distinct() {
-        let mut vfs = Vfs::default();
+        let vfs = Vfs::default();
         let mut adapter = test_adapter(None);
         adapter.session.paused.store(true, Ordering::Relaxed);
         assert!(adapter.paused());
-        assert!(!adapter.poll_control(&vfs).unwrap());
+        assert_eq!(
+            adapter.poll_host(&vfs).unwrap(),
+            trames_linux::HostState::Running
+        );
         adapter.session.cancelled.store(true, Ordering::Relaxed);
-        assert!(adapter.poll_control(&vfs).unwrap());
-        assert!(!adapter.control(&mut vfs).unwrap());
+        assert_eq!(
+            adapter.poll_host(&vfs).unwrap(),
+            trames_linux::HostState::Cancelled
+        );
+        assert_eq!(
+            adapter.poll_host(&vfs).unwrap(),
+            trames_linux::HostState::Cancelled
+        );
+    }
+    #[test]
+    fn multiple_terminals_are_initialized_before_live_polling() {
+        let mut vfs = Vfs::default();
+        let mut adapter = test_adapter(None);
+        Arc::get_mut(&mut adapter.session)
+            .unwrap()
+            .multiple_terminals = true;
+        assert!(adapter.poll_host(&vfs).is_err());
+        adapter.initialize(&mut vfs).unwrap();
+        assert!(adapter.terminals.is_some());
+        for _ in 0..3 {
+            assert_eq!(
+                adapter.poll_host(&vfs).unwrap(),
+                trames_linux::HostState::Running
+            );
+        }
     }
     #[test]
     fn filesystem_commands_keep_source_execution_and_paused_completion() {
@@ -1533,7 +1525,10 @@ mod memory_tests {
                 cancelled: Arc::new(AtomicBool::new(false)),
             }))
             .unwrap();
-        assert!(!adapter.poll_control(&vfs).unwrap());
+        assert_eq!(
+            adapter.poll_host(&vfs).unwrap(),
+            trames_linux::HostState::Running
+        );
         assert!(!adapter.flush_output().unwrap());
         run_host(&adapter, &disk);
         let inode = result.recv().unwrap().unwrap();
@@ -1561,7 +1556,10 @@ mod memory_tests {
             }))
             .unwrap();
         adapter.session.paused.store(true, Ordering::Relaxed);
-        assert!(!adapter.poll_control(&vfs).unwrap());
+        assert_eq!(
+            adapter.poll_host(&vfs).unwrap(),
+            trames_linux::HostState::Running
+        );
         assert!(adapter.paused());
         run_host(&adapter, &disk);
         assert_ne!(result.recv().unwrap().unwrap(), inode);
@@ -1585,7 +1583,10 @@ mod memory_tests {
                 reply,
             ))
             .unwrap();
-        assert!(!adapter.poll_control(&vfs).unwrap());
+        assert_eq!(
+            adapter.poll_host(&vfs).unwrap(),
+            trames_linux::HostState::Running
+        );
         run_host(&adapter, &disk);
         result.recv().unwrap().unwrap();
         let output = path.with_extension("export");
@@ -1608,7 +1609,10 @@ mod memory_tests {
                 cancelled: Arc::new(AtomicBool::new(false)),
             }))
             .unwrap();
-        assert!(!adapter.poll_control(&vfs).unwrap());
+        assert_eq!(
+            adapter.poll_host(&vfs).unwrap(),
+            trames_linux::HostState::Running
+        );
         run_host(&adapter, &disk);
         result.recv().unwrap().unwrap();
         assert_eq!(fs::read(&output).unwrap(), b"edited");
@@ -1645,7 +1649,10 @@ mod memory_tests {
                 [1, 0, 0],
             )
             .unwrap();
-            assert!(!adapter.poll_control(&vfs).unwrap());
+            assert_eq!(
+                adapter.poll_host(&vfs).unwrap(),
+                trames_linux::HostState::Running
+            );
             assert_eq!(
                 adapter
                     .init_monitor
@@ -1657,7 +1664,10 @@ mod memory_tests {
             );
         }
         session.paused.store(true, Ordering::Relaxed);
-        assert!(!adapter.poll_control(&vfs).unwrap());
+        assert_eq!(
+            adapter.poll_host(&vfs).unwrap(),
+            trames_linux::HostState::Running
+        );
         assert!(adapter.paused());
     }
 

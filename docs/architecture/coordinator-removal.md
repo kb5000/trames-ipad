@@ -2,35 +2,33 @@
 
 ## Current status — 2026-11-10
 
-Stage 103 removes **production terminal session lifecycle** from the coordinator
-categories. Completion, cancellation/deadline, instruction-budget exhaustion,
-source failure and final task/mm/native cleanup use a one-way lifecycle protocol
-on existing executors. Stopping CPU admission does not grant the waiting host
-permission to execute guest operations. Single-CPU product sessions use this same
-path. The remaining count is **three**, with explicit legacy embedding debt still
-listed below; this is not a claim that the final generic dispatch is unreachable.
+Stage 104 closes the **host embedding and initial execution orchestration**
+category. Mutable stopped callbacks, boolean requests to join all CPUs, backend
+opt-out from worker execution and the caller-side serial CPU loop are removed.
+All guest instruction entry belongs to existing execution workers, including one
+CPU, cold admission, resumed ready work and mapping-operation batching. The
+remaining count is **two**; the final compatibility dispatcher is still present.
 
 | Remaining class | Current boundary | Recent concrete progress |
 | --- | --- | --- |
-| Missing capabilities and excluded resources | Genuinely absent original providers/bodies; two submitter-scoped io_uring maintenance setters remain | Task RSS/layout observations use their original resources; actual missing providers remain |
-| Final execution dispatch | An unfinished SVC/native-resource operation returned by the explicit compatibility handoff | Terminal completion cannot use this handoff; stage 102 also unified structural dispatch, but the generic catch-all remains |
-| Initial/legacy orchestration | Bootstrap, capability-less embeddings, legacy mutable stopped hooks and backends without parallel execution support | Mac HVF and iPad interpreter single-CPU sessions now execute and finish on workers; legacy contracts remain explicit |
+| Missing capabilities and excluded resources | Genuinely absent original providers/bodies; two submitter-scoped io_uring maintenance setters remain | Original-resource admission is shared by both products; absent providers remain explicit |
+| Final execution dispatch | An unfinished SVC/native-resource operation returned by the explicit compatibility handoff, including nonmember resource retries | Source terminal completion and host events cannot request this handoff; its compatibility handler cannot execute guest instructions |
 
-The new architecture gate freezes the remaining compatibility handoff sites and
-rejects new sites or guest dispatch in terminal completion. The completion command
-replies with `()`, not an unfinished CPU call. Original task publication, accepted
-request cancellation, child/process locks, namespaces, memory publication and
-network shutdown finish on an existing executor. Accepted CPU traps survive a
-resumable budget return without replaying retirement. A busy native GPU context
-retains its own retirement and completes it on its actual lease-unlock/fence
-notifications; it cannot hold unrelated session completion hostage.
+Host adapters perform mutable setup once per `Runtime::run` attempt, before CPU
+admission. Execution receives a separate live-only interface with no setup hook.
+Host polls return `Running` or `Cancelled`; launches, signals, terminal events and
+file transfers retain their original resources and use existing executors. A
+sleeping initial root still admits source host launches. A busy backing admits
+metadata-only work and wakes its existing execution slot on resource release.
+No coordinator/resource-service thread, polling bus, whole-call guest lock or
+ordinary memory fence is added.
 
-See [stage 103](#103-one-way-source-session-completion--2026-11-10) and the
-[validation record](../validation/session-completion-20261110.json). Final local acceptance passes both seven-step runtime workflows, 471 process
-regressions and ten FFI cases on macOS and ARM64 Linux, both iPad SDK targets,
-78 signed hardware cases and Mac development gates 1–8. The installed Dev init,
-host lifecycle and tracing checks pass; stable's runner hash is unchanged.
-Historical stage paragraphs below retain their recorded counts and validation.
+See [stage 104](#104-host-embedding-and-initial-execution-orchestration--2026-11-10)
+and its [validation record](../validation/host-orchestration-20261110.json).
+Stage 103's source completion and immutable terminal-cause checks remain active.
+The new host-execution gate rejects stopped callbacks, bootstrap access from
+execution, new caller CPU loops and the old backend fallback flag. Historical
+stage paragraphs below retain their recorded counts and validation.
 
 Recent signed native fixtures demonstrate concrete path removal. Each baseline
 below is four CPUs; each final fixture passes at both four and twelve. These are
@@ -229,7 +227,7 @@ records source/executable hashes, original joined behavior, reuse proof and fina
 installed acceptance. Only Mac Dev is updated; stable 1.5.4, business environments
 and physical iPad installs remain unchanged.
 
-### Remaining boundaries after stage 81
+### Remaining boundaries after stage 81 (historical)
 
 **The coordinator still exists.** io_uring's remaining `owner_required` setters
 are the two actual source-maintenance failures: unavailable wait capability or an
@@ -294,8 +292,8 @@ admission already use the live execution queue. Single-CPU/solo execution retain
 its coordinated caller path, which does not by itself imply an extra RPC.
 
 The [current consolidated audit](https://github.com/kb5000/trames-runtime/blob/f5e613b0de1847d06a26ec15e77372c4ccf54a16/docs/architecture/coordination-boundaries.md)
-records scopes, actual admission gates and source locations. Earlier sections
-below are historical records and do not override this inventory.
+records scopes, actual admission gates and source locations. This stage 81 inventory is historical; the stage 104 inventory at the top
+of this document is authoritative.
 
 ### Stage 74 init supervision closure (historical)
 
@@ -6316,3 +6314,50 @@ are published before returning that assignment. Terminal budget completion waits
 until no CPU or scoped executor owns such work. Unlimited sessions bypass the
 additional atomic credit probe. A deterministic reservation/refund regression
 covers the boundary without relying on thread timing or a joined caller retry.
+
+## 104. Host embedding and initial execution orchestration — 2026-11-10
+
+This batch removes one complete architectural category and its connected routes:
+
+- `GuestOutput::control(&mut Vfs)`, `poll_control() -> bool` and the adapter opt-in
+  flag are deleted. `poll_host()` returns a typed `HostState` with no join state.
+  Explicit cancellation enters source completion directly.
+- Mutable adapter setup is restricted to `initialize()` before the session Kernel
+  exists. The Kernel and Linux dispatcher accept `execution_io::Output`, which
+  cannot call setup. A compile-fail example and the architecture gate enforce this
+  separation. The forwarding implementation is statically dispatched; it creates
+  no proxy queue, snapshot Kernel or service worker.
+- FFI multi-terminal control endpoints are created during bootstrap. Terminal
+  input, resize, close and signals then use original PTY resources. Host file
+  commands require the session's existing file executor; their synchronous mutable
+  stopped fallback is deleted. Mac, iPad, standalone CLI and graphical acceptance
+  adapters all implement the same live contract.
+- Both execution backends must use their existing workers. `Cpu::PARALLEL` and
+  `run_coordinated` disappear. Ready tasks no longer execute a host-side serial
+  quantum. The legacy mapping compatibility handler also loses its native CPU
+  window; bounded mapping batching remains only on the execution worker. Kernel
+  no longer owns a CPU engine.
+- Initial sleeping/futex actors can form a source session without a ready guest
+  CPU. Accepted host launches always require a source epoch, including image
+  construction and admission. Busy first backing layouts become metadata-only
+  execution jobs, with original release subscriptions preparing their first View.
+
+Terminal cancellation now consistently retires children instead of preserving
+legacy stopped-handler state. Regression observations therefore retain physical
+result pages or inspect live original statistics before cancellation; they do not
+read discarded child address spaces afterward. Missing source capabilities and
+unfinished operation dispatch remain explicit under the two classes above.
+Neither is hidden behind a new terminal cancellation or guest errno.
+
+Validation covers one/four/twelve CPU bootstrap ordering and setup failure,
+metadata-only first backing waits, host launch with every initial CPU asleep,
+terminal cancellation, file work while paused, multiple-terminal bootstrap, both
+product compositions and the unchanged hardware acceptance workloads. See the
+[paired record](../validation/host-orchestration-20261110.json) for exact results.
+Final acceptance passes both seven-step runtime workflows, 472 process cases and
+11 FFI cases on each of macOS and ARM64 Linux, both iPad SDK targets, all 78 signed
+hardware cases and applicable Mac development gates 1–8. Installed init, host
+lifecycle and tracing pass; the native host cohort remains one with zero services.
+Only Mac Dev is updated in this batch; stable apps, business environments and
+physical iPad installations are unchanged. No controlled throughput or Firefox
+latency result is claimed.

@@ -1,0 +1,214 @@
+{
+  "date": "2026-11-10",
+  "stage": 104,
+  "title": "Host embedding and initial execution orchestration removal",
+  "runtime_base": "bfa2cc071ed6f8142eceb8b98f9c5059bae64ecf",
+  "runtime_revision": "257914058941add91700ba25704f8433725eba8e",
+  "mac_source_commit": "161a58d4d09b626f041d2c24b4feee486c9e23fd",
+  "source_sha256": {
+    "runtime/crates/trames-engine/src/lib.rs": "58fbae44a5547074a42b91347311f1a576b3ff2c0cd9f44fca6b5f2aa5d26b74",
+    "runtime/crates/trames-linux/src/file_calls.rs": "d766e68972c4af20e2b7e305baee132ca667b1fe564d01872df16f30865d1387",
+    "runtime/crates/trames-linux/src/lib.rs": "fae09b26f0ecfacb7c1dc80611085959d0978fbb3d0db01fe352ac0df68825da",
+    "runtime/crates/trames-linux/src/state.rs": "0a0f40ed01f29005c9e12432b8451767000bfe54a5f342623c48c7750da6b963",
+    "runtime/crates/trames-session/src/lib.rs": "03d7042b15e953d943efeaafc6d56f76f868de7570219b217e1d8b54e49387a3",
+    "runtime/crates/trames-session/src/process.rs": "1921c15c64ff2563ea1bf7cdf9a0edc273b174dc7888b326d8232ba7f4f5f500",
+    "runtime/crates/trames-session/src/process_completion_tests.rs": "63f27f1c133eb3a391f45f6c7093e7e8c6dec25b52d8f2ce339c96e01762c7d2",
+    "runtime/crates/trames-session/src/process_file_io.rs": "12f39228348fe61bae42e3a5016b3048faf2801d7172496b491877a5c34515f9",
+    "runtime/crates/trames-session/src/process_host.rs": "a9572ccc687df34ac2d41dae1e8124f685c1fd6d2626a286b872cca8bb65410f",
+    "runtime/crates/trames-session/src/process_lifecycle_host.rs": "add5e275aa7d934e6ebcc5d1c984d6617560d9774ec47431fff01bef6812e91e",
+    "runtime/crates/trames-session/src/process_prctl_tests.rs": "3bf2c31b3e6b5da37b1f1724d51087c013737a58b26da569809f71c62adc9087",
+    "runtime/crates/trames-session/src/process_proc.rs": "4b11447723b373c70b90d7993dc06a1de127b8d655dd4fa2e1f88d486c27f3d2",
+    "runtime/crates/trames-session/src/process_statistics_tests.rs": "17d062d4a56f31dc70f89a74deaf90ca3b146d20ccf6830346f94c14be0f900b",
+    "runtime/crates/trames-session/src/process_vm.rs": "8ae6802f61c7e8334583912aa5ab9d9898cc5900d840daefda72950c25e2ad99",
+    "runtime/crates/trames-session/src/run_queue.rs": "0a97d2e60b28fa590908a5fca311b7c19abbc6abca620280ece7d52e4cbddc3a",
+    "runtime/crates/trames-session/src/terminal.rs": "e8ee4d69677418b9dabf82c75e87d634adaa475ff703ba131d68431c67b14e81"
+  },
+  "mac_product_source_sha256": {
+    "crates/trames-hvf/src/hardware_tests.rs": "921f171cab1a69125636a4005098a315dae2f3041860a323ab371cd3f3b0f80b",
+    "crates/trames-hvf/src/kernel.rs": "f231ba22158e12b699ff53d31dedffd6c8e1bf981ffbb8acd67a1ff9f61b0632",
+    "crates/trames-mac/src/session.rs": "83b26a9411a3561e067cbf8dbaa30203160295750ac28d4c250a2a1c20d402f6"
+  },
+  "ipad_product_source_sha256": {
+    "crates/trames-cli/src/main.rs": "f6e451e34f4d052fb38394aeb2de28eb7f7230497d147f55422c75ae9123b94b",
+    "crates/trames-core/tests/wayland.rs": "6afe8756addb5d07546ce8d239fee81ed325f3a50c901ece48ce0f2fc04af334",
+    "crates/trames-cpu/src/lib.rs": "3cec3c9fac9818cc432286cbd671892397d386cdb14a212d4d212c0b94732de2",
+    "crates/trames-ffi/src/session.rs": "76d2b429340826fac10712ff6fbacb5fd2758ac6bf762ac00b6c28dd3f29a14a"
+  },
+  "workflows": {
+    "runtime_macos": {
+      "passed": 7,
+      "total": 7,
+      "sha256": "759ea3dac05d65a6f394f12ebff588107fc43881b58a26fb8e4fb25625c20a91"
+    },
+    "runtime_linux": {
+      "passed": 7,
+      "total": 7,
+      "sha256": "7a1da4d6c17a61719cf8edf86b4a9d8a3e74c81530ced6ff19eaf3bca38c1c35"
+    },
+    "mac_product": {
+      "passed": 8,
+      "total": 12,
+      "sha256": "dbfdec86c5e3d064ffc05997ecf409861dc501fdda4f8eb89be4f8c052f4f74b"
+    }
+  },
+  "process_tests": {
+    "macos": {
+      "passed": 472,
+      "ignored": 2,
+      "sha256": "382a0c169d640e362fe61d0d989ea95a9e8fb8376f3159ff30d5ec3fdb1c5812"
+    },
+    "linux": {
+      "passed": 472,
+      "ignored": 2,
+      "sha256": "c6526fa1a646ea97f5e892f55f1b927adf84af36ea4fcf5f1e27e51acb4fc965"
+    }
+  },
+  "ffi_tests": {
+    "macos": {
+      "passed": 11,
+      "ignored": 0,
+      "sha256": "7e57f5ce1b151cade6b9af70eab0021a94f021b8c98c317b479558fc01d84478"
+    },
+    "linux": {
+      "passed": 11,
+      "ignored": 0,
+      "sha256": "c6d627fc351010383c91f556db02470491c2e304e3e561da516841229daac06e"
+    }
+  },
+  "ipad_sdk_targets": [
+    "aarch64-apple-ios",
+    "aarch64-apple-ios-sim"
+  ],
+  "hardware": {
+    "passed": true,
+    "runtime_revision": "257914058941add91700ba25704f8433725eba8e",
+    "rows": [
+      {
+        "target": "trames-mac-run",
+        "executable_sha256": "1f30a7702bcfa14468e3ee1016ac871b563c98cb69d77e0180ca4d1d6ad164ba",
+        "exit": 0,
+        "passed_tests": 26
+      },
+      {
+        "target": "trames_hvf",
+        "executable_sha256": "b0a1d241bcd42ebd931994668c7f16b91b7cebc6f998f0aa1f282313e4d9c9d8",
+        "exit": 0,
+        "passed_tests": 52
+      }
+    ]
+  },
+  "installed_dev": {
+    "version": "Trames Dev 1.5.4 (dev) runtime 257914058941add91700ba25704f8433725eba8e",
+    "runner_sha256": "3f3dd9b37e65aad5b4826bd8ef1df874efe346f7045aec19f664f2db37a1ec87",
+    "stable_sha256": "8fc21435034e8c041632e2e50419da9d2123bf790aedb0a1499286fc8367e614",
+    "stable_unchanged": true,
+    "checks": [
+      {
+        "name": "init",
+        "code": 0,
+        "seconds": 2.1430406250000003
+      },
+      {
+        "name": "host",
+        "code": 0,
+        "seconds": 0.9220985420000001
+      },
+      {
+        "name": "tracing",
+        "code": 0,
+        "seconds": 0.26400266699999975
+      }
+    ]
+  },
+  "installed_host_lifecycle": {
+    "passed": true,
+    "cpus": 12,
+    "runner_sha256": "3f3dd9b37e65aad5b4826bd8ef1df874efe346f7045aec19f664f2db37a1ec87",
+    "exec_16_elapsed_ns": 135217250,
+    "metrics": {
+      "cohort_rounds": 1,
+      "cohort_stop_us": 52,
+      "service_caller_wait_us": 0,
+      "service_requests": 0,
+      "serviced_syscalls": 0,
+      "syscalls": 3586,
+      "vm_local_syscalls": 393,
+      "worker_direct_syscalls": 1534,
+      "worker_fd_syscalls": 495,
+      "worker_file_syscalls": 251,
+      "worker_futex_waits": 9,
+      "worker_futex_wakes": 39,
+      "worker_gpu_calls": 0,
+      "worker_gpu_waits": 0,
+      "worker_poll_syscalls": 422,
+      "worker_socket_syscalls": 0,
+      "worker_syscalls": 3586,
+      "worker_task_resumes": 95,
+      "worker_uring_syscalls": 0
+    },
+    "checks": [
+      "live_exec",
+      "native_terminal_open",
+      "initial_size",
+      "live_resize",
+      "early_close_before_slave_open",
+      "master_close",
+      "busy_peer_survives",
+      "no_service_requests"
+    ]
+  },
+  "architecture": {
+    "host_orchestration_category_removed": true,
+    "host_mutable_callback": "initialize before Kernel and CPU admission, once per Runtime.run attempt",
+    "execution_interface": "execution_io::Output has no initialize method",
+    "host_poll_states": [
+      "Running",
+      "Cancelled"
+    ],
+    "stopped_mutable_hook_removed": true,
+    "host_join_boolean_removed": true,
+    "host_opt_in_removed": true,
+    "backend_parallel_opt_out_removed": true,
+    "caller_cpu_loop_removed": true,
+    "caller_mapping_cpu_window_removed": true,
+    "kernel_cpu_engine_removed": true,
+    "initial_backing_waits": "metadata-only original jobs; original layout release subscriptions",
+    "cold_host_launch_with_sleeping_root": true,
+    "host_launches_require_source_epoch": true,
+    "multi_terminal_initialization_before_admission": true,
+    "synchronous_stopped_file_command_fallback_removed": true,
+    "new_resource_service_threads": 0,
+    "new_polling_buses": 0,
+    "new_global_guest_algorithm_locks": 0,
+    "new_ordinary_memory_fences": 0
+  },
+  "provenance": [
+    "Every changed common Rust fingerprint matches both runtime test workflows, the Linux source snapshot and the Mac product tests",
+    "Product Rust fingerprints match their validated snapshots",
+    "One/four/twelve CPU bootstrap ordering, initialization failure, busy first backing and no-ready-CPU host launch regressions pass",
+    "Mac signed hardware acceptance retains unchanged workloads and includes source terminal completion at one/four/twelve CPUs",
+    "Installed init supervision, host lifecycle and tracing acceptance pass; native host lifecycle retains one cohort with no returned SVCs or owner services",
+    "Stable runner hash unchanged; fixed build directories reused with CARGO_INCREMENTAL=0"
+  ],
+  "remaining": {
+    "broad_categories": 2,
+    "categories": [
+      "Missing original capabilities and excluded resources",
+      "Final unfinished-operation execution dispatch, including nonmember resource retries"
+    ],
+    "uring_maintenance_escalation_sites": 2,
+    "overall_goal_complete": false
+  },
+  "unchanged": [
+    "Stable 1.5.4 app and runner",
+    "Business environments",
+    "Physical iPad installations"
+  ],
+  "limitations": [
+    "Actual optional source providers and generic unfinished-operation handoff remain explicit",
+    "No arbitrary suspended process-tree or blocked-I/O checkpoint support is added",
+    "No controlled Firefox latency or throughput measurement",
+    "iPad shared code and device/simulator SDKs compiled; physical iPad validation/deployment not performed",
+    "Mac release packaging gates 9–12 are outside this Dev-only deployment"
+  ]
+}

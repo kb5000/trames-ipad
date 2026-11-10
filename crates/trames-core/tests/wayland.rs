@@ -43,7 +43,7 @@ impl GuestOutput for Sink {
         .append(bytes);
         Ok(bytes.len())
     }
-    fn control(&mut self, _: &mut trames_vfs::Vfs) -> io::Result<bool> {
+    fn poll_host(&mut self, _: &trames_vfs::Vfs) -> io::Result<trames_linux::HostState> {
         let snapshot = self.server.snapshot();
         for window in &snapshot.windows {
             if !self.focused {
@@ -132,7 +132,9 @@ impl GuestOutput for Sink {
                 self.text_confirmed = true;
             }
         }
-        Ok(self.began.elapsed() < Duration::from_secs(90))
+        Ok(trames_linux::HostState::from_cancelled(
+            self.began.elapsed() >= Duration::from_secs(90),
+        ))
     }
 }
 fn run(program: &str, editor: bool) -> Sink {
