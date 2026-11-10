@@ -1,0 +1,220 @@
+{
+  "date": "2026-11-10",
+  "stage": 103,
+  "title": "One-way source session completion and connected original-resource dependencies",
+  "runtime_base": "287fddcce660276c984b45f2d123562ddf1cccc5",
+  "runtime_revision": "633906b8f7d388693aa13a2cff0e9df1749e5a05",
+  "commits": [
+    "9322b3c501c57aa273b72cec886564bf1d02ccc6",
+    "9f441d20bed8ee1b67a96acd3267dc8ec9d6e50d",
+    "980fe6069cb51a4c82f236d7b8f1aae953b3edeb",
+    "633906b8f7d388693aa13a2cff0e9df1749e5a05"
+  ],
+  "source_sha256": {
+    "runtime/crates/trames-linux/src/lib.rs": "08b54d6788b744a993902ff03e6003e58a0c7a575dfe5f5dbca40bf43222bca5",
+    "runtime/crates/trames-session/src/execution_control.rs": "04f33fa8767faedc1877f09e3dbc347f8b0d8ea286a6abca607f083fc7805264",
+    "runtime/crates/trames-session/src/lib.rs": "74c855b6571c095cbc5577144fe5fc63c7bd5653c921c2f1cc3e380fc9753966",
+    "runtime/crates/trames-session/src/process.rs": "a49be4ecf5e2f3df64845a8b0dbdd9d97c136f390d7d040ce717ddcc8a132c04",
+    "runtime/crates/trames-session/src/process_completion_tests.rs": "e8969d4714bd3098a0352a5bedda84607552b17a211690dd3f9de75ad672d0c5",
+    "runtime/crates/trames-session/src/process_dispatch.rs": "51ba7eb5cdfced7b5c0ce232c5e6267549c077f84b9bc21684c7aac3f9917b3c",
+    "runtime/crates/trames-session/src/process_host_io_tests.rs": "25fe200131dbaf042b9cc01049787c2de1223b0fd13449c6ab4868b5af5b5c73",
+    "runtime/crates/trames-session/src/process_lifecycle.rs": "3d7c8e7b6d1e64c4362b7570ccbd7c645d13dc023839cda7f34a3aa4f26c329d",
+    "runtime/crates/trames-session/src/process_lifecycle_completion.rs": "155b210df75a530267b36127e1a787380bf1f74fbb03c7f3f17148a426ba43b9",
+    "runtime/crates/trames-session/src/process_lifecycle_layouts.rs": "d8630d73621f1470ce3c5b8841123a43677bdb1ece0502c5b209807f004bb86b",
+    "runtime/crates/trames-session/src/process_lifecycle_memory.rs": "e22d7b69eb00356bd8506310c8896c0b973732a9afa77035ff79c3df11a62fc8",
+    "runtime/crates/trames-session/src/process_lifecycle_retirement.rs": "9f541ab178e5b56de7bbbc178f2d343d40fdf0e09b9e787b13da6bcb2a1e04a0",
+    "runtime/crates/trames-session/src/process_proc.rs": "6a5592d5f89a95081a8176b7ebd20d9d840f4e63a96b98770579e52df9b15f01",
+    "runtime/crates/trames-session/src/process_return.rs": "a5bb6d63718c3e69dc6b35d6ad79780a68543cd27ab242833e04b521e0a877f3",
+    "runtime/crates/trames-session/src/process_seccomp.rs": "7c6e7b523d5ed8d1541819e860db303b01adc67f4c1166c9d4a6cdc2ef1849eb",
+    "runtime/crates/trames-session/src/process_tasks.rs": "71199210c9dde95edccdc50051473d474f8be735e300ac1ae03592760b627bd5",
+    "runtime/crates/trames-session/src/process_vm.rs": "32e9886de5d9af2ea67cfee4a934b3ee6389829079ed9cf10dc91a369af693c8",
+    "runtime/crates/trames-session/src/run_queue.rs": "82825bff0571047a16b75912694cb6b943ba7130ba7bb71e434833a2cedeec24",
+    "runtime/crates/trames-session/src/terminal.rs": "0926a7441ce723daeb713ae98a590ade969d03b4398bd423d3ecb8606293d9f0",
+    "runtime/crates/trames-session/src/workers.rs": "fe02a90d7e36f05bd02163c16152b709cd750eb70156cd16dd926da2f8a4a83a",
+    "runtime/crates/trames-vfs/src/lib.rs": "55ffc354417ee40ccf4bba9d14595d1aa52914bcff385cef13f1a68833933b13",
+    "runtime/crates/trames-vfs/src/pseudo.rs": "7c93546b7808965a6bf9750d112e020a064aaa1e4f029d3e2e26eda0ba459487",
+    "runtime/crates/trames-vulkan/src/context.rs": "5717ec7f4f6120f0eb30d13f7241cac04f6599530a4ca3c8f1f61ba658322c70",
+    "runtime/crates/trames-vulkan/src/context/retirement.rs": "458b7f1c4595f33d54d4c77d9b800180d806a88eb540f204752e1b0f0ddeca67"
+  },
+  "mac_product_source_sha256": {
+    "crates/trames-mac/src/session.rs": "1bac6b12f20018701a7d9f87b9c5810b69564afe1bd9f8b0cf72f29a63aef3f4"
+  },
+  "workflows": {
+    "runtime_macos": {
+      "passed": 7,
+      "total": 7,
+      "sha256": "9483d8fb3ca22b1fc5c4874bd08fd7ddd1be9668ea6d742304ef7703603f3261"
+    },
+    "runtime_linux": {
+      "passed": 7,
+      "total": 7,
+      "sha256": "6adf18c304a81c99ebabd36896d0f05aa1fde3e9e7817f7d2e99065d0cdf3f06"
+    },
+    "mac_product": {
+      "passed": 8,
+      "total": 12,
+      "sha256": "ba14aaa00c92e1f0f573a5b0801219db5c5c857af3693b9daf93ed8a7b994a70"
+    }
+  },
+  "process_tests": {
+    "macos": {
+      "passed": 470,
+      "ignored": 2,
+      "sha256": "9ad0dd95b9b199c37243133bb803a6257dd1b991fbb0dd3cc92f6217177580e2"
+    },
+    "linux": {
+      "passed": 470,
+      "ignored": 2,
+      "sha256": "6f1cb34af5feb3b44eec1ee69b628e3500ec8509200679af813d9c6de581e20f"
+    }
+  },
+  "ffi_tests": {
+    "macos": {
+      "passed": 10,
+      "ignored": 0,
+      "sha256": "60b5178dc3ab42e7545002a2b7b0852414d06fcd251a501695bf007a376cdecf"
+    },
+    "linux": {
+      "passed": 10,
+      "ignored": 0,
+      "sha256": "61513bb8008ae005bb6509d907dec458e23df3c8ff7b858fd63d030fe96420f4"
+    }
+  },
+  "ipad_sdk_targets": [
+    "aarch64-apple-ios",
+    "aarch64-apple-ios-sim"
+  ],
+  "hardware": {
+    "passed": true,
+    "runtime_revision": "633906b8f7d388693aa13a2cff0e9df1749e5a05",
+    "rows": [
+      {
+        "target": "trames-mac-run",
+        "executable_sha256": "8654106389ae90101fe5427322033b1f4fce18c495cd9817dc54acbaa1e07cf6",
+        "exit": 0,
+        "passed_tests": 26
+      },
+      {
+        "target": "trames_hvf",
+        "executable_sha256": "ef57196e8e0a728949d3eeb21b1e7a22b4f7dcf0342a4ad53555d0cead51673a",
+        "exit": 0,
+        "passed_tests": 52
+      }
+    ]
+  },
+  "installed_dev": {
+    "version": "Trames Dev 1.5.4 (dev) runtime 633906b8f7d388693aa13a2cff0e9df1749e5a05",
+    "runner_sha256": "1c8ea663268a991ec14d74c495669ecc74d395b42f3c5893559794971d052779",
+    "stable_sha256": "8fc21435034e8c041632e2e50419da9d2123bf790aedb0a1499286fc8367e614",
+    "stable_unchanged": true,
+    "checks": [
+      {
+        "name": "init",
+        "code": 0,
+        "seconds": 2.1698852090000003
+      },
+      {
+        "name": "host",
+        "code": 0,
+        "seconds": 0.8883778339999999
+      },
+      {
+        "name": "tracing",
+        "code": 0,
+        "seconds": 0.30841200000000013
+      }
+    ]
+  },
+  "installed_host_lifecycle": {
+    "passed": true,
+    "cpus": 12,
+    "runner_sha256": "1c8ea663268a991ec14d74c495669ecc74d395b42f3c5893559794971d052779",
+    "exec_16_elapsed_ns": 136412125,
+    "metrics": {
+      "cohort_rounds": 1,
+      "cohort_stop_us": 67,
+      "service_caller_wait_us": 0,
+      "service_requests": 0,
+      "serviced_syscalls": 0,
+      "syscalls": 3488,
+      "vm_local_syscalls": 371,
+      "worker_direct_syscalls": 1516,
+      "worker_fd_syscalls": 467,
+      "worker_file_syscalls": 232,
+      "worker_futex_waits": 8,
+      "worker_futex_wakes": 41,
+      "worker_gpu_calls": 0,
+      "worker_gpu_waits": 0,
+      "worker_poll_syscalls": 424,
+      "worker_socket_syscalls": 0,
+      "worker_syscalls": 3488,
+      "worker_task_resumes": 94,
+      "worker_uring_syscalls": 0
+    },
+    "checks": [
+      "live_exec",
+      "native_terminal_open",
+      "initial_size",
+      "live_resize",
+      "early_close_before_slave_open",
+      "master_close",
+      "busy_peer_survives",
+      "no_service_requests"
+    ]
+  },
+  "proc_race": {
+    "before_failed_within_repetitions": 4,
+    "before_error": "ESRCH after a different caller overwrote the shared proc alias target",
+    "workload_source_sha256": "6d611212b33bda9dd826ba4db2c700f72ccf716d1500ce956766d5d05e6fd872",
+    "guest_workload_unchanged": true,
+    "final_repetitions": 100,
+    "final_executable_sha256": "8654106389ae90101fe5427322033b1f4fce18c495cd9817dc54acbaa1e07cf6",
+    "log_sha256": "0090eef4d288aebd9f0385c797895f865d52f9e53bc4792230ed2d9b78f68d11"
+  },
+  "architecture": {
+    "terminal_lifecycle_category_removed_from_production": true,
+    "single_cpu_products_use_source_session": true,
+    "first_terminal_cause_is_one_way": true,
+    "host_completion_reply": "()",
+    "source_cpu_trace_wait_publication": true,
+    "source_task_namespace_lock_memory_native_network_retirement": true,
+    "accepted_cpu_and_policy_continuations": true,
+    "busy_gpu_retirement_uses_original_unlock_and_completion": true,
+    "proc_alias_inode_identity_shared_and_target_caller_owned": true,
+    "embedding_pty_zero_uses_original_source_capabilities": true,
+    "new_resource_service_threads": 0,
+    "new_polling_buses": 0,
+    "new_global_guest_algorithm_locks": 0,
+    "new_ordinary_memory_fences": 0
+  },
+  "provenance": [
+    "Final changed Rust source fingerprints match both complete runtime workflows, Linux process/FFI snapshot and Mac product CI",
+    "Actual native one/four/twelve-CPU exit and explicit host cancel avoid stopped host hooks and returned SVCs",
+    "Original read/poll/io_uring backend failure uses the payload-free source completion protocol",
+    "Budget continuation preserves accepted entry policy without re-evaluation or retirement replay",
+    "The unchanged proc guest workload fails before its caller-owned alias fix and passes 100 consecutive final native repetitions",
+    "Existing installed host lifecycle acceptance retains one cohort and zero service requests after source PTY 0 admission",
+    "Stable installed runner hash is unchanged; all builds reuse fixed targets with CARGO_INCREMENTAL=0"
+  ],
+  "remaining": {
+    "broad_categories": 3,
+    "categories": [
+      "Missing capabilities and excluded original resources",
+      "Final generic execution dispatch fallback",
+      "Initial and legacy embedding/backend orchestration"
+    ],
+    "uring_maintenance_escalation_sites": 2,
+    "overall_goal_complete": false
+  },
+  "unchanged": [
+    "Stable 1.5.4 app and runner",
+    "Business environments",
+    "Physical iPad installations"
+  ],
+  "limitations": [
+    "Legacy mutable embedding contracts and the existing generic handoff are still explicitly tracked",
+    "No claim that every unsupported/custom source provider has acquired an implementation",
+    "No controlled Firefox latency or throughput measurement",
+    "iPad common code and both SDK targets compiled; no physical iPad validation or deployment in this batch"
+  ]
+}

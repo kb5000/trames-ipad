@@ -2,19 +2,35 @@
 
 ## Current status — 2026-11-10
 
-Through stage 102 the broad remaining count is **four**. The latest batch closes
-the complete original task/mm structural dispatch dependency: mapping changes,
-clone/exec, io_uring registration, policy, custody, image/layout work, batching and
-accounting now share one typed ABI classification. The umbrella count is not a
-syscall count or a measurement of production fallback frequency; the generic
-catch-all remains an audit target.
+Stage 103 removes **production terminal session lifecycle** from the coordinator
+categories. Completion, cancellation/deadline, instruction-budget exhaustion,
+source failure and final task/mm/native cleanup use a one-way lifecycle protocol
+on existing executors. Stopping CPU admission does not grant the waiting host
+permission to execute guest operations. Single-CPU product sessions use this same
+path. The remaining count is **three**, with explicit legacy embedding debt still
+listed below; this is not a claim that the final generic dispatch is unreachable.
 
 | Remaining class | Current boundary | Recent concrete progress |
 | --- | --- | --- |
-| Host control and final teardown | Actual cancellation/deadline/shutdown, native-event failure and final CPU/session drain | Ordinary supervision, guest exit and controls are source-owned |
-| Missing capabilities and excluded resources | Genuinely absent original providers/bodies; two submitter-scoped io_uring maintenance setters remain | Task RSS/layout observations no longer depend on optional host-global statistics; io_uring retains its real sources. Actual absent global/typed providers remain |
-| Final execution dispatch | SVC or cold native-resource operation not completed, parked or accepted by a source scope | Stage 102 unifies the whole structural task/mm pipeline and closes its raw-selector and filtered cold-registration backdoors; final generic dispatch remains unproven |
-| Initial/legacy orchestration | Initial admission and standalone/capability-less scheduling | Unbound futex delivery now retains the original ready resource and admits exact cold waiters on existing executors; standalone caller-side draining remains |
+| Missing capabilities and excluded resources | Genuinely absent original providers/bodies; two submitter-scoped io_uring maintenance setters remain | Task RSS/layout observations use their original resources; actual missing providers remain |
+| Final execution dispatch | An unfinished SVC/native-resource operation returned by the explicit compatibility handoff | Terminal completion cannot use this handoff; stage 102 also unified structural dispatch, but the generic catch-all remains |
+| Initial/legacy orchestration | Bootstrap, capability-less embeddings, legacy mutable stopped hooks and backends without parallel execution support | Mac HVF and iPad interpreter single-CPU sessions now execute and finish on workers; legacy contracts remain explicit |
+
+The new architecture gate freezes the remaining compatibility handoff sites and
+rejects new sites or guest dispatch in terminal completion. The completion command
+replies with `()`, not an unfinished CPU call. Original task publication, accepted
+request cancellation, child/process locks, namespaces, memory publication and
+network shutdown finish on an existing executor. Accepted CPU traps survive a
+resumable budget return without replaying retirement. A busy native GPU context
+retains its own retirement and completes it on its actual lease-unlock/fence
+notifications; it cannot hold unrelated session completion hostage.
+
+See [stage 103](#103-one-way-source-session-completion--2026-11-10) and the
+[validation record](../validation/session-completion-20261110.json). Final local acceptance passes both seven-step runtime workflows, 470 process
+regressions and ten FFI cases on macOS and ARM64 Linux, both iPad SDK targets,
+78 signed hardware cases and Mac development gates 1–8. The installed Dev init,
+host lifecycle and tracing checks pass; stable's runner hash is unchanged.
+Historical stage paragraphs below retain their recorded counts and validation.
 
 Recent signed native fixtures demonstrate concrete path removal. Each baseline
 below is four CPUs; each final fixture passes at both four and twelve. These are
@@ -6235,3 +6251,58 @@ service thread, polling bus, global algorithm lock or ordinary memory fence is
 introduced. The four broad categories, two io_uring guards and overall goal
 remain open. This batch deploys only Mac Dev; stable and physical iPad installs
 keep their versions.
+
+
+## 103. One-way source session completion — 2026-11-10
+
+The old boolean stop conflated terminal lifecycle and an incomplete-call return.
+Stage 103 gives terminal completion a one-way state transition. Legacy handoff
+can suspend old dispatch, but cannot downgrade a closing session. Root completion,
+host cancellation/deadline, budget exhaustion and source/backend failure enter
+lifecycle completion rather than a joined guest-operation hook. They do not form
+a coordinator category merely because CPUs stop executing.
+
+After execution Views return, an existing CPU worker publishes CPU/trace and
+accepted wait state directly to the original task bodies. Original retirement
+resources handle terminal threads, child membership, clear_tid, namespaces,
+process locks and memory publication. Accepted ring cancellation preserves its
+original backend error; root network shutdown also runs here. The host's completion
+reply has no task, CPU or syscall payload. Its subsequent work is diagnostic
+collection, host-output flushing and returning/moving the completed root runtime.
+A pending, already-accounted CPU trap is retained across a resumable budget return,
+then consumes the original continuation and accepted policy decision on its next
+executor, without filtering the accepted call again.
+
+Single-CPU Mac/iPad execution now uses the same source session path. Old standalone
+cohort fixtures retain their explicit bounded-handoff contract, and custom legacy
+embedding hooks/backends remain an outstanding category. This change does not
+rename or remove the two actual io_uring missing-provider/body guards, nor assert
+that all final generic-dispatch cases are covered.
+
+The dependency audit also found a blocking native context retirement. Its original
+resource now retains a deferred retirement graph and reacts to lease-unlock and
+completion notifications. It adds no polling loop or resource-service thread.
+The architecture gate prevents growth of compatibility handoff sites, prevents
+terminal completion from invoking the old dispatcher, and checks that its host
+reply stays payload-free. The common implementation and constraints apply to
+both products. The paired [validation](../validation/session-completion-20261110.json)
+records concentrated common, hardware and installed Dev acceptance. Stable and
+physical iPad installations keep their prior versions.
+
+The terminal-path hardware audit also exposed a shared proc alias cache race:
+`/proc/self` and `/proc/thread-self` stored a caller's link target in an inode
+shared with other callers. Another executor could overwrite it between lookup
+and follow, bind an open to the wrong original task, and later return ESRCH when
+that task exited. These aliases now cache only inode/type metadata. Resolution,
+readlink and empty-path O_PATH reads compute the target from the current query's
+original caller/namespace context. Inode identity remains shared; no global
+resolver lock, owner handoff or ordinary file-byte check is added. The unchanged
+native proc workload failed within four repetitions before the fix and passes
+100 consecutive four/twelve-CPU repetitions after it.
+
+Single-CPU admission also exposed an obsolete controlling-terminal exception for
+embedding PTY ID 0. Its original terminal task and pair already exist, so zero is
+not an absent capability. `/dev/tty` now uses the same original source open body
+for embedding and ordinary PTYs. The existing twelve-CPU host lifecycle test
+retains its one-cohort/zero-return requirement; no bootstrap boundary is hidden
+or removed from the accounting.

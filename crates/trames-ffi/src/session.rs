@@ -1286,6 +1286,9 @@ impl GuestOutput for Adapter {
             .readiness(self.session.console_readiness.clone()),
         )
     }
+    fn cancellation_requested(&self) -> bool {
+        self.session.cancelled.load(Ordering::Acquire)
+    }
     fn poll_control(&mut self, vfs: &Vfs) -> io::Result<bool> {
         if self.session.cancelled.load(Ordering::Acquire) {
             return Ok(true);
