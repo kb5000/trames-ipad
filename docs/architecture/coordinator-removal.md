@@ -1,24 +1,25 @@
 # Coordinator dependency audit
 
-## Current status — 2026-11-10
+## Current status — 2026-11-11
 
-Stage 105 closes the **final generic execution-dispatch** category as a whole.
-Warm View and cold original Memory syscalls now share one accepted dispatcher;
-cold full Linux/native operations use original task/mm custody on existing
-workers. Initial frozen, blocked and sleeping actors are retained as original
-source jobs. Ordinary SVC/HLT exits and unknown CPU yields cannot request host
-dispatch. The architecture gate forbids generic production handoffs.
+Stage 106 closes the **last missing-capability/resource category**. The remaining
+production coordinator-dispatch category count is **zero**. The missing-resource
+return protocol, admission suspension, both io_uring owner setters and the
+residual host retry/wait loop are deleted. Bounded compatibility execution is a
+test-only mode; production can only run original source work or close the session.
 
-The remaining count is **one**, down from two in stage 104:
+| Former dependency | Final implementation |
+| --- | --- |
+| Host statistics | Original Send+Sync provider required at host-managed startup; synchronous host callback removed |
+| Cold byte/factory binding | Accepted original OFD/message and caller resources, on an existing executor |
+| Poll/select reader and graph binding | Retained full OFDs, imported arrays and deadlines, independent of FD reuse |
+| io_uring body/wait maintenance | Original submitter task/mm custody, canonical progress and original readiness; no owner flag |
+| Initial already-exited root | Existing source completion executor; no host guest-retry loop |
 
-| Remaining class | Current boundary | What no longer belongs to it |
-| --- | --- | --- |
-| Missing capabilities and excluded resources | An actual absent host statistics, byte or wait-graph provider; two submitter-scoped io_uring maintenance setters remain | Ordinary unfinished SVC/HLT work, nonmember actor retries, initial orchestration and terminal completion |
-
-A missing capability is attached to the exact accepted operation. Other returned
-CPUs keep their traps for source execution; the provider return cannot authorize
-unrelated host dispatch. Genuine object waits and affected-mm/backing quiescence
-remain object synchronization, not coordinator service work.
+This removes coordinator dispatch authority. Actual object waits, affected-mm
+quiescence, backing leases, backend failures and UI-thread affinity retain their
+real meaning. Unsupported Linux/device APIs preserve their existing behavior;
+this is not a claim of complete Linux API coverage.
 
 Host adapters perform mutable setup once per `Runtime::run` attempt, before CPU
 admission. Execution receives a separate live-only interface with no setup hook.
@@ -29,8 +30,8 @@ metadata-only work and wakes its existing execution slot on resource release.
 No coordinator/resource-service thread, polling bus, whole-call guest lock or
 ordinary memory fence is added.
 
-See [stage 105](#105-complete-original-source-execution-dispatch--2026-11-10)
-and its [validation record](../validation/source-dispatch-20261110.json).
+See [stage 106](#106-source-capabilities-and-final-coordinator-removal--2026-11-10)
+and its [validation record](../validation/source-capabilities-20261111.json).
 Source completion, bootstrap-only setup, live host polling and existing-worker
 CPU entry remain enforced. Historical sections retain their then-current counts.
 
@@ -6419,3 +6420,50 @@ cases and 11 FFI cases on each of macOS and native ARM64 Linux, both iPad SDK
 targets, Mac development gates 1–8 and all 78 signed hardware cases. Installed
 Dev init, twelve-CPU multi-terminal host lifecycle and tracing pass. Stable
 runner fingerprints and physical iPad installations are unchanged.
+
+
+## 106. Source capabilities and final coordinator removal — 2026-11-10
+
+The complete final category and its dependencies are migrated together. Shared
+host statistics are an admission contract, not a synchronous execution callback.
+A missing provider in host-managed mode fails before any CPU executes; bounded
+memory environments retain their original budget. Standalone kernel admission
+publishes the same original task/statistics graph before execution.
+
+Cold byte and poll/select operations bind complete original resources on an
+existing worker. Accepted OFDs, ancillary/message state, arrays, deadlines and
+policy decisions are preserved; neither numeric FD reuse nor later guest buffer
+edits can select a replacement. BPF poll remains canonically never-ready without
+adding BPF byte or epoll_ctl functionality.
+
+The ring maintenance owner bit and both setters are removed. A genuinely cold
+body uses its original submitter task/mm, full Linux body and readiness. It
+subscribes before its deciding progress pass, releases the execution slot while
+blocked and never requests host dispatch. Scope metadata now reports only
+pending publication/revision. The deleted missing-capability enum cannot be used
+to revive arbitrary stopped guest work.
+
+Production execution mode has only its source variant. The alternative bounded
+mode and suspension helpers are compiled solely for interpreter fixtures. The
+waiting host's legacy task scan, guest retry loop and native/socket/deadline wait
+loop are deleted. An already exited root also completes through an existing
+source worker. Architecture gates reject new production suspension methods,
+missing-provider return tags, owner-maintenance APIs, synchronous host accounting
+and host guest-dispatch loops. No coordinator/resource thread, polling bus,
+global guest algorithm lock or ordinary memory fence is added.
+
+New validation covers original-provider callback threads and startup failure at
+one/four/twelve CPUs, original standalone sysinfo, initial exited-root cleanup,
+cold Unix packet binding, poll/select signal-reader binding with FD/array reuse,
+canonical BPF poll and a real linked pending SQE missing its fast execution
+context. It verifies actual output/CQ state and retained inputs. Historical
+sections retain their prior counts. The [paired record](../validation/source-capabilities-20261111.json)
+contains final local CI, product and installed acceptance. Only Mac Dev is
+updated; stable apps, business environments and physical iPad installs remain
+unchanged. No controlled Firefox latency or throughput result is claimed.
+
+Final acceptance completed on 2026-11-11: both seven-step runtime workflows,
+478 session/process cases and 11 FFI cases per host, 320 Linux resource cases per
+host, both iPad SDK targets, Mac development gates 1–8 and all 78 signed hardware
+cases pass. Installed Dev init, twelve-CPU multi-terminal host lifecycle and
+tracing pass. Stable runner fingerprints and physical iPad installs are unchanged.

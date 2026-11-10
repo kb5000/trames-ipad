@@ -1,0 +1,252 @@
+{
+  "date": "2026-11-11",
+  "implementation_date": "2026-11-10",
+  "stage": 106,
+  "title": "Source capabilities and final coordinator removal",
+  "completed_utc": "2026-11-10T16:04:34.921244+00:00",
+  "runtime_base": "365f858bc345280fd0ae7af616aef5b6aae89b1b",
+  "runtime_revision": "74f5c7f3f9961c879b51142bec84a065ab810dad",
+  "mac_source_commit": "b75ed45a32ec0a4bcb7b07b8f5accf83d550da81",
+  "source_sha256": {
+    "runtime/crates/trames-linux/src/direct.rs": "421c80548b33f3c1cd85d26d3d853e83e9f545b6002f8d78f810b3870451c070",
+    "runtime/crates/trames-linux/src/direct/uring.rs": "021d6c0fc7c9fbf682c9981ead44a322e2d9e121fd3e2270fc924c10f7bdb4dd",
+    "runtime/crates/trames-linux/src/direct/uring/background.rs": "e27138382c9a802d55ffb3e5f7b3cfbdd0830bdc87d3c8b2050639c13d7de14e",
+    "runtime/crates/trames-linux/src/direct/uring/maintenance_tests.rs": "9217ef28ef941a5b48892767c292674e4efcfe76e6b05749a8745d29c2bc278f",
+    "runtime/crates/trames-linux/src/direct/uring/owned_tests.rs": "84bb0f96a290f0bfa75e59ec46ad1f6b0fe87977a834b280187a98665fdd6735",
+    "runtime/crates/trames-linux/src/direct/uring/scope.rs": "4fe8305b4cdf733704a13c5d40336381ed7f35b39f1c7ad36ebf86fdd72d6322",
+    "runtime/crates/trames-linux/src/direct/uring/scope_tests.rs": "0092b8aeeb026e8cb67042c5fea3e85bfef3bfada7e631498873fa60b9b1eb83",
+    "runtime/crates/trames-linux/src/direct/uring/subsystem_tests.rs": "e41001992ca401435a9e27e466b37e2dc6f43767b4aa7243167267ab89e3875c",
+    "runtime/crates/trames-linux/src/direct/uring/wait.rs": "b57d29da5de029a91b539de2327940e1e282d0ed1092270d9119b7e529cf7652",
+    "runtime/crates/trames-linux/src/direct/uring/wait_tests.rs": "c5ec2a7f4882fac6627a129957eb0ed1d7c4021c53ecf9b726160ec92dd80b91",
+    "runtime/crates/trames-linux/src/event_wait.rs": "657b4cd210329db0e4ea34d9cb55c7a08367e0a0999836905135a63ff5f633b8",
+    "runtime/crates/trames-linux/src/lib.rs": "2b127105c86e01635a508ebb40f787f9e9bf8f1f95d8e5d3023c74f3dabaaeff",
+    "runtime/crates/trames-linux/src/poll.rs": "a871e0dec73784e3c07338f8cbf456ae9a0afc6752475a5249314e512a359578",
+    "runtime/crates/trames-linux/src/uring.rs": "399b9cf859f96d2b5b9fb3c4e96643449ea40254196b0a0830e6e5ab95daff1d",
+    "runtime/crates/trames-session/src/execution_control.rs": "bab90896c6c7ec66832fe1147375e8389c9cebb4d31740f29fc69e7d7ad4e0ce",
+    "runtime/crates/trames-session/src/lib.rs": "b3142d2784e58469d13ee667c63f96fb804a6b8b43f16921ceae870641b9f7a7",
+    "runtime/crates/trames-session/src/process.rs": "f8cba497cd67055fd8af1303504e6afb319e86be4a3a2ae63c0e68c4c1a7a35c",
+    "runtime/crates/trames-session/src/process_completion_tests.rs": "5ae9cec18dc2b38c033ec7e935554131534165701c4b460cc88469af3c406870",
+    "runtime/crates/trames-session/src/process_exit.rs": "79d36c4418a07788221cef936c913256734670a7178f6c79a16efc74b808c9e5",
+    "runtime/crates/trames-session/src/process_host_io_tests.rs": "c6f33e4ffc55ade56d3ae4d109fea83feafcf7f9a36fcca1886658ec935758b0",
+    "runtime/crates/trames-session/src/process_lifecycle_dispatch.rs": "4cc8e474ecc71ea40c4bc24c3efe8b56ce5cd20065bfa647cbc12759c0ccddbb",
+    "runtime/crates/trames-session/src/process_proc.rs": "df91d23ef5c519777f05e0a91c3d7a4e7cbf047e1200a6fc422462d02eaf4baf",
+    "runtime/crates/trames-session/src/process_published_proc_tests.rs": "6688fefcd01274e205561c418d4cd0fbba854296c7d8bca6a65a292510eaf07d",
+    "runtime/crates/trames-session/src/process_statistics_tests.rs": "d2139be8caecd3b35f719fa1dcb3efd41f7f1bd7d59072bc85911507dfe9df5a",
+    "runtime/crates/trames-session/src/process_uring_authority_tests.rs": "415656d24c40309b2928b1b77097b7a8ea507820c92d432877cc285260d7994a",
+    "runtime/crates/trames-session/src/process_uring_original_tests.rs": "b3cae8a0932638b282b1983005f93cf22cb07518111da2db2d7fe1fbbf1ccd75",
+    "runtime/crates/trames-session/src/retired_memory.rs": "95744e17b6b7aa1e080a25135f4891da071b82e0199e70ae46a79b482dae8b2e",
+    "runtime/crates/trames-session/src/run_queue.rs": "d78217b0fa62b21d4834a485494f482a5c0ef7f7f3dc1fbcfdbe4c818a3778ca",
+    "runtime/crates/trames-session/src/terminal.rs": "7f1e69ba27a2aca04d02069df4db1e70f72121e73f1a8b4379f16c842dce86fe",
+    "runtime/crates/trames-session/src/workers.rs": "7b874500c4670833d7a91125e590b6bb498fa752b9bec43d5f6bf861f46929b3",
+    "runtime/crates/trames-vfs/src/direct_io.rs": "cc9d9c750c3c0b7c09c3ee392279d5596418755c62dbb4cc5e5d97e6806b172d",
+    "runtime/crates/trames-vfs/src/fd_table.rs": "b8f180bf9ecd864ac1a2046722c327e79a46a581d9cc4dabf6c2fa199eba4dd9"
+  },
+  "architecture_gate_sha256": "6e35785655421bed2ca577b778f7807320c01b66a2f23e8c59c4b02e5357d579",
+  "mac_product_source_sha256": {
+    "crates/trames-mac/src/session.rs": "48b024a0aebc584c613ce270a9612baa1eabf5c48fddb3b3746b334c3523a4b5"
+  },
+  "ipad_product_source_sha256": {},
+  "workflows": {
+    "runtime_macos": {
+      "passed": 7,
+      "total": 7,
+      "sha256": "f326b049198d6b33abf9541a3ff2859ab6d3d306f9ed68018f5cc9c6fc2a0ac2"
+    },
+    "runtime_linux": {
+      "passed": 7,
+      "total": 7,
+      "sha256": "30ee1e86623978292799686a8ca7e81c629fa66656aa1c8ed54898efb2c98e72"
+    },
+    "mac_product": {
+      "passed": 8,
+      "total": 12,
+      "sha256": "4141e69be353387bf63768643a7f539e8ecf815003719f543b7623dd4b514b02"
+    }
+  },
+  "process_tests": {
+    "macos": {
+      "passed": 478,
+      "ignored": 2,
+      "sha256": "2a82559e9be5e26411eff4b46e26a354bb80bc5562a2a3d36814a5600677f34e"
+    },
+    "linux": {
+      "passed": 478,
+      "ignored": 2,
+      "sha256": "24a86f8129a27ca46d2666c2138b5455a3a59b234ab51002d50b0d21b7336240"
+    }
+  },
+  "linux_resource_tests": {
+    "macos": {
+      "passed": 320,
+      "ignored": 1,
+      "workflow_test_log_sha256": "ededd9e0a555c42a87f886327fc3051f819782aaa864e3369c9a18e3ef73e0ab"
+    },
+    "linux": {
+      "passed": 320,
+      "ignored": 1,
+      "workflow_test_log_sha256": "fb93cbb50fda16caf778bddcc2d808c1dc296fff2a5ab287be93bbbe9042c7b5"
+    }
+  },
+  "ffi_tests": {
+    "macos": {
+      "passed": 11,
+      "ignored": 0,
+      "sha256": "628b09c68e479ce7b932c969e6457916a9b063f7eeaabc7a46a0d5ba6892e660"
+    },
+    "linux": {
+      "passed": 11,
+      "ignored": 0,
+      "sha256": "776af972a4050dd58a7b07dc3950330338193485bbfba127066b38d28c01011b"
+    }
+  },
+  "ipad_sdk_targets": [
+    "aarch64-apple-ios",
+    "aarch64-apple-ios-sim"
+  ],
+  "hardware": {
+    "passed": true,
+    "runtime_revision": "74f5c7f3f9961c879b51142bec84a065ab810dad",
+    "rows": [
+      {
+        "target": "trames-mac-run",
+        "executable_sha256": "6cb250ef86ad350afc4c5f3a3b4c8b0f5919c6badcf636b23b9b3ffa897369af",
+        "exit": 0,
+        "passed_tests": 26
+      },
+      {
+        "target": "trames_hvf",
+        "executable_sha256": "05de2d3ea0d534de8893d05060aa99f7896ae9ed3e835ea5791d5f30bbe899ca",
+        "exit": 0,
+        "passed_tests": 52
+      }
+    ]
+  },
+  "installed_dev": {
+    "version": "Trames Dev 1.5.4 (dev) runtime 74f5c7f3f9961c879b51142bec84a065ab810dad",
+    "runner_sha256": "674c1b4492b89eac132bfe0a844575e39dc09367117f6fb748fa2428347a7575",
+    "stable_sha256": "8fc21435034e8c041632e2e50419da9d2123bf790aedb0a1499286fc8367e614",
+    "stable_unchanged": true,
+    "checks": [
+      {
+        "name": "init",
+        "code": 0,
+        "seconds": 2.147508542
+      },
+      {
+        "name": "host",
+        "code": 0,
+        "seconds": 0.9143323329999999
+      },
+      {
+        "name": "tracing",
+        "code": 0,
+        "seconds": 0.26462074999999974
+      }
+    ]
+  },
+  "installed_host_lifecycle": {
+    "passed": true,
+    "cpus": 12,
+    "runner_sha256": "674c1b4492b89eac132bfe0a844575e39dc09367117f6fb748fa2428347a7575",
+    "exec_16_elapsed_ns": 136982917,
+    "metrics": {
+      "cohort_rounds": 1,
+      "cohort_stop_us": 77,
+      "service_caller_wait_us": 0,
+      "service_requests": 0,
+      "serviced_syscalls": 0,
+      "syscalls": 3326,
+      "vm_local_syscalls": 349,
+      "worker_direct_syscalls": 1458,
+      "worker_fd_syscalls": 442,
+      "worker_file_syscalls": 195,
+      "worker_futex_waits": 9,
+      "worker_futex_wakes": 38,
+      "worker_gpu_calls": 0,
+      "worker_gpu_waits": 0,
+      "worker_poll_syscalls": 422,
+      "worker_socket_syscalls": 0,
+      "worker_syscalls": 3326,
+      "worker_task_resumes": 92,
+      "worker_uring_syscalls": 0
+    },
+    "checks": [
+      "live_exec",
+      "native_terminal_open",
+      "initial_size",
+      "live_resize",
+      "early_close_before_slave_open",
+      "master_close",
+      "busy_peer_survives",
+      "no_service_requests"
+    ]
+  },
+  "architecture": {
+    "final_capability_category_removed": true,
+    "generic_production_handoff_sites": 0,
+    "provider_dispatch_suspension_sites": 0,
+    "missing_operation_return_enum": false,
+    "production_execution_modes": [
+      "Source"
+    ],
+    "bounded_compatibility_mode": "interpreter conformance fixtures only; absent from production enum",
+    "host_synchronous_memory_callback_removed": true,
+    "host_memory_contract": "an original Send+Sync provider is required for host-managed startup, before CPU admission; bounded sessions use original budgets",
+    "standalone_statistics": "original task/statistics graph published before execution",
+    "cold_byte_binding": "accepted original OFD/message plus actual namespace and factory",
+    "cold_poll_binding": "accepted full OFD retained before the caller signal reader binds, independent of numeric reuse and guest array edits",
+    "native_subscription_failures": "actual errors preserved; ready results win stale interests",
+    "bpf_poll": "canonical never-ready result; no new BPF byte or epoll_ctl functionality",
+    "uring_owner_required_state_removed": true,
+    "uring_owner_escalation_setters": 0,
+    "uring_cold_progress": "original submitter task/mm, full canonical body, subscribe-before-deciding retry, existing execution workers",
+    "scope_metadata": "pending publication and revision only",
+    "host_guest_retry_loop_removed": true,
+    "host_native_wait_loop_removed": true,
+    "already_exited_root": "existing source completion worker; payload-free host result",
+    "new_resource_service_threads": 0,
+    "new_polling_buses": 0,
+    "new_global_guest_algorithm_locks": 0,
+    "new_ordinary_memory_fences": 0
+  },
+  "provenance": [
+    "Every changed common Rust fingerprint matches both runtime workflows, the Linux source snapshot and Mac product tests",
+    "Changed Mac adapter/hardware fixture fingerprint matches the final product test snapshot",
+    "The architecture gate fingerprint matches all three final gate runs",
+    "Original shared host-statistics and accepted peer callbacks are verified on source threads at one/four/twelve CPUs; missing shared startup accounting executes no guest instructions",
+    "Standalone sysinfo and already-exited root completion use original source resources with no host guest-dispatch loop",
+    "Cold packet and signal poll/select bindings preserve imported operands and actual OFDs through close/reuse and guest buffer edits",
+    "A real linked pending open SQE without a fast execution lease completes via its original directory/path, after a real dependency wake; EAGAIN queue rotation is handled by request identity in the fixture",
+    "Native cold-poll errors preserve their actual cause, while ready operations can complete after stale native interests fail",
+    "All 78 unchanged signed native hardware workloads pass after the Mac provider-contract migration",
+    "Installed init supervision, twelve-CPU multi-terminal host lifecycle and tracing pass; installed host lifecycle retains one cohort and zero services",
+    "Stable runner hash unchanged; fixed build directories reused with CARGO_INCREMENTAL=0; owned Linux CI VM shut down afterward"
+  ],
+  "remaining": {
+    "broad_categories": 0,
+    "categories": [],
+    "uring_maintenance_escalation_sites": 0,
+    "coordinator_removal_goal_complete": true
+  },
+  "synchronization_retained": [
+    "Original object locks and readiness",
+    "Affected task/mm/backing custody and physical CPU interruption",
+    "Guest atomic operations and required memory order",
+    "Existing native I/O/device executors",
+    "Platform UI-thread presentation affinity"
+  ],
+  "unchanged": [
+    "Stable 1.5.4 app and runner",
+    "Business environments",
+    "Physical iPad installations"
+  ],
+  "limitations": [
+    "Zero coordinator-dispatch dependencies does not mean every Linux/device API is implemented; existing unsupported results remain",
+    "Custom host-managed embeddings must migrate the deleted synchronous host_memory method to host_memory_source; no copied periodic hint or new guest errno replaces it",
+    "Standalone DirectSyscalls fast-path checkpoints remain resource admission markers; they cannot suspend a production session for host execution",
+    "No arbitrary suspended process-tree or blocked-I/O checkpoint support is added",
+    "No controlled Firefox latency or throughput measurement",
+    "iPad common code and device/simulator SDKs compiled; physical iPad validation/deployment not performed",
+    "Mac stable/release packaging gates 10–12 are outside this Dev-only deployment; Dev gate 9 is covered by the recorded build/install checks"
+  ]
+}
