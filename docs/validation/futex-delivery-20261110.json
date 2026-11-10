@@ -1,0 +1,317 @@
+{
+  "date": "2026-11-10",
+  "stage": 101,
+  "subsystem": "Original unbound futex delivery, cold admission, custody retry, execution handoff and complete clear_tid exit dependencies; common WAKE_OP atomic body",
+  "status": "Validated and installed to Mac Dev only; overall coordinator-removal goal remains active",
+  "baseline_runtime": "789f4de84e83b3dcd83a3b18b1ebac9606406b8f",
+  "runtime_revision": "0894bef6642da29df58da8dea4cc71221068913e",
+  "workflows": {
+    "runtime_macos": {
+      "passed": 7,
+      "total": 7,
+      "sha256": "b8a4cb2a528b1ef4d5c1ec8f4d4257f8f3022b04f8a2b9cc6473abfc05d1dba1"
+    },
+    "runtime_linux": {
+      "passed": 7,
+      "total": 7,
+      "sha256": "b980dc7eed697b88cd3721e4681849b558c0346b25920906f02a3816a7999ae6"
+    },
+    "mac_product": {
+      "passed": 8,
+      "total": 12,
+      "sha256": "0c756cdfc9f3613861c73245b7299b2f9f2fd103f7fbdc8354ed6b033fe0c3ae"
+    }
+  },
+  "process": {
+    "macos": {
+      "passed": 461,
+      "ignored": 2,
+      "sha256": "bd80f2497361b3359ab10e873ee7e68140ec5936e6f4ce80bcfa5468e0df5b96"
+    },
+    "linux": {
+      "passed": 461,
+      "ignored": 2,
+      "sha256": "56a644ed3142a2b8dfc7e49edec571f1d772b09e30575eeab1e75f1c1e73f469"
+    }
+  },
+  "ffi": {
+    "macos": {
+      "passed": 10,
+      "ignored": 0,
+      "sha256": "20cee499953e2e9baf5c1b0f430288771694b3188fe74f8d656d4f892aedad19"
+    },
+    "linux": {
+      "passed": 10,
+      "ignored": 0,
+      "sha256": "22c46e8ce19fde14ef922caeec3cb6a7189cf37db5195dbfe4b428eb65e7e4bb"
+    }
+  },
+  "apple_sdk_checks": [
+    {
+      "name": "aarch64-apple-ios",
+      "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+      "code": 0
+    },
+    {
+      "name": "aarch64-apple-ios-sim",
+      "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk",
+      "code": 0
+    }
+  ],
+  "native_hardware": {
+    "passed": true,
+    "runtime_revision": "0894bef6642da29df58da8dea4cc71221068913e",
+    "rows": [
+      {
+        "target": "trames-mac-run",
+        "executable_sha256": "aeb7a9bacabebe455df3dc468cb2fb5398bd39f1fb77aa247102cc465584637a",
+        "exit": 0,
+        "passed_tests": 24
+      },
+      {
+        "target": "trames_hvf",
+        "executable_sha256": "0e3e64e30cabcf20031aa1fc3c7a5925bdd0e5876b3829c146e5727478e58abb",
+        "exit": 0,
+        "passed_tests": 52
+      }
+    ]
+  },
+  "original_scope_counts": {
+    "4": 2,
+    "12": 10
+  },
+  "source_sha256": {
+    "runtime/crates/trames-session/src/futex.rs": "7fffaf44850aa212de80cec4c34f9c495b9e1a4310c000ac481f78663cd5b35a",
+    "runtime/crates/trames-session/src/process_events.rs": "cc7a8464145b5773bf95def9fc7635b2b72e50d45a3226ee05d13f795cc83515",
+    "runtime/crates/trames-session/src/process_lifecycle.rs": "452ed80b70ec91011f693b5faa5e8a6021c6b191178c21e776767368a672bf09",
+    "runtime/crates/trames-session/src/process_lifecycle_futex.rs": "4dc6d46c564710b132b603c4f533173ca79cce133dd13391e48204bbee419f09",
+    "runtime/crates/trames-session/src/process_lifecycle_retirement.rs": "204ea5b080b2ed3e0acd6e3fdebcc77fbfd2cf88dccfaebd437b6090c1507e40",
+    "runtime/crates/trames-session/src/process_seccomp.rs": "b105d43937ae74b56add7c2637a9d335b5d662a0c33efc5e21749582139a9d0c",
+    "runtime/crates/trames-session/src/run_queue.rs": "1c3f1595e83a17ce48ffd22e10a6a2b649c47c6bf5ded0a021f3e5ffc15ebdf9",
+    "runtime/crates/trames-session/src/worker_syscalls.rs": "966b562e7b6e79ef335602974e5a2fe8d0947a403c1bc28a1776727e6df91a28",
+    "runtime/crates/trames-session/src/workers.rs": "a2ce586c79ac9f8a75d959213fa350868059ee2e1b64beeb938b13962b42de2c"
+  },
+  "mac_fixture_sha256": "ef07e2af4547599f3cd513130db0e7cac1292868dfbc51b86a77008bee90d257",
+  "installed": {
+    "version": "Trames Dev 1.5.4 (dev) runtime 0894bef6642da29df58da8dea4cc71221068913e",
+    "runner_sha256": "ee051961d187ed438c89b65461fd88f1f1e20cd75ddfbf40a0ccaec1d9bec636",
+    "stable_sha256": "8fc21435034e8c041632e2e50419da9d2123bf790aedb0a1499286fc8367e614",
+    "stable_unchanged": true,
+    "checks": [
+      {
+        "name": "init",
+        "code": 0,
+        "seconds": 3.298508042
+      },
+      {
+        "name": "host",
+        "code": 0,
+        "seconds": 0.9225145420000005
+      },
+      {
+        "name": "tracing",
+        "code": 0,
+        "seconds": 0.2564488340000004
+      }
+    ]
+  },
+  "local_checks": [
+    {
+      "name": "process-all",
+      "code": 0,
+      "seconds": 34.057678792
+    },
+    {
+      "name": "ffi",
+      "code": 0,
+      "seconds": 9.809831208000006
+    },
+    {
+      "name": "core-clippy",
+      "code": 0,
+      "seconds": 6.948238709000002
+    },
+    {
+      "name": "ffi-clippy",
+      "code": 0,
+      "seconds": 0.37502933399999705
+    },
+    {
+      "name": "aarch64-apple-ios",
+      "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+      "code": 0
+    },
+    {
+      "name": "aarch64-apple-ios-sim",
+      "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk",
+      "code": 0
+    }
+  ],
+  "linux_checks": [
+    {
+      "name": "process-all",
+      "code": 0,
+      "seconds": 62.31963873600001
+    },
+    {
+      "name": "ffi-all",
+      "code": 0,
+      "seconds": 12.636810214000008
+    },
+    {
+      "name": "core-clippy",
+      "code": 0,
+      "seconds": 5.887055251999996
+    },
+    {
+      "name": "runtime-ci",
+      "code": 0,
+      "seconds": 55.90776389899999
+    }
+  ],
+  "mac_checks": [
+    {
+      "name": "runtime-fetch",
+      "code": 0,
+      "seconds": 0.298434125
+    },
+    {
+      "name": "runtime-checkout",
+      "code": 0,
+      "seconds": 0.023622916999999966
+    },
+    {
+      "name": "mac-product-ci",
+      "code": 0,
+      "seconds": 13.780421
+    },
+    {
+      "name": "hardware",
+      "code": 0,
+      "seconds": 6.045172709000001
+    },
+    {
+      "name": "dev-build",
+      "code": 0,
+      "seconds": 16.746224542
+    },
+    {
+      "name": "dev-install",
+      "code": 0,
+      "seconds": 0.088848500000001
+    },
+    {
+      "name": "dev-signature",
+      "code": 0,
+      "seconds": 0.043813042000000024
+    },
+    {
+      "name": "installed",
+      "code": 0,
+      "seconds": 5.004693291999999
+    }
+  ],
+  "common_fixture": {
+    "slots": [
+      1,
+      4,
+      12
+    ],
+    "connected_modes": 7,
+    "operations": [
+      "WAKE",
+      "WAKE_BITSET",
+      "CMP_REQUEUE + WAKE",
+      "WAKE_OP",
+      "ordinary exit clear_tid",
+      "seccomp-fatal exit clear_tid",
+      "cold exit clear_tid"
+    ],
+    "unbound_task_admitted_without_epoch_stop": true,
+    "unrelated_workers_retained": true,
+    "custody_cases": [
+      "task body",
+      "original mm",
+      "release before readiness publication",
+      "stopped owner handback",
+      "replacement wait",
+      "PID reuse"
+    ],
+    "ready_resource_cases": [
+      "exact driver replacement",
+      "old driver Drop cannot clear new driver",
+      "deferred readiness across stop",
+      "callbacks outside resource and bucket locks"
+    ],
+    "existing_regressions": [
+      "shared cross-mm REQUEUE and wake",
+      "timeouts and cancellation",
+      "STOP/CONT",
+      "signals and exit",
+      "native and virtual I/O"
+    ]
+  },
+  "common_baseline": {
+    "first_operation": "WAKE",
+    "slots": 1,
+    "expected_failure": "Previous runtime stops the whole cohort before the cold actor can run",
+    "log_sha256": "c6eea25c8e1543d0b2ffcbec77872c654b5105f4cc03428334cde9a25fd49cb5",
+    "fixture_identity": {
+      "baseline_sha256": "e6157c876e9b95e62b101a846895abe55239d70f0492b1c801d93a6eba29d36e",
+      "final_sha256": "e45781d56327f1d6f282648bcd938df4d32ff32cbd49165da7cb3fa670c90a7c",
+      "rustfmt_equal": true
+    }
+  },
+  "native_baseline": {
+    "cpus": 4,
+    "expected_failure": "WAKE_OP returns ENOSYS instead of executing the original atomic body",
+    "log_sha256": "fcdb69910080b737f21053bee7b2a8636fbe63efee533770a647eff6635a3114"
+  },
+  "native_final": {
+    "cpus": [
+      4,
+      12
+    ],
+    "integer_operations": 5,
+    "signed_comparisons": 6,
+    "cohorts": 1,
+    "returned_calls": {},
+    "service_requests": 0,
+    "actual_mapping_scopes_retained": true
+  },
+  "removed": {
+    "legacy_effect_flag": true,
+    "per_dispatch_ready_latch": true,
+    "production_cohort_stop_sites": 5,
+    "new_service_threads": 0,
+    "new_polling_buses": 0
+  },
+  "validation_provenance": [
+    "Final changed Rust fingerprints match both complete local runtime workflows, Linux copy and Mac product gates",
+    "The old and final common fixture test source is rustfmt-identical; the only raw difference is array spacing and old runtime stops on first WAKE",
+    "Native old runtime returns the actual prior ENOSYS; final executes thirty operation/comparison combinations per hardware CPU",
+    "Cold original task/mm custody never blocks a CPU slot, and exact ticket identity prevents wait/PID donation",
+    "clear_tid includes ordinary exit, seccomp-fatal exit and cold original group retirement",
+    "Original affected-mm scopes remain required and are not returned coordinator syscalls",
+    "Both iPad SDK targets compile against the same tested runtime source",
+    "Full passed suites reused after documentation, evidence and rebuildable-cache cleanup only changes"
+  ],
+  "remaining": {
+    "broad_categories": 4,
+    "uring_maintenance_escalation_sites": 2,
+    "generic_dispatch_catch_all_not_proven_unreachable": true,
+    "overall_goal_complete": false
+  },
+  "unchanged": [
+    "Stable 1.5.4 installed runner",
+    "Business environments",
+    "Physical iPad installations"
+  ],
+  "limitations": [
+    "No controlled throughput or Firefox latency benchmark",
+    "No production unbound-futex fallback-frequency measurement",
+    "Native new fixture validates the atomic ABI; actual cold-admission/exit ownership is proven by the shared real executor fixture",
+    "PI and other currently unsupported futex commands retain their canonical unsupported results",
+    "No claim of universal custom embedding coverage or overall objective completion"
+  ]
+}

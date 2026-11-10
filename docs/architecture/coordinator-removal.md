@@ -2,9 +2,9 @@
 
 ## Current status — 2026-11-10
 
-Through stage 100 the broad remaining count is **four**. The latest batch closes
-the original per-task memory-observation resource family and its metadata,
-byte/vector, io_uring, lifetime and host-accounting dependencies. The umbrella count is not a syscall count or a
+Through stage 101 the broad remaining count is **four**. The latest batch closes
+the original futex unbound-delivery resource, cold task admission, custody retry,
+executor handoff and clear_tid exit dependencies, removing five cohort-stop sites. The umbrella count is not a syscall count or a
 measurement of production fallback frequency; the generic catch-all is still an
 audit target.
 
@@ -13,7 +13,7 @@ audit target.
 | Host control and final teardown | Actual cancellation/deadline/shutdown, native-event failure and final CPU/session drain | Ordinary supervision, guest exit and controls are source-owned |
 | Missing capabilities and excluded resources | Genuinely absent original providers/bodies; two submitter-scoped io_uring maintenance setters remain | Task RSS/layout observations no longer depend on optional host-global statistics; io_uring retains its real sources. Actual absent global/typed providers remain |
 | Final execution dispatch | SVC or cold native-resource operation not completed, parked or accepted by a source scope | Stage 98 closes canonical FD/error admission, the complete original epoll/poll/select graph, current-offset vector transports and residual setup/validation entries; the catch-all is not proven unreachable |
-| Initial/legacy orchestration | Initial admission and standalone/capability-less scheduling | Typed cold waits and compatibility io_uring retain original sources; genuinely missing providers retain their actual deadlines |
+| Initial/legacy orchestration | Initial admission and standalone/capability-less scheduling | Unbound futex delivery now retains the original ready resource and admits exact cold waiters on existing executors; standalone caller-side draining remains |
 
 Recent signed native fixtures demonstrate concrete path removal. Each baseline
 below is four CPUs; each final fixture passes at both four and twelve. These are
@@ -51,20 +51,24 @@ statistics. Metadata, byte/vector and io_uring paths share that admission. Suppl
 adapters also avoid host-global queries for per-task reads; host-managed meminfo
 uses its original host provider without scanning unused task/mm resources.
 
-Original FD/PID identity, live residency and final retirement remain intact.
-Genuine missing global memory providers keep their explicit boundary; the two
-actual io_uring guards and four broad categories are not declared removed. The
-[shared inventory](https://github.com/kb5000/trames-runtime/blob/main/docs/architecture/coordination-boundaries.md#current-remaining-categories)
-and [stage 100 validation](../validation/task-proc-resources-20261110.json) carry
-source-bound checks and native before/after evidence. Mac Dev alone is updated;
-stable 1.5.4, business environments and physical iPad installs retain their versions.
-Both runtime workflows pass seven local steps. Mac and ARM64 Linux each pass
-456 process regressions (two intentionally ignored) and ten FFI cases; both iPad
-SDK targets compile. All 75 signed native cases and Mac development gates 1–8
-pass. Native four/twelve-CPU task observations finish one cohort with no returned
-syscall/service and one startup host sample, retaining two/ten actual mapping
-scopes. Installed Dev init, host lifecycle, tracing and real meminfo/cpuinfo/status
-checks pass. Stable's runner hash is unchanged. The overall goal stays active.
+Stage 101 closes unbound futex delivery and its complete cold-admission/exit
+dependency graph. The old ready latch and five cohort-stop sites are removed;
+original tickets, task/mm custody, executor handoff and clear_tid stay on existing
+workers. WAKE_OP now uses the common original guest atomic body. The exact cold
+fixture stops on the prior runtime, then completes seven connected modes on
+one/four/twelve slots after this batch. This is distinct from the unchanged fast
+path for already-bound waits and does not estimate production fallback frequency.
+
+Both complete runtime workflows pass seven local steps. Mac and ARM64 Linux each
+pass 461 process regressions (two intentionally ignored) and ten FFI cases; both
+iPad SDK targets compile. All 76 signed native cases and Mac development gates
+1–8 pass. Native WAKE_OP covers thirty arithmetic/comparison combinations per CPU
+in one cohort with no returned syscall/service at four/twelve CPUs, retaining
+two/ten real mapping scopes. Installed Dev init, host lifecycle and tracing checks
+pass. Stable's runner hash is unchanged. The [stage 101 validation](../validation/futex-delivery-20261110.json)
+and [shared inventory](https://github.com/kb5000/trames-runtime/blob/main/docs/architecture/coordination-boundaries.md#current-remaining-categories)
+carry exact source evidence. Four broad categories, two io_uring guards and final
+dispatch remain open. The overall goal stays active.
 
 ### Stage 81 read-only memory observations (historical)
 
@@ -6156,3 +6160,41 @@ cross-platform verification are in the [validation record](../validation/task-pr
 Actual mapping-reader synchronization, genuine absent global providers and both
 io_uring maintenance guards remain. Four broad categories and the overall goal
 stay open; these fixtures are not a throughput/fallback-frequency claim.
+
+
+## 101. Original futex delivery, admission and exit dependency graph — 2026-11-10
+
+This batch replaces the complete unbound-ready stop mechanism, rather than just
+removing a waker flag. WAKE/WAKE_BITSET, REQUEUE/CMP_REQUEUE and clear_tid from
+ordinary exit, seccomp-fatal exit and cold group retirement now publish original
+tickets to the same persistent futex table. Its current executor driver is weak
+and identity checked. Existing workers drain it outside the run-queue mutex;
+already-bound waits preserve their direct queue callback. Five production
+`take_readied` stop sites and the per-dispatch legacy latch are removed.
+
+A cold ticket resolves the original task directory and takes nonblocking original
+task/mm custody. Exact wait identity is revalidated before CPU/trace capture;
+PID reuse or replacement waits cannot receive an old wake. Only that task's
+metadata is admitted, with byte Views prepared by the existing affected-mm
+machinery. Contention retains original custody notifications and returns the CPU
+slot. Stopped/replaced executors leave undelivered work in the original resource;
+the standalone caller can drain it after stop. No task/Files projection, new
+thread, polling bus, ordinary guest-memory fence or global algorithm lock is added.
+
+The previously unsupported WAKE_OP is included in the common non-PI queue ABI.
+It uses the same guest atomic-update contract as the CPU, ordered original futex
+buckets, five integer operations, six signed comparisons and Linux's legacy shift
+and zero-count behavior. Invalid comparison retains the atomic write and returns
+ENOSYS before waking, matching the [Linux implementation](https://github.com/torvalds/linux/blob/v6.12/kernel/futex/waitwake.c#L194).
+Actual PI/unknown commands keep their existing unsupported result; this is not a
+claim to implement every Linux futex extension.
+
+The exact cold-waiter fixture fails on the previous runtime at its first WAKE:
+the producer stops the entire cohort. The final fixture covers the connected
+wake/requeue/exit group at one/four/twelve CPU slots without that stop. Custody,
+source replacement, stopped owner handoff, release-before-publication, task/wait
+reuse, cancellation/timeout and STOP/CONT are in the concentrated regression
+closure. See the [validation record](../validation/futex-delivery-20261110.json)
+for cross-platform checks and signed native evidence. The four broad categories,
+two genuine io_uring guards and generic dispatch audit remain open. Only Mac Dev
+is deployed in this batch; stable and physical iPad installations are unchanged.
