@@ -2,17 +2,23 @@
 
 ## Current status — 2026-11-10
 
-Stage 104 closes the **host embedding and initial execution orchestration**
-category. Mutable stopped callbacks, boolean requests to join all CPUs, backend
-opt-out from worker execution and the caller-side serial CPU loop are removed.
-All guest instruction entry belongs to existing execution workers, including one
-CPU, cold admission, resumed ready work and mapping-operation batching. The
-remaining count is **two**; the final compatibility dispatcher is still present.
+Stage 105 closes the **final generic execution-dispatch** category as a whole.
+Warm View and cold original Memory syscalls now share one accepted dispatcher;
+cold full Linux/native operations use original task/mm custody on existing
+workers. Initial frozen, blocked and sleeping actors are retained as original
+source jobs. Ordinary SVC/HLT exits and unknown CPU yields cannot request host
+dispatch. The architecture gate forbids generic production handoffs.
 
-| Remaining class | Current boundary | Recent concrete progress |
+The remaining count is **one**, down from two in stage 104:
+
+| Remaining class | Current boundary | What no longer belongs to it |
 | --- | --- | --- |
-| Missing capabilities and excluded resources | Genuinely absent original providers/bodies; two submitter-scoped io_uring maintenance setters remain | Original-resource admission is shared by both products; absent providers remain explicit |
-| Final execution dispatch | An unfinished SVC/native-resource operation returned by the explicit compatibility handoff, including nonmember resource retries | Source terminal completion and host events cannot request this handoff; its compatibility handler cannot execute guest instructions |
+| Missing capabilities and excluded resources | An actual absent host statistics, byte or wait-graph provider; two submitter-scoped io_uring maintenance setters remain | Ordinary unfinished SVC/HLT work, nonmember actor retries, initial orchestration and terminal completion |
+
+A missing capability is attached to the exact accepted operation. Other returned
+CPUs keep their traps for source execution; the provider return cannot authorize
+unrelated host dispatch. Genuine object waits and affected-mm/backing quiescence
+remain object synchronization, not coordinator service work.
 
 Host adapters perform mutable setup once per `Runtime::run` attempt, before CPU
 admission. Execution receives a separate live-only interface with no setup hook.
@@ -23,12 +29,10 @@ metadata-only work and wakes its existing execution slot on resource release.
 No coordinator/resource-service thread, polling bus, whole-call guest lock or
 ordinary memory fence is added.
 
-See [stage 104](#104-host-embedding-and-initial-execution-orchestration--2026-11-10)
-and its [validation record](../validation/host-orchestration-20261110.json).
-Stage 103's source completion and immutable terminal-cause checks remain active.
-The new host-execution gate rejects stopped callbacks, bootstrap access from
-execution, new caller CPU loops and the old backend fallback flag. Historical
-stage paragraphs below retain their recorded counts and validation.
+See [stage 105](#105-complete-original-source-execution-dispatch--2026-11-10)
+and its [validation record](../validation/source-dispatch-20261110.json).
+Source completion, bootstrap-only setup, live host polling and existing-worker
+CPU entry remain enforced. Historical sections retain their then-current counts.
 
 Recent signed native fixtures demonstrate concrete path removal. Each baseline
 below is four CPUs; each final fixture passes at both four and twelve. These are
@@ -6361,3 +6365,57 @@ lifecycle and tracing pass; the native host cohort remains one with zero service
 Only Mac Dev is updated in this batch; stable apps, business environments and
 physical iPad installations are unchanged. No controlled throughput or Firefox
 latency result is claimed.
+
+
+## 105. Complete original-source execution dispatch — 2026-11-10
+
+This batch removes the entire final generic-dispatch mechanism, including its
+initial/nonmember dependencies and background-maintenance paths. Both products
+use the same accepted syscall body over their actual CPU and Memory/View. Cold
+full Linux operations borrow the original task's state; structural/native work
+retains its existing affected-mm scope. No Kernel copy, task-table projection,
+new service worker, polling bus or global guest algorithm lock is introduced.
+
+Accepted FD/OFD resources, deadlines, pending results and seccomp entry decisions
+stay with the same job. Blocked exec/mapping entries retain their actual ABI and
+accepted policy, rather than becoming ordinary I/O retries. Frozen, blocked,
+signal, namespace, policy and completion wait actors enter the same source graph;
+only actual CPU/byte work prepares a View. Host polling cannot revive them by
+scanning stale Process state. An unclassified CPU yield simply requeues its job.
+
+The sole production admission suspension requires a typed actual missing resource
+on the original operation. Unrelated returned SVC/HLT traps are preserved for
+source execution. Background ring maintenance first uses the original submitter
+scope and escalates only its genuinely missing graph. The two underlying ring
+maintenance setters remain part of the one outstanding capability category.
+Generic handoff methods are available only to bounded interpreter test fixtures;
+the architecture gate rejects adding them to production.
+
+Shared original-VFS cold execution also revealed a proc cache/inode lock-order
+conflict. Cache identity interning now returns a pending inode update, applied
+only after releasing the pseudo publication and cache-index locks. Existing
+inode identities, caller-specific aliases and live contents are retained without
+a global path lock. The previously hung filtered parallel proc-open regression
+now completes.
+
+Validation adds full ABI parity against the complete canonical entry, unknown
+yields at one/four/twelve CPUs, and a missing-provider/accepted-peer case that
+checks the actual callback thread. The [paired record](../validation/source-dispatch-20261110.json)
+contains final common, product, hardware and installed Dev results. Only Mac Dev
+is deployed; stable apps, business environments and physical iPad installs remain
+unchanged. No controlled Firefox latency or throughput claim is made.
+
+The hardware audit additionally covers a conservative ABI-recognition overlap:
+read/write numbers can name either a terminal session handler or a full Linux
+OFD body. Recognition alone cannot reject the latter. An original legacy proc
+OFD without the optimized query provider now reads through its actual full VFS
+body on source. The unchanged dormant shared-futex hardware workload retains its
+exit and memory-marker assertions and now requires one cohort with zero returned
+syscalls, replacing its prior two cohorts and one returned read. A common
+one/four/twelve-CPU regression also checks the actual bytes and read count.
+
+Final acceptance passes both seven-step runtime workflows, 476 session/process
+cases and 11 FFI cases on each of macOS and native ARM64 Linux, both iPad SDK
+targets, Mac development gates 1–8 and all 78 signed hardware cases. Installed
+Dev init, twelve-CPU multi-terminal host lifecycle and tracing pass. Stable
+runner fingerprints and physical iPad installations are unchanged.
