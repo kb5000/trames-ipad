@@ -1,0 +1,162 @@
+{
+  "date": "2026-11-11",
+  "stage": 107,
+  "title": "Native host waits and release compatibility entry removal",
+  "completed_utc": "2026-11-10T17:31:16.691495+00:00",
+  "runtime_base": "74f5c7f3f9961c879b51142bec84a065ab810dad",
+  "runtime_revision": "cb5b70317cae2c7f969ca479d1c6621bd83d862e",
+  "runtime_commits": [
+    "d1070cd98bb3bfe8e53fccd7a1c9799a8d877594",
+    "cb5b70317cae2c7f969ca479d1c6621bd83d862e"
+  ],
+  "mac_revision": "5782968b5b56a81ff671c5cccb61715f4cfdf89a",
+  "production_coordinator_dispatch_categories": 0,
+  "removed_release_entries": [
+    "Kernel syscall body/call wrapper, vm_checkpoint and joined CPU restoration",
+    "parallel_timeout_for task/deadline scans",
+    "VmReady/Retired/Idle host event receivers",
+    "implicit terminal/control poll interval",
+    "image/proc/futex/launch/retired-memory owner notifications"
+  ],
+  "remaining_host_roles": [
+    "Bootstrap and initial worker admission",
+    "Actual embedding transport/control activity using native readiness",
+    "Physical completion waits, original output drain and result return"
+  ],
+  "design": [
+    "Original source workers own every guest operation and affected-resource scope",
+    "One existing caller waits on native descriptors and original subscriptions; no added reactor or resource-service thread",
+    "Ready regular/device console I/O retries directly; only blocked transports register a native interest",
+    "New exec/queue/terminal state transitions notify subscription refresh once",
+    "Normal source closure rejects unadmitted FFI commands and drains accepted native I/O",
+    "Existing object locks and affected-mm quiescence retain their original meaning"
+  ],
+  "validation": {
+    "runtime_workflows": {
+      "macOS": {
+        "shell_steps": 7,
+        "passed": true
+      },
+      "native_arm64_linux": {
+        "shell_steps": 7,
+        "passed": true
+      }
+    },
+    "process_cases": {
+      "macOS": {
+        "passed": 482,
+        "ignored": 2,
+        "composition": "481 cases from the final complete batch, plus the corrected ready-device regression; only its coalesced-wake assertion changed for the rerun"
+      },
+      "native_arm64_linux": {
+        "passed": 482,
+        "ignored": 2,
+        "composition": "Final complete batch"
+      }
+    },
+    "ffi_cases_per_host": 12,
+    "linux_resource_cases_per_host": {
+      "passed": 320,
+      "ignored": 1
+    },
+    "shared_resource_cases_per_host": 27,
+    "ipad_sdks": [
+      {
+        "name": "aarch64-apple-ios",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+        "code": 0
+      },
+      {
+        "name": "aarch64-apple-ios-sim",
+        "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk",
+        "code": 0
+      }
+    ],
+    "mac_development_gates": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "dev_build_sign_install": true,
+    "signed_hardware": [
+      {
+        "target": "trames-mac-run",
+        "executable_sha256": "79eae1f3148e33576fe8315196a62ce3e9c166b54333aca00b94d410b97ce7a9",
+        "exit": 0,
+        "passed_tests": 26
+      },
+      {
+        "target": "trames_hvf",
+        "executable_sha256": "d9b89ed727a5fbd81dd180a76fb84aaceffa87b286be5fe118144e114e836cdf",
+        "exit": 0,
+        "passed_tests": 52
+      }
+    ],
+    "installed": {
+      "version": "Trames Dev 1.5.4 (dev) runtime cb5b70317cae2c7f969ca479d1c6621bd83d862e",
+      "runner_sha256": "3880d8a07814b64190dcd1d3ee37aeac7e6b8d0b85db8b3eb5838cc360474233",
+      "stable_sha256": "8fc21435034e8c041632e2e50419da9d2123bf790aedb0a1499286fc8367e614",
+      "stable_unchanged": true,
+      "checks": [
+        {
+          "name": "init",
+          "code": 0,
+          "seconds": 1.9050323329999999
+        },
+        {
+          "name": "host",
+          "code": 0,
+          "seconds": 0.8303562920000003
+        },
+        {
+          "name": "tracing",
+          "code": 0,
+          "seconds": 0.2501794999999998
+        }
+      ]
+    },
+    "additional_regressions": [
+      "Notifications between deciding pass and wait",
+      "Native descriptor close/reuse and actual idle deadlines",
+      "At most four host polls during an 80 ms source run at one/four/twelve CPUs",
+      "Initial pause resumed by the original host notification",
+      "Permanent EOF and immediately-ready /dev/null without native registration",
+      "OS pressure callback to native waiter",
+      "Late exec admission and preparation-error response before subscriptions exist",
+      "Closed FFI command receiver with already-admitted I/O still active"
+    ],
+    "linux_rs_toml_snapshot_matches_final": true,
+    "current_static_architecture_gate_rechecked": true
+  },
+  "deployment": {
+    "mac_dev_app": "/Users/main/Applications/Trames Dev.app",
+    "version": "Trames Dev 1.5.4 (dev) runtime cb5b70317cae2c7f969ca479d1c6621bd83d862e",
+    "runner_sha256": "3880d8a07814b64190dcd1d3ee37aeac7e6b8d0b85db8b3eb5838cc360474233",
+    "stable_runner_sha256": "8fc21435034e8c041632e2e50419da9d2123bf790aedb0a1499286fc8367e614",
+    "stable_unchanged": true,
+    "physical_ipad_install_changed": false,
+    "ci_vm_stopped": true
+  },
+  "evidence": {
+    "mac_local": "target/host-wait/local-results.json",
+    "mac_runtime": "target/host-wait/runtime-mac/summary.json",
+    "mac_process": "target/host-wait/conformance-final.log.gz",
+    "ready_device_rerun": "target/host-wait/ready-input-test.log",
+    "linux": "target/local-ci/io/host-wait/final-results.json",
+    "linux_runtime": "target/local-ci/io/host-wait/runtime-linux-ci/summary.json",
+    "mac_product": "target/host-wait/mac-product-ci/summary.json",
+    "mac_acceptance": "target/host-wait/mac-final-checks.json",
+    "installed": "target/host-wait/installed-checks.json"
+  },
+  "limitations": [
+    "No controlled Firefox latency/throughput or Geekbench comparison in this batch",
+    "iPad common code and both SDK targets validated; physical iPad testing/deployment not performed",
+    "Stable packaging/release gates 10-12 are outside this Dev-only deployment",
+    "Unsupported Linux/device functionality retains its existing results"
+  ]
+}

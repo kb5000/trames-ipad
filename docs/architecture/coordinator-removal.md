@@ -2,38 +2,35 @@
 
 ## Current status — 2026-11-11
 
-Stage 106 closes the **last missing-capability/resource category**. The remaining
-production coordinator-dispatch category count is **zero**. The missing-resource
-return protocol, admission suspension, both io_uring owner setters and the
-residual host retry/wait loop are deleted. Bounded compatibility execution is a
-test-only mode; production can only run original source work or close the session.
+Stage 107 removes the remaining **host scheduling and compatibility entry class**.
+The previous zero count described normal guest dispatch; it did not mean the
+caller lacked a periodic task scan or a compiled legacy checkpoint handler.
+Those remaining entries are now absent from release execution.
 
-| Former dependency | Final implementation |
+| Former host entry | Current implementation |
 | --- | --- |
-| Host statistics | Original Send+Sync provider required at host-managed startup; synchronous host callback removed |
-| Cold byte/factory binding | Accepted original OFD/message and caller resources, on an existing executor |
-| Poll/select reader and graph binding | Retained full OFDs, imported arrays and deadlines, independent of FD reuse |
-| io_uring body/wait maintenance | Original submitter task/mm custody, canonical progress and original readiness; no owner flag |
-| Initial already-exited root | Existing source completion executor; no host guest-retry loop |
+| `parallel_timeout_for` task/deadline scans | Interpreter fixtures only; live guest deadlines remain on original execution resources |
+| `VmReady`, `Retired`, `Idle` host events | Interpreter fixtures only; existing workers own scoped maintenance, retirement and idle failure |
+| `vm_checkpoint`, `Kernel::call` and joined CPU restoration | Interpreter fixtures only; the release syscall recognizer remains available without a Kernel dispatch body |
+| Implicit 2 ms terminal / 10 ms host poll | Actual native descriptor and original resource notifications, plus explicit embedding expiry |
+| Owner wake for images, proc reads, futexes, launches and retired memory | Original execution subscriptions; fixture-only outside-epoch notifiers |
 
-This removes coordinator dispatch authority. Actual object waits, affected-mm
-quiescence, backing leases, backend failures and UI-thread affinity retain their
-real meaning. Unsupported Linux/device APIs preserve their existing behavior;
-this is not a claim of complete Linux API coverage.
+The caller still bootstraps execution, handles embedding transport activity,
+waits for physical completion and returns the result. These roles have no guest
+CPU/syscall retry authority. Terminal input, resize, output backpressure,
+control sockets, host launches, systemd notification/shutdown, iPad file commands,
+UI pause/cancel and Mac memory pressure retain their actual readiness sources.
+An idle embedding sleeps until an event or its own explicit deadline. Permanent
+stdin EOF is removed from its read interest rather than causing repeated wakes.
 
-Host adapters perform mutable setup once per `Runtime::run` attempt, before CPU
-admission. Execution receives a separate live-only interface with no setup hook.
-Host polls return `Running` or `Cancelled`; launches, signals, terminal events and
-file transfers retain their original resources and use existing executors. A
-sleeping initial root still admits source host launches. A busy backing admits
-metadata-only work and wakes its existing execution slot on resource release.
-No coordinator/resource-service thread, polling bus, whole-call guest lock or
-ordinary memory fence is added.
+Mac HVF and the iPad interpreter share the common waiter and source lifecycle.
+Platform UI affinity remains in the adapters. No service thread, polling bus,
+Kernel/task-table clone or ordinary guest-memory barrier is introduced.
+Unsupported Linux/device APIs preserve their existing behavior.
 
-See [stage 106](#106-source-capabilities-and-final-coordinator-removal--2026-11-10)
-and its [validation record](../validation/source-capabilities-20261111.json).
-Source completion, bootstrap-only setup, live host polling and existing-worker
-CPU entry remain enforced. Historical sections retain their then-current counts.
+See [stage 107](#107-native-host-waits-and-release-compatibility-entry-removal--2026-11-11)
+and its [validation record](../validation/host-wait-20261111.json).
+Historical sections retain their then-current counts.
 
 Recent signed native fixtures demonstrate concrete path removal. Each baseline
 below is four CPUs; each final fixture passes at both four and twelve. These are
@@ -6467,3 +6464,61 @@ Final acceptance completed on 2026-11-11: both seven-step runtime workflows,
 host, both iPad SDK targets, Mac development gates 1–8 and all 78 signed hardware
 cases pass. Installed Dev init, twelve-CPU multi-terminal host lifecycle and
 tracing pass. Stable runner fingerprints and physical iPad installs are unchanged.
+
+## 107. Native host waits and release compatibility entry removal — 2026-11-11
+
+This batch removes the complete caller-side scheduling/compatibility class and
+its connected notifications. Release builds have no `vm_checkpoint`, Kernel
+syscall body/call wrapper, joined return restoration, host task/deadline scanner,
+or `VmReady`/`Retired`/`Idle` receiver. The dispatch macro keeps its ABI recognizer
+available while cfg-excluding the old body. Source workers consume every original
+scope; source failure cannot select a compatibility receiver. Bounded interpreter
+fixtures retain their explicit test contract.
+
+The existing host caller uses a native event set with retained descriptor
+interests and original resource subscriptions. It arms before registration and
+the deciding nonblocking pass. Events between that pass and sleep are latched.
+There is no implicit control timer. Worker source completion wakes the same
+waiter, and final terminal output retains it through backpressure and bounded
+native writes. Permanent host EOF stops registering stdin readability.
+
+Mac console/exec sockets register only actual read/write interests. Guest PTYs,
+launch completion and systemd's authenticated endpoint notify through their
+original resources. OS signals use an async-signal-safe pipe; the existing memory
+pressure callback latches into a process-lifetime pipe. Reclamation subscribes
+to actual borrower release and bounds each active batch. iPad input/output,
+terminal creation/close/resize, pause/cancel, file/timezone commands, file
+completion and status observations notify the actual embedding. No new reactor,
+coordinator or resource-service thread is created.
+
+Architecture checks inspect release source, including cfg-only blocks, fields,
+closures and macro declarations. They reject restoring a host checkpoint receiver,
+Kernel dispatch wrapper, owner notification or periodic control API. Validation
+includes descriptor close/reuse, notifications before sleep, idle deadlines,
+source polling counts at one/four/twelve CPUs, initial pause/resume and permanent
+stdin EOF, in addition to the existing full conformance and native fixtures.
+Exact final results and deployment scope are recorded in the linked validation.
+
+Installed acceptance additionally exposed systemd's embedding PTY with
+`/dev/null` stdin: macOS rejects its native read filter even though the read is
+already ready. The host now retries ready console operations directly and
+registers only blocked transports. The regression accepts finite coalesced
+notifications and requires eventual idle sleep after EOF. Normal source closure
+also explicitly closes the iPad command receiver, reports queued unadmitted
+commands as failed, and drains already admitted I/O through its original wake.
+
+Real twelve-CPU transport acceptance also covers a request received after socket
+interest registration. Creating its job/completion sources or an error response
+now notifies the current waiter once. Transitions to pending input/output and
+post-flush terminal removal do the same. Stable blocked queues keep their
+original subscriptions; they do not request periodic retries. A deterministic
+Mac regression covers successful admission and preparation failure.
+
+Final acceptance: both complete seven-step runtime workflows pass on macOS and
+native ARM64 Linux. Each host passes 482 process/terminal and 12 FFI cases (two
+original process cases remain ignored); 320 Linux resource cases pass per host
+with one existing ignore. Both iPad SDKs compile. Mac development gates 1–8,
+all 78 signed hardware cases, native pressure/late-request regressions and the
+installed Dev init, twelve-CPU multi-terminal/exec lifecycle and tracing checks
+pass. Both products pin the same runtime commit. Stable 1.5.4, business
+environments and physical iPad installs remain unchanged. The CI VM is stopped.

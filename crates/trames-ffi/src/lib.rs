@@ -298,6 +298,7 @@ pub unsafe extern "C" fn trames_session_terminal_input(
             drop(buffers);
             if count != 0 {
                 session.console_readiness.notify_locked();
+                session.notify_host();
             }
             Ok::<_, &str>(count as i32)
         })();
@@ -344,6 +345,7 @@ pub unsafe extern "C" fn trames_session_terminal_output(
             drop(buffers);
             if count != 0 {
                 session.console_readiness.notify_locked();
+                session.notify_host();
             }
             Ok::<_, &str>(count)
         })();
@@ -372,6 +374,7 @@ pub extern "C" fn trames_session_terminal_resize(
                         return error("invalid or closed terminal");
                     };
                     b.size = Some((rows, columns));
+                    s.notify_host();
                     0
                 }
                 Err(_) => error("session lock unavailable"),
@@ -396,6 +399,7 @@ pub extern "C" fn trames_session_pause(handle: u64, paused: u32) -> i32 {
     boundary(|| match session(handle) {
         Ok(s) => {
             s.paused.store(paused != 0, Ordering::Release);
+            s.notify_host();
             0
         }
         Err(e) => error(e),
@@ -422,6 +426,8 @@ pub extern "C" fn trames_session_terminal_open(handle: u64) -> u64 {
         }
         let id = session.next_terminal.fetch_add(1, Ordering::Relaxed);
         b.terminals.insert(id, terminals::Channel::default());
+        drop(b);
+        session.notify_host();
         Ok(id)
     }));
     match result {
@@ -451,6 +457,7 @@ pub extern "C" fn trames_session_terminal_close(handle: u64, terminal: u64) -> i
                 .terminals
                 .remove(&terminal)
                 .ok_or("invalid or closed terminal")?;
+            session.notify_host();
             Ok::<_, &str>(0)
         })();
         result.unwrap_or_else(error)
@@ -544,6 +551,7 @@ pub unsafe extern "C" fn trames_session_status(
     boundary(|| {
         let result = (|| {
             let session = session(handle).map_err(str::to_string)?;
+            session.notify_host();
             let b = session
                 .buffers
                 .lock()
@@ -610,6 +618,7 @@ pub extern "C" fn trames_session_close(handle: u64) -> i32 {
             Some(s) => {
                 s.display.detach();
                 s.cancelled.store(true, Ordering::Release);
+                s.notify_host();
                 0
             }
             None => error("invalid or closed session handle"),

@@ -167,6 +167,7 @@ pub struct Session {
     pub buffers: Mutex<Buffers>,
     pub console_revision: [AtomicU64; 2],
     pub console_readiness: Arc<trames_vfs::Readiness>,
+    host_wake: std::sync::OnceLock<Arc<trames_linux::HostWake>>,
     pub cancelled: AtomicBool,
     pub paused: AtomicBool,
     pub multiple_terminals: bool,
@@ -219,6 +220,11 @@ impl Drop for WorkerPermit {
     }
 }
 impl Session {
+    pub fn notify_host(&self) {
+        if let Some(wake) = self.host_wake.get() {
+            wake.notify();
+        }
+    }
     pub fn start(options: Options) -> Result<Arc<Self>, String> {
         if !options.store.is_absolute()
             || options.store.as_os_str().len() > 4096
@@ -258,6 +264,7 @@ impl Session {
         let session = Arc::new(Self {
             console_revision: Default::default(),
             console_readiness: Arc::default(),
+            host_wake: Default::default(),
             display: trames_core::VulkanDisplay::default(),
             wayland: Mutex::new(None),
             bridge: trames_bridge::Broker::default(),
@@ -349,6 +356,7 @@ impl Session {
         self.commands
             .try_send(Command::Timezone(timezone, response))
             .map_err(|_| "local session is busy or closed")?;
+        self.notify_host();
         loop {
             if self.cancelled.load(Ordering::Acquire) {
                 return Err("session cancelled".into());
@@ -412,6 +420,7 @@ impl Session {
                 cancelled: cancelled.clone(),
             }))
             .map_err(|_| "local session is busy or closed")?;
+        self.notify_host();
         loop {
             if self.cancelled.load(Ordering::Acquire) || cancelled.load(Ordering::Acquire) {
                 return Err("session cancelled".into());
@@ -840,7 +849,6 @@ impl Adapter {
                 completion: HostCompletion {
                     session: self.session.clone(),
                     done,
-                    wake: std::thread::current(),
                 },
             }));
         Ok(())
@@ -998,13 +1006,12 @@ impl Adapter {
 struct HostCompletion {
     session: Arc<Session>,
     done: Arc<AtomicBool>,
-    wake: std::thread::Thread,
 }
 impl Drop for HostCompletion {
     fn drop(&mut self) {
         self.done.store(true, Ordering::Release);
         self.session.console_readiness.notify_locked();
-        self.wake.unpark();
+        self.session.notify_host();
     }
 }
 #[derive(Default)]
@@ -1206,6 +1213,25 @@ impl GuestOutput for Adapter {
     fn paused(&self) -> bool {
         self.session.paused.load(Ordering::Acquire)
     }
+    fn finish_host(&mut self) {
+        if let Some(command) = self.pending.take() {
+            fail_command(
+                command,
+                "session exited before file command admission".into(),
+            );
+        }
+        let (closed, receiver) = mpsc::sync_channel(0);
+        drop(closed);
+        let commands = std::mem::replace(&mut self.commands, receiver);
+        for command in commands.try_iter().take(8) {
+            fail_command(
+                command,
+                "session exited before file command admission".into(),
+            );
+        }
+        // Dropping the old receiver closes racing sends as well. Already
+        // admitted original I/O retains its own completion and output drain.
+    }
     fn flush_output(&mut self) -> io::Result<bool> {
         if self.pending.is_none() {
             self.pending = self.commands.try_recv().ok();
@@ -1293,6 +1319,19 @@ impl GuestOutput for Adapter {
         }
         Ok(())
     }
+    fn bind_host_wake(&mut self, wake: Arc<trames_linux::HostWake>) {
+        self.session.host_wake.get_or_init(|| wake);
+    }
+    fn host_interest(&mut self, wait: &mut trames_linux::HostWait) -> io::Result<()> {
+        wait.retain([self.session.console_readiness.subscribe(wait.signal())]);
+        if let Some(terminals) = &self.terminals {
+            wait.retain(terminals.subscribe(wait.signal()));
+        }
+        if let Some(init) = &self.init_monitor {
+            wait.retain([init.subscribe(wait.signal())]);
+        }
+        Ok(())
+    }
     fn poll_host(&mut self, vfs: &Vfs) -> io::Result<trames_linux::HostState> {
         if self.cancellation_requested() {
             return Ok(trames_linux::HostState::Cancelled);
@@ -1312,7 +1351,9 @@ impl GuestOutput for Adapter {
                 .buffers
                 .lock()
                 .map_err(|_| io::Error::other("session lock failed"))?;
-            terminals.pump(&mut buffers.terminals);
+            if terminals.pump(&mut buffers.terminals) {
+                self.session.notify_host();
+            }
         }
         if self.snapshot_at.elapsed() >= Duration::from_secs(1) {
             self.snapshot(vfs);
@@ -1413,6 +1454,7 @@ mod memory_tests {
             }),
             console_revision: Default::default(),
             console_readiness: Arc::default(),
+            host_wake: Default::default(),
             cancelled: AtomicBool::new(false),
             paused: AtomicBool::new(false),
             multiple_terminals: false,
@@ -1431,6 +1473,38 @@ mod memory_tests {
             host_active: None,
             init_monitor,
         }
+    }
+    #[test]
+    fn closed_source_rejects_unadmitted_commands_and_drains_actual_file_work() {
+        let mut adapter = test_adapter(None);
+        let (first, pending) = mpsc::sync_channel(1);
+        let (second, queued) = mpsc::sync_channel(1);
+        let timezone = || HostTimezone {
+            identifier: "UTC".into(),
+            data: Vec::new(),
+        };
+        adapter.pending = Some(Command::Timezone(timezone(), first));
+        assert!(adapter
+            .session
+            .commands
+            .try_send(Command::Timezone(timezone(), second))
+            .is_ok());
+        let done = Arc::new(AtomicBool::new(false));
+        adapter.host_active = Some(done.clone());
+        adapter.finish_host();
+        assert!(pending
+            .recv()
+            .unwrap()
+            .unwrap_err()
+            .contains("session exited"));
+        assert!(queued
+            .recv()
+            .unwrap()
+            .unwrap_err()
+            .contains("session exited"));
+        assert!(!adapter.flush_output().unwrap());
+        done.store(true, Ordering::Release);
+        assert!(adapter.flush_output().unwrap());
     }
     type HostJob = (
         Box<dyn trames_linux::HostFileTask>,
