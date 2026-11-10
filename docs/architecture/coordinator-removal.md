@@ -2,17 +2,18 @@
 
 ## Current status — 2026-11-10
 
-Through stage 101 the broad remaining count is **four**. The latest batch closes
-the original futex unbound-delivery resource, cold task admission, custody retry,
-executor handoff and clear_tid exit dependencies, removing five cohort-stop sites. The umbrella count is not a syscall count or a
-measurement of production fallback frequency; the generic catch-all is still an
-audit target.
+Through stage 102 the broad remaining count is **four**. The latest batch closes
+the complete original task/mm structural dispatch dependency: mapping changes,
+clone/exec, io_uring registration, policy, custody, image/layout work, batching and
+accounting now share one typed ABI classification. The umbrella count is not a
+syscall count or a measurement of production fallback frequency; the generic
+catch-all remains an audit target.
 
 | Remaining class | Current boundary | Recent concrete progress |
 | --- | --- | --- |
 | Host control and final teardown | Actual cancellation/deadline/shutdown, native-event failure and final CPU/session drain | Ordinary supervision, guest exit and controls are source-owned |
 | Missing capabilities and excluded resources | Genuinely absent original providers/bodies; two submitter-scoped io_uring maintenance setters remain | Task RSS/layout observations no longer depend on optional host-global statistics; io_uring retains its real sources. Actual absent global/typed providers remain |
-| Final execution dispatch | SVC or cold native-resource operation not completed, parked or accepted by a source scope | Stage 98 closes canonical FD/error admission, the complete original epoll/poll/select graph, current-offset vector transports and residual setup/validation entries; the catch-all is not proven unreachable |
+| Final execution dispatch | SVC or cold native-resource operation not completed, parked or accepted by a source scope | Stage 102 unifies the whole structural task/mm pipeline and closes its raw-selector and filtered cold-registration backdoors; final generic dispatch remains unproven |
 | Initial/legacy orchestration | Initial admission and standalone/capability-less scheduling | Unbound futex delivery now retains the original ready resource and admits exact cold waiters on existing executors; standalone caller-side draining remains |
 
 Recent signed native fixtures demonstrate concrete path removal. Each baseline
@@ -51,24 +52,25 @@ statistics. Metadata, byte/vector and io_uring paths share that admission. Suppl
 adapters also avoid host-global queries for per-task reads; host-managed meminfo
 uses its original host provider without scanning unused task/mm resources.
 
-Stage 101 closes unbound futex delivery and its complete cold-admission/exit
-dependency graph. The old ready latch and five cohort-stop sites are removed;
-original tickets, task/mm custody, executor handoff and clear_tid stay on existing
-workers. WAKE_OP now uses the common original guest atomic body. The exact cold
-fixture stops on the prior runtime, then completes seven connected modes on
-one/four/twelve slots after this batch. This is distinct from the unchanged fast
-path for already-bound waits and does not estimate production fallback frequency.
+Stage 102 unifies the whole structural task/mm control pipeline. One typed
+classification is shared by worker admission and policy, source custody,
+clone/exec group and image work, mapping/layout checks, bounded native batching,
+ring controls and accounting. The old per-phase number/command whitelists no
+longer disagree on ABI-equivalent register values. Nonpinning ring controls keep
+the direct path; pinning and genuine cold admissions retain their original mm.
 
 Both complete runtime workflows pass seven local steps. Mac and ARM64 Linux each
-pass 461 process regressions (two intentionally ignored) and ten FFI cases; both
-iPad SDK targets compile. All 76 signed native cases and Mac development gates
-1–8 pass. Native WAKE_OP covers thirty arithmetic/comparison combinations per CPU
-in one cohort with no returned syscall/service at four/twelve CPUs, retaining
-two/ten real mapping scopes. Installed Dev init, host lifecycle and tracing checks
-pass. Stable's runner hash is unchanged. The [stage 101 validation](../validation/futex-delivery-20261110.json)
+pass 463 process regressions (two intentionally ignored) and ten FFI cases; both
+iPad SDK targets compile. All 77 signed native cases and Mac development gates
+1–8 pass. The identical old common/native fixtures expose the actual clone-worker
+panic; final structural cases complete one cohort at four/twelve CPUs and one
+slot without returned syscall/service. Native tests retain ten/thirty genuine
+mapping scopes. A native Linux raw-SVC oracle independently confirms ABI behavior.
+Installed Dev init, host lifecycle and tracing pass; stable's runner hash is
+unchanged. The [stage 102 validation](../validation/structural-dispatch-20261110.json)
 and [shared inventory](https://github.com/kb5000/trames-runtime/blob/main/docs/architecture/coordination-boundaries.md#current-remaining-categories)
 carry exact source evidence. Four broad categories, two io_uring guards and final
-dispatch remain open. The overall goal stays active.
+generic dispatch remain open. The overall objective stays incomplete.
 
 ### Stage 81 read-only memory observations (historical)
 
@@ -6198,3 +6200,38 @@ closure. See the [validation record](../validation/futex-delivery-20261110.json)
 for cross-platform checks and signed native evidence. The four broad categories,
 two genuine io_uring guards and generic dispatch audit remain open. Only Mac Dev
 is deployed in this batch; stable and physical iPad installations are unchanged.
+
+
+## 102. Unified original task/mm structural dispatch — 2026-11-10
+
+The entire structural control family now uses one Call/Memory classification
+across worker preflight and policy, source eligibility, original task/mm custody,
+clone/exec groups, image replacement, mapping/layout admission, bounded native
+batching and proc accounting. This replaces duplicated phase-specific whitelists
+rather than adding another leaf-specific test. It covers brk, munmap, mremap,
+mmap, mprotect, mincore, madvise, io_uring registration, clone and both exec forms.
+
+The previous pipeline treated ABI-equivalent upper register bits inconsistently:
+clone panicked on its executing worker, fixed-buffer registration returned the
+whole cohort to the owner, and native mmap batching could mistake a new mapping
+for an inline continuation. All phases now use the same interpretation while
+preserving the raw guest registers. io_uring's shared registration body decodes
+its unsigned opcode/nr_args once for the whole control family. Fixed buffers,
+files/updates, eventfd, probes and provided-buffer rings share that body. Queries
+and nonpinning controls retain their direct path; genuine cold admissions use
+the original task/mm scope even when filtered. BPF still sees the raw arguments
+and its accepted decision is consumed once.
+
+The concentrated test uses thirty connected valid/error operations at four/twelve
+CPUs and one slot, including a filter that inspects upper argument bits. Separate
+valid clone/execve/execveat children replace their image, return their real status
+to the original parent and leave unrelated actors running. The identical old
+fixture fails with the actual clone-worker panic. A native Linux raw-SVC oracle
+independently verifies the ABI. Signed native coverage includes wide-number
+clone, original pin/unpin and the complete mapping sequence. Exact cross-platform
+and installed outcomes are in the [validation record](../validation/structural-dispatch-20261110.json).
+Actual original reader/backing synchronization is retained. No new coordinator,
+service thread, polling bus, global algorithm lock or ordinary memory fence is
+introduced. The four broad categories, two io_uring guards and overall goal
+remain open. This batch deploys only Mac Dev; stable and physical iPad installs
+keep their versions.

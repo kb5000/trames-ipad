@@ -1,0 +1,332 @@
+{
+  "date": "2026-11-10",
+  "stage": 102,
+  "subsystem": "Complete original task/mm structural dispatch: admission, accepted policy, pinning, clone/exec, group and image work, mapping/layouts, native batching, ring controls and accounting",
+  "status": "Validated and installed to Mac Dev only; overall coordinator-removal objective remains incomplete",
+  "baseline_runtime": "0894bef6642da29df58da8dea4cc71221068913e",
+  "runtime_revision": "287fddcce660276c984b45f2d123562ddf1cccc5",
+  "workflows": {
+    "runtime_macos": {
+      "passed": 7,
+      "total": 7,
+      "sha256": "af8d661823435ab202ff86008cbdd52af376024686dbd9852062ea8980614585"
+    },
+    "runtime_linux": {
+      "passed": 7,
+      "total": 7,
+      "sha256": "b6d612034ee97d3acab64a19d8b76c34bdb3b98ae103253adde4ad8ee5726adb"
+    },
+    "mac_product": {
+      "passed": 8,
+      "total": 12,
+      "sha256": "6d96c4549c96790622a56499249a99726fac01ac609b755a71863c2c5ee77c23"
+    }
+  },
+  "process": {
+    "macos": {
+      "passed": 463,
+      "ignored": 2,
+      "sha256": "93075b13652e9727ee3e9e56c939a292ecaccd2ae94a6d42f7246709f44d074e"
+    },
+    "linux": {
+      "passed": 463,
+      "ignored": 2,
+      "sha256": "1af9c800bcde3f06ff144b555c522c01a2bdf67c6db7073efec55daa5af0ce97"
+    }
+  },
+  "ffi": {
+    "macos": {
+      "passed": 10,
+      "ignored": 0,
+      "sha256": "55363e62352d9a1a4db0c5478f8dc860f452393af7eb6029da7af1a2ffe8b3b0"
+    },
+    "linux": {
+      "passed": 10,
+      "ignored": 0,
+      "sha256": "e530c5533abb9621ad76899664310880f78a6e0cd973f33f7883e82d794cf013"
+    }
+  },
+  "apple_sdk_checks": [
+    {
+      "name": "aarch64-apple-ios",
+      "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+      "code": 0
+    },
+    {
+      "name": "aarch64-apple-ios-sim",
+      "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk",
+      "code": 0
+    }
+  ],
+  "native_hardware": {
+    "passed": true,
+    "runtime_revision": "287fddcce660276c984b45f2d123562ddf1cccc5",
+    "rows": [
+      {
+        "target": "trames-mac-run",
+        "executable_sha256": "4371ae62d4b255f0614c788ecf077728544617be3258aef4059a497533e11a29",
+        "exit": 0,
+        "passed_tests": 25
+      },
+      {
+        "target": "trames_hvf",
+        "executable_sha256": "7dcad75bc02b8255dd6c41fba7ab411fedb65013f1edaf61e4966081fb71e54f",
+        "exit": 0,
+        "passed_tests": 52
+      }
+    ]
+  },
+  "original_scope_counts": {
+    "4": 10,
+    "12": 30
+  },
+  "source_sha256": {
+    "runtime/crates/trames-linux/src/uring.rs": "6be73c9688f4e6eaa457bec73a3ff6af09ba759ef6656db9e75520ac6c2d94bf",
+    "runtime/crates/trames-session/src/lib.rs": "9ccfaf4aaf6d2d484c92fa62f3948ea5e2e02e71335ba49cf54c39ec67357223",
+    "runtime/crates/trames-session/src/process.rs": "c5d51faf39ad12d26da8e3ed9a99e2a9cf1e0858c94c7b0d307b8d20213480cb",
+    "runtime/crates/trames-session/src/process_lifecycle.rs": "59911025d88a22a99b508b179889c4de8cb73fc7623aceccb03cbce8f41d3ba9",
+    "runtime/crates/trames-session/src/process_lifecycle_exec.rs": "9153eb443e9a005a432f1396846d1fbabd9549cc240953b75629247fe7b0d580",
+    "runtime/crates/trames-session/src/process_lifecycle_mapping.rs": "4e40060122c299f947bf3a151939c7abbf96706fe552b6272172b90d84bbc760",
+    "runtime/crates/trames-session/src/process_proc.rs": "9b7f7e9ad3a75f01ee58459c75fb846a545f19dcbf214c21d1829483cd8e8224",
+    "runtime/crates/trames-session/src/process_structural_tests.rs": "7b03c3298aa9fc3b06626ce1c8af982bf2d955d3a1f0ac46a945929a80757a07",
+    "runtime/crates/trames-session/src/process_vm.rs": "68a315a3fab9b316a0c58cbb1d01af76b28eca6e32e94b90e4f5d69933849b02",
+    "runtime/crates/trames-session/src/run_queue.rs": "0108ed218e8d352e9035d2434fb5891ffc800b65cc6e6e51ac354b0b88117cbf",
+    "runtime/crates/trames-session/src/structural.rs": "44188dcc394947d20444de8eaf2e147e84b8ee06bd07cc2e0feca234dd921c6e",
+    "runtime/crates/trames-session/src/worker_syscalls.rs": "a72060f776825073ccc65bc8b5076295a65fbc663dac48c583683c3e036a054e",
+    "runtime/crates/trames-session/src/workers.rs": "14d80b9cc3d4106aa0c4158f89763845241792cf605d4f054b87f2ae15a9d358"
+  },
+  "mac_fixture_sha256": "5773e8cc6a27a1dcc9e8f883f313d5020a288ee9460038e301fcb1db24c084c0",
+  "installed": {
+    "version": "Trames Dev 1.5.4 (dev) runtime 287fddcce660276c984b45f2d123562ddf1cccc5",
+    "runner_sha256": "e3530c82c4ceb341fd9f2baef6844f91a8a879c1fcaf60df32f3a77dafdd7c40",
+    "stable_sha256": "8fc21435034e8c041632e2e50419da9d2123bf790aedb0a1499286fc8367e614",
+    "stable_unchanged": true,
+    "checks": [
+      {
+        "name": "init",
+        "code": 0,
+        "seconds": 3.278525208
+      },
+      {
+        "name": "host",
+        "code": 0,
+        "seconds": 0.9303907499999995
+      },
+      {
+        "name": "tracing",
+        "code": 0,
+        "seconds": 0.25647549999999963
+      }
+    ]
+  },
+  "local_checks": [
+    {
+      "name": "process-all",
+      "code": 0,
+      "seconds": 30.669279
+    },
+    {
+      "name": "ffi",
+      "code": 0,
+      "seconds": 5.301435333000004
+    },
+    {
+      "name": "core-clippy",
+      "code": 0,
+      "seconds": 9.70814825
+    },
+    {
+      "name": "ffi-clippy",
+      "code": 0,
+      "seconds": 0.682704790999999
+    },
+    {
+      "name": "aarch64-apple-ios",
+      "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+      "code": 0
+    },
+    {
+      "name": "aarch64-apple-ios-sim",
+      "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator27.2.sdk",
+      "code": 0
+    }
+  ],
+  "linux_checks": [
+    {
+      "name": "process-all",
+      "code": 0,
+      "seconds": 74.570877281
+    },
+    {
+      "name": "ffi-all",
+      "code": 0,
+      "seconds": 12.622601923000005
+    },
+    {
+      "name": "core-clippy",
+      "code": 0,
+      "seconds": 9.03610375400001
+    },
+    {
+      "name": "runtime-ci",
+      "code": 0,
+      "seconds": 54.66969439900001
+    }
+  ],
+  "mac_checks": [
+    {
+      "name": "runtime-fetch",
+      "code": 0,
+      "seconds": 0.32161504199999996
+    },
+    {
+      "name": "runtime-checkout",
+      "code": 0,
+      "seconds": 0.04098412499999998
+    },
+    {
+      "name": "mac-product-ci",
+      "code": 0,
+      "seconds": 21.5861105
+    },
+    {
+      "name": "hardware",
+      "code": 0,
+      "seconds": 6.214673167000001
+    },
+    {
+      "name": "dev-build",
+      "code": 0,
+      "seconds": 17.313855917
+    },
+    {
+      "name": "dev-install",
+      "code": 0,
+      "seconds": 0.08625679200000036
+    },
+    {
+      "name": "dev-signature",
+      "code": 0,
+      "seconds": 0.043919457999997746
+    },
+    {
+      "name": "installed",
+      "code": 0,
+      "seconds": 5.105690708000001
+    }
+  ],
+  "common_family": {
+    "cpus": [
+      4,
+      12
+    ],
+    "slots": [
+      1,
+      4,
+      12
+    ],
+    "connected_sequence_calls": 30,
+    "cohorts": 1,
+    "returned_syscalls": {},
+    "service_requests": 0,
+    "structural_entries": [
+      "brk",
+      "munmap",
+      "mremap",
+      "mmap",
+      "mprotect",
+      "mincore",
+      "madvise",
+      "io_uring_register",
+      "clone",
+      "execve",
+      "execveat"
+    ],
+    "ring_controls": [
+      "setup",
+      "fixed buffers and duplicate registration",
+      "unregister buffers",
+      "fixed files",
+      "file updates",
+      "eventfd register/unregister",
+      "probe",
+      "unregister files",
+      "provided-buffer ring register/status/unregister",
+      "unsupported command and canonical errno"
+    ],
+    "policy": "Filter inspects original high word of opcode; accepted decisions are evaluated once and low-word normalization cannot change the policy input",
+    "valid_lifecycle": "Actual clone child executes a new image via both exec forms; parent collects its real exit status while unrelated actor stays in the cohort"
+  },
+  "common_baseline": {
+    "failure": "Clone panics after source handoff because a later phase compares raw x8 to 220",
+    "fixture_sha256": "7b03c3298aa9fc3b06626ce1c8af982bf2d955d3a1f0ac46a945929a80757a07",
+    "log_sha256": "8155d81df39160042beb4bf6a25a3b88d2004ed2b71ab24883166f36f59d50ff"
+  },
+  "native_baseline": {
+    "cpus": 4,
+    "failure": "Actual same wide-number clone-worker panic before the child cohort can execute the connected body",
+    "log_sha256": "588a1fb5edc4d3744e6f1eb9ae20ee6f541af39e8528f0be457c25a01152b599"
+  },
+  "native_final": {
+    "cpus": [
+      4,
+      12
+    ],
+    "cohorts": 1,
+    "returned_calls": {},
+    "service_requests": 0,
+    "wide_number_clone": true,
+    "original_pin_unpin": true,
+    "actual_mapping_scopes_retained": true
+  },
+  "native_linux_oracle": {
+    "source": "tests/fixtures/structural-abi-oracle.c",
+    "source_sha256": "5360965879f4ac770d00c2be1cbea65f972a310c6ffc5118ea686b7b40548a3b",
+    "log_sha256": "9a44058a153149d1a68c18142382a00e98c76521271fb5f56316254ea879e769",
+    "output": "wide_number_same_pid=1 io_uring_setup=3\nwide_buffer_registration=0 wide_unregistration=0 wide_probe=0",
+    "purpose": "Independent native Linux raw-SVC behavior, not a second Trames decoder"
+  },
+  "architecture": {
+    "duplicate_predicate_helpers_removed": [
+      "vm_call",
+      "vm_entry",
+      "custody_entry"
+    ],
+    "duplicate_mapping_accounting_tables_removed": 2,
+    "one_typed_structural_classification": true,
+    "guest_registers_preserved": true,
+    "full_registration_opcode_and_nr_args_decode_shared": true,
+    "filtered_cold_original_registration_supported": true,
+    "new_service_threads": 0,
+    "new_polling_buses": 0,
+    "new_ordinary_memory_fences": 0
+  },
+  "validation_provenance": [
+    "Final changed Rust fingerprints match both complete local runtime workflows, Linux source copy and Mac product gates",
+    "Common before/after acceptance file is byte-identical",
+    "Both old interpreter and old native runtime fail with the actual clone-worker panic, not an invented guest errno",
+    "Native Linux oracle independently confirms x8 number, opcode and nr_args width behavior",
+    "Complete ring registration control sequence shares one canonical body; unsupported operations retain canonical results",
+    "Raw policy argument inputs and one accepted BPF decision survive original-custody handoff",
+    "Actual child image replacement and real parent wait status are verified for both exec forms",
+    "Native four/twelve-CPU mapping scopes are retained synchronization, not returned coordinator calls",
+    "Only comments/docs/evidence and publication of an identical already-executed C oracle changed after successful source validation",
+    "Fixed host/guest compiler directories and CARGO_INCREMENTAL=0 prevent duplicate batch build caches"
+  ],
+  "remaining": {
+    "broad_categories": 4,
+    "uring_maintenance_escalation_sites": 2,
+    "generic_dispatch_catch_all_not_proven_unreachable": true,
+    "overall_goal_complete": false
+  },
+  "unchanged": [
+    "Stable 1.5.4 installed runner",
+    "Business environments",
+    "Physical iPad installations"
+  ],
+  "limitations": [
+    "No controlled Firefox latency or throughput benchmark",
+    "The two actual io_uring background missing-provider/body boundaries are not removed",
+    "No claim that the final generic dispatch fallback or custom capability-less embedding is fully eliminated"
+  ]
+}
