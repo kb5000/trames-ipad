@@ -24,7 +24,7 @@ with tempfile.TemporaryDirectory(prefix='trames-guest-artifact-') as temporary:
     output.mkdir()
     binary = output / 'libtrames_vulkan_icd.so'
     binary.write_bytes(b'fixture artifact')
-    manifest = {'wire_revision': 14, 'source_sha256': {
+    manifest = {'wire_revision': 15, 'source_sha256': {
         'accelerator/vulkan/icd.c': digest(inputs / 'icd.c')},
         'build_recipe_sha256': digest(recipe), 'icd_sha256': digest(binary)}
     path = output / 'manifest.json'
@@ -38,7 +38,7 @@ with tempfile.TemporaryDirectory(prefix='trames-guest-artifact-') as temporary:
         if change == 'new-source':
             (inputs / 'icd.c').write_text('new image import interface\n')
         elif change == 'old-wire':
-            test['wire_revision'] = 13
+            test['wire_revision'] = 14
         elif change == 'changed-recipe':
             recipe.write_text('different linkage flags\n')
         else:

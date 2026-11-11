@@ -119,11 +119,13 @@ try:
                              (('/tmp/render.ppm', guest_image),))
             assert native.stdout == rendered.stdout and host_image.read_bytes() == guest_image.read_bytes()
         if not a.renderpass_only and not a.probe_only and not a.resources_only:
-            for mode in ('legacy', 'template'):
-                args = ['template'] if mode == 'template' else []
+            for mode in ('legacy', 'template', 'batch', 'batch-template'):
+                args = [mode] if mode != 'legacy' else []
                 native = execute('compute-' + mode + '-native', [str(fixtures / 'vulkan-compute-host'), str(fixtures / 'vulkan-compute.spv'), *args], native=True)
                 guest_result = guest('compute-' + mode, '/tmp/compute', fixtures / 'vulkan-compute', ('/tmp/compute.spv', *args), (('/tmp/compute.spv', fixtures / 'vulkan-compute.spv'),))
                 assert native.stdout == guest_result.stdout
+            for mode in ('legacy', 'template'):
+                args = ['template'] if mode == 'template' else []
                 host_image = a.output / ('texture-' + mode + '-native.ppm')
                 native = execute('texture-' + mode + '-native', [str(fixtures / 'vulkan-texture-host'), str(fixtures / 'vulkan-texture.vert.spv'), str(fixtures / 'vulkan-texture.frag.spv'), str(host_image), *args], native=True)
                 guest_image = a.output / ('texture-' + mode + '-guest.ppm')

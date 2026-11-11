@@ -468,6 +468,7 @@ jobs:
           sudo apt-get install --yes gcc-aarch64-linux-gnu g++-aarch64-linux-gnu gcc-14-aarch64-linux-gnu g++-14-aarch64-linux-gnu libvulkan-dev mesa-vulkan-drivers libwayland-bin glslang-tools pkg-config bison flex ninja-build python3-venv patch
           bash scripts/build-vulkan-guest.sh
           python3 tests/integration/guest-vulkan-artifact.py
+          python3 tests/integration/vulkan-descriptor-batch.py
           python3 scripts/prepare-zink-guest.py --wayland
           python3 -m venv target/mesa-tools
           target/mesa-tools/bin/pip install -r scripts/zink-egl-requirements.txt

@@ -265,7 +265,7 @@ VKAPI_ATTR VkResult VKAPI_CALL vkCreateDevice(VkPhysicalDevice p,const VkDeviceC
     enabled|=legacy_features;
     if(legacy_features&2)enabled|=8;if(legacy_features&512)enabled|=256;if(legacy_features&2048)enabled|=1024;
     uint64_t compute_extensions;VkResult cr=compute_device(D(p),info,&compute_features,compute_seen,&compute_extensions);if(cr!=VK_SUCCESS){free_dispatch(d);return cr;}
-    d->enabled=enabled;
+    d->enabled=enabled;d->capabilities[0]=D(p)->capabilities[0];
     VkResult r=CALL(8,KEY(p),q->queueFamilyIndex,PTR(&d->key),wsi,feature_bits,enabled,compute_extensions,(uint64_t)compute_features,(uint64_t)(compute_features>>64));if(r!=VK_SUCCESS){free_dispatch(d);return r;}
     r=CALL(57,d->key,PTR(&d->map_alignment));if(r!=VK_SUCCESS){checked(CALL(9,d->key));free_dispatch(d);return r;}
     if(CALL(200,d->key,PTR(&d->bridge))!=VK_SUCCESS)d->bridge=0;
@@ -374,33 +374,15 @@ VKAPI_ATTR VkResult VKAPI_CALL vkAllocateDescriptorSets(VkDevice d,const VkDescr
     return CALL(31,KEY(d),(uint64_t)info->descriptorPool,PTR(info->pSetLayouts),info->descriptorSetCount,PTR(out),v && v->descriptorSetCount?PTR(v->pDescriptorCounts):0);
 }
 VKAPI_ATTR VkResult VKAPI_CALL vkFreeDescriptorSets(VkDevice d,VkDescriptorPool pool,uint32_t count,const VkDescriptorSet *sets) {return CALL(32,KEY(d),(uint64_t)pool,PTR(sets),count);}
+#include "descriptor-batch.inc"
 VKAPI_ATTR void VKAPI_CALL vkUpdateDescriptorSets(VkDevice d,uint32_t count,const VkWriteDescriptorSet *writes,uint32_t copies,const VkCopyDescriptorSet *copy) {
-    for(uint32_t j=0;j<count;j++){
-      const VkWriteDescriptorSet *original=&writes[j];if(!VALID(original,VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET) || !original->descriptorCount)checked(VK_ERROR_FEATURE_NOT_PRESENT);
-      for(uint32_t offset=0;offset<original->descriptorCount;){
-        VkWriteDescriptorSet part=*original;part.descriptorCount=original->descriptorCount-offset;if(part.descriptorCount>64)part.descriptorCount=64;part.dstArrayElement+=offset;
-        if(original->pBufferInfo)part.pBufferInfo+=offset;if(original->pImageInfo)part.pImageInfo+=offset;if(original->pTexelBufferView)part.pTexelBufferView+=offset;
-        const VkWriteDescriptorSet *w=&part;
-
-        uint64_t buffers[192];
-        if(w->descriptorType>=VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER && w->descriptorType<=VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC){
-            if(!w->pBufferInfo)checked(VK_ERROR_FEATURE_NOT_PRESENT);
-            for(uint32_t i=0;i<w->descriptorCount;i++){buffers[i*3]=(uint64_t)w->pBufferInfo[i].buffer;buffers[i*3+1]=w->pBufferInfo[i].offset;buffers[i*3+2]=w->pBufferInfo[i].range;}
-        }else if(w->descriptorType==VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER || w->descriptorType==VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER){
-            if(!w->pTexelBufferView)checked(VK_ERROR_FEATURE_NOT_PRESENT);
-            for(uint32_t i=0;i<w->descriptorCount;i++){buffers[i*3]=(uint64_t)w->pTexelBufferView[i];buffers[i*3+1]=0;buffers[i*3+2]=0;}
-        }else if(w->descriptorType<=VK_DESCRIPTOR_TYPE_STORAGE_IMAGE || w->descriptorType==VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT){
-            if(!w->pImageInfo)checked(VK_ERROR_FEATURE_NOT_PRESENT);
-            for(uint32_t i=0;i<w->descriptorCount;i++){buffers[i*3]=w->descriptorType>=VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE?0:(uint64_t)w->pImageInfo[i].sampler;buffers[i*3+1]=w->descriptorType==VK_DESCRIPTOR_TYPE_SAMPLER?0:(uint64_t)w->pImageInfo[i].imageView;buffers[i*3+2]=w->descriptorType==VK_DESCRIPTOR_TYPE_SAMPLER?0:w->pImageInfo[i].imageLayout;}
-        }else checked(VK_ERROR_FEATURE_NOT_PRESENT);
-        checked(CALL(33,KEY(d),(uint64_t)w->dstSet,w->dstBinding,w->dstArrayElement,w->descriptorCount,w->descriptorType,PTR(buffers)));
-        offset+=part.descriptorCount;
-      }
-    }
+    struct descriptor_batch batch;batch.device=D(d);batch.count=0;batch.used=0;
+    for(uint32_t j=0;j<count;j++)descriptor_write(&batch,writes+j);
     for(uint32_t i=0;i<copies;i++){
         const VkCopyDescriptorSet *c=copy+i;if(!VALID(c,VK_STRUCTURE_TYPE_COPY_DESCRIPTOR_SET))checked(VK_ERROR_FEATURE_NOT_PRESENT);
-        checked(CALL(216,KEY(d),(uint64_t)c->srcSet,c->srcBinding,c->srcArrayElement,(uint64_t)c->dstSet,c->dstBinding,c->dstArrayElement,c->descriptorCount));
+        descriptor_batch_copy(&batch,c);
     }
+    descriptor_batch_flush(&batch);
 }
 
 VKAPI_ATTR VkResult VKAPI_CALL vkCreateCommandPool(VkDevice d,const VkCommandPoolCreateInfo *info,const VkAllocationCallbacks *allocator,VkCommandPool *out) {CHECK(info,VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO);ALLOCATOR(allocator);return CALL(34,KEY(d),info->queueFamilyIndex,info->flags,PTR(out));}

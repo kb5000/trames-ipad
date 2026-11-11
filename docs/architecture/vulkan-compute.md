@@ -693,3 +693,46 @@ The native Metal teardown metric remains 1 MiB for this render workload and is
 reported separately from Vulkan object lifetime. All hashes and results are
 under `vulkan12_completion` in [the validation data](../validation/vulkan-compute-data.json).
 A new IPA, physical iPad GPU run and full CTS certification are not performed.
+
+## Synchronous descriptor update batches (2026-11-12)
+
+The paired wire-15 ICD groups writes and copies from one
+`vkUpdateDescriptorSets` or `vkUpdateDescriptorSetWithTemplate` invocation into
+operation 250. Each packet has up to 32 nine-word records: the original operation
+(33 or 216) followed by its eight arguments. Payloads remain owned by the caller
+until the synchronous NativeCall returns. Writes precede copies, including
+dependent copies across packets. A 256-descriptor scratch pool bounds stack use
+to about 8 KiB; filling either transport buffer flushes it without imposing an
+application descriptor limit.
+
+Capability bit 16384 in operation 115 negotiates this transport independently of
+Vulkan enabled features. An older runtime receives the original individual
+operations; an older ICD continues working with the new runtime. A failed batch
+is never replayed. The shared Mac/iPad handler admits only descriptor operations
+for the enclosing device, using the same resource/permission checks and update
+order as before. It introduces no deferred updates, guest-pointer retention,
+new synchronization, coordinator, service thread or GPU wait.
+
+The [transport regression](../../tests/integration/vulkan-descriptor-batch.py)
+checks buffers, images, texel views, payload lifetime, both buffer boundaries,
+ordered copies, padded templates and legacy negotiation. The compute oracle
+adds `batch` and `batch-template` cases; optional `-benchmark` suffixes repeat
+512 updates of 72 writes before validating actual GPU results. On Mac, both
+one and twelve guest CPUs pass. Updates take about 7–7.4 ms versus 44–49 ms
+through the old host, using the identical new ICD and oracle. This measures
+descriptor transport, not whole-page/video speed. Firefox playback evidence and
+remaining loading stalls are recorded in the
+[Mac validation](https://github.com/kb5000/trames-mac/blob/main/docs/validation/mac-firefox-gpu.md).
+
+Pure command recording also avoids the global completion collector between
+individual binds, draws, barriers and dynamic-state updates. These append to an
+already-recording buffer and cannot observe completion of its old execution.
+Begin/end/reset, submissions, waits, resource updates and lifetime operations
+retain collection. Executing secondary buffers retains it too, because a
+secondary buffer can finish old execution after primary recording begins.
+Abandoned teardown readiness is queried only when an abandoned teardown exists.
+Existing driver completion notifications, actual fence/timeline queries and
+resource leases keep their original synchronization. No collection timer or
+new completion thread is introduced. The full Vulkan 1.2 native output oracle,
+including secondary buffers and pending descriptor updates, passes at one and
+twelve guest CPUs after this change.

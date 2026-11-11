@@ -48,6 +48,7 @@ VKAPI_ATTR void VKAPI_CALL vkUpdateDescriptorSetWithTemplate(VkDevice device,VkD
     DescriptorTemplate *t=(DescriptorTemplate *)(uintptr_t)handle;
     // Template data is immutable. Destroying a template while updating with it
     // requires external synchronization in Vulkan; no new algorithm lock.
+    struct descriptor_batch batch;batch.device=D(device);batch.count=0;batch.used=0;
     for(uint32_t i=0;i<t->count;i++){
         const VkDescriptorUpdateTemplateEntry *e=t->entries+i;
         VkDescriptorBufferInfo buffers[64];VkDescriptorImageInfo images[64];VkBufferView views[64];
@@ -62,8 +63,9 @@ VKAPI_ATTR void VKAPI_CALL vkUpdateDescriptorSetWithTemplate(VkDevice device,VkD
         }
         VkWriteDescriptorSet write={.sType=VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,.dstSet=set,.dstBinding=e->dstBinding,.dstArrayElement=e->dstArrayElement+at,
             .descriptorCount=count,.descriptorType=e->descriptorType,.pBufferInfo=buffers,.pImageInfo=images,.pTexelBufferView=views};
-        vkUpdateDescriptorSets(device,1,&write,0,NULL);at+=count;
+        descriptor_write(&batch,&write);at+=count;
         }
     }
+    descriptor_batch_flush(&batch);
 }
 VKAPI_ATTR void VKAPI_CALL vkUpdateDescriptorSetWithTemplateKHR(VkDevice d,VkDescriptorSet set,VkDescriptorUpdateTemplate t,const void *data) {vkUpdateDescriptorSetWithTemplate(d,set,t,data);}

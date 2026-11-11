@@ -11,6 +11,7 @@
 #include <pthread.h>
 #include <stdatomic.h>
 #include <sched.h>
+#include <time.h>
 #define OK(expr) do {VkResult result=(expr);if(result!=VK_SUCCESS){fprintf(stderr,"%s: VkResult=%d\n",#expr,result);abort();}}while(0)
 #define N 4096u
 static _Atomic unsigned compile_active,peer_ready,peer_ticks;
@@ -28,7 +29,9 @@ static void *compile_peer(void *unused) {
 int main(int argc,char **argv) {
     assert(argc==2 || argc==3);
     int coherent=argc==3 && !strcmp(argv[2],"coherent");
-    int templates=argc==3 && !strcmp(argv[2],"template");
+    int batched=argc==3 && !strncmp(argv[2],"batch",5);
+    int benchmark=batched && strstr(argv[2],"benchmark");
+    int templates=argc==3 && (!strcmp(argv[2],"template") || (batched && strstr(argv[2],"template")));
     int bridge_checks=argc==3 && !strcmp(argv[2],"bridge-check");
     FILE *file=fopen(argv[1],"rb");assert(file);assert(fseek(file,0,SEEK_END)==0);long size=ftell(file);assert(size>0 && size%4==0);rewind(file);uint32_t *code=malloc((size_t)size);assert(code && fread(code,1,(size_t)size,file)==(size_t)size);fclose(file);
     VkApplicationInfo app={.sType=VK_STRUCTURE_TYPE_APPLICATION_INFO,.pApplicationName="Trames compute lab",.apiVersion=VK_API_VERSION_1_0};
@@ -78,16 +81,21 @@ int main(int argc,char **argv) {
     puts("parallel pipeline callers preserve default/specialized outputs: ok");
     VkDescriptorPoolSize poolsize={VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,1};VkDescriptorPoolCreateInfo dpi={.sType=VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,.flags=VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT,.maxSets=1,.poolSizeCount=1,.pPoolSizes=&poolsize};VkDescriptorPool descriptor_pool;OK(vkCreateDescriptorPool(device,&dpi,NULL,&descriptor_pool));VkDescriptorSetAllocateInfo dsa={.sType=VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,.descriptorPool=descriptor_pool,.descriptorSetCount=1,.pSetLayouts=&descriptor_layout};VkDescriptorSet set;OK(vkAllocateDescriptorSets(device,&dsa,&set));
     VkDescriptorBufferInfo db={.buffer=buffer,.range=VK_WHOLE_SIZE};VkWriteDescriptorSet write={.sType=VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,.dstSet=set,.descriptorCount=1,.descriptorType=VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,.pBufferInfo=&db};
+    struct timespec update_start,update_end;assert(clock_gettime(CLOCK_MONOTONIC,&update_start)==0);
     if(templates){
         PFN_vkCreateDescriptorUpdateTemplateKHR create=(PFN_vkCreateDescriptorUpdateTemplateKHR)vkGetDeviceProcAddr(device,"vkCreateDescriptorUpdateTemplateKHR");
         PFN_vkUpdateDescriptorSetWithTemplateKHR update=(PFN_vkUpdateDescriptorSetWithTemplateKHR)vkGetDeviceProcAddr(device,"vkUpdateDescriptorSetWithTemplateKHR");
         PFN_vkDestroyDescriptorUpdateTemplateKHR destroy=(PFN_vkDestroyDescriptorUpdateTemplateKHR)vkGetDeviceProcAddr(device,"vkDestroyDescriptorUpdateTemplateKHR");assert(create && update && destroy);
-        struct payload {uint64_t padding[3];VkDescriptorBufferInfo descriptor;} data={{0},db};
-        VkDescriptorUpdateTemplateEntry entry={.descriptorCount=1,.descriptorType=VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,.offset=offsetof(struct payload,descriptor),.stride=sizeof(data)};
-        VkDescriptorUpdateTemplateCreateInfo ti={.sType=VK_STRUCTURE_TYPE_DESCRIPTOR_UPDATE_TEMPLATE_CREATE_INFO,.descriptorUpdateEntryCount=1,.pDescriptorUpdateEntries=&entry,.templateType=VK_DESCRIPTOR_UPDATE_TEMPLATE_TYPE_DESCRIPTOR_SET,.descriptorSetLayout=descriptor_layout};
-        VkDescriptorUpdateTemplate t;OK(create(device,&ti,NULL,&t));update(device,set,t,&data);destroy(device,t,NULL);
+        struct payload {uint64_t padding[3];VkDescriptorBufferInfo descriptor;} data[72];VkDescriptorUpdateTemplateEntry entries[72];
+        for(unsigned i=0;i<72;i++){data[i]=(struct payload){{0},db};entries[i]=(VkDescriptorUpdateTemplateEntry){.descriptorCount=1,.descriptorType=VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,.offset=i*sizeof(*data)+offsetof(struct payload,descriptor),.stride=sizeof(*data)};}
+        VkDescriptorUpdateTemplateCreateInfo ti={.sType=VK_STRUCTURE_TYPE_DESCRIPTOR_UPDATE_TEMPLATE_CREATE_INFO,.descriptorUpdateEntryCount=batched?72:1,.pDescriptorUpdateEntries=entries,.templateType=VK_DESCRIPTOR_UPDATE_TEMPLATE_TYPE_DESCRIPTOR_SET,.descriptorSetLayout=descriptor_layout};
+        VkDescriptorUpdateTemplate t;OK(create(device,&ti,NULL,&t));for(unsigned i=0;i<(benchmark?512u:1u);i++)update(device,set,t,data);destroy(device,t,NULL);
         memset(&data,0,sizeof(data));puts("descriptor template copied padded buffer payload before destroy: ok");
-    }else vkUpdateDescriptorSets(device,1,&write,0,NULL);
+    }else if(batched){VkWriteDescriptorSet writes[72];for(unsigned i=0;i<72;i++)writes[i]=write;for(unsigned i=0;i<(benchmark?512u:1u);i++)vkUpdateDescriptorSets(device,72,writes,0,NULL);}
+    else vkUpdateDescriptorSets(device,1,&write,0,NULL);
+    assert(clock_gettime(CLOCK_MONOTONIC,&update_end)==0);
+    if(benchmark)printf("descriptor-update-benchmark: %s 512x72 %.3f ms\n",templates?"template":"writes",(update_end.tv_sec-update_start.tv_sec)*1000.0+(update_end.tv_nsec-update_start.tv_nsec)/1000000.0);
+    if(batched)puts("72 descriptor updates across transport chunks: ok");
     VkCommandPoolCreateInfo cpi={.sType=VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,.flags=VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,.queueFamilyIndex=family};VkCommandPool command_pool;OK(vkCreateCommandPool(device,&cpi,NULL,&command_pool));VkCommandBufferAllocateInfo cba={.sType=VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,.commandPool=command_pool,.level=VK_COMMAND_BUFFER_LEVEL_PRIMARY,.commandBufferCount=1};VkCommandBuffer command;OK(vkAllocateCommandBuffers(device,&cba,&command));
     VkFenceCreateInfo fi={.sType=VK_STRUCTURE_TYPE_FENCE_CREATE_INFO};VkFence fence;OK(vkCreateFence(device,&fi,NULL,&fence));
     for(uint32_t round=0;round<3;round++) {
