@@ -239,6 +239,12 @@ pub struct ImageInfo {
     pub scale: i32,
     pub transform: u32,
 }
+#[repr(C)]
+pub struct ImageGeometry {
+    pub width: u32,
+    pub height: u32,
+    pub source: [f32; 4],
+}
 #[no_mangle]
 pub extern "C" fn trames_session_wayland_frame_acquire(handle: u64, window: u64) -> u64 {
     catch_unwind(AssertUnwindSafe(|| {
@@ -303,6 +309,30 @@ pub unsafe extern "C" fn trames_wayland_frame_image(
     index: u32,
     output: *mut ImageInfo,
 ) -> i32 {
+    // SAFETY: preserve the original fixed-size ABI; only v2 writes geometry.
+    unsafe { frame_image(handle, index, output, std::ptr::null_mut()) }
+}
+/// # Safety
+/// Both outputs are writable native records; frame retention matches v1.
+#[no_mangle]
+pub unsafe extern "C" fn trames_wayland_frame_image_v2(
+    handle: u64,
+    index: u32,
+    output: *mut ImageInfo,
+    geometry: *mut ImageGeometry,
+) -> i32 {
+    if geometry.is_null() {
+        return error("null image geometry pointer");
+    }
+    // SAFETY: caller supplies both bounded records; no references escape.
+    unsafe { frame_image(handle, index, output, geometry) }
+}
+unsafe fn frame_image(
+    handle: u64,
+    index: u32,
+    output: *mut ImageInfo,
+    geometry: *mut ImageGeometry,
+) -> i32 {
     boundary(|| {
         if output.is_null() {
             return error("null image info pointer");
@@ -352,6 +382,16 @@ pub unsafe extern "C" fn trames_wayland_frame_image(
         };
         // SAFETY: same scoped caller-owned native record contract.
         unsafe { output.write_unaligned(info) };
+        if !geometry.is_null() {
+            // SAFETY: v2 supplies a separate fixed-size caller-owned record.
+            unsafe {
+                geometry.write_unaligned(ImageGeometry {
+                    width: image.destination.0,
+                    height: image.destination.1,
+                    source: image.source,
+                })
+            };
+        }
         0
     })
 }
@@ -374,4 +414,87 @@ pub extern "C" fn trames_wayland_frame_release(
         drop(frame);
         0
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    struct Image;
+    // SAFETY: test-only capability has no native texture or outstanding GPU use.
+    unsafe impl trames_wayland::GpuImage for Image {
+        fn dimensions(&self) -> (u32, u32) {
+            (100, 50)
+        }
+        fn metal_texture(&self) -> usize {
+            0
+        }
+        fn ready(&self) -> std::io::Result<bool> {
+            Ok(true)
+        }
+    }
+    #[test]
+    fn image_v1_keeps_its_record_size_and_v2_returns_viewport_geometry() {
+        assert_eq!(std::mem::size_of::<ImageInfo>(), 64);
+        assert_eq!(std::mem::size_of::<ImageGeometry>(), 24);
+        let handle = NEXT_FRAME.fetch_add(1, Ordering::Relaxed);
+        frames().lock().unwrap().insert(
+            handle,
+            Frame {
+                session: 0,
+                server: Server::new().unwrap(),
+                window: WindowSnapshot {
+                    id: 1,
+                    connection: 1,
+                    title: String::new(),
+                    app_id: String::new(),
+                    width: 30,
+                    height: 10,
+                    mode: WindowMode::Floating,
+                    interaction: None,
+                    parent: None,
+                    min_size: (0, 0),
+                    max_size: (0, 0),
+                    revision: 1,
+                    scene: vec![trames_wayland::SurfaceImage {
+                        surface: 1,
+                        x: 0,
+                        y: 0,
+                        scale: 1,
+                        transform: 0,
+                        destination: (30, 10),
+                        source: [0.1, 0.2, 0.5, 0.25],
+                        buffer: trames_wayland::ImageBuffer::Gpu(Arc::new(Image)),
+                    }],
+                },
+            },
+        );
+        #[repr(C)]
+        struct Guarded {
+            image: ImageInfo,
+            guard: u64,
+        }
+        let mut record = Guarded {
+            image: Default::default(),
+            guard: 0x1234_5678_90ab_cdef,
+        };
+        let mut geometry = ImageGeometry {
+            width: 0,
+            height: 0,
+            source: [0.0; 4],
+        };
+        // SAFETY: both versions receive their exact caller-owned native records.
+        unsafe {
+            assert_eq!(trames_wayland_frame_image(handle, 0, &mut record.image), 0);
+            assert_eq!(record.guard, 0x1234_5678_90ab_cdef);
+            assert_eq!(
+                trames_wayland_frame_image_v2(handle, 0, &mut record.image, &mut geometry),
+                0
+            );
+        }
+        assert_eq!(record.image.width, 100);
+        assert_eq!(record.guard, 0x1234_5678_90ab_cdef);
+        assert_eq!((geometry.width, geometry.height), (30, 10));
+        assert_eq!(geometry.source, [0.1, 0.2, 0.5, 0.25]);
+        assert_eq!(trames_wayland_frame_release(handle, 0, 0), 0);
+    }
 }

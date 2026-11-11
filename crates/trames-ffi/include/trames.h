@@ -83,11 +83,16 @@ typedef struct {
     uint32_t width, height, stride, alpha;
     int32_t x, y, scale; uint32_t transform;
 } TramesWaylandImageInfo;
+/* Viewporter geometry in surface-local units and normalized transformed UVs.
+ * The original image ABI remains unchanged. v2 obtains both records under the
+ * same retained-frame lookup, without copying pixels or taking another lock. */
+typedef struct { uint32_t width, height; float source[4]; } TramesWaylandImageGeometry;
 int32_t trames_session_wayland_status(uint64_t session, uint8_t *output, uint32_t capacity);
 int32_t trames_session_wayland_command(uint64_t session, const uint8_t *json, uint32_t length);
 uint64_t trames_session_wayland_frame_acquire(uint64_t session, uint64_t window);
 int32_t trames_wayland_frame_info(uint64_t frame, TramesWaylandFrameInfo *output);
 int32_t trames_wayland_frame_image(uint64_t frame, uint32_t index, TramesWaylandImageInfo *output);
+int32_t trames_wayland_frame_image_v2(uint64_t frame, uint32_t index, TramesWaylandImageInfo *output, TramesWaylandImageGeometry *geometry);
 int32_t trames_wayland_frame_release(uint64_t frame, uint32_t presented, uint32_t milliseconds);
 #ifdef __cplusplus
 }

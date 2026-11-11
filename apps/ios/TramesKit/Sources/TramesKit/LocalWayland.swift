@@ -50,6 +50,7 @@ public final class LocalWaylandFrame: @unchecked Sendable {
     private var handle: UInt64
     public let info: TramesWaylandFrameInfo
     public let images: [TramesWaylandImageInfo]
+    public let geometry: [TramesWaylandImageGeometry]
     init(handle: UInt64) throws {
         self.handle = handle
         var info = TramesWaylandFrameInfo()
@@ -60,16 +61,20 @@ public final class LocalWaylandFrame: @unchecked Sendable {
         }
         self.info = info
         var images: [TramesWaylandImageInfo] = []
+        var geometry: [TramesWaylandImageGeometry] = []
         for index in 0..<info.images {
             var image = TramesWaylandImageInfo()
-            guard trames_wayland_frame_image(handle, index, &image) == 0 else {
+            var shape = TramesWaylandImageGeometry()
+            guard trames_wayland_frame_image_v2(handle, index, &image, &shape) == 0 else {
                 _ = trames_wayland_frame_release(handle, 0, 0)
                 self.handle = 0
                 throw LocalSession.lastError()
             }
             images.append(image)
+            geometry.append(shape)
         }
         self.images = images
+        self.geometry = geometry
     }
     deinit { release(presented: false) }
     public func release(presented: Bool) {

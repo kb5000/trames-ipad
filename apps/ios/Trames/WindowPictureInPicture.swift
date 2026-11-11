@@ -190,15 +190,17 @@ final class WindowPictureInPicture: NSObject, ObservableObject, AVPictureInPictu
         // outlives the synchronous CoreGraphics draw. No guest pointer escapes.
         let orientations:[UIImage.Orientation]=[.up,.right,.down,.left,.upMirrored,.leftMirrored,.downMirrored,.rightMirrored]
         UIGraphicsPushContext(context);defer {UIGraphicsPopContext()}
-        for image in frame.images {
+        for (image,shape) in zip(frame.images,frame.geometry) {
             guard image.kind == 1,image.offset < image.length,
                   let base=UnsafeRawPointer(bitPattern:UInt(image.address)),
                   let provider=CGDataProvider(dataInfo:nil,data:base.advanced(by:Int(image.offset)),size:Int(image.length-image.offset),releaseData:{_,_,_ in}),
                   let bitmap=CGImage(width:Int(image.width),height:Int(image.height),bitsPerComponent:8,bitsPerPixel:32,bytesPerRow:Int(image.stride),space:CGColorSpaceCreateDeviceRGB(),bitmapInfo:[.byteOrder32Little,CGBitmapInfo(rawValue:image.alpha == 0 ? CGImageAlphaInfo.noneSkipFirst.rawValue : CGImageAlphaInfo.premultipliedFirst.rawValue)],provider:provider,decode:nil,shouldInterpolate:false,intent:.defaultIntent) else {continue}
-            let scale=CGFloat(max(1,image.scale))
-            let w=CGFloat(image.transform & 1 == 0 ? image.width : image.height)/scale
-            let h=CGFloat(image.transform & 1 == 0 ? image.height : image.width)/scale
-            UIImage(cgImage:bitmap,scale:1,orientation:orientations[Int(image.transform & 7)]).draw(in:CGRect(x:CGFloat(image.x),y:CGFloat(image.y),width:w,height:h))
+            let w=CGFloat(shape.width),h=CGFloat(shape.height)
+            let sx=CGFloat(shape.source.0),sy=CGFloat(shape.source.1),sw=CGFloat(shape.source.2),sh=CGFloat(shape.source.3)
+            context.saveGState()
+            context.clip(to:CGRect(x:CGFloat(image.x),y:CGFloat(image.y),width:w,height:h))
+            UIImage(cgImage:bitmap,scale:1,orientation:orientations[Int(image.transform & 7)]).draw(in:CGRect(x:CGFloat(image.x)-sx*w/sw,y:CGFloat(image.y)-sy*h/sh,width:w/sw,height:h/sh))
+            context.restoreGState()
         }
     }
 

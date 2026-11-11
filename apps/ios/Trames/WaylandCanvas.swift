@@ -114,6 +114,7 @@ final class WaylandCanvas: WaylandInputView {
         var height: UInt32
         var alpha: UInt32
         var transform: UInt32
+        var source: SIMD4<Float>
     }
     init(sharedDevice: MTLDevice? = MTLCreateSystemDefaultDevice()) throws {
         guard let device = sharedDevice, let queue = device.makeCommandQueue(),
@@ -230,13 +231,12 @@ final class WaylandCanvas: WaylandInputView {
         do {
             guard let frame = try session?.waylandFrame(window: windowID) else { return }
             guard lastRevision != frame.info.revision else { return }
-            visibleRects=frame.images.map { image in
-                let scale=CGFloat(max(1,image.scale))
-                let size=image.transform & 1 == 0 ? CGSize(width:CGFloat(image.width)/scale,height:CGFloat(image.height)/scale) : CGSize(width:CGFloat(image.height)/scale,height:CGFloat(image.width)/scale)
+            visibleRects=zip(frame.images,frame.geometry).map { image,shape in
+                let size=CGSize(width:CGFloat(shape.width),height:CGFloat(shape.height))
                 return CGRect(origin:CGPoint(x:CGFloat(image.x),y:CGFloat(image.y)),size:size)
             }
             var buffers: [(Source, ImageUniform)] = []
-            for image in frame.images {
+            for (image,shape) in zip(frame.images,frame.geometry) {
                 guard let pointer = UnsafeMutableRawPointer(bitPattern: UInt(image.address)) else { continue }
                 let source:Source
                 if image.kind == 1 {
@@ -256,11 +256,11 @@ final class WaylandCanvas: WaylandInputView {
                     }
                     source = .texture(texture)
                 } else { continue }
-                let scale = Float(max(1,image.scale))
                 let uniform = ImageUniform(origin: SIMD2(Float(image.x)-Float(sceneOrigin.x),Float(image.y)-Float(sceneOrigin.y)),
-                    size: image.transform & 1 == 0 ? SIMD2(Float(image.width)/scale,Float(image.height)/scale) : SIMD2(Float(image.height)/scale,Float(image.width)/scale),
+                    size: SIMD2(Float(shape.width),Float(shape.height)),
                     viewport: SIMD2(Float(bounds.width),Float(bounds.height)), offset: UInt32(image.offset),
-                    stride: image.stride,width: image.width,height: image.height,alpha: image.alpha,transform:image.transform)
+                    stride: image.stride,width: image.width,height: image.height,alpha: image.alpha,transform:image.transform,
+                    source:SIMD4(shape.source.0,shape.source.1,shape.source.2,shape.source.3))
                 buffers.append((source,uniform))
             }
             guard let drawable = metal.nextDrawable(), let command = queue.makeCommandBuffer() else { return }

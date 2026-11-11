@@ -262,10 +262,48 @@ The headless ABI test does not validate Apple pixels or system keyboard behavior
 Apple CI uses these same original inputs against real CAMetalLayer drawables,
 UIKit input and native configure-driven image recreation.
 
+## Host density and viewport geometry (2026-11-11)
+
+Frontends publish the host window's integer backing density through the existing
+output-scale command. Logical window sizes and pointer positions do not change.
+Virtual density outputs have distinct logical origins: overlapping `(0,0)` output
+keys caused Firefox's monitor lookup to combine the 2x monitor with the 1x mode
+and infer a false fractional scale of one.
+
+The shared compositor also implements standard `wp_viewporter` source cropping,
+destination scaling, reset/destruction and double-buffered state, including
+synchronized subsurfaces. Crop coordinates follow buffer transform and buffer
+scale. Protocol values and buffer extents are checked when the state is applied;
+normal pixel access and guest byte visibility gain no extra checks or barriers.
+The [viewport protocol](https://gitlab.freedesktop.org/wayland/wayland-protocols/-/blob/1.43/stable/viewporter/viewporter.xml)
+defines these coordinate and lifetime rules.
+
+Firefox 151.0.3 needs viewporter even for its integer/ceiled content-surface scale
+path. Without it, GTK's toplevel reached scale two while Firefox's own EGL child
+fell back to monitor zero and rendered at scale one. The matching
+[upstream implementation](https://hg.mozilla.org/releases/mozilla-release/file/2d490a949ec649b79bfdecbc07b7531472dc41a0/widget/gtk/WaylandSurface.cpp#l769)
+requires a viewport in `EnableCeiledScaleLocked`; no forced browser DPI setting
+or Firefox patch is needed after providing that protocol.
+
+Committed scene images carry the logical destination and normalized transformed
+source rectangle. Mac and iPad Metal shaders draw the original SHM/GPU capability
+with those coordinates; no resized intermediate image, readback, new lock or
+service thread is introduced. iPad PiP uses the same crop metadata. Native FFI
+image v1 stays 64 bytes; v2 returns its separate 24-byte geometry record in the
+same frame lookup. Old ABI callers must opt into v2 to display viewport content.
+
+Original libwayland C regressions cover independent output identities, 1x/2x
+transitions, source crop, 90-degree transform, destruction/reset, and malformed
+source/destination/lifetime requests. Mac Firefox acceptance additionally checks
+DPR=2 at browser zoom 1 with the default DPI preference, actual 3840x1856 EGL
+pixels for a 1920x928 logical window, and native mouse/keyboard coordinates.
+
 ## Initial limits and upstream notices
 
 This is a selected protocol/graphics implementation, not full Wayland or Vulkan
-conformance. Output scale is initially one. Image clipboard, DnD, custom
+conformance. Output scale starts at one until the frontend publishes host density.
+Virtual output geometry is synthetic, not a complete physical-monitor layout;
+fractional output density is not advertised. Image clipboard, DnD, custom
 cursor images, automatic reactive popup relayout, touch protocol and EGL/OpenGL
 bridging are not implemented. Device touch and actual system keyboard experience
 still require iPad use.

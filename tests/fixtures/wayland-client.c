@@ -73,11 +73,22 @@ static void top_close(void *data,struct xdg_toplevel *top){(void)data;(void)top;
 static const struct xdg_toplevel_listener top_listener={.configure=top_configure,.close=top_close};
 static void ping(void *data,struct xdg_wm_base *base,uint32_t serial){(void)data;xdg_wm_base_pong(base,serial);}
 static const struct xdg_wm_base_listener shell_listener={ping};
-struct output {struct wl_output *resource;int scale;};
+struct output {struct wl_output *resource;int scale,x,y,width,height,done;};
 static struct output outputs[8];static int output_count;
-static void output_geometry(void *d,struct wl_output *o,int32_t x,int32_t y,int32_t w,int32_t h,int32_t sub,const char *make,const char *model,int32_t t){(void)d;(void)o;(void)x;(void)y;(void)w;(void)h;(void)sub;(void)make;(void)model;(void)t;}
-static void output_mode(void *d,struct wl_output *o,uint32_t flags,int32_t w,int32_t h,int32_t refresh){(void)d;(void)o;(void)flags;(void)w;(void)h;(void)refresh;}
-static void output_done(void *d,struct wl_output *o){(void)d;(void)o;}
+static void output_geometry(void *d,struct wl_output *o,int32_t x,int32_t y,int32_t w,int32_t h,int32_t sub,const char *make,const char *model,int32_t t){(void)o;(void)w;(void)h;(void)sub;(void)make;(void)model;(void)t;struct output *output=d;output->x=x;output->y=y;}
+static void output_mode(void *d,struct wl_output *o,uint32_t flags,int32_t w,int32_t h,int32_t refresh){(void)o;(void)refresh;if(flags&WL_OUTPUT_MODE_CURRENT){struct output *output=d;output->width=w;output->height=h;}}
+static void output_done(void *d,struct wl_output *o){
+    (void)o;struct output *output=d;output->done=1;
+    // Toolkits identify monitor configurations by their logical origin as well
+    // as wl_output identity. Distinct virtual outputs must not alias that key.
+    for(int i=0;i<output_count;i++){
+        struct output *other=&outputs[i];if(other==output||!other->done)continue;
+        int w=output->width/output->scale,h=output->height/output->scale;
+        int ow=other->width/other->scale,oh=other->height/other->scale;
+        assert(output->x+w<=other->x||other->x+ow<=output->x||output->y+h<=other->y||other->y+oh<=output->y);
+    }
+    printf("wayland-output origin=%d,%d scale=%d pixels=%dx%d\n",output->x,output->y,output->scale,output->width,output->height);fflush(stdout);
+}
 static void output_scale(void *d,struct wl_output *o,int32_t scale){(void)o;((struct output *)d)->scale=scale;}
 static const struct wl_output_listener output_listener={.geometry=output_geometry,.mode=output_mode,.done=output_done,.scale=output_scale};
 static void change_scale(struct window *w,int scale){if(w->scale==scale)return;w->scale=scale;printf("wayland-scale window=%d factor=%d\n",w->number,scale);fflush(stdout);if(w->configured)draw(w);}
