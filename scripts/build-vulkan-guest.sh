@@ -4,11 +4,13 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 python3 scripts/generate-vulkan-compute.py --check
 python3 scripts/prepare-vulkan.py
-if [[ ! -x target/busybox-build/musl/bin/musl-gcc ]]; then bash scripts/build-busybox.sh; fi
-if [[ ! -f target/alpine-build/lib/libc.so ]]; then bash scripts/prepare-alpine.sh; fi
 compiler="${MUSL_CC:-$PWD/target/busybox-build/musl/bin/musl-gcc}"
+if ! command -v "$compiler" >/dev/null; then bash scripts/build-busybox.sh; fi
+guest_libc="${TRAMES_GUEST_LIBC:-$PWD/target/alpine-build/lib/libc.so}"
+if [[ ! -f "$guest_libc" ]]; then bash scripts/prepare-alpine.sh; fi
 headers="$PWD/target/vulkan-upstream/headers/Vulkan-Headers-cfebfc96b2b0bce93da7d12f2c14cc01793ae25c/include"
-output="$PWD/target/vulkan-guest"
+output="${TRAMES_VULKAN_OUTPUT:-$PWD/target/vulkan-guest}"
+export TRAMES_VULKAN_OUTPUT="$output"
 mkdir -p "$output"
 python3 - <<'PY'
 from pathlib import Path
@@ -30,15 +32,20 @@ PY
 # static musl adds private auxv/loader state and breaks feature negotiation.
 "$compiler" -O2 -fPIC -fvisibility=hidden -Wall -Wextra -Werror -Wno-misleading-indentation \
   -I "$headers" -I accelerator/vulkan -shared -nostdlib \
-  accelerator/vulkan/icd.c accelerator/vulkan/calls.S "$PWD/target/alpine-build/lib/libc.so" \
+  accelerator/vulkan/icd.c accelerator/vulkan/calls.S "$guest_libc" \
   -Wl,--build-id=sha1 -Wl,-z,noexecstack -o "$output/libtrames_vulkan_icd.so"
 "${AARCH64_READELF:-aarch64-linux-gnu-readelf}" -d "$output/libtrames_vulkan_icd.so" | awk '/NEEDED.*libc.musl-aarch64.so.1/ { found=1 } END { exit !found }'
 python3 - <<'PY'
 from pathlib import Path
-import hashlib,json
-p=Path('target/vulkan-guest')
+import hashlib,json,os
+p=Path(os.environ['TRAMES_VULKAN_OUTPUT'])
 (p/'trames.json').write_text(json.dumps({'file_format_version':'1.0.0','ICD':{'api_version':'1.2.0','library_path':'/usr/lib/libtrames_vulkan_icd.so'}},indent=2)+'\n')
 v={'profile':65542,'auxv_key':'0x54520008','wire_revision':14,'optional_host_bridge':{'capability_operation':200,'shared_mapping_bit':1,'completion_wait_bit':2,'shared_map_hint':'0x534841524544','fence_wait_operation':201,'timeline_wait_operation':202},'multisample_graphics':{'resolve_image_operation':215,'image_samples_argument':14,'render_pass_attachment_metadata_argument':14,'pipeline_multisample_config_bit':16384},'render_graph':{'create':217,'next_subpass':218,'execute_secondary':219},'descriptor_indexing':{'copy':216,'feature_words':2,'layout_stride':6,'variable_allocation_argument':5},'core12_completion':{'events':[220,227],'memory_commitment':228,'subresource_layout':229,'ycbcr':[230,231],'peer_memory':232,'sparse_requirements':233,'draw_indirect_count':[235,236],'dedicated_requirements':239},'native_image_import':{'capability_bit':8192,'handle_type':'DMA_BUF','import_only':True,'formats':['R8','RG8','RGBA8','BGRA8'],'modifier':'LINEAR','fd_properties_operation':241,'modifier_operation':242,'image_barrier_stride':12},'gpu_indirect_commands':{'draw':203,'draw_indexed':204,'dispatch':205},'compute_features':{'capabilities_operation':206,'properties_operation':207,'buffer_device_address_operation':208,'host_query_reset_operation':209,'dispatch_base_operation':210,'device_mask_operation':211,'layout_support_operation':212,'update_buffer_operation':213,'render_granularity_operation':214,'schema_sha256':hashlib.sha256(Path('runtime/crates/trames-vulkan/compute-profile.json').read_bytes()).hexdigest()},'compressed_texture_blocks':'native-supported ETC2/EAC, ASTC LDR and BC','experimental':True,'instance_api':'1.2.0','device_api':'1.2.0','scope':'selected compute, graphics, queries, descriptor templates, Wayland and fixed-display WSI API; not Vulkan conformance or complete Zink','icd_sha256':hashlib.sha256((p/'libtrames_vulkan_icd.so').read_bytes()).hexdigest(),'loader':'unmodified distro libvulkan.so.1','headers':'1.3.281','native_moltenvk':'1.4.2','default_enabled':False}
+v['build_recipe_sha256']=hashlib.sha256(Path('scripts/build-vulkan-guest.sh').read_bytes()).hexdigest()
+v['source_sha256']={str(source):hashlib.sha256(source.read_bytes()).hexdigest()
+                    for source in sorted(Path('accelerator/vulkan').iterdir())
+                    if source.suffix in ('.c','.inc','.S')}
 (p/'manifest.json').write_text(json.dumps(v,indent=2)+'\n')
 PY
+python3 scripts/check-guest-vulkan.py "$output"
 cp LICENSE "$output/GPL-3.0.txt"

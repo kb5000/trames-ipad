@@ -17,6 +17,7 @@ esac
 mkdir -p apps/ios/Trames/GuestMusl
 cp target/musl-hybrid/libc.so target/musl-hybrid/manifest.json target/musl-hybrid/musl-COPYRIGHT.txt target/musl-hybrid/GPL-3.0.txt apps/ios/Trames/GuestMusl/
 [[ -f target/vulkan-guest/libtrames_vulkan_icd.so && -f target/vulkan-guest/manifest.json ]]
+python3 scripts/check-guest-vulkan.py
 mkdir -p apps/ios/Trames/GuestVulkan
 cp target/vulkan-guest/libtrames_vulkan_icd.so target/vulkan-guest/manifest.json target/vulkan-guest/GPL-3.0.txt apps/ios/Trames/GuestVulkan/
 cp target/vulkan-guest/trames-xwayland target/vulkan-guest/launcher-manifest.json apps/ios/Trames/GuestVulkan/
