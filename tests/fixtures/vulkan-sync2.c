@@ -33,6 +33,38 @@ static void timeline_chain(VkQueue queue,VkCommandPool pool){
  }
  pthread_t thread;assert(!pthread_create(&thread,NULL,host_chain,&chain));VkFenceCreateInfo fc={.sType=VK_STRUCTURE_TYPE_FENCE_CREATE_INFO};VkFence fence;OK(vkCreateFence(device,&fc,NULL,&fence));OK(api.submit(queue,12,submit,fence));OK(vkWaitForFences(device,1,&fence,VK_TRUE,5000000000ull));assert(!pthread_join(thread,NULL));vkDestroyFence(device,fence,NULL);vkFreeCommandBuffers(device,pool,12,cb);vkDestroySemaphore(device,chain.semaphore,NULL);release(chain.output);
 }
+// Geekbench's adaptive calibration submits 165 command buffers in one record.
+// Exercise that size, larger record counts, and both semaphore representations
+// against the identical native driver and guest ICD, checking actual GPU output.
+static void large_legacy_submits(VkQueue queue,VkCommandPool pool){
+ enum {COMMANDS=165,SEMAPHORES=65};
+ struct buffer output=buffer(4096);VkCommandBuffer cb[COMMANDS];
+ VkCommandBufferAllocateInfo allocate={.sType=VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,.commandPool=pool,.level=VK_COMMAND_BUFFER_LEVEL_PRIMARY,.commandBufferCount=COMMANDS};OK(vkAllocateCommandBuffers(device,&allocate,cb));
+ for(unsigned i=0;i<COMMANDS;i++){
+  VkCommandBufferBeginInfo begin={.sType=VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO};OK(vkBeginCommandBuffer(cb[i],&begin));vkCmdFillBuffer(cb[i],output.buffer,i*4,4,i+1);
+  VkBufferMemoryBarrier b={.sType=VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER,.srcAccessMask=VK_ACCESS_TRANSFER_WRITE_BIT,.dstAccessMask=VK_ACCESS_HOST_READ_BIT,.srcQueueFamilyIndex=VK_QUEUE_FAMILY_IGNORED,.dstQueueFamilyIndex=VK_QUEUE_FAMILY_IGNORED,.buffer=output.buffer,.offset=i*4,.size=4};
+  vkCmdPipelineBarrier(cb[i],VK_PIPELINE_STAGE_TRANSFER_BIT,VK_PIPELINE_STAGE_HOST_BIT,0,0,NULL,1,&b,0,NULL);OK(vkEndCommandBuffer(cb[i]));
+ }
+ VkFenceCreateInfo fc={.sType=VK_STRUCTURE_TYPE_FENCE_CREATE_INFO};VkFence fence;OK(vkCreateFence(device,&fc,NULL,&fence));
+ for(unsigned phase=0;phase<4;phase++){
+  memset(output.data,0,4096);VkSubmitInfo submits[COMMANDS];uint32_t count=1;
+  submits[0]=(VkSubmitInfo){.sType=VK_STRUCTURE_TYPE_SUBMIT_INFO,.commandBufferCount=COMMANDS,.pCommandBuffers=cb};
+  VkSemaphore semaphores[SEMAPHORES];uint64_t values[SEMAPHORES];VkPipelineStageFlags stages[SEMAPHORES];
+  VkTimelineSemaphoreSubmitInfo signal={.sType=VK_STRUCTURE_TYPE_TIMELINE_SEMAPHORE_SUBMIT_INFO,.signalSemaphoreValueCount=SEMAPHORES,.pSignalSemaphoreValues=values},wait={.sType=VK_STRUCTURE_TYPE_TIMELINE_SEMAPHORE_SUBMIT_INFO,.waitSemaphoreValueCount=SEMAPHORES,.pWaitSemaphoreValues=values};
+  if(phase==1){count=COMMANDS;for(unsigned i=0;i<COMMANDS;i++)submits[i]=(VkSubmitInfo){.sType=VK_STRUCTURE_TYPE_SUBMIT_INFO,.commandBufferCount=1,.pCommandBuffers=cb+i};}
+  if(phase>=2){
+   VkSemaphoreTypeCreateInfo type={.sType=VK_STRUCTURE_TYPE_SEMAPHORE_TYPE_CREATE_INFO,.semaphoreType=VK_SEMAPHORE_TYPE_TIMELINE};VkSemaphoreCreateInfo sc={.sType=VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,.pNext=phase==3?&type:NULL};
+   for(unsigned i=0;i<SEMAPHORES;i++){OK(vkCreateSemaphore(device,&sc,NULL,&semaphores[i]));values[i]=i+1;stages[i]=VK_PIPELINE_STAGE_TRANSFER_BIT;}
+   submits[1]=submits[0];submits[1].waitSemaphoreCount=SEMAPHORES;submits[1].pWaitSemaphores=semaphores;submits[1].pWaitDstStageMask=stages;submits[1].pNext=phase==3?&wait:NULL;
+   submits[0]=(VkSubmitInfo){.sType=VK_STRUCTURE_TYPE_SUBMIT_INFO,.pNext=phase==3?&signal:NULL,.signalSemaphoreCount=SEMAPHORES,.pSignalSemaphores=semaphores};count=2;
+  }
+  OK(vkQueueSubmit(queue,count,submits,fence));OK(vkWaitForFences(device,1,&fence,VK_TRUE,5000000000ull));
+  for(unsigned i=0;i<COMMANDS;i++)assert(((uint32_t*)output.data)[i]==i+1);
+  if(phase>=2)for(unsigned i=0;i<SEMAPHORES;i++)vkDestroySemaphore(device,semaphores[i],NULL);
+  OK(vkResetFences(device,1,&fence));
+ }
+ vkDestroyFence(device,fence,NULL);vkFreeCommandBuffers(device,pool,COMMANDS,cb);release(output);
+}
 int main(int argc,char **argv){
  assert(argc==2);VkApplicationInfo ai={.sType=VK_STRUCTURE_TYPE_APPLICATION_INFO,.apiVersion=VK_API_VERSION_1_2};const char *ie[]={VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME};VkInstanceCreateInfo ii={.sType=VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,.pApplicationInfo=&ai,.enabledExtensionCount=1,.ppEnabledExtensionNames=ie};VkInstance instance;OK(vkCreateInstance(&ii,NULL,&instance));uint32_t n=1;OK(vkEnumeratePhysicalDevices(instance,&n,&physical));
  VkPhysicalDeviceSynchronization2Features sync={.sType=VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES};VkPhysicalDeviceTimelineSemaphoreFeatures timeline={.sType=VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TIMELINE_SEMAPHORE_FEATURES,.pNext=&sync};VkPhysicalDeviceFeatures2 f={.sType=VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2,.pNext=&timeline};vkGetPhysicalDeviceFeatures2(physical,&f);assert(sync.synchronization2 && timeline.timelineSemaphore);
@@ -61,7 +93,7 @@ int main(int argc,char **argv){
  for(unsigned i=0;i<64;i++)assert(((uint32_t*)out.data)[i]==(i+11)*3+7);unsigned char expected[4]={64,128,191,255};for(unsigned i=0;i<64;i++)assert(!memcmp((unsigned char*)pixels.data+i*4,expected,4));uint64_t timestamps[2];OK(vkGetQueryPoolResults(device,queries,0,2,sizeof(timestamps),timestamps,8,VK_QUERY_RESULT_64_BIT|VK_QUERY_RESULT_WAIT_BIT));assert(timestamps[1]>=timestamps[0]);assert(vkGetEventStatus(device,events[0])==VK_EVENT_RESET);
  OK(vkResetFences(device,1,&fence));wait[0]=(VkSemaphoreSubmitInfo){.sType=VK_STRUCTURE_TYPE_SEMAPHORE_SUBMIT_INFO,.semaphore=gate,.value=3,.stageMask=VK_PIPELINE_STAGE_2_COPY_BIT};last.value=3;VkSubmitInfo2 future={.sType=VK_STRUCTURE_TYPE_SUBMIT_INFO_2,.waitSemaphoreInfoCount=1,.pWaitSemaphoreInfos=wait,.signalSemaphoreInfoCount=1,.pSignalSemaphoreInfos=&last};OK(api.submit(queue,1,&future,fence));VkSemaphoreSignalInfo host={.sType=VK_STRUCTURE_TYPE_SEMAPHORE_SIGNAL_INFO,.semaphore=gate,.value=3};OK(vkSignalSemaphore(device,&host));OK(vkWaitForFences(device,1,&fence,VK_TRUE,UINT64_MAX));OK(vkResetFences(device,1,&fence));OK(api.submit(queue,0,NULL,fence));OK(vkWaitForFences(device,1,&fence,VK_TRUE,UINT64_MAX));
  OK(vkResetFences(device,1,&fence));uint64_t serial_value=3;VkPipelineStageFlags none=0;VkTimelineSemaphoreSubmitInfo legacy_timeline={.sType=VK_STRUCTURE_TYPE_TIMELINE_SEMAPHORE_SUBMIT_INFO,.waitSemaphoreValueCount=1,.pWaitSemaphoreValues=&serial_value};VkSubmitInfo legacy={.sType=VK_STRUCTURE_TYPE_SUBMIT_INFO,.pNext=&legacy_timeline,.waitSemaphoreCount=1,.pWaitSemaphores=&serial,.pWaitDstStageMask=&none};OK(vkQueueSubmit(queue,1,&legacy,fence));OK(vkWaitForFences(device,1,&fence,VK_TRUE,UINT64_MAX));
- timeline_chain(queue,pool);
- printf("sync2-ok: storage64=64 pixels=64 events=2 timestamps=%llu,%llu submit-boundaries=2 future-wait=ok arena-spill=65 legacy-none=ok host-chain=12\n",(unsigned long long)timestamps[0],(unsigned long long)timestamps[1]);
+ timeline_chain(queue,pool);large_legacy_submits(queue,pool);
+ printf("sync2-ok: storage64=64 pixels=64 events=2 timestamps=%llu,%llu submit-boundaries=2 future-wait=ok arena-spill=65 legacy-none=ok host-chain=12 legacy-commands=165 legacy-boundaries=165 binary-and-timeline-semaphores=65\n",(unsigned long long)timestamps[0],(unsigned long long)timestamps[1]);
  vkDestroyFence(device,fence,NULL);vkDestroySemaphore(device,serial,NULL);vkDestroySemaphore(device,gate,NULL);vkDestroySemaphore(device,binary,NULL);vkDestroyEvent(device,events[0],NULL);vkDestroyEvent(device,events[1],NULL);vkDestroyQueryPool(device,queries,NULL);vkDestroyCommandPool(device,pool,NULL);vkDestroyFramebuffer(device,framebuffer,NULL);vkDestroyRenderPass(device,pass,NULL);vkDestroyImageView(device,view,NULL);vkDestroyImage(device,image,NULL);vkFreeMemory(device,image_memory,NULL);vkDestroyPipeline(device,pipeline,NULL);vkDestroyShaderModule(device,shader,NULL);vkDestroyPipelineLayout(device,pl,NULL);vkDestroyDescriptorPool(device,descriptors,NULL);vkDestroyDescriptorSetLayout(device,sl,NULL);release(source);release(data);release(out);release(pixels);vkDestroyDevice(device,NULL);vkDestroyInstance(instance,NULL);return 0;
 }

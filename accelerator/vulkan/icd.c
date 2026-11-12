@@ -476,28 +476,7 @@ VKAPI_ATTR VkResult VKAPI_CALL vkWaitForFences(VkDevice d,uint32_t count,const V
         struct timespec sleep={0,(long)(timeout==UINT64_MAX || timeout-elapsed>1000000?1000000:timeout-elapsed)};nanosleep(&sleep,NULL);
     }
 }
-VKAPI_ATTR VkResult VKAPI_CALL vkQueueSubmit(VkQueue queue,uint32_t count,const VkSubmitInfo *submits,VkFence fence) {
-    if(count>64)return VK_ERROR_FEATURE_NOT_PRESENT;
-    uint64_t records[64][9],legacy[64][7],commands[64],waits[64],signals[64],wait_values[64]={0},signal_values[64]={0};uint32_t stages[64],nc=0,nw=0,ns=0;int timeline=0;
-    for(uint32_t i=0;i<count;i++){const VkSubmitInfo *s=&submits[i];if(s->sType!=VK_STRUCTURE_TYPE_SUBMIT_INFO)return VK_ERROR_FEATURE_NOT_PRESENT;
-        const VkTimelineSemaphoreSubmitInfo *t=(void *)find_next(s->pNext,VK_STRUCTURE_TYPE_TIMELINE_SEMAPHORE_SUBMIT_INFO);
-        if(t){
-            if(!VALID(t,VK_STRUCTURE_TYPE_TIMELINE_SEMAPHORE_SUBMIT_INFO) || !(DEVICE(queue)->enabled&2) ||
-               (t->waitSemaphoreValueCount && t->waitSemaphoreValueCount!=s->waitSemaphoreCount) ||
-               (t->signalSemaphoreValueCount && t->signalSemaphoreValueCount!=s->signalSemaphoreCount))return VK_ERROR_FEATURE_NOT_PRESENT;
-            timeline=1;
-        }
-        if(s->waitSemaphoreCount>64-nw || s->signalSemaphoreCount>64-ns || s->commandBufferCount>64-nc)return VK_ERROR_FEATURE_NOT_PRESENT;
-        records[i][0]=PTR(waits+nw);records[i][1]=s->waitSemaphoreCount;records[i][2]=PTR(stages+nw);records[i][3]=PTR(commands+nc);records[i][4]=s->commandBufferCount;records[i][5]=PTR(signals+ns);records[i][6]=s->signalSemaphoreCount;
-        records[i][7]=PTR(wait_values+nw);records[i][8]=PTR(signal_values+ns);
-        for(uint32_t j=0;j<s->waitSemaphoreCount;j++){waits[nw]=(uint64_t)s->pWaitSemaphores[j];if(t && t->waitSemaphoreValueCount)wait_values[nw]=t->pWaitSemaphoreValues[j];stages[nw++]=s->pWaitDstStageMask[j];}
-        for(uint32_t j=0;j<s->commandBufferCount;j++)commands[nc++]=KEY(s->pCommandBuffers[j]);
-        for(uint32_t j=0;j<s->signalSemaphoreCount;j++){if(t && t->signalSemaphoreValueCount)signal_values[ns]=t->pSignalSemaphoreValues[j];signals[ns++]=(uint64_t)s->pSignalSemaphores[j];}
-        memcpy(legacy[i],records[i],sizeof(legacy[i]));
-    }
-    if(!timeline)return CALL(56,DEVKEY(queue),KEY(queue),PTR(legacy),count,(uint64_t)fence);
-    return CALL(120,DEVKEY(queue),KEY(queue),PTR(records),count,(uint64_t)fence);
-}
+// Queue submission packing shares Sync2's call-owned stack/spill arena below.
 VKAPI_ATTR VkResult VKAPI_CALL vkQueueWaitIdle(VkQueue q) {VkFence fence;VkFenceCreateInfo f={.sType=VK_STRUCTURE_TYPE_FENCE_CREATE_INFO};VkDevice d=(VkDevice)DEVICE(q);VkResult r=vkCreateFence(d,&f,NULL,&fence);if(r!=VK_SUCCESS)return r;r=vkQueueSubmit(q,0,NULL,fence);if(r==VK_SUCCESS)r=vkWaitForFences(d,1,&fence,VK_TRUE,UINT64_MAX);vkDestroyFence(d,fence,NULL);return r;}
 VKAPI_ATTR VkResult VKAPI_CALL vkDeviceWaitIdle(VkDevice d) {for(Dispatch *q=D(d)->queue;q;q=q->next){VkResult r=vkQueueWaitIdle((VkQueue)q);if(r!=VK_SUCCESS)return r;}return VK_SUCCESS;}
 

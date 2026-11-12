@@ -9,6 +9,35 @@ static uint64_t *s2_alloc(S2Arena *a,size_t count,size_t width){
     return rg_alloc(&a->spill,count,width);
 }
 static void s2_free(S2Arena *a){while(a->spill.blocks){RGBlock *next=a->spill.blocks->next;free(a->spill.blocks);a->spill.blocks=next;}}
+// Preserve the application's whole batch and semaphore boundaries. Small calls
+// stay on the stack; array size follows the call rather than a fixed quota.
+VKAPI_ATTR VkResult VKAPI_CALL vkQueueSubmit(VkQueue queue,uint32_t count,const VkSubmitInfo *submits,VkFence fence){
+    S2Arena a;s2_init(&a);uint64_t *h=s2_alloc(&a,count,9);int timeline=0;
+    for(uint32_t i=0;i<count && a.spill.result==VK_SUCCESS;i++){
+        const VkSubmitInfo *s=submits+i;if(!VALID(s,VK_STRUCTURE_TYPE_SUBMIT_INFO)){a.spill.result=VK_ERROR_FEATURE_NOT_PRESENT;break;}
+        const VkTimelineSemaphoreSubmitInfo *t=(void *)find_next(s->pNext,VK_STRUCTURE_TYPE_TIMELINE_SEMAPHORE_SUBMIT_INFO);
+        if(t){
+            if(!VALID(t,VK_STRUCTURE_TYPE_TIMELINE_SEMAPHORE_SUBMIT_INFO) || !(DEVICE(queue)->enabled&2) ||
+               (t->waitSemaphoreValueCount && t->waitSemaphoreValueCount!=s->waitSemaphoreCount) ||
+               (t->signalSemaphoreValueCount && t->signalSemaphoreValueCount!=s->signalSemaphoreCount)){a.spill.result=VK_ERROR_FEATURE_NOT_PRESENT;break;}
+            timeline=1;
+        }
+        uint64_t *w=s2_alloc(&a,s->waitSemaphoreCount,1),*c=s2_alloc(&a,s->commandBufferCount,1),*signal=s2_alloc(&a,s->signalSemaphoreCount,1);
+        uint32_t *stages=(void *)s2_alloc(&a,s->waitSemaphoreCount,1);
+        uint64_t *wv=s2_alloc(&a,s->waitSemaphoreCount,1),*sv=s2_alloc(&a,s->signalSemaphoreCount,1);
+        if(a.spill.result!=VK_SUCCESS)break;
+        uint64_t row[9]={PTR(w),s->waitSemaphoreCount,PTR(stages),PTR(c),s->commandBufferCount,PTR(signal),s->signalSemaphoreCount,PTR(wv),PTR(sv)};memcpy(h+(size_t)i*9,row,sizeof(row));
+        for(uint32_t j=0;j<s->waitSemaphoreCount;j++){w[j]=(uint64_t)s->pWaitSemaphores[j];stages[j]=s->pWaitDstStageMask[j];wv[j]=t && t->waitSemaphoreValueCount?t->pWaitSemaphoreValues[j]:0;}
+        for(uint32_t j=0;j<s->commandBufferCount;j++)c[j]=KEY(s->pCommandBuffers[j]);
+        for(uint32_t j=0;j<s->signalSemaphoreCount;j++){signal[j]=(uint64_t)s->pSignalSemaphores[j];sv[j]=t && t->signalSemaphoreValueCount?t->pSignalSemaphoreValues[j]:0;}
+    }
+    VkResult r=a.spill.result;
+    if(r==VK_SUCCESS){
+        if(!timeline)for(uint32_t i=0;i<count;i++)memmove(h+(size_t)i*7,h+(size_t)i*9,7*sizeof(*h));
+        r=CALL(timeline?120:56,DEVKEY(queue),KEY(queue),PTR(h),count,(uint64_t)fence);
+    }
+    s2_free(&a);return r;
+}
 static void s2_dependency(S2Arena *a,const VkDependencyInfo *d,uint64_t h[7]){
     if(!VALID(d,VK_STRUCTURE_TYPE_DEPENDENCY_INFO)){a->spill.result=VK_ERROR_FEATURE_NOT_PRESENT;return;}
     uint64_t *mem=s2_alloc(a,d->memoryBarrierCount,4),*buf=s2_alloc(a,d->bufferMemoryBarrierCount,9),*im=s2_alloc(a,d->imageMemoryBarrierCount,14);

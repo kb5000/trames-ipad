@@ -65,7 +65,6 @@
     if(!strcmp(name,"vkResetFences"))return (PFN_vkVoidFunction)vkResetFences;
     if(!strcmp(name,"vkGetFenceStatus"))return (PFN_vkVoidFunction)vkGetFenceStatus;
     if(!strcmp(name,"vkWaitForFences"))return (PFN_vkVoidFunction)vkWaitForFences;
-    if(!strcmp(name,"vkQueueSubmit"))return (PFN_vkVoidFunction)vkQueueSubmit;
     if(!strcmp(name,"vkQueueWaitIdle"))return (PFN_vkVoidFunction)vkQueueWaitIdle;
     if(!strcmp(name,"vkDeviceWaitIdle"))return (PFN_vkVoidFunction)vkDeviceWaitIdle;
     if(!strcmp(name,"vkCreatePipelineCache"))return (PFN_vkVoidFunction)vkCreatePipelineCache;
@@ -281,6 +280,7 @@
     if(!strcmp(name,"vkCmdWaitEvents"))return (PFN_vkVoidFunction)vkCmdWaitEvents;
     if(!strcmp(name,"vkGetDeviceMemoryCommitment"))return (PFN_vkVoidFunction)vkGetDeviceMemoryCommitment;
     if(!strcmp(name,"vkGetImageSubresourceLayout"))return (PFN_vkVoidFunction)vkGetImageSubresourceLayout;
+    if(!strcmp(name,"vkQueueSubmit"))return (PFN_vkVoidFunction)vkQueueSubmit;
     if(!strcmp(name,"vkCmdPipelineBarrier2"))return (PFN_vkVoidFunction)vkCmdPipelineBarrier2;
     if(!strcmp(name,"vkCmdSetEvent2"))return (PFN_vkVoidFunction)vkCmdSetEvent2;
     if(!strcmp(name,"vkCmdResetEvent2"))return (PFN_vkVoidFunction)vkCmdResetEvent2;
