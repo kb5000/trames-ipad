@@ -424,9 +424,13 @@ VKAPI_ATTR VkResult VKAPI_CALL vkBeginCommandBuffer(VkCommandBuffer c,const VkCo
     if(!info || info->sType!=VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO)return VK_ERROR_FEATURE_NOT_PRESENT;
     const VkDeviceGroupCommandBufferBeginInfo *group=(void *)find_next(info->pNext,VK_STRUCTURE_TYPE_DEVICE_GROUP_COMMAND_BUFFER_BEGIN_INFO);
     if(group && (!VALID(group,VK_STRUCTURE_TYPE_DEVICE_GROUP_COMMAND_BUFFER_BEGIN_INFO) || group->deviceMask!=1))return VK_ERROR_FEATURE_NOT_PRESENT;
-    const VkCommandBufferInheritanceInfo *v=D(c)->level==VK_COMMAND_BUFFER_LEVEL_SECONDARY?info->pInheritanceInfo:NULL;uint64_t inherited[6];
+    const VkCommandBufferInheritanceInfo *v=D(c)->level==VK_COMMAND_BUFFER_LEVEL_SECONDARY?info->pInheritanceInfo:NULL;uint64_t inherited[6],rendering[6];const VkCommandBufferInheritanceRenderingInfo *dr=NULL;
     if(v){if(!VALID(v,VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO))return VK_ERROR_FEATURE_NOT_PRESENT;inherited[0]=(uint64_t)v->renderPass;inherited[1]=v->subpass;inherited[2]=(uint64_t)v->framebuffer;inherited[3]=v->occlusionQueryEnable;inherited[4]=v->queryFlags;inherited[5]=v->pipelineStatistics;}
-    return CALL(38,DEVKEY(c),KEY(c),D(c)->level==VK_COMMAND_BUFFER_LEVEL_PRIMARY?(info->flags&~VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT):info->flags,v?PTR(inherited):0);
+    if(v && !v->renderPass && (info->flags&VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT)){
+        dr=find_next(v->pNext,VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_RENDERING_INFO);
+        if(dr){rendering[0]=dr->viewMask;rendering[1]=dr->colorAttachmentCount;rendering[2]=PTR(dr->pColorAttachmentFormats);rendering[3]=dr->depthAttachmentFormat;rendering[4]=dr->stencilAttachmentFormat;rendering[5]=dr->rasterizationSamples;}
+    }
+    return CALL(38,DEVKEY(c),KEY(c),D(c)->level==VK_COMMAND_BUFFER_LEVEL_PRIMARY?(info->flags&~VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT):info->flags,v?PTR(inherited):0,dr?PTR(rendering):0,dr?dr->flags:0);
 }
 VKAPI_ATTR void VKAPI_CALL vkCmdExecuteCommands(VkCommandBuffer c,uint32_t count,const VkCommandBuffer *commands) {
     uint64_t *keys=count?malloc((size_t)count*8):NULL;if(count && !keys)checked(VK_ERROR_OUT_OF_HOST_MEMORY);
@@ -511,6 +515,7 @@ VKAPI_ATTR VkResult VKAPI_CALL vkResetDescriptorPool(VkDevice d,VkDescriptorPool
 VKAPI_ATTR VkResult VKAPI_CALL vkGetPipelineCacheData(VkDevice d,VkPipelineCache cache,size_t *size,void *data) {return CALL(130,KEY(d),(uint64_t)cache,PTR(size),PTR(data));}
 VKAPI_ATTR VkResult VKAPI_CALL vkMergePipelineCaches(VkDevice d,VkPipelineCache dest,uint32_t count,const VkPipelineCache *sources) {if(count>64)return VK_ERROR_FEATURE_NOT_PRESENT;return CALL(131,KEY(d),(uint64_t)dest,count,PTR(sources));}
 
+#include "dynamic.inc"
 #include "graphics.inc"
 #include "rendergraph.inc"
 #include "external.inc"

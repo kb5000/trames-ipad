@@ -73,7 +73,10 @@ VKAPI_ATTR void VKAPI_CALL vkGetPhysicalDeviceProperties2(VkPhysicalDevice p,VkP
 VKAPI_ATTR void VKAPI_CALL vkGetPhysicalDeviceProperties2KHR(VkPhysicalDevice p,VkPhysicalDeviceProperties2 *out) {vkGetPhysicalDeviceProperties2(p,out);}
 VKAPI_ATTR void VKAPI_CALL vkGetPhysicalDeviceMemoryProperties2(VkPhysicalDevice p,VkPhysicalDeviceMemoryProperties2 *out) {
     query_output(out,VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MEMORY_PROPERTIES_2);
-    vkGetPhysicalDeviceMemoryProperties(p,&out->memoryProperties);
+    VkPhysicalDeviceMemoryBudgetPropertiesEXT *budget=NULL;
+    for(VkBaseOutStructure *n=out->pNext;n;n=n->pNext)if(n->sType==VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MEMORY_BUDGET_PROPERTIES_EXT && (D(p)->compute_caps[0]&(1UL<<35)))budget=(void *)n;
+    if(budget)checked(CALL(252,KEY(p),PTR(budget->heapBudget),PTR(&out->memoryProperties)));
+    else vkGetPhysicalDeviceMemoryProperties(p,&out->memoryProperties);
 }
 VKAPI_ATTR void VKAPI_CALL vkGetPhysicalDeviceMemoryProperties2KHR(VkPhysicalDevice p,VkPhysicalDeviceMemoryProperties2 *out) {vkGetPhysicalDeviceMemoryProperties2(p,out);}
 VKAPI_ATTR void VKAPI_CALL vkGetPhysicalDeviceFormatProperties2(VkPhysicalDevice p,VkFormat format,VkFormatProperties2 *out) {

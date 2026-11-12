@@ -35,6 +35,8 @@ static const struct compute_extension compute_extensions[] = {
     {"VK_KHR_dedicated_allocation", 1UL << 31},
     {"VK_EXT_shader_viewport_index_layer", 1UL << 32},
     {"VK_EXT_pipeline_creation_cache_control", 1UL << 33},
+    {"VK_KHR_dynamic_rendering", 1UL << 34},
+    {"VK_EXT_memory_budget", 1UL << 35},
 };
 static const struct compute_feature compute_features[] = {
     {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES, offsetof(VkPhysicalDevice16BitStorageFeatures, storageBuffer16BitAccess), 4, 0, 1UL << 1, VK_API_VERSION_1_1},
@@ -58,6 +60,7 @@ static const struct compute_feature compute_features[] = {
     {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES, offsetof(VkPhysicalDeviceSamplerYcbcrConversionFeatures, samplerYcbcrConversion), 1, 70, 1UL << 27, VK_API_VERSION_1_1},
     {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_ATOMIC_INT64_FEATURES, offsetof(VkPhysicalDeviceShaderAtomicInt64Features, shaderBufferInt64Atomics), 2, 71, 1UL << 28, VK_API_VERSION_1_2},
     {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_CREATION_CACHE_CONTROL_FEATURES, offsetof(VkPhysicalDevicePipelineCreationCacheControlFeatures, pipelineCreationCacheControl), 1, 73, 1UL << 33, VK_API_VERSION_1_3},
+    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES, offsetof(VkPhysicalDeviceDynamicRenderingFeatures, dynamicRendering), 1, 74, 1UL << 34, VK_API_VERSION_1_3},
 };
 static const struct compute_core12 compute_core12[] = {
     {39, 0},

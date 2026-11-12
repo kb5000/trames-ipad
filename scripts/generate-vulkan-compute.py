@@ -19,7 +19,7 @@ for e in schema['extensions']:
     rs += [f'    (1 << {e["index"]}, c"{e["extension"]}", {api(e["minimum_api"])}),']
 rs += ['];']
 for e in schema['extensions']:
-    if e['name'] in ('storage_class', 'maintenance3'):
+    if e['name'] in ('storage_class', 'maintenance3', 'memory_budget'):
         rs += [f'pub(super) const EXT_{e["name"].upper()}: u64 = 1 << {e["index"]};']
 rs += ['compute_features! {']
 bit_mask = 0
@@ -31,7 +31,7 @@ for f in schema['features']:
         assert not bit_mask & (1 << (f['bit'] + i))
         bit_mask |= 1 << (f['bit'] + i)
 rs += ['}']
-constants = {'pipeline_creation_cache_control','sampler_ycbcr_conversion', 'buffer_device_address', 'subgroup_size_control', 'compute_full_subgroups', 'shader_shared_float32_atomic_add', 'shader_shared_float32_atomics', 'host_query_reset','multiview','separate_depth_stencil_layouts','descriptor_binding_uniform_buffer_update_after_bind','descriptor_binding_sampled_image_update_after_bind','descriptor_binding_storage_image_update_after_bind','descriptor_binding_storage_buffer_update_after_bind','descriptor_binding_uniform_texel_buffer_update_after_bind','descriptor_binding_storage_texel_buffer_update_after_bind','descriptor_binding_update_unused_while_pending','descriptor_binding_partially_bound','descriptor_binding_variable_descriptor_count'}
+constants = {'dynamic_rendering','pipeline_creation_cache_control','sampler_ycbcr_conversion', 'buffer_device_address', 'subgroup_size_control', 'compute_full_subgroups', 'shader_shared_float32_atomic_add', 'shader_shared_float32_atomics', 'host_query_reset','multiview','separate_depth_stencil_layouts','descriptor_binding_uniform_buffer_update_after_bind','descriptor_binding_sampled_image_update_after_bind','descriptor_binding_storage_image_update_after_bind','descriptor_binding_storage_buffer_update_after_bind','descriptor_binding_uniform_texel_buffer_update_after_bind','descriptor_binding_storage_texel_buffer_update_after_bind','descriptor_binding_update_unused_while_pending','descriptor_binding_partially_bound','descriptor_binding_variable_descriptor_count'}
 for f in schema['features']:
     for i, field in enumerate(f['fields']):
         if field['rust'] in constants:

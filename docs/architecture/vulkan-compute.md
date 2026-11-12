@@ -791,3 +791,51 @@ hash gate and iPad ARM64 FFI compilation pass. CPU/kernel/network checks are
 reused because their source is unchanged. The Mac Dev app is updated; stable and
 installed iPad apps are unchanged. Full CTS, WSI CTS and physical iPad GPU CTS
 remain unrun.
+
+
+## Native dynamic rendering and memory budget (2026-11-12)
+
+Shared runtime `50223c7` and paired guest wire revision 18 add
+`VK_KHR_dynamic_rendering` and `VK_EXT_memory_budget`, gated by original native
+support in the generated host/guest profile. The advertised API remains Vulkan
+1.2; these extensions do not imply Vulkan 1.3 conformance or synchronization2.
+
+Dynamic rendering uses original native begin/end commands, pipeline rendering
+formats and secondary-command inheritance. Primary and self-contained secondary
+scopes, inherited rendering, multiview, color/depth/stencil attachments, native
+resolves and suspend/resume follow the original command/submission graph.
+Recorded attachment views retain their images and allocations through completion
+and cancellation. Dynamic pipelines store a format signature; no native render
+pass or framebuffer is fabricated. Format arrays are owned before asynchronous
+compilation. Ignored rasterization state stays ignored. Unknown extension nodes
+are skipped without retaining guest pointers. No coordinator, service thread,
+new lock or ordinary memory barrier is introduced.
+
+Wire operations 253/254 begin/end rendering. Begin receives an 11-word header
+and nine-word attachment records; operation 38 receives optional six-word dynamic
+inheritance. Pipeline config bit 262144 adds five format words at index 111.
+The native driver owns suspend/resume synchronization and actual rendering.
+
+Operation 252 returns native memory properties and `heapBudget[16]` /
+`heapUsage[16]` from one query on the caller. These are the driver's process/heap
+estimates, rather than guest CPU residency or an automatic eviction mechanism.
+Existing explicit session caps still bound exposed heap sizes/budgets;
+host-managed sessions add no artificial cap. No periodic sampler or separate
+accounting service is introduced. The serializer writes initialized ABI fields
+and deterministic padding only.
+
+The same original 1,601 CTS cases improve from 1,065 to 1,292 Pass. The expanded
+3,305-case selection reports 1,988 Pass, 1,317 NotSupported and zero
+Fail/ResourceError/Crash/Timeout. This includes both memory-budget cases and
+selected dynamic-rendering, inheritance, multiview, resolve and suspend/resume
+coverage. Full CTS, WSI CTS and physical iPad GPU CTS remain unrun. The
+[Mac record](https://github.com/kb5000/trames-mac/blob/main/docs/validation/mac-vulkan-cts.json)
+preserves individual results, the selection, baseline, diagnostic failures and
+the upstream low-resolution-Z prerequisite caveat.
+
+All 73 shared Vulkan tests pass, including nine native GPU cases. One/twelve-CPU
+GPU output oracles, Firefox WebRender/Zink exact pixels, strict affected lints,
+artifact/source/recipe gates, execution boundaries and iPad ARM64 FFI compilation
+pass. Unchanged CPU/Linux/network/HVF checks are reused. Mac Dev is updated;
+stable and installed iPad apps are unchanged. The implementation is shared;
+physical iPad rendering has not been newly validated.

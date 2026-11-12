@@ -98,24 +98,34 @@ VKAPI_ATTR VkResult VKAPI_CALL vkCreateGraphicsPipelines(VkDevice d,VkPipelineCa
     OBJECT_ALLOCATOR(d,allocator,VK_SYSTEM_ALLOCATION_SCOPE_OBJECT);*out=VK_NULL_HANDLE;
     CHECK(info,VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO);
     if((info->flags&~(VK_PIPELINE_CREATE_DISABLE_OPTIMIZATION_BIT|VK_PIPELINE_CREATE_ALLOW_DERIVATIVES_BIT|VK_PIPELINE_CREATE_DERIVATIVE_BIT|VK_PIPELINE_CREATE_FAIL_ON_PIPELINE_COMPILE_REQUIRED_BIT|VK_PIPELINE_CREATE_EARLY_RETURN_ON_FAILURE_BIT)) || info->stageCount<1 || info->stageCount>2)return unsupported_graphics_pipeline(__LINE__);
+    const VkPipelineRenderingCreateInfo *rendering=info->renderPass?NULL:find_next(info->pNext,VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO);
+    if(rendering && rendering->colorAttachmentCount>8)return unsupported_graphics_pipeline(__LINE__);
     const VkPipelineShaderStageCreateInfo *vertex=NULL,*fragment=NULL;
     for(unsigned i=0;i<info->stageCount;i++){const VkPipelineShaderStageCreateInfo *s=&info->pStages[i];CHECK(s,VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO);if(s->flags)return unsupported_graphics_pipeline(__LINE__);if(s->stage==VK_SHADER_STAGE_VERTEX_BIT && !vertex)vertex=s;else if(s->stage==VK_SHADER_STAGE_FRAGMENT_BIT && !fragment)fragment=s;else return unsupported_graphics_pipeline(__LINE__);}
     const VkPipelineVertexInputStateCreateInfo *v=info->pVertexInputState;if(!v || v->sType!=VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO)return unsupported_graphics_pipeline(__LINE__);if(v->flags || v->vertexBindingDescriptionCount>16 || v->vertexAttributeDescriptionCount>16)return unsupported_graphics_pipeline(__LINE__);
     const VkPipelineInputAssemblyStateCreateInfo *a=info->pInputAssemblyState;CHECK(a,VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO);if(a->flags || (a->primitiveRestartEnable && a->topology!=VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP && a->topology!=VK_PRIMITIVE_TOPOLOGY_LINE_STRIP && a->topology!=VK_PRIMITIVE_TOPOLOGY_TRIANGLE_FAN))return unsupported_graphics_pipeline(__LINE__);
-    const VkPipelineViewportStateCreateInfo *p=info->pViewportState;CHECK(p,VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO);if(p->flags || p->viewportCount!=1 || p->scissorCount!=1)return unsupported_graphics_pipeline(__LINE__);
-    const VkPipelineRasterizationStateCreateInfo *r=info->pRasterizationState;CHECK(r,VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO);if(r->flags || r->depthClampEnable || r->polygonMode>VK_POLYGON_MODE_POINT || r->lineWidth!=1.0f)return unsupported_graphics_pipeline(__LINE__);
+    const VkPipelineRasterizationStateCreateInfo *r=info->pRasterizationState;CHECK(r,VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO);
+    VkPipelineRasterizationStateCreateInfo discarded={.sType=VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,.rasterizerDiscardEnable=VK_TRUE,.lineWidth=1.0f};
+    if(r->rasterizerDiscardEnable)r=&discarded;
+    if(r->flags || r->depthClampEnable || r->polygonMode>VK_POLYGON_MODE_POINT || r->lineWidth!=1.0f)return unsupported_graphics_pipeline(__LINE__);
+    VkPipelineViewportStateCreateInfo unused_viewport={.sType=VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,.viewportCount=1,.scissorCount=1};
+    const VkPipelineViewportStateCreateInfo *p=r->rasterizerDiscardEnable?&unused_viewport:info->pViewportState;CHECK(p,VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO);if(p->flags || p->viewportCount!=1 || p->scissorCount!=1)return unsupported_graphics_pipeline(__LINE__);
     if(!vertex)return unsupported_graphics_pipeline(__LINE__);
-    const VkPipelineMultisampleStateCreateInfo *m=info->pMultisampleState;CHECK(m,VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO);
+    VkPipelineMultisampleStateCreateInfo unused_multisample={.sType=VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,.rasterizationSamples=VK_SAMPLE_COUNT_1_BIT};
+    const VkPipelineMultisampleStateCreateInfo *m=r->rasterizerDiscardEnable?&unused_multisample:info->pMultisampleState;CHECK(m,VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO);
     if(m->flags || !m->rasterizationSamples || m->rasterizationSamples>VK_SAMPLE_COUNT_64_BIT || (m->rasterizationSamples&(m->rasterizationSamples-1))){
         if(getenv("TRAMES_VULKAN_TRACE"))fprintf(stderr,"Trames Vulkan: multisample flags=%u samples=%u shading=%u coverage=%u alphaOne=%u mask=%08x\n",m->flags,m->rasterizationSamples,m->sampleShadingEnable,m->alphaToCoverageEnable,m->alphaToOneEnable,m->pSampleMask?m->pSampleMask[0]:UINT32_MAX);
         return unsupported_graphics_pipeline(__LINE__);
     }
-    const VkPipelineDepthStencilStateCreateInfo *z=info->pDepthStencilState;if(z){CHECK(z,VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO);if(z->flags || z->depthBoundsTestEnable || z->depthCompareOp>VK_COMPARE_OP_ALWAYS)return unsupported_graphics_pipeline(__LINE__);}
-    const VkPipelineColorBlendStateCreateInfo *b=info->pColorBlendState;CHECK(b,VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO);if(b->flags || b->logicOp>VK_LOGIC_OP_SET || b->attachmentCount>8)return unsupported_graphics_pipeline(__LINE__);
+    const VkPipelineDepthStencilStateCreateInfo *z=(r->rasterizerDiscardEnable || (!info->renderPass && (!rendering || (!rendering->depthAttachmentFormat && !rendering->stencilAttachmentFormat))))?NULL:info->pDepthStencilState;if(z){CHECK(z,VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO);if(z->flags || z->depthBoundsTestEnable || z->depthCompareOp>VK_COMPARE_OP_ALWAYS)return unsupported_graphics_pipeline(__LINE__);}
+    VkPipelineColorBlendStateCreateInfo unused_blend={.sType=VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO};
+    const VkPipelineColorBlendStateCreateInfo *b=(r->rasterizerDiscardEnable || (!info->renderPass && (!rendering || !rendering->colorAttachmentCount)))?&unused_blend:info->pColorBlendState;CHECK(b,VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO);if(b->flags || b->logicOp>VK_LOGIC_OP_SET || b->attachmentCount>8)return unsupported_graphics_pipeline(__LINE__);
     const VkPipelineDynamicStateCreateInfo *dynamic=info->pDynamicState;unsigned states=0;
     if(dynamic){CHECK(dynamic,VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO);if(dynamic->flags || dynamic->dynamicStateCount>9)return unsupported_graphics_pipeline(__LINE__);for(unsigned i=0;i<dynamic->dynamicStateCount;i++){unsigned bit=dynamic->pDynamicStates[i]<=VK_DYNAMIC_STATE_STENCIL_REFERENCE?1u<<dynamic->pDynamicStates[i]:0;if(!bit || (states&bit))return unsupported_graphics_pipeline(__LINE__);states|=bit;}}
     if(r->depthBiasEnable && !(states&(1u<<VK_DYNAMIC_STATE_DEPTH_BIAS)) && (r->depthBiasConstantFactor!=0 || r->depthBiasClamp!=0 || r->depthBiasSlopeFactor!=0))return unsupported_graphics_pipeline(__LINE__);
-    uint64_t config[23+8*8+15+1+8]={states|512|1024|2048|4096|16384|32768|65536|131072};config[102]=info->flags;config[22]=b->attachmentCount;
+    if(r->rasterizerDiscardEnable)states|=3;
+    uint64_t config[23+8*8+15+1+8+5]={states|512|1024|2048|4096|16384|32768|65536|131072};config[102]=info->flags;config[22]=b->attachmentCount;
+    if(!info->renderPass){config[0]|=262144;if(rendering){config[111]=rendering->viewMask;config[112]=rendering->colorAttachmentCount;config[113]=PTR(rendering->pColorAttachmentFormats);config[114]=rendering->depthAttachmentFormat;config[115]=rendering->stencilAttachmentFormat;}}
     // Copy the original sample masks/state before asynchronous native compile.
     config[11]=m->pSampleMask?m->pSampleMask[0]:UINT32_MAX;
     config[13]=m->rasterizationSamples;config[14]=m->pSampleMask && m->rasterizationSamples==VK_SAMPLE_COUNT_64_BIT?m->pSampleMask[1]:UINT32_MAX;

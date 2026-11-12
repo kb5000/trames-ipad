@@ -90,6 +90,10 @@
     if(!strcmp(name,"vkCmdSetDeviceMaskKHR"))return (PFN_vkVoidFunction)vkCmdSetDeviceMaskKHR;
     if(!strcmp(name,"vkCmdUpdateBuffer"))return (PFN_vkVoidFunction)vkCmdUpdateBuffer;
     if(!strcmp(name,"vkGetRenderAreaGranularity"))return (PFN_vkVoidFunction)vkGetRenderAreaGranularity;
+    if(!strcmp(name,"vkCmdBeginRendering"))return (PFN_vkVoidFunction)vkCmdBeginRendering;
+    if(!strcmp(name,"vkCmdEndRendering"))return (PFN_vkVoidFunction)vkCmdEndRendering;
+    if(!strcmp(name,"vkCmdBeginRenderingKHR"))return (PFN_vkVoidFunction)vkCmdBeginRenderingKHR;
+    if(!strcmp(name,"vkCmdEndRenderingKHR"))return (PFN_vkVoidFunction)vkCmdEndRenderingKHR;
     if(!strcmp(name,"vkCreateImage"))return (PFN_vkVoidFunction)vkCreateImage;
     if(!strcmp(name,"vkDestroyImage"))return (PFN_vkVoidFunction)vkDestroyImage;
     if(!strcmp(name,"vkGetImageMemoryRequirements"))return (PFN_vkVoidFunction)vkGetImageMemoryRequirements;
