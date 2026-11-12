@@ -36,30 +36,34 @@ frontend explicitly flattens arrays and structures. Guest pointers, native
 function pointers, Objective-C objects and native handles are never passed
 through unchanged. Proc-address queries return ordinary guest ELF functions.
 Dispatchable objects contain the loader's required first word plus an opaque
-resource ID. Loader-private create-info nodes are recognized locally; unsupported
-application `pNext`, allocation callbacks, extensions and flags are rejected.
+resource ID. Known create-info extension bodies are decoded locally; unrecognized `pNext`
+records are skipped using only their headers. Application allocation callbacks
+run as ordinary guest functions on the calling thread. Unsupported enabled
+features, extension names and meaningful flags still return their Vulkan errors.
 
-The CPU gates Vulkan independently of pure-memory NativeCall. The coordinator
+The CPU gates Vulkan independently of pure-memory NativeCall. The executing worker
 checks its host-created capability snapshot and exact stub code before invoking
 the backend. Matching instruction bytes alone do not grant GPU access. CLI
-activation is `--vulkan`. iPad's default-off “Vulkan 计算与图形（实验）” switch applies
+activation is `--vulkan`. iPad's “Vulkan 计算与图形（实验）” setting applies
 to the next local session, which receives the verified ICD at
 `/usr/lib/libtrames_vulkan_icd.so` and its JSON under `/usr/share/vulkan/icd.d`.
 Install the ordinary `vulkan-loader` package with apk.
 
 ## Supported compute operations
 
-The [catalog](../../accelerator/vulkan/entrypoints.inc) contains 238 public
-functions plus ICD negotiation exports. The profile supports one instance,
-compute-capable physical device, logical device and queue per address space;
+The [catalog](../../accelerator/vulkan/entrypoints.inc) exposes the core ABI and
+ICD negotiation exports. A process can retain multiple original instances and
+logical devices, one selected compute-capable physical device per instance, and
+the original native queues requested from its reported families. Devices support
 property queries; buffers and memory; SPIR-V modules; storage/uniform buffer
-descriptors; pipeline layouts and one compute pipeline per create call; primary and secondary
-command buffers, dispatch, push constants, barriers, buffer copy/fill; fences,
-binary semaphores, resets and idle waits. Compute pipeline specialization copies
-up to 64 map entries and 64 KiB of constant data into owned host records, checks
-IDs/offsets/sizes, and passes them to the original driver/compiler.
+descriptors; pipeline layouts; batched compute/graphics pipeline creation;
+primary and secondary command buffers, dispatch, push constants, barriers,
+buffer copy/fill; fences, binary/timeline semaphores, resets and idle waits.
+Per-stage specialization copies up to 64 map entries and 64 KiB of constant data
+into owned records before asynchronous native compilation. It checks
+IDs/offsets/sizes and calls the original driver/compiler.
 
-Query pools support native timestamps, nonprecise occlusion and, when actually
+Query pools support native timestamps, occlusion (including native precise support) and, when actually
 supported/enabled, transform-feedback stream-zero statistics. CPU result reads
 poll the native driver once; the guest WAIT wrapper yields through nanosleep.
 GPU query copies and transform-feedback counters stay on the native queue.
@@ -736,3 +740,54 @@ resource leases keep their original synchronization. No collection timer or
 new completion thread is introduced. The full Vulkan 1.2 native output oracle,
 including secondary buffers and pending descriptor updates, passes at one and
 twelve guest CPUs after this change.
+
+
+## Original object ownership and CTS ingress fixes (2026-11-12)
+
+Wire revision 17 is paired with shared runtime `28eb94c`. The original
+`vulkan-cts-1.4.7.0` executable, data and loader run unchanged through the actual
+Mac product. The identical 1,601-case diagnostic set now reports **1,065 Pass,
+536 NotSupported, zero Fail/ResourceError/Crash/Timeout**, compared with 252 Pass,
+1,093 Fail, 54 ResourceError, three crashes and 199 NotSupported initially.
+This is selected diagnostic coverage, not a complete CTS pass or conformance
+claim; [the Mac record](https://github.com/kb5000/trames-mac/blob/main/docs/validation/mac-vulkan-cts.json)
+retains every result and the baseline.
+
+- Extra instance/device graphs retain their original native owners and unique
+  handle domains inside the existing exclusive Context. Pending jobs, cancellation,
+  completion, authenticated image imports and teardown route to that graph.
+  Shared instance surfaces keep Rc dependencies until the last swapchain use;
+  surface destruction removes cached capabilities from device graphs. The whole
+  aggregate moves together between workers; no Rc escapes, lock or service thread
+  is added. The first-device path remains inline.
+- Queue-create descriptions and priorities are copied once, and each family/index
+  retains its actual native queue. Command pools, submit, present and idle use
+  that queue. The guest allocates immutable queue wrappers during device creation,
+  so `vkGetDeviceQueue` performs no allocation or callback. Buffer/image creation retains the original exclusive or concurrent sharing
+  mode and family list, including native-texture import recreation. Ordinary
+  queue-family ownership barriers pass to Vulkan; the existing Metal FD adapter
+  alone elides its foreign ownership indices. No address-space or visibility
+  emulation is added.
+- Guest allocation callbacks own persistent frontend metadata and dispatch
+  records. Their copied callbacks survive until the corresponding object is
+  destroyed, roll back on failure and run outside metadata locks. No guest
+  callback or pointer enters a native compiler thread.
+- Unknown extension nodes are skipped; known nodes are found anywhere in the
+  chain. Primary command buffers never read ignored inheritance pointers.
+  Optional derivative/optimization hints, graphics specialization, legal shader
+  visibility masks, no-fragment depth pipelines, ignored blend state on depth-only
+  subpasses and negative sampler `minLod` retain their Vulkan meaning.
+- Feature-dependent limits agree with the executable feature profile. Precise
+  occlusion is selected from native support. Native
+  `VK_EXT_pipeline_creation_cache_control` feature/flags, pipeline-cache external
+  synchronization and early-return/compile-required results are forwarded through
+  the same generated host/guest schema; unsupported native features stay disabled.
+
+All 71 shared Vulkan tests, including seven actual native ownership/fence/queue
+cases, pass. The native 1/12-CPU Vulkan 1.2 and core shader output oracles pass;
+Firefox WebRender/Zink passes 512-draw exact-pixel trials without GL errors or
+context loss. Strict affected lints, Mac product tests, the guest artifact/source
+hash gate and iPad ARM64 FFI compilation pass. CPU/kernel/network checks are
+reused because their source is unchanged. The Mac Dev app is updated; stable and
+installed iPad apps are unchanged. Full CTS, WSI CTS and physical iPad GPU CTS
+remain unrun.

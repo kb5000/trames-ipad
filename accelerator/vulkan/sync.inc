@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Core events and layout/accounting queries use original native objects.
-VKAPI_ATTR VkResult VKAPI_CALL vkCreateEvent(VkDevice d,const VkEventCreateInfo *info,const VkAllocationCallbacks *allocator,VkEvent *out){CHECK(info,VK_STRUCTURE_TYPE_EVENT_CREATE_INFO);ALLOCATOR(allocator);return CALL(220,KEY(d),info->flags,PTR(out));}
-VKAPI_ATTR void VKAPI_CALL vkDestroyEvent(VkDevice d,VkEvent event,const VkAllocationCallbacks *allocator){if(event)checked(allocator?VK_ERROR_FEATURE_NOT_PRESENT:CALL(221,KEY(d),(uint64_t)event));}
+VKAPI_ATTR VkResult VKAPI_CALL vkCreateEvent(VkDevice d,const VkEventCreateInfo *info,const VkAllocationCallbacks *allocator,VkEvent *out){CHECK(info,VK_STRUCTURE_TYPE_EVENT_CREATE_INFO);OBJECT_ALLOCATOR(d,allocator,VK_SYSTEM_ALLOCATION_SCOPE_OBJECT);return CALL(220,KEY(d),info->flags,PTR(out));}
+VKAPI_ATTR void VKAPI_CALL vkDestroyEvent(VkDevice d,VkEvent event,const VkAllocationCallbacks *allocator){if(event)checked(CALL(221,KEY(d),(uint64_t)event));if(allocator || D(d)->custom_allocator)allocation_release(D(d),(uint64_t)event);}
 VKAPI_ATTR VkResult VKAPI_CALL vkGetEventStatus(VkDevice d,VkEvent event){return CALL(222,KEY(d),(uint64_t)event);}
 VKAPI_ATTR VkResult VKAPI_CALL vkSetEvent(VkDevice d,VkEvent event){return CALL(223,KEY(d),(uint64_t)event);}
 VKAPI_ATTR VkResult VKAPI_CALL vkResetEvent(VkDevice d,VkEvent event){return CALL(224,KEY(d),(uint64_t)event);}

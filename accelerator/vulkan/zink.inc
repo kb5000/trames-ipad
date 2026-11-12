@@ -26,7 +26,7 @@ VKAPI_ATTR VkResult VKAPI_CALL vkWaitSemaphoresKHR(VkDevice d,const VkSemaphoreW
 // Renderpass2 uses the original KHR driver entrypoints; profile limits match the
 // legacy single-subpass/MRT path. Every nested record is flattened before dispatch.
 VKAPI_ATTR VkResult VKAPI_CALL vkCreateRenderPass2(VkDevice d,const VkRenderPassCreateInfo2 *info,const VkAllocationCallbacks *allocator,VkRenderPass *out) {
-    if(!VALID(info,VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO_2))return VK_ERROR_FEATURE_NOT_PRESENT;ALLOCATOR(allocator);
+    if(!VALID(info,VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO_2))return VK_ERROR_FEATURE_NOT_PRESENT;OBJECT_ALLOCATOR(d,allocator,VK_SYSTEM_ALLOCATION_SCOPE_OBJECT);
     return render_graph_modern(d,info,out);
 }
 VKAPI_ATTR VkResult VKAPI_CALL vkCreateRenderPass2KHR(VkDevice d,const VkRenderPassCreateInfo2 *info,const VkAllocationCallbacks *allocator,VkRenderPass *out) {return vkCreateRenderPass2(d,info,allocator,out);}
@@ -43,13 +43,13 @@ VKAPI_ATTR void VKAPI_CALL vkCmdNextSubpass2KHR(VkCommandBuffer c,const VkSubpas
 // Query data and transform-feedback counters remain native GPU objects. WAIT
 // yields through Linux instead of holding a native worker in a driver wait.
 VKAPI_ATTR VkResult VKAPI_CALL vkCreateQueryPool(VkDevice d,const VkQueryPoolCreateInfo *info,const VkAllocationCallbacks *allocator,VkQueryPool *out) {
-    CHECK(info,VK_STRUCTURE_TYPE_QUERY_POOL_CREATE_INFO);ALLOCATOR(allocator);
+    CHECK(info,VK_STRUCTURE_TYPE_QUERY_POOL_CREATE_INFO);OBJECT_ALLOCATOR(d,allocator,VK_SYSTEM_ALLOCATION_SCOPE_OBJECT);
     if(info->flags || info->pipelineStatistics)return VK_ERROR_FEATURE_NOT_PRESENT;
     return CALL(138,KEY(d),info->queryType,info->queryCount,PTR(out));
 }
 VKAPI_ATTR void VKAPI_CALL vkDestroyQueryPool(VkDevice d,VkQueryPool pool,const VkAllocationCallbacks *allocator) {
-    if(pool)checked(allocator?VK_ERROR_FEATURE_NOT_PRESENT:CALL(139,KEY(d),(uint64_t)pool));
-}
+    if(pool)checked(CALL(139,KEY(d),(uint64_t)pool));
+if(allocator || D(d)->custom_allocator)allocation_release(D(d),(uint64_t)pool);}
 VKAPI_ATTR VkResult VKAPI_CALL vkGetQueryPoolResults(VkDevice d,VkQueryPool pool,uint32_t first,uint32_t count,size_t size,void *out,VkDeviceSize stride,VkQueryResultFlags flags) {
     for(;;){
         VkResult r=CALL(141,KEY(d),(uint64_t)pool,first,count,size,PTR(out),stride,flags);

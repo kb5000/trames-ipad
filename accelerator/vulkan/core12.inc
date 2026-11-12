@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Remaining promoted commands use owned wire records and original GPU calls.
 VKAPI_ATTR VkResult VKAPI_CALL vkCreateSamplerYcbcrConversion(VkDevice d,const VkSamplerYcbcrConversionCreateInfo *info,const VkAllocationCallbacks *allocator,VkSamplerYcbcrConversion *out){
-    CHECK(info,VK_STRUCTURE_TYPE_SAMPLER_YCBCR_CONVERSION_CREATE_INFO);ALLOCATOR(allocator);
+    CHECK(info,VK_STRUCTURE_TYPE_SAMPLER_YCBCR_CONVERSION_CREATE_INFO);OBJECT_ALLOCATOR(d,allocator,VK_SYSTEM_ALLOCATION_SCOPE_OBJECT);
     uint64_t w[11]={info->format,info->ycbcrModel,info->ycbcrRange,info->components.r,info->components.g,info->components.b,info->components.a,info->xChromaOffset,info->yChromaOffset,info->chromaFilter,info->forceExplicitReconstruction};
     return CALL(230,KEY(d),PTR(w),PTR(out));
 }
-VKAPI_ATTR void VKAPI_CALL vkDestroySamplerYcbcrConversion(VkDevice d,VkSamplerYcbcrConversion c,const VkAllocationCallbacks *allocator){if(c)checked(allocator?VK_ERROR_FEATURE_NOT_PRESENT:CALL(231,KEY(d),(uint64_t)c));}
+VKAPI_ATTR void VKAPI_CALL vkDestroySamplerYcbcrConversion(VkDevice d,VkSamplerYcbcrConversion c,const VkAllocationCallbacks *allocator){if(c)checked(CALL(231,KEY(d),(uint64_t)c));if(allocator || D(d)->custom_allocator)allocation_release(D(d),(uint64_t)c);}
 VKAPI_ATTR VkResult VKAPI_CALL vkCreateSamplerYcbcrConversionKHR(VkDevice d,const VkSamplerYcbcrConversionCreateInfo *info,const VkAllocationCallbacks *a,VkSamplerYcbcrConversion *out){return vkCreateSamplerYcbcrConversion(d,info,a,out);}
 VKAPI_ATTR void VKAPI_CALL vkDestroySamplerYcbcrConversionKHR(VkDevice d,VkSamplerYcbcrConversion c,const VkAllocationCallbacks *a){vkDestroySamplerYcbcrConversion(d,c,a);}
 VKAPI_ATTR void VKAPI_CALL vkGetDeviceGroupPeerMemoryFeatures(VkDevice d,uint32_t heap,uint32_t local,uint32_t remote,VkPeerMemoryFeatureFlags *out){checked(CALL(232,KEY(d),heap,local,remote,PTR(out)));}

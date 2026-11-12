@@ -18,19 +18,22 @@
 
 struct result { uint64_t value, fallback; };
 extern struct result trames_vulkan_call(uint64_t, const uint64_t *, size_t);
-typedef struct memory_record { uint64_t key,size; void *base,*mapped; size_t length; struct memory_record *next; } Memory;
+typedef struct memory_record { uint64_t key,size; void *base,*mapped; size_t length; struct memory_record *next; VkAllocationCallbacks callbacks;int custom_allocator; } Memory;
 typedef struct descriptor_template DescriptorTemplate;
 static void free_templates(DescriptorTemplate *head);
+typedef struct object_allocation ObjectAllocation;
 typedef struct dispatch {
     uintptr_t magic; uint64_t key;
     struct dispatch *device, *physical, *queue, *commands, *next;
-    uint64_t parent,map_alignment,capabilities[2],compute_caps[4],enabled,bridge; uint32_t family;
+    uint64_t parent,map_alignment,capabilities[2],compute_caps[4],enabled,bridge; uint32_t family,level;
     pthread_mutex_t lock; Memory *memories; DescriptorTemplate *templates;
+    ObjectAllocation *allocations;VkAllocationCallbacks callbacks;VkSystemAllocationScope allocation_scope;int custom_allocator;
 } Dispatch;
 #define D(h) ((Dispatch *)(h))
 #define KEY(h) (D(h)->key)
 #define DEVICE(h) (D(h)->device)
 #define DEVKEY(h) (DEVICE(h)->key)
+#include "allocator.inc"
 static VkResult call(unsigned op, uint64_t a[16],const char *name) {
     if (getauxval(0x54520008UL)!=0x10006UL) return VK_ERROR_INCOMPATIBLE_DRIVER;
     VkResult r=(VkResult)(int32_t)trames_vulkan_call(op,a,128).value;
@@ -39,19 +42,18 @@ static VkResult call(unsigned op, uint64_t a[16],const char *name) {
 }
 #define CALL(op, ...) call(op,(uint64_t[16]){__VA_ARGS__},__func__)
 #define PTR(p) ((uint64_t)(uintptr_t)(p))
-static int supported_next(const void *next) {
-    const VkBaseInStructure *p=next;
-    for(unsigned i=0;p && i<16;i++,p=p->pNext)
-        if(p->sType!=VK_STRUCTURE_TYPE_LOADER_INSTANCE_CREATE_INFO && p->sType!=VK_STRUCTURE_TYPE_LOADER_DEVICE_CREATE_INFO)return 0;
-    return !p;
+// Unknown extension records belong to other loader/layer components. Decode
+// known records at their ingress; never reject or inspect unknown payloads.
+static int supported_next(const void *next) { (void)next; return 1; }
+static const void *find_next(const void *chain,VkStructureType type) {
+    const VkBaseInStructure *p=chain;for(unsigned n=0;p && n<64;n++,p=p->pNext)if(p->sType==type)return p;return NULL;
 }
 #define VALID(p, st) ((p) && (p)->sType==(st) && supported_next((p)->pNext))
 #define CHECK(p, st) do { if (!VALID(p,st)) return VK_ERROR_FEATURE_NOT_PRESENT; } while (0)
-#define ALLOCATOR(p) do { if (p) return VK_ERROR_FEATURE_NOT_PRESENT; } while (0)
 static void check_result(VkResult r,const char *name) { if (r!=VK_SUCCESS) { fprintf(stderr,"Trames Vulkan: %s failed (%d)\n",name,r); abort(); } }
 #define checked(r) check_result((r),__func__)
-static Dispatch *dispatch(uint64_t key, Dispatch *device) { Dispatch *d=calloc(1,sizeof(*d)); if (d) { set_loader_magic_value(d); d->key=key;d->device=device;pthread_mutex_init(&d->lock,NULL); } return d; }
-static void free_dispatch(Dispatch *d) {pthread_mutex_destroy(&d->lock);free(d);}
+static void free_dispatch(Dispatch *d) {VkAllocationCallbacks callbacks=d->callbacks;int custom=d->custom_allocator;allocations_clear(d);pthread_mutex_destroy(&d->lock);if(custom)callbacks.pfnFree(callbacks.pUserData,d);else free(d);}
+static void free_memory_record(Memory *r){if(r->custom_allocator){VkAllocationCallbacks a=r->callbacks;a.pfnFree(a.pUserData,r);}else free(r);}
 static Memory *memory(Dispatch *d,VkDeviceMemory key) {for (Memory *m=d->memories;m;m=m->next) if(m->key==(uint64_t)key)return m;return NULL;}
 
 static uint64_t now_ns(void);
@@ -139,12 +141,7 @@ static int has_extension(uint32_t count,const char *const *names,const char *nam
 }
 
 VKAPI_ATTR VkResult VKAPI_CALL vkCreateInstance(const VkInstanceCreateInfo *info,const VkAllocationCallbacks *allocator,VkInstance *out) {
-    if(!info || info->sType!=VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO)return VK_ERROR_FEATURE_NOT_PRESENT;ALLOCATOR(allocator);
-    const VkBaseInStructure *node=info->pNext;unsigned nodes=0;
-    // Layer settings apply to the original guest loader/layers. They never
-    // configure the host MoltenVK instance (which owns its own settings).
-    for(;node && nodes++<64;node=node->pNext)if(node->sType!=VK_STRUCTURE_TYPE_LOADER_INSTANCE_CREATE_INFO && node->sType!=VK_STRUCTURE_TYPE_LAYER_SETTINGS_CREATE_INFO_EXT)return VK_ERROR_FEATURE_NOT_PRESENT;
-    if(node)return VK_ERROR_FEATURE_NOT_PRESENT;
+    *out=VK_NULL_HANDLE;if(!info || info->sType!=VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO)return VK_ERROR_FEATURE_NOT_PRESENT;
     int wsi=extensions(info->enabledExtensionCount,info->ppEnabledExtensionNames,0);if(wsi<0 || info->enabledLayerCount)return VK_ERROR_EXTENSION_NOT_PRESENT;
     // Accept applications targeting newer versions. Physical-device queries
     // report the selected native profile, capped at Vulkan 1.2.
@@ -154,10 +151,10 @@ VKAPI_ATTR VkResult VKAPI_CALL vkCreateInstance(const VkInstanceCreateInfo *info
         if(!VALID(app,VK_STRUCTURE_TYPE_APPLICATION_INFO) || (app->apiVersion &&
            (VK_API_VERSION_VARIANT(app->apiVersion) || VK_API_VERSION_MAJOR(app->apiVersion)!=1)))return VK_ERROR_INCOMPATIBLE_DRIVER;
     }
-    Dispatch *d=dispatch(0,NULL);if(!d)return VK_ERROR_OUT_OF_HOST_MEMORY;
+    Dispatch *d=dispatch_with_allocator(0,NULL,allocator,VK_SYSTEM_ALLOCATION_SCOPE_INSTANCE);if(!d)return VK_ERROR_OUT_OF_HOST_MEMORY;
     VkResult r=CALL(1,PTR(&d->key),wsi);if(r!=VK_SUCCESS){free_dispatch(d);return r;}*out=(VkInstance)d;return VK_SUCCESS;
 }
-VKAPI_ATTR void VKAPI_CALL vkDestroyInstance(VkInstance instance,const VkAllocationCallbacks *allocator) { if (!instance)return;checked(allocator?VK_ERROR_FEATURE_NOT_PRESENT:CALL(2,KEY(instance)));if(D(instance)->physical)free_dispatch(D(instance)->physical);free_dispatch(D(instance)); }
+VKAPI_ATTR void VKAPI_CALL vkDestroyInstance(VkInstance instance,const VkAllocationCallbacks *allocator) { (void)allocator;if (!instance)return;checked(CALL(2,KEY(instance)));if(D(instance)->physical)free_dispatch(D(instance)->physical);free_dispatch(D(instance)); }
 VKAPI_ATTR VkResult VKAPI_CALL vkEnumerateInstanceVersion(uint32_t *out) {*out=VK_API_VERSION_1_2;return VK_SUCCESS;}
 VKAPI_ATTR VkResult VKAPI_CALL vkEnumerateInstanceExtensionProperties(const char *layer,uint32_t *count,VkExtensionProperties *out) {return display_extensions(layer,count,out,0,0,0);}
 VKAPI_ATTR VkResult VKAPI_CALL vkEnumerateInstanceLayerProperties(uint32_t *count,VkLayerProperties *out) {(void)out;*count=0;return VK_SUCCESS;}
@@ -166,7 +163,7 @@ VKAPI_ATTR VkResult VKAPI_CALL vkEnumerateDeviceLayerProperties(VkPhysicalDevice
 VKAPI_ATTR VkResult VKAPI_CALL vkEnumeratePhysicalDevices(VkInstance instance,uint32_t *count,VkPhysicalDevice *out) {
     uint32_t n=1;uint64_t key=0;VkResult r=CALL(3,KEY(instance),PTR(&n),PTR(&key));if(r!=VK_SUCCESS)return r;
     if (!out){*count=1;return VK_SUCCESS;}if (!*count)return VK_INCOMPLETE;
-    Dispatch *i=D(instance);if(!i->physical)i->physical=dispatch(key,NULL);if(!i->physical)return VK_ERROR_OUT_OF_HOST_MEMORY;
+    Dispatch *i=D(instance);if(!i->physical)i->physical=dispatch_with_allocator(key,NULL,dispatch_allocator(i),VK_SYSTEM_ALLOCATION_SCOPE_INSTANCE);if(!i->physical)return VK_ERROR_OUT_OF_HOST_MEMORY;
     checked(CALL(115,key,PTR(i->physical->capabilities)));
     if(CALL(206,key,PTR(i->physical->compute_caps),4)!=VK_SUCCESS)memset(i->physical->compute_caps,0,sizeof(i->physical->compute_caps));
     *count=1;out[0]=(VkPhysicalDevice)i->physical;return VK_SUCCESS;
@@ -179,7 +176,7 @@ VKAPI_ATTR void VKAPI_CALL vkGetPhysicalDeviceFormatProperties(VkPhysicalDevice 
 VKAPI_ATTR VkResult VKAPI_CALL vkGetPhysicalDeviceImageFormatProperties(VkPhysicalDevice p,VkFormat format,VkImageType type,VkImageTiling tiling,VkImageUsageFlags usage,VkImageCreateFlags flags,VkImageFormatProperties *out) {return CALL(59,KEY(p),format,type,tiling,usage,flags,PTR(out));}
 VKAPI_ATTR void VKAPI_CALL vkGetPhysicalDeviceSparseImageFormatProperties(VkPhysicalDevice p,VkFormat format,VkImageType type,VkSampleCountFlagBits samples,VkImageUsageFlags usage,VkImageTiling tiling,uint32_t *count,VkSparseImageFormatProperties *out) {(void)p;(void)format;(void)type;(void)samples;(void)usage;(void)tiling;(void)out;*count=0;}
 VKAPI_ATTR VkResult VKAPI_CALL vkCreateDevice(VkPhysicalDevice p,const VkDeviceCreateInfo *info,const VkAllocationCallbacks *allocator,VkDevice *out) {
-    if(!info || info->sType!=VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO)return VK_ERROR_FEATURE_NOT_PRESENT;ALLOCATOR(allocator);
+    *out=VK_NULL_HANDLE;if(!info || info->sType!=VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO)return VK_ERROR_FEATURE_NOT_PRESENT;
     const VkPhysicalDeviceFeatures *features=info->pEnabledFeatures;
     const VkBaseInStructure *next=info->pNext;unsigned chain=0;int timeline=0,seen_timeline=0,imageless=0,seen_imageless=0,scalar=0,seen_scalar=0,seen_portability=0,feedback=0,seen_feedback=0,divisor=0,zero_divisor=0,seen_divisor=0;
     uint64_t compute_seen=0,legacy_features=0;FeatureBits compute_features=0;
@@ -217,26 +214,32 @@ VKAPI_ATTR VkResult VKAPI_CALL vkCreateDevice(VkPhysicalDevice p,const VkDeviceC
             if(seen_divisor++ || v->vertexAttributeInstanceRateDivisor>VK_TRUE || v->vertexAttributeInstanceRateZeroDivisor>VK_TRUE)return VK_ERROR_FEATURE_NOT_PRESENT;
             divisor=v->vertexAttributeInstanceRateDivisor;zero_divisor=v->vertexAttributeInstanceRateZeroDivisor;
         }else if(next->sType!=VK_STRUCTURE_TYPE_LOADER_DEVICE_CREATE_INFO){
-            if(compute_feature(next,&compute_seen,&compute_features,&legacy_features)!=1)return VK_ERROR_FEATURE_NOT_PRESENT;
+            if(compute_feature(next,&compute_seen,&compute_features,&legacy_features)<0)return VK_ERROR_FEATURE_NOT_PRESENT;
         }
         next=next->pNext;
     }
     if(next)return VK_ERROR_FEATURE_NOT_PRESENT;
     if((compute_seen&(1UL<<62)) && (seen_timeline || seen_imageless || seen_scalar))return VK_ERROR_FEATURE_NOT_PRESENT;
-    int wsi=extensions(info->enabledExtensionCount,info->ppEnabledExtensionNames,1);if(info->flags || info->queueCreateInfoCount!=1 || wsi<0)return VK_ERROR_FEATURE_NOT_PRESENT;
+    int wsi=extensions(info->enabledExtensionCount,info->ppEnabledExtensionNames,1);if(info->flags || !info->queueCreateInfoCount || info->queueCreateInfoCount>64 || wsi<0)return VK_ERROR_FEATURE_NOT_PRESENT;
     const VkDeviceQueueCreateInfo *q=info->pQueueCreateInfos;CHECK(q,VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO);
-    if(q->flags || q->queueCount!=1)return VK_ERROR_FEATURE_NOT_PRESENT;
+    uint64_t queues[64][3];
+    if(!(D(p)->capabilities[0]&(1UL<<15)) && (info->queueCreateInfoCount!=1 || q->queueCount!=1))return VK_ERROR_FEATURE_NOT_PRESENT;
+    for(uint32_t i=0;i<info->queueCreateInfoCount;i++){
+        const VkDeviceQueueCreateInfo *v=q+i;CHECK(v,VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO);
+        if(v->flags || !v->queueCount || v->queueCount>64)return VK_ERROR_FEATURE_NOT_PRESENT;
+        queues[i][0]=v->queueFamilyIndex;queues[i][1]=v->queueCount;queues[i][2]=PTR(v->pQueuePriorities);
+    }
     uint64_t feature_bits=0;
     if(features){
         const VkBool32 *v=(const VkBool32 *)features;
-        const size_t offsets[]={offsetof(VkPhysicalDeviceFeatures,samplerAnisotropy),offsetof(VkPhysicalDeviceFeatures,logicOp),offsetof(VkPhysicalDeviceFeatures,fillModeNonSolid),offsetof(VkPhysicalDeviceFeatures,shaderClipDistance),offsetof(VkPhysicalDeviceFeatures,independentBlend),offsetof(VkPhysicalDeviceFeatures,imageCubeArray),offsetof(VkPhysicalDeviceFeatures,sampleRateShading),offsetof(VkPhysicalDeviceFeatures,shaderImageGatherExtended),offsetof(VkPhysicalDeviceFeatures,shaderStorageImageExtendedFormats),offsetof(VkPhysicalDeviceFeatures,shaderStorageImageReadWithoutFormat),offsetof(VkPhysicalDeviceFeatures,shaderStorageImageWriteWithoutFormat),offsetof(VkPhysicalDeviceFeatures,vertexPipelineStoresAndAtomics),offsetof(VkPhysicalDeviceFeatures,fragmentStoresAndAtomics),offsetof(VkPhysicalDeviceFeatures,shaderUniformBufferArrayDynamicIndexing),offsetof(VkPhysicalDeviceFeatures,shaderSampledImageArrayDynamicIndexing),offsetof(VkPhysicalDeviceFeatures,shaderStorageBufferArrayDynamicIndexing),offsetof(VkPhysicalDeviceFeatures,shaderStorageImageArrayDynamicIndexing),offsetof(VkPhysicalDeviceFeatures,multiDrawIndirect),offsetof(VkPhysicalDeviceFeatures,drawIndirectFirstInstance),offsetof(VkPhysicalDeviceFeatures,textureCompressionETC2),offsetof(VkPhysicalDeviceFeatures,textureCompressionASTC_LDR),offsetof(VkPhysicalDeviceFeatures,textureCompressionBC),offsetof(VkPhysicalDeviceFeatures,shaderInt16),offsetof(VkPhysicalDeviceFeatures,shaderInt64),offsetof(VkPhysicalDeviceFeatures,alphaToOne),offsetof(VkPhysicalDeviceFeatures,robustBufferAccess),offsetof(VkPhysicalDeviceFeatures,fullDrawIndexUint32)};
+        const size_t offsets[]={offsetof(VkPhysicalDeviceFeatures,samplerAnisotropy),offsetof(VkPhysicalDeviceFeatures,logicOp),offsetof(VkPhysicalDeviceFeatures,fillModeNonSolid),offsetof(VkPhysicalDeviceFeatures,shaderClipDistance),offsetof(VkPhysicalDeviceFeatures,independentBlend),offsetof(VkPhysicalDeviceFeatures,imageCubeArray),offsetof(VkPhysicalDeviceFeatures,sampleRateShading),offsetof(VkPhysicalDeviceFeatures,shaderImageGatherExtended),offsetof(VkPhysicalDeviceFeatures,shaderStorageImageExtendedFormats),offsetof(VkPhysicalDeviceFeatures,shaderStorageImageReadWithoutFormat),offsetof(VkPhysicalDeviceFeatures,shaderStorageImageWriteWithoutFormat),offsetof(VkPhysicalDeviceFeatures,vertexPipelineStoresAndAtomics),offsetof(VkPhysicalDeviceFeatures,fragmentStoresAndAtomics),offsetof(VkPhysicalDeviceFeatures,shaderUniformBufferArrayDynamicIndexing),offsetof(VkPhysicalDeviceFeatures,shaderSampledImageArrayDynamicIndexing),offsetof(VkPhysicalDeviceFeatures,shaderStorageBufferArrayDynamicIndexing),offsetof(VkPhysicalDeviceFeatures,shaderStorageImageArrayDynamicIndexing),offsetof(VkPhysicalDeviceFeatures,multiDrawIndirect),offsetof(VkPhysicalDeviceFeatures,drawIndirectFirstInstance),offsetof(VkPhysicalDeviceFeatures,textureCompressionETC2),offsetof(VkPhysicalDeviceFeatures,textureCompressionASTC_LDR),offsetof(VkPhysicalDeviceFeatures,textureCompressionBC),offsetof(VkPhysicalDeviceFeatures,shaderInt16),offsetof(VkPhysicalDeviceFeatures,shaderInt64),offsetof(VkPhysicalDeviceFeatures,alphaToOne),offsetof(VkPhysicalDeviceFeatures,robustBufferAccess),offsetof(VkPhysicalDeviceFeatures,fullDrawIndexUint32),offsetof(VkPhysicalDeviceFeatures,occlusionQueryPrecise)};
         for(size_t j=0;j<sizeof(VkPhysicalDeviceFeatures)/sizeof(VkBool32);j++)if(v[j]){
             int found=0;if(v[j]!=VK_TRUE)return VK_ERROR_FEATURE_NOT_PRESENT;
             for(unsigned k=0;k<sizeof(offsets)/sizeof(offsets[0]);k++)if(j==offsets[k]/sizeof(VkBool32)){feature_bits|=1UL<<k;found=1;}
             if(!found)return VK_ERROR_FEATURE_NOT_PRESENT;
         }
     }
-    Dispatch *d=dispatch(0,NULL);if(!d)return VK_ERROR_OUT_OF_HOST_MEMORY;d->device=d;d->family=q->queueFamilyIndex;
+    Dispatch *d=dispatch_with_allocator(0,NULL,allocator,VK_SYSTEM_ALLOCATION_SCOPE_DEVICE);if(!d)return VK_ERROR_OUT_OF_HOST_MEMORY;d->device=d;d->family=q->queueFamilyIndex;
     uint64_t enabled=(has_extension(info->enabledExtensionCount,info->ppEnabledExtensionNames,VK_KHR_MAINTENANCE_1_EXTENSION_NAME)?1UL:0)
         |(has_extension(info->enabledExtensionCount,info->ppEnabledExtensionNames,VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME)?8UL:0)
         |(has_extension(info->enabledExtensionCount,info->ppEnabledExtensionNames,VK_KHR_DRIVER_PROPERTIES_EXTENSION_NAME)?4UL:0)|(timeline?2UL:0);
@@ -252,7 +255,7 @@ VKAPI_ATTR VkResult VKAPI_CALL vkCreateDevice(VkPhysicalDevice p,const VkDeviceC
     if(divisor)enabled|=65536;if(zero_divisor)enabled|=131072;
     if((divisor || zero_divisor) && !(enabled&32768)){free_dispatch(d);return VK_ERROR_FEATURE_NOT_PRESENT;}
     if(feedback && !(enabled&8192)){free_dispatch(d);return VK_ERROR_FEATURE_NOT_PRESENT;}
-    if(timeline && !(enabled&8)){free_dispatch(d);return VK_ERROR_FEATURE_NOT_PRESENT;}
+    if(timeline && !(enabled&8) && D(p)->compute_caps[2]<VK_API_VERSION_1_2){free_dispatch(d);return VK_ERROR_FEATURE_NOT_PRESENT;}
     // Promoted operations remain available without repeating extension names.
     if(D(p)->compute_caps[2]>=VK_API_VERSION_1_1){
         if(D(p)->capabilities[0]&1)enabled|=1;
@@ -262,44 +265,57 @@ VKAPI_ATTR VkResult VKAPI_CALL vkCreateDevice(VkPhysicalDevice p,const VkDeviceC
         if(D(p)->capabilities[0]&32)enabled|=64;
         if(D(p)->capabilities[0]&64)enabled|=128;
     }
+    if(timeline)enabled|=8;if(imageless)enabled|=256;if(scalar)enabled|=1024;
     enabled|=legacy_features;
     if(legacy_features&2)enabled|=8;if(legacy_features&512)enabled|=256;if(legacy_features&2048)enabled|=1024;
     uint64_t compute_extensions;VkResult cr=compute_device(D(p),info,&compute_features,compute_seen,&compute_extensions);if(cr!=VK_SUCCESS){free_dispatch(d);return cr;}
     d->enabled=enabled;d->capabilities[0]=D(p)->capabilities[0];
-    VkResult r=CALL(8,KEY(p),q->queueFamilyIndex,PTR(&d->key),wsi,feature_bits,enabled,compute_extensions,(uint64_t)compute_features,(uint64_t)(compute_features>>64));if(r!=VK_SUCCESS){free_dispatch(d);return r;}
+    VkResult r=CALL(8,KEY(p),q->queueFamilyIndex,PTR(&d->key),wsi,feature_bits,enabled,compute_extensions,(uint64_t)compute_features,(uint64_t)(compute_features>>64),PTR(queues),info->queueCreateInfoCount);if(r!=VK_SUCCESS){free_dispatch(d);return r;}
     r=CALL(57,d->key,PTR(&d->map_alignment));if(r!=VK_SUCCESS){checked(CALL(9,d->key));free_dispatch(d);return r;}
     if(CALL(200,d->key,PTR(&d->bridge))!=VK_SUCCESS)d->bridge=0;
+    // Publish immutable queue wrappers at device creation: void queue lookup
+    // cannot fail allocation, and callbacks never run while holding a lock.
+    for(uint32_t i=0;i<info->queueCreateInfoCount;i++)for(uint32_t j=0;j<q[i].queueCount;j++){
+        uint64_t key=0;r=CALL(10,d->key,q[i].queueFamilyIndex,j,PTR(&key));
+        Dispatch *v=r==VK_SUCCESS?dispatch_with_allocator(key,d,dispatch_allocator(d),VK_SYSTEM_ALLOCATION_SCOPE_DEVICE):NULL;
+        if(!v){while(d->queue){Dispatch *v=d->queue;d->queue=v->next;free_dispatch(v);}checked(CALL(9,d->key));free_dispatch(d);return r==VK_SUCCESS?VK_ERROR_OUT_OF_HOST_MEMORY:r;}
+        v->family=q[i].queueFamilyIndex;v->level=j;v->next=d->queue;d->queue=v;
+    }
     *out=(VkDevice)d;return VK_SUCCESS;
 }
 VKAPI_ATTR void VKAPI_CALL vkDestroyDevice(VkDevice device,const VkAllocationCallbacks *allocator) {
-    if(!device)return;Dispatch *d=D(device);checked(allocator?VK_ERROR_FEATURE_NOT_PRESENT:CALL(9,d->key));
+    (void)allocator;if(!device)return;Dispatch *d=D(device);checked(CALL(9,d->key));
     free_templates(d->templates);
-    while(d->memories){Memory *m=d->memories;d->memories=m->next;if(m->mapped)munmap(m->base,m->length);free(m);}
-    while(d->commands){Dispatch *c=d->commands;d->commands=c->next;free_dispatch(c);}if(d->queue)free_dispatch(d->queue);free_dispatch(d);
+    while(d->memories){Memory *m=d->memories;d->memories=m->next;if(m->mapped)munmap(m->base,m->length);free_memory_record(m);}
+    while(d->commands){Dispatch *c=d->commands;d->commands=c->next;free_dispatch(c);}while(d->queue){Dispatch *v=d->queue;d->queue=v->next;free_dispatch(v);}free_dispatch(d);
 }
 VKAPI_ATTR void VKAPI_CALL vkGetDeviceQueue(VkDevice device,uint32_t family,uint32_t index,VkQueue *out) {
-    Dispatch *d=D(device);pthread_mutex_lock(&d->lock);if(!d->queue){uint64_t key=0;checked(CALL(10,d->key,family,index,PTR(&key)));d->queue=dispatch(key,d);if(!d->queue)abort();}*out=(VkQueue)d->queue;pthread_mutex_unlock(&d->lock);
+    *out=VK_NULL_HANDLE;for(Dispatch *v=D(device)->queue;v;v=v->next)if(v->family==family && v->level==index){*out=(VkQueue)v;return;}
 }
-VKAPI_ATTR VkResult VKAPI_CALL vkCreateBuffer(VkDevice d,const VkBufferCreateInfo *info,const VkAllocationCallbacks *allocator,VkBuffer *out) {CHECK(info,VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO);ALLOCATOR(allocator);if(info->flags || info->sharingMode!=VK_SHARING_MODE_EXCLUSIVE)return VK_ERROR_FEATURE_NOT_PRESENT;return CALL(11,KEY(d),info->size,info->usage,PTR(out));}
-VKAPI_ATTR void VKAPI_CALL vkDestroyBuffer(VkDevice d,VkBuffer b,const VkAllocationCallbacks *allocator) {if(b)checked(allocator?VK_ERROR_FEATURE_NOT_PRESENT:CALL(12,KEY(d),(uint64_t)b));}
+VKAPI_ATTR VkResult VKAPI_CALL vkCreateBuffer(VkDevice d,const VkBufferCreateInfo *info,const VkAllocationCallbacks *allocator,VkBuffer *out) {CHECK(info,VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO);OBJECT_ALLOCATOR(d,allocator,VK_SYSTEM_ALLOCATION_SCOPE_OBJECT);if(info->flags || info->sharingMode>VK_SHARING_MODE_CONCURRENT)return VK_ERROR_FEATURE_NOT_PRESENT;return CALL(11,KEY(d),info->size,info->usage,PTR(out),info->sharingMode,PTR(info->pQueueFamilyIndices),info->queueFamilyIndexCount);}
+VKAPI_ATTR void VKAPI_CALL vkDestroyBuffer(VkDevice d,VkBuffer b,const VkAllocationCallbacks *allocator) {if(b)checked(CALL(12,KEY(d),(uint64_t)b));if(allocator || D(d)->custom_allocator)allocation_release(D(d),(uint64_t)b);}
 VKAPI_ATTR void VKAPI_CALL vkGetBufferMemoryRequirements(VkDevice d,VkBuffer b,VkMemoryRequirements *out) {checked(CALL(13,KEY(d),(uint64_t)b,PTR(out)));}
 VKAPI_ATTR VkResult VKAPI_CALL vkAllocateMemory(VkDevice device,const VkMemoryAllocateInfo *info,const VkAllocationCallbacks *allocator,VkDeviceMemory *out) {
-    if(!info || info->sType!=VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO)return VK_ERROR_FEATURE_NOT_PRESENT;ALLOCATOR(allocator);
+    if(!info || info->sType!=VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO)return VK_ERROR_FEATURE_NOT_PRESENT;OBJECT_ALLOCATOR(device,allocator,VK_SYSTEM_ALLOCATION_SCOPE_OBJECT);
     const VkMemoryAllocateFlagsInfo *flags=NULL;const VkMemoryDedicatedAllocateInfo *dedicated=NULL;
     const VkImportMemoryFdInfoKHR *import=NULL;
     for(const VkBaseInStructure *n=info->pNext;n;n=n->pNext){
         if(n->sType==VK_STRUCTURE_TYPE_IMPORT_MEMORY_FD_INFO_KHR && !import){import=(const void *)n;if(import->handleType!=VK_EXTERNAL_MEMORY_HANDLE_TYPE_DMA_BUF_BIT_EXT || import->fd<0)return VK_ERROR_INVALID_EXTERNAL_HANDLE;}
         else if(n->sType==VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_FLAGS_INFO && !flags){flags=(const void *)n;if(flags->flags&~VK_MEMORY_ALLOCATE_DEVICE_ADDRESS_BIT)return VK_ERROR_FEATURE_NOT_PRESENT;}
         else if(n->sType==VK_STRUCTURE_TYPE_MEMORY_DEDICATED_ALLOCATE_INFO && !dedicated){dedicated=(const void *)n;if(dedicated->image&&dedicated->buffer)return VK_ERROR_FEATURE_NOT_PRESENT;}
-        else return VK_ERROR_FEATURE_NOT_PRESENT;
     }
-    Memory *r=calloc(1,sizeof(*r));if(!r)return VK_ERROR_OUT_OF_HOST_MEMORY;
-    VkResult v=CALL(14,KEY(device),info->allocationSize,info->memoryTypeIndex,PTR(&r->key),flags?flags->flags:0,dedicated?(dedicated->image?2:dedicated->buffer?1:0):0,dedicated?(dedicated->image?(uint64_t)dedicated->image:(uint64_t)dedicated->buffer):0,import?(uint64_t)import->fd+1:0,import?import->handleType:0);if(v!=VK_SUCCESS){free(r);return v;}r->size=info->allocationSize;
+    const VkAllocationCallbacks *callbacks=allocation.record?&allocation.record->callbacks:NULL;
+    Memory *r=callbacks?callbacks->pfnAllocation(callbacks->pUserData,sizeof(*r),_Alignof(Memory),allocation.scope):malloc(sizeof(*r));if(!r)return VK_ERROR_OUT_OF_HOST_MEMORY;
+    memset(r,0,sizeof(*r));if(callbacks){r->callbacks=*callbacks;r->custom_allocator=1;}
+    VkResult v=CALL(14,KEY(device),info->allocationSize,info->memoryTypeIndex,PTR(&r->key),flags?flags->flags:0,dedicated?(dedicated->image?2:dedicated->buffer?1:0):0,dedicated?(dedicated->image?(uint64_t)dedicated->image:(uint64_t)dedicated->buffer):0,import?(uint64_t)import->fd+1:0,import?import->handleType:0);if(v!=VK_SUCCESS){free_memory_record(r);return v;}r->size=info->allocationSize;
     Dispatch *d=D(device);pthread_mutex_lock(&d->lock);r->next=d->memories;d->memories=r;pthread_mutex_unlock(&d->lock);*out=(VkDeviceMemory)r->key;return VK_SUCCESS;
 }
 VKAPI_ATTR void VKAPI_CALL vkFreeMemory(VkDevice device,VkDeviceMemory mem,const VkAllocationCallbacks *allocator) {
-    if(!mem)return;checked(allocator?VK_ERROR_FEATURE_NOT_PRESENT:CALL(15,KEY(device),(uint64_t)mem));Dispatch *d=D(device);pthread_mutex_lock(&d->lock);
-    for(Memory **p=&d->memories;*p;p=&(*p)->next)if((*p)->key==(uint64_t)mem){Memory *r=*p;*p=r->next;if(r->mapped)munmap(r->base,r->length);free(r);break;}pthread_mutex_unlock(&d->lock);
+    if(!mem)return;checked(CALL(15,KEY(device),(uint64_t)mem));Dispatch *d=D(device);Memory *released=NULL;pthread_mutex_lock(&d->lock);
+    for(Memory **p=&d->memories;*p;p=&(*p)->next)if((*p)->key==(uint64_t)mem){released=*p;*p=released->next;break;}
+    pthread_mutex_unlock(&d->lock);
+    if(released){if(released->mapped)munmap(released->base,released->length);free_memory_record(released);}
+    if(allocator || d->custom_allocator)allocation_release(d,(uint64_t)mem);
 }
 VKAPI_ATTR VkResult VKAPI_CALL vkBindBufferMemory(VkDevice d,VkBuffer b,VkDeviceMemory mem,VkDeviceSize offset) {return CALL(16,KEY(d),(uint64_t)b,(uint64_t)mem,offset);}
 VKAPI_ATTR VkResult VKAPI_CALL vkMapMemory(VkDevice device,VkDeviceMemory mem,VkDeviceSize offset,VkDeviceSize size,VkMemoryMapFlags flags,void **out) {
@@ -318,11 +334,11 @@ VKAPI_ATTR VkResult VKAPI_CALL vkMapMemory(VkDevice device,VkDeviceMemory mem,Vk
 VKAPI_ATTR void VKAPI_CALL vkUnmapMemory(VkDevice device,VkDeviceMemory mem) {checked(CALL(18,KEY(device),(uint64_t)mem));Dispatch *d=D(device);pthread_mutex_lock(&d->lock);Memory *r=memory(d,mem);if(r && r->mapped){munmap(r->base,r->length);r->base=NULL;r->mapped=NULL;r->length=0;}pthread_mutex_unlock(&d->lock);}
 VKAPI_ATTR VkResult VKAPI_CALL vkFlushMappedMemoryRanges(VkDevice d,uint32_t count,const VkMappedMemoryRange *ranges) {for(uint32_t i=0;i<count;i++){CHECK(&ranges[i],VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE);VkResult r=CALL(19,KEY(d),(uint64_t)ranges[i].memory,ranges[i].offset,ranges[i].size);if(r!=VK_SUCCESS)return r;}return VK_SUCCESS;}
 VKAPI_ATTR VkResult VKAPI_CALL vkInvalidateMappedMemoryRanges(VkDevice d,uint32_t count,const VkMappedMemoryRange *ranges) {for(uint32_t i=0;i<count;i++){CHECK(&ranges[i],VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE);VkResult r=CALL(20,KEY(d),(uint64_t)ranges[i].memory,ranges[i].offset,ranges[i].size);if(r!=VK_SUCCESS)return r;}return VK_SUCCESS;}
-VKAPI_ATTR VkResult VKAPI_CALL vkCreateShaderModule(VkDevice d,const VkShaderModuleCreateInfo *info,const VkAllocationCallbacks *allocator,VkShaderModule *out) {CHECK(info,VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO);ALLOCATOR(allocator);if(info->flags)return VK_ERROR_FEATURE_NOT_PRESENT;return CALL(21,KEY(d),PTR(info->pCode),info->codeSize,PTR(out));}
-VKAPI_ATTR void VKAPI_CALL vkDestroyShaderModule(VkDevice d,VkShaderModule shader,const VkAllocationCallbacks *allocator) {if(shader)checked(allocator?VK_ERROR_FEATURE_NOT_PRESENT:CALL(22,KEY(d),(uint64_t)shader));}
+VKAPI_ATTR VkResult VKAPI_CALL vkCreateShaderModule(VkDevice d,const VkShaderModuleCreateInfo *info,const VkAllocationCallbacks *allocator,VkShaderModule *out) {CHECK(info,VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO);OBJECT_ALLOCATOR(d,allocator,VK_SYSTEM_ALLOCATION_SCOPE_OBJECT);if(info->flags)return VK_ERROR_FEATURE_NOT_PRESENT;return CALL(21,KEY(d),PTR(info->pCode),info->codeSize,PTR(out));}
+VKAPI_ATTR void VKAPI_CALL vkDestroyShaderModule(VkDevice d,VkShaderModule shader,const VkAllocationCallbacks *allocator) {if(shader)checked(CALL(22,KEY(d),(uint64_t)shader));if(allocator || D(d)->custom_allocator)allocation_release(D(d),(uint64_t)shader);}
 static int descriptor_layout_wire(const VkDescriptorSetLayoutCreateInfo *info,uint64_t **data) {
     if(info->flags&~VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT)return 0;
-    const VkDescriptorSetLayoutBindingFlagsCreateInfo *flags=info->pNext;
+    const VkDescriptorSetLayoutBindingFlagsCreateInfo *flags=(void *)find_next(info->pNext,VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO);
     if(flags && (!VALID(flags,VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO) || (flags->bindingCount && flags->bindingCount!=info->bindingCount)))return 0;
     *data=info->bindingCount?malloc((size_t)info->bindingCount*6*sizeof(uint64_t)):NULL;if(info->bindingCount && !*data)return -1;
     for(uint32_t i=0;i<info->bindingCount;i++){
@@ -332,7 +348,7 @@ static int descriptor_layout_wire(const VkDescriptorSetLayoutCreateInfo *info,ui
 }
 VKAPI_ATTR void VKAPI_CALL vkGetDescriptorSetLayoutSupport(VkDevice d,const VkDescriptorSetLayoutCreateInfo *info,VkDescriptorSetLayoutSupport *out) {
     if(!out || out->sType!=VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_SUPPORT)checked(VK_ERROR_FEATURE_NOT_PRESENT);
-    VkDescriptorSetVariableDescriptorCountLayoutSupport *variable=out->pNext;
+    VkDescriptorSetVariableDescriptorCountLayoutSupport *variable=(void *)find_next(out->pNext,VK_STRUCTURE_TYPE_DESCRIPTOR_SET_VARIABLE_DESCRIPTOR_COUNT_LAYOUT_SUPPORT);
     if(variable && !VALID(variable,VK_STRUCTURE_TYPE_DESCRIPTOR_SET_VARIABLE_DESCRIPTOR_COUNT_LAYOUT_SUPPORT))checked(VK_ERROR_FEATURE_NOT_PRESENT);
     out->supported=VK_FALSE;if(variable)variable->maxVariableDescriptorCount=0;if(!info || info->sType!=VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO)return;
     uint64_t *data=NULL;if(descriptor_layout_wire(info,&data)!=1)return;
@@ -340,36 +356,37 @@ VKAPI_ATTR void VKAPI_CALL vkGetDescriptorSetLayoutSupport(VkDevice d,const VkDe
 }
 VKAPI_ATTR void VKAPI_CALL vkGetDescriptorSetLayoutSupportKHR(VkDevice d,const VkDescriptorSetLayoutCreateInfo *info,VkDescriptorSetLayoutSupport *out) {vkGetDescriptorSetLayoutSupport(d,info,out);}
 VKAPI_ATTR VkResult VKAPI_CALL vkCreateDescriptorSetLayout(VkDevice d,const VkDescriptorSetLayoutCreateInfo *info,const VkAllocationCallbacks *allocator,VkDescriptorSetLayout *out) {
-    if(!info || info->sType!=VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO)return VK_ERROR_FEATURE_NOT_PRESENT;ALLOCATOR(allocator);
+    if(!info || info->sType!=VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO)return VK_ERROR_FEATURE_NOT_PRESENT;OBJECT_ALLOCATOR(d,allocator,VK_SYSTEM_ALLOCATION_SCOPE_OBJECT);
     uint64_t *data=NULL;int v=descriptor_layout_wire(info,&data);if(v!=1)return v<0?VK_ERROR_OUT_OF_HOST_MEMORY:VK_ERROR_FEATURE_NOT_PRESENT;
     VkResult r=CALL(23,KEY(d),PTR(data),info->bindingCount,PTR(out),info->flags,6);free(data);return r;
 }
-VKAPI_ATTR void VKAPI_CALL vkDestroyDescriptorSetLayout(VkDevice d,VkDescriptorSetLayout layout,const VkAllocationCallbacks *allocator) {if(layout)checked(allocator?VK_ERROR_FEATURE_NOT_PRESENT:CALL(24,KEY(d),(uint64_t)layout));}
+VKAPI_ATTR void VKAPI_CALL vkDestroyDescriptorSetLayout(VkDevice d,VkDescriptorSetLayout layout,const VkAllocationCallbacks *allocator) {if(layout)checked(CALL(24,KEY(d),(uint64_t)layout));if(allocator || D(d)->custom_allocator)allocation_release(D(d),(uint64_t)layout);}
 VKAPI_ATTR VkResult VKAPI_CALL vkCreatePipelineLayout(VkDevice d,const VkPipelineLayoutCreateInfo *info,const VkAllocationCallbacks *allocator,VkPipelineLayout *out) {
-    CHECK(info,VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO);ALLOCATOR(allocator);if(info->flags || info->pushConstantRangeCount>8)return VK_ERROR_FEATURE_NOT_PRESENT;
+    CHECK(info,VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO);OBJECT_ALLOCATOR(d,allocator,VK_SYSTEM_ALLOCATION_SCOPE_OBJECT);if(info->flags || info->pushConstantRangeCount>8)return VK_ERROR_FEATURE_NOT_PRESENT;
     uint64_t ranges[24];for(uint32_t i=0;i<info->pushConstantRangeCount;i++){ranges[i*3]=info->pPushConstantRanges[i].stageFlags;ranges[i*3+1]=info->pPushConstantRanges[i].offset;ranges[i*3+2]=info->pPushConstantRanges[i].size;}
     return CALL(25,KEY(d),PTR(info->pSetLayouts),info->setLayoutCount,PTR(ranges),info->pushConstantRangeCount,PTR(out));
 }
-VKAPI_ATTR void VKAPI_CALL vkDestroyPipelineLayout(VkDevice d,VkPipelineLayout layout,const VkAllocationCallbacks *allocator) {if(layout)checked(allocator?VK_ERROR_FEATURE_NOT_PRESENT:CALL(26,KEY(d),(uint64_t)layout));}
+VKAPI_ATTR void VKAPI_CALL vkDestroyPipelineLayout(VkDevice d,VkPipelineLayout layout,const VkAllocationCallbacks *allocator) {if(layout)checked(CALL(26,KEY(d),(uint64_t)layout));if(allocator || D(d)->custom_allocator)allocation_release(D(d),(uint64_t)layout);}
 VKAPI_ATTR VkResult VKAPI_CALL vkCreateComputePipelines(VkDevice d,VkPipelineCache cache,uint32_t count,const VkComputePipelineCreateInfo *info,const VkAllocationCallbacks *allocator,VkPipeline *out) {
-    ALLOCATOR(allocator);if(count!=1)return VK_ERROR_FEATURE_NOT_PRESENT;CHECK(info,VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO);if(info->stage.sType!=VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO)return VK_ERROR_FEATURE_NOT_PRESENT;
-    const VkPipelineShaderStageRequiredSubgroupSizeCreateInfo *subgroup=info->stage.pNext;
+    if(count!=1){memset(out,0,count*sizeof(*out));VkResult result=VK_SUCCESS;for(uint32_t i=0;i<count;i++){VkResult r=vkCreateComputePipelines(d,cache,1,info+i,allocator,out+i);if(r!=VK_SUCCESS){result=r;if(info[i].flags&VK_PIPELINE_CREATE_EARLY_RETURN_ON_FAILURE_BIT)break;}}return result;}
+    OBJECT_ALLOCATOR(d,allocator,VK_SYSTEM_ALLOCATION_SCOPE_OBJECT);CHECK(info,VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO);if(info->stage.sType!=VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO)return VK_ERROR_FEATURE_NOT_PRESENT;
+    const VkPipelineShaderStageRequiredSubgroupSizeCreateInfo *subgroup=find_next(info->stage.pNext,VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_REQUIRED_SUBGROUP_SIZE_CREATE_INFO);
     if(subgroup && (!VALID(subgroup,VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_REQUIRED_SUBGROUP_SIZE_CREATE_INFO) || !subgroup->requiredSubgroupSize))return VK_ERROR_FEATURE_NOT_PRESENT;
-    if((info->flags&~VK_PIPELINE_CREATE_DISPATCH_BASE_BIT) || (info->stage.flags&~3U) || info->stage.stage!=VK_SHADER_STAGE_COMPUTE_BIT || info->basePipelineHandle)return VK_ERROR_FEATURE_NOT_PRESENT;
+    if((info->flags&~(VK_PIPELINE_CREATE_DISPATCH_BASE_BIT|VK_PIPELINE_CREATE_DISABLE_OPTIMIZATION_BIT|VK_PIPELINE_CREATE_ALLOW_DERIVATIVES_BIT|VK_PIPELINE_CREATE_DERIVATIVE_BIT|VK_PIPELINE_CREATE_FAIL_ON_PIPELINE_COMPILE_REQUIRED_BIT|VK_PIPELINE_CREATE_EARLY_RETURN_ON_FAILURE_BIT)) || (info->stage.flags&~3U) || info->stage.stage!=VK_SHADER_STAGE_COMPUTE_BIT)return VK_ERROR_FEATURE_NOT_PRESENT;
     const VkSpecializationInfo *s=info->stage.pSpecializationInfo;uint64_t entries[192];
     if(s){if(s->mapEntryCount>64 || s->dataSize>65536 || (s->mapEntryCount && !s->pMapEntries) || (s->dataSize && !s->pData))return VK_ERROR_FEATURE_NOT_PRESENT;
         for(uint32_t i=0;i<s->mapEntryCount;i++){entries[i*3]=s->pMapEntries[i].constantID;entries[i*3+1]=s->pMapEntries[i].offset;entries[i*3+2]=s->pMapEntries[i].size;}}
     return CALL(27,KEY(d),(uint64_t)info->layout,(uint64_t)info->stage.module,PTR(info->stage.pName),PTR(out),PTR(entries),s?s->mapEntryCount:0,s?PTR(s->pData):0,s?s->dataSize:0,(uint64_t)cache,info->flags,info->stage.flags,subgroup?subgroup->requiredSubgroupSize:0);
 }
-VKAPI_ATTR void VKAPI_CALL vkDestroyPipeline(VkDevice d,VkPipeline pipeline,const VkAllocationCallbacks *allocator) {if(pipeline)checked(allocator?VK_ERROR_FEATURE_NOT_PRESENT:CALL(28,KEY(d),(uint64_t)pipeline));}
+VKAPI_ATTR void VKAPI_CALL vkDestroyPipeline(VkDevice d,VkPipeline pipeline,const VkAllocationCallbacks *allocator) {if(pipeline)checked(CALL(28,KEY(d),(uint64_t)pipeline));if(allocator || D(d)->custom_allocator)allocation_release(D(d),(uint64_t)pipeline);}
 VKAPI_ATTR VkResult VKAPI_CALL vkCreateDescriptorPool(VkDevice d,const VkDescriptorPoolCreateInfo *info,const VkAllocationCallbacks *allocator,VkDescriptorPool *out) {
-    CHECK(info,VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO);ALLOCATOR(allocator);if(info->poolSizeCount>64)return VK_ERROR_FEATURE_NOT_PRESENT;
+    CHECK(info,VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO);OBJECT_ALLOCATOR(d,allocator,VK_SYSTEM_ALLOCATION_SCOPE_OBJECT);if(info->poolSizeCount>64)return VK_ERROR_FEATURE_NOT_PRESENT;
     uint64_t sizes[128];for(uint32_t i=0;i<info->poolSizeCount;i++){sizes[i*2]=info->pPoolSizes[i].type;sizes[i*2+1]=info->pPoolSizes[i].descriptorCount;}return CALL(29,KEY(d),PTR(sizes),info->poolSizeCount,info->maxSets,info->flags,PTR(out));
 }
-VKAPI_ATTR void VKAPI_CALL vkDestroyDescriptorPool(VkDevice d,VkDescriptorPool pool,const VkAllocationCallbacks *allocator) {if(pool)checked(allocator?VK_ERROR_FEATURE_NOT_PRESENT:CALL(30,KEY(d),(uint64_t)pool));}
+VKAPI_ATTR void VKAPI_CALL vkDestroyDescriptorPool(VkDevice d,VkDescriptorPool pool,const VkAllocationCallbacks *allocator) {if(pool)checked(CALL(30,KEY(d),(uint64_t)pool));if(allocator || D(d)->custom_allocator)allocation_release(D(d),(uint64_t)pool);}
 VKAPI_ATTR VkResult VKAPI_CALL vkAllocateDescriptorSets(VkDevice d,const VkDescriptorSetAllocateInfo *info,VkDescriptorSet *out) {
     if(!info || info->sType!=VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO)return VK_ERROR_FEATURE_NOT_PRESENT;
-    const VkDescriptorSetVariableDescriptorCountAllocateInfo *v=info->pNext;
+    const VkDescriptorSetVariableDescriptorCountAllocateInfo *v=(void *)find_next(info->pNext,VK_STRUCTURE_TYPE_DESCRIPTOR_SET_VARIABLE_DESCRIPTOR_COUNT_ALLOCATE_INFO);
     if(v && (!VALID(v,VK_STRUCTURE_TYPE_DESCRIPTOR_SET_VARIABLE_DESCRIPTOR_COUNT_ALLOCATE_INFO) || (v->descriptorSetCount && v->descriptorSetCount!=info->descriptorSetCount)))return VK_ERROR_FEATURE_NOT_PRESENT;
     return CALL(31,KEY(d),(uint64_t)info->descriptorPool,PTR(info->pSetLayouts),info->descriptorSetCount,PTR(out),v && v->descriptorSetCount?PTR(v->pDescriptorCounts):0);
 }
@@ -385,26 +402,31 @@ VKAPI_ATTR void VKAPI_CALL vkUpdateDescriptorSets(VkDevice d,uint32_t count,cons
     descriptor_batch_flush(&batch);
 }
 
-VKAPI_ATTR VkResult VKAPI_CALL vkCreateCommandPool(VkDevice d,const VkCommandPoolCreateInfo *info,const VkAllocationCallbacks *allocator,VkCommandPool *out) {CHECK(info,VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO);ALLOCATOR(allocator);return CALL(34,KEY(d),info->queueFamilyIndex,info->flags,PTR(out));}
+VKAPI_ATTR VkResult VKAPI_CALL vkCreateCommandPool(VkDevice d,const VkCommandPoolCreateInfo *info,const VkAllocationCallbacks *allocator,VkCommandPool *out) {CHECK(info,VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO);OBJECT_ALLOCATOR(d,allocator,VK_SYSTEM_ALLOCATION_SCOPE_OBJECT);return CALL(34,KEY(d),info->queueFamilyIndex,info->flags,PTR(out));}
 static void unlink_commands(Dispatch *d,uint64_t pool,Dispatch *specific) {
-    pthread_mutex_lock(&d->lock);for(Dispatch **p=&d->commands;*p;){Dispatch *c=*p;if((specific && c==specific) || (!specific && c->parent==pool)){*p=c->next;free_dispatch(c);}else p=&c->next;}pthread_mutex_unlock(&d->lock);
+    Dispatch *released=NULL;pthread_mutex_lock(&d->lock);
+    for(Dispatch **p=&d->commands;*p;){Dispatch *c=*p;if((specific && c==specific) || (!specific && c->parent==pool)){*p=c->next;c->next=released;released=c;}else p=&c->next;}
+    pthread_mutex_unlock(&d->lock);
+    while(released){Dispatch *next=released->next;free_dispatch(released);released=next;}
 }
-VKAPI_ATTR void VKAPI_CALL vkDestroyCommandPool(VkDevice d,VkCommandPool pool,const VkAllocationCallbacks *allocator) {if(pool){checked(allocator?VK_ERROR_FEATURE_NOT_PRESENT:CALL(35,KEY(d),(uint64_t)pool));unlink_commands(D(d),(uint64_t)pool,NULL);}}
+VKAPI_ATTR void VKAPI_CALL vkDestroyCommandPool(VkDevice d,VkCommandPool pool,const VkAllocationCallbacks *allocator) {if(pool){checked(CALL(35,KEY(d),(uint64_t)pool));unlink_commands(D(d),(uint64_t)pool,NULL);}if(allocator || D(d)->custom_allocator)allocation_release(D(d),(uint64_t)pool);}
 VKAPI_ATTR VkResult VKAPI_CALL vkAllocateCommandBuffers(VkDevice device,const VkCommandBufferAllocateInfo *info,VkCommandBuffer *out) {
     CHECK(info,VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO);if(info->level>VK_COMMAND_BUFFER_LEVEL_SECONDARY)return VK_ERROR_FEATURE_NOT_PRESENT;
-    Dispatch *d=D(device);for(uint32_t i=0;i<info->commandBufferCount;i++){Dispatch *c=dispatch(0,d);VkResult r=c?CALL(36,d->key,(uint64_t)info->commandPool,PTR(&c->key),info->level):VK_ERROR_OUT_OF_HOST_MEMORY;
+    Dispatch *d=D(device);VkAllocationCallbacks callbacks;int custom=pool_allocator(d,(uint64_t)info->commandPool,&callbacks);
+    memset(out,0,(size_t)info->commandBufferCount*sizeof(*out));
+    for(uint32_t i=0;i<info->commandBufferCount;i++){Dispatch *c=dispatch_with_allocator(0,d,custom?&callbacks:NULL,VK_SYSTEM_ALLOCATION_SCOPE_OBJECT);VkResult r=c?CALL(36,d->key,(uint64_t)info->commandPool,PTR(&c->key),info->level):VK_ERROR_OUT_OF_HOST_MEMORY;
         if(r!=VK_SUCCESS){if(c)free_dispatch(c);for(uint32_t j=0;j<i;j++){checked(CALL(37,d->key,(uint64_t)info->commandPool,KEY(out[j])));unlink_commands(d,0,D(out[j]));}return r;}
-        c->parent=(uint64_t)info->commandPool;pthread_mutex_lock(&d->lock);c->next=d->commands;d->commands=c;pthread_mutex_unlock(&d->lock);out[i]=(VkCommandBuffer)c;
+        c->parent=(uint64_t)info->commandPool;c->level=info->level;pthread_mutex_lock(&d->lock);c->next=d->commands;d->commands=c;pthread_mutex_unlock(&d->lock);out[i]=(VkCommandBuffer)c;
     }return VK_SUCCESS;
 }
 VKAPI_ATTR void VKAPI_CALL vkFreeCommandBuffers(VkDevice d,VkCommandPool pool,uint32_t count,const VkCommandBuffer *commands) {for(uint32_t i=0;i<count;i++){checked(CALL(37,KEY(d),(uint64_t)pool,KEY(commands[i])));unlink_commands(D(d),0,D(commands[i]));}}
 VKAPI_ATTR VkResult VKAPI_CALL vkBeginCommandBuffer(VkCommandBuffer c,const VkCommandBufferBeginInfo *info) {
     if(!info || info->sType!=VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO)return VK_ERROR_FEATURE_NOT_PRESENT;
-    const VkDeviceGroupCommandBufferBeginInfo *group=info->pNext;
+    const VkDeviceGroupCommandBufferBeginInfo *group=(void *)find_next(info->pNext,VK_STRUCTURE_TYPE_DEVICE_GROUP_COMMAND_BUFFER_BEGIN_INFO);
     if(group && (!VALID(group,VK_STRUCTURE_TYPE_DEVICE_GROUP_COMMAND_BUFFER_BEGIN_INFO) || group->deviceMask!=1))return VK_ERROR_FEATURE_NOT_PRESENT;
-    const VkCommandBufferInheritanceInfo *v=info->pInheritanceInfo;uint64_t inherited[6];
+    const VkCommandBufferInheritanceInfo *v=D(c)->level==VK_COMMAND_BUFFER_LEVEL_SECONDARY?info->pInheritanceInfo:NULL;uint64_t inherited[6];
     if(v){if(!VALID(v,VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO))return VK_ERROR_FEATURE_NOT_PRESENT;inherited[0]=(uint64_t)v->renderPass;inherited[1]=v->subpass;inherited[2]=(uint64_t)v->framebuffer;inherited[3]=v->occlusionQueryEnable;inherited[4]=v->queryFlags;inherited[5]=v->pipelineStatistics;}
-    return CALL(38,DEVKEY(c),KEY(c),info->flags,v?PTR(inherited):0);
+    return CALL(38,DEVKEY(c),KEY(c),D(c)->level==VK_COMMAND_BUFFER_LEVEL_PRIMARY?(info->flags&~VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT):info->flags,v?PTR(inherited):0);
 }
 VKAPI_ATTR void VKAPI_CALL vkCmdExecuteCommands(VkCommandBuffer c,uint32_t count,const VkCommandBuffer *commands) {
     uint64_t *keys=count?malloc((size_t)count*8):NULL;if(count && !keys)checked(VK_ERROR_OUT_OF_HOST_MEMORY);
@@ -427,17 +449,17 @@ VKAPI_ATTR void VKAPI_CALL vkCmdPipelineBarrier(VkCommandBuffer c,VkPipelineStag
 }
 VKAPI_ATTR void VKAPI_CALL vkCmdCopyBuffer(VkCommandBuffer c,VkBuffer src,VkBuffer dst,uint32_t count,const VkBufferCopy *regions) {if(count>64)checked(VK_ERROR_FEATURE_NOT_PRESENT);uint64_t data[192];for(uint32_t i=0;i<count;i++){data[i*3]=regions[i].srcOffset;data[i*3+1]=regions[i].dstOffset;data[i*3+2]=regions[i].size;}checked(CALL(45,DEVKEY(c),KEY(c),(uint64_t)src,(uint64_t)dst,PTR(data),count));}
 VKAPI_ATTR void VKAPI_CALL vkCmdFillBuffer(VkCommandBuffer c,VkBuffer buffer,VkDeviceSize offset,VkDeviceSize size,uint32_t value) {checked(CALL(46,DEVKEY(c),KEY(c),(uint64_t)buffer,offset,size,value));}
-VKAPI_ATTR void VKAPI_CALL vkCmdPushConstants(VkCommandBuffer c,VkPipelineLayout layout,VkShaderStageFlags stages,uint32_t offset,uint32_t size,const void *values) {if(!stages || (stages & ~(VK_SHADER_STAGE_COMPUTE_BIT|VK_SHADER_STAGE_VERTEX_BIT|VK_SHADER_STAGE_FRAGMENT_BIT)))checked(VK_ERROR_FEATURE_NOT_PRESENT);checked(CALL(47,DEVKEY(c),KEY(c),(uint64_t)layout,offset,size,PTR(values),stages));}
-VKAPI_ATTR VkResult VKAPI_CALL vkCreateFence(VkDevice d,const VkFenceCreateInfo *info,const VkAllocationCallbacks *allocator,VkFence *out) {CHECK(info,VK_STRUCTURE_TYPE_FENCE_CREATE_INFO);ALLOCATOR(allocator);return CALL(48,KEY(d),info->flags,PTR(out));}
-VKAPI_ATTR void VKAPI_CALL vkDestroyFence(VkDevice d,VkFence f,const VkAllocationCallbacks *allocator) {if(f)checked(allocator?VK_ERROR_FEATURE_NOT_PRESENT:CALL(49,KEY(d),(uint64_t)f));}
+VKAPI_ATTR void VKAPI_CALL vkCmdPushConstants(VkCommandBuffer c,VkPipelineLayout layout,VkShaderStageFlags stages,uint32_t offset,uint32_t size,const void *values) {if(stages!=VK_SHADER_STAGE_ALL && (!stages || (stages & ~0x3fU)))checked(VK_ERROR_FEATURE_NOT_PRESENT);checked(CALL(47,DEVKEY(c),KEY(c),(uint64_t)layout,offset,size,PTR(values),stages));}
+VKAPI_ATTR VkResult VKAPI_CALL vkCreateFence(VkDevice d,const VkFenceCreateInfo *info,const VkAllocationCallbacks *allocator,VkFence *out) {CHECK(info,VK_STRUCTURE_TYPE_FENCE_CREATE_INFO);OBJECT_ALLOCATOR(d,allocator,VK_SYSTEM_ALLOCATION_SCOPE_OBJECT);return CALL(48,KEY(d),info->flags,PTR(out));}
+VKAPI_ATTR void VKAPI_CALL vkDestroyFence(VkDevice d,VkFence f,const VkAllocationCallbacks *allocator) {if(f)checked(CALL(49,KEY(d),(uint64_t)f));if(allocator || D(d)->custom_allocator)allocation_release(D(d),(uint64_t)f);}
 VKAPI_ATTR VkResult VKAPI_CALL vkCreateSemaphore(VkDevice d,const VkSemaphoreCreateInfo *info,const VkAllocationCallbacks *allocator,VkSemaphore *out) {
-    if(!info || info->sType!=VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO || info->flags)return VK_ERROR_FEATURE_NOT_PRESENT;ALLOCATOR(allocator);
-    const VkSemaphoreTypeCreateInfo *type=info->pNext;
+    if(!info || info->sType!=VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO || info->flags)return VK_ERROR_FEATURE_NOT_PRESENT;OBJECT_ALLOCATOR(d,allocator,VK_SYSTEM_ALLOCATION_SCOPE_OBJECT);
+    const VkSemaphoreTypeCreateInfo *type=(void *)find_next(info->pNext,VK_STRUCTURE_TYPE_SEMAPHORE_TYPE_CREATE_INFO);
     if(type && (!VALID(type,VK_STRUCTURE_TYPE_SEMAPHORE_TYPE_CREATE_INFO) || type->semaphoreType>VK_SEMAPHORE_TYPE_TIMELINE ||
        (type->semaphoreType==VK_SEMAPHORE_TYPE_TIMELINE && !(D(d)->enabled&2)) || (type->semaphoreType==VK_SEMAPHORE_TYPE_BINARY && type->initialValue)))return VK_ERROR_FEATURE_NOT_PRESENT;
     return CALL(54,KEY(d),PTR(out),type?type->semaphoreType:0,type?type->initialValue:0);
 }
-VKAPI_ATTR void VKAPI_CALL vkDestroySemaphore(VkDevice d,VkSemaphore s,const VkAllocationCallbacks *allocator) {if(s)checked(allocator?VK_ERROR_FEATURE_NOT_PRESENT:CALL(55,KEY(d),(uint64_t)s));}
+VKAPI_ATTR void VKAPI_CALL vkDestroySemaphore(VkDevice d,VkSemaphore s,const VkAllocationCallbacks *allocator) {if(s)checked(CALL(55,KEY(d),(uint64_t)s));if(allocator || D(d)->custom_allocator)allocation_release(D(d),(uint64_t)s);}
 VKAPI_ATTR VkResult VKAPI_CALL vkResetFences(VkDevice d,uint32_t count,const VkFence *fences) {for(uint32_t i=0;i<count;i++){VkResult r=CALL(50,KEY(d),(uint64_t)fences[i]);if(r!=VK_SUCCESS)return r;}return VK_SUCCESS;}
 VKAPI_ATTR VkResult VKAPI_CALL vkGetFenceStatus(VkDevice d,VkFence f) {return CALL(51,KEY(d),(uint64_t)f);}
 static uint64_t now_ns(void) {struct timespec t;clock_gettime(CLOCK_MONOTONIC,&t);return (uint64_t)t.tv_sec*1000000000UL+(uint64_t)t.tv_nsec;}
@@ -454,7 +476,7 @@ VKAPI_ATTR VkResult VKAPI_CALL vkQueueSubmit(VkQueue queue,uint32_t count,const 
     if(count>64)return VK_ERROR_FEATURE_NOT_PRESENT;
     uint64_t records[64][9],legacy[64][7],commands[64],waits[64],signals[64],wait_values[64]={0},signal_values[64]={0};uint32_t stages[64],nc=0,nw=0,ns=0;int timeline=0;
     for(uint32_t i=0;i<count;i++){const VkSubmitInfo *s=&submits[i];if(s->sType!=VK_STRUCTURE_TYPE_SUBMIT_INFO)return VK_ERROR_FEATURE_NOT_PRESENT;
-        const VkTimelineSemaphoreSubmitInfo *t=s->pNext;
+        const VkTimelineSemaphoreSubmitInfo *t=(void *)find_next(s->pNext,VK_STRUCTURE_TYPE_TIMELINE_SEMAPHORE_SUBMIT_INFO);
         if(t){
             if(!VALID(t,VK_STRUCTURE_TYPE_TIMELINE_SEMAPHORE_SUBMIT_INFO) || !(DEVICE(queue)->enabled&2) ||
                (t->waitSemaphoreValueCount && t->waitSemaphoreValueCount!=s->waitSemaphoreCount) ||
@@ -473,17 +495,17 @@ VKAPI_ATTR VkResult VKAPI_CALL vkQueueSubmit(VkQueue queue,uint32_t count,const 
     return CALL(120,DEVKEY(queue),KEY(queue),PTR(records),count,(uint64_t)fence);
 }
 VKAPI_ATTR VkResult VKAPI_CALL vkQueueWaitIdle(VkQueue q) {VkFence fence;VkFenceCreateInfo f={.sType=VK_STRUCTURE_TYPE_FENCE_CREATE_INFO};VkDevice d=(VkDevice)DEVICE(q);VkResult r=vkCreateFence(d,&f,NULL,&fence);if(r!=VK_SUCCESS)return r;r=vkQueueSubmit(q,0,NULL,fence);if(r==VK_SUCCESS)r=vkWaitForFences(d,1,&fence,VK_TRUE,UINT64_MAX);vkDestroyFence(d,fence,NULL);return r;}
-VKAPI_ATTR VkResult VKAPI_CALL vkDeviceWaitIdle(VkDevice d) {VkQueue q;vkGetDeviceQueue(d,D(d)->family,0,&q);return vkQueueWaitIdle(q);}
+VKAPI_ATTR VkResult VKAPI_CALL vkDeviceWaitIdle(VkDevice d) {for(Dispatch *q=D(d)->queue;q;q=q->next){VkResult r=vkQueueWaitIdle((VkQueue)q);if(r!=VK_SUCCESS)return r;}return VK_SUCCESS;}
 
 
 VKAPI_ATTR VkResult VKAPI_CALL vkCreatePipelineCache(VkDevice d,const VkPipelineCacheCreateInfo *info,const VkAllocationCallbacks *allocator,VkPipelineCache *out) {
-    CHECK(info,VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO);ALLOCATOR(allocator);
-    if(info->flags || info->initialDataSize>64UL*1024*1024)return VK_ERROR_FEATURE_NOT_PRESENT;
-    return CALL(112,KEY(d),PTR(out),PTR(info->pInitialData),info->initialDataSize);
+    CHECK(info,VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO);OBJECT_ALLOCATOR(d,allocator,VK_SYSTEM_ALLOCATION_SCOPE_CACHE);
+    if((info->flags&~VK_PIPELINE_CACHE_CREATE_EXTERNALLY_SYNCHRONIZED_BIT) || info->initialDataSize>64UL*1024*1024)return VK_ERROR_FEATURE_NOT_PRESENT;
+    return CALL(112,KEY(d),PTR(out),PTR(info->pInitialData),info->initialDataSize,info->flags);
 }
 VKAPI_ATTR void VKAPI_CALL vkDestroyPipelineCache(VkDevice d,VkPipelineCache cache,const VkAllocationCallbacks *allocator) {
-    if(cache)checked(allocator?VK_ERROR_FEATURE_NOT_PRESENT:CALL(113,KEY(d),(uint64_t)cache));
-}
+    if(cache)checked(CALL(113,KEY(d),(uint64_t)cache));
+if(allocator || D(d)->custom_allocator)allocation_release(D(d),(uint64_t)cache);}
 
 VKAPI_ATTR VkResult VKAPI_CALL vkResetDescriptorPool(VkDevice d,VkDescriptorPool pool,VkDescriptorPoolResetFlags flags) {return CALL(129,KEY(d),(uint64_t)pool,flags);}
 VKAPI_ATTR VkResult VKAPI_CALL vkGetPipelineCacheData(VkDevice d,VkPipelineCache cache,size_t *size,void *data) {return CALL(130,KEY(d),(uint64_t)cache,PTR(size),PTR(data));}

@@ -16,7 +16,7 @@ VKAPI_ATTR VkResult VKAPI_CALL vkGetDisplayModePropertiesKHR(VkPhysicalDevice p,
     VkDisplayModePropertiesKHR value={.displayMode=(VkDisplayModeKHR)1,.parameters={{(uint32_t)info[1],(uint32_t)info[2]},60000}};ONE(count,out,value);
 }
 VKAPI_ATTR VkResult VKAPI_CALL vkCreateDisplayModeKHR(VkPhysicalDevice p,VkDisplayKHR display,const VkDisplayModeCreateInfoKHR *info,const VkAllocationCallbacks *allocator,VkDisplayModeKHR *out) {
-    CHECK(info,VK_STRUCTURE_TYPE_DISPLAY_MODE_CREATE_INFO_KHR);ALLOCATOR(allocator);uint64_t d[3]={0};
+    CHECK(info,VK_STRUCTURE_TYPE_DISPLAY_MODE_CREATE_INFO_KHR);OBJECT_ALLOCATOR(p,allocator,VK_SYSTEM_ALLOCATION_SCOPE_OBJECT);uint64_t d[3]={0};
     if((uint64_t)display!=1 || info->flags || !display_info(KEY(p),d) || info->parameters.visibleRegion.width!=d[1] || info->parameters.visibleRegion.height!=d[2] || info->parameters.refreshRate!=60000)return VK_ERROR_FEATURE_NOT_PRESENT;
     *out=(VkDisplayModeKHR)1;return VK_SUCCESS;
 }
@@ -26,24 +26,24 @@ VKAPI_ATTR VkResult VKAPI_CALL vkGetDisplayPlaneCapabilitiesKHR(VkPhysicalDevice
     out->minSrcExtent=out->maxSrcExtent=out->minDstExtent=out->maxDstExtent=(VkExtent2D){(uint32_t)info[1],(uint32_t)info[2]};return VK_SUCCESS;
 }
 VKAPI_ATTR VkResult VKAPI_CALL vkCreateDisplayPlaneSurfaceKHR(VkInstance i,const VkDisplaySurfaceCreateInfoKHR *info,const VkAllocationCallbacks *allocator,VkSurfaceKHR *out) {
-    CHECK(info,VK_STRUCTURE_TYPE_DISPLAY_SURFACE_CREATE_INFO_KHR);ALLOCATOR(allocator);uint64_t d[3]={0};
+    CHECK(info,VK_STRUCTURE_TYPE_DISPLAY_SURFACE_CREATE_INFO_KHR);OBJECT_ALLOCATOR(i,allocator,VK_SYSTEM_ALLOCATION_SCOPE_OBJECT);uint64_t d[3]={0};
     if(info->flags || (uint64_t)info->displayMode!=1 || info->planeIndex || info->planeStackIndex || info->transform!=VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR || info->alphaMode!=VK_DISPLAY_PLANE_ALPHA_OPAQUE_BIT_KHR || info->globalAlpha!=1.0f || !display_info(0,d) || info->imageExtent.width!=d[1] || info->imageExtent.height!=d[2])return VK_ERROR_FEATURE_NOT_PRESENT;
     return CALL(81,KEY(i),PTR(out));
 }
-VKAPI_ATTR void VKAPI_CALL vkDestroySurfaceKHR(VkInstance i,VkSurfaceKHR surface,const VkAllocationCallbacks *allocator) {if(surface){checked(allocator?VK_ERROR_FEATURE_NOT_PRESENT:CALL(82,KEY(i),(uint64_t)surface));wayland_forget_surface(surface);}}
+VKAPI_ATTR void VKAPI_CALL vkDestroySurfaceKHR(VkInstance i,VkSurfaceKHR surface,const VkAllocationCallbacks *allocator) {if(surface){checked(CALL(82,KEY(i),(uint64_t)surface));wayland_forget_surface(surface);}if(allocator || D(i)->custom_allocator)allocation_release(D(i),(uint64_t)surface);}
 VKAPI_ATTR VkResult VKAPI_CALL vkGetPhysicalDeviceSurfaceSupportKHR(VkPhysicalDevice p,uint32_t family,VkSurfaceKHR surface,VkBool32 *out) {return CALL(83,KEY(p),(uint64_t)surface,family,PTR(out));}
 VKAPI_ATTR VkResult VKAPI_CALL vkGetPhysicalDeviceSurfaceCapabilitiesKHR(VkPhysicalDevice p,VkSurfaceKHR surface,VkSurfaceCapabilitiesKHR *out) {return CALL(84,KEY(p),(uint64_t)surface,PTR(out));}
 VKAPI_ATTR VkResult VKAPI_CALL vkGetPhysicalDeviceSurfaceFormatsKHR(VkPhysicalDevice p,VkSurfaceKHR surface,uint32_t *count,VkSurfaceFormatKHR *out) {return CALL(85,KEY(p),(uint64_t)surface,PTR(count),PTR(out));}
 VKAPI_ATTR VkResult VKAPI_CALL vkGetPhysicalDeviceSurfacePresentModesKHR(VkPhysicalDevice p,VkSurfaceKHR surface,uint32_t *count,VkPresentModeKHR *out) {return CALL(86,KEY(p),(uint64_t)surface,PTR(count),PTR(out));}
 VKAPI_ATTR VkResult VKAPI_CALL vkCreateSwapchainKHR(VkDevice d,const VkSwapchainCreateInfoKHR *info,const VkAllocationCallbacks *allocator,VkSwapchainKHR *out) {
-    CHECK(info,VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR);ALLOCATOR(allocator);
+    CHECK(info,VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR);OBJECT_ALLOCATOR(d,allocator,VK_SYSTEM_ALLOCATION_SCOPE_OBJECT);
     // Original vkmark leaves transform/alpha at zero; this single-profile
     // surface interprets those as its only supported identity/opaque choices.
     if(info->flags || info->imageArrayLayers!=1 || info->imageSharingMode!=VK_SHARING_MODE_EXCLUSIVE || (info->preTransform && info->preTransform!=VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR) || (info->compositeAlpha && info->compositeAlpha!=VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR) || (info->presentMode!=VK_PRESENT_MODE_FIFO_KHR && info->presentMode!=VK_PRESENT_MODE_MAILBOX_KHR))return VK_ERROR_FEATURE_NOT_PRESENT;
     VkResult r=CALL(87,KEY(d),(uint64_t)info->surface,info->minImageCount,info->imageFormat,info->imageColorSpace,info->imageExtent.width,info->imageExtent.height,info->imageUsage,(uint64_t)info->oldSwapchain,info->presentMode==VK_PRESENT_MODE_MAILBOX_KHR,PTR(out),info->clipped);
-    if(r==VK_SUCCESS && !wayland_register_chain(*out,info->surface)){CALL(88,KEY(d),(uint64_t)*out);return VK_ERROR_OUT_OF_HOST_MEMORY;}return r;
+    if(r==VK_SUCCESS && !wayland_register_chain(*out,info->surface)){CALL(88,KEY(d),(uint64_t)*out);*out=VK_NULL_HANDLE;return VK_ERROR_OUT_OF_HOST_MEMORY;}return r;
 }
-VKAPI_ATTR void VKAPI_CALL vkDestroySwapchainKHR(VkDevice d,VkSwapchainKHR chain,const VkAllocationCallbacks *allocator) {if(chain){checked(allocator?VK_ERROR_FEATURE_NOT_PRESENT:CALL(88,KEY(d),(uint64_t)chain));wayland_forget_chain(chain);}}
+VKAPI_ATTR void VKAPI_CALL vkDestroySwapchainKHR(VkDevice d,VkSwapchainKHR chain,const VkAllocationCallbacks *allocator) {if(chain){checked(CALL(88,KEY(d),(uint64_t)chain));wayland_forget_chain(chain);}if(allocator || D(d)->custom_allocator)allocation_release(D(d),(uint64_t)chain);}
 VKAPI_ATTR VkResult VKAPI_CALL vkGetSwapchainImagesKHR(VkDevice d,VkSwapchainKHR chain,uint32_t *count,VkImage *out) {return CALL(89,KEY(d),(uint64_t)chain,PTR(count),PTR(out));}
 VKAPI_ATTR VkResult VKAPI_CALL vkAcquireNextImageKHR(VkDevice d,VkSwapchainKHR chain,uint64_t timeout,VkSemaphore semaphore,VkFence fence,uint32_t *out) {
     if(D(d)->bridge&4)return CALL(251,KEY(d),(uint64_t)chain,(uint64_t)semaphore,(uint64_t)fence,PTR(out),timeout);
@@ -56,7 +56,8 @@ VKAPI_ATTR VkResult VKAPI_CALL vkQueuePresentKHR(VkQueue q,const VkPresentInfoKH
     if(!info || info->sType!=VK_STRUCTURE_TYPE_PRESENT_INFO_KHR || info->swapchainCount!=1 || info->waitSemaphoreCount>64)return VK_ERROR_FEATURE_NOT_PRESENT;
     const VkBaseInStructure *next=info->pNext;unsigned chain=0;int regions_seen=0;
     for(;next && chain<16;next=next->pNext,chain++) {
-        if(next->sType!=VK_STRUCTURE_TYPE_PRESENT_REGIONS_KHR || regions_seen++)return VK_ERROR_FEATURE_NOT_PRESENT;
+        if(next->sType!=VK_STRUCTURE_TYPE_PRESENT_REGIONS_KHR)continue;
+        if(regions_seen++)return VK_ERROR_FEATURE_NOT_PRESENT;
         const VkPresentRegionsKHR *regions=(const void *)next;
         if(regions->swapchainCount!=info->swapchainCount || !regions->pRegions)return VK_ERROR_FEATURE_NOT_PRESENT;
         if(regions->pRegions[0].rectangleCount && !regions->pRegions[0].pRectangles)return VK_ERROR_FEATURE_NOT_PRESENT;

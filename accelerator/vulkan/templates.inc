@@ -5,10 +5,12 @@
 struct descriptor_template {
     DescriptorTemplate *next;
     uint32_t count;
+    VkAllocationCallbacks callbacks;int custom_allocator;
     VkDescriptorUpdateTemplateEntry entries[];
 };
+static void free_template(DescriptorTemplate *t){if(t->custom_allocator){VkAllocationCallbacks a=t->callbacks;a.pfnFree(a.pUserData,t);}else free(t);}
 static void free_templates(DescriptorTemplate *head) {
-    while(head){DescriptorTemplate *next=head->next;free(head);head=next;}
+    while(head){DescriptorTemplate *next=head->next;free_template(head);head=next;}
 }
 static size_t descriptor_record_size(VkDescriptorType type) {
     switch(type){
@@ -19,7 +21,7 @@ static size_t descriptor_record_size(VkDescriptorType type) {
     }
 }
 VKAPI_ATTR VkResult VKAPI_CALL vkCreateDescriptorUpdateTemplate(VkDevice device,const VkDescriptorUpdateTemplateCreateInfo *info,const VkAllocationCallbacks *allocator,VkDescriptorUpdateTemplate *out) {
-    CHECK(info,VK_STRUCTURE_TYPE_DESCRIPTOR_UPDATE_TEMPLATE_CREATE_INFO);ALLOCATOR(allocator);
+    CHECK(info,VK_STRUCTURE_TYPE_DESCRIPTOR_UPDATE_TEMPLATE_CREATE_INFO);OBJECT_ALLOCATOR(device,allocator,VK_SYSTEM_ALLOCATION_SCOPE_OBJECT);
     if(info->flags || info->templateType!=VK_DESCRIPTOR_UPDATE_TEMPLATE_TYPE_DESCRIPTOR_SET)return VK_ERROR_FEATURE_NOT_PRESENT;
     for(uint32_t i=0;i<info->descriptorUpdateEntryCount;i++){
         const VkDescriptorUpdateTemplateEntry *e=info->pDescriptorUpdateEntries+i;
@@ -27,8 +29,11 @@ VKAPI_ATTR VkResult VKAPI_CALL vkCreateDescriptorUpdateTemplate(VkDevice device,
         if(!size || !e->descriptorCount || e->offset>SIZE_MAX-size ||
            (e->descriptorCount>1 && e->stride>(SIZE_MAX-size-e->offset)/(e->descriptorCount-1)))return VK_ERROR_FEATURE_NOT_PRESENT;
     }
-    DescriptorTemplate *t=malloc(sizeof(*t)+info->descriptorUpdateEntryCount*sizeof(*t->entries));
+    const VkAllocationCallbacks *callbacks=allocation.record?&allocation.record->callbacks:NULL;
+    size_t size=sizeof(DescriptorTemplate)+(size_t)info->descriptorUpdateEntryCount*sizeof(VkDescriptorUpdateTemplateEntry);
+    DescriptorTemplate *t=callbacks?callbacks->pfnAllocation(callbacks->pUserData,size,_Alignof(DescriptorTemplate),allocation.scope):malloc(size);
     if(!t)return VK_ERROR_OUT_OF_HOST_MEMORY;
+    t->custom_allocator=callbacks!=NULL;if(callbacks)t->callbacks=*callbacks;
     t->count=info->descriptorUpdateEntryCount;
     if(t->count)memcpy(t->entries,info->pDescriptorUpdateEntries,t->count*sizeof(*t->entries));
     Dispatch *d=D(device);pthread_mutex_lock(&d->lock);t->next=d->templates;d->templates=t;pthread_mutex_unlock(&d->lock);
@@ -36,12 +41,10 @@ VKAPI_ATTR VkResult VKAPI_CALL vkCreateDescriptorUpdateTemplate(VkDevice device,
 }
 VKAPI_ATTR VkResult VKAPI_CALL vkCreateDescriptorUpdateTemplateKHR(VkDevice d,const VkDescriptorUpdateTemplateCreateInfo *info,const VkAllocationCallbacks *allocator,VkDescriptorUpdateTemplate *out) {return vkCreateDescriptorUpdateTemplate(d,info,allocator,out);}
 VKAPI_ATTR void VKAPI_CALL vkDestroyDescriptorUpdateTemplate(VkDevice device,VkDescriptorUpdateTemplate handle,const VkAllocationCallbacks *allocator) {
-    if(!handle)return;if(allocator)checked(VK_ERROR_FEATURE_NOT_PRESENT);
-    Dispatch *d=D(device);pthread_mutex_lock(&d->lock);
-    for(DescriptorTemplate **p=&d->templates;*p;p=&(*p)->next){
-        if((uintptr_t)*p==(uintptr_t)handle){DescriptorTemplate *t=*p;*p=t->next;free(t);break;}
-    }
-    pthread_mutex_unlock(&d->lock);
+    if(!handle)return;Dispatch *d=D(device);DescriptorTemplate *released=NULL;pthread_mutex_lock(&d->lock);
+    for(DescriptorTemplate **p=&d->templates;*p;p=&(*p)->next)if((uintptr_t)*p==(uintptr_t)handle){released=*p;*p=released->next;break;}
+    pthread_mutex_unlock(&d->lock);if(released)free_template(released);
+    if(allocator || d->custom_allocator)allocation_release(d,(uint64_t)handle);
 }
 VKAPI_ATTR void VKAPI_CALL vkDestroyDescriptorUpdateTemplateKHR(VkDevice d,VkDescriptorUpdateTemplate t,const VkAllocationCallbacks *allocator) {vkDestroyDescriptorUpdateTemplate(d,t,allocator);}
 VKAPI_ATTR void VKAPI_CALL vkUpdateDescriptorSetWithTemplate(VkDevice device,VkDescriptorSet set,VkDescriptorUpdateTemplate handle,const void *data) {

@@ -127,7 +127,7 @@ static void wayland_present(VkSwapchainKHR key) {
     wayland_api.flush(display);
 }
 VKAPI_ATTR VkResult VKAPI_CALL vkCreateWaylandSurfaceKHR(VkInstance i,const VkWaylandSurfaceCreateInfoKHR *info,const VkAllocationCallbacks *allocator,VkSurfaceKHR *out) {
-    CHECK(info,VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR);ALLOCATOR(allocator);pthread_once(&wayland_once,wayland_load);
+    CHECK(info,VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR);OBJECT_ALLOCATOR(i,allocator,VK_SYSTEM_ALLOCATION_SCOPE_OBJECT);pthread_once(&wayland_once,wayland_load);
     if(info->flags || !info->display || !info->surface || !wayland_api.fd || !wayland_api.flush || !wayland_api.id || !wayland_api.version || !wayland_api.marshal || !wayland_api.listen || !wayland_api.destroy || !wayland_api.callback)return VK_ERROR_SURFACE_LOST_KHR;
     int fd=wayland_api.fd(info->display);uint32_t id=wayland_api.id((struct wl_proxy *)info->surface);
     if(fd<0 || !id)return VK_ERROR_SURFACE_LOST_KHR;
@@ -141,7 +141,7 @@ VKAPI_ATTR VkResult VKAPI_CALL vkCreateWaylandSurfaceKHR(VkInstance i,const VkWa
             fd=grant.fd;relay=1;continue;
         }
         if(r!=VK_NOT_READY)wayland_grant_end(&grant);
-        if(r==VK_SUCCESS && !wayland_register_surface(*out,info->display,info->surface)){CALL(82,KEY(i),(uint64_t)*out);return VK_ERROR_OUT_OF_HOST_MEMORY;}
+        if(r==VK_SUCCESS && !wayland_register_surface(*out,info->display,info->surface)){CALL(82,KEY(i),(uint64_t)*out);*out=VK_NULL_HANDLE;return VK_ERROR_OUT_OF_HOST_MEMORY;}
         if(r!=VK_NOT_READY)return r;
         // The native server owns its own thread. Yield while it processes the
         // flushed wl_surface creation; do not dispatch the application's queue.
