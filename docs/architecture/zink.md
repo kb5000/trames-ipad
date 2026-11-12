@@ -219,3 +219,33 @@ for the exact artifacts and scope. No GL version override, software GPU, new
 service thread or ordinary guest-memory barrier is introduced. Multisample
 rendering/resolve and the complete GLES CTS remain further work. Physical iPad
 GPU validation and a new IPA are not part of this batch.
+
+
+## Event-driven Wayland image acquisition (2026-11-12)
+
+Guest ICD wire revision 16 negotiates host-bridge bit 4 through operation 200.
+On that path, `vkAcquireNextImageKHR` uses operation 251 once, with the original
+swapchain, semaphore/fence, output address and timeout. A pending acquisition
+parks the original task and releases its executor slot. It subscribes to both
+the original surface's image-release readiness and native producer completion;
+the latter also collects completed producer leases. There is no 1 ms guest
+retry loop, polling bus, coordinator or additional service thread. Older hosts
+and the separate physical-display adapter keep the legacy operation-90 path.
+
+An available image has already outlived its native producer and final UI read
+leases. The shared backend therefore signals acquisition logically on the host,
+without a dummy GPU submission, private fence or unrelated coherent readback.
+A binary semaphore consumes that host signal exactly once; later native signals
+and waits, timeline values and submit-batch boundaries retain their normal
+meaning. CPU fence notifications run after releasing the GPU context lease.
+Hot acquire/present validate the original surface's lifetime directly; cold
+metadata queries copy only that surface, rather than the complete scene snapshot.
+
+Waiting retains the original resource generations, never a new object looked up
+by a recycled guest handle. Absolute deadlines, cancellation, destroyed surfaces,
+retired swapchains and output faults complete through the existing pending-job
+model. The implementation is shared with iPad; physical iPad GPU acceptance is
+separate. Real native image/fence tests cover cancellation, deadlines, sync-object
+replacement, producer/UI release, output faults and notification after unlock.
+See the [Mac GPU record](https://github.com/kb5000/trames-mac/blob/main/docs/validation/mac-firefox-gpu.md)
+for quiet browser measurements and their remaining limitations.

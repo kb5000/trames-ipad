@@ -46,6 +46,7 @@ VKAPI_ATTR VkResult VKAPI_CALL vkCreateSwapchainKHR(VkDevice d,const VkSwapchain
 VKAPI_ATTR void VKAPI_CALL vkDestroySwapchainKHR(VkDevice d,VkSwapchainKHR chain,const VkAllocationCallbacks *allocator) {if(chain){checked(allocator?VK_ERROR_FEATURE_NOT_PRESENT:CALL(88,KEY(d),(uint64_t)chain));wayland_forget_chain(chain);}}
 VKAPI_ATTR VkResult VKAPI_CALL vkGetSwapchainImagesKHR(VkDevice d,VkSwapchainKHR chain,uint32_t *count,VkImage *out) {return CALL(89,KEY(d),(uint64_t)chain,PTR(count),PTR(out));}
 VKAPI_ATTR VkResult VKAPI_CALL vkAcquireNextImageKHR(VkDevice d,VkSwapchainKHR chain,uint64_t timeout,VkSemaphore semaphore,VkFence fence,uint32_t *out) {
+    if(D(d)->bridge&4)return CALL(251,KEY(d),(uint64_t)chain,(uint64_t)semaphore,(uint64_t)fence,PTR(out),timeout);
     uint64_t began=now_ns();for(;;){VkResult r=CALL(90,KEY(d),(uint64_t)chain,(uint64_t)semaphore,(uint64_t)fence,PTR(out));if(r!=VK_NOT_READY && r!=VK_TIMEOUT)return r;
         if(!timeout)return VK_NOT_READY;uint64_t elapsed=now_ns()-began;if(timeout!=UINT64_MAX && elapsed>=timeout)return VK_TIMEOUT;
         struct timespec sleep={0,(long)(timeout==UINT64_MAX || timeout-elapsed>1000000?1000000:timeout-elapsed)};nanosleep(&sleep,NULL);
