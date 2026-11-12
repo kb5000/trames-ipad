@@ -31,6 +31,12 @@ static double now(void) {
     return ts.tv_sec + ts.tv_nsec * 1e-9;
 }
 #ifdef __APPLE__
+#ifdef TRAMES_FFMPEG_NATIVE_INTERNALS
+// Optional property verification against the exact native FFmpeg source/build.
+#include "libavcodec/internal.h"
+#include "libavcodec/vt_internal.h"
+#include "libavcodec/videotoolbox.h"
+#endif
 #define HW_TYPE AV_HWDEVICE_TYPE_VIDEOTOOLBOX
 #define HW_FORMAT AV_PIX_FMT_VIDEOTOOLBOX
 #else
@@ -55,6 +61,18 @@ static void receive(AVCodecContext *codec, AVFrame *frame, struct Stats *stats) 
         if (status == AVERROR(EAGAIN) || status == AVERROR_EOF) return;
         check(status, "receive");
         if (frame->format != HW_FORMAT) abort();
+#if defined(__APPLE__) && defined(TRAMES_FFMPEG_NATIVE_INTERNALS)
+        if (!stats->frames) {
+            VTContext *internal = codec->internal->hwaccel_priv_data;
+            AVVideotoolboxContext *vt = internal->vt_ctx ? internal->vt_ctx : codec->hwaccel_context;
+            CFTypeRef value = NULL;
+            OSStatus property = VTSessionCopyProperty(vt->session,
+                kVTDecompressionPropertyKey_UsingHardwareAcceleratedVideoDecoder, NULL, &value);
+            int hardware = !property && value && CFEqual(value, kCFBooleanTrue);
+            if (value) CFRelease(value);
+            if (!hardware) { fprintf(stderr, "actual VideoToolbox hardware decode is required\n"); exit(1); }
+        }
+#endif
         double began = now();
         if (stats->mode == 2) {
             check(av_hwframe_transfer_data(stats->download, frame, 0), "download");
@@ -102,7 +120,11 @@ int main(int argc, char **argv) {
     check(avformat_find_stream_info(input, NULL), "stream info");
     int stream = av_find_best_stream(input, AVMEDIA_TYPE_VIDEO, -1, -1, NULL, 0);
     check(stream, "video stream");
-    const AVCodec *decoder = avcodec_find_decoder(input->streams[stream]->codecpar->codec_id);
+    enum AVCodecID codec_id = input->streams[stream]->codecpar->codec_id;
+    // libdav1d/libaom are software-only decoders. Select FFmpeg's actual AV1
+    // hardware-acceleration adapter instead of accepting its default preference.
+    const AVCodec *decoder = codec_id == AV_CODEC_ID_AV1 ?
+        avcodec_find_decoder_by_name("av1") : avcodec_find_decoder(codec_id);
     AVCodecContext *codec = avcodec_alloc_context3(decoder);
     if (!codec) abort();
     check(avcodec_parameters_to_context(codec, input->streams[stream]->codecpar), "parameters");

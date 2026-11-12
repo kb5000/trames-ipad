@@ -1,13 +1,79 @@
 # VA-API over VideoToolbox
 
-Status: experimental H.264 implementation, 2026-11-01. The shared runtime,
+Status: experimental H.264, HEVC and AV1 decode, updated 2026-11-12. The shared runtime,
 standard libva driver, retained image FDs, native Vulkan import and Mesa EGL
 adapter are implemented. Stock Firefox 142 selects VA-API in its RDD process
 with its normal sandbox. Foreground 720p30 and near-source-rate 1080p60 playback
 are validated below. The recommended Firefox 151/native-video profile passes cold short-clip
 autoplay/looping without the old 15-second buffer pause; Firefox 142 retains that
-limitation. HEVC, AV1, encoding, video processing, physical A/V synchronization and physical iPad playback are not validated.
+limitation. HEVC Main and AV1 Profile 0 hardware decode now work with the paired
+FFmpeg adapter below, limited to 8-bit 4:2:0 output. Encoding, Main10/P010, video
+processing, physical A/V synchronization and physical iPad playback remain unvalidated.
 Mac audio output and virtual input are covered in the native-audio follow-up below.
+
+## Original-bitstream HEVC / AV1 adapter (2026-11-12)
+
+The runtime now accepts HEVC and AV1 complete compressed samples through the
+same asynchronous decoder, retained frame FDs and native GPU plane imports as
+H.264. It requires a hardware VideoToolbox session and checks the actual
+`UsingHardwareAcceleratedVideoDecoder` property; it never silently substitutes a
+software VideoToolbox decoder. Compressed input is owned until native completion.
+Callbacks signal the original eventfd; waiting releases the guest execution slot.
+There is no new coordinator or video service thread.
+
+The standard stateless VA structures omit original codec fields. Rather than
+inventing those fields, a small
+[FFmpeg 7.1.1 patch](https://github.com/kb5000/trames-runtime/blob/main/patches/ffmpeg/0001-vaapi-original-bitstream-v1.patch)
+negotiates `trames_vaapi_bitstream_v1` with `vaGetLibFunc`. It forwards the original
+escaped HEVC VPS/SPS/PPS and slice NALs, or AV1 `av1C`, sequence and complete frame
+OBUs, including hidden reference pictures and all tile groups. Ordinary AV1
+`show_existing_frame` reuses the retained output surface; KEY-reference display
+also updates the native decoder's reference state. The unchanged H.264 adapter
+remains available to ordinary libva clients. HEVC/AV1 profiles are exposed only
+on an opted-in display and only when the host reports the corresponding hardware.
+
+Build the driver with the existing `runtime/scripts/build-video-guest.sh`. On
+native ARM64 Linux with libva/libdrm development headers, Bash, make, pkg-config,
+patch, xz, curl and Python installed, build the paired FFmpeg overlay with:
+
+```sh
+cd runtime
+TRAMES_FFMPEG_OUTPUT=/absolute/path/to/ffmpeg-output \
+  bash scripts/build-video-ffmpeg.sh
+```
+
+The recipe pins the official source archive and patch hash, preserves the LGPL
+license, and emits an install manifest with library hashes. Use a musl build for
+Alpine and a glibc build for Debian. The Mac Firefox launcher accepts
+`--video-driver /path/to/trames_drv_video.so --video-ffmpeg /path/to/ffmpeg-output/install`.
+It verifies the protocol, patch and library hashes, then imports the overlay into
+a private content-addressed directory without replacing distribution libraries.
+Only that paired launch sets `TRAMES_VIDEO_BITSTREAM_V1=1` for Gecko's separate
+VA profile probe; do not set it globally for unpatched VA clients. FFmpeg CLI
+clients negotiate directly and do not need that environment switch. Select the
+`av1` decoder when requesting AV1 hardware acceleration; `libdav1d` and `libaom`
+are software decoder implementations.
+
+On the local M6, full-frame hashes exactly match independent stock software
+decoders for 60 HEVC 1080p30 frames, 240 HEVC 1080p60 frames, 240 AV1 1080p30
+frames with hidden/reference reuse, and 60 AV1 720p30 frames with 2×2 tiles.
+Tests cover invalid configuration, valid configuration with corrupt packets,
+callback completion and context destruction. The existing H.264 multi-slice
+fork/SCM_RIGHTS/EGL native-pixel import oracle still passes. The old constant
+H.264 import fixture fails on both the published baseline and candidate; this
+work does not expand the original H.264 reconstruction boundary.
+
+Firefox 151 confirms actual RDD hardware decode for both codecs. The local
+AV1 1080p30 interval accepts 600/600 frames; HEVC 1080p60 accepts 888/901 frames
+over repeated four-second loops. These are browser counters, not physical scanout
+measurements. The requested Bilibili AV1 page accepts about 24 fps after reference
+reuse, with compositor drops still present. Hardware decoding does not eliminate
+the remaining complex-page execution and presentation overhead. Filtered
+[Mac evidence](https://github.com/kb5000/trames-mac/blob/main/docs/validation/mac-bilibili-BV1FRHV68EUX.json)
+includes independent native VideoToolbox throughput controls and their differing
+FFmpeg versions. ARM64 iPad FFI compilation passes; no iPad hardware result is
+claimed. Hardware encoding needs a separate input-surface, compressed-output and
+rate-control interface and is deferred.
 
 ## Architecture
 
