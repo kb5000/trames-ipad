@@ -66,8 +66,10 @@ work does not expand the original H.264 reconstruction boundary.
 Firefox 151 confirms actual RDD hardware decode for both codecs. The local
 AV1 1080p30 interval accepts 600/600 frames; HEVC 1080p60 accepts 888/901 frames
 over repeated four-second loops. These are browser counters, not physical scanout
-measurements. The requested Bilibili AV1 page accepts about 24 fps after reference
-reuse, with compositor drops still present. Hardware decoding does not eliminate
+measurements. The requested Bilibili AV1 page initially accepts about 24 fps after
+reference reuse; final installed Dev intervals reach 28.99–29.77 fps, dropping
+20 and 4 frames respectively out of 600. Both are visible, focused and buffered;
+startup and page-state variation remain. Hardware decoding does not eliminate
 the remaining complex-page execution and presentation overhead. Filtered
 [Mac evidence](https://github.com/kb5000/trames-mac/blob/main/docs/validation/mac-bilibili-BV1FRHV68EUX.json)
 includes independent native VideoToolbox throughput controls and their differing
