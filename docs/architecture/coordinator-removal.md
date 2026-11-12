@@ -6522,3 +6522,37 @@ all 78 signed hardware cases, native pressure/late-request regressions and the
 installed Dev init, twelve-CPU multi-terminal/exec lifecycle and tracing checks
 pass. Both products pin the same runtime commit. Stable 1.5.4, business
 environments and physical iPad installs remain unchanged. The CI VM is stopped.
+
+
+## Atomic terminal idle decisions (2026-11-13)
+
+Runtime `0416b41` closes a source-completion race without restoring any
+coordinator role. An empty ready queue is only a candidate for terminal
+quiescence. Native-service inspection releases the queue mutex; its observation
+cannot authorize closing execution after another task has run or a new event
+source has appeared. Production no longer calls the weaker fixture `idle()`.
+
+An idle-only queue-local token identifies the probe. Original ready publication
+already invalidates an idle observation, so ordinary instructions, syscalls and
+dispatch need no new counter or atomic update. The final check repeats all
+queue/source, timer, GPU, external wait, host admission and retirement conditions
+under the original queue mutex. Invalid observations retry scheduling and
+source readiness before sleeping. A valid native source parks with the same
+queue guard through the atomic condition-variable wait. The terminal decision
+and admission close are one transaction. Its Deadlocked cause uses the existing
+one-way control word, without acquiring a lifecycle report mutex under the
+queue lock or overwriting a prior normal exit.
+
+Deterministic regressions cover a new deadline or resource in the probe gap,
+ready/run/repark, superseded observers, valid native-source parking, earlier
+normal exit and genuine guest futex deadlock. All 487 shared session/process
+cases pass (three unchanged manual timing profiles remain ignored), along with
+strict core/Mac lints, 22 Mac tests, iPad ARM64 FFI and paired execution/completion
+boundaries. Installed Mac Dev completes and uploads the unchanged 12-CPU
+Geekbench 6.7.1 fixture: 4,335 single / 16,156 multi. This validates successful
+completion; the two original failing interleavings were not captured, and
+unfixed error-diagnostic builds also completed computation before the fix.
+[Full evidence](https://github.com/kb5000/trames-mac/blob/main/docs/validation/mac-geekbench.json)
+preserves the failures, diagnostics, exact binaries and component comparisons.
+Both Mac channels are updated; stable environments remain stopped and installed
+iPad apps are unchanged.
