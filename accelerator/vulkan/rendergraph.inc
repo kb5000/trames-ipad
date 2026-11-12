@@ -2,7 +2,7 @@
 // Normalize both renderpass generations to one copied attachment/subpass graph.
 // All pointers here still belong to the guest; the host builds owned native records.
 typedef struct rg_block {struct rg_block *next;uint64_t words[];} RGBlock;
-typedef struct {RGBlock *blocks;VkResult result;} RGArena;
+typedef struct {RGBlock *blocks;VkResult result;uint32_t dependency_stride;} RGArena;
 static uint64_t *rg_alloc(RGArena *a,size_t count,size_t width){
     if(!count)return NULL;
     if(count> (SIZE_MAX-sizeof(RGBlock))/(width*8)){a->result=VK_ERROR_OUT_OF_HOST_MEMORY;return NULL;}
@@ -10,7 +10,7 @@ static uint64_t *rg_alloc(RGArena *a,size_t count,size_t width){
     b->next=a->blocks;a->blocks=b;return b->words;
 }
 static VkResult rg_finish(RGArena *a,VkDevice d,uint64_t header[8],VkRenderPassCreateFlags flags,VkRenderPass *out){
-    VkResult r=a->result;if(r==VK_SUCCESS)r=CALL(217,KEY(d),PTR(header),PTR(out),flags);
+    VkResult r=a->result;if(r==VK_SUCCESS)r=CALL(217,KEY(d),PTR(header),PTR(out),flags,a->dependency_stride);
     while(a->blocks){RGBlock *next=a->blocks->next;free(a->blocks);a->blocks=next;}
     return r;
 }
@@ -68,7 +68,10 @@ static VkResult render_graph_legacy(VkDevice d,const VkRenderPassCreateInfo *inf
 }
 static VkResult render_graph_modern(VkDevice d,const VkRenderPassCreateInfo2 *info,VkRenderPass *out){
     RGArena a={0};uint64_t h[8]={info->attachmentCount,0,info->subpassCount,0,info->dependencyCount,0,info->correlatedViewMaskCount,PTR(info->pCorrelatedViewMasks)};
-    uint64_t *at=rg_alloc(&a,info->attachmentCount,11),*sub=rg_alloc(&a,info->subpassCount,14),*dep=rg_alloc(&a,info->dependencyCount,8);
+    uint32_t stride=8;
+    for(uint32_t i=0;i<info->dependencyCount;i++)if(find_next(info->pDependencies[i].pNext,VK_STRUCTURE_TYPE_MEMORY_BARRIER_2))stride=9;
+    a.dependency_stride=stride;
+    uint64_t *at=rg_alloc(&a,info->attachmentCount,11),*sub=rg_alloc(&a,info->subpassCount,14),*dep=rg_alloc(&a,info->dependencyCount,stride);
     h[1]=PTR(at);h[3]=PTR(sub);h[5]=PTR(dep);if(a.result!=VK_SUCCESS)return rg_finish(&a,d,h,info->flags,out);
     for(uint32_t i=0;i<info->attachmentCount;i++){
         const VkAttachmentDescription2 *x=info->pAttachments+i;uint64_t *v=at+i*11;
@@ -94,9 +97,10 @@ static VkResult render_graph_modern(VkDevice d,const VkRenderPassCreateInfo2 *in
         }
     }
     for(uint32_t i=0;i<info->dependencyCount;i++){
-        const VkSubpassDependency2 *x=info->pDependencies+i;uint64_t *v=dep+i*8;
+        const VkSubpassDependency2 *x=info->pDependencies+i;uint64_t *v=dep+i*stride;
         if(!VALID(x,VK_STRUCTURE_TYPE_SUBPASS_DEPENDENCY_2)){a.result=VK_ERROR_FEATURE_NOT_PRESENT;break;}
         v[0]=x->srcSubpass;v[1]=x->dstSubpass;v[2]=x->srcStageMask;v[3]=x->dstStageMask;v[4]=x->srcAccessMask;v[5]=x->dstAccessMask;v[6]=x->dependencyFlags;v[7]=(int64_t)x->viewOffset;
+        if(stride==9){const VkMemoryBarrier2 *m=find_next(x->pNext,VK_STRUCTURE_TYPE_MEMORY_BARRIER_2);v[8]=m!=NULL;if(m){v[2]=m->srcStageMask;v[3]=m->dstStageMask;v[4]=m->srcAccessMask;v[5]=m->dstAccessMask;}}
     }
     return rg_finish(&a,d,h,info->flags,out);
 }

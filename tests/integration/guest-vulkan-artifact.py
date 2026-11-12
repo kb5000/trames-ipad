@@ -24,7 +24,7 @@ with tempfile.TemporaryDirectory(prefix='trames-guest-artifact-') as temporary:
     output.mkdir()
     binary = output / 'libtrames_vulkan_icd.so'
     binary.write_bytes(b'fixture artifact')
-    manifest = {'wire_revision': 19, 'source_sha256': {
+    manifest = {'wire_revision': 20, 'source_sha256': {
         'accelerator/vulkan/icd.c': digest(inputs / 'icd.c')},
         'build_recipe_sha256': digest(recipe), 'icd_sha256': digest(binary)}
     path = output / 'manifest.json'

@@ -281,6 +281,18 @@
     if(!strcmp(name,"vkCmdWaitEvents"))return (PFN_vkVoidFunction)vkCmdWaitEvents;
     if(!strcmp(name,"vkGetDeviceMemoryCommitment"))return (PFN_vkVoidFunction)vkGetDeviceMemoryCommitment;
     if(!strcmp(name,"vkGetImageSubresourceLayout"))return (PFN_vkVoidFunction)vkGetImageSubresourceLayout;
+    if(!strcmp(name,"vkCmdPipelineBarrier2"))return (PFN_vkVoidFunction)vkCmdPipelineBarrier2;
+    if(!strcmp(name,"vkCmdSetEvent2"))return (PFN_vkVoidFunction)vkCmdSetEvent2;
+    if(!strcmp(name,"vkCmdResetEvent2"))return (PFN_vkVoidFunction)vkCmdResetEvent2;
+    if(!strcmp(name,"vkCmdWaitEvents2"))return (PFN_vkVoidFunction)vkCmdWaitEvents2;
+    if(!strcmp(name,"vkCmdWriteTimestamp2"))return (PFN_vkVoidFunction)vkCmdWriteTimestamp2;
+    if(!strcmp(name,"vkQueueSubmit2"))return (PFN_vkVoidFunction)vkQueueSubmit2;
+    if(!strcmp(name,"vkCmdPipelineBarrier2KHR"))return (PFN_vkVoidFunction)vkCmdPipelineBarrier2KHR;
+    if(!strcmp(name,"vkCmdSetEvent2KHR"))return (PFN_vkVoidFunction)vkCmdSetEvent2KHR;
+    if(!strcmp(name,"vkCmdResetEvent2KHR"))return (PFN_vkVoidFunction)vkCmdResetEvent2KHR;
+    if(!strcmp(name,"vkCmdWaitEvents2KHR"))return (PFN_vkVoidFunction)vkCmdWaitEvents2KHR;
+    if(!strcmp(name,"vkCmdWriteTimestamp2KHR"))return (PFN_vkVoidFunction)vkCmdWriteTimestamp2KHR;
+    if(!strcmp(name,"vkQueueSubmit2KHR"))return (PFN_vkVoidFunction)vkQueueSubmit2KHR;
     if(!strcmp(name,"vkCreateSamplerYcbcrConversion"))return (PFN_vkVoidFunction)vkCreateSamplerYcbcrConversion;
     if(!strcmp(name,"vkDestroySamplerYcbcrConversion"))return (PFN_vkVoidFunction)vkDestroySamplerYcbcrConversion;
     if(!strcmp(name,"vkCreateSamplerYcbcrConversionKHR"))return (PFN_vkVoidFunction)vkCreateSamplerYcbcrConversionKHR;

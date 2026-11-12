@@ -469,7 +469,7 @@ VKAPI_ATTR VkResult VKAPI_CALL vkGetFenceStatus(VkDevice d,VkFence f) {return CA
 static uint64_t now_ns(void) {struct timespec t;clock_gettime(CLOCK_MONOTONIC,&t);return (uint64_t)t.tv_sec*1000000000UL+(uint64_t)t.tv_nsec;}
 VKAPI_ATTR VkResult VKAPI_CALL vkWaitForFences(VkDevice d,uint32_t count,const VkFence *fences,VkBool32 all,uint64_t timeout) {
     if(D(d)->bridge&2)return CALL(201,KEY(d),PTR(fences),count,all,timeout);
-    if(!count || count>64)return VK_ERROR_FEATURE_NOT_PRESENT;uint64_t began=now_ns();
+    if(!count)return VK_ERROR_FEATURE_NOT_PRESENT;uint64_t began=now_ns();
     for(;;){unsigned ready=0;for(uint32_t i=0;i<count;i++){VkResult r=vkGetFenceStatus(d,fences[i]);if(r==VK_SUCCESS)ready++;else if(r!=VK_NOT_READY)return r;}
         if(ready==(all?count:1) || (!all && ready))return VK_SUCCESS;
         uint64_t elapsed=now_ns()-began;if(timeout!=UINT64_MAX && elapsed>=timeout)return VK_TIMEOUT;
@@ -525,6 +525,7 @@ VKAPI_ATTR VkResult VKAPI_CALL vkMergePipelineCaches(VkDevice d,VkPipelineCache 
 #include "copy2.inc"
 #include "zink.inc"
 #include "sync.inc"
+#include "sync2.inc"
 #include "core12.inc"
 #include "templates.inc"
 #include "wayland.inc"

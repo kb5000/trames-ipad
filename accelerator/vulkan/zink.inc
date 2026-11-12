@@ -11,7 +11,7 @@ VKAPI_ATTR VkResult VKAPI_CALL vkSignalSemaphore(VkDevice d,const VkSemaphoreSig
 VKAPI_ATTR VkResult VKAPI_CALL vkSignalSemaphoreKHR(VkDevice d,const VkSemaphoreSignalInfo *info) {return vkSignalSemaphore(d,info);}
 VKAPI_ATTR VkResult VKAPI_CALL vkWaitSemaphores(VkDevice d,const VkSemaphoreWaitInfo *info,uint64_t timeout) {
     CHECK(info,VK_STRUCTURE_TYPE_SEMAPHORE_WAIT_INFO);
-    if(!info->semaphoreCount || info->semaphoreCount>64 || (info->flags&~VK_SEMAPHORE_WAIT_ANY_BIT))return VK_ERROR_FEATURE_NOT_PRESENT;
+    if(!info->semaphoreCount || (info->flags&~VK_SEMAPHORE_WAIT_ANY_BIT))return VK_ERROR_FEATURE_NOT_PRESENT;
     if(D(d)->bridge&2)return CALL(202,KEY(d),PTR(info->pSemaphores),PTR(info->pValues),info->semaphoreCount,info->flags,timeout);
     uint64_t began=now_ns();
     for(;;){

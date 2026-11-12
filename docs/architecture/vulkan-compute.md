@@ -848,8 +848,9 @@ physical iPad rendering has not been newly validated.
 Paired wire revision 19 adds `VK_EXT_extended_dynamic_state`,
 `VK_EXT_extended_dynamic_state2`, selected `VK_EXT_extended_dynamic_state3`
 features and `VK_EXT_host_image_copy`. The generated profile gates every feature
-against the original driver. API 1.2 remains advertised. Synchronization2 is not
-implemented or exposed; copy-commands2 is a separate dependency, not sync2.
+against the original driver. API 1.2 remains advertised. At that revision,
+synchronization2 was not implemented or exposed; the next section records its
+implementation. Copy-commands2 remains a separate API.
 
 Extended state records directly into the original command buffer on the caller.
 Native command tables are cached once per device. Pipeline creation preserves
@@ -942,3 +943,86 @@ native), one/twelve-CPU GPU output oracles, Firefox exact pixels, affected stric
 lints, artifact/boundary gates and iPad ARM64 FFI compilation pass. This is
 selected coverage; full CTS/WSI and physical iPad GPU acceptance remain unrun.
 Mac Dev is updated; stable and installed iPad apps retain their previous builds.
+
+
+## Original synchronization2 commands (2026-11-13)
+
+Paired wire revision 20 exposes `VK_KHR_synchronization2` only when the original
+native driver reports its extension and feature. API 1.2 remains advertised;
+this addition does not claim complete Vulkan 1.3 or conformance. Both core and
+KHR names are available for pipeline-barrier2, set/reset/wait-events2,
+write-timestamp2 and queue-submit2.
+
+Operations 266–270 record directly into the original command buffer on the
+caller, without unrelated submission-completion collection. Native entrypoints
+are cached once per device. Dependency records preserve 64-bit stage and access
+masks, including COPY/BLIT/RESOLVE/CLEAR and the separate shader-storage access
+bits. Device-only events, NONE stages, generic READ_ONLY/ATTACHMENT layouts and
+equal-layout image barriers retain original semantics. When synchronization2 is
+enabled, legacy queue submissions and subpass dependencies also permit NONE;
+clients that have not enabled the feature retain their original contract.
+
+Dependency headers contain seven words, with memory/buffer/image rows of
+4/9/14 words. Submit2 headers also contain seven words, with four-word semaphore
+and two-word command records. A call-owned arena uses 192 words of stack scratch
+and allocates overflow without a total record-count ceiling. Guest pointers do
+not escape the synchronous call. Renderpass2 dependencies use an optional
+nine-word row when a `VkMemoryBarrier2` pNext overrides the legacy masks; ordinary
+dependencies keep their existing eight-word path and allocation behavior.
+
+Operation 271 preserves every original submit boundary, timeline value, 64-bit
+wait/signal stage, command device mask and native fence. It shares the legacy
+submission ownership transaction, coherent-memory preparation and completion
+leases. A rejected batch does not publish binary signals or consume waits.
+Timeline waits are submitted to the native queue without polling their future
+value first. A narrow-stage Sync2 timeline signal does not prove that an entire
+command graph has completed; only an ALL_COMMANDS signal can participate in
+logical command-buffer reuse, while narrower signals retain native-fence
+authority. Actual resource ownership remains retained until native completion.
+No coordinator, resource-service thread, global CPU barrier or GPU wait is added.
+
+Original CTS coverage also removes two old bridge restrictions: framebuffers
+accept native 1D attachment views, and a pipeline's unused depth/stencil state is
+left to the original driver's Vulkan semantics. The same-source
+[Sync2 oracle](../../tests/fixtures/vulkan-sync2.c) runs outside Trames against
+the same native driver and inside the guest. It verifies actual SSBO compute,
+image readback, two events, timestamps, multiple submit boundaries, future host
+signals, arena overflow and legacy NONE-stage compatibility. A twelve-step
+GPU/host timeline chain verifies intermediate progress independently of a
+whole-batch fence. Build its guest executable and validated SPIR-V with
+`scripts/build-vulkan-sync2-fixtures.sh`, using the existing pinned headers and
+original Vulkan loader.
+
+A pending host timeline wait registers the requested value on the original
+exported `MTLSharedEvent`. Its system dispatch callback publishes only a weak
+scheduler readiness capability; it never reads guest memory or holds a backend
+borrow. Wait cancellation releases the observer, and a racing callback retains
+its own native shared owner until return. Notifications that have not fired keep
+only a weak owner. This also works for headless sessions with image import off:
+the internal Metal-object extension is enabled for timeline scheduling itself.
+The shared event listener uses the existing system dispatch pool, with no new
+Trames coordinator/service thread and no polling bus. A final submission fence
+alone cannot wake an intermediate host step when that step must signal the GPU
+before the final fence becomes reachable. The original native driver does not
+need a new patch for these callbacks. The one/twelve-CPU oracle exercises the
+same twelve-step chain and the native unit regression checks wake/cancellation
+without any submission fence at all.
+
+
+Selected original CTS acceptance for shared runtime `0fd9a28` reports
+**11,890 Pass / 19,493 NotSupported, zero errors** over 31,383 cases,
+including the unchanged 15,542-case baseline and 15,841 selected Sync2 cases.
+Acceptance combines the complete original run with an 11,021-case affected
+wait/semaphore/fence rerun after removing the old 64-element host-wait limit;
+other passing results are reused and the original reports remain intact.
+Sync2 itself reports 4,821 Pass / 11,020 NotSupported.
+This is selected coverage, not the entire 81,617-case Sync2 inventory, WSI CTS
+or Vulkan conformance. All 78 shared Vulkan tests (fourteen native GPU cases),
+strict affected lints, 22 Mac tests, paired artifact/boundary gates and iPad ARM64
+FFI compilation pass. One/twelve-CPU Sync2 and existing GPU output oracles pass.
+Firefox WebRender/Zink returns exact expected pixels without GL errors or context
+loss; this is a rendering regression, not a page/video performance comparison.
+The signed Mac Dev app is updated; stable and installed iPad apps are unchanged.
+Physical iPad GPU rendering is not newly validated. Original results, diagnostic
+failures, selections and baseline comparison remain in the
+[Mac validation record](https://github.com/kb5000/trames-mac/blob/main/docs/validation/mac-vulkan-cts.json).
