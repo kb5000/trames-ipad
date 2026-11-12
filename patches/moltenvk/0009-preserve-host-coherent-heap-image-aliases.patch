@@ -1,0 +1,23 @@
+--- a/MoltenVK/MoltenVK/GPUObjects/MVKImage.mm
++++ b/MoltenVK/MoltenVK/GPUObjects/MVKImage.mm
+@@ -410,7 +410,7 @@
+ 
+ 	MVKImageMemoryBinding* memBind = getMemoryBinding();
+ 	bool needsSync = memBind->needsHostReadSync(barrier);
+-	bool needsPull = ((!memBind->_mtlTexelBuffer || memBind->_ownsTexelBuffer) &&
++	bool needsPull = (memBind->shouldFlushHostMemory() &&
+ 					  memBind->isMemoryHostCoherent() &&
+ 					  barrier.newLayout == VK_IMAGE_LAYOUT_GENERAL &&
+ 					  mvkIsAnyFlagEnabled(barrier.dstAccessMask, (VK_ACCESS_HOST_READ_BIT | VK_ACCESS_MEMORY_READ_BIT)));
+@@ -565,7 +565,10 @@
+ #endif
+ }
+ 
+-bool MVKImageMemoryBinding::shouldFlushHostMemory() { return isMemoryHostAccessible() && (!_mtlTexelBuffer || _ownsTexelBuffer); }
++// Heap-backed resources and the mapped buffer already alias the same storage.
++// Copying linear texture bytes back into that heap corrupts the native layout.
++// Match MVKDeviceMemory::flushToDevice/pullFromDevice at this shared boundary.
++bool MVKImageMemoryBinding::shouldFlushHostMemory() { return isMemoryHostAccessible() && !_deviceMemory->getMTLHeap() && (!_mtlTexelBuffer || _ownsTexelBuffer); }
+ 
+ // Flushes the memory at the specified memory range into the MTLTexture. 
+ // Updates all subresources that overlap the specified range and are in an updatable layout state.

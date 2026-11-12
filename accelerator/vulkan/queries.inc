@@ -42,6 +42,13 @@ VKAPI_ATTR void VKAPI_CALL vkGetPhysicalDeviceProperties2(VkPhysicalDevice p,VkP
     VkBaseOutStructure *next=out->pNext;
     for(unsigned i=0;next && i<64;i++,next=next->pNext){
         compute_properties_output(p,next);
+        if(next->sType==VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLE_LOCATIONS_PROPERTIES_EXT && (D(p)->compute_caps[0]&(1UL<<43)))checked(CALL(264,KEY(p),PTR(&((VkPhysicalDeviceSampleLocationsPropertiesEXT*)next)->sampleLocationSampleCounts)));
+
+        if(next->sType==VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_IMAGE_COPY_PROPERTIES_EXT && (D(p)->compute_caps[0]&(1UL<<39))){
+            VkPhysicalDeviceHostImageCopyPropertiesEXT *v=(void*)next;uint64_t h[6]={v->copySrcLayoutCount,PTR(v->pCopySrcLayouts),v->copyDstLayoutCount,PTR(v->pCopyDstLayouts),PTR(v->optimalTilingLayoutUUID),PTR(&v->identicalMemoryTypeRequirements)};
+            checked(CALL(257,KEY(p),PTR(h)));v->copySrcLayoutCount=h[0];v->copyDstLayoutCount=h[2];
+        }
+
         if(next->sType==VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_DIVISOR_PROPERTIES_EXT)
             checked(CALL(150,KEY(p),PTR(&((VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT *)next)->maxVertexAttribDivisor)));
         if(next->sType==VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TRANSFORM_FEEDBACK_PROPERTIES_EXT){
@@ -83,6 +90,13 @@ VKAPI_ATTR void VKAPI_CALL vkGetPhysicalDeviceFormatProperties2(VkPhysicalDevice
     query_output(out,VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2);
     vkGetPhysicalDeviceFormatProperties(p,format,&out->formatProperties);
     for(VkBaseOutStructure *n=out->pNext;n;n=n->pNext) {
+        if(n->sType==VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3 && (D(p)->compute_caps[0]&(1UL<<41))){
+            VkFormatProperties3 *v=(void*)n;uint64_t native[3];checked(CALL(256,KEY(p),format,PTR(native)));
+            uint64_t high=VK_FORMAT_FEATURE_2_STORAGE_READ_WITHOUT_FORMAT_BIT|VK_FORMAT_FEATURE_2_STORAGE_WRITE_WITHOUT_FORMAT_BIT|VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_DEPTH_COMPARISON_BIT|VK_FORMAT_FEATURE_2_HOST_IMAGE_TRANSFER_BIT_EXT;
+            v->linearTilingFeatures=out->formatProperties.linearTilingFeatures|(native[0]&high);
+            v->optimalTilingFeatures=out->formatProperties.optimalTilingFeatures|(native[1]&high);
+            v->bufferFeatures=out->formatProperties.bufferFeatures|(native[2]&high);
+        }
         if(n->sType==VK_STRUCTURE_TYPE_DRM_FORMAT_MODIFIER_PROPERTIES_LIST_EXT) {
             VkDrmFormatModifierPropertiesListEXT *list=(void*)n;unsigned count=native_external_format(D(p),format)?1:0;
             if(list->pDrmFormatModifierProperties && list->drmFormatModifierCount && count)
@@ -119,6 +133,9 @@ VKAPI_ATTR VkResult VKAPI_CALL vkGetPhysicalDeviceImageFormatProperties2(VkPhysi
     VkSamplerYcbcrConversionImageFormatProperties *conversion=NULL;
     for(VkBaseOutStructure *n=out->pNext;n;n=n->pNext)if(n->sType==VK_STRUCTURE_TYPE_SAMPLER_YCBCR_CONVERSION_IMAGE_FORMAT_PROPERTIES)conversion=(void *)n;
     VkResult result=CALL(59,KEY(p),info->format,info->type,native?VK_IMAGE_TILING_OPTIMAL:info->tiling,info->usage,info->flags,PTR(&out->imageFormatProperties),stencil?PTR(extra):extra[0],stencil?UINT64_MAX:extra[1],conversion?PTR(&conversion->combinedImageSamplerDescriptorCount):0);
+    if(result==VK_SUCCESS && (D(p)->compute_caps[0]&(1UL<<39)))for(VkBaseOutStructure *n=out->pNext;n;n=n->pNext)if(n->sType==VK_STRUCTURE_TYPE_HOST_IMAGE_COPY_DEVICE_PERFORMANCE_QUERY_EXT){
+        VkHostImageCopyDevicePerformanceQueryEXT *v=(void*)n;result=CALL(258,KEY(p),info->format,info->type,info->tiling,info->usage,info->flags,PTR(&v->optimalDeviceAccess),list?PTR(list->pViewFormats):0,list?list->viewFormatCount:0,stencil?stencil->stencilUsage:0);break;
+    }
     if(result==VK_SUCCESS && native){out->imageFormatProperties.maxMipLevels=1;out->imageFormatProperties.maxArrayLayers=1;out->imageFormatProperties.sampleCounts=VK_SAMPLE_COUNT_1_BIT;}
     return result;
 }

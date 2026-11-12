@@ -37,6 +37,14 @@ static const struct compute_extension compute_extensions[] = {
     {"VK_EXT_pipeline_creation_cache_control", 1UL << 33},
     {"VK_KHR_dynamic_rendering", 1UL << 34},
     {"VK_EXT_memory_budget", 1UL << 35},
+    {"VK_EXT_extended_dynamic_state", 1UL << 36},
+    {"VK_EXT_extended_dynamic_state2", 1UL << 37},
+    {"VK_EXT_extended_dynamic_state3", 1UL << 38},
+    {"VK_EXT_host_image_copy", 1UL << 39},
+    {"VK_KHR_copy_commands2", 1UL << 40},
+    {"VK_KHR_format_feature_flags2", 1UL << 41},
+    {"VK_EXT_line_rasterization", 1UL << 42},
+    {"VK_EXT_sample_locations", 1UL << 43},
 };
 static const struct compute_feature compute_features[] = {
     {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES, offsetof(VkPhysicalDevice16BitStorageFeatures, storageBuffer16BitAccess), 4, 0, 1UL << 1, VK_API_VERSION_1_1},
@@ -61,6 +69,11 @@ static const struct compute_feature compute_features[] = {
     {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_ATOMIC_INT64_FEATURES, offsetof(VkPhysicalDeviceShaderAtomicInt64Features, shaderBufferInt64Atomics), 2, 71, 1UL << 28, VK_API_VERSION_1_2},
     {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_CREATION_CACHE_CONTROL_FEATURES, offsetof(VkPhysicalDevicePipelineCreationCacheControlFeatures, pipelineCreationCacheControl), 1, 73, 1UL << 33, VK_API_VERSION_1_3},
     {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES, offsetof(VkPhysicalDeviceDynamicRenderingFeatures, dynamicRendering), 1, 74, 1UL << 34, VK_API_VERSION_1_3},
+    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_FEATURES_EXT, offsetof(VkPhysicalDeviceExtendedDynamicStateFeaturesEXT, extendedDynamicState), 1, 75, 1UL << 36, VK_API_VERSION_1_3},
+    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_2_FEATURES_EXT, offsetof(VkPhysicalDeviceExtendedDynamicState2FeaturesEXT, extendedDynamicState2), 3, 76, 1UL << 37, VK_API_VERSION_1_3},
+    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_3_FEATURES_EXT, offsetof(VkPhysicalDeviceExtendedDynamicState3FeaturesEXT, extendedDynamicState3TessellationDomainOrigin), 31, 79, 1UL << 38, UINT32_MAX},
+    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_IMAGE_COPY_FEATURES_EXT, offsetof(VkPhysicalDeviceHostImageCopyFeaturesEXT, hostImageCopy), 1, 110, 1UL << 39, VK_MAKE_API_VERSION(0, 1, 4, 0)},
+    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_LINE_RASTERIZATION_FEATURES_EXT, offsetof(VkPhysicalDeviceLineRasterizationFeaturesEXT, rectangularLines), 6, 111, 1UL << 42, UINT32_MAX},
 };
 static const struct compute_core12 compute_core12[] = {
     {39, 0},
@@ -83,6 +96,8 @@ static const struct compute_property compute_properties[] = {
     {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_PROPERTIES, offsetof(VkPhysicalDeviceDescriptorIndexingProperties, maxUpdateAfterBindDescriptorsInAllPools), 92, 1UL << 23, VK_API_VERSION_1_1},
     {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES, offsetof(VkPhysicalDeviceMultiviewProperties, maxMultiviewViewCount), 8, 1UL << 24, VK_API_VERSION_1_1},
     {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_STENCIL_RESOLVE_PROPERTIES, offsetof(VkPhysicalDeviceDepthStencilResolveProperties, supportedDepthResolveModes), 16, 1UL << 26, VK_API_VERSION_1_1},
+    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_3_PROPERTIES_EXT, offsetof(VkPhysicalDeviceExtendedDynamicState3PropertiesEXT, dynamicPrimitiveTopologyUnrestricted), 4, 1UL << 38, VK_API_VERSION_1_1},
+    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_LINE_RASTERIZATION_PROPERTIES_EXT, offsetof(VkPhysicalDeviceLineRasterizationPropertiesEXT, lineSubPixelPrecisionBits), 4, 1UL << 42, VK_API_VERSION_1_1},
     {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_3_PROPERTIES, offsetof(VkPhysicalDeviceMaintenance3Properties, maxPerSetDescriptors), 16, 1UL << 16, VK_API_VERSION_1_1},
     {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES, offsetof(VkPhysicalDeviceVulkan11Properties, deviceUUID), sizeof(VkPhysicalDeviceVulkan11Properties) - offsetof(VkPhysicalDeviceVulkan11Properties, deviceUUID), 0, VK_API_VERSION_1_1},
     {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES, offsetof(VkPhysicalDeviceVulkan12Properties, driverID), sizeof(VkPhysicalDeviceVulkan12Properties) - offsetof(VkPhysicalDeviceVulkan12Properties, driverID), 0, VK_API_VERSION_1_2},

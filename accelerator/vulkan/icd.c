@@ -63,7 +63,7 @@ static int wayland_available(void) {uint64_t available=0;return CALL(109,PTR(&av
 static VkResult display_extensions(const char *layer,uint32_t *count,VkExtensionProperties *out,int device,uint64_t caps,uint64_t compute) {
     if(layer)return VK_ERROR_LAYER_NOT_PRESENT;
     uint64_t info[3]={0};int fixed=display_info(0,info),wayland=wayland_available();
-    const char *names[64];uint32_t n=0;
+    const char *names[32+sizeof(compute_extensions)/sizeof(*compute_extensions)];uint32_t n=0;
     if(device){
         if(fixed || wayland)names[n++]=VK_KHR_SWAPCHAIN_EXTENSION_NAME;
         if(fixed || wayland)names[n++]=VK_KHR_INCREMENTAL_PRESENT_EXTENSION_NAME;
@@ -98,7 +98,7 @@ static VkResult display_extensions(const char *layer,uint32_t *count,VkExtension
         names[n++]=VK_KHR_EXTERNAL_MEMORY_CAPABILITIES_EXTENSION_NAME;
     }
     if(!out){*count=n;return VK_SUCCESS;}uint32_t capacity=*count;*count=capacity<n?capacity:n;
-    for(uint32_t i=0;i<*count;i++){memset(out+i,0,sizeof(*out));strcpy(out[i].extensionName,names[i]);out[i].specVersion=!strcmp(names[i],VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME)?3:(!strcmp(names[i],VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME) || !strcmp(names[i],VK_KHR_MAINTENANCE_1_EXTENSION_NAME) || !strcmp(names[i],VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME))?2:1;}
+    for(uint32_t i=0;i<*count;i++){memset(out+i,0,sizeof(*out));strcpy(out[i].extensionName,names[i]);out[i].specVersion=!strcmp(names[i],VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME)?3:(!strcmp(names[i],VK_KHR_FORMAT_FEATURE_FLAGS_2_EXTENSION_NAME) || !strcmp(names[i],VK_EXT_EXTENDED_DYNAMIC_STATE_3_EXTENSION_NAME))?2:(!strcmp(names[i],VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME) || !strcmp(names[i],VK_KHR_MAINTENANCE_1_EXTENSION_NAME) || !strcmp(names[i],VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME))?2:1;}
     return capacity<n?VK_INCOMPLETE:VK_SUCCESS;
 }
 static int extensions(uint32_t count,const char *const *names,int device) {
@@ -232,7 +232,7 @@ VKAPI_ATTR VkResult VKAPI_CALL vkCreateDevice(VkPhysicalDevice p,const VkDeviceC
     uint64_t feature_bits=0;
     if(features){
         const VkBool32 *v=(const VkBool32 *)features;
-        const size_t offsets[]={offsetof(VkPhysicalDeviceFeatures,samplerAnisotropy),offsetof(VkPhysicalDeviceFeatures,logicOp),offsetof(VkPhysicalDeviceFeatures,fillModeNonSolid),offsetof(VkPhysicalDeviceFeatures,shaderClipDistance),offsetof(VkPhysicalDeviceFeatures,independentBlend),offsetof(VkPhysicalDeviceFeatures,imageCubeArray),offsetof(VkPhysicalDeviceFeatures,sampleRateShading),offsetof(VkPhysicalDeviceFeatures,shaderImageGatherExtended),offsetof(VkPhysicalDeviceFeatures,shaderStorageImageExtendedFormats),offsetof(VkPhysicalDeviceFeatures,shaderStorageImageReadWithoutFormat),offsetof(VkPhysicalDeviceFeatures,shaderStorageImageWriteWithoutFormat),offsetof(VkPhysicalDeviceFeatures,vertexPipelineStoresAndAtomics),offsetof(VkPhysicalDeviceFeatures,fragmentStoresAndAtomics),offsetof(VkPhysicalDeviceFeatures,shaderUniformBufferArrayDynamicIndexing),offsetof(VkPhysicalDeviceFeatures,shaderSampledImageArrayDynamicIndexing),offsetof(VkPhysicalDeviceFeatures,shaderStorageBufferArrayDynamicIndexing),offsetof(VkPhysicalDeviceFeatures,shaderStorageImageArrayDynamicIndexing),offsetof(VkPhysicalDeviceFeatures,multiDrawIndirect),offsetof(VkPhysicalDeviceFeatures,drawIndirectFirstInstance),offsetof(VkPhysicalDeviceFeatures,textureCompressionETC2),offsetof(VkPhysicalDeviceFeatures,textureCompressionASTC_LDR),offsetof(VkPhysicalDeviceFeatures,textureCompressionBC),offsetof(VkPhysicalDeviceFeatures,shaderInt16),offsetof(VkPhysicalDeviceFeatures,shaderInt64),offsetof(VkPhysicalDeviceFeatures,alphaToOne),offsetof(VkPhysicalDeviceFeatures,robustBufferAccess),offsetof(VkPhysicalDeviceFeatures,fullDrawIndexUint32),offsetof(VkPhysicalDeviceFeatures,occlusionQueryPrecise)};
+        const size_t offsets[]={offsetof(VkPhysicalDeviceFeatures,samplerAnisotropy),offsetof(VkPhysicalDeviceFeatures,logicOp),offsetof(VkPhysicalDeviceFeatures,fillModeNonSolid),offsetof(VkPhysicalDeviceFeatures,shaderClipDistance),offsetof(VkPhysicalDeviceFeatures,independentBlend),offsetof(VkPhysicalDeviceFeatures,imageCubeArray),offsetof(VkPhysicalDeviceFeatures,sampleRateShading),offsetof(VkPhysicalDeviceFeatures,shaderImageGatherExtended),offsetof(VkPhysicalDeviceFeatures,shaderStorageImageExtendedFormats),offsetof(VkPhysicalDeviceFeatures,shaderStorageImageReadWithoutFormat),offsetof(VkPhysicalDeviceFeatures,shaderStorageImageWriteWithoutFormat),offsetof(VkPhysicalDeviceFeatures,vertexPipelineStoresAndAtomics),offsetof(VkPhysicalDeviceFeatures,fragmentStoresAndAtomics),offsetof(VkPhysicalDeviceFeatures,shaderUniformBufferArrayDynamicIndexing),offsetof(VkPhysicalDeviceFeatures,shaderSampledImageArrayDynamicIndexing),offsetof(VkPhysicalDeviceFeatures,shaderStorageBufferArrayDynamicIndexing),offsetof(VkPhysicalDeviceFeatures,shaderStorageImageArrayDynamicIndexing),offsetof(VkPhysicalDeviceFeatures,multiDrawIndirect),offsetof(VkPhysicalDeviceFeatures,drawIndirectFirstInstance),offsetof(VkPhysicalDeviceFeatures,textureCompressionETC2),offsetof(VkPhysicalDeviceFeatures,textureCompressionASTC_LDR),offsetof(VkPhysicalDeviceFeatures,textureCompressionBC),offsetof(VkPhysicalDeviceFeatures,shaderInt16),offsetof(VkPhysicalDeviceFeatures,shaderInt64),offsetof(VkPhysicalDeviceFeatures,alphaToOne),offsetof(VkPhysicalDeviceFeatures,robustBufferAccess),offsetof(VkPhysicalDeviceFeatures,fullDrawIndexUint32),offsetof(VkPhysicalDeviceFeatures,occlusionQueryPrecise),offsetof(VkPhysicalDeviceFeatures,depthClamp)};
         for(size_t j=0;j<sizeof(VkPhysicalDeviceFeatures)/sizeof(VkBool32);j++)if(v[j]){
             int found=0;if(v[j]!=VK_TRUE)return VK_ERROR_FEATURE_NOT_PRESENT;
             for(unsigned k=0;k<sizeof(offsets)/sizeof(offsets[0]);k++)if(j==offsets[k]/sizeof(VkBool32)){feature_bits|=1UL<<k;found=1;}
@@ -516,10 +516,13 @@ VKAPI_ATTR VkResult VKAPI_CALL vkGetPipelineCacheData(VkDevice d,VkPipelineCache
 VKAPI_ATTR VkResult VKAPI_CALL vkMergePipelineCaches(VkDevice d,VkPipelineCache dest,uint32_t count,const VkPipelineCache *sources) {if(count>64)return VK_ERROR_FEATURE_NOT_PRESENT;return CALL(131,KEY(d),(uint64_t)dest,count,PTR(sources));}
 
 #include "dynamic.inc"
+#include "extended.inc"
 #include "graphics.inc"
 #include "rendergraph.inc"
 #include "external.inc"
 #include "queries.inc"
+#include "host-copy.inc"
+#include "copy2.inc"
 #include "zink.inc"
 #include "sync.inc"
 #include "core12.inc"

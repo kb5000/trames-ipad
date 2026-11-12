@@ -101,8 +101,10 @@ blending, transfer color clears, draws, image layout barriers, buffer-to-image
 uploads and image-to-buffer copies are supported. Queue queries retain native
 graphics/compute/transfer flags. Image format queries expose only this profile:
 native-supported sample counts, mip chains and array/volume subresources, dimensions
-up to 4096 and at most 2048 array layers; allocation/session budgets still apply. Device memory uses explicit noncoherent transfers or coherent shadow
-mappings synchronized at the exposed host synchronization boundaries.
+up to 4096 and at most 2048 array layers; allocation/session budgets still apply. Device memory retains original native storage. Eligible aligned coherent mappings
+back guest pages directly; remaining mappings use explicit noncoherent transfers
+or coherent shadows at the exposed host synchronization boundaries. See
+[original allocation ownership](#native-extended-state-and-host-image-access-2026-11-12).
 
 Pipelines accept generated vertices or vertex/instance buffers (up to 16 bindings
 and attributes), triangle list/strip topology (including strip primitive restart), 16/32-bit index buffers and indexed
@@ -839,3 +841,104 @@ artifact/source/recipe gates, execution boundaries and iPad ARM64 FFI compilatio
 pass. Unchanged CPU/Linux/network/HVF checks are reused. Mac Dev is updated;
 stable and installed iPad apps are unchanged. The implementation is shared;
 physical iPad rendering has not been newly validated.
+
+
+## Native extended state and host image access (2026-11-12)
+
+Paired wire revision 19 adds `VK_EXT_extended_dynamic_state`,
+`VK_EXT_extended_dynamic_state2`, selected `VK_EXT_extended_dynamic_state3`
+features and `VK_EXT_host_image_copy`. The generated profile gates every feature
+against the original driver. API 1.2 remains advertised. Synchronization2 is not
+implemented or exposed; copy-commands2 is a separate dependency, not sync2.
+
+Extended state records directly into the original command buffer on the caller.
+Native command tables are cached once per device. Pipeline creation preserves
+static state that dynamic commands do not replace, including topology class,
+line width, depth bias, sample locations and line rasterization. Ignored static
+state and discarded draws remain the original driver's responsibility; the
+bridge does not mirror or replay scalar state or create pipeline variants.
+The supported EDS3 subset is depth-clamp enable, polygon mode, sample-locations
+enable and line-rasterization mode. Sample locations and line rasterization
+have their own native-gated dependencies. Depth-clip enable remains disabled
+because the required base depth-clip extension is not exposed. Native-absent
+features remain false. Patch-control-point commands are wired when supported,
+but this does not add the currently absent tessellation pipeline implementation.
+
+Operation 255 carries the dynamic-state selector and its owned flat arguments;
+pure recording skips unrelated completion collection. Pipeline config bit
+524288 adds an extended-state array at word 116; bit 1048576 adds line/sample
+state at 118; bit 2097152 adds the four original raster floats at 128. Existing
+object dependencies retain buffers and other resources through completion.
+No coordinator, service thread, pipeline cache policy or new synchronization is
+introduced.
+
+Host-copy operations 259–263 call the original synchronous native APIs for
+memory-to-image, image-to-memory, image-to-image, layout transition and
+subresource-layout2. Query operations 256–258 retain original format-feature2
+flags, supported layouts, layout UUID, memory requirements and performance
+properties. The guest serializers initialize ABI fields only. Region packets
+have bounded stack use without imposing a total region-count limit. CPU rows
+use the existing guest-memory access model, including physically noncontiguous
+pages and padding. A call-owned packed CPU buffer crosses the boundary; no guest
+pointer escapes. MEMCPY mode preserves native opaque layout and native size.
+There is no GPU staging allocation, command submission or global GPU wait.
+Only the affected mapped allocation uses existing coherence handling. The six
+copy-commands2 APIs use the existing original copy/blit/resolve resource graph;
+`VK_KHR_format_feature_flags2` preserves the native 64-bit flags.
+
+Generic Vulkan memory now retains the original driver allocation and image/buffer
+aliasing. External CPU-buffer import is restricted to an explicit dedicated-buffer
+contract. A host-coherent whole-allocation mapping with complete aligned host
+page granules can directly back the existing guest shared mapping. Its owner
+retains the native allocation, device, instance and original budget charge until
+the last guest view is released. Logical Vulkan unmap does not invalidate a live
+guest lease; the final owner unmaps and frees. Unaligned or partial cases retain
+the existing shadow path. No extra CPU-memory cap or memory-core model is added.
+
+MoltenVK patch 0009 fixes duplicate image synchronization on native Metal heaps.
+Its allocation-level flush/pull path already recognizes that heap buffers and
+textures share storage, but the image HOST_READ barrier path could still copy
+linear texture bytes into that same native heap, corrupting its image layout.
+A shared image synchronization predicate now excludes these original heap
+aliases, while preserving actual non-heap copies and managed-storage sync.
+The same-source [layout control](../../tests/fixtures/vulkan-host-layout.c)
+reproduces unequal raw bytes with the original native driver under
+`--mapped-images`; the patched native driver returns equal bytes without
+masking `identicalMemoryLayout` or changing the original layout UUID. Guest
+and native validation results are recorded in the
+[Mac graphics record](https://github.com/kb5000/trames-mac/blob/main/docs/validation/mac-vulkan-cts.json).
+
+Patch 0010 corrects a separate native capability error. MoltenVK advertised
+host-image transfer for depth/stencil formats, but its image allocation requires
+private storage for those formats and excludes private storage for HOST_TRANSFER.
+The original native control reports successful image support with
+`memoryTypeBits == 0`. The patched native format table no longer advertises that
+unusable combination, and its image-format query returns FORMAT_NOT_SUPPORTED;
+Mesa can use its ordinary depth-image path. Color host transfers remain enabled.
+This is a reproduced original-driver storage limitation, not a CTS waiver or a
+blanket host-copy disable. The same control also creates a sample-compatible
+depth image through both the guest ICD and the native API. Query, image creation
+and imageless framebuffer metadata accept that original image-create flag.
+
+Copy ingress retains Vulkan's size-compatible compressed/uncompressed block
+extents, 2D-array/3D slice correspondence and color buffer offsets aligned to the
+actual texel size. Source and destination bounds use their own representation;
+the original wire extent reaches the native command unchanged. Depth/stencil
+alignment remains intact. These shared copy rules apply to the existing commands,
+copy2 adapters and host image-to-image transfers.
+
+Host-managed sessions also stop treating 64 unfinished submission bookkeeping
+fences as out-of-host-memory. Fast native submission can legitimately outrun GPU
+completion, including the original CTS 32,768-submit semaphore chains. The
+original queue and actual resource allocation govern that path; no artificial
+GPU wait, retry, polling loop or resource-service thread is added. Explicitly
+constrained sessions retain their existing policy.
+
+
+Selected CTS acceptance for shared runtime `d3509e3` reports
+**7,069 Pass / 8,473 NotSupported,
+zero errors** over 15,542 original cases. All 76 shared Vulkan tests (twelve
+native), one/twelve-CPU GPU output oracles, Firefox exact pixels, affected strict
+lints, artifact/boundary gates and iPad ARM64 FFI compilation pass. This is
+selected coverage; full CTS/WSI and physical iPad GPU acceptance remain unrun.
+Mac Dev is updated; stable and installed iPad apps retain their previous builds.

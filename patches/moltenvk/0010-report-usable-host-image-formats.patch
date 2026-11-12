@@ -1,0 +1,16 @@
+--- a/MoltenVK/MoltenVK/GPUObjects/MVKPixelFormats.mm
++++ b/MoltenVK/MoltenVK/GPUObjects/MVKPixelFormats.mm
+@@ -1593,6 +1593,13 @@
+ 	enableFormatFeatures(DSAtt, Tex, mtlPixFmtCaps, vkProps.optimalTilingFeatures);
+ 	enableFormatFeatures(Blend, Tex, mtlPixFmtCaps, vkProps.optimalTilingFeatures);
+ 
++	// Depth/stencil textures require private memory in MVKImage, while
++	// HOST_TRANSFER excludes private memory. Advertising host copy would
++	// create images with no valid memory type and breaks client fallback.
++	if (mvkIsAnyFlagEnabled(vkProps.optimalTilingFeatures, VK_FORMAT_FEATURE_2_DEPTH_STENCIL_ATTACHMENT_BIT)) {
++		mvkDisableFlags(vkProps.optimalTilingFeatures, VK_FORMAT_FEATURE_2_HOST_IMAGE_TRANSFER_BIT);
++	}
++
+ 	if (isDepthFormat(vkDesc.mtlPixelFormat) && mvkIsAnyFlagEnabled(vkProps.optimalTilingFeatures, VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_BIT)) {
+ 		vkProps.optimalTilingFeatures |= VK_FORMAT_FEATURE_2_SAMPLED_IMAGE_DEPTH_COMPARISON_BIT;
+ 	}

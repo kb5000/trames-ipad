@@ -36,7 +36,7 @@ VKAPI_ATTR VkResult VKAPI_CALL vkCreateImage(VkDevice d,const VkImageCreateInfo 
         modifier->drmFormatModifier || modifier->drmFormatModifierPlaneCount!=1))return VK_ERROR_FORMAT_NOT_SUPPORTED;
     uint64_t extra[10]={list?PTR(list->pViewFormats):0,list?list->viewFormatCount:0,stencil?stencil->stencilUsage:0,
         external?external->handleTypes:0,modifier?modifier->drmFormatModifier:0,modifier?modifier->pPlaneLayouts[0].rowPitch:0,modifier?modifier->pPlaneLayouts[0].offset:0,modifier?modifier->drmFormatModifierPlaneCount:0,PTR(info->pQueueFamilyIndices),info->queueFamilyIndexCount};
-    if((info->flags&~(VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT|VK_IMAGE_CREATE_EXTENDED_USAGE_BIT|VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT|VK_IMAGE_CREATE_2D_ARRAY_COMPATIBLE_BIT)) || info->imageType>VK_IMAGE_TYPE_3D || !info->extent.depth || !info->mipLevels || !info->arrayLayers || !info->samples || info->samples>VK_SAMPLE_COUNT_64_BIT || (info->samples&(info->samples-1)) || (info->tiling>VK_IMAGE_TILING_LINEAR && !(external && info->tiling==VK_IMAGE_TILING_DRM_FORMAT_MODIFIER_EXT)) || info->sharingMode>VK_SHARING_MODE_CONCURRENT || (info->initialLayout!=VK_IMAGE_LAYOUT_UNDEFINED && info->initialLayout!=VK_IMAGE_LAYOUT_PREINITIALIZED))return VK_ERROR_FEATURE_NOT_PRESENT;
+    if((info->flags&~(VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT|VK_IMAGE_CREATE_EXTENDED_USAGE_BIT|VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT|VK_IMAGE_CREATE_2D_ARRAY_COMPATIBLE_BIT|VK_IMAGE_CREATE_SAMPLE_LOCATIONS_COMPATIBLE_DEPTH_BIT_EXT)) || info->imageType>VK_IMAGE_TYPE_3D || !info->extent.depth || !info->mipLevels || !info->arrayLayers || !info->samples || info->samples>VK_SAMPLE_COUNT_64_BIT || (info->samples&(info->samples-1)) || (info->tiling>VK_IMAGE_TILING_LINEAR && !(external && info->tiling==VK_IMAGE_TILING_DRM_FORMAT_MODIFIER_EXT)) || info->sharingMode>VK_SHARING_MODE_CONCURRENT || (info->initialLayout!=VK_IMAGE_LAYOUT_UNDEFINED && info->initialLayout!=VK_IMAGE_LAYOUT_PREINITIALIZED))return VK_ERROR_FEATURE_NOT_PRESENT;
     return CALL(60,KEY(d),info->format,info->extent.width,info->extent.height,info->usage,PTR(out),info->initialLayout,(stencil||external||info->sharingMode==VK_SHARING_MODE_CONCURRENT)?PTR(extra):extra[0],info->sharingMode==VK_SHARING_MODE_CONCURRENT?UINT64_MAX-2:external?UINT64_MAX-1:stencil?UINT64_MAX:extra[1],info->flags,info->imageType,info->extent.depth,info->mipLevels,info->arrayLayers,info->samples,info->tiling);
 }
 VKAPI_ATTR void VKAPI_CALL vkDestroyImage(VkDevice d,VkImage image,const VkAllocationCallbacks *allocator) {if(image)checked(CALL(61,KEY(d),(uint64_t)image));if(allocator || D(d)->custom_allocator)allocation_release(D(d),(uint64_t)image);}
@@ -98,18 +98,31 @@ VKAPI_ATTR VkResult VKAPI_CALL vkCreateGraphicsPipelines(VkDevice d,VkPipelineCa
     OBJECT_ALLOCATOR(d,allocator,VK_SYSTEM_ALLOCATION_SCOPE_OBJECT);*out=VK_NULL_HANDLE;
     CHECK(info,VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO);
     if((info->flags&~(VK_PIPELINE_CREATE_DISABLE_OPTIMIZATION_BIT|VK_PIPELINE_CREATE_ALLOW_DERIVATIVES_BIT|VK_PIPELINE_CREATE_DERIVATIVE_BIT|VK_PIPELINE_CREATE_FAIL_ON_PIPELINE_COMPILE_REQUIRED_BIT|VK_PIPELINE_CREATE_EARLY_RETURN_ON_FAILURE_BIT)) || info->stageCount<1 || info->stageCount>2)return unsupported_graphics_pipeline(__LINE__);
+    const VkPipelineDynamicStateCreateInfo *dynamic=info->pDynamicState;unsigned states=0,extended_count=0;uint32_t extended[32];
+    if(dynamic){CHECK(dynamic,VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO);if(dynamic->flags || dynamic->dynamicStateCount>41)return unsupported_graphics_pipeline(__LINE__);for(unsigned i=0;i<dynamic->dynamicStateCount;i++){VkDynamicState value=dynamic->pDynamicStates[i];if(value<=VK_DYNAMIC_STATE_STENCIL_REFERENCE){unsigned bit=1u<<value;if(states&bit)return unsupported_graphics_pipeline(__LINE__);states|=bit;}else{if(!extended_dynamic(value) || extended_count==32)return unsupported_graphics_pipeline(__LINE__);for(unsigned j=0;j<extended_count;j++)if(extended[j]==(uint32_t)value)return unsupported_graphics_pipeline(__LINE__);extended[extended_count++]=value;}}}
+    if(pipeline_dynamic(info,VK_DYNAMIC_STATE_VIEWPORT_WITH_COUNT))states|=1;
+    if(pipeline_dynamic(info,VK_DYNAMIC_STATE_SCISSOR_WITH_COUNT))states|=2;
     const VkPipelineRenderingCreateInfo *rendering=info->renderPass?NULL:find_next(info->pNext,VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO);
     if(rendering && rendering->colorAttachmentCount>8)return unsupported_graphics_pipeline(__LINE__);
     const VkPipelineShaderStageCreateInfo *vertex=NULL,*fragment=NULL;
     for(unsigned i=0;i<info->stageCount;i++){const VkPipelineShaderStageCreateInfo *s=&info->pStages[i];CHECK(s,VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO);if(s->flags)return unsupported_graphics_pipeline(__LINE__);if(s->stage==VK_SHADER_STAGE_VERTEX_BIT && !vertex)vertex=s;else if(s->stage==VK_SHADER_STAGE_FRAGMENT_BIT && !fragment)fragment=s;else return unsupported_graphics_pipeline(__LINE__);}
     const VkPipelineVertexInputStateCreateInfo *v=info->pVertexInputState;if(!v || v->sType!=VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO)return unsupported_graphics_pipeline(__LINE__);if(v->flags || v->vertexBindingDescriptionCount>16 || v->vertexAttributeDescriptionCount>16)return unsupported_graphics_pipeline(__LINE__);
-    const VkPipelineInputAssemblyStateCreateInfo *a=info->pInputAssemblyState;CHECK(a,VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO);if(a->flags || (a->primitiveRestartEnable && a->topology!=VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP && a->topology!=VK_PRIMITIVE_TOPOLOGY_LINE_STRIP && a->topology!=VK_PRIMITIVE_TOPOLOGY_TRIANGLE_FAN))return unsupported_graphics_pipeline(__LINE__);
-    const VkPipelineRasterizationStateCreateInfo *r=info->pRasterizationState;CHECK(r,VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO);
+    const VkPipelineInputAssemblyStateCreateInfo *a=info->pInputAssemblyState;CHECK(a,VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO);VkPipelineInputAssemblyStateCreateInfo assembly=*a;a=&assembly;if(pipeline_dynamic(info,VK_DYNAMIC_STATE_PRIMITIVE_RESTART_ENABLE))assembly.primitiveRestartEnable=VK_FALSE;if(a->flags)return unsupported_graphics_pipeline(__LINE__);
+    VkPipelineRasterizationStateCreateInfo default_raster={.sType=VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,.lineWidth=1.0f};
+    const VkPipelineRasterizationStateCreateInfo *r=info->pRasterizationState?info->pRasterizationState:&default_raster;CHECK(r,VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO);
+    VkPipelineRasterizationStateCreateInfo raster=*r;r=&raster;
+    if(pipeline_dynamic(info,VK_DYNAMIC_STATE_LINE_WIDTH))raster.lineWidth=1.0f;
+    if(pipeline_dynamic(info,VK_DYNAMIC_STATE_CULL_MODE))raster.cullMode=VK_CULL_MODE_NONE;
+    if(pipeline_dynamic(info,VK_DYNAMIC_STATE_FRONT_FACE))raster.frontFace=VK_FRONT_FACE_COUNTER_CLOCKWISE;
+    if(pipeline_dynamic(info,VK_DYNAMIC_STATE_RASTERIZER_DISCARD_ENABLE))raster.rasterizerDiscardEnable=VK_FALSE;
+    if(pipeline_dynamic(info,VK_DYNAMIC_STATE_DEPTH_BIAS_ENABLE))raster.depthBiasEnable=VK_FALSE;
+    if(pipeline_dynamic(info,VK_DYNAMIC_STATE_DEPTH_CLAMP_ENABLE_EXT))raster.depthClampEnable=VK_FALSE;
+    if(pipeline_dynamic(info,VK_DYNAMIC_STATE_POLYGON_MODE_EXT))raster.polygonMode=VK_POLYGON_MODE_FILL;
     VkPipelineRasterizationStateCreateInfo discarded={.sType=VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,.rasterizerDiscardEnable=VK_TRUE,.lineWidth=1.0f};
     if(r->rasterizerDiscardEnable)r=&discarded;
-    if(r->flags || r->depthClampEnable || r->polygonMode>VK_POLYGON_MODE_POINT || r->lineWidth!=1.0f)return unsupported_graphics_pipeline(__LINE__);
+    if(r->flags || r->polygonMode>VK_POLYGON_MODE_POINT)return unsupported_graphics_pipeline(__LINE__);
     VkPipelineViewportStateCreateInfo unused_viewport={.sType=VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,.viewportCount=1,.scissorCount=1};
-    const VkPipelineViewportStateCreateInfo *p=r->rasterizerDiscardEnable?&unused_viewport:info->pViewportState;CHECK(p,VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO);if(p->flags || p->viewportCount!=1 || p->scissorCount!=1)return unsupported_graphics_pipeline(__LINE__);
+    const VkPipelineViewportStateCreateInfo *p=(r->rasterizerDiscardEnable || (pipeline_dynamic(info,VK_DYNAMIC_STATE_VIEWPORT_WITH_COUNT) && pipeline_dynamic(info,VK_DYNAMIC_STATE_SCISSOR_WITH_COUNT)))?&unused_viewport:info->pViewportState;CHECK(p,VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO);if(p->flags || (!pipeline_dynamic(info,VK_DYNAMIC_STATE_VIEWPORT_WITH_COUNT) && p->viewportCount!=1) || (!pipeline_dynamic(info,VK_DYNAMIC_STATE_SCISSOR_WITH_COUNT) && p->scissorCount!=1))return unsupported_graphics_pipeline(__LINE__);
     if(!vertex)return unsupported_graphics_pipeline(__LINE__);
     VkPipelineMultisampleStateCreateInfo unused_multisample={.sType=VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,.rasterizationSamples=VK_SAMPLE_COUNT_1_BIT};
     const VkPipelineMultisampleStateCreateInfo *m=r->rasterizerDiscardEnable?&unused_multisample:info->pMultisampleState;CHECK(m,VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO);
@@ -117,15 +130,29 @@ VKAPI_ATTR VkResult VKAPI_CALL vkCreateGraphicsPipelines(VkDevice d,VkPipelineCa
         if(getenv("TRAMES_VULKAN_TRACE"))fprintf(stderr,"Trames Vulkan: multisample flags=%u samples=%u shading=%u coverage=%u alphaOne=%u mask=%08x\n",m->flags,m->rasterizationSamples,m->sampleShadingEnable,m->alphaToCoverageEnable,m->alphaToOneEnable,m->pSampleMask?m->pSampleMask[0]:UINT32_MAX);
         return unsupported_graphics_pipeline(__LINE__);
     }
-    const VkPipelineDepthStencilStateCreateInfo *z=(r->rasterizerDiscardEnable || (!info->renderPass && (!rendering || (!rendering->depthAttachmentFormat && !rendering->stencilAttachmentFormat))))?NULL:info->pDepthStencilState;if(z){CHECK(z,VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO);if(z->flags || z->depthBoundsTestEnable || z->depthCompareOp>VK_COMPARE_OP_ALWAYS)return unsupported_graphics_pipeline(__LINE__);}
+    const VkPipelineDepthStencilStateCreateInfo *z=(r->rasterizerDiscardEnable || (!info->renderPass && (!rendering || (!rendering->depthAttachmentFormat && !rendering->stencilAttachmentFormat))))?NULL:info->pDepthStencilState;
+    VkPipelineDepthStencilStateCreateInfo depth_state;if(z){CHECK(z,VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO);depth_state=*z;z=&depth_state;
+    if(pipeline_dynamic(info,VK_DYNAMIC_STATE_DEPTH_TEST_ENABLE))depth_state.depthTestEnable=VK_FALSE;
+    if(pipeline_dynamic(info,VK_DYNAMIC_STATE_DEPTH_WRITE_ENABLE))depth_state.depthWriteEnable=VK_FALSE;
+    if(pipeline_dynamic(info,VK_DYNAMIC_STATE_DEPTH_COMPARE_OP))depth_state.depthCompareOp=VK_COMPARE_OP_ALWAYS;
+    if(pipeline_dynamic(info,VK_DYNAMIC_STATE_DEPTH_BOUNDS_TEST_ENABLE))depth_state.depthBoundsTestEnable=VK_FALSE;
+    if(pipeline_dynamic(info,VK_DYNAMIC_STATE_STENCIL_TEST_ENABLE))depth_state.stencilTestEnable=VK_FALSE;
+    if(pipeline_dynamic(info,VK_DYNAMIC_STATE_STENCIL_OP)){depth_state.front.failOp=depth_state.front.passOp=depth_state.front.depthFailOp=depth_state.back.failOp=depth_state.back.passOp=depth_state.back.depthFailOp=VK_STENCIL_OP_KEEP;depth_state.front.compareOp=depth_state.back.compareOp=VK_COMPARE_OP_ALWAYS;}
+    if(z->flags || z->depthBoundsTestEnable || z->depthCompareOp>VK_COMPARE_OP_ALWAYS)return unsupported_graphics_pipeline(__LINE__);}
     VkPipelineColorBlendStateCreateInfo unused_blend={.sType=VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO};
     const VkPipelineColorBlendStateCreateInfo *b=(r->rasterizerDiscardEnable || (!info->renderPass && (!rendering || !rendering->colorAttachmentCount)))?&unused_blend:info->pColorBlendState;CHECK(b,VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO);if(b->flags || b->logicOp>VK_LOGIC_OP_SET || b->attachmentCount>8)return unsupported_graphics_pipeline(__LINE__);
-    const VkPipelineDynamicStateCreateInfo *dynamic=info->pDynamicState;unsigned states=0;
-    if(dynamic){CHECK(dynamic,VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO);if(dynamic->flags || dynamic->dynamicStateCount>9)return unsupported_graphics_pipeline(__LINE__);for(unsigned i=0;i<dynamic->dynamicStateCount;i++){unsigned bit=dynamic->pDynamicStates[i]<=VK_DYNAMIC_STATE_STENCIL_REFERENCE?1u<<dynamic->pDynamicStates[i]:0;if(!bit || (states&bit))return unsupported_graphics_pipeline(__LINE__);states|=bit;}}
-    if(r->depthBiasEnable && !(states&(1u<<VK_DYNAMIC_STATE_DEPTH_BIAS)) && (r->depthBiasConstantFactor!=0 || r->depthBiasClamp!=0 || r->depthBiasSlopeFactor!=0))return unsupported_graphics_pipeline(__LINE__);
     if(r->rasterizerDiscardEnable)states|=3;
-    uint64_t config[23+8*8+15+1+8+5]={states|512|1024|2048|4096|16384|32768|65536|131072};config[102]=info->flags;config[22]=b->attachmentCount;
+    uint64_t config[23+8*8+15+1+8+5+2+10+4]={states|512|1024|2048|4096|16384|32768|65536|131072};config[102]=info->flags;config[22]=b->attachmentCount;if(extended_count){config[0]|=524288;config[116]=extended_count;config[117]=PTR(extended);}
     if(!info->renderPass){config[0]|=262144;if(rendering){config[111]=rendering->viewMask;config[112]=rendering->colorAttachmentCount;config[113]=PTR(rendering->pColorAttachmentFormats);config[114]=rendering->depthAttachmentFormat;config[115]=rendering->stencilAttachmentFormat;}}
+    const VkPipelineRasterizationLineStateCreateInfoEXT *line=find_next(r->pNext,VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_LINE_STATE_CREATE_INFO_EXT);
+    const VkPipelineSampleLocationsStateCreateInfoEXT *locations=find_next(m->pNext,VK_STRUCTURE_TYPE_PIPELINE_SAMPLE_LOCATIONS_STATE_CREATE_INFO_EXT);
+    if(line || locations){config[0]|=1048576;
+        if(line){config[118]=pipeline_dynamic(info,VK_DYNAMIC_STATE_LINE_RASTERIZATION_MODE_EXT)?VK_LINE_RASTERIZATION_MODE_DEFAULT_EXT:line->lineRasterizationMode;config[119]=line->stippledLineEnable;config[120]=line->lineStippleFactor;config[121]=line->lineStipplePattern;}
+        if(locations){config[122]=pipeline_dynamic(info,VK_DYNAMIC_STATE_SAMPLE_LOCATIONS_ENABLE_EXT)?VK_FALSE:locations->sampleLocationsEnable;
+            if(locations->sampleLocationsEnable || pipeline_dynamic(info,VK_DYNAMIC_STATE_SAMPLE_LOCATIONS_ENABLE_EXT)){const VkSampleLocationsInfoEXT *v=&locations->sampleLocationsInfo;if(!pipeline_dynamic(info,VK_DYNAMIC_STATE_SAMPLE_LOCATIONS_EXT)){config[123]=v->sampleLocationsPerPixel;config[124]=v->sampleLocationGridSize.width;config[125]=v->sampleLocationGridSize.height;config[126]=v->sampleLocationsCount;config[127]=PTR(v->pSampleLocations);}}
+        }
+    }
+    float raster_values[4]={r->lineWidth,r->depthBiasConstantFactor,r->depthBiasClamp,r->depthBiasSlopeFactor};uint32_t raster_bits[4];memcpy(raster_bits,raster_values,sizeof(raster_bits));config[0]|=2097152;for(unsigned i=0;i<4;i++)config[128+i]=raster_bits[i];
     // Copy the original sample masks/state before asynchronous native compile.
     config[11]=m->pSampleMask?m->pSampleMask[0]:UINT32_MAX;
     config[13]=m->rasterizationSamples;config[14]=m->pSampleMask && m->rasterizationSamples==VK_SAMPLE_COUNT_64_BIT?m->pSampleMask[1]:UINT32_MAX;
@@ -155,7 +182,7 @@ VKAPI_ATTR VkResult VKAPI_CALL vkCreateGraphicsPipelines(VkDevice d,VkPipelineCa
     }
     uint64_t state[6]={(uint64_t)info->renderPass,a->topology,r->cullMode,r->frontFace,b->attachmentCount?b->pAttachments[0].colorWriteMask:0,info->subpass};
     uint64_t bindings[16][4],attributes[16][4];
-    for(uint32_t i=0;i<v->vertexBindingDescriptionCount;i++){const VkVertexInputBindingDescription *x=&v->pVertexBindingDescriptions[i];bindings[i][0]=x->binding;bindings[i][1]=x->stride;bindings[i][2]=x->inputRate;bindings[i][3]=1;}
+    for(uint32_t i=0;i<v->vertexBindingDescriptionCount;i++){const VkVertexInputBindingDescription *x=&v->pVertexBindingDescriptions[i];bindings[i][0]=x->binding;bindings[i][1]=pipeline_dynamic(info,VK_DYNAMIC_STATE_VERTEX_INPUT_BINDING_STRIDE)?0:x->stride;bindings[i][2]=x->inputRate;bindings[i][3]=1;}
     const VkPipelineVertexInputDivisorStateCreateInfoEXT *ds=find_next(v->pNext,VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_DIVISOR_STATE_CREATE_INFO_EXT);
     if(ds){
         if(!(D(d)->enabled&32768) || !VALID(ds,VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_DIVISOR_STATE_CREATE_INFO_EXT) || !ds->vertexBindingDivisorCount || ds->vertexBindingDivisorCount>16 || !ds->pVertexBindingDivisors)return unsupported_graphics_pipeline(__LINE__);
@@ -168,7 +195,7 @@ VKAPI_ATTR VkResult VKAPI_CALL vkCreateGraphicsPipelines(VkDevice d,VkPipelineCa
         }
     }
     for(uint32_t i=0;i<v->vertexAttributeDescriptionCount;i++){const VkVertexInputAttributeDescription *x=&v->pVertexAttributeDescriptions[i];attributes[i][0]=x->location;attributes[i][1]=x->binding;attributes[i][2]=x->format;attributes[i][3]=x->offset;}
-    return CALL(70,KEY(d),(uint64_t)info->layout,(uint64_t)vertex->module,fragment?(uint64_t)fragment->module:0,PTR(vertex->pName),fragment?PTR(fragment->pName):0,PTR(state),PTR(out),PTR(bindings),v->vertexBindingDescriptionCount,PTR(attributes),v->vertexAttributeDescriptionCount,a->primitiveRestartEnable,(uint64_t)cache,((z?((z->depthTestEnable?1UL:0)|(z->depthWriteEnable?2UL:0)|((uint64_t)z->depthCompareOp<<4)):0)|((uint64_t)r->polygonMode<<8)|(b->logicOpEnable?1024UL:0)|((uint64_t)b->logicOp<<12)|(r->rasterizerDiscardEnable?65536UL:0)|(r->depthBiasEnable?131072UL:0)),PTR(config));
+    return CALL(70,KEY(d),(uint64_t)info->layout,(uint64_t)vertex->module,fragment?(uint64_t)fragment->module:0,PTR(vertex->pName),fragment?PTR(fragment->pName):0,PTR(state),PTR(out),PTR(bindings),v->vertexBindingDescriptionCount,PTR(attributes),v->vertexAttributeDescriptionCount,a->primitiveRestartEnable,(uint64_t)cache,((z?((z->depthTestEnable?1UL:0)|(z->depthWriteEnable?2UL:0)|((uint64_t)z->depthCompareOp<<4)):0)|((uint64_t)r->polygonMode<<8)|(b->logicOpEnable?1024UL:0)|((uint64_t)b->logicOp<<12)|(r->rasterizerDiscardEnable?65536UL:0)|(r->depthBiasEnable?131072UL:0)|(r->depthClampEnable?262144UL:0)),PTR(config));
 }
 static VkResult begin_pass(VkCommandBuffer c,const VkRenderPassBeginInfo *info,VkSubpassContents contents,unsigned op) {
     if(!info || info->sType!=VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO || contents>VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS)return VK_ERROR_FEATURE_NOT_PRESENT;
