@@ -415,7 +415,11 @@ fn run() -> Result<u8, Box<dyn std::error::Error>> {
         }
         vfs.configure_virtual_network(&fabric, id, network)?;
     } else {
-        vfs.configure_network(network)?;
+        if android_init {
+            vfs.configure_managed_uplink(network)?;
+        } else {
+            vfs.configure_network(network)?;
+        }
         for (virtual_ip, host_ip) in host_mappings {
             vfs.map_network_host_ip(virtual_ip, host_ip)?;
         }
@@ -511,6 +515,9 @@ fn run() -> Result<u8, Box<dyn std::error::Error>> {
             ..Default::default()
         },
     )?;
+    if android_init {
+        runtime.linux.task_limit = trames_distro::android::TASK_LIMIT;
+    }
     runtime.linux.trace = trace;
     if install_busybox {
         runtime

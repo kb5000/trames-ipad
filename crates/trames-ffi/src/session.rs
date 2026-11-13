@@ -656,13 +656,18 @@ fn run(
         trames_distro::synchronize_timezone(&mut vfs, &timezone.identifier, &timezone.data)
             .map_err(|e| e.to_string())?;
     }
-    vfs.configure_network(match options.network.as_str() {
+    let mode = match options.network.as_str() {
         "off" => NetworkMode::Off,
         "loopback" => NetworkMode::Loopback,
         "outbound" => NetworkMode::Outbound,
         "full" => NetworkMode::Full,
         _ => return Err("invalid network mode".into()),
-    })
+    };
+    if android {
+        vfs.configure_managed_uplink(mode)
+    } else {
+        vfs.configure_network(mode)
+    }
     .map_err(|e| e.to_string())?;
     let mut environment: Vec<String> = if android {
         trames_distro::android::environment()
@@ -782,6 +787,9 @@ fn run(
         },
     )
     .map_err(|e| e.to_string())?;
+    if android {
+        runtime.linux.task_limit = trames_distro::android::TASK_LIMIT;
+    }
     let mut terminal = Terminal::default();
     runtime.vulkan_display = session.display.clone();
     terminal.resize(options.rows, options.columns);

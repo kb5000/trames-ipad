@@ -63,19 +63,20 @@ authorized. The profile now selects original `dex2oat64` on this ARM64-only targ
 an original `cmd package compile -m speed -f` completed successfully in 3.766
 seconds instead of attempting the unsupported 32-bit compiler.
 
-**Geekbench CPU/GPU compatibility is not accepted:** both run buttons currently
-open an unreadable white error dialog before workload progress, including after
-restarting the test session with real host outbound sockets. No score or result
-upload was produced. The free APK documents an Internet requirement, and Android
-ConnectivityService currently has no default network: original netd first fails
-`SIOCSIFADDR` while configuring eth0. The old image's iproute2 also sends oversized
-generic address/route dumps that the runtime currently rejects. Android network
-registration, guest-owned interface configuration, routing and app DNS need an
-integrated implementation and end-to-end acceptance; returning success without
-those semantics or bypassing the APK's network/license checks is not a fix.
-The empty dialog itself also needs a separate rendering diagnosis. Network is
-therefore off by default for this preview. FUSE/emulated external storage remains
-another independent application-compatibility limitation.
+Android app networking now has end-to-end acceptance in the isolated Mac
+product target: the original EthernetTracker/IpClient/netd configure `eth0`,
+publish network 100, and ConnectivityService reports `VALIDATED` after real
+HTTP/HTTPS probes. A Bionic probe with a non-root application identity and the
+original Android `inet` supplementary group resolves through all four ordinary /
+network-bound, `AI_ADDRCONFIG` on/off entry points. The original Geekbench CPU
+and Vulkan runs have completed all workloads; final scores and the remaining
+result-page limitation are recorded below. No APK networking or license check
+is patched or bypassed.
+
+Networking stays explicitly selectable: the preview default remains `off`.
+For an isolated Mac environment use `trames -e android config set network outbound`
+and restart that environment. Existing explicit settings are retained.
+FUSE/emulated external storage remains an independent compatibility limitation.
 
 `tests/integration/android-apk.py` retains the direct PackageManager test;
 `tests/integration/android-target.py` exercises normal target creation, CLI APK
@@ -744,3 +745,119 @@ Only test artifacts and existing build caches were used; the Linux reference
 instance was stopped after its checks. Available disk space remained above
 100 GiB. The source/image/toolchain recipes and limitations above are part of
 the acceptance record; binary images and local stores are not committed.
+
+
+## Managed Android IP uplink (2026-11-13)
+
+Android needs ownership of its interface configuration and policy routing;
+exporting a read-only snapshot of a host interface is insufficient. The cold
+Android session selects a guest-owned IP-only `eth0` over the existing dynamic
+userspace packet stack and native gateway. This is shared runtime code; Mac
+and iPad select it only for the Android target. Ordinary Linux sessions keep
+their existing native socket path. No host NIC, route, sysctl, firewall or
+DNS setting is modified, and no network coordinator/service thread is added.
+
+The original Android 13 IpConfigStore v3 file seeds `10.0.0.2/24`, gateway and
+DNS `10.0.0.1` only when neither original configuration location exists.
+EthernetTracker, IpClient, netd and DnsResolver then perform their normal
+configuration, service registration, policy and DNS work. User configuration
+is not overwritten. DNS uses the existing gateway resolver and real reply
+routes, including original flow ownership rather than an interface-number
+assumption for routed namespaces.
+
+The integrated kernel interfaces include IPv4 address/netmask ioctls,
+guest-only mutable link/address state, Android policy rules and route tables,
+SO_MARK with its NET_ADMIN/NET_RAW authorization, socket creator UID and real
+sockfs `fchown` UID/GID changes. The latter updates the original socket's
+routing UID and shared descriptor metadata. It stays on the current executing
+worker and original socket control gate, even with a disk-backed rootfs.
+Unknown marks and prohibited UIDs reject actual socket I/O; these are not
+readback-only controls. Legacy non-strict netlink dumps accept unused request
+padding from the image's original iproute2. The original zero IPv4 address-add
+request succeeds without inserting an address, matching Linux.
+
+UDP connect to destination port zero is a real source-route probe on Linux.
+The shared stack now permits it, selects the source address and retains Linux's
+ENOTCONN result for getpeername with a zero peer port. This is required by both
+Android Java and Bionic address-family detection. Socket ownership transfer is
+required by Bionic's per-application source probe: returning EINVAL for fchown
+made all non-root getaddrinfo paths report no address even after asynchronous
+DNS was working.
+
+The guest IPv6 interface controls retain `accept_ra`, `use_tempaddr`,
+`disable_ipv6`, `addr_gen_mode` and stable-secret state. Disabling a device
+retires its actual IPv6 addresses and main/custom routes and emits deletions;
+new IPv6 address insertion is denied while disabled. Unset stable secrets and
+writes to `all/stable_secret` return EIO. This IP-only link has no Ethernet RA
+source; these controls do not claim SLAAC, IPv6 Internet, Android VPN/tethering,
+eBPF accounting or DNS-over-TLS support. Unsupported facilities continue to
+return errors. The accepted external network path is IPv4 outbound.
+
+Validation includes original netd request replay against a native ARM64 Linux
+private network namespace; marked, unmarked, unknown-mark and prohibited-UID
+route probes; real host TCP/UDP payload and reply delivery; live UID/mark
+blocking; DNS gateway replies; IPv6 address/route retirement; and sysctl/socket
+metadata authorization and descriptor/namespace lifetimes. The native reference
+fixture refuses to run in PID 1's network namespace. Reference request/ACK bytes
+are retained in `runtime/tests/fixtures/managed-network-linux-reference.txt`;
+`managed-network-reference.py` regenerates them. Bionic validation source is
+`tests/fixtures/android-network.c`.
+
+
+The first full 12-slot CPU attempt reached 48% and then aborted in multi-core
+File Compression. Bionic logged `pthread_create: clone failed: Try again`
+immediately before Zstd's error assertion. The complete desktop had 83 live
+processes with 985 tasks, against the Mac launcher's legacy 1,024-task ceiling;
+no zombie buildup was present. Independent original-library Zstd tests pass
+single-threaded, internal 12-worker and 12 parallel-context compression. The
+Android cold profile now uses 8,192 task admission slots on all product entry
+points. This changes only the existing atomic task admission bound; it does not
+preallocate guest memory, start more host CPU workers or add a coordinator.
+The subsequent full CPU run passes the former failure and all remaining workloads.
+
+
+### Official Android Geekbench acceptance
+
+The original, unmodified Geekbench 6.7.1 Android AArch64 APK completes CPU and
+Vulkan compute in the isolated Mac Android 13 target. The session uses 12 CPU
+slots, host-managed memory and the native Apple M6 GPU forwarding path. No
+benchmark-specific library interposition, sandbox bypass or APK modification
+is used. The installed APK is not distributed with the Android image.
+
+| Test | Saved score |
+| --- | ---: |
+| CPU single-core | 3483 |
+| CPU multi-core | 8952 |
+| GPU Vulkan | 43738 |
+
+Scores are preserved by the application's original history database and visible
+in its history list. Exported evidence contains only score, API and timestamp
+fields, not a copy of the app's private database. No version-matched native-host
+run was made for this batch, so these numbers do not establish an overhead ratio.
+Image-format queries returning `VK_ERROR_FORMAT_NOT_SUPPORTED` are capability
+probes, not failed compute submissions.
+
+The Android default network setting remains `off`; this acceptance explicitly
+selects `outbound` for the isolated target. Original ConnectivityService selects
+a validated default Ethernet network after HTTP and HTTPS connectivity probes.
+The non-root Bionic probe passes ordinary and network-bound getaddrinfo with and
+without AI_ADDRCONFIG, including original socket fchown and port-zero source
+selection. Static IP seed data does not enable host connectivity by itself.
+
+Shared runtime revision: [`3edbde9`](https://github.com/kb5000/trames-runtime/commit/3edbde917b2d0bbde165743c3c9bd3297ce68955).
+
+The shared-runtime full local workflow passes on macOS and native ARM64 Linux
+(7/7 each); the Mac product workflow passes 12/12, including both channel builds
+and unnotarized package checks. iPad/CLI workspace all-feature Clippy and the
+ARM64 iOS FFI cross-check pass. Physical iPad Android acceptance is still pending.
+
+Result-page compatibility remains under investigation: without syscall tracing,
+opening a saved result can terminate the parent app with SIGTRAP during WebView
+startup. Reopening the saved CPU result under full tracing rendered the complete
+score page. A separate exception-only diagnostic build also rendered it without
+recording a fatal seccomp entry; neither diagnostic success is treated as a
+production fix. Temporary diagnostic edits were removed before integration. The
+existing system WebView APK also lacks the crash-handler trampoline requested
+by its failure-reporting path; that secondary failure does not establish the
+original cause. Completed workloads and saved scores are independent of this
+remaining UI failure. Stable product installations and environments are unchanged.
