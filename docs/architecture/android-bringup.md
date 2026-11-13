@@ -183,6 +183,77 @@ comparisons where applicable and actual guest binaries. Run complete local CI
 at integration/release boundaries. This document-only change does not require
 rebuilding CPU, graphics, Linux or existing installed applications.
 
+## GPU route: reuse execution, add Android buffer interoperability
+
+The recommended Android GPU path keeps the current Vulkan command backend.
+It adds Android loader/driver entry points and the external-buffer/fence
+contracts used by Android's producer, compositor and HWC processes. This is a
+design decision, not completed Android GPU support.
+
+| Responsibility | Current implementation | Android addition |
+| --- | --- | --- |
+| Draw/compute commands and shaders | Guest Vulkan bridge to native Vulkan/MoltenVK/Metal | Reuse the same backend; package the guest side for Bionic and Android's Vulkan driver-loading ABI. |
+| Renderable image allocation and sharing | Retained native-image FDs, selected import-only image-plane support, backend-owned Wayland swapchain images | Extend allocation/export of renderable native images; provide matching Gralloc/Mapper/native-handle metadata and Android native-buffer import. This does not require arbitrary VkDeviceMemory export. |
+| Cross-process completion | Native Vulkan fences/timelines and internal image completion leases | Provide acquire/release sync-file FDs that travel with buffers over Binder and remain connected to real native GPU completion. |
+| Desktop presentation | Existing Wayland server and native presenter | Reuse Waydroid HWC, add its required buffer protocols and import the same retained native images. |
+
+Android's Vulkan loader has a different device-driver and native-window
+integration contract from the current Linux ICD/JSON path. A Bionic recompile
+alone is insufficient. Audit the selected platform's HAL entry points and
+Android native-buffer hooks, including gralloc usage queries, image acquisition
+and release-fence production; public AHardwareBuffer import is related but is
+not a substitute for all of that loader/WSI contract. Only advertise actual
+implemented extensions and buffer formats.
+
+The intended ownership flow is:
+
+1. Gralloc allocates a native-backed image and returns its guest FD/handle and
+   actual format, dimensions, row stride and supported plane metadata.
+2. The app renders into that same allocation through the Vulkan bridge, directly
+   or through the chosen Android EGL/GLES implementation.
+3. BufferQueue/Binder transfers its handle and acquire-fence FD to the consumer.
+   Binder moves descriptor references and metadata, not pixel contents.
+4. SurfaceFlinger and Waydroid HWC compose/present using the retained allocation;
+   the native presenter releases it only after its actual consumer use ends.
+5. The release fence controls reuse by the producer. Closing one FD or returning
+   from an API call alone must not allow reuse while GPU/UI work is pending.
+
+CPU lock/unlock and CPU/GPU coherency are required when a supported allocation
+is actually CPU-accessed. Do not force CPU readback, an ordinary memfd shadow or
+whole-frame byte copies into the standard GPU presentation path. Necessary GPU
+composition is distinct from an avoidable CPU copy.
+
+### What the DRM node needs
+
+Current `crates/trames-linux/src/render.rs` supports a discovery/version query
+only. It is not a GEM/GBM allocation, PRIME sharing or GPU-submission driver.
+Adding a device node or a plausible driver name cannot make an existing Mesa
+hardware driver work.
+
+Prefer a small Trames allocator backend under the existing Gralloc interface,
+retaining Waydroid's HWC and the current native image resource model. That path
+does not require routing draw/dispatch commands through DRM. Keep the render
+node discovery-only until a chosen userspace backend demonstrates a need for
+additional operations; select Android driver/allocator properties explicitly.
+
+If preserving a GBM interface makes a thin DRM buffer adapter useful, its scope
+is supported capability queries, original per-open buffer handles/lifetime,
+allocation and mapping for supported usages, PRIME-style FD import/export and
+the actual synchronization operations used by that backend. Allocation calls
+can be backend-specific; render nodes are not KMS dumb-buffer allocators.
+Advertise only real capabilities. A thin buffer adapter still does not run
+unmodified Intel/AMD/virtio GPU command-submission drivers.
+
+Waydroid HWC presents through Wayland, so this route does not need DRM master,
+connectors, CRTCs, planes or KMS atomic modesetting. The existing host presenter
+continues to own physical display integration. No new DRM coordinator or GPU
+service thread is introduced; buffer and fence ownership remain ordinary shared
+runtime resources on existing workers.
+
+References: [Android Vulkan loader/driver architecture](https://source.android.com/docs/core/graphics/implement-vulkan),
+[BufferQueue and Gralloc](https://source.android.com/docs/core/graphics/arch-bq-gralloc),
+[Linux render-node and PRIME interfaces](https://docs.kernel.org/gpu/drm-uapi.html#render-nodes).
+
 ## Upstream evidence inspected
 
 Waydroid sources were inspected on the `lineage-20` branch; actual image
