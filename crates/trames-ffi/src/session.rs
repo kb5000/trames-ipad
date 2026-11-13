@@ -26,6 +26,8 @@ pub struct Options {
     pub rootfs: Option<PathBuf>,
     #[serde(default = "default_distro")]
     pub distro: String,
+    #[serde(default)]
+    pub target: trames_distro::boot::Target,
     pub rootfs_sha256: Option<String>,
     #[serde(default = "default_init")]
     pub init: String,
@@ -107,14 +109,19 @@ fn install_image(
         "debian" => {
             trames_distro::install_debian(&mut reader, vfs).map_err(|e| e.to_string())?;
         }
-        "custom" => {
+        "custom" | "android" => {
             trames_distro::rootfs::install(archive, vfs, options.rootfs_sha256.as_deref())
                 .map_err(|e| e.to_string())?;
         }
         _ => return Err("unsupported distribution".into()),
     }
-    trames_distro::rootfs::validate_command(vfs, &["/bin/sh".into()]).map_err(|e| e.to_string())?;
-    trames_distro::systemd::renew_identity(vfs).map_err(|e| e.to_string())?;
+    if options.target == trames_distro::boot::Target::Android {
+        trames_distro::android::validate_image(vfs).map_err(|e| e.to_string())?;
+    } else {
+        trames_distro::rootfs::validate_command(vfs, &["/bin/sh".into()])
+            .map_err(|e| e.to_string())?;
+        trames_distro::systemd::renew_identity(vfs).map_err(|e| e.to_string())?;
+    }
     if let Some(libc) = &options.musl_libc {
         if options.distro == "alpine" {
             trames_distro::install_musl(&mut File::open(libc).map_err(|e| e.to_string())?, vfs)
@@ -535,6 +542,18 @@ fn run(
     commands: mpsc::Receiver<Command>,
 ) -> Result<u8, String> {
     let guest_memory_limits = memory_limits(&options)?;
+    let android = options.target == trames_distro::boot::Target::Android;
+    if android
+        && (options.init != "shell"
+            || options.command.is_some()
+            || options.multiple_terminals
+            || options.debian_setup.is_some())
+    {
+        return Err(
+            "Android owns its init and desktop; use a separate maintenance session for commands"
+                .into(),
+        );
+    }
     if !matches!(options.init.as_str(), "shell" | "systemd") {
         return Err("init must be shell or systemd".into());
     }
@@ -551,9 +570,10 @@ fn run(
         vfs.set_storage_limits(limits).map_err(|e| e.to_string())?;
     }
     vfs.attach_bridge(session.bridge.clone());
-    if vfs
-        .stat_at(trames_vfs::AT_FDCWD, b"/usr/local/bin/trames")
-        .is_err()
+    if !android
+        && vfs
+            .stat_at(trames_vfs::AT_FDCWD, b"/usr/local/bin/trames")
+            .is_err()
     {
         vfs.import_executable(
             b"/usr/local/bin/trames",
@@ -563,7 +583,14 @@ fn run(
     }
     // First installation uses a new store chosen by the native adapter. A partial
     // failed installation is never promoted to the active environment directory.
-    if vfs.executable(b"/bin/sh").is_err() {
+    if vfs
+        .executable(if android {
+            b"/system/bin/init"
+        } else {
+            b"/bin/sh"
+        })
+        .is_err()
+    {
         let archive = options
             .rootfs
             .as_ref()
@@ -572,6 +599,9 @@ fn run(
     }
     if session.cancelled.load(Ordering::Acquire) {
         return Err("session cancelled".into());
+    }
+    if android {
+        trames_distro::android::prepare(&mut vfs).map_err(|e| e.to_string())?;
     }
     if options.distro == "alpine" {
         if let Some(libc) = &options.musl_libc {
@@ -594,9 +624,12 @@ fn run(
     };
     // Before Wayland publishes its socket or any terminal/service can run.
     // Mounts belong to this kernel session, shared by all its local terminals.
-    prepare_runtime_mounts(&mut vfs)?;
-    prepare_guest_defaults(&mut vfs, &options.network, &options.distro)?;
-    vfs.chdir(b"/root").map_err(|e| e.to_string())?;
+    if !android {
+        prepare_runtime_mounts(&mut vfs)?;
+        prepare_guest_defaults(&mut vfs, &options.network, &options.distro)?;
+    }
+    vfs.chdir(if android { b"/" } else { b"/root" })
+        .map_err(|e| e.to_string())?;
     // Bundled Mesa/Xwayland adapters target musl. Keep glibc rootfs loaders
     // and libraries intact; their own Wayland clients still use this server.
     let bundled_musl = vfs.executable(trames_distro::MUSL_LOADER).is_ok();
@@ -631,14 +664,18 @@ fn run(
         _ => return Err("invalid network mode".into()),
     })
     .map_err(|e| e.to_string())?;
-    let mut environment: Vec<String> = vec![
-        "HOME=/root".into(),
-        "USER=root".into(),
-        "LOGNAME=root".into(),
-        "PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin".into(),
-        "TERM=xterm-256color".into(),
-        "LANG=C.UTF-8".into(),
-    ];
+    let mut environment: Vec<String> = if android {
+        trames_distro::android::environment()
+    } else {
+        vec![
+            "HOME=/root".into(),
+            "USER=root".into(),
+            "LOGNAME=root".into(),
+            "PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin".into(),
+            "TERM=xterm-256color".into(),
+            "LANG=C.UTF-8".into(),
+        ]
+    };
     if zink_egl {
         environment.extend([
             "GALLIUM_DRIVER=zink".into(),
@@ -668,9 +705,18 @@ fn run(
                 }
             }
         }
+        let directory = if android {
+            "/run/trames-wayland"
+        } else {
+            "/run/user/0"
+        };
         let server = vfs
-            .enable_wayland(b"/run/user/0")
+            .enable_wayland(directory.as_bytes())
             .map_err(|e| e.to_string())?;
+        if android {
+            trames_distro::android::display(&mut vfs, directory.as_bytes())
+                .map_err(|e| e.to_string())?;
+        }
         server
             .attach_clipboard(Arc::new(crate::clipboard::Clipboard::new(&session)))
             .map_err(|e| e.to_string())?;
@@ -679,13 +725,15 @@ fn run(
             .lock()
             .map_err(|_| "Wayland lock unavailable")? = Some(server);
         environment.extend([
-            "XDG_RUNTIME_DIR=/run/user/0".into(),
+            format!("XDG_RUNTIME_DIR={directory}"),
             "WAYLAND_DISPLAY=wayland-0".into(),
             "DISPLAY=:0".into(),
             "XMODIFIERS=@im=trames".into(),
         ]);
     }
-    let argv = if init_monitor.is_some() {
+    let argv = if android {
+        trames_distro::android::command()
+    } else if init_monitor.is_some() {
         environment.extend([
             "container=trames".into(),
             "NOTIFY_SOCKET=/run/host/notify".into(),
@@ -737,9 +785,11 @@ fn run(
     let mut terminal = Terminal::default();
     runtime.vulkan_display = session.display.clone();
     terminal.resize(options.rows, options.columns);
-    runtime
-        .enable_terminal(terminal)
-        .map_err(|e| e.to_string())?;
+    if !android {
+        runtime
+            .enable_terminal(terminal)
+            .map_err(|e| e.to_string())?;
+    }
     let mut io = Adapter {
         session: session.clone(),
         commands,

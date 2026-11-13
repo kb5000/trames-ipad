@@ -14,6 +14,8 @@ struct RootfsEnvironment: Codable, Equatable, Identifiable, Sendable {
     var packages: String? = nil
     var needsSetup: Bool? = nil
     var sourceSHA256: String? = nil
+    var target: String? = nil
+    var bootTarget: String { target ?? (distro == "android" ? "android" : "linux") }
     var distro: String { distribution ?? "alpine" }
     var boot: String { initMode ?? "shell" }
     func storeURL(in root:URL) throws -> URL {

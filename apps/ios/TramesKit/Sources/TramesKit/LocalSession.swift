@@ -26,14 +26,14 @@ public struct LocalTerminalStatus: Decodable, Sendable {
 public final class LocalSession: @unchecked Sendable {
     private let lock = NSLock()
     private var handle: UInt64
-    public init(store: URL, rootfs: URL?, total: UInt64, available: UInt64, network: String = "full", useVolumeBudget: Bool = false, muslLibc: URL? = nil, pureAccelerator: Bool = false, vulkanICD: URL? = nil, memoryBudgetMiB: Int = 1024, processMemoryBudgetMiB: Int = 512, multipleTerminals: Bool = false, initiallyPaused: Bool = false, storeOwnerLock: URL? = nil, distribution: String = "alpine", initMode: String = "shell", command: [String]? = nil, debianPackages: String? = nil, prepareSystemd: Bool = false) throws {
+    public init(store: URL, rootfs: URL?, total: UInt64, available: UInt64, network: String = "full", useVolumeBudget: Bool = false, muslLibc: URL? = nil, pureAccelerator: Bool = false, vulkanICD: URL? = nil, memoryBudgetMiB: Int = 1024, processMemoryBudgetMiB: Int = 512, multipleTerminals: Bool = false, initiallyPaused: Bool = false, storeOwnerLock: URL? = nil, distribution: String = "alpine", initMode: String = "shell", command: [String]? = nil, debianPackages: String? = nil, prepareSystemd: Bool = false, target: String = "linux") throws {
         guard memoryBudgetMiB > 0, processMemoryBudgetMiB > 0,
               processMemoryBudgetMiB <= memoryBudgetMiB,
               memoryBudgetMiB <= (1 << 28) else { throw TramesError.message("Invalid guest memory budget") }
         guard trames_abi_version() == 3 else { throw TramesError.message("Unsupported Trames ABI") }
         var options: [String:Any] = ["store": store.path, "volume_total":total, "volume_available":available, "network":network]
         if let rootfs { options["rootfs"] = rootfs.path }
-        options["distro"] = distribution; options["init"] = initMode
+        options["distro"] = distribution; options["init"] = initMode; options["target"] = target
         if let command { options["command"] = command }
         if let debianPackages { options["debian_setup"] = ["packages":debianPackages,"systemd":prepareSystemd] }
         if let muslLibc { options["musl_libc"] = muslLibc.path }
@@ -41,6 +41,7 @@ public final class LocalSession: @unchecked Sendable {
         options["process_memory_budget_bytes"] = UInt64(processMemoryBudgetMiB) << 20
         options["pure_accelerator"] = pureAccelerator
         options["wayland"] = true
+        if target == "android" {options["vulkan_accelerator"] = true}
         if let launcher = Bundle.main.url(forResource: "trames-xwayland", withExtension: nil, subdirectory: "GuestVulkan") {
             options["xwayland_launcher"] = launcher.path
         }
@@ -75,6 +76,7 @@ public final class LocalSession: @unchecked Sendable {
         var options: [String:Any] = ["store":store.path, "rootfs":rootfs.path, "volume_total":total, "volume_available":available]
         if let muslLibc { options["musl_libc"] = muslLibc.path }
         options["distro"] = distribution
+        options["target"] = distribution == "android" ? "android" : "linux"
         if let sha256 { options["rootfs_sha256"] = sha256 }
         if let storeOwnerLock { options["store_owner_lock"] = storeOwnerLock.path }
         let data = try JSONSerialization.data(withJSONObject: options)

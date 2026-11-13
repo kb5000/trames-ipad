@@ -11,6 +11,86 @@ Init/resource foundation:
 Original runtime audit baseline:
 [`c082959`](https://github.com/kb5000/trames-runtime/commit/c0829591f8652e55c3edb074f593f680efbb76b9).
 
+## Optional product target and APK installation
+
+Linux remains the default. Android is a separate experimental environment with
+its own persistent store and original Android init, rather than a Linux init
+mode or a replacement framework. The manager can import a Trames Android ARM64
+package. The iPad catalog and embedding API carry the same `target` selection;
+physical iPad Android boot remains unverified.
+
+The Mac CLI uses the normal environment lifecycle:
+
+```sh
+trames env create android --target android --rootfs Trames-Android-13-arm64-preview.tar.gz
+trames env start android
+trames -e android exec -- /system/bin/getprop sys.boot_completed
+trames -e android apk install /path/to/original.apk
+trames -e android apk list
+trames -e android apk launch com.example.application
+trames -e android shell
+trames env stop android
+```
+
+Wait for the original framework to finish its first boot before launching apps.
+APK install/list use Android's own blocking PackageManager service lookup. APK
+bytes stream through the existing bounded exec pipes while output is drained;
+there is no new guest HTTP/ADB daemon or coordinator service. Android uses its
+own init and Vulkan HALs; selecting Linux systemd or disabling required Vulkan
+for that environment is rejected. Older configurations without `target` retain
+Linux behavior. Host launch agents raise only their own file descriptor soft
+limit, since the original Android framework exceeds launchd's 256-FD default.
+Stopped launchd jobs are re-registered so changed executable paths and limits
+take effect. APK launch resolves the real component through PackageManager,
+then calls the original `am start -W -n`; Android `am` errors produce a failing
+host exit status even when the original command itself returns zero. An explicit
+`PACKAGE/ACTIVITY` is also accepted.
+
+The optional package is built with `scripts/package-android.py` from the pinned
+official system/vendor archives in `scripts/android-images.json`, the clean
+owner-preserving rootfs, and the three thin ARM64 HAL components. It streams a
+compressed archive without another unpacked tree, preserves original ownership
+and links, excludes mutable data/device/cache contents and separately installed
+APKs, and includes provenance, a graphics contract version, licenses and source
+exports. The current local preview is approximately 1.04 GB compressed. It is
+not bundled into the default Linux app download or published as a stable image.
+
+The official Geekbench 6.7.1 Android APK (464,329,585 bytes, SHA-256
+`e3b1a98c5edae1ef03106b8a0c25f13953b6550ddf5db6ae968179f3b4ef7249`)
+installed through unchanged PackageManager in 5.198 seconds and cold-launched
+its real HomeActivity in 5.885 seconds. Its EULA/privacy acceptance was explicitly
+authorized. The profile now selects original `dex2oat64` on this ARM64-only target;
+an original `cmd package compile -m speed -f` completed successfully in 3.766
+seconds instead of attempting the unsupported 32-bit compiler.
+
+**Geekbench CPU/GPU compatibility is not accepted:** both run buttons currently
+open an unreadable white error dialog before workload progress, including after
+restarting the test session with real host outbound sockets. No score or result
+upload was produced. The free APK documents an Internet requirement, and Android
+ConnectivityService currently has no default network: original netd first fails
+`SIOCSIFADDR` while configuring eth0. The old image's iproute2 also sends oversized
+generic address/route dumps that the runtime currently rejects. Android network
+registration, guest-owned interface configuration, routing and app DNS need an
+integrated implementation and end-to-end acceptance; returning success without
+those semantics or bypassing the APK's network/license checks is not a fix.
+The empty dialog itself also needs a separate rendering diagnosis. Network is
+therefore off by default for this preview. FUSE/emulated external storage remains
+another independent application-compatibility limitation.
+
+`tests/integration/android-apk.py` retains the direct PackageManager test;
+`tests/integration/android-target.py` exercises normal target creation, CLI APK
+streaming, malformed-APK failure and app/data persistence across a clean restart.
+
+Validation for this target/APK batch: shared runtime macOS 7/7 and native ARM64
+Linux 7/7; Mac product CI 12/12 including both channel builds/package checks;
+normal Linux CLI configuration/rootfs/PATH/streaming regression; 13 iPad FFI
+tests, iOS cross-check, final static library and unsigned iPad app build. The
+normal Android target test installs/lists the official APK, resolves and cold
+launches its HomeActivity (`Status: ok`, 9.130 seconds in that run), rejects an
+invalid APK without breaking later commands, and retains the application plus
+a private data marker across stop/start. These are local checks before source
+integration; no stable app/environment was installed, restarted or replaced.
+
 The initial target is an ARM64 Android desktop and APK execution using an
 existing Waydroid system/vendor pair. Reuse upstream container adaptations,
 ART, framework, SurfaceFlinger and HWC. Trames supplies the Linux interfaces and
@@ -633,6 +713,10 @@ navigated its search UI and visibly entered `trames keyboard test`.
   ANR before Launcher resumed, so startup responsiveness is not accepted as a
   stable product experience. Network/app DNS, audio output, camera, codecs,
   suspend/resume and arbitrary third-party APKs are not accepted in this run.
+- Clean-package first boot also produced a recoverable original SystemUI
+  KeyguardService exception in `AppOpsControllerImpl.setListening`. This remains
+  a separate cold-start/audio-service compatibility issue; successful APK launch
+  and persistence tests do not constitute a crash-free Android system pass.
 - The runtime executes ARM64. This image's remaining 32-bit OMX/camera launchers
   cannot run; no ARM32 compatibility is claimed.
 - No SELinux LSM, pressure-based Android LMK policy, Android CTS/VTS or general

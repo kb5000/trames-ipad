@@ -32,13 +32,14 @@ actor EnvironmentStore {
     private func source(_ profile:RootfsEnvironment) -> URL {authorizationRoot.appendingPathComponent("rootfs-\(profile.id).archive")}
     func create(name:String,distribution:String,initMode:String,packages:String,archive:URL?,sha256:String?) async throws -> RootfsEnvironment {
         let name=name.trimmingCharacters(in:.whitespacesAndNewlines)
-        guard !name.isEmpty,name.utf8.count<=255,!name.contains("/"),!name.utf8.contains(0),["alpine","debian","custom"].contains(distribution),["shell","systemd"].contains(initMode),["minimal","standard","development"].contains(packages),distribution != "alpine" || initMode=="shell" else {throw TramesError.message(L10n.text("环境配置无效"))}
+        guard !name.isEmpty,name.utf8.count<=255,!name.contains("/"),!name.utf8.contains(0),["alpine","debian","custom","android"].contains(distribution),["shell","systemd"].contains(initMode),["minimal","standard","development"].contains(packages),distribution != "alpine" || initMode=="shell" else {throw TramesError.message(L10n.text("环境配置无效"))}
+        if distribution == "android", initMode != "shell" {throw TramesError.message("Android uses its own init")}
         let digest=sha256?.trimmingCharacters(in:.whitespacesAndNewlines).lowercased()
         if let digest,!digest.isEmpty, digest.count != 64 || !digest.allSatisfy({$0.isHexDigit && $0.isASCII}) {throw TramesError.message(L10n.text("SHA-256 应为 64 位十六进制字符"))}
         let id=UUID().uuidString.lowercased()
-        let profile=RootfsEnvironment(id:id,name:name,store:"environments/\(id)",distribution:distribution,initMode:initMode,packages:packages,needsSetup:distribution=="debian" && (packages != "minimal" || initMode=="systemd"),sourceSHA256:digest?.isEmpty == false ? digest : nil)
+        let profile=RootfsEnvironment(id:id,name:name,store:"environments/\(id)",distribution:distribution,initMode:initMode,packages:packages,needsSetup:distribution=="debian" && (packages != "minimal" || initMode=="systemd"),sourceSHA256:digest?.isEmpty == false ? digest : nil,target:distribution == "android" ? "android" : "linux")
         _=try profile.storeURL(in:root)
-        if distribution=="custom" {
+        if ["custom","android"].contains(distribution) {
             guard let archive else {throw TramesError.message(L10n.text("请选择 ARM64 Linux rootfs 压缩包"))}
             try await ScopedFiles.stage(selected:archive,destination:source(profile))
         }
@@ -53,7 +54,7 @@ actor EnvironmentStore {
         try RootfsCatalog(version:1,environments:profiles().map {$0.id==profile.id ? profile : $0}).save(root)
     }
     func setBoot(_ profile:RootfsEnvironment,mode:String) throws -> RootfsEnvironment {
-        guard ["shell","systemd"].contains(mode),profile.distro != "alpine" || mode=="shell" else {throw TramesError.message(L10n.text("此环境不支持 systemd"))}
+        guard profile.bootTarget == "linux",["shell","systemd"].contains(mode),profile.distro != "alpine" || mode=="shell" else {throw TramesError.message(L10n.text("此环境不支持 systemd"))}
         var next=profile;next.initMode=mode
         if next.distro=="debian",mode=="systemd" {next.needsSetup=true}
         try replace(next);return next
@@ -72,14 +73,14 @@ actor EnvironmentStore {
         guard let total=values.volumeTotalCapacity,let available=values.volumeAvailableCapacityForImportantUsage,total>0,available>=0 else {throw TramesError.message("Cannot determine device storage capacity")}
         if !FileManager.default.fileExists(atPath:active.path) {
             let archive:URL
-            if profile.distro=="custom" {archive=source(profile)}
+            if ["custom","android"].contains(profile.distro) {archive=source(profile)}
             else {
                 output(Data(L10n.text("正在下载 %@…\r\n", String(describing: profile.name)).utf8))
                 let (download,response)=try await ConnectivityRetry.download(from:profile.distro=="debian" ? Self.debianURL : Self.archiveURL)
                 guard (response as? HTTPURLResponse)?.statusCode==200,(try download.resourceValues(forKeys:[.fileSizeKey])).fileSize ?? Int.max <= 64*1024*1024 else {try? FileManager.default.removeItem(at:download);throw TramesError.message(L10n.text("rootfs 下载无效"))}
                 archive=download
             }
-            defer {if profile.distro != "custom" {try? FileManager.default.removeItem(at:archive)}}
+            defer {if !["custom","android"].contains(profile.distro) {try? FileManager.default.removeItem(at:archive)}}
             try Task.checkCancellation();guard generation==began,!resetting else {throw CancellationError()}
             let staging=root.appendingPathComponent("install-\(UUID().uuidString)",isDirectory:true)
             let distribution=profile.distro,sha=profile.sourceSHA256
@@ -119,7 +120,7 @@ actor EnvironmentStore {
         let retryUntil=Date().addingTimeInterval(10)
         while true {
             try Task.checkCancellation()
-            let local=try LocalSession(store:active,rootfs:nil,total:UInt64(total),available:UInt64(available),useVolumeBudget:useVolumeBudget,muslLibc:musl,pureAccelerator:true,vulkanICD:icd,memoryBudgetMiB:memoryBudgetMiB,processMemoryBudgetMiB:processMemoryBudgetMiB,multipleTerminals:true,initiallyPaused:true,storeOwnerLock:lock,distribution:profile.distro,initMode:maintenance ? "shell" : profile.boot)
+            let local=try LocalSession(store:active,rootfs:nil,total:UInt64(total),available:UInt64(available),network:profile.bootTarget == "android" ? "off" : "full",useVolumeBudget:useVolumeBudget,muslLibc:musl,pureAccelerator:true,vulkanICD:icd,memoryBudgetMiB:memoryBudgetMiB,processMemoryBudgetMiB:processMemoryBudgetMiB,multipleTerminals:profile.bootTarget == "linux",initiallyPaused:true,storeOwnerLock:lock,distribution:profile.distro,initMode:maintenance ? "shell" : profile.boot,target:profile.bootTarget)
             do {
                 var status=try local.status()
                 while status.phase=="starting" {try await Task.sleep(for:.milliseconds(20));status=try local.status()}
@@ -134,7 +135,7 @@ actor EnvironmentStore {
     func reset(profile:RootfsEnvironment? = nil) async throws {
         guard !resetting else {throw TramesError.message(L10n.text("Linux 环境正在重置"))}
         let profile=try profile ?? profiles().first(where:{$0.id=="alpine"}) ?? RootfsCatalog.alpine.environments[0]
-        guard profile.distro != "custom" || FileManager.default.fileExists(atPath:source(profile).path) else {throw TramesError.message(L10n.text("请重新导入此自定义 rootfs"))}
+        guard !["custom","android"].contains(profile.distro) || FileManager.default.fileExists(atPath:source(profile).path) else {throw TramesError.message(L10n.text("请重新导入此自定义 rootfs"))}
         resetting=true;generation &+= 1;defer {resetting=false}
         try await LocalSession.reset(store:profile.storeURL(in:root),storeOwnerLock:ownerLock(profile))
         if profile.distro=="debian" {var next=profile;next.needsSetup=true;try replace(next)}

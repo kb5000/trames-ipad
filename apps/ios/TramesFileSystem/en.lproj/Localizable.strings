@@ -130,3 +130,7 @@
 "画中画" = "Picture in Picture";
 "此设备不支持画中画" = "Picture in Picture is unavailable on this device";
 "画中画未能启动，请保持窗口可见后重试" = "Picture in Picture could not start. Keep the window visible and try again.";
+"系统" = "System";
+"新建环境" = "New Environment";
+"环境" = "Environments";
+"导入可选 Trames Android ARM64 安装包。Android 桌面仍为实验性；iPad 真机兼容性待验证。" = "Import the optional Trames Android ARM64 package. Android desktop support is experimental; physical iPad compatibility has not been verified.";

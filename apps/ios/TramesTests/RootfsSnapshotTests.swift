@@ -70,8 +70,10 @@ final class RootfsSnapshotTests:XCTestCase {
     func testCatalogSupportsMultipleRootsAndRejectsEscapingStores() throws {
         let root=FileManager.default.temporaryDirectory.appendingPathComponent("roots-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at:root,withIntermediateDirectories:true);defer {try? FileManager.default.removeItem(at:root)}
-        let catalog=RootfsCatalog(version:1,environments:[.init(id:"alpine",name:"Alpine",store:"environment"),.init(id:"debian",name:"Debian",store:"environments/debian")])
+        let catalog=RootfsCatalog(version:1,environments:[.init(id:"alpine",name:"Alpine",store:"environment"),.init(id:"debian",name:"Debian",store:"environments/debian"),.init(id:"android",name:"Android",store:"environments/android",distribution:"android",target:"android")])
         try catalog.save(root);XCTAssertEqual(try RootfsCatalog.load(root).environments,catalog.environments)
+        XCTAssertEqual(catalog.environments[0].bootTarget,"linux")
+        XCTAssertEqual(catalog.environments[2].bootTarget,"android")
         XCTAssertThrowsError(try RootfsEnvironment(id:"bad",name:"bad",store:"../outside").storeURL(in:root))
         try FileManager.default.createSymbolicLink(at:root.appendingPathComponent("escape"),withDestinationURL:root.deletingLastPathComponent())
         XCTAssertThrowsError(try RootfsEnvironment(id:"escape",name:"escape",store:"escape").storeURL(in:root))

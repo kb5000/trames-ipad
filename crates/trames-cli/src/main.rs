@@ -180,7 +180,7 @@ fn run() -> Result<u8, Box<dyn std::error::Error>> {
     let mut guest_path = false;
     let mut extra_env = Vec::new();
     if args.peek().is_some_and(|a| a == "--help" || a == "-h") {
-        println!("Usage: trames-run [--rootfs VERIFIED_ALPINE_TAR_GZ] [--guest] [--env KEY=VALUE] [--virtual-network ID] [--host-map VIRTUAL_IP=HOST_IP] [--network off|loopback|outbound|full] [--storage DIR | --memory] [--storage-budget BYTES|16GiB|auto] [--storage-info] [--memory-budget 1GiB] [--process-memory-budget 512MiB] [--max-instructions N] [--trace-syscalls] [--metrics] [--cpus auto|1..32] [--accelerator pure|off] [--native-bsearch] [--native-allocator] [--wayland] [--vulkan] [--video] [--musl-libc HOST_ELF] [--file /GUEST=HOST] [--exec-file /GUEST=HOST] [--export /GUEST=HOST] [--install-busybox] [--android-init] [--pty] [--] ELF [ARG ...]\nDefault native network: full host TCP/UDP access and listeners, subject to host OS permissions; use --network outbound or loopback to restrict it.\n--virtual-network ID selects isolated 10.0.0.ID / fd00::ID and private loopback; ID must be 2..254.\n--host-map explicitly forwards a logical external IP to a trusted host service.\nDefault storage: .trames/storage in the current directory, 16 GiB logical file budget on first creation.\nDefault committed memory: 512 MiB per address space, 1 GiB aggregate; --process-memory-budget and --memory-budget change these limits without preallocation.\nImports copy selected host files; exports create new host files after guest exit.\n--memory selects the ephemeral 16 MiB test backend. auto uses the storage volume's total capacity.");
+        println!("Usage: trames-run [--rootfs VERIFIED_ALPINE_TAR_GZ] [--guest] [--env KEY=VALUE] [--virtual-network ID] [--host-map VIRTUAL_IP=HOST_IP] [--network off|loopback|outbound|full] [--storage DIR | --memory] [--storage-budget BYTES|16GiB|auto] [--storage-info] [--memory-budget 1GiB] [--process-memory-budget 512MiB] [--max-instructions N] [--trace-syscalls] [--metrics] [--cpus auto|1..32] [--accelerator pure|off] [--native-bsearch] [--native-allocator] [--wayland] [--vulkan] [--video] [--musl-libc HOST_ELF] [--file /GUEST=HOST] [--exec-file /GUEST=HOST] [--export /GUEST=HOST] [--install-busybox] [--target linux|android] [--android-init] [--pty] [--] ELF [ARG ...]\nDefault native network: full host TCP/UDP access and listeners, subject to host OS permissions; use --network outbound or loopback to restrict it.\n--virtual-network ID selects isolated 10.0.0.ID / fd00::ID and private loopback; ID must be 2..254.\n--host-map explicitly forwards a logical external IP to a trusted host service.\nDefault storage: .trames/storage in the current directory, 16 GiB logical file budget on first creation.\nDefault committed memory: 512 MiB per address space, 1 GiB aggregate; --process-memory-budget and --memory-budget change these limits without preallocation.\nImports copy selected host files; exports create new host files after guest exit.\n--memory selects the ephemeral 16 MiB test backend. auto uses the storage volume's total capacity.");
         return Ok(0);
     }
     while let Some(option) = args.peek() {
@@ -326,6 +326,17 @@ fn run() -> Result<u8, Box<dyn std::error::Error>> {
                     return Err("instruction limit must be positive".into());
                 }
             }
+            "--target" => {
+                args.next();
+                android_init =
+                    trames_distro::boot::Target::parse(&args.next().ok_or("missing target")?)?
+                        == trames_distro::boot::Target::Android;
+                if android_init {
+                    guest_path = true;
+                    wayland = true;
+                    vulkan_accelerator = true;
+                }
+            }
             "--android-init" => {
                 args.next();
                 android_init = true;
@@ -356,9 +367,13 @@ fn run() -> Result<u8, Box<dyn std::error::Error>> {
     }
     let path = args
         .next()
+        .or_else(|| android_init.then(|| "/system/bin/init".to_owned()))
         .ok_or("Usage: trames-run [--max-instructions N] [--] ELF [ARG ...]")?;
     let mut argv = vec![path.clone()];
     argv.extend(args);
+    if android_init && argv == ["/system/bin/init"] {
+        argv.push("second_stage".into());
+    }
     let mut envp = vec![
         "PATH=/usr/sbin:/usr/bin:/sbin:/bin".into(),
         "LANG=C".into(),
@@ -406,7 +421,12 @@ fn run() -> Result<u8, Box<dyn std::error::Error>> {
         }
     }
     if let Some(archive) = rootfs {
-        trames_distro::install_alpine(&mut File::open(archive)?, &mut vfs)?;
+        if android_init {
+            trames_distro::rootfs::install(std::path::Path::new(&archive), &mut vfs, None)?;
+            trames_distro::android::validate_image(&mut vfs)?;
+        } else {
+            trames_distro::install_alpine(&mut File::open(archive)?, &mut vfs)?;
+        }
     }
     for (guest, host, executable) in files {
         vfs.import_reader(guest.as_bytes(), &mut File::open(host)?, executable)?;
