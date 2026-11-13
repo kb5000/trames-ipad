@@ -851,13 +851,32 @@ The shared-runtime full local workflow passes on macOS and native ARM64 Linux
 and unnotarized package checks. iPad/CLI workspace all-feature Clippy and the
 ARM64 iOS FFI cross-check pass. Physical iPad Android acceptance is still pending.
 
-Result-page compatibility remains under investigation: without syscall tracing,
-opening a saved result can terminate the parent app with SIGTRAP during WebView
-startup. Reopening the saved CPU result under full tracing rendered the complete
-score page. A separate exception-only diagnostic build also rendered it without
-recording a fatal seccomp entry; neither diagnostic success is treated as a
-production fix. Temporary diagnostic edits were removed before integration. The
-existing system WebView APK also lacks the crash-handler trampoline requested
-by its failure-reporting path; that secondary failure does not establish the
-original cause. Completed workloads and saved scores are independent of this
-remaining UI failure. Stable product installations and environments are unchanged.
+### WebView thread CPU clock compatibility
+
+The untraced result-page crash was a missing Linux clock ABI. A bounded syscall
+history captured `clock_gettime(CLOCK_THREAD_CPUTIME_ID)` returning EINVAL
+immediately before Chromium deliberately raised SIGTRAP. The original system
+HTMLViewer reproduces the same failure independently of Geekbench. Successful
+rendering under full tracing was timing-dependent and did not fix the cause.
+The missing crash-handler trampoline is a secondary failure in crash reporting.
+
+Shared runtime [`4333558`](https://github.com/kb5000/trames-runtime/commit/4333558c95574f61c76e3e38eb1b75f13726f28d)
+implements clock ID 3 and its resolution query on the calling executor, using
+the original guest task's existing execution accounting. The value survives
+execution-slot migration and excludes parked time and other guest threads.
+There is no new coordinator, lock or accounting sample on normal syscalls or
+wall-clock reads. As with the existing `/proc` accounting, this measures charged
+execution-assignment time, including host preemption within an assignment; it
+is not a strict host kernel CPU-time measurement. Process-wide and encoded
+per-thread CPU clocks remain unsupported pending live and retired task accounting.
+
+The original WebView/APKs and sandbox settings are unchanged. Six consecutive
+HTMLViewer cold launches pass without syscall tracing. The Bionic
+`android-memory` fixture verifies clock resolution, low-32-bit clock IDs,
+EFAULT, time growth, parked sleep and isolation from another running thread.
+Geekbench's saved CPU (3483/8952) and Vulkan (43738) detail pages both render
+fully in this normal build, including their individual workload charts.
+Shared-runtime local CI passes on macOS and native ARM64 Linux (7/7 each);
+the Mac product workflow passes 12/12. iPad/CLI all-feature Clippy, iOS ARM64
+FFI cross-check and all 13 FFI tests pass.
+Stable product installations and environments are unchanged.

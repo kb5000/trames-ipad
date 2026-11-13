@@ -2,6 +2,7 @@
 #define _GNU_SOURCE
 #include <errno.h>
 #include <fcntl.h>
+#include <pthread.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,10 +11,38 @@
 #include <sys/socket.h>
 #include <sys/syscall.h>
 #include <sys/uio.h>
+#include <time.h>
 #include <ucontext.h>
 #include <unistd.h>
 static void check(int okay,const char *step){if(!okay){perror(step);exit(1);}}
 static volatile sig_atomic_t caught;
+static long long clock_ns(clockid_t id){
+    struct timespec value;check(!clock_gettime(id,&value),"clock_gettime");
+    return value.tv_sec*1000000000LL+value.tv_nsec;
+}
+static void *clock_worker(void *unused){
+    (void)unused;
+    long long before=clock_ns(CLOCK_THREAD_CPUTIME_ID),until=clock_ns(CLOCK_MONOTONIC)+80000000;
+    do{for(volatile int i=0;i<10000;i++){} }while(clock_ns(CLOCK_MONOTONIC)<until);
+    check(clock_ns(CLOCK_THREAD_CPUTIME_ID)>before,"other thread CPU time advances");
+    return NULL;
+}
+static void thread_clocks(void){
+    struct timespec resolution;
+    check(!clock_getres(CLOCK_THREAD_CPUTIME_ID,&resolution)&&resolution.tv_nsec>0,"thread clock resolution");
+    check(!syscall(SYS_clock_getres,0xffffffff00000003UL,NULL),"clockid low 32 bits and null resolution");
+    errno=0;check(syscall(SYS_clock_gettime,3,NULL)==-1&&errno==EFAULT,"thread clock null destination");
+    long long before=clock_ns(CLOCK_THREAD_CPUTIME_ID);
+    struct timespec delay={.tv_nsec=200000000};check(!nanosleep(&delay,NULL),"clock sleep");
+    long long slept=clock_ns(CLOCK_THREAD_CPUTIME_ID)-before;
+    check(slept>=0&&slept<100000000,"parked task does not charge sleep");
+    pthread_t thread;check(!pthread_create(&thread,NULL,clock_worker,NULL),"clock pthread_create");
+    before=clock_ns(CLOCK_THREAD_CPUTIME_ID);
+    check(!pthread_join(thread,NULL),"clock pthread_join");
+    long long joined=clock_ns(CLOCK_THREAD_CPUTIME_ID)-before;
+    check(joined>=0&&joined<60000000,"thread clock excludes other guest thread execution");
+    printf("thread clocks: sleep charged %.3f ms, join charged %.3f ms\n",slept/1e6,joined/1e6);
+}
 static void zygote_receive(void){
     int pair[2];check(!socketpair(AF_UNIX,SOCK_STREAM,0,pair),"zygote socketpair");
     int original=memfd_create("zygote-fd",MFD_CLOEXEC);check(original>=0,"zygote memfd");
@@ -71,6 +100,6 @@ int main(void){
     int pipefd[2];check(!pipe(pipefd),"pipe");
     int size=fcntl(pipefd[0],F_SETPIPE_SZ,1024*1024);check(size>=1024*1024,"debugger pipe capacity");
     check(fcntl(pipefd[1],F_GETPIPE_SZ)==size,"shared pipe capacity");close(pipefd[0]);close(pipefd[1]);
-    zygote_receive();queued_signal();
-    puts("android-memory: PASS signal probing/context, ART safe read, partial faults, pipe capacity, Zygote fd receive and debugger queued signals");return 0;
+    zygote_receive();queued_signal();thread_clocks();
+    puts("android-memory: PASS signal probing/context, ART safe read, partial faults, pipe capacity, Zygote fd receive, debugger queued signals and original thread CPU clocks");return 0;
 }
