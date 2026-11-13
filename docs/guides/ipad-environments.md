@@ -105,3 +105,17 @@ the app's platform budget. Arbitrary host execution and Mac private-network or
 host-mount administration are unavailable on iPad; Files permissions remain
 security-scoped platform authorizations. Unsupported settings fail rather than
 silently selecting a different network or mounting an arbitrary host path.
+
+## Planned task-capacity configuration
+
+Owner decision, 2026-11-14: replace the Linux/Android-specific task-count defaults
+with a larger shared default and Linux-compatible live sysctl administration.
+This is recorded work, not an implemented configuration option.
+
+The intended interface is `/proc/sys/kernel/threads-max`, with a proposed
+`[kernel.sysctl]` manifest table providing boot-time values. Guest `sysctl -w`
+and manifest initialization must update the same environment-owned capacity.
+`pid_max`, per-UID `RLIMIT_NPROC`, and cgroup `pids.max` remain distinct controls.
+Increasing capacity must not preallocate tasks, memory, or host threads. The
+exact default and schema will be settled in the implementation task; do not add
+a second independent `resources.tasks` quota or a coordinator/service thread.
