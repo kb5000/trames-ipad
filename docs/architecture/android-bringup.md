@@ -254,6 +254,45 @@ References: [Android Vulkan loader/driver architecture](https://source.android.c
 [BufferQueue and Gralloc](https://source.android.com/docs/core/graphics/arch-bq-gralloc),
 [Linux render-node and PRIME interfaces](https://docs.kernel.org/gpu/drm-uapi.html#render-nodes).
 
+### Independent GPU component builds
+
+Do not check out or build full AOSP to add the initial GPU bridge. Reuse the
+selected image's SurfaceFlinger, HWC, interface libraries and vendor ANGLE first.
+Build only the Android/Bionic Trames Vulkan driver module and the small native-
+image allocator/mapper backend that connects to the existing host resources.
+These outputs use Android's driver/HAL contract, not the Linux ICD JSON package.
+
+Waydroid's Android.bp/Android.mk files describe platform builds; the hardware
+repository is not a self-contained NDK project. Provide a standalone CMake or
+equivalent build using the NDK toolchain, selected platform/HAL headers, generated
+interface headers where needed, and matching prebuilt libraries from the pinned
+system/vendor image. Avoid private C++ platform dependencies in the small C ABI
+bridge where practical.
+
+If HWC later needs changes, its upstream implementation can also be built this
+way. The [waydroid-nvidia standalone build](https://github.com/Shiro836/waydroid-nvidia/blob/main/hwcomposer/build.sh)
+and [dependency provisioning](https://github.com/Shiro836/waydroid-nvidia/blob/main/hwcomposer/provision.sh)
+provide a concrete reference using selected AOSP repositories/headers, HIDL and
+Wayland code generation, static guest dependencies and image-derived link inputs,
+without the AOSP build system. That reference targets x86_64 on Linux; it is not
+an ARM64/macOS validation result. Our target triple, API level, host tools and
+private platform/C++ ABI must match our selected ARM64 image.
+
+Pin source revisions, NDK version, generated inputs and image digests. Link-time
+stubs must not become shipped runtime implementations. Retain Android linker
+namespace/VNDK compatibility and do not replace the image's platform C++ runtime
+with an unrelated NDK runtime merely to satisfy the linker. Validate ELF imports,
+loader/HAL discovery, native-buffer interoperability and actual pixels after
+linking; producing a .so alone is not GPU acceptance.
+
+ANGLE normally comes from the selected vendor image. If it needs rebuilding,
+use its own [Android GN/Ninja build](https://chromium.googlesource.com/angle/angle/+/HEAD/doc/DevSetupAndroid.md)
+and pinned dependencies, not a full AOSP checkout. The documented Android ANGLE
+build currently requires Linux; verify host-tool architecture separately rather
+than assuming the current ARM64 Linux CI instance is an upstream-supported host.
+The APK-based app opt-in ANGLE route is not a replacement for the image's native
+vendor EGL/GLES integration used by SurfaceFlinger and HWC.
+
 ## Upstream evidence inspected
 
 Waydroid sources were inspected on the `lineage-20` branch; actual image
