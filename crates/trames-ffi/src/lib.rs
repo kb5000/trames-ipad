@@ -231,6 +231,33 @@ pub unsafe extern "C" fn trames_environment_install(pointer: *const u8, length: 
     })
 }
 /// # Safety
+/// Input is a UTF-8 archive path (`bytes`); output follows `copy`. Returns zero
+/// for a legacy rootfs, or JSON describing pinned upstream downloads. No I/O
+/// worker/session is started and no caller pointer is retained.
+#[no_mangle]
+pub unsafe extern "C" fn trames_android_package_plan(
+    pointer: *const u8,
+    length: u32,
+    output: *mut u8,
+    capacity: u32,
+) -> i32 {
+    boundary(|| {
+        let result = (|| {
+            let path =
+                std::str::from_utf8(unsafe { bytes(pointer, length) }.map_err(str::to_string)?)
+                    .map_err(|e| e.to_string())?;
+            let plan = trames_distro::android_package::plan(std::path::Path::new(path))
+                .map_err(|e| e.to_string())?;
+            let data = match plan {
+                Some(plan) => serde_json::to_vec(&plan).map_err(|e| e.to_string())?,
+                None => vec![],
+            };
+            unsafe { copy(output, capacity, &data) }.map_err(str::to_string)
+        })();
+        result.unwrap_or_else(error)
+    })
+}
+/// # Safety
 /// See `bytes`. The JSON configuration is copied, never retained by pointer.
 #[no_mangle]
 pub unsafe extern "C" fn trames_session_open(pointer: *const u8, length: u32) -> u64 {

@@ -78,7 +78,7 @@ private struct CreateEnvironmentView:View {
                     if ["custom","android"].contains(distribution) {
                         Button(archive?.lastPathComponent ?? L10n.text("从 Files 选择 rootfs")) {choosing=true}
                         TextField(L10n.text("SHA-256（可选）"),text:$sha256).textInputAutocapitalization(.never).autocorrectionDisabled()
-                        Text(distribution == "android" ? L10n.text("导入可选 Trames Android ARM64 安装包。Android 桌面仍为实验性；iPad 真机兼容性待验证。") : L10n.text("支持 ARM64 Linux 的 tar / tar.gz，需包含 /bin/sh、setsid 及其运行库。systemd 模式还需预装 systemd 和 D-Bus。导入使用独立副本。")).font(.caption).foregroundStyle(.secondary)
+                        Text(distribution == "android" ? L10n.text("导入 Trames Android ARM64 适配包，首次安装会下载官方 Waydroid 镜像。Android 桌面仍为实验性；iPad 真机兼容性待验证。") : L10n.text("支持 ARM64 Linux 的 tar / tar.gz，需包含 /bin/sh、setsid 及其运行库。systemd 模式还需预装 systemd 和 D-Bus。导入使用独立副本。")).font(.caption).foregroundStyle(.secondary)
                     }
                 }
                 if let failure {Section {Text(failure).foregroundStyle(.red)}}

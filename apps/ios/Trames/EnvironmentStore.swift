@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 import Foundation
+import CryptoKit
 import TramesKit
 actor EnvironmentStore {
     static let archiveURL = URL(string: "https://dl-cdn.alpinelinux.org/alpine/v3.22/releases/aarch64/alpine-minirootfs-3.22.6-aarch64.tar.gz")!
@@ -30,6 +31,36 @@ actor EnvironmentStore {
         authorizationRoot.appendingPathComponent(profile.id=="alpine" ? "environment-owner.lock" : "environment-\(profile.id)-owner.lock")
     }
     private func source(_ profile:RootfsEnvironment) -> URL {authorizationRoot.appendingPathComponent("rootfs-\(profile.id).archive")}
+    private func androidImages(archive:URL,output:@escaping @Sendable(Data)->Void) async throws -> URL? {
+        let images=try await Task.detached(priority:.userInitiated) {try LocalSession.androidImages(rootfs:archive)}.value
+        guard !images.isEmpty else {return nil}
+        let cache=authorizationRoot.appendingPathComponent("android-images",isDirectory:true)
+        try FileManager.default.createDirectory(at:cache,withIntermediateDirectories:true)
+        for image in images {
+            try Task.checkCancellation()
+            let destination=cache.appendingPathComponent(image.filename)
+            if try await Self.verifiedAndroidImage(destination,image:image) {continue}
+            output(Data(L10n.text("正在下载 %@…\r\n",image.filename).utf8))
+            let (temporary,response)=try await ConnectivityRetry.download(from:image.url)
+            defer {try? FileManager.default.removeItem(at:temporary)}
+            guard (response as? HTTPURLResponse)?.statusCode==200,try await Self.verifiedAndroidImage(temporary,image:image) else {throw TramesError.message(L10n.text("Android 镜像大小或 SHA-256 校验失败"))}
+            try Task.checkCancellation()
+            // An invalid cached file is replaced only after the complete new
+            // download passes. Every environment keeps separate writable data.
+            if FileManager.default.fileExists(atPath:destination.path) {try FileManager.default.removeItem(at:destination)}
+            try FileManager.default.moveItem(at:temporary,to:destination)
+        }
+        return cache
+    }
+    private nonisolated static func verifiedAndroidImage(_ file:URL,image:AndroidImageDownload) async throws -> Bool {
+        try await Task.detached(priority:.utility) {
+            guard FileManager.default.fileExists(atPath:file.path),(try file.resourceValues(forKeys:[.fileSizeKey])).fileSize.map(UInt64.init)==image.size else {return false}
+            let handle=try FileHandle(forReadingFrom:file);defer {try? handle.close()}
+            var hash=SHA256()
+            while let bytes=try handle.read(upToCount:65536),!bytes.isEmpty {try Task.checkCancellation();hash.update(data:bytes)}
+            return hash.finalize().map {String(format:"%02x",$0)}.joined()==image.sha256
+        }.value
+    }
     func create(name:String,distribution:String,initMode:String,packages:String,archive:URL?,sha256:String?) async throws -> RootfsEnvironment {
         let name=name.trimmingCharacters(in:.whitespacesAndNewlines)
         guard !name.isEmpty,name.utf8.count<=255,!name.contains("/"),!name.utf8.contains(0),["alpine","debian","custom","android"].contains(distribution),["shell","systemd"].contains(initMode),["minimal","standard","development"].contains(packages),distribution != "alpine" || initMode=="shell" else {throw TramesError.message(L10n.text("环境配置无效"))}
@@ -84,9 +115,11 @@ actor EnvironmentStore {
             try Task.checkCancellation();guard generation==began,!resetting else {throw CancellationError()}
             let staging=root.appendingPathComponent("install-\(UUID().uuidString)",isDirectory:true)
             let distribution=profile.distro,sha=profile.sourceSHA256
+            let images=distribution=="android" ? try await androidImages(archive:archive,output:output) : nil
+            try Task.checkCancellation();guard generation==began,!resetting else {throw CancellationError()}
             output(Data(L10n.text("正在导入 %@…\r\n", String(describing: profile.name)).utf8))
             do {
-                try await Task.detached(priority:.userInitiated) {try LocalSession.install(store:staging,rootfs:archive,total:UInt64(total),available:UInt64(available),muslLibc:musl,storeOwnerLock:lock,distribution:distribution,sha256:sha)}.value
+                try await Task.detached(priority:.userInitiated) {try LocalSession.install(store:staging,rootfs:archive,total:UInt64(total),available:UInt64(available),muslLibc:musl,storeOwnerLock:lock,distribution:distribution,sha256:sha,androidImages:images)}.value
                 try Task.checkCancellation();guard generation==began,!resetting else {throw CancellationError()}
                 try FileManager.default.createDirectory(at:active.deletingLastPathComponent(),withIntermediateDirectories:true)
                 try FileManager.default.moveItem(at:staging,to:active)

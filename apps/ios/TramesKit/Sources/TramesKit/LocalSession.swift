@@ -22,6 +22,12 @@ public struct LocalTerminalStatus: Decodable, Sendable {
     public let error: String?
     public let exit_code: UInt8?
 }
+public struct AndroidImageDownload: Decodable, Sendable {
+    public let filename: String
+    public let url: URL
+    public let size: UInt64
+    public let sha256: String
+}
 /// Methods are serialized by the frontend; the ABI itself is thread-safe.
 public final class LocalSession: @unchecked Sendable {
     private let lock = NSLock()
@@ -72,12 +78,24 @@ public final class LocalSession: @unchecked Sendable {
             try await Task.sleep(for:.milliseconds(20))
         }
     }
-    public static func install(store: URL, rootfs: URL, total: UInt64, available: UInt64, muslLibc: URL? = nil, storeOwnerLock: URL? = nil, distribution: String = "alpine", sha256: String? = nil) throws {
+    public static func androidImages(rootfs: URL) throws -> [AndroidImageDownload] {
+        let path=Data(rootfs.path.utf8)
+        var output=[UInt8](repeating:0,count:65536)
+        let count=path.withUnsafeBytes { p in output.withUnsafeMutableBufferPointer { b in
+            trames_android_package_plan(p.bindMemory(to:UInt8.self).baseAddress,UInt32(p.count),b.baseAddress,UInt32(b.count))
+        }}
+        guard count>=0 else {throw lastError()}
+        if count==0 {return []}
+        struct Plan:Decodable {let images:[AndroidImageDownload]}
+        return try JSONDecoder().decode(Plan.self,from:Data(output.prefix(Int(count)))).images
+    }
+    public static func install(store: URL, rootfs: URL, total: UInt64, available: UInt64, muslLibc: URL? = nil, storeOwnerLock: URL? = nil, distribution: String = "alpine", sha256: String? = nil, androidImages: URL? = nil) throws {
         var options: [String:Any] = ["store":store.path, "rootfs":rootfs.path, "volume_total":total, "volume_available":available]
         if let muslLibc { options["musl_libc"] = muslLibc.path }
         options["distro"] = distribution
         options["target"] = distribution == "android" ? "android" : "linux"
         if let sha256 { options["rootfs_sha256"] = sha256 }
+        if let androidImages {options["android_images"] = androidImages.path}
         if let storeOwnerLock { options["store_owner_lock"] = storeOwnerLock.path }
         let data = try JSONSerialization.data(withJSONObject: options)
         let result = data.withUnsafeBytes { trames_environment_install($0.bindMemory(to: UInt8.self).baseAddress, UInt32($0.count)) }

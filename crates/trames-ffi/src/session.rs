@@ -29,6 +29,7 @@ pub struct Options {
     #[serde(default)]
     pub target: trames_distro::boot::Target,
     pub rootfs_sha256: Option<String>,
+    pub android_images: Option<PathBuf>,
     #[serde(default = "default_init")]
     pub init: String,
     pub command: Option<Vec<String>>,
@@ -108,6 +109,23 @@ fn install_image(
         }
         "debian" => {
             trames_distro::install_debian(&mut reader, vfs).map_err(|e| e.to_string())?;
+        }
+        "android"
+            if trames_distro::android_package::plan(archive)
+                .map_err(|e| e.to_string())?
+                .is_some() =>
+        {
+            let images = options
+                .android_images
+                .as_deref()
+                .ok_or("Android upstream image cache is required")?;
+            trames_distro::android_package::install(
+                archive,
+                images,
+                vfs,
+                options.rootfs_sha256.as_deref(),
+            )
+            .map_err(|e| e.to_string())?;
         }
         "custom" | "android" => {
             trames_distro::rootfs::install(archive, vfs, options.rootfs_sha256.as_deref())

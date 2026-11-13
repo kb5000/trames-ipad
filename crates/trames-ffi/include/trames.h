@@ -24,6 +24,7 @@ int32_t trames_session_display_attach(uint64_t handle, void *metal_layer, uint32
 int32_t trames_session_display_detach(uint64_t handle);
 int32_t trames_session_display_status(uint64_t handle, uint8_t *json, uint32_t capacity);
 int32_t trames_environment_install(const uint8_t *json, uint32_t length);
+int32_t trames_android_package_plan(const uint8_t *path, uint32_t length, uint8_t *output, uint32_t capacity);
 /* Destructive native-only store reset, {"store":"/authorized/private/store"}.
  * Serialize against new opens; returns 1 while a worker owns the lock, 0 after
  * deletion, -1 on error. Call on a background queue after closing sessions. */

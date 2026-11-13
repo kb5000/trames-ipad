@@ -133,4 +133,6 @@
 "系统" = "System";
 "新建环境" = "New Environment";
 "环境" = "Environments";
-"导入可选 Trames Android ARM64 安装包。Android 桌面仍为实验性；iPad 真机兼容性待验证。" = "Import the optional Trames Android ARM64 package. Android desktop support is experimental; physical iPad compatibility has not been verified.";
+"导入 Trames Android ARM64 适配包，首次安装会下载官方 Waydroid 镜像。Android 桌面仍为实验性；iPad 真机兼容性待验证。" = "Import a Trames Android ARM64 adapter package. Initial installation downloads official Waydroid images. Android desktop support is experimental; physical iPad compatibility has not been verified.";
+
+"Android 镜像大小或 SHA-256 校验失败" = "Android image size or SHA-256 verification failed";

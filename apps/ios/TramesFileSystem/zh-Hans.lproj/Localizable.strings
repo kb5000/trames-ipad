@@ -133,4 +133,6 @@
 "系统" = "系统";
 "新建环境" = "新建环境";
 "环境" = "环境";
-"导入可选 Trames Android ARM64 安装包。Android 桌面仍为实验性；iPad 真机兼容性待验证。" = "导入可选 Trames Android ARM64 安装包。Android 桌面仍为实验性；iPad 真机兼容性待验证。";
+"导入 Trames Android ARM64 适配包，首次安装会下载官方 Waydroid 镜像。Android 桌面仍为实验性；iPad 真机兼容性待验证。" = "导入 Trames Android ARM64 适配包，首次安装会下载官方 Waydroid 镜像。Android 桌面仍为实验性；iPad 真机兼容性待验证。";
+
+"Android 镜像大小或 SHA-256 校验失败" = "Android 镜像大小或 SHA-256 校验失败";

@@ -22,7 +22,7 @@ physical iPad Android boot remains unverified.
 The Mac CLI uses the normal environment lifecycle:
 
 ```sh
-trames env create android --target android --rootfs Trames-Android-13-arm64-preview.tar.gz
+trames env create android --target android --rootfs Trames-Android-13-arm64-adapters.tar.gz
 trames env start android
 trames -e android exec -- /system/bin/getprop sys.boot_completed
 trames -e android apk install /path/to/original.apk
@@ -46,16 +46,75 @@ then calls the original `am start -W -n`; Android `am` errors produce a failing
 host exit status even when the original command itself returns zero. An explicit
 `PACKAGE/ACTIVITY` is also accepted.
 
-The optional package is built with `scripts/package-android.py` from the pinned
-official system/vendor archives in `scripts/android-images.json`, the clean
-owner-preserving rootfs, and the three thin ARM64 HAL components. It streams a
-compressed archive without another unpacked tree, preserves original ownership
-and links, excludes mutable data/device/cache contents and separately installed
-APKs, and includes provenance, a graphics contract version, licenses and source
-exports. The current local preview is approximately 1.04 GB compressed. It is
-not bundled into the default Linux app download or published as a stable image.
+### Small adapter package and upstream composition
 
-### Package contents and host requirements
+The optional package built by `scripts/package-android.py` now contains only
+three ARM64 adapter binaries, graphics-selection properties, a manifest, the
+GPL text and source-location metadata: seven regular files, approximately
+107 KB compressed. Android system/vendor, APKs, user data and source tarballs
+are not in this adapter archive. Matching iPad/runtime source exports are a
+separate `-sources.tar.gz` artifact; publish it with the adapters and checksum
+sidecars. Linux remains the default and no Android image is added to either
+product application download.
+
+The authoritative upstream recipe is `runtime/scripts/android-images.json`.
+It pins the official Waydroid ARM64 VANILLA system and MAINLINE vendor ZIP URLs,
+compressed sizes/SHA-256 and exact raw ext4 image names/sizes. The adapter
+manifest must match the host's supported image pair and graphics contract.
+Updates to these pins require compatibility validation, rather than selecting
+a moving upstream `latest` image.
+
+Mac environment creation and iPad Android import read that manifest, download
+missing ZIPs directly from upstream using their existing platform downloader,
+verify size/hash and retain a reusable cache. The common `trames-distro`
+installer verifies the inputs, expands one image at a time to an immediately
+unlinked temporary file, then copies filesystem entries straight into the
+unpublished private VFS. It preserves numeric owners, modes, timestamps,
+symlinks and hardlink identity. No root privileges, filesystem mount, external
+extraction command, Linux VM or host directory tree is required. The readonly
+ext4 parser is upstream `ext4-view` 1.0.0, with one documented accessor exposing
+inode numbers for hardlink preservation; ZIP decoding uses pinned `zip` 9.5.1.
+The parser and download path are installation-only; normal guest filesystem I/O
+uses the existing private store without a new wrapper or coordinator.
+
+Each environment gets independent writable data. The adapter payload excludes
+mutable paths; the installer also omits mutable system-image descendants.
+Android's guest network default remains `off`: downloading installation inputs
+does not enable outbound guest traffic. Old full-rootfs packages remain
+importable through the original path.
+
+```sh
+python3 scripts/package-android.py \
+  --output target/android-packages/Trames-Android-13-arm64-adapters.tar.gz
+trames env create android --target android \
+  --rootfs target/android-packages/Trames-Android-13-arm64-adapters.tar.gz
+```
+
+Mac caches ZIPs under `TRAMES_HOME/cache/android`; an explicit
+`TRAMES_ANDROID_IMAGE_CACHE` directory can reuse independently obtained, pinned
+ZIPs for offline creation. iPad caches inputs in its private application support
+area. Users still need approximately 1.06 GB of upstream downloads and roughly
+2.43 GB of installed file content, plus first-boot/application data and one
+image's temporary installation space. The distribution size reduction does not
+remove the Android system's installed storage requirement.
+
+Validation: a fresh Mac environment was created from the 106,601-byte test
+adapter and original cached ZIPs, completed Android boot and displayed the
+original Calendar application through native graphics. A native ext4 fixture
+checks UID/GID, executable permissions, hardlinks, relative/absolute symlinks
+and mutable-data exclusion. Import tests reject unsupported image recipes,
+duplicate/unexpected payloads and wrong hashes before opening upstream images;
+the packaging check verifies the seven-file payload and separate source bundle.
+iPad FFI cross-compilation and an unsigned Dev application build pass. Physical
+iPad Android/download acceptance remains pending.
+
+Shared importer revision:
+[`81c9c15`](https://github.com/kb5000/trames-runtime/commit/81c9c1564b13b0db542321db19947c1ec089803f).
+Full local runtime workflows pass on Mac and native ARM64 Linux (7/7 each);
+the Mac product workflow passes 12/12, and all 13 iPad FFI regressions pass.
+Stable application installations and environments were not replaced or restarted.
+
+### Legacy full-preview inventory
 
 The inspected local archive is
 `Trames-Android-13-arm64-preview-240bc18.tar.gz`: 1,040,917,377 compressed bytes
@@ -94,8 +153,8 @@ WebView clock fix require the newer tested host, currently runtime `4333558`;
 they do not require rebuilding the unchanged Android APKs/HALs. The archive's
 legacy `network/audio not accepted` limitation predates network acceptance:
 IPv4 outbound is now tested on Mac when explicitly enabled, while host audio
-remains unaccepted. Refresh this metadata and source provenance for the next
-package publication. This remains a local preview; physical iPad Android
+remains unaccepted. The new adapter package records current provenance and
+separates these limitations; this old full package is retained for compatibility. This remains a local preview; physical iPad Android
 acceptance and general app/hardware conformance are pending.
 
 The official Geekbench 6.7.1 Android APK (464,329,585 bytes, SHA-256
