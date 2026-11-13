@@ -1,5 +1,11 @@
 # Delivery roadmap
 
+Android container bring-up is being prepared using existing Waydroid ARM64
+images and HWC. The [foundation implementation plan](../architecture/android-bringup.md)
+records the source-audited Binder, shared-memory, boot, permissive/no-SELinux,
+resource-pressure and device dependencies. This is planned work; Android boot
+acceptance has not yet run.
+
 The owner prioritized [Vulkan compute](../architecture/vulkan-compute.md) before
 graphics/presentation and deferred host port forwarding. The first experimental
 standard-loader/ICD path has actual native compute verification at 1/4 CPUs;
