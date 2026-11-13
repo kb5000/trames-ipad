@@ -46,6 +46,26 @@
     "system/graphics.h": {
       "url": "https://android.googlesource.com/platform/system/core/+/refs/tags/android-13.0.0_r83/libsystem/include/system/graphics.h?format=TEXT",
       "sha256": "3ad78e6b394e080fb034e1ae4ff6f893e2ecf6c093235990b3d9e8d0daf8250d"
+    },
+    "hardware/gralloc.h": {
+      "url": "https://android.googlesource.com/platform/hardware/libhardware/+/refs/tags/android-13.0.0_r83/include/hardware/gralloc.h?format=TEXT",
+      "sha256": "bd4610235a828b30c8d850be07e51375744ba2f6133f16cd7e10d7fe618806e6"
+    },
+    "vulkan/vk_android_native_buffer.h": {
+      "url": "https://android.googlesource.com/platform/frameworks/native/+/refs/tags/android-13.0.0_r83/vulkan/include/vulkan/vk_android_native_buffer.h?format=TEXT",
+      "sha256": "2e056f486ff03efd93aa9d646860055c8561d3fcdb56c294aad702f427f0228f"
+    },
+    "hardware/fb.h": {
+      "url": "https://android.googlesource.com/platform/hardware/libhardware/+/refs/tags/android-13.0.0_r83/include/hardware/fb.h?format=TEXT",
+      "sha256": "2b23a40596f20c85d59dda0bd68869be87019043f99f6360a0bcc2814353870f"
     }
+  },
+  "platform_cxx": {
+    "url": "https://android.googlesource.com/platform/external/libcxx/+archive/refs/tags/android-13.0.0_r83/include.tar.gz",
+    "archive": "libcxx-android13.tar.gz",
+    "sha256": "0c965c0e5ff69426d2b16db840061876363975b7c85ce2bd5e5e2ea84d0b2209",
+    "license_url": "https://android.googlesource.com/platform/external/libcxx/+/refs/tags/android-13.0.0_r83/LICENSE.TXT?format=TEXT",
+    "license_archive": "libcxx-android13-LICENSE.TXT",
+    "license_sha256": "c1938c0e9e90639d1e8f5a7f6bebaab83a3642e0ee44295a4c69934686d0bda8"
   }
 }

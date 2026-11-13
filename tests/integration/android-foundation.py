@@ -22,7 +22,7 @@ import time
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def rpc(path, argv, timeout=15):
+def rpc(path, argv, timeout=15, environment=()):
     def read(stream, size):
         data = bytearray()
         while len(data) < size:
@@ -32,7 +32,7 @@ def rpc(path, argv, timeout=15):
             data.extend(chunk)
         return bytes(data)
 
-    request = json.dumps(dict(argv=argv, environment=[], cwd="/", tty=False, size=None)).encode()
+    request = json.dumps(dict(argv=argv, environment=list(environment), cwd="/", tty=False, size=None)).encode()
     output = []
     with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as stream:
         stream.settimeout(timeout)
@@ -61,6 +61,7 @@ def main():
     parser.add_argument("--vulkan-probe", type=Path)
     parser.add_argument("--hal-probe", type=Path)
     parser.add_argument("--shader", type=Path)
+    parser.add_argument("--sync-probe", type=Path)
     args = parser.parse_args()
     gpu = [args.vulkan_driver, args.vulkan_probe, args.shader]
     if any(gpu) and not all(gpu):
@@ -82,6 +83,8 @@ def main():
         "/trames-init-foundation.rc": ROOT / "runtime/tests/fixtures/android-init-foundation.rc",
         "/trames-init-probe": args.probe,
     }
+    if args.sync_probe:
+        files["/system/bin/trames-sync-probe"] = args.sync_probe
     properties = "ro.boot.init_rc=/trames-init-foundation.rc\nro.cold_boot_done=true\nro.zygote=zygote64\nro.logd.auditd=false\nro.logd.kernel=false\nsys.use_memfd=true\n"
     if all(gpu):
         properties += "ro.hardware.vulkan=trames\n"
@@ -131,6 +134,13 @@ def main():
                         if reply["status"]:
                             raise RuntimeError(str(reply))
                         case["properties"][key] = reply["output"].strip()
+                    if args.sync_probe:
+                        reply = rpc(control.with_suffix(".exec"), ["/system/bin/toybox", "chmod", "755", "/system/bin/trames-sync-probe"])
+                        if reply["status"]:
+                            raise RuntimeError(str(reply))
+                        case["sync"] = rpc(control.with_suffix(".exec"), ["/system/bin/trames-sync-probe"])
+                        if case["sync"]["status"] or "PASS original libsync" not in case["sync"]["output"]:
+                            raise RuntimeError("Android sync-file acceptance failed: " + str(case["sync"]))
                     if all(gpu):
                         if args.hal_probe:
                             reply = rpc(control.with_suffix(".exec"), ["/system/bin/toybox", "chmod", "755", "/system/bin/trames-vulkan-hal-probe"])

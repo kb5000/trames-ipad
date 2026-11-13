@@ -1,17 +1,17 @@
-# Android container bring-up: foundation and roadmap
+# Android container bring-up
 
-Status: Binder, original init/APEX/property/logging bring-up and headless Android
-Vulkan HAL implemented, 2026-11-13. Unchanged Waydroid service-manager/client
-binaries pass on the interpreter and Mac HVF with 1, 4 and 12 CPU slots. The
-Android Vulkan loader has executed compute on the native Apple GPU. A complete
-Android desktop and APK launch have not yet been accepted. Binder implementation:
+Status, 2026-11-13: the original ARM64 Waydroid Android 13 framework,
+SurfaceFlinger and Launcher3 run in a native Mac window through the shared
+userspace kernel and native Apple GPU. Native mouse input opens the original
+Calendar APK, and keyboard text reaches its search field. This is an experimental
+desktop milestone, not general Android application or hardware conformance. Binder implementation:
 [`fe2f98e`](https://github.com/kb5000/trames-runtime/commit/fe2f98ea447cf23a13083fd962c34a7b65bd1075).
 Init/resource foundation:
 [`e6c9546`](https://github.com/kb5000/trames-runtime/commit/e6c954634e5e5a01cda034aea6c78b8898f0d17f).
 Original runtime audit baseline:
 [`c082959`](https://github.com/kb5000/trames-runtime/commit/c0829591f8652e55c3edb074f593f680efbb76b9).
 
-The first target is a complete ARM64 Android desktop and APK execution using an
+The initial target is an ARM64 Android desktop and APK execution using an
 existing Waydroid system/vendor pair. Reuse upstream container adaptations,
 ART, framework, SurfaceFlinger and HWC. Trames supplies the Linux interfaces and
 host device bridges. This does not introduce a full Linux-kernel VM or a second
@@ -51,18 +51,18 @@ dependency; it is not silently treated as unnecessary for boot.
 
 | ID | Component | Current audit | First implementation / acceptance boundary |
 | --- | --- | --- | --- |
-| A0 | Image import and Android boot profile | Matching binary system/vendor rootfs imported with original ownership. Shared Android preparation and experimental `--android-init` run original init with fresh device/property state and retained `/data`. | Complete the original full boot scripts and accept framework/desktop startup. This is not yet an Android catalog entry or a claim that system_server/Launcher booted. |
+| A0 | Image import and Android boot profile | Matching binary system/vendor rootfs imported with original ownership. Shared Android preparation and experimental `--android-init` run original init with fresh device/property state and retained `/data`. | Original full init, system_server and Launcher3 boot on Mac. Keep this opt-in; no Android catalog entry or iPad desktop acceptance yet. |
 | A1 | Binder IPC | Shared 64-bit Binder foundation implemented; original Waydroid service-manager/client smoke test passes. | Provide separate binder/hwbinder/vndbinder contexts, the 64-bit device UAPI, transaction mappings, object/FD transfers, nested synchronous calls, ordered one-way delivery, death notifications, poll/wait and original process/thread/FD cleanup. See the complete subsystem contract below. |
 | A2 | Android shared memory | memfd, FD transfer and `F_SEAL_FUTURE_WRITE` are implemented, including existing VMA write rights. | Validate new write/mapping denial and retained old shared mappings through the canonical memory model. Verify the selected libcutils memfd detection. Add ashmem-on-memfd ioctls or a legacy ashmem device only if the selected image actually requires them. |
 | A3 | SELinux boot compatibility | Disabled: no SELinux LSM or selinuxfs; security xattrs report absence on reads and reject writes. `/proc/cmdline` includes `selinux=0`. | Use the existing Waydroid no-SELinux adaptations. Do not expose an `enforce=0` pseudo-filesystem or claim permissive/enforcing policy support. |
 | A4 | Boot metadata, logging and basic ABI | Original bootstrap Bionic, init, flattened APEX activation and generated linker configuration work. Per-boot command line supplies container hardware identity and disabled SELinux. | Continue with ART-used synchronization and actual framework/runtime callers. Host device enumeration is not exposed; boot preparation records completion of its own supplied device set. |
 | A5 | Unix IPC and credentials | Original init property socket, non-root logd and system-UID servicemanager work; real getprop/setprop and log/logcat round trips pass. | Continue with remaining services, SO_PEERGROUPS/security-context callers and full app credentials. Peer identity remains the guest's original credentials. |
-| A6 | Task profiles and memory-pressure interfaces | cgroup v2 membership, pids, freezer/kill, mutable original cgroup UID/GID/mode and oom_score_adj exist. CPU/memory/cpuset controllers, PSI and pidfd remain incomplete. | Resolve the selected task_profiles/cgroups configuration and provide a real LMKD pressure path. Unsupported v1 controller mounts still return errors; metadata support does not claim CPU/memory controller implementation or unrestricted cgroup delegation. |
-| A7 | Android sync fences | Vulkan fences/timelines and existing resource waits exist; Linux sync_file/sw_sync device ABI was not found. | Reuse completion resources for pollable sync-file FDs, fence merge/status and the sw_sync operations used by the selected HWC. Retain native-image ownership until its real producer/consumer fences complete. |
-| A8 | Waydroid HWC, Wayland and input | Trames Wayland supports shared-memory buffers, windows, keyboard/pointer and native image presentation. Generic linux-dmabuf protocol handling was not found; wl_touch currently has no actual event delivery. | Reuse Waydroid HWC and its existing shared-memory route first. Test its required globals, subsurfaces, configure/frame/release ordering and input FIFO integration. Add actual touch delivery for iPad. GPU DMA-BUF/import support comes with A9. |
-| A9 | Native Android graphics buffers | Bionic Vulkan HAL now reuses the current command bridge; original Android libvulkan executes verified native GPU compute. Native images and selected DMA-BUF-shaped imports already exist. | Add Android native-buffer/Gralloc/Mapper metadata, supported image allocation/export, Wayland import and real acquire/release fences. Headless compute does not constitute SurfaceFlinger or native-window support. |
+| A6 | Task profiles and memory-pressure interfaces | cgroup v2 membership, pids, freezer/kill, mutable original cgroup UID/GID/mode and oom_score_adj exist. CPU/memory/cpuset controllers, PSI and pidfd remain incomplete. Original LMKD control/reply handling runs with upstream pressure monitors explicitly disabled. | Resolve the selected task_profiles/cgroups configuration and provide a real LMKD pressure path. Unsupported v1 controller mounts still return errors; metadata support does not claim CPU/memory controller implementation or unrestricted cgroup delegation. |
+| A7 | Android sync fences | Real Linux sync_file/sw_sync create, increment, merge, status, timestamp and final-OFD cancellation are implemented and tested with original libsync. | Original libsync passes timeline/merge/status/close/fork/wrap/copyout cases. Native-image ownership remains retained until real producer/consumer completion. |
+| A8 | Waydroid HWC, Wayland and input | Original Waydroid HWC presents retained native images through android_wlegl. Its EventHub input FIFOs receive native mouse/keyboard events. Native-image cursor subsurfaces are selected by default; iPad touch is not accepted. | Launcher and Calendar display through the native-image route; Mac mouse/keyboard input is accepted. iPad touch, broader window lifecycle and the software-cursor fallback remain unaccepted. |
+| A9 | Native Android graphics buffers | Bionic Vulkan/Gralloc HALs, native-buffer and selected AHardwareBuffer import reuse the command bridge and canonical native images. Original ANGLE renders the desktop through Vulkan on the Apple GPU. | Selected RGBA/BGRA native-buffer, AHardwareBuffer import and SurfaceFlinger presentation work. General export, protected/YUV and full Android graphics conformance remain incomplete. |
 | A10 | netd and networking | Shared TCP/UDP/DNS, routing/netlink and netfilter resources exist; full Android eBPF integration does not. | Reuse Waydroid's no-BPF configuration/patches where present, while returning honest unsupported results from absent kernel APIs. Verify IP configuration, app DNS and actual app traffic. Do not infer netd compatibility from Docker networking. |
-| A11 | APEX, vold and external storage | Original apexd bootstrap activates the selected image's flattened modules; original linkerconfig generates their namespaces. VFS/bind mounts and private persistence are reusable. | Complete the remaining apexd/vold paths required by full boot. FUSE and external-storage operations remain conditional boot/app dependencies, not assumed successes. Full AVB, OTA, disk encryption and phone block-device setup are outside this milestone. |
+| A11 | APEX, vold and external storage | Original apexd bootstrap activates the selected image's flattened modules; original linkerconfig generates their namespaces. VFS/bind mounts and private persistence are reusable. | POSIX default ACL inheritance lets original vold unlock private credential-encrypted user storage. /dev/fuse and emulated external storage remain missing; media/gallery services still show ANRs. Full AVB, OTA, disk encryption and phone block-device setup are outside this milestone. |
 
 The original shared-memory audit found that `F_SEAL_FUTURE_WRITE` was rejected.
 It is now implemented: writes/pwrites and newly writable shared mappings fail,
@@ -137,17 +137,17 @@ Both products use these resources; the interpreter and HVF remain CPU backends.
   notifications. FDA cleanup tracks the actual destination slot, including reuse
   of a number for the same OFD, and applies original process-lock close semantics.
 - Freeze, transaction security-context delivery and one-way spam detection are
-  not advertised or faked. Binderfs control, ashmem compatibility and full Android
-  boot are separate remaining milestones.
+  not advertised or faked. Binderfs control and legacy ashmem compatibility remain separate from this
+  selected-image desktop acceptance.
 
 The first inspected binary image is the official ARM64 VANILLA build
 `lineage-20.0-20260927-VANILLA-waydroid_arm64-system.zip` (912,267,974 bytes), SHA-256
 `5fb8179ed4455f45919c5a2bfbfdd1591619295994ad321217f03bb1dcfc53a7`.
 Its system fingerprint is
 `waydroid/lineage_waydroid_arm64/waydroid_arm64:13/TQ3A.230901.001/aleasto09270452:userdebug/test-keys`.
-Only the required original executables/libraries were imported for the smoke
-test. No complete AOSP checkout or Android source rebuild was used. This does
-not validate a vendor image or the complete system/vendor boot pair.
+The initial Binder smoke test imported only the required executables/libraries.
+The later desktop acceptance uses the complete matching system/vendor pair below.
+Neither stage uses a complete AOSP checkout or rebuild of the framework.
 
 The same ARM64 static
 [`binder-foundation.c`](https://github.com/kb5000/trames-runtime/blob/main/tests/fixtures/binder-foundation.c)
@@ -237,7 +237,7 @@ of a shell console. It adds no service thread and lets the test query the live
 Android PID 1 environment. Explicit syscall tracing also prints retained guest
 kernel logs at exit; normal runs do not perform that diagnostic dump.
 
-The final combined acceptance passes with 1, 4 and 12 Mac CPU slots: original
+At foundation integration, the combined acceptance passed with 1, 4 and 12 Mac CPU slots: original
 init/APEX/linkerconfig, property/log round trips, Binder discovery, SPHAL module
 discovery and native Apple M6 Vulkan compute. Each run records zero coordinator
 service requests and an empty cohort-return syscall list. The identical mount
@@ -245,8 +245,8 @@ fixture additionally passes with 1, 4 and 12 slots on both HVF and the interpret
 including busy-peer rejection and downstream-slave reparenting, and on native
 ARM64 Linux. Common-runtime local CI passes 7/7 on macOS and 7/7 on Linux; Mac
 product CI passes 12/12. Interpreter kernel checks pass 489 tests (3 ignored),
-and the iOS embedding checks for `aarch64-apple-ios`. These results do not imply
-a full Android boot or native GPU validation on a physical iPad.
+and the iOS embedding checks for `aarch64-apple-ios`. These foundation results alone did not imply a desktop boot. The later Mac
+desktop milestone below still does not validate a physical iPad Android desktop.
 
 ## SELinux scope: disabled
 
@@ -286,8 +286,9 @@ requiring a port of the entire LXC host manager.
   on demand and release it with real ownership. Do not add arbitrary global
   socket-like quotas or count reserved address space as physical consumption.
 - For LMKD, counters and notifications must describe the available guest/host
-  memory model. Merely exposing a permanently zero PSI file is not monitoring;
-  disabling PSI is insufficient unless the image has a working alternative.
+  memory model. Do not expose a permanently zero PSI file. This experimental
+  profile keeps the real control protocol alive with upstream monitors disabled;
+  it does not implement Android pressure-based app killing or claim otherwise.
 - Initially use Waydroid's EventHub input-FIFO adaptation when applicable. Do not
   implement an entire evdev/uinput stack just because generic Android uses it.
 - Do not force raw GPU image readback/copy into every frame. Software/shared-
@@ -323,8 +324,8 @@ documentation or test-recording details change.
 
 The Android Vulkan HAL now reuses the current Vulkan command backend. The
 original Android loader executes verified native GPU compute through this
-frontend. External-buffer/fence contracts used by Android's producer,
-SurfaceFlinger and HWC remain the next graphics milestone.
+frontend. The desktop now uses selected Android native-buffer/Gralloc contracts and real
+completion handling across its producer, SurfaceFlinger and original HWC.
 
 | Responsibility | Current implementation | Android addition |
 | --- | --- | --- |
@@ -397,11 +398,12 @@ The standalone build is implemented in
 [`accelerator/android/vulkan.c`](../../accelerator/android/vulkan.c). The small
 HAL wrapper exports Android's HMI/device contract and directly includes the
 existing guest wire encoder. Linux's ICD/JSON frontend remains unchanged. The
-allocator/mapper, native-buffer and acquire/release-fence frontend is still
-pending; the current module does not advertise those Android capabilities.
+Gralloc0.3, native-buffer version 5 and selected public AHardwareBuffer imports
+are implemented. Advertised capabilities are limited to the supported contracts
+and formats described below.
 
 [`scripts/prepare-android.py`](../../scripts/prepare-android.py) verifies the
-pinned official NDK r27d archive and nine Android 13 public/platform C headers.
+pinned official NDK r27d archive and Android 13 public/platform C headers.
 It extracts about 18 MB of Bionic headers/API 33 link stubs, rather than the NDK
 compiler, and uses native host Clang plus the existing Rust ELF linker. No
 x86 compiler execution or complete AOSP checkout is involved. The linked guest
@@ -419,8 +421,9 @@ No Android loader or image executable was patched to make this work.
 On the native Apple GPU, the existing compute fixture passes through original
 Android libvulkan: three 4096-element dispatch rounds, two specialized semaphore
 chains, active/concurrent pipeline callers, semaphore reuse and memory
-mapping/flush/invalidate checks. This is headless compute acceptance, not Android
-Vulkan conformance or native-window/SurfaceFlinger acceptance.
+mapping/flush/invalidate checks. That fixture validates headless compute. Separate desktop and original ANGLE
+fixtures now cover native windows and SurfaceFlinger; no Vulkan/AHB CTS claim is
+made for Android.
 
 For a repeatable local run (using an isolated, owner-preserving rootfs/store):
 
@@ -492,3 +495,168 @@ acceptance remain pending.
 - [ANGLE/Pastel fallback selection](https://github.com/waydroid/android_vendor_waydroid/blob/lineage-20/waydroid-patches/base-patches-33/system/core/0013-init-Substitute-swiftshader-with-angle-pastel-on-ven.patch)
 - [Linux binderfs semantics](https://docs.kernel.org/admin-guide/binderfs.html)
 - [Android LMKD dependencies](https://source.android.com/docs/core/perf/lmkd)
+
+
+## Native desktop integration (2026-11-13)
+
+The desktop uses the original init, APEX modules, Bionic, ART, framework,
+SurfaceFlinger, Waydroid HWC, ANGLE and APKs from the recorded binary images.
+Only the small Trames Vulkan/Gralloc frontends and a 64-bit audio-service launcher
+are built separately. The audio launcher loads the image's original HIDL 4.0
+implementations; it does not replace AudioFlinger or claim working host audio.
+No framework executable, APK, Linux GPU driver or full Linux kernel is rebuilt.
+
+### Buffer and fence contract
+
+`gralloc.trames.so` implements Gralloc0.3 allocation, registration, validation,
+CPU lock/unlock and asynchronous fence ownership. Supported native allocation
+formats are RGBA8888, RGBX8888, BGRA8888 and height-one BLOB. Protected and YUV
+allocations are rejected. Handles contain one retained guest FD plus typed
+metadata; pitch and allocation length come from the canonical native image.
+CPU mappings alias its actual shared backing, including across FD transfer.
+
+The Android Vulkan frontend retains original native-window owners, imports
+supported dedicated RGBA/BGRA images and exposes the implemented Android hooks.
+Original ANGLE renders through the same Vulkan backend as Linux. Its selected
+queue-family view contains the single supported family; original Android's
+loader owns WSI. This is not arbitrary device-memory export or complete public
+AHardwareBuffer interoperability. BLOB/general buffer import, YUV, protected
+content and the full Android format-properties query surface remain incomplete.
+
+The vendored protocol retains its upstream copyright/license. The inspected
+Waydroid HWC source revision is `a575cfcc12ab79a122844218f2c6df5bd208cca0`;
+container/EventHub adaptation was checked against android_vendor_waydroid
+`lineage-20` revision `4dced17d9528ba07f6a6eab11b78a8ed38a36067`.
+
+The upstream `android_wlegl` protocol transports the retained image and actual
+geometry to the existing scene/presenter. Producer completion and consumer
+leases control reuse and `wl_buffer.release`; a normal frame does not require a
+CPU pixel copy. Native-image cursor subsurfaces use the same ownership path.
+The original HWC's alternative software-cursor EGL readback path crashed in
+bring-up and is not accepted; `persist.waydroid.cursor_on_subsurface=true` is
+an absent-only default, with explicit caller settings preserved.
+
+`/dev/sw_sync` supplies real pollable Linux sync-file FDs. Merge coalesces the
+latest point in each timeline context, reports real status/timestamps and
+retains original final-OFD ownership across dup/fork/Binder/SCM_RIGHTS. Destroying
+a timeline reports pending-fence cancellation instead of success. The current
+Vulkan release adapter waits for actual producer completion on the existing
+resource wait, then returns `-1` for an already completed release; it never
+manufactures an early signalled fence or adds a GPU service/coordinator thread.
+
+### Full-init dependencies and observed stalls
+
+- Binder process work and synchronous thread replies have distinct readiness.
+  Poll/epoll handles bind to the original calling task and cannot consume another
+  thread's reply or revive a retired TID. Completion, owner-reference work,
+  nested callbacks, thread-pool growth and node-address reuse follow real driver
+  ordering. The same C poll/epoll fixture runs against native Linux Binder.
+- A real Java stack identified repeated three-second framework stalls in
+  `LmkdConnection.waitForConnection`, while ActivityManager and process locks
+  were held. Original LMKD had exited because neither PSI nor v1 vmpressure is
+  implemented. The profile sets `ro.lmk.use_new_strategy=true` and both PSI stall
+  thresholds to zero. Upstream LMKD deliberately skips those monitors and keeps
+  its real priority/control/reply channel operational. **Pressure-based Android
+  app killing remains disabled**; host memory management does not replace that
+  missing policy. No fake PSI source or dummy LMKD is supplied.
+- Waydroid EventHub reads original Linux input_event records from four named
+  FIFOs owned by system:input. The container provisions these before boot. The
+  original Lineage physical bugreport keychord is omitted from a per-boot RC
+  overlay: Android init otherwise opens the FIFOs without O_NONBLOCK before HWC
+  and InputFlinger can start, deadlocking service startup. Other service options
+  and the bugreport service are retained.
+- Queued process/thread signals preserve the AArch64 kernel siginfo payload and
+  original permissions, including 64-bit sigval and signalfd conversion. Original
+  Bionic and debuggerd now produce actual Java stacks rather than ENOSYS.
+- POSIX access/default ACLs, inheritance before umask, chmod mask updates and
+  persistence permit original vold to unlock private user storage. This does
+  not implement FUSE or make emulated external storage usable.
+- Same-mm process_vm transfers, pipe sizing, boot/alarm timerfd clocks and
+  nonblocking/timeout Unix-socket behavior use the shared resource model. Netlink
+  additions supply real selected route/uevent behavior and honest unsupported
+  netfilter replies. All common changes remain available to the iPad interpreter.
+
+### Build and run
+
+Use an isolated owner-preserving rootfs/store made from the matching images.
+The foundation test replaces its boot-property overlay, so **use separate stores
+for the foundation fixture and the full desktop**. The rootfs must contain the
+full original system, system_ext, product, vendor and flattened APEX trees.
+Offline `--fs put` preserves host ordinary permission bits (subject to guest
+umask), including executable bits; it does not import setuid/setgid. Use a
+runner containing this change for executable HAL helpers and probes.
+
+```sh
+python3 scripts/build-vulkan-android.py --shader /path/to/compute.spv
+python3 scripts/build-android-hal-service.py --rootfs /path/to/waydroid-rootfs.tar
+
+# Use a signed Mac runner. debug run --fs is offline; stop this store first.
+RUNNER=/path/to/signed/trames-mac-run
+STORE=/path/to/isolated/android-desktop-store
+"$RUNNER" debug run --storage "$STORE" --rootfs /path/to/waydroid-rootfs.tar --fs ls /
+"$RUNNER" debug run --storage "$STORE" --fs put --replace target/vulkan-android/vulkan.trames.so /vendor/lib64/hw/vulkan.trames.so
+"$RUNNER" debug run --storage "$STORE" --fs put --replace target/vulkan-android/gralloc.trames.so /vendor/lib64/hw/gralloc.trames.so
+"$RUNNER" debug run --storage "$STORE" --fs put --replace target/vulkan-android/trames-hal-service /vendor/bin/hw/trames-hal-service
+```
+
+Supply a vendor overlay containing `ro.hardware.vulkan=trames`,
+`ro.hardware.egl=angle` and `ro.hardware.gralloc=trames`. Do not set
+`ro.boot.init_rc` for a full desktop: that would select the foundation fixture
+instead of the image's real boot scripts. Run with windows enabled:
+
+```sh
+"$RUNNER" debug run --storage "$STORE" --android-init --vulkan --cpus 12 \
+  --no-pty /system/bin/init second_stage
+
+# Automated framework/APK/probe acceptance; native input is separately manual.
+python3 tests/integration/android-desktop.py --runner "$RUNNER" --store "$STORE" \
+  --output target/android-desktop-acceptance --fixtures target/vulkan-android \
+  --install-calendar
+```
+
+The automated test requires actual framework boot completion, resumed original
+Launcher, Calendar launch, unchanged composer/framework PIDs and no fatal Java
+or native crash. Optional APK acceptance copies the image's original Calendar
+APK and reinstalls it into private app storage through the real PackageManager.
+The fixtures exercise original libsync, Gralloc async fence ownership, original
+ANGLE GPU-to-CPU AHardwareBuffer pixels, queued signals, ACLs and netlink. An ANR
+list is retained separately; background media failures are not reported as an
+all-app pass. Native mouse/keyboard acceptance additionally opened Calendar,
+navigated its search UI and visibly entered `trames keyboard test`.
+
+### Remaining acceptance boundary
+
+- Mac desktop is experimental. iPad shares the kernel and graphics resources,
+  but an Android desktop on a physical iPad has not been tested.
+- FUSE/emulated external storage and media/gallery boot broadcasts remain
+  incomplete; those apps can ANR. A loaded boot also produced a KeyguardService
+  ANR before Launcher resumed, so startup responsiveness is not accepted as a
+  stable product experience. Network/app DNS, audio output, camera, codecs,
+  suspend/resume and arbitrary third-party APKs are not accepted in this run.
+- The runtime executes ARM64. This image's remaining 32-bit OMX/camera launchers
+  cannot run; no ARM32 compatibility is claimed.
+- No SELinux LSM, pressure-based Android LMK policy, Android CTS/VTS or general
+  Vulkan/AHB conformance is claimed. Stable Trames installations are unchanged.
+
+
+### Validation for the native desktop batch
+
+Shared runtime revision: [`b227f4e`](https://github.com/kb5000/trames-runtime/commit/b227f4ee653233efaa33675464be117cd88f0fa5).
+
+| Acceptance | Result |
+| --- | --- |
+| Full shared-runtime local CI | macOS 7/7 and native ARM64 Linux 7/7. |
+| Mac product local CI | 12/12, including both channel builds and unnotarized packaging checks. No stable installation was updated. |
+| Interpreter kernel conformance | 489 pass, 3 ignored. Reused 487 passes; the new queued-signal legacy oracle and a load-sensitive host-pause case passed their focused reruns. |
+| iPad composition | Workspace all-target/all-feature Clippy and `trames-ffi` for `aarch64-apple-ios` pass. No physical iPad Android acceptance. |
+| Native Linux comparison | Identical ARM64 C Binder poll/epoll/nested-FD/lifecycle, queued-signal/memory and POSIX ACL fixtures pass. |
+| Original Android foundation | Original init/APEX/log/property/Binder, libsync, HAL discovery and native GPU compute pass with 1, 4 and 12 Mac CPU slots. Same native Linux Binder binary passes all three HVF configurations. |
+| Full Android desktop | Final windowed run: framework boot at 59.824 s; actual Launcher resumed at 74.437 s. Original Calendar APK installation reports Success. Composer/system_server PIDs remain unchanged through app/probe acceptance and a 20 s settling interval. |
+| Original graphics/ABI probes | All seven Bionic probes pass: memory/signals, netlink, ACL, libsync, Gralloc, original ANGLE/EGL and Vulkan HAL. The ANGLE renderer identifies Apple M6/Vulkan/MoltenVK; imported AHardwareBuffer pixels are 64,128,191,255 as expected. |
+| Runtime logs | Final accepted run contains no ANR, fatal Java exception or native fatal signal. Earlier loaded boots had the failures recorded above; this is a bounded run, not a longevity claim. |
+| Concurrency | Final full desktop metrics: zero coordinator service requests and an empty cohort-return syscall list. Native image presentation uses retained storage. |
+
+Only test artifacts and existing build caches were used; the Linux reference
+instance was stopped after its checks. Available disk space remained above
+100 GiB. The source/image/toolchain recipes and limitations above are part of
+the acceptance record; binary images and local stores are not committed.

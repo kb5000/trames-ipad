@@ -212,9 +212,13 @@
     if(!strcmp(name,"vkGetImageSparseMemoryRequirements2"))return (PFN_vkVoidFunction)vkGetImageSparseMemoryRequirements2;
     if(!strcmp(name,"vkGetImageSparseMemoryRequirements2KHR"))return (PFN_vkVoidFunction)vkGetImageSparseMemoryRequirements2KHR;
     if(!strcmp(name,"vkEnumeratePhysicalDeviceGroups"))return (PFN_vkVoidFunction)vkEnumeratePhysicalDeviceGroups;
+    if(!strcmp(name,"vkEnumeratePhysicalDeviceGroupsKHR"))return (PFN_vkVoidFunction)vkEnumeratePhysicalDeviceGroups;
     if(!strcmp(name,"vkGetPhysicalDeviceExternalBufferProperties"))return (PFN_vkVoidFunction)vkGetPhysicalDeviceExternalBufferProperties;
+    if(!strcmp(name,"vkGetPhysicalDeviceExternalBufferPropertiesKHR"))return (PFN_vkVoidFunction)vkGetPhysicalDeviceExternalBufferProperties;
     if(!strcmp(name,"vkGetPhysicalDeviceExternalFenceProperties"))return (PFN_vkVoidFunction)vkGetPhysicalDeviceExternalFenceProperties;
+    if(!strcmp(name,"vkGetPhysicalDeviceExternalFencePropertiesKHR"))return (PFN_vkVoidFunction)vkGetPhysicalDeviceExternalFenceProperties;
     if(!strcmp(name,"vkGetPhysicalDeviceExternalSemaphoreProperties"))return (PFN_vkVoidFunction)vkGetPhysicalDeviceExternalSemaphoreProperties;
+    if(!strcmp(name,"vkGetPhysicalDeviceExternalSemaphorePropertiesKHR"))return (PFN_vkVoidFunction)vkGetPhysicalDeviceExternalSemaphoreProperties;
     if(!strcmp(name,"vkTrimCommandPool"))return (PFN_vkVoidFunction)vkTrimCommandPool;
     if(!strcmp(name,"vkTrimCommandPoolKHR"))return (PFN_vkVoidFunction)vkTrimCommandPoolKHR;
     if(!strcmp(name,"vkGetSemaphoreCounterValue"))return (PFN_vkVoidFunction)vkGetSemaphoreCounterValue;

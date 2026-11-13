@@ -18,7 +18,11 @@
 
 struct result { uint64_t value, fallback; };
 extern struct result trames_vulkan_call(uint64_t, const uint64_t *, size_t);
-typedef struct memory_record { uint64_t key,size; void *base,*mapped; size_t length; struct memory_record *next; VkAllocationCallbacks callbacks;int custom_allocator; } Memory;
+typedef struct memory_record { uint64_t key,size; void *base,*mapped; size_t length; struct memory_record *next; VkAllocationCallbacks callbacks;int custom_allocator;
+#ifdef __ANDROID__
+    void *android_buffer;
+#endif
+} Memory;
 typedef struct descriptor_template DescriptorTemplate;
 static void free_templates(DescriptorTemplate *head);
 typedef struct object_allocation ObjectAllocation;

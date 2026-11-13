@@ -431,6 +431,9 @@ fn run() -> Result<u8, Box<dyn std::error::Error>> {
             }
         }
     }
+    if trace {
+        vfs.retain_kernel_log_bursts();
+    }
     if let Some(libc) = musl_libc {
         trames_distro::install_musl(&mut File::open(libc)?, &mut vfs)?;
     }
@@ -444,9 +447,16 @@ fn run() -> Result<u8, Box<dyn std::error::Error>> {
         let directory = envp
             .iter()
             .find_map(|s: &String| s.strip_prefix("XDG_RUNTIME_DIR="))
-            .unwrap_or("/run/user/0")
+            .unwrap_or(if android_init {
+                "/run/trames-wayland"
+            } else {
+                "/run/user/0"
+            })
             .to_owned();
         vfs.enable_wayland(directory.as_bytes())?;
+        if android_init {
+            trames_distro::android::display(&mut vfs, directory.as_bytes())?;
+        }
         if !envp.iter().any(|s| s.starts_with("XDG_RUNTIME_DIR=")) {
             envp.push(format!("XDG_RUNTIME_DIR={directory}"));
         }

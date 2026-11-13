@@ -3,9 +3,9 @@
 """Build a Bionic Vulkan HAL and original-loader acceptance tools without AOSP.
 
 Uses the existing native Clang/Rust ELF linker and a verified NDK C sysroot.
-The output is a headless Android HAL, not a Linux ICD/JSON package. Android
-native buffers, Gralloc and acquire/release sync-file interoperability remain
-separate work; no such capabilities are advertised by this frontend.
+Builds the Android Vulkan and Gralloc HALs plus original-loader probes.
+Native buffers retain host image storage through Binder/Wayland transport;
+release waits for real GPU completion before returning an already-done fence.
 """
 import argparse
 import hashlib
@@ -56,16 +56,19 @@ def main():
     lib = cache / f"sysroot/usr/lib/aarch64-linux-android/{api}"
     compiler = [args.cc, f"--target=aarch64-linux-android{api}", f"--sysroot={cache / 'sysroot'}", f"--ld-path={linker_name}", "-O2", "-mno-outline-atomics", "-Wall", "-Wextra", "-Werror", "-Wno-misleading-indentation", "-I", str(HEADERS), "-I", str(cache / "platform-headers"), "-I", str(ROOT / "accelerator/vulkan")]
     link = ["-L", str(lib), "-Wl,--no-undefined", "-Wl,--build-id=sha1", "-Wl,-z,noexecstack"]
-    commands = [compiler + ["-fPIC", "-fvisibility=hidden", "-shared", "-nostdlib", str(ROOT / "accelerator/android/vulkan.c"), str(ROOT / "accelerator/vulkan/calls.S")] + link + ["-Wl,-soname,vulkan.trames.so", "-lc", "-ldl", "-lm", "-o", str(output / "vulkan.trames.so")]]
-    for source, name, libraries in [("vulkan-compute.c", "vulkan-compute", ["-lvulkan"]), ("android-vulkan-hal.c", "vulkan-hal-probe", [])]:
+    commands = [compiler + ["-fPIC", "-fvisibility=hidden", "-shared", "-nostdlib", str(ROOT / "accelerator/android/vulkan.c"), str(ROOT / "accelerator/vulkan/calls.S")] + link + ["-Wl,-soname,vulkan.trames.so", "-lc", "-ldl", "-lm", "-lnativewindow", "-o", str(output / "vulkan.trames.so")]]
+    commands.append(compiler + ["-fPIC", "-fvisibility=hidden", "-shared", "-nostdlib", str(ROOT / "accelerator/android/gralloc.c"), str(ROOT / "accelerator/vulkan/calls.S")] + link + ["-Wl,-soname,gralloc.trames.so", "-lc", "-o", str(output / "gralloc.trames.so")])
+    for source, name, libraries in [("vulkan-compute.c", "vulkan-compute", ["-lvulkan"]), ("android-vulkan-hal.c", "vulkan-hal-probe", []), ("android-sync.c", "android-sync", []), ("android-netlink.c", "android-netlink", []), ("android-memory.c", "android-memory", []), ("android-acl.c", "android-acl", []), ("android-gralloc.c", "android-gralloc", []), ("android-egl.c", "android-egl", ["-lEGL", "-lGLESv2", "-lnativewindow"])]:
         commands.append(compiler + ["-fPIE", "-pie", "-nostdlib", str(lib / "crtbegin_dynamic.o"), str(ROOT / "tests/fixtures" / source)] + link + ["-Wl,--dynamic-linker,/system/bin/linker64", "-lc", "-ldl", "-lm"] + libraries + [str(lib / "crtend_android.o"), "-o", str(output / name)])
     for command in commands:
         subprocess.run(command, check=True, cwd=ROOT)
     if args.shader:
         shutil.copyfile(args.shader, output / "vulkan-compute.spv")
-    sources = [ROOT / "accelerator/android/vulkan.c", ROOT / "scripts/android-upstream.json", ROOT / "scripts/prepare-android.py", Path(__file__).resolve(), ROOT / "tests/fixtures/vulkan-compute.c", ROOT / "tests/fixtures/android-vulkan-hal.c"]
+    sources = [ROOT / "scripts/android-upstream.json", ROOT / "scripts/prepare-android.py", Path(__file__).resolve(), ROOT / "tests/fixtures/vulkan-compute.c", ROOT / "tests/fixtures/android-vulkan-hal.c"]
+    sources += sorted(p for p in (ROOT / "accelerator/android").iterdir() if p.suffix in (".c", ".h", ".inc"))
+    sources += sorted((ROOT / "tests/fixtures").glob("android-*.c"))
     sources += sorted(p for p in (ROOT / "accelerator/vulkan").iterdir() if p.suffix in (".c", ".inc", ".S"))
-    manifest = dict(api=api, abi="arm64-v8a", hal="/vendor/lib64/hw/vulkan.trames.so", property="ro.hardware.vulkan=trames", wire_profile="0x10006", wire_revision=20, scope="headless Android Vulkan HAL; no Android native-buffer/surface advertisement", compiler=subprocess.check_output([args.cc, "--version"], text=True).splitlines()[0], rust=rust_version, commands=commands, sources_sha256={str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}, outputs_sha256={p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in output.iterdir() if p.name in ["vulkan.trames.so", "vulkan-compute", "vulkan-hal-probe", "vulkan-compute.spv"]})
+    manifest = dict(api=api, abi="arm64-v8a", hal="/vendor/lib64/hw/vulkan.trames.so", property="ro.hardware.vulkan=trames", wire_profile="0x10006", wire_revision=20, android_image_operations=[272, 273, 274, 275], scope="Android Vulkan and Gralloc HALs; native RGBA/BGRA image import and synchronous release", compiler=subprocess.check_output([args.cc, "--version"], text=True).splitlines()[0], rust=rust_version, commands=commands, sources_sha256={str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}, outputs_sha256={p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in output.iterdir() if p.name in ["vulkan.trames.so", "gralloc.trames.so", "vulkan-compute", "vulkan-hal-probe", "vulkan-compute.spv", "android-sync", "android-egl", "android-gralloc", "android-netlink", "android-memory", "android-acl"]})
     (output / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
     shutil.copyfile(ROOT / "LICENSE", output / "GPL-3.0.txt")
     print(json.dumps(dict(output=str(output), artifacts=manifest["outputs_sha256"]), indent=2))
