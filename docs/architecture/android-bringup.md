@@ -55,6 +55,49 @@ APKs, and includes provenance, a graphics contract version, licenses and source
 exports. The current local preview is approximately 1.04 GB compressed. It is
 not bundled into the default Linux app download or published as a stable image.
 
+### Package contents and host requirements
+
+The inspected local archive is
+`Trames-Android-13-arm64-preview-240bc18.tar.gz`: 1,040,917,377 compressed bytes
+(1.04 GB), with approximately 2.43 GB of regular-file payload before import.
+This is an optional complete Android userspace image, not just a driver archive.
+The system/vendor pair is Waydroid LineageOS 20 / Android 13, API 33, ARM64,
+VANILLA system and MAINLINE vendor, dated 2026-09-27.
+
+| Included layer | Contents and role |
+| --- | --- |
+| Original Android userspace | Init, Bionic/linker, ART, APEX modules, framework, Binder service managers, PackageManager, netd and other system services |
+| Original desktop and apps | SurfaceFlinger, Waydroid HWC, launcher/SystemUI/Settings, DocumentsUI, Jelly browser, WebView, calendar, calculator, clock, contacts and other original system APKs |
+| Original graphics libraries | ANGLE/EGL/OpenGL ES and Waydroid display components; ANGLE uses the Trames Vulkan frontend |
+| `vulkan.trames.so` | 224,464-byte ARM64 frontend to the shared native Vulkan forwarding path |
+| `gralloc.trames.so` | 8,328-byte ARM64 allocator/native-buffer adapter |
+| `trames-hal-service` | 8,584-byte ARM64 launcher for the image's original audio HIDL implementations; host audio is not accepted |
+| Configuration and provenance | Vulkan/ANGLE/Gralloc properties, `/.trames-android.json`, image/component hashes and graphics contract version; adjacent JSON and SHA-256 sidecars describe the archive |
+| Source and license material | Original image material plus Trames GPL text and separate iPad/runtime source exports under `/.trames-android/sources/` |
+
+The archive excludes mutable `/data`, device, proc/sys, runtime, storage and
+cache contents. Installed Geekbench/other added APKs, their data, benchmark
+results and diagnostic fixtures are not included. The VANILLA image has no
+Google Play/GMS. Presence of an original system app or service does not establish
+host camera, microphone, telephony, external-storage or other hardware support.
+
+Binder, Linux syscall compatibility, networking, guest scheduling and memory,
+the native GPU backend and host window/input bridges live in the Trames host
+application/shared runtime, rather than being another kernel in this archive.
+Each imported environment receives its own persistent data; transient mounts,
+devices and boot overlays are prepared by the host at startup.
+
+The archive records source `240bc18` and runtime `37ea838` as **build provenance**;
+its bundled source exports are not the executing runtime. Its three adapter
+hashes still match the locally built adapters. Network acceptance and the
+WebView clock fix require the newer tested host, currently runtime `4333558`;
+they do not require rebuilding the unchanged Android APKs/HALs. The archive's
+legacy `network/audio not accepted` limitation predates network acceptance:
+IPv4 outbound is now tested on Mac when explicitly enabled, while host audio
+remains unaccepted. Refresh this metadata and source provenance for the next
+package publication. This remains a local preview; physical iPad Android
+acceptance and general app/hardware conformance are pending.
+
 The official Geekbench 6.7.1 Android APK (464,329,585 bytes, SHA-256
 `e3b1a98c5edae1ef03106b8a0c25f13953b6550ddf5db6ae968179f3b4ef7249`)
 installed through unchanged PackageManager in 5.198 seconds and cold-launched
@@ -69,8 +112,8 @@ publish network 100, and ConnectivityService reports `VALIDATED` after real
 HTTP/HTTPS probes. A Bionic probe with a non-root application identity and the
 original Android `inet` supplementary group resolves through all four ordinary /
 network-bound, `AI_ADDRCONFIG` on/off entry points. The original Geekbench CPU
-and Vulkan runs have completed all workloads; final scores and the remaining
-result-page limitation are recorded below. No APK networking or license check
+and Vulkan runs have completed all workloads; final scores and the result-page
+compatibility fix are recorded below. No APK networking or license check
 is patched or bypassed.
 
 Networking stays explicitly selectable: the preview default remains `off`.
