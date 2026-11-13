@@ -153,6 +153,7 @@ fn run() -> Result<u8, Box<dyn std::error::Error>> {
         .peekable();
     let mut budget = DEFAULT_INSTRUCTION_LIMIT;
     let mut trace = false;
+    let mut android_init = false;
     let backend = "cached";
     let mut metrics = false;
     let mut cpu_count = None;
@@ -179,7 +180,7 @@ fn run() -> Result<u8, Box<dyn std::error::Error>> {
     let mut guest_path = false;
     let mut extra_env = Vec::new();
     if args.peek().is_some_and(|a| a == "--help" || a == "-h") {
-        println!("Usage: trames-run [--rootfs VERIFIED_ALPINE_TAR_GZ] [--guest] [--env KEY=VALUE] [--virtual-network ID] [--host-map VIRTUAL_IP=HOST_IP] [--network off|loopback|outbound|full] [--storage DIR | --memory] [--storage-budget BYTES|16GiB|auto] [--storage-info] [--memory-budget 1GiB] [--process-memory-budget 512MiB] [--max-instructions N] [--trace-syscalls] [--metrics] [--cpus auto|1..32] [--accelerator pure|off] [--native-bsearch] [--native-allocator] [--wayland] [--vulkan] [--video] [--musl-libc HOST_ELF] [--file /GUEST=HOST] [--exec-file /GUEST=HOST] [--export /GUEST=HOST] [--install-busybox] [--pty] [--] ELF [ARG ...]\nDefault native network: full host TCP/UDP access and listeners, subject to host OS permissions; use --network outbound or loopback to restrict it.\n--virtual-network ID selects isolated 10.0.0.ID / fd00::ID and private loopback; ID must be 2..254.\n--host-map explicitly forwards a logical external IP to a trusted host service.\nDefault storage: .trames/storage in the current directory, 16 GiB logical file budget on first creation.\nDefault committed memory: 512 MiB per address space, 1 GiB aggregate; --process-memory-budget and --memory-budget change these limits without preallocation.\nImports copy selected host files; exports create new host files after guest exit.\n--memory selects the ephemeral 16 MiB test backend. auto uses the storage volume's total capacity.");
+        println!("Usage: trames-run [--rootfs VERIFIED_ALPINE_TAR_GZ] [--guest] [--env KEY=VALUE] [--virtual-network ID] [--host-map VIRTUAL_IP=HOST_IP] [--network off|loopback|outbound|full] [--storage DIR | --memory] [--storage-budget BYTES|16GiB|auto] [--storage-info] [--memory-budget 1GiB] [--process-memory-budget 512MiB] [--max-instructions N] [--trace-syscalls] [--metrics] [--cpus auto|1..32] [--accelerator pure|off] [--native-bsearch] [--native-allocator] [--wayland] [--vulkan] [--video] [--musl-libc HOST_ELF] [--file /GUEST=HOST] [--exec-file /GUEST=HOST] [--export /GUEST=HOST] [--install-busybox] [--android-init] [--pty] [--] ELF [ARG ...]\nDefault native network: full host TCP/UDP access and listeners, subject to host OS permissions; use --network outbound or loopback to restrict it.\n--virtual-network ID selects isolated 10.0.0.ID / fd00::ID and private loopback; ID must be 2..254.\n--host-map explicitly forwards a logical external IP to a trusted host service.\nDefault storage: .trames/storage in the current directory, 16 GiB logical file budget on first creation.\nDefault committed memory: 512 MiB per address space, 1 GiB aggregate; --process-memory-budget and --memory-budget change these limits without preallocation.\nImports copy selected host files; exports create new host files after guest exit.\n--memory selects the ephemeral 16 MiB test backend. auto uses the storage volume's total capacity.");
         return Ok(0);
     }
     while let Some(option) = args.peek() {
@@ -325,6 +326,10 @@ fn run() -> Result<u8, Box<dyn std::error::Error>> {
                     return Err("instruction limit must be positive".into());
                 }
             }
+            "--android-init" => {
+                args.next();
+                android_init = true;
+            }
             "--trace-syscalls" => {
                 args.next();
                 trace = true;
@@ -406,25 +411,25 @@ fn run() -> Result<u8, Box<dyn std::error::Error>> {
     for (guest, host, executable) in files {
         vfs.import_reader(guest.as_bytes(), &mut File::open(host)?, executable)?;
     }
-    if vfs
-        .stat_at(-100, b"/etc/resolv.conf")
-        .is_err_and(|e| e.0 == 2)
-    {
-        if vfs.stat_at(-100, b"/etc").is_err_and(|e| e.0 == 2) {
-            vfs.mkdir_at(-100, b"/etc", 0o755)?;
+    trames_distro::install_resolver(
+        &mut vfs,
+        if virtual_network.is_some() {
+            b"nameserver 10.0.0.1\n"
+        } else {
+            b"nameserver 169.254.0.53\n"
+        },
+    )?;
+    if android_init {
+        trames_distro::android::prepare(&mut vfs)?;
+        for entry in trames_distro::android::environment() {
+            let key = entry.split_once('=').unwrap().0;
+            if !envp
+                .iter()
+                .any(|e: &String| e.starts_with(&format!("{key}=")))
+            {
+                envp.push(entry);
+            }
         }
-        vfs.import_reader(
-            b"/etc/resolv.conf",
-            &mut if virtual_network.is_some() {
-                &b"nameserver 10.0.0.1\n"[..]
-            } else {
-                // Match iPad sessions: Docker filters loopback nameservers
-                // from container resolv.conf. The managed resolver is reachable
-                // from each guest network namespace, without a daemon override.
-                &b"nameserver 169.254.0.53\n"[..]
-            },
-            false,
-        )?;
     }
     if let Some(libc) = musl_libc {
         trames_distro::install_musl(&mut File::open(libc)?, &mut vfs)?;
@@ -530,6 +535,16 @@ fn run() -> Result<u8, Box<dyn std::error::Error>> {
     let began = std::time::Instant::now();
     let result = runtime.run(&mut HostOutput::new(), budget);
     let synced = runtime.linux.vfs.sync();
+    if trace {
+        if let Ok(log) = runtime.linux.vfs.syslog(3, 1024 * 1024) {
+            if !log.is_empty() {
+                eprintln!(
+                    "trames guest kernel log:\n{}",
+                    String::from_utf8_lossy(&log)
+                );
+            }
+        }
+    }
     if metrics {
         let seconds = began.elapsed().as_secs_f64();
         let profile = &runtime.metrics;

@@ -1,0 +1,51 @@
+{
+  "ndk": {
+    "version": "27.3.13750724",
+    "url": "https://dl.google.com/android/repository/android-ndk-r27d-linux.zip",
+    "archive": "android-ndk-r27d-linux.zip",
+    "size": 663956036,
+    "sha1": "22105e410cf29afcf163760cc95522b9fb981121",
+    "sysroot_prefix": "android-ndk-r27d/toolchains/llvm/prebuilt/linux-x86_64/sysroot/"
+  },
+  "api": 33,
+  "architecture": "aarch64",
+  "platform_tag": "android-13.0.0_r83",
+  "headers": {
+    "cutils/native_handle.h": {
+      "url": "https://android.googlesource.com/platform/system/core/+/refs/tags/android-13.0.0_r83/libcutils/include/cutils/native_handle.h?format=TEXT",
+      "sha256": "274d7252085f24c975191eb07f209166a78aa1d92d6a7a1f32a84b9b6ae4a42d"
+    },
+    "hardware/hardware.h": {
+      "url": "https://android.googlesource.com/platform/hardware/libhardware/+/refs/tags/android-13.0.0_r83/include/hardware/hardware.h?format=TEXT",
+      "sha256": "05cc2f0108d6c87e36384380559943d34acd104e3c2ade9aeba4415cfb23aee8"
+    },
+    "hardware/hwvulkan.h": {
+      "url": "https://android.googlesource.com/platform/frameworks/native/+/refs/tags/android-13.0.0_r83/vulkan/include/hardware/hwvulkan.h?format=TEXT",
+      "sha256": "c719f035ed301690d5688bf3378dde99ec398c4ceec1e5dce0983b4496a930e2"
+    },
+    "system/graphics-base-v1.0.h": {
+      "url": "https://android.googlesource.com/platform/system/core/+/refs/tags/android-13.0.0_r83/libsystem/include/system/graphics-base-v1.0.h?format=TEXT",
+      "sha256": "1950723d8660b2c00cf5685f51031e79af0814ad4c00b94ef48caf4af3646d1f"
+    },
+    "system/graphics-base-v1.1.h": {
+      "url": "https://android.googlesource.com/platform/system/core/+/refs/tags/android-13.0.0_r83/libsystem/include/system/graphics-base-v1.1.h?format=TEXT",
+      "sha256": "8e22bfdc66a7ec548e972238b53e827574303ea3c066a7cd4e9708159b5b6d39"
+    },
+    "system/graphics-base-v1.2.h": {
+      "url": "https://android.googlesource.com/platform/system/core/+/refs/tags/android-13.0.0_r83/libsystem/include/system/graphics-base-v1.2.h?format=TEXT",
+      "sha256": "1c22b50c060d6e9709b1e68ffc0d4a5d309166d640620f3f21ddc12d62a5c226"
+    },
+    "system/graphics-base.h": {
+      "url": "https://android.googlesource.com/platform/system/core/+/refs/tags/android-13.0.0_r83/libsystem/include/system/graphics-base.h?format=TEXT",
+      "sha256": "58dadf516c74c48ebf0ca652f5eb5fb15a0f432fe7b4d18888bf36b42444fa4a"
+    },
+    "system/graphics-sw.h": {
+      "url": "https://android.googlesource.com/platform/system/core/+/refs/tags/android-13.0.0_r83/libsystem/include/system/graphics-sw.h?format=TEXT",
+      "sha256": "957e089937f69aee425c4a2de7995ab42bfbee606567963af625fa429e7f5497"
+    },
+    "system/graphics.h": {
+      "url": "https://android.googlesource.com/platform/system/core/+/refs/tags/android-13.0.0_r83/libsystem/include/system/graphics.h?format=TEXT",
+      "sha256": "3ad78e6b394e080fb034e1ae4ff6f893e2ecf6c093235990b3d9e8d0daf8250d"
+    }
+  }
+}
