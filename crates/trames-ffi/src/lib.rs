@@ -74,6 +74,76 @@ unsafe fn copy(pointer: *mut u8, capacity: u32, source: &[u8]) -> Result<i32, &'
 pub extern "C" fn trames_abi_version() -> u32 {
     3
 }
+/// Cold shared TOML codec for native configuration UIs; no runtime is started.
+/// # Safety
+/// Input/output follow the bounded caller-owned buffer contract of this ABI.
+#[no_mangle]
+pub unsafe extern "C" fn trames_environment_config(
+    input: *const u8,
+    length: u32,
+    output: *mut u8,
+    capacity: u32,
+) -> i32 {
+    boundary(|| {
+        let result = (|| -> Result<i32, String> {
+            use trames_distro::environment as model;
+            let request: serde_json::Value =
+                serde_json::from_slice(unsafe { bytes(input, length) }.map_err(str::to_string)?)
+                    .map_err(|e| e.to_string())?;
+            let action = request["action"]
+                .as_str()
+                .ok_or("configuration action required")?;
+            let data = match action {
+                "defaults" => {
+                    let mut c =
+                        model::Manifest::new(request["distribution"].as_str().unwrap_or("alpine"));
+                    c.environment.name = request["name"].as_str().unwrap_or("").into();
+                    c.environment.uuid = request["uuid"].as_str().unwrap_or("").into();
+                    if let Some(mode) = request["init"].as_str() {
+                        c.boot.mode = match mode {
+                            "systemd" => model::Init::Systemd,
+                            "shell" if c.environment.kind == trames_distro::boot::Target::Linux => {
+                                model::Init::Shell
+                            }
+                            _ => c.boot.mode,
+                        };
+                    }
+                    c.validate().map_err(|e| e.to_string())?;
+                    model::encode(&c).map_err(|e| e.to_string())?.into_bytes()
+                }
+                "grant" => {
+                    let auth = model::Authorization {
+                        environment_uuid: request["uuid"]
+                            .as_str()
+                            .ok_or("environment UUID required")?
+                            .into(),
+                        grant: model::Grant {
+                            clipboard: request["clipboard"].as_bool().unwrap_or(false),
+                            ..Default::default()
+                        },
+                    };
+                    model::encode(&auth)
+                        .map_err(|e| e.to_string())?
+                        .into_bytes()
+                }
+                "decode" => serde_json::to_vec(
+                    &model::Manifest::parse(request["toml"].as_str().ok_or("TOML is required")?)
+                        .map_err(|e| e.to_string())?,
+                )
+                .map_err(|e| e.to_string())?,
+                "encode" => {
+                    let c: model::Manifest = serde_json::from_value(request["value"].clone())
+                        .map_err(|e| e.to_string())?;
+                    c.validate().map_err(|e| e.to_string())?;
+                    model::encode(&c).map_err(|e| e.to_string())?.into_bytes()
+                }
+                _ => return Err("unknown configuration action".into()),
+            };
+            unsafe { copy(output, capacity, &data) }.map_err(str::to_string)
+        })();
+        result.unwrap_or_else(error)
+    })
+}
 /// # Safety
 /// `layer` is a live native CAMetalLayer configured on the UI main thread.
 /// Its bounds/drawable size remain fixed while attached. Retained natively;
@@ -677,5 +747,43 @@ mod tests {
             assert!(trames_last_error(error.as_mut_ptr(), error.len() as u32) > 0);
         }
         assert_eq!(trames_session_close(u64::MAX), -1);
+    }
+}
+
+#[cfg(test)]
+mod environment_config_tests {
+    use super::*;
+    fn codec(value: serde_json::Value) -> Result<Vec<u8>, String> {
+        let input = serde_json::to_vec(&value).unwrap();
+        let mut output = vec![0u8; 65536];
+        let n = unsafe {
+            trames_environment_config(
+                input.as_ptr(),
+                input.len() as u32,
+                output.as_mut_ptr(),
+                output.len() as u32,
+            )
+        };
+        if n < 0 {
+            Err(LAST_ERROR.with(|e| e.borrow().clone()))
+        } else {
+            output.truncate(n as usize);
+            Ok(output)
+        }
+    }
+    #[test]
+    fn native_ui_uses_the_shared_toml_model_without_starting_a_session() {
+        let text=codec(serde_json::json!({"action":"defaults","name":"work","distribution":"android","uuid":"e478757e-f5ab-40d9-aa62-d048b27da7a3"})).unwrap();
+        let config: serde_json::Value = serde_json::from_slice(
+            &codec(serde_json::json!({"action":"decode","toml":String::from_utf8(text).unwrap()}))
+                .unwrap(),
+        )
+        .unwrap();
+        assert_eq!(config["boot"]["mode"], "android");
+        assert_eq!(config["network"]["mode"], "host");
+        assert!(codec(serde_json::json!({"action":"encode","value":config})).is_ok());
+        assert!(
+            codec(serde_json::json!({"action":"decode","toml":"[resources]\ncpuz=4"})).is_err()
+        );
     }
 }

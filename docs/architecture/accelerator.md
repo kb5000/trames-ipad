@@ -239,7 +239,7 @@ Avoid conflating the proposed Native Accelerator with the existing static `trame
 
 ## 9. Control plane, observability, and compatibility
 
-Retain the existing `/dev/trames-bridge` `accel.*` API as an explicit administrative/diagnostic surface. Consider extending `accel.list` (through a **new schema revision**, not a silent meaning change) to report:
+Retain the `/dev/trames/info` `accel.*` API as an explicit administrative/diagnostic surface. Consider extending `accel.list` (through a **new schema revision**, not a silent meaning change) to report:
 
 - backend/profile ID and family, guest ELF Build-ID/digest, ABI/protocol versions, enabled/disabled/incompatible reason;
 - native-call count, guest bytes read/written, copies induced by COW, guest-to-host transfer, native execution time and total bridge overhead;

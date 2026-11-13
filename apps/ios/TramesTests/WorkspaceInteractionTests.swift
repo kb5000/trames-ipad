@@ -15,7 +15,8 @@ final class WorkspaceInteractionTests: XCTestCase {
         let directory=FileManager.default.temporaryDirectory.appendingPathComponent("multiple-terminals-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at:directory,withIntermediateDirectories:true)
         let archive=try XCTUnwrap(Bundle.main.resourceURL).appendingPathComponent("GuestVulkan/acceptance/alpine-minirootfs.tar.gz")
-        let native=try LocalSession(store:directory.appendingPathComponent("store"),rootfs:archive,total:1<<30,available:1<<30,network:"off",multipleTerminals:true)
+        let (config,grants)=try authorizedBridgeConfiguration(directory)
+        let native=try LocalSession(store:directory.appendingPathComponent("store"),rootfs:archive,total:1<<30,available:1<<30,network:"off",multipleTerminals:true,environmentConfig:config,environmentGrants:grants)
         var created:[TerminalSession]=[first],output:[UUID:String]=[:]
         let defaults=UserDefaults.standard,oldBridge=defaults.object(forKey:"bridgeEnabled")
         let pasteboard=UIPasteboard.general
@@ -88,7 +89,7 @@ final class WorkspaceInteractionTests: XCTestCase {
         // once; a secondary shell can copy to the actual iPad pasteboard.
         let json="{\"version\":1,\"id\":1,\"method\":\"clipboard.write\",\"params\":{\"text\":\"multiple terminals 中文\"}}"
         stage="Bridge after closing first view"
-        third.send(Data("exec 3<>/dev/trames-bridge; printf '%s\\n' '\(json)' >&3; IFS= read -r reply <&3; printf '\\nBRIDGE_FROM_THIRD\\n'; exec 3>&-\n".utf8))
+        third.send(Data("exec 3<>/dev/trames/clipboard; printf '%s\\n' '\(json)' >&3; IFS= read -r reply <&3; printf '\\nBRIDGE_FROM_THIRD\\n'; exec 3>&-\n".utf8))
         try await wait {output[third.id,default:""].contains("\r\nBRIDGE_FROM_THIRD\r\n")}
         XCTAssertEqual(pasteboard.string,"multiple terminals 中文")
         stage="shared pause/resume"

@@ -15,6 +15,9 @@ struct RootfsEnvironment: Codable, Equatable, Identifiable, Sendable {
     var needsSetup: Bool? = nil
     var sourceSHA256: String? = nil
     var target: String? = nil
+    // Boot mode is an in-memory UI cache of the TOML profile. This JSON file
+    // is an installation/File Provider index, never configuration authority.
+    enum CodingKeys:String,CodingKey {case id,name,store,distribution,packages,needsSetup,sourceSHA256,target}
     var bootTarget: String { target ?? (distro == "android" ? "android" : "linux") }
     var distro: String { distribution ?? "alpine" }
     var boot: String { initMode ?? "shell" }

@@ -32,12 +32,14 @@ public struct AndroidImageDownload: Decodable, Sendable {
 public final class LocalSession: @unchecked Sendable {
     private let lock = NSLock()
     private var handle: UInt64
-    public init(store: URL, rootfs: URL?, total: UInt64, available: UInt64, network: String = "full", useVolumeBudget: Bool = false, muslLibc: URL? = nil, pureAccelerator: Bool = false, vulkanICD: URL? = nil, memoryBudgetMiB: Int = 1024, processMemoryBudgetMiB: Int = 512, multipleTerminals: Bool = false, initiallyPaused: Bool = false, storeOwnerLock: URL? = nil, distribution: String = "alpine", initMode: String = "shell", command: [String]? = nil, debianPackages: String? = nil, prepareSystemd: Bool = false, target: String = "linux") throws {
+    public init(store: URL, rootfs: URL?, total: UInt64, available: UInt64, network: String = "host", useVolumeBudget: Bool = false, muslLibc: URL? = nil, pureAccelerator: Bool = false, vulkanICD: URL? = nil, memoryBudgetMiB: Int = 1024, processMemoryBudgetMiB: Int = 512, multipleTerminals: Bool = false, initiallyPaused: Bool = false, storeOwnerLock: URL? = nil, distribution: String = "alpine", initMode: String = "shell", command: [String]? = nil, debianPackages: String? = nil, prepareSystemd: Bool = false, target: String = "linux", environmentConfig: URL? = nil, environmentGrants: URL? = nil) throws {
         guard memoryBudgetMiB > 0, processMemoryBudgetMiB > 0,
               processMemoryBudgetMiB <= memoryBudgetMiB,
               memoryBudgetMiB <= (1 << 28) else { throw TramesError.message("Invalid guest memory budget") }
         guard trames_abi_version() == 3 else { throw TramesError.message("Unsupported Trames ABI") }
         var options: [String:Any] = ["store": store.path, "volume_total":total, "volume_available":available, "network":network]
+        if let environmentConfig {let data=try Data(contentsOf:environmentConfig);guard data.count<=65536,let text=String(data:data,encoding:.utf8) else{throw TramesError.message("Invalid environment TOML")};options["environment_config"]=text}
+        if let environmentGrants {options["environment_grants"]=try String(contentsOf:environmentGrants,encoding:.utf8)}
         if let rootfs { options["rootfs"] = rootfs.path }
         options["distro"] = distribution; options["init"] = initMode; options["target"] = target
         if let command { options["command"] = command }
@@ -62,6 +64,11 @@ public final class LocalSession: @unchecked Sendable {
         guard handle != 0 else { throw Self.lastError() }
     }
     deinit { close() }
+    public static func environmentConfig(_ request:[String:Any]) throws -> Data {
+        let input=try JSONSerialization.data(withJSONObject:request);var output=[UInt8](repeating:0,count:65536)
+        let count=input.withUnsafeBytes{p in output.withUnsafeMutableBufferPointer{b in trames_environment_config(p.bindMemory(to:UInt8.self).baseAddress,UInt32(p.count),b.baseAddress,UInt32(b.count))}}
+        guard count>=0 else{throw lastError()};return Data(output.prefix(Int(count)))
+    }
     public static func reset(store: URL, storeOwnerLock: URL? = nil) async throws {
         var options=["store":store.path]
         if let storeOwnerLock {options["store_owner_lock"] = storeOwnerLock.path}

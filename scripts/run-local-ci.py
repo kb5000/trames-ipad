@@ -94,6 +94,8 @@ def rust_inputs(root):
     for folder in ('crates', 'runtime/crates', 'runtime/vendor', '.cargo'):
         paths.update(p for p in (root / folder).rglob('*') if p.suffix in
                      ('.rs', '.toml', '.lock', '.c', '.h', '.m', '.mm', '.py', '.json', '.S'))
+    for folder in ('resources','runtime/resources'):
+        paths.update(p for p in (root/folder).rglob('*') if p.is_file())
     return file_map(root, paths)
 
 

@@ -10,4 +10,13 @@ final class ConfigurationTests: XCTestCase {
             XCTAssertFalse(FileManager.default.fileExists(atPath: store.path))
         }
     }
+    func testNativeConfigurationUsesSharedTomlAndRejectsUnknownFields() throws {
+        let data=try LocalSession.environmentConfig(["action":"defaults","distribution":"debian","name":"工作环境","uuid":UUID().uuidString.lowercased()])
+        let text=try XCTUnwrap(String(data:data,encoding:.utf8))
+        let value=try XCTUnwrap(try JSONSerialization.jsonObject(with:LocalSession.environmentConfig(["action":"decode","toml":text])) as? [String:Any])
+        XCTAssertEqual((value["environment"] as? [String:Any])?["name"] as? String,"工作环境")
+        XCTAssertEqual((value["network"] as? [String:Any])?["mode"] as? String,"host")
+        XCTAssertThrowsError(try LocalSession.environmentConfig(["action":"decode","toml":"[resources]\ncpuz=4"]))
+    }
+
 }

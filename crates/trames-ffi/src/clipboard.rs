@@ -75,7 +75,7 @@ fn transfer(
     broker: trames_bridge::Broker,
     current: impl Fn() -> bool,
 ) {
-    let Ok(connection) = broker.connect() else {
+    let Ok(connection) = broker.connect_channel(trames_bridge::Channel::Clipboard) else {
         return;
     };
     let mut text = Vec::new();
@@ -171,6 +171,9 @@ mod tests {
     fn compositor_text_read_write_wait_for_host_and_preserve_unicode() {
         for writing in [false, true] {
             let broker = trames_bridge::Broker::default();
+            broker
+                .configure(trames_bridge::Policy::default().with_clipboard(true))
+                .unwrap();
             let native = broker.clone();
             let (mut read, mut write) = NativePipe::pair().unwrap();
             let expected = "clipboard 中文 🧪";

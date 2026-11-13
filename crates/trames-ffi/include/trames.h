@@ -16,6 +16,7 @@ extern "C" {
  * No callbacks into Swift.
  */
 uint32_t trames_abi_version(void);
+int32_t trames_environment_config(const uint8_t *json,uint32_t length,uint8_t *output,uint32_t capacity);
 /* Native-only Metal target, retained until all native surface/swapchain leases
  * end. Configure fixed layer bounds/drawableSize on main before attaching.
  * Window movement/scale uses its parent transform. Pointer is never guest data.

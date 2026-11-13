@@ -13,7 +13,8 @@ final class ClipboardBridgeTests:XCTestCase {
         let directory=FileManager.default.temporaryDirectory.appendingPathComponent("clipboard-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at:directory,withIntermediateDirectories:true)
         let archive=try XCTUnwrap(Bundle.main.resourceURL).appendingPathComponent("GuestVulkan/acceptance/alpine-minirootfs.tar.gz")
-        let native=try LocalSession(store:directory.appendingPathComponent("store"),rootfs:archive,total:1<<30,available:1<<30,network:"off")
+        let (config,grants)=try authorizedBridgeConfiguration(directory)
+        let native=try LocalSession(store:directory.appendingPathComponent("store"),rootfs:archive,total:1<<30,available:1<<30,network:"off",environmentConfig:config,environmentGrants:grants)
         let controller=BridgeController();controller.attach(native)
         defer {
             controller.close();native.close();pasteboard.items=oldItems
@@ -31,7 +32,7 @@ final class ClipboardBridgeTests:XCTestCase {
         for (index,method,params) in [(1,"clipboard.write",["text":expected]),(2,"clipboard.read",[:])] {
             let request:[String:Any] = ["version":1,"id":index,"method":method,"params":params]
             let json=String(decoding:try JSONSerialization.data(withJSONObject:request,options:.sortedKeys),as:UTF8.self)
-            let command=Data("exec 3<>/dev/trames-bridge; printf '%s\\n' '\(json)' >&3; IFS= read -r reply <&3; printf '\\nCLIP_REPLY_\(index):%s\\n' \"$reply\"; exec 3>&-\n".utf8)
+            let command=Data("exec 3<>/dev/trames/clipboard; printf '%s\\n' '\(json)' >&3; IFS= read -r reply <&3; printf '\\nCLIP_REPLY_\(index):%s\\n' \"$reply\"; exec 3>&-\n".utf8)
             XCTAssertEqual(try native.send(command),command.count)
             let deadline=Date().addingTimeInterval(10);var output=""
             let marker="\r\nCLIP_REPLY_\(index):"

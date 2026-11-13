@@ -27,13 +27,15 @@ final class RootfsSnapshotTests:XCTestCase {
         let catalog=RootfsCatalog(version:1,environments:[profile]);try catalog.save(alias)
         XCTAssertEqual(try RootfsCatalog.load(alias).environments,[profile])
     }
-    func testLegacyCatalogAndNewEnvironmentMetadataRoundTrip() throws {
+    func testInstallationIndexDoesNotPersistBootConfiguration() throws {
         let legacy=try JSONDecoder().decode(RootfsCatalog.self,from:Data("{\"version\":1,\"environments\":[{\"id\":\"alpine\",\"name\":\"Alpine\",\"store\":\"environment\"}]}".utf8))
         XCTAssertEqual(legacy.environments[0].distro,"alpine")
         XCTAssertEqual(legacy.environments[0].boot,"shell")
         let debian=RootfsEnvironment(id:"debian",name:"Debian",store:"environments/debian",distribution:"debian",initMode:"systemd",packages:"standard",needsSetup:true)
         let roundTrip=try JSONDecoder().decode(RootfsCatalog.self,from:JSONEncoder().encode(RootfsCatalog(version:1,environments:legacy.environments+[debian])))
-        XCTAssertEqual(roundTrip.environments[1],debian)
+        var indexed=debian;indexed.initMode=nil
+        XCTAssertEqual(roundTrip.environments[1],indexed)
+        XCTAssertFalse(String(decoding:try JSONEncoder().encode(roundTrip),as:UTF8.self).contains("initMode"))
         XCTAssertEqual(roundTrip.environments[0],legacy.environments[0])
     }
     func testPendingImportDoesNotHideInstalledEnvironmentsFromFiles() throws {

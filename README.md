@@ -153,6 +153,11 @@ guest root、UID/GID、目录权限及持久化所有权修复了安装 Vim 的 
 
 ## M5 更新（0.3.0 / build 4）
 
+Historical release notes below describe the original single Bridge device.
+Current environments use shared TOML profiles and capability-scoped
+`/dev/trames/*` devices, including `/dev/trames/clipboard`; see the
+[environment guide](docs/guides/ipad-environments.md#toml-configuration).
+
 [下载经验证的 unsigned IPA](https://github.com/kb5000/trames/actions/runs/38145322045/artifacts/11704499330)，解压后用 Windows Sideloadly 签名安装。两种 Linux 后端和七项 iPad 模拟器测试通过；[验证记录](docs/validation/m5.md) 包含校验和及验收范围。
 
 首次 Alpine 下载会等待网络授权生效，并对暂时的连接／DNS 错误最多尝试三次；界面在此期间显示正在准备环境。

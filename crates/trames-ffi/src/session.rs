@@ -23,6 +23,8 @@ static WORKERS: AtomicUsize = AtomicUsize::new(0);
 #[serde(deny_unknown_fields)]
 pub struct Options {
     pub store: PathBuf,
+    pub environment_config: Option<String>,
+    pub environment_grants: Option<String>,
     pub rootfs: Option<PathBuf>,
     #[serde(default = "default_distro")]
     pub distro: String,
@@ -167,7 +169,7 @@ fn default_columns() -> u16 {
     80
 }
 fn default_network() -> String {
-    "full".into()
+    "host".into()
 }
 #[derive(Clone, Serialize)]
 pub struct Status {
@@ -273,7 +275,7 @@ impl Session {
             || options.volume_available > options.volume_total
             || !matches!(
                 options.network.as_str(),
-                "off" | "loopback" | "outbound" | "full"
+                "off" | "loopback" | "outbound" | "full" | "host" | "none"
             )
         {
             return Err("invalid session configuration".into());
@@ -537,6 +539,64 @@ fn prepare_guest_defaults(vfs: &mut Vfs, network: &str, distro: &str) -> Result<
     }
     Ok(())
 }
+fn control_policy(
+    config: &trames_distro::environment::Manifest,
+    authorization: Option<&trames_distro::environment::Authorization>,
+) -> Result<trames_bridge::Policy, String> {
+    let denied = trames_distro::environment::Grant::default();
+    let grant = match authorization {
+        Some(auth) => auth
+            .for_environment(&config.environment.uuid)
+            .map_err(|e| e.to_string())?,
+        None => &denied,
+    };
+    let effective = grant.effective(&config.interop);
+    // Platform support intersects host grants. iPad cannot execute host commands.
+    Ok(trames_bridge::Policy::new(
+        effective.host_ui.enabled,
+        false,
+        effective.files.enabled,
+        false,
+        false,
+    )
+    .with_clipboard(effective.clipboard.enabled))
+}
+
+#[cfg(test)]
+mod control_policy_tests {
+    use super::*;
+    use trames_bridge::Channel;
+    use trames_distro::environment::{Authorization, Grant, Manifest};
+
+    #[test]
+    fn clipboard_needs_a_matching_independent_host_grant() {
+        let mut config = Manifest::default();
+        config.environment.uuid = "2615675a-e07a-42b5-a87d-777a678103e1".into();
+        assert!(!control_policy(&config, None)
+            .unwrap()
+            .allows(Channel::Clipboard));
+        let auth = Authorization {
+            environment_uuid: config.environment.uuid.clone(),
+            grant: Grant {
+                clipboard: true,
+                host_exec: true,
+                host_cli: true,
+                ..Default::default()
+            },
+        };
+        let policy = control_policy(&config, Some(&auth)).unwrap();
+        assert!(policy.allows(Channel::Clipboard));
+        assert!(!policy.allows(Channel::HostControl));
+        assert!(!policy.allows(Channel::HostExec));
+        config.interop.clipboard.enabled = false;
+        assert!(!control_policy(&config, Some(&auth))
+            .unwrap()
+            .allows(Channel::Clipboard));
+        config.environment.uuid.clear();
+        assert!(control_policy(&config, Some(&auth)).is_err());
+    }
+}
+
 fn open_store(options: &Options) -> Result<Vfs, String> {
     let disk = DiskOptions {
         volume_space: Some(VolumeSpace {
@@ -555,11 +615,10 @@ fn open_store(options: &Options) -> Result<Vfs, String> {
     .map_err(|e| e.to_string())
 }
 fn run(
-    options: Options,
+    mut options: Options,
     session: Arc<Session>,
     commands: mpsc::Receiver<Command>,
 ) -> Result<u8, String> {
-    let guest_memory_limits = memory_limits(&options)?;
     let android = options.target == trames_distro::boot::Target::Android;
     if android
         && (options.init != "shell"
@@ -588,17 +647,6 @@ fn run(
         vfs.set_storage_limits(limits).map_err(|e| e.to_string())?;
     }
     vfs.attach_bridge(session.bridge.clone());
-    if !android
-        && vfs
-            .stat_at(trames_vfs::AT_FDCWD, b"/usr/local/bin/trames")
-            .is_err()
-    {
-        vfs.import_executable(
-            b"/usr/local/bin/trames",
-            include_bytes!("../../../resources/guest/trames").to_vec(),
-        )
-        .map_err(|e| e.to_string())?;
-    }
     // First installation uses a new store chosen by the native adapter. A partial
     // failed installation is never promoted to the active environment directory.
     if vfs
@@ -615,6 +663,111 @@ fn run(
             .ok_or("rootfs archive is required for first installation")?;
         install_image(&options, archive, &mut vfs)?;
     }
+    trames_distro::environment::install_cli_for(&mut vfs, options.target)
+        .map_err(|e| e.to_string())?;
+    use trames_distro::environment as model;
+    let mut defaults = model::Manifest::new(&options.distro);
+    let authorization = options
+        .environment_grants
+        .as_deref()
+        .map(model::decode::<model::Authorization>)
+        .transpose()
+        .map_err(|e| e.to_string())?;
+    if let Some(auth) = &authorization {
+        defaults.environment.uuid = auth.environment_uuid.clone();
+    }
+    let manifest = if let Some(text) = &options.environment_config {
+        Some(model::Manifest::with_defaults(text, &defaults).map_err(|e| e.to_string())?)
+    } else {
+        model::guest(&mut vfs, &defaults)
+            .map_err(|e| e.to_string())?
+            .map(|mut config| {
+                // Guest declarations cannot replace the host authorization identity.
+                config.environment = defaults.environment.clone();
+                config.image = defaults.image.clone();
+                config
+            })
+    };
+    let mut cpu_count = None;
+    let mut login = None;
+    if let Some(config) = &manifest {
+        if config.environment.kind != options.target {
+            return Err("environment type differs from the installed image".into());
+        }
+        options.network = match config.network.mode {
+            model::NetworkMode::Host => "host",
+            model::NetworkMode::None => "none",
+            model::NetworkMode::Bridge => "bridge",
+        }
+        .into();
+        if config.network.mode == model::NetworkMode::Bridge {
+            return Err(
+                "select a host-provided Trames bridge attachment before starting this environment"
+                    .into(),
+            );
+        }
+        cpu_count = Some(
+            config
+                .resources
+                .cpus
+                .resolve(std::thread::available_parallelism().map_or(1, usize::from))
+                .map_err(|e| e.to_string())?,
+        );
+        if let Some(mib) = model::memory_mib(
+            config
+                .resources
+                .memory_limit
+                .as_deref()
+                .unwrap_or(&config.resources.memory),
+        )
+        .map_err(|e| e.to_string())?
+        {
+            let bytes = usize::try_from(mib)
+                .ok()
+                .and_then(|n| n.checked_mul(1 << 20))
+                .ok_or("memory size overflow")?;
+            options.memory_budget_bytes = Some(bytes);
+            options.process_memory_budget_bytes = Some(bytes);
+        }
+        options.pure_accelerator = config
+            .components
+            .thunking
+            .resolve(true)
+            .map_err(|e| e.to_string())?;
+        options.native_bsearch = options.pure_accelerator;
+        options.native_allocator = options.pure_accelerator;
+        options.vulkan_accelerator = config
+            .components
+            .vulkan
+            .resolve(options.vulkan_icd.is_some())
+            .map_err(|e| e.to_string())?;
+        options.wayland = config.display.windows;
+        if options.command.is_none() && options.debian_setup.is_none() {
+            options.init = if config.boot.mode == model::Init::Systemd {
+                "systemd"
+            } else {
+                "shell"
+            }
+            .into();
+            if !options.multiple_terminals && !android {
+                options.command = Some(config.session.shell.clone());
+            }
+            login = Some(config.session.clone());
+        }
+        if !config.mounts.is_empty() {
+            return Err("iPad shared folders require a platform security-scoped attachment".into());
+        }
+        session
+            .bridge
+            .configure(control_policy(config, authorization.as_ref())?)
+            .map_err(|e| format!("host capability policy: {e}"))?;
+    } else {
+        session
+            .bridge
+            .configure(Default::default())
+            .map_err(|e| e.to_string())?;
+    }
+    let guest_memory_limits = memory_limits(&options)?;
     if session.cancelled.load(Ordering::Acquire) {
         return Err("session cancelled".into());
     }
@@ -636,7 +789,16 @@ fn run(
         None
     };
     let native_terminals = if options.multiple_terminals && init_monitor.is_some() {
-        Some(crate::terminals::NativeTerminals::for_systemd(&mut vfs)?)
+        Some(crate::terminals::NativeTerminals::for_systemd_launcher(
+            &mut vfs,
+            &trames_distro::terminals::launcher_at(
+                &manifest
+                    .as_ref()
+                    .map(|c| c.session.shell.clone())
+                    .unwrap_or_else(|| vec!["/bin/sh".into(), "-il".into()]),
+                manifest.as_ref().map(|c| c.session.cwd.as_str()),
+            ),
+        )?)
     } else {
         None
     };
@@ -675,18 +837,13 @@ fn run(
             .map_err(|e| e.to_string())?;
     }
     let mode = match options.network.as_str() {
-        "off" => NetworkMode::Off,
+        "off" | "none" => NetworkMode::Off,
         "loopback" => NetworkMode::Loopback,
         "outbound" => NetworkMode::Outbound,
-        "full" => NetworkMode::Full,
+        "full" | "host" => NetworkMode::Full,
         _ => return Err("invalid network mode".into()),
     };
-    if android {
-        vfs.configure_managed_uplink(mode)
-    } else {
-        vfs.configure_network(mode)
-    }
-    .map_err(|e| e.to_string())?;
+    vfs.configure_network(mode).map_err(|e| e.to_string())?;
     let mut environment: Vec<String> = if android {
         trames_distro::android::environment()
     } else {
@@ -740,9 +897,11 @@ fn run(
             trames_distro::android::display(&mut vfs, directory.as_bytes())
                 .map_err(|e| e.to_string())?;
         }
-        server
-            .attach_clipboard(Arc::new(crate::clipboard::Clipboard::new(&session)))
-            .map_err(|e| e.to_string())?;
+        if session.bridge.enabled(trames_bridge::Channel::Clipboard) {
+            server
+                .attach_clipboard(Arc::new(crate::clipboard::Clipboard::new(&session)))
+                .map_err(|e| e.to_string())?;
+        }
         *session
             .wayland
             .lock()
@@ -781,7 +940,17 @@ fn run(
     } else if let Some(command) = options.command {
         command
     } else if options.multiple_terminals {
-        vec!["/bin/sh".into(), "-c".into(), crate::terminals::INIT.into()]
+        vec![
+            "/bin/sh".into(),
+            "-c".into(),
+            trames_distro::terminals::launcher_at(
+                &manifest
+                    .as_ref()
+                    .map(|c| c.session.shell.clone())
+                    .unwrap_or_else(|| vec!["/bin/sh".into(), "-il".into()]),
+                manifest.as_ref().map(|c| c.session.cwd.as_str()),
+            ),
+        ]
     } else {
         vec!["/bin/sh".into(), "-il".into()]
     };
@@ -789,6 +958,11 @@ fn run(
     let bytes = vfs
         .executable(argv.first().ok_or("empty Linux command")?.as_bytes())
         .map_err(|e| e.to_string())?;
+    if let Some(login) = &login {
+        if !android && init_monitor.is_none() {
+            vfs.chdir(login.cwd.as_bytes()).map_err(|e| e.to_string())?;
+        }
+    }
     let mut runtime = Runtime::load_with_options(
         &bytes,
         &argv,
@@ -800,11 +974,20 @@ fn run(
             native_bsearch: options.native_bsearch,
             native_allocator: options.native_allocator,
             vulkan_accelerator: options.vulkan_accelerator,
-            video_accelerator: options.vulkan_accelerator,
-            ..Default::default()
+            video_accelerator: manifest
+                .as_ref()
+                .map(|c| c.components.vaapi.resolve(true))
+                .transpose()
+                .map_err(|e| e.to_string())?
+                .unwrap_or(options.vulkan_accelerator),
+            audio_output: manifest.as_ref().is_some_and(|c| c.components.audio),
+            audio_input: manifest.as_ref().is_some_and(|c| c.components.audio_input),
         },
     )
     .map_err(|e| e.to_string())?;
+    if let Some(cpus) = cpu_count {
+        runtime.cpu_count = cpus;
+    }
     if android {
         runtime.linux.task_limit = trames_distro::android::TASK_LIMIT;
     }

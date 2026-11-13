@@ -69,6 +69,22 @@ with tempfile.TemporaryDirectory(prefix='trames-embedding-') as directory:
     temporary=Path(directory)
     store=temporary/'staging'
     options={'store':str(store),'rootfs':str(archive),'volume_total':64<<30,'volume_available':32<<30,'network':'off'}
+    identity='d2cb3881-23df-49fa-b70b-c6eca3fa9885'
+    options['environment_config']=f"""version = 1
+[environment]
+name = "embedding"
+uuid = "{identity}"
+[resources]
+cpus = 2
+[network]
+mode = "none"
+[components]
+vulkan = false
+thunking = {"true" if os.getenv("TRAMES_TEST_MUSL") else "false"}
+[session]
+cwd = "/root"
+"""
+    options['environment_grants']=f'environment_uuid = "{identity}"\n[grant]\nclipboard = true\n'
     if os.getenv('TRAMES_TEST_MUSL'):
         options.update(musl_libc=os.environ['TRAMES_TEST_MUSL'],pure_accelerator=True)
     assert request(api.trames_environment_install,payload=options)==0,error()
@@ -90,8 +106,9 @@ with tempfile.TemporaryDirectory(prefix='trames-embedding-') as directory:
     wait(lambda:(output.extend(drain(handle)) or (b'MEMORY_TOTAL_65536\r\n' in output and b'MEMORY_PROCESS_32768\r\n' in output)))
     def bridge_command(method, params):
         output.clear()
-        payload=json.dumps({'version':1,'id':1,'method':method,'params':params},separators=(',',':'))
-        send(handle,("trames bridge '"+payload+"'; printf '\\nBRIDGE_DONE:%d\\n' $?\n").encode())
+        device='clipboard' if method.startswith('clipboard.') else 'info'
+        payload=json.dumps(params,separators=(',',':'))
+        send(handle,("trames rpc "+device+" "+method+" '"+payload+"'; printf '\\nBRIDGE_DONE:%d\\n' $?\n").encode())
     def native_request():
         b=ctypes.create_string_buffer(65536)
         found=[]

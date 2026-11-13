@@ -82,3 +82,26 @@ iPadOS restricts background Metal execution. Preview capture runs only while
 requested, at up to 5 fps and 960×720. Staged Files edits continue to commit on a
 foreground return. See the shared [display lifecycle design](https://github.com/kb5000/trames-runtime/blob/main/docs/architecture/display-lifecycle.md)
 and [validation record](../validation/display-lifecycle-20261104.json).
+
+## TOML configuration
+
+New environments have a host profile at `profiles/<installation-id>.toml` in
+Trames' shared data root. The app uses the same Rust manifest model as Mac; its
+[configuration and authorization specification](https://github.com/kb5000/trames-runtime/blob/main/docs/architecture/environment-configuration.md)
+is shared. Without an explicit host profile the runtime reads guest
+`/etc/trames/env.toml`. There is no configuration migration reader.
+
+`roots.json` is an installation and File Provider index. It identifies private
+stores and pending package preparation; boot settings are loaded from TOML.
+Host-owned `grants-<installation-id>.toml` records are stored separately in the
+app's authorization directory and are bound to the manifest UUID. New
+owner-created environments retain basic clipboard integration; other command
+capabilities require explicit grants. Clipboard controls use
+`/dev/trames/clipboard`, independently of host UI, CLI, and execution.
+
+The iPad embedding supports Linux shell/systemd and Android manifests and
+resolves CPU/component selections from them. Its `auto` memory selection uses
+the app's platform budget. Arbitrary host execution and Mac private-network or
+host-mount administration are unavailable on iPad; Files permissions remain
+security-scoped platform authorizations. Unsupported settings fail rather than
+silently selecting a different network or mounting an arbitrary host path.
