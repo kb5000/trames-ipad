@@ -1,7 +1,10 @@
-# Android container bring-up: foundation implementation plan
+# Android container bring-up: foundation and roadmap
 
-Status: source audit and implementation plan, 2026-11-13. Android has not yet
-been booted or tested in Trames. Runtime audit baseline:
+Status: shared Binder foundation implemented, 2026-11-13. Unchanged Waydroid
+service-manager/client binaries pass on the interpreter and Mac HVF with 1, 4
+and 12 CPU slots. A full Android system has not yet booted. Implementation:
+[`fe2f98e`](https://github.com/kb5000/trames-runtime/commit/fe2f98ea447cf23a13083fd962c34a7b65bd1075).
+Original runtime audit baseline:
 [`c082959`](https://github.com/kb5000/trames-runtime/commit/c0829591f8652e55c3edb074f593f680efbb76b9).
 
 The first target is a complete ARM64 Android desktop and APK execution using an
@@ -45,10 +48,10 @@ dependency; it is not silently treated as unnecessary for boot.
 | ID | Component | Current audit | First implementation / acceptance boundary |
 | --- | --- | --- | --- |
 | A0 | Image import and Android boot profile | Rootfs import, PID 1, mount namespaces, tmpfs/proc/sysfs/devpts and systemd boot preparation exist; Android policy is missing. | Install a matching image pair, prepare private device/mount trees and boot properties, retain `/data` across restart, and run the existing init with observable logs. |
-| A1 | Binder IPC | No Android Binder implementation found. | Provide separate binder/hwbinder/vndbinder contexts, the 64-bit device UAPI, transaction mappings, object/FD transfers, nested synchronous calls, ordered one-way delivery, death notifications, poll/wait and original process/thread/FD cleanup. See the complete subsystem contract below. |
-| A2 | Android shared memory | memfd, shared mappings, FD transfer and four original seals exist. `memfd.rs` rejects seal bits outside `0x0f`. | Implement real `F_SEAL_FUTURE_WRITE` semantics across file I/O, shared mapping admission and native views. Verify the selected libcutils memfd detection. Add ashmem-on-memfd ioctls or a legacy ashmem device only if the selected image actually requires them. |
-| A3 | SELinux boot compatibility | No SELinux policy engine or selinuxfs; security xattrs currently report absence on reads and reject writes. | Prefer the upstream Waydroid no-SELinux route. Add only demonstrated permissive metadata/query dependencies, scoped to the Android profile. Enforcing policy is outside this boot milestone. |
-| A4 | Boot metadata, logging and basic ABI | kmsg/syslog, proc task/memory/time views, random devices, PTYs, ELF/PT_INTERP, fork/exec, signals, timers, epoll, futexes and membarrier have implementations. | Reuse them. Probe Bionic/linker64, TLS, allocator reservations, tagged-address controls and ART-used synchronization. Supply missing `/proc/cmdline`, `/proc/bootconfig` and selected sysfs metadata from the guest boot profile, without leaking host configuration or advertising absent hardware. |
+| A1 | Binder IPC | Shared 64-bit Binder foundation implemented; original Waydroid service-manager/client smoke test passes. | Provide separate binder/hwbinder/vndbinder contexts, the 64-bit device UAPI, transaction mappings, object/FD transfers, nested synchronous calls, ordered one-way delivery, death notifications, poll/wait and original process/thread/FD cleanup. See the complete subsystem contract below. |
+| A2 | Android shared memory | memfd, FD transfer and `F_SEAL_FUTURE_WRITE` are implemented, including existing VMA write rights. | Validate new write/mapping denial and retained old shared mappings through the canonical memory model. Verify the selected libcutils memfd detection. Add ashmem-on-memfd ioctls or a legacy ashmem device only if the selected image actually requires them. |
+| A3 | SELinux boot compatibility | Disabled: no SELinux LSM or selinuxfs; security xattrs report absence on reads and reject writes. `/proc/cmdline` includes `selinux=0`. | Use the existing Waydroid no-SELinux adaptations. Do not expose an `enforce=0` pseudo-filesystem or claim permissive/enforcing policy support. |
+| A4 | Boot metadata, logging and basic ABI | kmsg/syslog, proc task/memory/time views, random devices, PTYs, ELF/PT_INTERP, fork/exec, signals, timers, epoll, futexes and membarrier have implementations. | Reuse them. Probe Bionic/linker64, TLS, allocator reservations, tagged-address controls and ART-used synchronization. The basic `/proc/cmdline` and empty `/proc/bootconfig` now exist; supply Android-specific boot arguments and selected sysfs metadata from the guest boot profile, without leaking host configuration or advertising absent hardware. |
 | A5 | Unix IPC and credentials | Unix streams/datagrams, peer credentials, SCM_CREDENTIALS and SCM_RIGHTS exist. | Test init property sockets and logd against their real credential/group queries. Audit SO_PEERGROUPS and any remaining security-context queries. Peer identity must be the guest's original credentials, never the host UID/groups. |
 | A6 | Task profiles and memory-pressure interfaces | cgroup v2 membership, pids, freezer/kill and oom_score_adj exist. CPU/memory/cpuset controllers and PSI are not established; pidfd names exist without a corresponding implementation found in this audit. | Resolve the selected task_profiles/cgroups configuration, implement required pidfd open/signal/readiness/exit lifetime, and provide a real LMKD pressure path. Existing pids/freezer support does not mean all Android cgroup controllers exist. |
 | A7 | Android sync fences | Vulkan fences/timelines and existing resource waits exist; Linux sync_file/sw_sync device ABI was not found. | Reuse completion resources for pollable sync-file FDs, fence merge/status and the sw_sync operations used by the selected HWC. Retain native-image ownership until its real producer/consumer fences complete. |
@@ -57,13 +60,15 @@ dependency; it is not silently treated as unnecessary for boot.
 | A10 | netd and networking | Shared TCP/UDP/DNS, routing/netlink and netfilter resources exist; full Android eBPF integration does not. | Reuse Waydroid's no-BPF configuration/patches where present, while returning honest unsupported results from absent kernel APIs. Verify IP configuration, app DNS and actual app traffic. Do not infer netd compatibility from Docker networking. |
 | A11 | APEX, vold and external storage | Existing VFS/bind mounts and private persistence are reusable; APEX image activation and FUSE are not established. | Inspect how the selected container image activates its packaged modules. Run the existing apexd/vold path where compatible. FUSE and external-storage operations remain conditional boot/app dependencies, not assumed successes. Full AVB, OTA, disk encryption and phone block-device setup are outside this milestone. |
 
-The shared-memory gap is concrete: current
-[memfd seal admission](https://github.com/kb5000/trames-runtime/blob/c0829591f8652e55c3edb074f593f680efbb76b9/crates/trames-vfs/src/memfd.rs#L310)
-rejects `F_SEAL_FUTURE_WRITE`. Current upstream
+The original shared-memory audit found that `F_SEAL_FUTURE_WRITE` was rejected.
+It is now implemented: writes/pwrites and newly writable shared mappings fail,
+while existing mappings retain their original maximum permissions. Size changes
+remain possible unless GROW/SHRINK seals are also present. The same-source native
+Linux/Trames fixture tests this behavior. Current upstream
 [libcutils probing](https://android.googlesource.com/platform/system/core/+/refs/heads/main/libcutils/ashmem-dev.cpp)
-checks this seal and ashmem compatibility ioctls on memfds. The exact probe in
-the chosen Android 13 binaries still needs confirmation; newer-source checks
-must not be silently assigned to every older image.
+also checks ashmem compatibility ioctls on memfds. The chosen Android 13 graphics
+and shared-memory callers still need their own acceptance; do not assign every
+newer-source probe to older binaries or add a legacy ashmem device speculatively.
 
 ## Binder as one complete subsystem
 
@@ -103,27 +108,94 @@ Use the pinned Linux Binder UAPI and native Linux differential tests where a
 Binder-capable reference is available. Linux reference tests are test tooling,
 not a replacement for Trames' userspace kernel.
 
-## SELinux scope: boot without policy enforcement
+## Implemented Binder foundation
 
-The owner's initial requirement is boot compatibility, including permissive-only
-support if needed. Waydroid already provides a smaller initial path:
+The common runtime owns the implementation in
+[`trames-vfs/src/binder`](https://github.com/kb5000/trames-runtime/tree/main/crates/trames-vfs/src/binder),
+with the retained ioctl read adapter in
+[`trames-linux/src/direct/binder.rs`](https://github.com/kb5000/trames-runtime/blob/main/crates/trames-linux/src/direct/binder.rs).
+Both products use these resources; the interpreter and HVF remain CPU backends.
 
-- Its init patch skips policy loading and enters second stage directly.
-- Its service-manager patch bypasses SELinux access checks.
-- Its Binder patch omits transaction security-context requests.
-- Its host/container layer supplies Binder nodes; its init patch removes the
-  binderfs mount/device setup.
+- `/dev/binder`, `/dev/hwbinder` and `/dev/vndbinder` have independent contexts,
+  shared by the original environment and all its worker path views.
+- The 64-bit protocol includes synchronous/nested replies, per-node ordered
+  one-way calls, strong/weak object translation, flat FDs, SG parent fixups/FD
+  arrays, loopers, thread exit, death/clear/acknowledgement and node queries.
+- Binder receive mappings use canonical lazy shared pages, including when the
+  guest requests `MAP_PRIVATE`. They cannot gain write permission or be inherited
+  by a process fork. Unmapping releases logical VMA lifetime independently of
+  retained physical CPU snapshots; process/thread exit also retires Binder state.
+- Ready requests finish on their original caller without allocating a parked
+  request. Blocking reads subscribe, recheck and surrender the existing execution
+  slot. Already consumed write commands are retained rather than replayed.
+- Epoll admission/readiness follows the original Binder resource. A context
+  manager's pinned null context object never receives null-pointer reference
+  notifications. FDA cleanup tracks the actual destination slot, including reuse
+  of a number for the same OFD, and applies original process-lock close semantics.
+- Freeze, transaction security-context delivery and one-way spam detection are
+  not advertised or faked. Binderfs control, ashmem compatibility and full Android
+  boot are separate remaining milestones.
 
-Use these existing upstream adaptations after checking the selected image's
-provenance. Do not implement a policy parser or fabricate a selinuxfs merely to
-turn an already supported no-SELinux path into a policy-loading path.
+The first inspected binary image is the official ARM64 VANILLA build
+`lineage-20.0-20260927-VANILLA-waydroid_arm64-system.zip` (912,267,974 bytes), SHA-256
+`5fb8179ed4455f45919c5a2bfbfdd1591619295994ad321217f03bb1dcfc53a7`.
+Its system fingerprint is
+`waydroid/lineage_waydroid_arm64/waydroid_arm64:13/TQ3A.230901.001/aleasto09270452:userdebug/test-keys`.
+Only the required original executables/libraries were imported for the smoke
+test. No complete AOSP checkout or Android source rebuild was used. This does
+not validate a vendor image or the complete system/vendor boot pair.
 
-If real callers still require a permissive subset, specify their actual files,
-xattrs or socket calls and implement metadata consistently on original guest
-objects. A supplied `enforce` view remains zero; attempts to enable enforcement
-are unsupported. Do not return success for loading/enforcing a policy that is
-not implemented. Generic Linux environments retain their existing behavior.
-This initial profile does not claim Android security-policy conformance.
+The same ARM64 static
+[`binder-foundation.c`](https://github.com/kb5000/trames-runtime/blob/main/tests/fixtures/binder-foundation.c)
+passes against the Linux Binder driver and Trames. It covers nested callbacks,
+OFD transfer/close/reuse, FD_CLOEXEC, death, VM_DONTCOPY and future-write sealing.
+The separate
+[`android-binder-supervisor.c`](https://github.com/kb5000/trames-runtime/blob/main/tests/fixtures/android-binder-supervisor.c)
+runs the image's unchanged Bionic linker, libraries, `servicemanager` and `service`
+clients in one guest environment, and requires both a registered `manager` in
+`service list` and `Service manager: found` from a separate `service check manager`
+process. A successful process exit alone is insufficient.
+The same supervisor also requires the image's original `toybox getenforce` to
+report `Disabled`.
+
+Resource tests also cover independent contexts, one-way progress across nodes,
+SG/FDA rollback, malformed offsets, signal cancellation, concurrent references,
+worker-open context identity and retained-snapshot unmap lifetime. The interpreter
+executor test runs Binder round trips with 1, 4 and 12 execution slots and requires
+zero coordinator service requests and zero per-mm checkpoints for those calls.
+The full static fixture additionally uses ordinary fork/mmap/munmap/exit, whose
+existing structural memory paths are outside that no-checkpoint IPC assertion.
+
+### Validation at integration
+
+| Layer | Result |
+| --- | --- |
+| Binder/memfd resources | 13 Binder tests and the future-write seal test pass, including concurrent reference updates, FD-slot reuse and logical unmap lifetime. |
+| Session kernel conformance | 489 tests pass; three existing tests remain ignored. The former rejection of the newly supported seal was updated and its affected test rerun. |
+| Native Linux comparison | The same ARM64 static Binder fixture passes on the Linux Binder driver and the interpreter. |
+| Mac hardware execution | The static Binder fixture and original Android service supervisor both pass with 1, 4 and 12 CPU slots. Their execution metrics contain zero coordinator service requests and no cohort-return syscalls. |
+| Interpreter execution | The original Android service supervisor passes with 1, 4 and 12 CPU slots. The focused IPC executor test also requires zero per-mm checkpoints. |
+| Complete local CI | Common runtime macOS 7/7 and Linux 7/7; Mac product 12/12, including both channel builds and packaging. |
+| iPad integration | `trames-ffi` checks successfully for `aarch64-apple-ios`; these interpreter tests do not constitute an Android boot on a physical iPad. |
+
+The real Bionic binaries exposed one CPU-backend gap: Mac HVF rejected
+execute-only mappings. The Mac backend now represents these with ARM64 AP=10
+and UXN clear. A signed hardware test verifies instruction execution, denied
+guest data loads and RX-to-X permission changes. This change is isolated from
+the common Binder implementation and the iPad interpreter.
+
+## SELinux scope: disabled
+
+The owner selected disabled mode, not permissive mode. Trames exposes no
+selinuxfs or SELinux filesystem type, rejects attempts to mount it, and reports
+missing security labels rather than manufacturing contexts or a policy engine.
+The generic boot view records `selinux=0`; no `enforce=0` view is synthesized.
+
+Use Waydroid's existing no-SELinux init/service adaptations, including its omission
+of Binder security-context requests. Keep unsupported APIs honest. This milestone
+does not load policies, perform enforcing checks or claim Android security-policy
+conformance. Android boot metadata and remaining service dependencies will be
+added from actual image failures rather than inventing permissive interfaces.
 
 Binderfs is similarly conditional: private device contexts are required, but
 mounting binderfs and BINDER_CTL_ADD are only needed if the chosen launcher/image
@@ -180,8 +252,8 @@ requiring a port of the entire LXC host manager.
 
 Each implementation batch gets focused resource tests, same-source Linux
 comparisons where applicable and actual guest binaries. Run complete local CI
-at integration/release boundaries. This document-only change does not require
-rebuilding CPU, graphics, Linux or existing installed applications.
+at integration/release boundaries. Reuse unchanged passed results when only
+documentation or test-recording details change.
 
 ## GPU route: reuse execution, add Android buffer interoperability
 
