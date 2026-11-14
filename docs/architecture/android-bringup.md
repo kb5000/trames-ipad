@@ -1099,3 +1099,10 @@ SystemUI ANR occurred during concurrent CI; its main thread was still running
 initialization, and an obsolete ANR input window subsequently remained. This
 cold-start/load condition is recorded, not claimed fully resolved by a successful
 foreground click. See the [follow-up record](../validation/android-desktop-followup-20261115.json).
+
+The final clean-build Files cold launch took 2,534 ms. A real mouse click selected
+Downloads and its content query returned
+`java.lang.IllegalArgumentException: Volume external_primary not found` through
+the original ContentProvider. The app remained alive. This confirms a missing
+Android external-storage volume, rather than a native click being lost; full
+file-content acceptance remains open.

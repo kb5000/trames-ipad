@@ -83,7 +83,10 @@
       "navigation_observed": true,
       "no_new_jni_overflow_during_soak": true,
       "file_contents_accepted": false,
-      "missing_feature": "Android emulated external storage / FUSE"
+      "missing_feature": "Android emulated external storage / FUSE",
+      "cold_launch_ms": 2534,
+      "download_directory_mouse_navigation": true,
+      "content_error": "java.lang.IllegalArgumentException: Volume external_primary not found"
     }
   },
   "remaining_observations": [
