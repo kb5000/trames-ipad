@@ -106,18 +106,24 @@ host-mount administration are unavailable on iPad; Files permissions remain
 security-scoped platform authorizations. Unsupported settings fail rather than
 silently selecting a different network or mounting an arbitrary host path.
 
-## Planned task-capacity configuration
+## Task capacity and planned live configuration
 
-Owner decision, 2026-11-14: replace the Linux/Android-specific task-count defaults
-with a larger shared default and Linux-compatible live sysctl administration.
-This is recorded work, not an implemented configuration option.
+The shared default is now 65,536 admitted tasks for both Linux and Android. The
+former Linux-only default of 256 could reject ordinary Firefox renderer thread
+creation with `EAGAIN`. This ceiling is atomic admission metadata: it does not
+preallocate tasks, guest memory or host execution threads. Existing lower
+embedding-supplied limits remain effective.
+
+Owner decision, 2026-11-14: add Linux-compatible live sysctl administration. That
+configuration interface remains planned; increasing the default does not make
+`threads-max` writable yet.
 
 The intended interface is `/proc/sys/kernel/threads-max`, with a proposed
 `[kernel.sysctl]` manifest table providing boot-time values. Guest `sysctl -w`
 and manifest initialization must update the same environment-owned capacity.
 `pid_max`, per-UID `RLIMIT_NPROC`, and cgroup `pids.max` remain distinct controls.
 Increasing capacity must not preallocate tasks, memory, or host threads. The
-exact default and schema will be settled in the implementation task; do not add
+schema will be settled in the implementation task; do not add
 a second independent `resources.tasks` quota or a coordinator/service thread.
 
 ## Alpine Firefox graphics payload
@@ -140,6 +146,9 @@ Linux startup seeds `/etc/machine-id` only when missing. Mac and iPad call the
 same shared runtime helper; existing identities and linked `/etc` directories
 are preserved. This does not install D-Bus: an accessibility-bus warning about a
 missing `dbus-launch` still requires the guest's own D-Bus packages/services.
+For Alpine, install `dbus-x11 at-spi2-core font-noto-cjk` and launch Firefox
+inside `dbus-run-session -- firefox` when no session bus is already running.
+These are guest packages, separate from the app's injected graphics payload.
 
 The iOS native Rust archive also carries a source-checked MoltenVK build record.
 `scripts/stage-ios-rust.py` builds and stages it with the correct Apple SDK;

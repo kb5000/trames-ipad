@@ -6,3 +6,5 @@ compiler="${MUSL_CC:-$(pwd)/target/busybox-build/musl/bin/musl-gcc}"
 mkdir -p tests/fixtures/bin
 "$compiler" -static -O2 -pthread -Wall -Wextra -Werror tests/fixtures/runtime-compat.c -o tests/fixtures/bin/runtime-compat
 "${HOST_CC:-cc}" -O2 -pthread -Wall -Wextra -Werror tests/fixtures/runtime-compat.c -o tests/fixtures/bin/runtime-compat-host
+"$compiler" -static -O2 -mno-outline-atomics -pthread -Wall -Wextra -Werror tests/fixtures/task-capacity.c -o tests/fixtures/bin/task-capacity
+"${HOST_CC:-cc}" -O2 -pthread -Wall -Wextra -Werror tests/fixtures/task-capacity.c -o tests/fixtures/bin/task-capacity-host

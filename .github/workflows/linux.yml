@@ -1322,6 +1322,7 @@ jobs:
         run: |
           bash scripts/build-runtime-compat-fixtures.sh
           python3 tests/integration/runtime-compat.py
+          python3 tests/integration/task-capacity.py
       - name: Compare inode notifications, epoll edges and fork with Linux
         run: |
           bash scripts/build-inotify-fixtures.sh

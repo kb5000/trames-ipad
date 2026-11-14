@@ -206,5 +206,72 @@
       "mac_dev": "signed product built; 4-CPU HVF pixel oracle passed; installed app unchanged",
       "stable": "unchanged"
     }
+  },
+  "firefox_task_capacity": {
+    "runtime_revision": "e2c1e30611c0813ae9c5b74c749bacc20313ab3d",
+    "failure": "The Linux default admitted only 256 tasks. Firefox reported WebRender thread creation EAGAIN, then software fallback also failed and IPC closed.",
+    "baseline_probe": "Before the default change a pthread probe created 255 children, then returned errno 11; the initial probe also inspected proc entries and is not byte-identical to the final entry/join-only fixture.",
+    "repair": {
+      "default_live_tasks": 65536,
+      "linux_android_shared": true,
+      "mac_override_removed": 1024,
+      "preallocated_tasks_or_memory": false,
+      "diagnostic": "Only failed task admission appends threads-max to the existing bounded kernel log.",
+      "live_sysctl_writes": "planned, not implemented"
+    },
+    "validation": {
+      "native_linux": {
+        "threads": 512,
+        "rounds": 4,
+        "result": "pass"
+      },
+      "interpreter": {
+        "cpus": 4,
+        "threads": 512,
+        "rounds": 4,
+        "result": "pass"
+      },
+      "physical_ipad": {
+        "threads": 512,
+        "rounds": 4,
+        "result": "pass",
+        "xcresult": "Test-TramesFirefoxProbeDev-2026.11.14_17-00-09-+0800.xcresult"
+      },
+      "mac_hvf": {
+        "cpus": 4,
+        "threads": 1536,
+        "rounds": 4,
+        "result": "pass",
+        "reported_threads_max": 65536
+      },
+      "shared_unit_tests": {
+        "passed": 731,
+        "ignored": 1
+      },
+      "interpreter_process_tests": {
+        "passed": 349,
+        "ignored": 2
+      },
+      "strict_clippy": "pass: affected shared crates and Mac product"
+    },
+    "physical_browser": {
+      "command": "firefox --no-remote --profile TEMP_PROFILE https://www.google.com/search?q=linux",
+      "start_local": "2026-11-14T17:14:46+08:00",
+      "observed_alive_until_local": "2026-11-14T17:50:00+08:00",
+      "monitor_360_seconds": "pass",
+      "interaction": "Changed search from linux to linux kernel; rendered results and stayed responsive.",
+      "parent_status_threads_observed": 105,
+      "resource_unavailable_log_matches": 0,
+      "peak_tasks": "not measured: proc/PID/task directory sampler undercounted; excluded from acceptance evidence.",
+      "stopping": "PID 12 was deliberately terminated after the soak to reload newly installed fonts and D-Bus."
+    },
+    "guest_packages": {
+      "dbus_x11": "installed",
+      "at_spi2_core": "already installed",
+      "font_noto_cjk": "Initial extraction returned EIO at NotoSerifCJK-Regular.ttc. The next APK transaction retried it successfully without storage code or quota changes; OK: 1068 MiB in 201 packages. Four CJK TTC files present, failed regular Serif file now 25.1 MiB. Initial root cause unconfirmed.",
+      "visual_check": "After restart, the Firefox Bilibili tab title rendered Chinese characters through Device Hub; user reported recovery and asked to finish iPad work."
+    },
+    "scope": "Installed updated iPad Dev only. Mac Dev built and exercised in isolated temporary stores; installed Mac apps and all Stable apps/environments unchanged.",
+    "limits": "This validates the task-admission regression, not general Firefox crash freedom. Missing logicOp/custom border color and the HiDPI cursor warning remain separate work."
   }
 }
