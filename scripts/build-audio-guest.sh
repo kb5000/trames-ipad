@@ -12,6 +12,9 @@ ${CC:-cc} -O2 -g -fPIC -DPIC -shared -Wall -Wextra -Werror \
   $(${PKG_CONFIG:-pkg-config} --libs alsa) \
   -Wl,-z,noexecstack -o "$out/libasound_module_pcm_trames.so"
 cp "$root/runtime/crates/trames-audio/guest/asound.conf" "$out/asound.conf"
+# The default ALSA configuration already loads /etc/asound.conf. Installing
+# the isolated test config there would recursively include that default file.
+sed '\|^</usr/share/alsa/alsa.conf>$|d' "$out/asound.conf" > "$out/asound-system.conf"
 ${CC:-cc} -O2 -g -Wall -Wextra -Werror \
   "$root/tests/fixtures/audio-native.c" \
   $(${PKG_CONFIG:-pkg-config} --cflags --libs alsa) -lm -lpthread \

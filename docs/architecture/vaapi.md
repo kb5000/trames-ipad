@@ -600,6 +600,11 @@ acceptance. Audio was muted; output/A-V synchronization remains outside scope.
 ## Native audio follow-up (2026-11-01)
 
 Standard ALSA output and capture now connect to the shared native audio backend.
+The guest build emits both an isolated `asound.conf` and an `asound-system.conf`
+fragment for `/etc/asound.conf`; the latter avoids including the distribution
+defaults recursively. Build against the guest libc: Alpine musl and Debian glibc
+plugins are separate artifacts. See the [Mac environment audio setup](https://github.com/kb5000/trames-mac/blob/main/docs/guides/environments.md#native-audio)
+for the normal Debian Firefox backend default and session bus setup.
 The final Mac output path uses AVAudioSourceNode device pull, rather than
 prefilling Audio Queue buffers with silence. This removes the persistent
 discontinuities heard in the first integration. Capture is accepted with the
