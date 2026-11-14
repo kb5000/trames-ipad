@@ -1433,6 +1433,7 @@ jobs:
           test -n "$VK_DRIVER_FILES"
           python3 tests/integration/vulkan-compute.py
           python3 tests/integration/vulkan-render.py
+          python3 tests/integration/vulkan-depth-clip.py
           python3 tests/integration/vulkan-texture.py
           CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-target}" cargo run --manifest-path runtime/Cargo.toml --release --locked -p trames-vulkan --example lifecycle -- tests/fixtures/bin/vulkan-compute.spv tests/fixtures/bin/vulkan-render.vert.spv tests/fixtures/bin/vulkan-render.frag.spv
         env:

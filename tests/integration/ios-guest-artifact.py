@@ -16,7 +16,7 @@ mesa = artifact.module('build-zink-gallium')
 with tempfile.TemporaryDirectory(prefix='trames-ios-graphics-') as temporary:
     output = Path(temporary)
     (output / 'libtrames_vulkan_icd.so').write_bytes(b'fixture ICD')
-    driver = {'wire_revision': 20, 'icd_sha256': digest(output / 'libtrames_vulkan_icd.so'),
+    driver = {'wire_revision': 21, 'icd_sha256': digest(output / 'libtrames_vulkan_icd.so'),
               'build_recipe_sha256': digest(root / 'scripts/build-vulkan-guest.sh'),
               'source_sha256': {str(p.relative_to(root)): digest(p)
                                 for p in (root / 'accelerator/vulkan').iterdir()
@@ -58,19 +58,21 @@ with tempfile.TemporaryDirectory(prefix='trames-ios-graphics-') as temporary:
     inputs['transform_feedback_patch_sha256'] = inputs.pop('tf_patch_sha256')
     inputs['cross_dispatch_patch_sha256'] = inputs.pop('cross_patch_sha256')
     inputs.update(recipe_sha256=digest(root / 'scripts/build-moltenvk.py'),
-                  manifest_sha256=digest(native.MANIFEST), arch='arm64', platform='ios',
+                  manifest_sha256=digest(native.MANIFEST), metal_private_api=False, arch='arm64', platform='ios',
                   transform_feedback_sources={p.name: digest(p)
                                               for p in native.NATIVE_TF.iterdir() if p.is_file()})
     record = {'inputs': inputs, 'rust_sha256': digest(library), 'rust_source_sha256': artifact.rust_sources()}
     path = directory / 'native-vulkan.json'
     path.write_text(json.dumps(record))
     artifact.check_native(directory)
-    for change in ('old-recipe', 'missing-host-image-fix', 'changed-rust-source', 'unmatched-rust-archive'):
+    for change in ('old-recipe', 'missing-host-image-fix', 'private-metal-api', 'changed-rust-source', 'unmatched-rust-archive'):
         current = dict(record, inputs=dict(inputs))
         if change == 'old-recipe':
             current['inputs']['recipe_sha256'] = 'old'
         elif change == 'missing-host-image-fix':
             current['inputs'].pop('host_image_patch_sha256')
+        elif change == 'private-metal-api':
+            current['inputs']['metal_private_api'] = True
         elif change == 'changed-rust-source':
             current['rust_source_sha256'] = {}
         else:

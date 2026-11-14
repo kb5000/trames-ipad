@@ -1026,3 +1026,24 @@ The signed Mac Dev app is updated; stable and installed iPad apps are unchanged.
 Physical iPad GPU rendering is not newly validated. Original results, diagnostic
 failures, selections and baseline comparison remain in the
 [Mac validation record](https://github.com/kb5000/trames-mac/blob/main/docs/validation/mac-vulkan-cts.json).
+
+
+## Public depth clipping (wire 21, 2026-11-14)
+
+The shared profile now exposes `VK_EXT_depth_clip_enable` and EDS3 dynamic depth
+clip enable only when the real driver provides the executable base feature. This
+also filters older drivers that report the dynamic field without the base
+extension. Static raster pNext state is copied into pipeline config word 132,
+flag 4194304; the existing operation 255 carries the dynamic selector directly to
+the native command buffer. No guest pointers survive pipeline compilation and no
+coordinator, state replay or per-draw global capability scan is introduced.
+
+Both Apple builds explicitly disable private Metal APIs. The native implementation
+backports upstream MoltenVK/SPIRV-Cross depth-clip emulation and updates compiler
+option serialization and pipeline-cache ABI. Normal complementary clip/clamp
+pipelines keep the native Metal path; pipelines that can use the independent
+combinations receive the required shader state. The
+[public-API equivalence registry](vulkan-equivalence.md) records costs, replacement
+criteria, Mac/iPad acceptance and the remaining logic-operation/custom-border
+work. Depth clip/clamp passed 432 color/depth cases per platform; this does not
+claim complete Vulkan conformance or completion of those other features.

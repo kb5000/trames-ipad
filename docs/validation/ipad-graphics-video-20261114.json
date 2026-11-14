@@ -148,5 +148,63 @@
     ],
     "packaging": "Negative tests reject stale guest/native source, old wire, missing/mismatched Gallium, unmatched Rust archive, wrong video libc and mismatched FFmpeg.",
     "unaffected": "Reused existing CPU, Linux, networking and Docker evidence; those implementations were unchanged."
+  },
+  "public_metal_equivalents": {
+    "date": "2026-11-14",
+    "policy": "Public APIs only on Mac and iPad; no private Metal API opt-in",
+    "wire_revision": 21,
+    "depth_clip_enable": {
+      "status": "implemented and validated",
+      "source_patch": "patches/moltenvk/0011-public-depth-clip-enable.patch",
+      "source_patch_sha256": "6bd82589f1d4a36cfb06e81c092619a70520eb2a79a725ecbf41cbf2baae94f6",
+      "native_mac": "target/moltenvk-patched/macos-arm64-6eb5c5401fb996dde951",
+      "native_ipad": "target/moltenvk-patched/ios-arm64-d63d9672b06094154f4f",
+      "oracle": "tests/fixtures/vulkan-depth-clip.c",
+      "cases_per_run": 432,
+      "passed": [
+        "Linux native Vulkan",
+        "Apple M6 native Metal",
+        "4-CPU interpreter guest on Apple M6",
+        "Physical iPad Air M3 / iPadOS 27.0.1",
+        "4-CPU Mac HVF product guest on Apple M6"
+      ],
+      "ipad_xcresult": "Test-TramesFirefoxProbeDev-2026.11.14_16-06-41-+0800.xcresult",
+      "ipad_attachment": "8C724049-3D82-4BFF-A980-345075E14E1D.txt",
+      "diagnostic_cache_errors": false,
+      "runtime_unit_tests": {
+        "passed": 66,
+        "ignored": 15
+      }
+    },
+    "logic_op": {
+      "status": "not exposed; public framebuffer-fetch prototype only",
+      "source": "tests/fixtures/vulkan-logic-fetch-metal.mm",
+      "mac_components_compared": 4096,
+      "operations": 16,
+      "overlapping_primitives": 2,
+      "pending": [
+        "remaining formats",
+        "MSAA",
+        "write masks and multiple attachments",
+        "physical iPad"
+      ]
+    },
+    "custom_border_color": {
+      "status": "not implemented or exposed"
+    },
+    "baseline_issue": {
+      "test": "tests/integration/vulkan-native-tf-runtime.py",
+      "failure": "Native timestamp query CPU/GPU copy comparison at public-tf.c:84",
+      "reproduced_old_driver": "macos-arm64-40ea6e9a8192eb134370",
+      "reproduced_new_driver": "macos-arm64-6eb5c5401fb996dde951",
+      "isolated_tf_without_timestamp_assertion": "passed capture/replay, topology/index/indirect, restart, zero-divisor and bounds tests",
+      "production_timestamps_changed": false
+    },
+    "runtime_revision": "e8e42af06530f0ea15a368b2f8fab3d8e3430486",
+    "products": {
+      "ipad_dev": "normal signed app installed and launched after XCTest",
+      "mac_dev": "signed product built; 4-CPU HVF pixel oracle passed; installed app unchanged",
+      "stable": "unchanged"
+    }
   }
 }

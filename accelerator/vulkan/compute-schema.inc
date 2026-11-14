@@ -46,6 +46,7 @@ static const struct compute_extension compute_extensions[] = {
     {"VK_EXT_line_rasterization", 1UL << 42},
     {"VK_EXT_sample_locations", 1UL << 43},
     {"VK_KHR_synchronization2", 1UL << 44},
+    {"VK_EXT_depth_clip_enable", 1UL << 45},
 };
 static const struct compute_feature compute_features[] = {
     {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES, offsetof(VkPhysicalDevice16BitStorageFeatures, storageBuffer16BitAccess), 4, 0, 1UL << 1, VK_API_VERSION_1_1},
@@ -76,6 +77,7 @@ static const struct compute_feature compute_features[] = {
     {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_IMAGE_COPY_FEATURES_EXT, offsetof(VkPhysicalDeviceHostImageCopyFeaturesEXT, hostImageCopy), 1, 110, 1UL << 39, VK_MAKE_API_VERSION(0, 1, 4, 0)},
     {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_LINE_RASTERIZATION_FEATURES_EXT, offsetof(VkPhysicalDeviceLineRasterizationFeaturesEXT, rectangularLines), 6, 111, 1UL << 42, UINT32_MAX},
     {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES, offsetof(VkPhysicalDeviceSynchronization2Features, synchronization2), 1, 117, 1UL << 44, VK_API_VERSION_1_3},
+    {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_CLIP_ENABLE_FEATURES_EXT, offsetof(VkPhysicalDeviceDepthClipEnableFeaturesEXT, depthClipEnable), 1, 118, 1UL << 45, UINT32_MAX},
 };
 static const struct compute_core12 compute_core12[] = {
     {39, 0},

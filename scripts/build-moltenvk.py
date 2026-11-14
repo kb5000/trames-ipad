@@ -39,12 +39,24 @@ EVENT_PATCH = ROOT/'patches/moltenvk/0008-preserve-queued-event-transitions.patc
 WAKE_PATCH = ROOT/'patches/moltenvk/0007-notify-host-fence-completion.patch'
 HOST_IMAGE_PATCH = ROOT/'patches/moltenvk/0009-preserve-host-coherent-heap-image-aliases.patch'
 HOST_FORMAT_PATCH = ROOT/'patches/moltenvk/0010-report-usable-host-image-formats.patch'
+DEPTH_CLIP_PATCH = ROOT/'patches/moltenvk/0011-public-depth-clip-enable.patch'
 IMAGE = Path('MoltenVK/MoltenVK/GPUObjects/MVKImage.mm')
 NATIVE_TF = ROOT/'runtime/crates/trames-vulkan/native/transform-feedback'
 
 
 def patch_paths(patch):
     return [Path(line[6:]) for line in patch.read_text().splitlines() if line.startswith('+++ b/')]
+
+
+def apply_depth_clip_patch(source):
+    paths = patch_paths(DEPTH_CLIP_PATCH)
+    before = {str(p): digest(source/p) for p in paths}
+    subprocess.run(['patch', '-s', '-p1', '-i', str(DEPTH_CLIP_PATCH)], cwd=source, input=b'', check=True)
+    pipeline = (source/'MoltenVK/MoltenVK/GPUObjects/MVKPipeline.mm').read_text()
+    assert 'opt.depth_clip_state_buffer_index,' in pipeline
+    assert 'opt.emulate_depth_clip_enable,' in pipeline
+    return dict(before=before, after={str(p): digest(source/p) for p in paths},
+                patch_sha256=digest(DEPTH_CLIP_PATCH))
 
 
 def apply_host_format_patch(source):
@@ -230,12 +242,19 @@ def main():
                 path = Path(tmp)/relative;path.parent.mkdir(parents=True, exist_ok=True)
                 path.write_bytes(archive.extractfile(member).read())
             native_host_formats = apply_host_format_patch(Path(tmp))
+            for relative in patch_paths(DEPTH_CLIP_PATCH):
+                if (Path(tmp)/relative).exists():
+                    continue
+                member = next(v for v in archive if v.name.endswith('/'+str(relative)))
+                path = Path(tmp)/relative;path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(archive.extractfile(member).read())
+            native_depth_clip = apply_depth_clip_patch(Path(tmp))
             archive_name = next(v for v in archive.getnames() if v.endswith('/Templates/spirv-tools/build.zip'))
             with zipfile.ZipFile(io.BytesIO(archive.extractfile(archive_name).read())) as headers:
                 assert headers.testzip() is None and 'build/OpenCLDebugInfo100.h' in headers.namelist()
             print(json.dumps(dict(original_sha256=before, patched_sha256=after, patch_sha256=digest(PATCH),
                 original_device_sha256=device_before, patched_device_sha256=device_after, timestamp_patch_sha256=digest(TIMESTAMP_PATCH), native_tf=native_tf,
-                native_sampler=native_sampler, native_components=native_components, native_wake=native_wake, native_events=native_events, native_host_images=native_host_images, native_host_formats=native_host_formats)))
+                native_sampler=native_sampler, native_components=native_components, native_wake=native_wake, native_events=native_events, native_host_images=native_host_images, native_host_formats=native_host_formats, native_depth_clip=native_depth_clip)))
         return
     assert platform.system() == 'Darwin', 'An Apple SDK host is required to build native MoltenVK'
     assert a.platform != 'ios' or a.arch == 'arm64', 'iOS device build requires arm64'
@@ -246,6 +265,7 @@ def main():
     toolchain = subprocess.check_output(['xcodebuild', '-version'], text=True)
     sdk_version = subprocess.check_output(['xcrun', '--sdk', sdk, '--show-sdk-version'], text=True).strip()
     inputs = dict(platform=a.platform, arch=a.arch, xcode=toolchain, sdk=sdk_version,
+                  metal_private_api=False, depth_clip_patch_sha256=digest(DEPTH_CLIP_PATCH),
                   patch_sha256=digest(PATCH), recipe_sha256=digest(Path(__file__)),
                   wake_patch_sha256=digest(WAKE_PATCH), event_patch_sha256=digest(EVENT_PATCH),
                   host_image_patch_sha256=digest(HOST_IMAGE_PATCH), host_format_patch_sha256=digest(HOST_FORMAT_PATCH),
@@ -302,8 +322,10 @@ def main():
     native_events = apply_event_patch(source)
     native_host_images = apply_host_image_patch(source)
     native_host_formats = apply_host_format_patch(source)
+    native_depth_clip = apply_depth_clip_patch(source)
     common = ['-configuration', 'Release', '-sdk', sdk, 'ARCHS='+a.arch,
               'ONLY_ACTIVE_ARCH=YES', 'CODE_SIGNING_ALLOWED=NO',
+              'GCC_PREPROCESSOR_DEFINITIONS=$(inherited) MVK_USE_METAL_PRIVATE_API=0 MVK_CONFIG_USE_METAL_PRIVATE_API=0',
               'SYMROOT='+str(out/'products'), 'OBJROOT='+str(out/'intermediates')]
     common.append('HEADER_SEARCH_PATHS=$(inherited) '+str(source/'TramesTF'))
     commands = [
@@ -333,7 +355,7 @@ def main():
     record.write_text(json.dumps(dict(inputs=inputs, commands=commands, original_transfer_sha256=before,
         patched_transfer_sha256=after, original_device_sha256=device_before,
         patched_device_sha256=device_after, library_sha256=digest(library)), indent=2)+'\n')
-    data = json.loads(record.read_text());data['native_transform_feedback']=native_tf;data['native_sampler']=native_sampler;data['native_components']=native_components;data['native_fence_wake']=native_wake;data['native_events']=native_events;data['native_host_images']=native_host_images;data['native_host_formats']=native_host_formats
+    data = json.loads(record.read_text());data['native_transform_feedback']=native_tf;data['native_sampler']=native_sampler;data['native_components']=native_components;data['native_fence_wake']=native_wake;data['native_events']=native_events;data['native_host_images']=native_host_images;data['native_host_formats']=native_host_formats;data['native_depth_clip']=native_depth_clip
     record.write_text(json.dumps(data, indent=2)+'\n')
     print(out)
 

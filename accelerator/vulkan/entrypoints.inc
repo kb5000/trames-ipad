@@ -132,6 +132,7 @@
     if(!strcmp(name,"vkCmdSetSampleLocationsEXT"))return (PFN_vkVoidFunction)vkCmdSetSampleLocationsEXT;
     if(!strcmp(name,"vkCmdSetLineStippleEXT"))return (PFN_vkVoidFunction)vkCmdSetLineStippleEXT;
     if(!strcmp(name,"vkGetPhysicalDeviceMultisamplePropertiesEXT"))return (PFN_vkVoidFunction)vkGetPhysicalDeviceMultisamplePropertiesEXT;
+    if(!strcmp(name,"vkCmdSetDepthClipEnableEXT"))return (PFN_vkVoidFunction)vkCmdSetDepthClipEnableEXT;
     if(!strcmp(name,"vkCopyMemoryToImageEXT"))return (PFN_vkVoidFunction)vkCopyMemoryToImageEXT;
     if(!strcmp(name,"vkCopyImageToMemoryEXT"))return (PFN_vkVoidFunction)vkCopyImageToMemoryEXT;
     if(!strcmp(name,"vkCopyImageToImageEXT"))return (PFN_vkVoidFunction)vkCopyImageToImageEXT;

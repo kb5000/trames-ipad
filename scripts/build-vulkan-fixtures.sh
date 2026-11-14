@@ -4,6 +4,11 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 bash scripts/build-vulkan-guest.sh
 mkdir -p tests/fixtures/bin target/vulkan-loader-sdk
+for stage in vert frag; do
+  "${GLSLANG_VALIDATOR:-glslangValidator}" -V "tests/fixtures/vulkan-depth-clip.$stage" -o "tests/fixtures/bin/vulkan-depth-clip.$stage.spv"
+done
+"${GLSLANG_VALIDATOR:-glslangValidator}" -V -DEXPLICIT_DEPTH=1 tests/fixtures/vulkan-depth-clip.frag -o tests/fixtures/bin/vulkan-depth-clip-explicit.frag.spv
+"${GLSLANG_VALIDATOR:-glslangValidator}" -V -DEARLY_TESTS=1 tests/fixtures/vulkan-depth-clip.frag -o tests/fixtures/bin/vulkan-depth-clip-early.frag.spv
 "${GLSLANG_VALIDATOR:-glslangValidator}" -V --target-env vulkan1.0 tests/fixtures/vulkan-feedback.vert -o tests/fixtures/bin/vulkan-feedback.spv
 for shader in vulkan-stencil.vert vulkan-stencil.frag vulkan-stencil-sample.frag vulkan-divisor.vert vulkan-divisor.frag; do
   "${GLSLANG_VALIDATOR:-glslangValidator}" -V --target-env vulkan1.0 "tests/fixtures/$shader" -o "tests/fixtures/bin/$shader.spv"
@@ -25,6 +30,12 @@ with tempfile.TemporaryDirectory(prefix='vulkan-sdk-') as directory:
                 Path('target/vulkan-loader-sdk/libvulkan.so').write_bytes(archive.extractfile(entry).read())
 PY
 headers="$PWD/target/vulkan-upstream/headers/Vulkan-Headers-cfebfc96b2b0bce93da7d12f2c14cc01793ae25c/include"
+"${HOST_CC:-cc}" -O2 -Wall -Wextra -Werror -I "$headers" tests/fixtures/vulkan-depth-clip.c \
+  "${VULKAN_HOST_LINK:--lvulkan}" -lm -o tests/fixtures/bin/vulkan-depth-clip-host
+"${MUSL_CC:-$PWD/target/busybox-build/musl/bin/musl-gcc}" -O2 -mno-outline-atomics -Wall -Wextra -Werror \
+  -I "$headers" -L "$PWD/target/vulkan-loader-sdk" -L "$PWD/target/alpine-build/lib" \
+  tests/fixtures/vulkan-depth-clip.c -lvulkan -lm -o tests/fixtures/bin/vulkan-depth-clip
+cp tests/fixtures/bin/vulkan-depth-clip tests/fixtures/bin/vulkan-depth-clip*.spv target/vulkan-guest/acceptance/
 "${GLSLANG_VALIDATOR:-glslangValidator}" -V --target-env vulkan1.0 tests/fixtures/vulkan-compute.comp -o tests/fixtures/bin/vulkan-compute.spv
 "${HOST_CC:-cc}" -O2 -Wall -Wextra -Werror -I "$headers" tests/fixtures/vulkan-compute.c \
   "${VULKAN_HOST_LINK:--lvulkan}" -ldl -o tests/fixtures/bin/vulkan-compute-host

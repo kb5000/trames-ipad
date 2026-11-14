@@ -1,5 +1,9 @@
 # Zink 路线与当前边界
 
+Public-API equivalents and replacement criteria for missing Metal operations are
+tracked in [Vulkan equivalence registry](vulkan-equivalence.md). That registry
+distinguishes experiments from exposed capabilities on both Mac and iPad.
+
 Latest functional validation (2026-10-30): the Mac/Apple M6 path naturally reports
 GLES 3.1 and passes the selected GPU-indirect/image/atomic and native ASTC oracles.
 This is not full GLES conformance; single-sample rendering remains the current

@@ -8,7 +8,7 @@ static int extended_dynamic(VkDynamicState state) {
     case VK_DYNAMIC_STATE_DEPTH_BOUNDS_TEST_ENABLE:case VK_DYNAMIC_STATE_STENCIL_TEST_ENABLE:case VK_DYNAMIC_STATE_STENCIL_OP:
     case VK_DYNAMIC_STATE_RASTERIZER_DISCARD_ENABLE:case VK_DYNAMIC_STATE_DEPTH_BIAS_ENABLE:case VK_DYNAMIC_STATE_PRIMITIVE_RESTART_ENABLE:
     case VK_DYNAMIC_STATE_PATCH_CONTROL_POINTS_EXT:case VK_DYNAMIC_STATE_LOGIC_OP_EXT:
-    case VK_DYNAMIC_STATE_DEPTH_CLAMP_ENABLE_EXT:case VK_DYNAMIC_STATE_POLYGON_MODE_EXT:case VK_DYNAMIC_STATE_SAMPLE_LOCATIONS_EXT:case VK_DYNAMIC_STATE_SAMPLE_LOCATIONS_ENABLE_EXT:case VK_DYNAMIC_STATE_LINE_RASTERIZATION_MODE_EXT:case VK_DYNAMIC_STATE_LINE_STIPPLE_EXT:return 1;
+    case VK_DYNAMIC_STATE_DEPTH_CLIP_ENABLE_EXT:case VK_DYNAMIC_STATE_DEPTH_CLAMP_ENABLE_EXT:case VK_DYNAMIC_STATE_POLYGON_MODE_EXT:case VK_DYNAMIC_STATE_SAMPLE_LOCATIONS_EXT:case VK_DYNAMIC_STATE_SAMPLE_LOCATIONS_ENABLE_EXT:case VK_DYNAMIC_STATE_LINE_RASTERIZATION_MODE_EXT:case VK_DYNAMIC_STATE_LINE_STIPPLE_EXT:return 1;
     default:return 0;}
 }
 static int pipeline_dynamic(const VkGraphicsPipelineCreateInfo *info,VkDynamicState state) {
@@ -55,3 +55,5 @@ VKAPI_ATTR void VKAPI_CALL vkCmdSetLineRasterizationModeEXT(VkCommandBuffer c,Vk
 VKAPI_ATTR void VKAPI_CALL vkCmdSetSampleLocationsEXT(VkCommandBuffer c,const VkSampleLocationsInfoEXT *v){if(!VALID(v,VK_STRUCTURE_TYPE_SAMPLE_LOCATIONS_INFO_EXT))checked(VK_ERROR_FEATURE_NOT_PRESENT);checked(CALL(255,DEVKEY(c),KEY(c),VK_DYNAMIC_STATE_SAMPLE_LOCATIONS_EXT,v->sampleLocationsPerPixel,v->sampleLocationGridSize.width,v->sampleLocationGridSize.height,v->sampleLocationsCount,PTR(v->pSampleLocations)));}
 VKAPI_ATTR void VKAPI_CALL vkCmdSetLineStippleEXT(VkCommandBuffer c,uint32_t factor,uint16_t pattern){checked(CALL(255,DEVKEY(c),KEY(c),VK_DYNAMIC_STATE_LINE_STIPPLE_EXT,factor,pattern));}
 VKAPI_ATTR void VKAPI_CALL vkGetPhysicalDeviceMultisamplePropertiesEXT(VkPhysicalDevice p,VkSampleCountFlagBits samples,VkMultisamplePropertiesEXT *out){if(!VALID(out,VK_STRUCTURE_TYPE_MULTISAMPLE_PROPERTIES_EXT))checked(VK_ERROR_FEATURE_NOT_PRESENT);checked(CALL(265,KEY(p),samples,PTR(&out->maxSampleLocationGridSize)));}
+
+VKAPI_ATTR void VKAPI_CALL vkCmdSetDepthClipEnableEXT(VkCommandBuffer c,VkBool32 value){checked(CALL(255,DEVKEY(c),KEY(c),VK_DYNAMIC_STATE_DEPTH_CLIP_ENABLE_EXT,value));}

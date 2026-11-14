@@ -142,7 +142,9 @@ VKAPI_ATTR VkResult VKAPI_CALL vkCreateGraphicsPipelines(VkDevice d,VkPipelineCa
     VkPipelineColorBlendStateCreateInfo unused_blend={.sType=VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO};
     const VkPipelineColorBlendStateCreateInfo *b=(r->rasterizerDiscardEnable || (!info->renderPass && (!rendering || !rendering->colorAttachmentCount)))?&unused_blend:info->pColorBlendState;CHECK(b,VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO);if(b->flags || b->logicOp>VK_LOGIC_OP_SET || b->attachmentCount>8)return unsupported_graphics_pipeline(__LINE__);
     if(r->rasterizerDiscardEnable)states|=3;
-    uint64_t config[23+8*8+15+1+8+5+2+10+4]={states|512|1024|2048|4096|16384|32768|65536|131072};config[102]=info->flags;config[22]=b->attachmentCount;if(extended_count){config[0]|=524288;config[116]=extended_count;config[117]=PTR(extended);}
+    uint64_t config[23+8*8+15+1+8+5+2+10+4+1]={states|512|1024|2048|4096|16384|32768|65536|131072};config[102]=info->flags;config[22]=b->attachmentCount;if(extended_count){config[0]|=524288;config[116]=extended_count;config[117]=PTR(extended);}
+    const VkPipelineRasterizationDepthClipStateCreateInfoEXT *depth_clip=find_next(r->pNext,VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_DEPTH_CLIP_STATE_CREATE_INFO_EXT);
+    if(depth_clip){config[0]|=4194304;config[132]=pipeline_dynamic(info,VK_DYNAMIC_STATE_DEPTH_CLIP_ENABLE_EXT)?VK_TRUE:depth_clip->depthClipEnable;}
     if(!info->renderPass){config[0]|=262144;if(rendering){config[111]=rendering->viewMask;config[112]=rendering->colorAttachmentCount;config[113]=PTR(rendering->pColorAttachmentFormats);config[114]=rendering->depthAttachmentFormat;config[115]=rendering->stencilAttachmentFormat;}}
     const VkPipelineRasterizationLineStateCreateInfoEXT *line=find_next(r->pNext,VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_LINE_STATE_CREATE_INFO_EXT);
     const VkPipelineSampleLocationsStateCreateInfoEXT *locations=find_next(m->pNext,VK_STRUCTURE_TYPE_PIPELINE_SAMPLE_LOCATIONS_STATE_CREATE_INFO_EXT);

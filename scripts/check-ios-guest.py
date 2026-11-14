@@ -41,7 +41,7 @@ def check_native_inputs(inputs, target):
                 for name, value in vars(native).items()
                 if name == 'PATCH' or name.endswith('_PATCH')}
     expected.update(recipe_sha256=digest(ROOT / 'scripts/build-moltenvk.py'),
-                    manifest_sha256=digest(native.MANIFEST),
+                    manifest_sha256=digest(native.MANIFEST), metal_private_api=False,
                     transform_feedback_sources={p.name: digest(p)
                                                 for p in sorted(native.NATIVE_TF.iterdir()) if p.is_file()},
                     platform='ios-simulator' if target.endswith('-sim') else 'ios', arch='arm64')

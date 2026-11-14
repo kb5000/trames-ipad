@@ -13,7 +13,7 @@ def check(root, directory):
     sources = {str(path.relative_to(root)): digest(path)
                for path in sorted((root / 'accelerator/vulkan').iterdir())
                if path.suffix in ('.c', '.inc', '.S')}
-    if (manifest.get('wire_revision') != 20 or manifest.get('source_sha256') != sources
+    if (manifest.get('wire_revision') != 21 or manifest.get('source_sha256') != sources
             or manifest.get('build_recipe_sha256') != digest(root / 'scripts/build-vulkan-guest.sh')):
         raise ValueError('Guest Vulkan inputs are stale; run scripts/build-vulkan-guest.sh')
     if manifest.get('icd_sha256') != digest(directory / 'libtrames_vulkan_icd.so'):
