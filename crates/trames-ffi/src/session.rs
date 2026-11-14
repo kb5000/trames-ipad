@@ -62,6 +62,7 @@ pub struct Options {
     #[serde(default)]
     pub multiple_terminals: bool,
     pub vulkan_icd: Option<PathBuf>,
+    pub video_driver: Option<PathBuf>,
     pub timezone: Option<HostTimezone>,
     #[serde(default)]
     pub initially_paused: bool,
@@ -495,6 +496,7 @@ fn prepare_runtime_mounts(vfs: &mut Vfs) -> Result<(), String> {
     prepare(vfs).map_err(|error| format!("prepare runtime tmpfs: {error}"))
 }
 fn prepare_guest_defaults(vfs: &mut Vfs, network: &str, distro: &str) -> Result<(), String> {
+    trames_distro::systemd::ensure_machine_identity(vfs).map_err(|e| e.to_string())?;
     let resolver = if network == "loopback" {
         b"nameserver 127.0.0.53\n".as_slice()
     } else {
@@ -813,6 +815,36 @@ fn run(
     // Bundled Mesa/Xwayland adapters target musl. Keep glibc rootfs loaders
     // and libraries intact; their own Wayland clients still use this server.
     let bundled_musl = vfs.executable(trames_distro::MUSL_LOADER).is_ok();
+    let video_accelerator = manifest
+        .as_ref()
+        .map(|c| c.components.vaapi.resolve(true))
+        .transpose()
+        .map_err(|e| e.to_string())?
+        .unwrap_or(options.vulkan_accelerator);
+    let mut bundled_video = false;
+    if video_accelerator && bundled_musl {
+        if let Some(path) = &options.video_driver {
+            trames_distro::install_vaapi_driver(
+                &mut File::open(path).map_err(|e| e.to_string())?,
+                &mut vfs,
+            )
+            .map_err(|e| format!("install VA-API driver: {e}"))?;
+            for name in [
+                "libavcodec.so.61",
+                "libavutil.so.59",
+                "libswresample.so.5",
+                "libswscale.so.8",
+            ] {
+                trames_distro::install_video_codec(
+                    &mut File::open(path.with_file_name(name)).map_err(|e| e.to_string())?,
+                    &mut vfs,
+                    name,
+                )
+                .map_err(|e| format!("install video codec: {e}"))?;
+            }
+            bundled_video = true;
+        }
+    }
     let mut zink_egl = false;
     if options.vulkan_accelerator && bundled_musl {
         if let Some(path) = &options.vulkan_icd {
@@ -823,6 +855,12 @@ fn run(
             .map_err(|e| format!("install Vulkan ICD: {e}"))?;
             match File::open(path.with_file_name("libEGL.so.1")) {
                 Ok(mut reader) => {
+                    // Mesa's private frontend/Gallium ABI must match. A lone
+                    // frontend can initialize EGL then crash during drawing.
+                    let mut gallium = File::open(path.with_file_name("libgallium-25.1.9.so"))
+                        .map_err(|e| format!("read paired Mesa Gallium: {e}"))?;
+                    trames_distro::install_zink_gallium(&mut gallium, &mut vfs)
+                        .map_err(|e| format!("install Mesa Gallium: {e}"))?;
                     trames_distro::install_zink_egl(&mut reader, &mut vfs)
                         .map_err(|e| format!("install Mesa EGL: {e}"))?;
                     zink_egl = true;
@@ -863,6 +901,13 @@ fn run(
             "LIBGL_KOPPER_WAYLAND_NO_DRM=true".into(),
             "mesa_glthread=false".into(),
             "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/trames.json".into(),
+        ]);
+    }
+    if bundled_video {
+        environment.extend([
+            "LIBVA_DRIVER_NAME=trames".into(),
+            "LIBVA_DRIVERS_PATH=/usr/local/lib/dri".into(),
+            "TRAMES_VIDEO_BITSTREAM_V1=1".into(),
         ]);
     }
     if options.wayland {
@@ -909,6 +954,8 @@ fn run(
         environment.extend([
             format!("XDG_RUNTIME_DIR={directory}"),
             "WAYLAND_DISPLAY=wayland-0".into(),
+            "XDG_SESSION_TYPE=wayland".into(),
+            "GDK_BACKEND=wayland".into(),
             "DISPLAY=:0".into(),
             "XMODIFIERS=@im=trames".into(),
         ]);
@@ -921,7 +968,10 @@ fn run(
             "NOTIFY_SOCKET=/run/host/notify".into(),
         ]);
         if options.wayland {
-            trames_distro::systemd::file(&mut vfs, b"/run/systemd/system/console-getty.service.d/70-wayland.conf", b"[Service]\nEnvironment=XDG_RUNTIME_DIR=/run/user/0 WAYLAND_DISPLAY=wayland-0 DISPLAY=:0\n").map_err(|e|e.to_string())?;
+            trames_distro::systemd::file(&mut vfs, b"/run/systemd/system/console-getty.service.d/70-wayland.conf", b"[Service]\nEnvironment=XDG_RUNTIME_DIR=/run/user/0 WAYLAND_DISPLAY=wayland-0 XDG_SESSION_TYPE=wayland GDK_BACKEND=wayland DISPLAY=:0\n").map_err(|e|e.to_string())?;
+        }
+        if bundled_video {
+            trames_distro::systemd::file(&mut vfs, b"/run/systemd/system/console-getty.service.d/70-video.conf", b"[Service]\nEnvironment=LIBVA_DRIVER_NAME=trames LIBVA_DRIVERS_PATH=/usr/local/lib/dri TRAMES_VIDEO_BITSTREAM_V1=1\n").map_err(|e|e.to_string())?;
         }
         vec![
             "/usr/lib/systemd/systemd".into(),
@@ -974,12 +1024,7 @@ fn run(
             native_bsearch: options.native_bsearch,
             native_allocator: options.native_allocator,
             vulkan_accelerator: options.vulkan_accelerator,
-            video_accelerator: manifest
-                .as_ref()
-                .map(|c| c.components.vaapi.resolve(true))
-                .transpose()
-                .map_err(|e| e.to_string())?
-                .unwrap_or(options.vulkan_accelerator),
+            video_accelerator,
             audio_output: manifest.as_ref().is_some_and(|c| c.components.audio),
             audio_input: manifest.as_ref().is_some_and(|c| c.components.audio_input),
         },

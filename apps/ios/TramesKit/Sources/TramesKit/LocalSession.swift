@@ -57,6 +57,9 @@ public final class LocalSession: @unchecked Sendable {
         options["initially_paused"] = initiallyPaused
         if let storeOwnerLock {options["store_owner_lock"] = storeOwnerLock.path}
         if let vulkanICD { options["vulkan_accelerator"] = true; options["vulkan_icd"] = vulkanICD.path }
+        if let driver = Bundle.main.url(forResource: "trames_drv_video", withExtension: "so", subdirectory: "GuestVideo") {
+            options["video_driver"] = driver.path
+        }
         options["budget_bytes"] = useVolumeBudget ? total : UInt64(16) << 30
         options["timezone"] = try LocalTimezone().options
         let data = try JSONSerialization.data(withJSONObject: options)

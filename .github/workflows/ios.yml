@@ -358,6 +358,10 @@ jobs:
       - name: Parse Swift sources before app builds
         run: |
           swiftc -frontend -parse apps/ios/Trames/*.swift apps/ios/TramesTests/*.swift apps/ios/TramesUITests/*.swift
+      - name: Validate stale driver and paired Mesa packaging rejection
+        run: |
+          python3 tests/integration/guest-vulkan-artifact.py
+          python3 tests/integration/ios-guest-artifact.py
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: nightly-2026-10-16
@@ -367,13 +371,13 @@ jobs:
     needs: scope
     if: needs.scope.outputs.frontend_only != 'true' && needs.scope.outputs.targeted != 'true'
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Install AArch64 source toolchain
-        run: sudo apt-get update && sudo apt-get install --yes gcc-aarch64-linux-gnu g++-aarch64-linux-gnu gcc-14-aarch64-linux-gnu g++-14-aarch64-linux-gnu binutils-aarch64-linux-gnu libvulkan-dev glslang-tools libwayland-dev pkg-config bison flex ninja-build python3-venv patch
+        run: sudo apt-get update && sudo apt-get install --yes gcc-aarch64-linux-gnu g++-aarch64-linux-gnu gcc-14-aarch64-linux-gnu g++-14-aarch64-linux-gnu binutils-aarch64-linux-gnu libvulkan-dev libva-dev glslang-tools libwayland-dev pkg-config bison flex ninja-build python3-venv patch
       - run: bash scripts/build-musl-hybrid.sh > /tmp/musl-build.log 2>&1 || { tail -30 /tmp/musl-build.log; exit 1; }
       - name: Build standard guest Vulkan ICD and retain original native GPU sources
         run: |
@@ -384,6 +388,13 @@ jobs:
           target/mesa-tools/bin/pip install -r scripts/zink-egl-requirements.txt
           export PATH="$PWD/target/mesa-tools/bin:$PATH"
           python3 scripts/build-zink-egl.py
+          TRAMES_VIDEO_CC="$PWD/target/mesa-egl/musl-cc" TRAMES_VIDEO_OUTPUT="$PWD/target/video-guest" bash runtime/scripts/build-video-guest.sh
+          PKG_CONFIG_SYSROOT_DIR="$PWD/target/mesa-egl/sdk" \
+          PKG_CONFIG_LIBDIR="$PWD/target/mesa-egl/sdk/usr/lib/pkgconfig" \
+          TRAMES_BUILD_JOBS=4 TRAMES_FFMPEG_OUTPUT="$PWD/target/video-ffmpeg" bash runtime/scripts/build-video-ffmpeg.sh \
+            --enable-cross-compile --arch=aarch64 --target-os=linux --cc="$PWD/target/mesa-egl/musl-cc" \
+            --disable-programs --disable-avdevice --disable-avfilter --disable-avformat --disable-postproc
+          python3 scripts/prepare-ios-video.py target/video-guest target/video-ffmpeg/install
           python3 scripts/build-xwayland-native.py
           python3 scripts/prepare-vulkan.py --apple
       - uses: actions/upload-artifact@v4

@@ -35,14 +35,23 @@ targets:
   Trames:
     type: application
     platform: iOS
+    preBuildScripts:
+      - name: Validate guest graphics resources
+        script: |
+          cd "$SRCROOT/../.."
+          python3 scripts/check-ios-guest.py --video-dir apps/ios/Trames/GuestVideo --rust-dir "${TRAMES_RUST_LIB_DIR:-$PWD/target/ios-link/$TRAMES_RUST_TARGET}"
+        basedOnDependencyAnalysis: false
     sources:
       - path: Trames
-        excludes: [GuestMusl, GuestVulkan]
+        excludes: [GuestMusl, GuestVulkan, GuestVideo]
       - path: TramesFileSystem
       - path: Trames/GuestMusl
         type: folder
         buildPhase: resources
       - path: Trames/GuestVulkan
+        type: folder
+        buildPhase: resources
+      - path: Trames/GuestVideo
         type: folder
         buildPhase: resources
     dependencies:

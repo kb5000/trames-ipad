@@ -119,3 +119,40 @@ and manifest initialization must update the same environment-owned capacity.
 Increasing capacity must not preallocate tasks, memory, or host threads. The
 exact default and schema will be settled in the implementation task; do not add
 a second independent `resources.tasks` quota or a coordinator/service thread.
+
+## Alpine Firefox graphics payload
+
+Firefox uses the native Wayland session (`GDK_BACKEND=wayland`). Its Vulkan ICD
+and the paired Mesa 25.1.9 EGL/Gallium libraries are app resources, installed
+before guest processes start. Both Mesa libraries go under `/usr/local/lib`;
+Alpine package files under `/usr/lib` remain intact. A frontend linked to a
+stock Gallium build is not an interchangeable pair: Firefox may initialize EGL
+and then crash when creating a drawing pipeline.
+
+`scripts/build-ios.sh` synchronizes the complete graphics payload. The Xcode app
+target also validates the actual resource directory against current ICD sources,
+wire revision, Mesa patches and binary hashes. Direct Xcode builds therefore
+reject stale resources. Build the guest ICD with `scripts/build-vulkan-guest.sh`
+and paired Mesa with `scripts/build-zink-egl.py` before packaging; already
+validated, unchanged Mesa binaries can be reused with their paired manifest.
+
+Linux startup seeds `/etc/machine-id` only when missing. Mac and iPad call the
+same shared runtime helper; existing identities and linked `/etc` directories
+are preserved. This does not install D-Bus: an accessibility-bus warning about a
+missing `dbus-launch` still requires the guest's own D-Bus packages/services.
+
+The iOS native Rust archive also carries a source-checked MoltenVK build record.
+`scripts/stage-ios-rust.py` builds and stages it with the correct Apple SDK;
+Xcode rejects a stale Rust archive or missing native image-memory corrections.
+
+`GuestVideo` contains the VA-API driver and the paired FFmpeg 7.1 decoder
+libraries. Stage it with `scripts/prepare-ios-video.py` from the current musl
+driver output and FFmpeg installation. `components.vaapi = true` enables its
+startup injection and VideoToolbox capability; disabling it does not expose the
+native video device. The bundle targets musl, with H.264 and original-bitstream
+HEVC/AV1 support; Debian/glibc requires its own compatible adapters. Decoder
+libraries remain separate from signed distribution files. This does not install
+a guest player or override Firefox's media preferences.
+
+Physical acceptance and the artifact hashes are recorded in
+[the 2026-11-14 graphics/video validation](../validation/ipad-graphics-video-20261114.json).

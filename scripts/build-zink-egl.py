@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Build Mesa's small EGL platform adapter, linking the original Alpine Gallium.
+"""Cross-build paired Mesa EGL/Gallium with the shared Trames Zink patches.
 
-Only the DRM-less Kopper platform and its resize-safe EGL capabilities change runtime source. Mesa's
-Zink/NIR/GLSL/SPIR-V/GLES2, libwayland and Vulkan loader remain original APKs.
+EGL and Gallium share a private ABI and must be built and packaged together.
 Requires scripts/zink-egl-requirements.txt, ninja/pkg-config/bison/flex/wayland-scanner and AArch64
 GCC/G++; no ARM executable is run by this build.
 """
@@ -21,7 +20,11 @@ import urllib.request
 ROOT = Path(__file__).resolve().parents[1]
 VERSION = '25.1.9'
 SOURCE_SHA = '412df33a1bb3c785ed698555a3972118a37c458e7accf6ae53f4bb87b3db454a'
-PATCH = ROOT / 'patches/mesa/0001-wayland-kopper-native-wsi.patch'
+spec = importlib.util.spec_from_file_location('gallium', ROOT / 'scripts/build-zink-gallium.py')
+gallium_build = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(gallium_build)
+patches = {name: hashlib.sha256((ROOT / 'patches/mesa' / name).read_bytes()).hexdigest()
+           for name in gallium_build.PATCHES}
 work = ROOT / 'target/mesa-egl'
 work.mkdir(parents=True, exist_ok=True)
 inputs = ROOT / 'target/zink-inputs'
@@ -34,9 +37,10 @@ assert hashlib.sha256(archive.read_bytes()).hexdigest() == SOURCE_SHA
 spec = importlib.util.spec_from_file_location('m6', ROOT / 'tests/integration/m6.py')
 m6 = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(m6)
-development = work / 'development'
+development = work / 'development-video'
 if not development.exists():
-    m6.repository(development, ('libdrm-dev', 'wayland-dev', 'wayland-protocols',
+    m6.repository(development, ('libdrm-dev', 'libva-dev', 'vulkan-headers', 'vulkan-loader-dev',
+                               'wayland-dev', 'wayland-protocols',
                                'expat-dev', 'zlib-dev', 'libstdc++-dev', 'musl-dev', 'linux-headers'))
 packages = sorted({*development.rglob('*.apk'), *(inputs / 'repository').rglob('*.apk')})
 sdk = work / 'sdk'
@@ -58,25 +62,17 @@ for package in packages:
 # pkg-config does not sysroot-rewrite arbitrary --variable values.
 protocols = sdk / 'usr/share/pkgconfig/wayland-protocols.pc'
 protocols.write_text(protocols.read_text().replace('prefix=/usr', 'prefix=' + str(sdk / 'usr')))
-gallium = sdk / 'usr/lib' / ('libgallium-' + VERSION + '.so')
-assert gallium.is_file()
 
 source = work / ('mesa-' + VERSION)
-patch_sha = hashlib.sha256(PATCH.read_bytes()).hexdigest()
+patch_sha = hashlib.sha256(json.dumps(patches, sort_keys=True).encode()).hexdigest()
 stamp = work / 'source-patch.sha256'
 if not stamp.exists() or stamp.read_text().strip() != patch_sha:
     if source.exists():
         shutil.rmtree(source)
     with tarfile.open(archive) as tar:
         tar.extractall(work, filter='data')
-    subprocess.run(['patch', '-p1', '-i', str(PATCH)], cwd=source, check=True)
-    # Build only libEGL. Link the exact original signed Gallium shared library,
-    # rather than rebuilding its shader compilers, driver or internal algorithms.
-    meson = source / 'src/egl/meson.build'
-    text = meson.read_text()
-    needle = '  link_for_egl += libgallium_dri'
-    assert text.count(needle) == 1
-    meson.write_text(text.replace(needle, '  link_args_for_egl += [' + repr(str(gallium)) + ']'))
+    for name in gallium_build.PATCHES:
+        subprocess.run(['patch', '-p1', '-i', str(ROOT / 'patches/mesa' / name)], cwd=source, check=True)
     stamp.write_text(patch_sha + '\n')
 
 cc = shlex.split(os.environ.get('MESA_CC', shutil.which('aarch64-linux-gnu-gcc-14') or 'aarch64-linux-gnu-gcc'))
@@ -102,33 +98,37 @@ native_pc.mkdir(exist_ok=True)
 cross = work / 'cross.ini'
 cross.write_text("[binaries]\nc = '" + str(work / 'musl-cc') + "'\ncpp = '" + str(work / 'musl-cpp') + "'\nar = '" + os.environ.get('MESA_AR', 'aarch64-linux-gnu-ar') + "'\npkg-config = 'pkg-config'\n[properties]\nneeds_exe_wrapper = true\nsys_root = '" + str(sdk) + "'\npkg_config_libdir = ['" + str(sdk / 'usr/lib/pkgconfig') + "', '" + str(sdk / 'usr/share/pkgconfig') + "']\n[host_machine]\nsystem = 'linux'\ncpu_family = 'aarch64'\ncpu = 'armv8-a'\nendian = 'little'\n")
 env = {**os.environ, 'PKG_CONFIG_PATH_FOR_BUILD': str(native_pc)}
-options = ['-Dgallium-drivers=zink,softpipe', '-Dvulkan-drivers=', '-Dllvm=disabled', '-Dplatforms=wayland',
-           '-Dglx=disabled', '-Dgbm=disabled', '-Degl=enabled', '-Dgles1=disabled', '-Dgles2=enabled',
-           '-Dglvnd=disabled', '-Dvideo-codecs=', '-Dgallium-va=disabled', '-Dgallium-vdpau=disabled',
-           '-Dvalgrind=disabled', '-Dlibunwind=disabled', '-Dlmsensors=disabled', '-Dbuild-tests=false',
-           '-Dzstd=disabled', '--buildtype=release']
+options = gallium_build.OPTIONS
 build = work / 'build'
-subprocess.run(['meson', 'setup', '--wipe', str(build), str(source), '--cross-file', str(cross), *options], env=env, check=True)
-subprocess.run(['ninja', '-C', str(build), '-j4', 'src/egl/libEGL.so.1.0.0'], env=env, check=True)
+setup = '--reconfigure' if (build / 'build.ninja').exists() else '--wipe'
+subprocess.run(['meson', 'setup', setup, str(build), str(source), '--cross-file', str(cross), *options], env=env, check=True)
+subprocess.run(['ninja', '-C', str(build), '-j4', 'src/egl/libEGL.so.1.0.0',
+                'src/gallium/targets/dri/libgallium-' + VERSION + '.so'], env=env, check=True)
 out = ROOT / 'target/vulkan-guest'
 library = out / 'libEGL.so.1'
 shutil.copyfile(build / 'src/egl/libEGL.so.1.0.0', library)
-needed = subprocess.check_output([os.environ.get('AARCH64_READELF', 'aarch64-linux-gnu-readelf'), '-d', str(library)], text=True)
+paired = out / ('libgallium-' + VERSION + '.so')
+shutil.copyfile(build / 'src/gallium/targets/dri' / paired.name, paired)
+readelf = os.environ.get('AARCH64_READELF', shutil.which('aarch64-linux-gnu-readelf') or 'readelf')
+needed = subprocess.check_output([readelf, '-d', str(library)], text=True)
 assert 'libc.musl-aarch64.so.1' in needed and 'libc.so.6' not in needed
 assert 'libgallium-' + VERSION + '.so' in needed
 manifest = dict(mesa=VERSION, architecture='aarch64-linux-musl', soname='libEGL.so.1',
                 source='https://archive.mesa3d.org/' + archive.name, source_sha256=SOURCE_SHA,
-                patch=str(PATCH.relative_to(ROOT)), patch_sha256=patch_sha,
-                original_gallium_sha256=hashlib.sha256(gallium.read_bytes()).hexdigest(),
+                patches=patches,
+                gallium_sha256=hashlib.sha256(paired.read_bytes()).hexdigest(),
                 egl_sha256=hashlib.sha256(library.read_bytes()).hexdigest(), options=options,
-                scope='opt-in DRM-less Wayland Kopper initialization with full render areas on resize; original Gallium/Zink and Vulkan capability checks',
+                scope='paired DRM-less Wayland EGL and patched Zink, including typed PBO uploads',
                 compiler=subprocess.check_output([*cc, '--version'], text=True).splitlines()[0],
                 development_apk_sha256={str(p.relative_to(development)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(development.rglob('*.apk'))})
 (out / 'egl-manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
 notices = out / 'Notices/Mesa-EGL'
 notices.mkdir(parents=True, exist_ok=True)
 shutil.copyfile(source / 'docs/license.rst', notices / 'license.rst')
-shutil.copyfile(PATCH, notices / PATCH.name)
+for name in gallium_build.PATCHES:
+    shutil.copyfile(ROOT / 'patches/mesa' / name, notices / name)
+shutil.copyfile(Path(__file__), notices / Path(__file__).name)
+shutil.copyfile(ROOT / 'scripts/build-zink-gallium.py', notices / 'build-zink-gallium.py')
 for path in (source / 'src/util/blake3').glob('LICENSE*'):
     shutil.copyfile(path, notices / path.name)
 print('Built Mesa EGL native WSI adapter:', manifest['egl_sha256'], flush=True)

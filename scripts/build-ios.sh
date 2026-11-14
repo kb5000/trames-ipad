@@ -21,15 +21,17 @@ python3 scripts/check-guest-vulkan.py
 mkdir -p apps/ios/Trames/GuestVulkan
 cp target/vulkan-guest/libtrames_vulkan_icd.so target/vulkan-guest/manifest.json target/vulkan-guest/GPL-3.0.txt apps/ios/Trames/GuestVulkan/
 cp target/vulkan-guest/trames-xwayland target/vulkan-guest/launcher-manifest.json apps/ios/Trames/GuestVulkan/
-if [[ -f target/vulkan-guest/libEGL.so.1 ]]; then
-  cp target/vulkan-guest/libEGL.so.1 target/vulkan-guest/egl-manifest.json apps/ios/Trames/GuestVulkan/
-fi
+python3 scripts/check-ios-guest.py target/vulkan-guest
+cp target/vulkan-guest/libEGL.so.1 target/vulkan-guest/libgallium-25.1.9.so target/vulkan-guest/egl-manifest.json apps/ios/Trames/GuestVulkan/
 if [[ -f target/vulkan-guest/Xwayland-native ]]; then
   cp target/vulkan-guest/Xwayland-native target/vulkan-guest/xwayland-native-manifest.json apps/ios/Trames/GuestVulkan/
 fi
 cp -R target/vulkan-guest/acceptance apps/ios/Trames/GuestVulkan/
 cp -R target/vulkan-guest/wayland-acceptance apps/ios/Trames/GuestVulkan/
 if [[ -d target/vulkan-guest/Notices ]]; then cp -R target/vulkan-guest/Notices apps/ios/Trames/GuestVulkan/; fi
+python3 scripts/check-ios-guest.py target/vulkan-guest --video-dir target/vulkan-guest/Video
+mkdir -p apps/ios/Trames/GuestVideo
+cp -R target/vulkan-guest/Video/. apps/ios/Trames/GuestVideo/
 python3 - <<'PYCODE'
 import hashlib,json,pathlib
 p=pathlib.Path('apps/ios/Trames/GuestVulkan');m=json.loads((p/'manifest.json').read_text());assert hashlib.sha256((p/'libtrames_vulkan_icd.so').read_bytes()).hexdigest()==m['icd_sha256']
@@ -50,11 +52,9 @@ import hashlib,json,pathlib
 p=pathlib.Path('apps/ios/Trames/GuestMusl');m=json.loads((p/'manifest.json').read_text());assert hashlib.sha256((p/'libc.so').read_bytes()).hexdigest()==m['libc_sha256']
 PYCODE
 rustup target add "$rust_target"
-cargo build -p trames-ffi --release --target "$rust_target" --locked
 # Keep only the static archive in the app linker search directory. Cargo also
 # produces a host-style dylib, which must never become an unembedded dependency.
-mkdir -p "target/ios-link/$rust_target"
-cp "target/$rust_target/release/libtrames_ffi.a" "target/ios-link/$rust_target/libtrames_ffi.a"
+python3 scripts/stage-ios-rust.py "$rust_target" "$native_moltenvk_dir"
 export TRAMES_RUST_LIB_DIR="$PWD/target/ios-link/$rust_target"
 xcodegen generate --spec apps/ios/project.yml
 xcodebuild -quiet -project apps/ios/Trames.xcodeproj -scheme Trames -configuration "$configuration" \

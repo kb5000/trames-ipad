@@ -17,7 +17,18 @@ from pathlib import Path
 import re
 source=''.join(Path('accelerator/vulkan/'+p).read_text() for p in ['icd.c','compute.inc','dynamic.inc','extended.inc','host-copy.inc','copy2.inc','graphics.inc','queries.inc','zink.inc','templates.inc','wsi.inc','wayland.inc','sync.inc','sync2.inc','core12.inc','external.inc'])
 names=re.findall(r'VKAPI_CALL (vk\w+)\(',source)
-expected='// SPDX-License-Identifier: GPL-3.0-or-later\n'+''.join(f'    if(!strcmp(name,"{name}"))return (PFN_vkVoidFunction){name};\n' for name in names if not name.startswith('vk_icd'))
+# These promoted instance aliases intentionally share their core implementation.
+# Keep them in the generated inventory instead of rejecting a valid catalog.
+aliases={'vkEnumeratePhysicalDeviceGroups':'vkEnumeratePhysicalDeviceGroupsKHR',
+         'vkGetPhysicalDeviceExternalBufferProperties':'vkGetPhysicalDeviceExternalBufferPropertiesKHR',
+         'vkGetPhysicalDeviceExternalFenceProperties':'vkGetPhysicalDeviceExternalFencePropertiesKHR',
+         'vkGetPhysicalDeviceExternalSemaphoreProperties':'vkGetPhysicalDeviceExternalSemaphorePropertiesKHR'}
+expected='// SPDX-License-Identifier: GPL-3.0-or-later\n'
+for name in names:
+    if name.startswith('vk_icd'): continue
+    expected+=f'    if(!strcmp(name,"{name}"))return (PFN_vkVoidFunction){name};\n'
+    if name in aliases:
+        expected+=f'    if(!strcmp(name,"{aliases[name]}"))return (PFN_vkVoidFunction){name};\n'
 assert Path('accelerator/vulkan/entrypoints.inc').read_text()==expected, 'refresh entrypoint catalog after changing exports'
 # All promoted core names must remain addressable. Feature availability and
 # actual native output checks are separate from this ABI inventory.

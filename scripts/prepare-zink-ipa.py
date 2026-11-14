@@ -30,6 +30,7 @@ def prepare():
     for path in (bundle / 'guest').iterdir():
         shutil.copyfile(path, output / path.name)
     component = json.loads((output / 'egl-manifest.json').read_text())
+    subprocess.run(['python3', str(root / 'scripts/check-ios-guest.py'), str(output)], check=True)
     assert sha((output / 'libEGL.so.1').read_bytes()) == component['egl_sha256']
     assert sha((output / 'libtrames_vulkan_icd.so').read_bytes()) == json.loads((output / 'manifest.json').read_text())['icd_sha256']
     with tarfile.open(output / 'vulkan-native-upstream-source.tar.gz') as archive:
@@ -45,8 +46,9 @@ def prepare():
         with urllib.request.urlopen(component['source'], timeout=120) as response, archive.open('wb') as dest:
             shutil.copyfileobj(response, dest)
     assert sha(archive.read_bytes()) == component['source_sha256']
-    patch = root / component['patch']
-    assert sha(patch.read_bytes()) == component['patch_sha256']
+    patches = [root / 'patches/mesa' / name for name in component['patches']]
+    for patch in patches:
+        assert sha(patch.read_bytes()) == component['patches'][patch.name]
     notices = output / 'Notices/Mesa-EGL'
     notices.mkdir(parents=True, exist_ok=True)
     with tarfile.open(archive) as source:
@@ -54,17 +56,20 @@ def prepare():
         for entry in source:
             if entry.isfile() and entry.name.startswith('mesa-25.1.9/src/util/blake3/LICENSE'):
                 (notices / Path(entry.name).name).write_bytes(source.extractfile(entry).read())
-    shutil.copyfile(patch, notices / patch.name)
+    for patch in patches:
+        shutil.copyfile(patch, notices / patch.name)
     with tarfile.open(output / 'mesa-egl-25.1.9-source.tar.gz', 'w:gz') as source:
         source.add(archive, arcname='upstream/mesa-25.1.9.tar.xz')
-        for name in [component['patch'], 'scripts/build-zink-egl.py', 'scripts/zink-egl-requirements.txt',
+        for name in [*(str(p.relative_to(root)) for p in patches), 'scripts/build-zink-egl.py',
+                     'scripts/build-zink-gallium.py', 'scripts/zink-egl-requirements.txt',
                      'scripts/prepare-zink-guest.py', 'tests/integration/m6.py', 'LICENSE']:
             source.add(root / name, arcname=name)
         source.add(output / 'egl-manifest.json', arcname='egl-manifest.json')
     proof = dict(graphics=plan['zink'], guest=plan['guest'], files_verified=len(actual),
                  source_commit=subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(),
                  icd_sha256=sha((output / 'libtrames_vulkan_icd.so').read_bytes()),
-                 egl_sha256=component['egl_sha256'], musl_sha256=sha((musl / 'libc.so').read_bytes()),
+                 egl_sha256=component['egl_sha256'], gallium_sha256=component['gallium_sha256'],
+                 musl_sha256=sha((musl / 'libc.so').read_bytes()),
                  paired_musl_sources_verified=True, original_moltenvk_pins_verified=True,
                  mesa_source_archive_sha256=component['source_sha256'])
     (output / 'ipa-guest-reuse.json').write_text(json.dumps(proof, indent=2) + '\n')

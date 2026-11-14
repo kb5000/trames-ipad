@@ -56,7 +56,7 @@ else:
         (out / folder).mkdir(exist_ok=True)
     for name in ('libtrames_vulkan_icd.so', 'trames.json', 'manifest.json'):
         shutil.copyfile(ROOT / 'target/vulkan-guest' / name, out / 'guest' / name)
-    for name in ('libEGL.so.1', 'egl-manifest.json'):
+    for name in ('libEGL.so.1', 'libgallium-25.1.9.so', 'egl-manifest.json'):
         if (ROOT / 'target/vulkan-guest' / name).is_file():
             shutil.copyfile(ROOT / 'target/vulkan-guest' / name, out / 'guest' / name)
     shutil.copyfile(ROOT / 'target/zink-inputs/zink-egl', out / 'bin/zink-egl')
