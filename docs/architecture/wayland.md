@@ -313,3 +313,25 @@ Apple cfg changes. See its TRAMES-PATCHES.md and the [dependency record](../secu
 Original dependency, XML and keymap notices are bundled in the App. The offline
 Wayland repository/client fixtures serve DEBUG XCTest acceptance and are omitted
 from sideload IPA packaging; runtime clients are installed with ordinary apk.
+
+
+## Native activation and popup clicks (2026-11-14)
+
+Native focus notifications identify the containing toplevel. AppKit may report
+that same toplevel again when a popup overlay becomes key and before a mouse
+button release. Repeated activation within the currently focused surface tree
+must preserve popup keyboard focus, held keys, and the implicit pointer grab.
+It must not send `xdg_popup.popup_done` before the client receives its click.
+A change to another toplevel or loss of native focus still dismisses popups;
+losing focus also releases held buttons. This rule belongs in the common Wayland
+seat and applies to both native presenters without another service thread.
+
+The regression first failed against the old seat behavior, which moved focus
+from a nested popup to its root. The repaired unit test covers nested popups,
+keyboard state, the complete button pair, switching to another window, and focus
+loss. The original C/libwayland scene test also receives a full popup click
+across repeated native focus before confirming outside-click dismissal. All
+24 Wayland unit tests and six original C-client cases pass. iOS FFI compilation
+also passes. The Mac Firefox package's internal Settings and certificate-manager
+rendering were separately checked in an isolated profile; native desktop mouse
+confirmation is distinct from those browser-engine checks.
