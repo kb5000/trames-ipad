@@ -43,7 +43,8 @@ static const char *name(struct wl_surface *s){return s==root?"root":s==child?"ch
 static void sync_done(void *data,struct wl_callback *cb,uint32_t serial){(void)serial;wl_callback_destroy(cb);printf("%s\n",(const char *)data);}
 static const struct wl_callback_listener sync_listener={sync_done};
 static void notify(const char *text){struct wl_callback *cb=wl_display_sync(display);wl_callback_add_listener(cb,&sync_listener,(void *)text);wl_display_flush(display);}
-static void root_configured(void *data,struct xdg_surface *s,uint32_t serial){(void)data;xdg_surface_ack_configure(s,serial);xdg_surface_set_window_geometry(s,10,10,200,120);paint(root,240,160,0xff112233);}
+static int root_width=240,root_height=160;
+static void root_configured(void *data,struct xdg_surface *s,uint32_t serial){(void)data;xdg_surface_ack_configure(s,serial);if(root_width==240)xdg_surface_set_window_geometry(s,10,10,200,120);else xdg_surface_set_window_geometry(s,0,0,root_width,root_height);paint(root,root_width,root_height,0xff112233);}
 static const struct xdg_surface_listener root_listener={root_configured};
 static void closed(void *data,struct xdg_toplevel *top){(void)data;(void)top;quit=1;}
 static void top_configured(void *data,struct xdg_toplevel *top,int32_t w,int32_t h,struct wl_array *states){(void)data;(void)top;(void)w;(void)h;(void)states;}
@@ -56,10 +57,16 @@ static const struct xdg_popup_listener popup_listener={popup_configured,popup_do
 static void popup_ack(void *data,struct xdg_surface *s,uint32_t serial){(void)data;xdg_surface_ack_configure(s,serial);paint(popup,popup_w,popup_h,0xffaabbcc);}
 static const struct xdg_surface_listener popup_surface_listener={popup_ack};
 static void keyboard_keymap(void *d,struct wl_keyboard *k,uint32_t format,int32_t fd,uint32_t size){(void)d;(void)k;(void)format;(void)size;close(fd);}
-static void keyboard_enter(void *d,struct wl_keyboard *k,uint32_t serial,struct wl_surface *s,struct wl_array *keys){(void)d;(void)k;(void)serial;(void)s;(void)keys;}
+static void keyboard_enter(void *d,struct wl_keyboard *k,uint32_t serial,struct wl_surface *s,struct wl_array *keys){(void)d;(void)k;(void)serial;(void)keys;printf("keyboard=%s\n",name(s));}
 static void keyboard_leave(void *d,struct wl_keyboard *k,uint32_t serial,struct wl_surface *s){(void)d;(void)k;(void)serial;(void)s;}
 static void keyboard_modifiers(void *d,struct wl_keyboard *k,uint32_t serial,uint32_t a,uint32_t b,uint32_t c,uint32_t group){(void)d;(void)k;(void)serial;(void)a;(void)b;(void)c;(void)group;}
 static void keyboard_repeat(void *d,struct wl_keyboard *k,int32_t rate,int32_t delay){(void)d;(void)k;(void)rate;(void)delay;}
+static struct xdg_positioner *wide_positioner(void) {
+ struct xdg_positioner *p=xdg_wm_base_create_positioner(shell);
+ xdg_positioner_set_size(p,340,681);xdg_positioner_set_anchor_rect(p,1876,52,40,24);
+ xdg_positioner_set_anchor(p,XDG_POSITIONER_ANCHOR_BOTTOM_RIGHT);xdg_positioner_set_gravity(p,XDG_POSITIONER_GRAVITY_BOTTOM_LEFT);
+ xdg_positioner_set_constraint_adjustment(p,63);return p;
+}
 static void keyboard_key(void *d,struct wl_keyboard *k,uint32_t serial,uint32_t time,uint32_t key,uint32_t state){
  (void)d;(void)k;(void)serial;(void)time;if(!state)return;
  if(key==30){wl_subsurface_set_position(sub,70,50);paint(child,32,24,0xff00cc00);notify("staged");}
@@ -70,6 +77,13 @@ static void keyboard_key(void *d,struct wl_keyboard *k,uint32_t serial,uint32_t 
    struct xdg_positioner *p=xdg_wm_base_create_positioner(shell);xdg_positioner_set_size(p,80,60);xdg_positioner_set_anchor_rect(p,100,80,10,10);xdg_positioner_set_anchor(p,XDG_POSITIONER_ANCHOR_BOTTOM_RIGHT);xdg_positioner_set_gravity(p,XDG_POSITIONER_GRAVITY_BOTTOM_RIGHT);
    popup_role=xdg_surface_get_popup(popup_xdg,root_xdg,p);xdg_popup_add_listener(popup_role,&popup_listener,NULL);xdg_popup_grab(popup_role,seat,serial);xdg_positioner_destroy(p);wl_surface_commit(popup);notify("grabbed");
  }
+ if(key==34){
+   xdg_popup_destroy(popup_role);xdg_surface_destroy(popup_xdg);wl_surface_destroy(popup);
+   root_width=1920;root_height=928;xdg_surface_set_window_geometry(root_xdg,0,0,root_width,root_height);paint(root,root_width,root_height,0xff112233);
+   popup=wl_compositor_create_surface(compositor);popup_xdg=xdg_wm_base_get_xdg_surface(shell,popup);xdg_surface_add_listener(popup_xdg,&popup_surface_listener,NULL);
+   struct xdg_positioner *p=wide_positioner();popup_role=xdg_surface_get_popup(popup_xdg,root_xdg,p);xdg_popup_add_listener(popup_role,&popup_listener,NULL);xdg_positioner_destroy(p);wl_surface_commit(popup);notify("wide-menu");
+ }
+ if(key==35){struct xdg_positioner *p=wide_positioner();xdg_popup_reposition(popup_role,p,18);xdg_positioner_destroy(p);notify("wide-reposition");}
  if(key==32){struct xdg_positioner *p=xdg_wm_base_create_positioner(shell);xdg_positioner_set_size(p,60,40);xdg_positioner_set_anchor_rect(p,5,5,10,10);xdg_positioner_set_anchor(p,XDG_POSITIONER_ANCHOR_TOP_LEFT);xdg_positioner_set_gravity(p,XDG_POSITIONER_GRAVITY_TOP_LEFT);xdg_positioner_set_constraint_adjustment(p,XDG_POSITIONER_CONSTRAINT_ADJUSTMENT_SLIDE_X|XDG_POSITIONER_CONSTRAINT_ADJUSTMENT_SLIDE_Y);xdg_popup_reposition(popup_role,p,17);xdg_positioner_destroy(p);notify("reposition-sent");}
 }
 static const struct wl_keyboard_listener keyboard_listener={keyboard_keymap,keyboard_enter,keyboard_leave,keyboard_key,keyboard_modifiers,keyboard_repeat};

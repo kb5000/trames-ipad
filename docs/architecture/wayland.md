@@ -315,23 +315,41 @@ Wayland repository/client fixtures serve DEBUG XCTest acceptance and are omitted
 from sideload IPA packaging; runtime clients are installed with ordinary apk.
 
 
-## Native activation and popup clicks (2026-11-14)
+## Native activation and popup coordinates (2026-11-14)
 
-Native focus notifications identify the containing toplevel. AppKit may report
-that same toplevel again when a popup overlay becomes key and before a mouse
-button release. Repeated activation within the currently focused surface tree
-must preserve popup keyboard focus, held keys, and the implicit pointer grab.
-It must not send `xdg_popup.popup_done` before the client receives its click.
-A change to another toplevel or loss of native focus still dismisses popups;
-losing focus also releases held buttons. This rule belongs in the common Wayland
-seat and applies to both native presenters without another service thread.
+Native focus notifications identify a containing toplevel. AppKit can repeat
+that activation when a popup overlay becomes key and before a button release.
+Within the currently active surface tree, these notifications preserve popup
+focus, held keys and pointer grabs. Real toplevel changes and native focus loss
+still dismiss menus; focus loss also releases held buttons.
 
-The regression first failed against the old seat behavior, which moved focus
-from a nested popup to its root. The repaired unit test covers nested popups,
-keyboard state, the complete button pair, switching to another window, and focus
-loss. The original C/libwayland scene test also receives a full popup click
-across repeated native focus before confirming outside-click dismissal. All
-24 Wayland unit tests and six original C-client cases pass. iOS FFI compilation
-also passes. The Mac Firefox package's internal Settings and certificate-manager
-rendering were separately checked in an isolated profile; native desktop mouse
-confirmation is distinct from those browser-engine checks.
+Pointer delivery and keyboard activation are separate. Non-grabbing panels,
+including Firefox's hamburger menu, receive pointer events while keyboard focus
+stays on their containing toplevel. An explicit popup grab can own keyboard
+focus. Rendering subsurfaces do not become independent keyboard windows just
+because they receive a pointer hit. The old behavior sent keyboard leave on
+Firefox's main surface during a menu press, causing the client to destroy the
+panel before release. The failed-before regression and original C client cover
+both the non-grabbing and explicitly grabbed paths.
+
+Positioners use each parent window's logical geometry, independently of buffer
+pixel scale. A native presenter can supply its available workspace relative to
+each toplevel. Mac converts `NSScreen.visibleFrame` through the window and flipped
+canvas, updating it on resize, movement and screen changes. Popup creation and
+reposition translate these bounds into a nested parent's coordinates. Before
+host metadata arrives, fallback bounds at least include the actual toplevel size.
+This common implementation remains iPad-compatible and adds no service thread.
+
+The actual Firefox trace demonstrated why the bootstrap viewport is insufficient:
+a 340x681 menu anchored at (1876,52,40,24) in a 1920x928 window was constrained
+against 1024x768 and moved to x=684. It now receives
+`xdg_popup.configure(1576,76,340,681)`, under the hamburger button.
+
+All 27 Wayland unit tests and six original C-client cases pass, including wide
+menu creation/reposition, nested bounds, complete clicks and outside dismissal.
+Strict shared/Mac Clippy, paired iOS FFI compilation, Mac release builds and
+architecture guards pass. The owner confirmed real mouse input opens Settings
+and Manage certificates in Dev. Both Mac channels are updated, and the original
+Stable Debian business container restored healthy. The earlier generic native
+frame test was occluded and is recorded separately from that owner-observed
+acceptance; it is not reported as a pass. See the [Mac acceptance record](https://github.com/kb5000/trames-mac/blob/main/docs/validation/mac-firefox-dialogs-20261114.json).
