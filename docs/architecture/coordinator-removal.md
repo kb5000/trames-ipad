@@ -6556,3 +6556,32 @@ unfixed error-diagnostic builds also completed computation before the fix.
 preserves the failures, diagnostics, exact binaries and component comparisons.
 Both Mac channels are updated; stable environments remain stopped and installed
 iPad apps are unchanged.
+
+## DNS completion owns its wakeup (2026-11-14)
+
+Native DNS exposed a missing original-source notification after coordinator
+removal: a resolver worker placed a valid answer in its result channel, but a
+retained guest wait watched the ordinary BSD socket rather than the DNS
+completion. Raw UDP replies appeared only at the caller's two-second timeout;
+glibc clients could discard the late observation and fail resolution.
+
+The existing resolver workers now publish directly to the original DNS endpoint
+and signal its nonblocking native notification socket. Retained poll/select,
+epoll and byte-I/O waits receive that source through the existing wait-source
+interface. Shutdown, framing failures and released reply-buffer slots notify
+the same source; separate read/write epochs preserve edge-triggered waits.
+Lazy endpoint creation also changes the original socket's source
+revision, so an already parked reader is rearmed by the existing publication
+path. Ordinary TCP payloads retain their direct path. The legacy native wait
+helper watches the same DNS completion source instead of a two-millisecond tick.
+No coordinator, additional resolver worker or periodic polling loop is added.
+
+Regression coverage includes connected/unconnected UDP, TCP framing, completion
+without any guest poll/tick, first DNS admission after a reader subscribed, EOF,
+malformed framing and writable-buffer recovery.
+The shared network/Linux/VFS batch passes 100/327/625 tests (two unchanged cases
+ignored), strict lints and iPad ARM64 FFI compilation. On Mac Dev Debian, the six
+original UDP probes complete in roughly 0.3–4.3 ms instead of 2,001–2,002 ms;
+twenty glibc lookups complete with session startup in 0.42 seconds. Official APT
+repositories work directly again. This is a wakeup regression result, not a
+general DNS or browser performance guarantee.
