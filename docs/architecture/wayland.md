@@ -353,3 +353,14 @@ and Manage certificates in Dev. Both Mac channels are updated, and the original
 Stable Debian business container restored healthy. The earlier generic native
 frame test was occluded and is recorded separately from that owner-observed
 acceptance; it is not reported as a pass. See the [Mac acceptance record](https://github.com/kb5000/trames-mac/blob/main/docs/validation/mac-firefox-dialogs-20261114.json).
+
+
+### Native-image alpha contract (2026-11-15)
+
+`GpuImage::has_alpha` carries the producer's premultiplied-alpha contract into
+both native presenters. Its default is opaque, preserving existing WSI behavior;
+Android RGBA/BGRA imports override it and RGBX remains opaque. `ImageBuffer`
+provides the same query for SHM and GPU storage. The iPad frame record keeps its
+existing ABI size and alpha field. This fixes black cursor rectangles without
+readback or copies. The independent Metal pixel fixture uses each product's
+actual shader, including the opaque/RGBX case.

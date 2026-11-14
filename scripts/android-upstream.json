@@ -67,5 +67,68 @@
     "license_url": "https://android.googlesource.com/platform/external/libcxx/+/refs/tags/android-13.0.0_r83/LICENSE.TXT?format=TEXT",
     "license_archive": "libcxx-android13-LICENSE.TXT",
     "license_sha256": "c1938c0e9e90639d1e8f5a7f6bebaab83a3642e0ee44295a4c69934686d0bda8"
+  },
+  "vndk_headers": {
+    "url": "https://android.googlesource.com/platform/prebuilts/vndk/v33/+archive/d79ad875113d34c9665a65b8a33dcf7a4fb7dcf1/arm64/include.tar.gz",
+    "archive": "vndk-v33-d79ad875-headers.tar.gz",
+    "sha256": "526782b8b5688de63bf4b88d6708b72e06d418480097405f2734ba564c189916",
+    "revision": "d79ad875113d34c9665a65b8a33dcf7a4fb7dcf1",
+    "include_dirs": [
+      "external/libcxx/include",
+      "frameworks/av/media/libmedia/include",
+      "frameworks/av/media/libstagefright/foundation/include",
+      "frameworks/av/media/libstagefright/include",
+      "frameworks/av/media/libstagefright/omx/include",
+      "frameworks/av/media/libstagefright/xmlparser/include",
+      "frameworks/native/libs/binder/include",
+      "frameworks/native/libs/binder/ndk/include_cpp",
+      "frameworks/native/libs/binder/ndk/include_ndk",
+      "frameworks/native/libs/binder/ndk/include_platform",
+      "frameworks/native/libs/nativebase/include",
+      "frameworks/native/libs/nativewindow/include",
+      "frameworks/native/libs/ui/include",
+      "generated-headers/frameworks/native/libs/binder/libbinder/android_vendor.33_arm64_armv8-a_shared/gen/aidl",
+      "generated-headers/hardware/interfaces/graphics/bufferqueue/1.0/android.hardware.graphics.bufferqueue@1.0_genc++_headers/gen",
+      "generated-headers/hardware/interfaces/graphics/common/1.0/android.hardware.graphics.common@1.0_genc++_headers/gen",
+      "generated-headers/hardware/interfaces/media/1.0/android.hardware.media@1.0_genc++_headers/gen",
+      "generated-headers/hardware/interfaces/media/omx/1.0/android.hardware.media.omx@1.0_genc++_headers/gen",
+      "generated-headers/system/libhidl/transport/base/1.0/android.hidl.base@1.0_genc++_headers/gen",
+      "generated-headers/system/libhidl/transport/manager/1.0/android.hidl.manager@1.0_genc++_headers/gen",
+      "system/core/libcutils/include",
+      "system/core/libcutils/include_outside_system",
+      "system/core/libprocessgroup/include",
+      "system/core/libsystem/include",
+      "system/core/libutils/include",
+      "system/libbase/include",
+      "system/libfmq/base",
+      "system/libhidl/base/include",
+      "system/libhidl/transport/include",
+      "system/libhwbinder/include",
+      "system/logging/liblog/include_vndk"
+    ]
+  },
+  "media_service_inputs": {
+    "resource_source": {
+      "url": "https://android.googlesource.com/platform/frameworks/av/+archive/refs/tags/android-13.0.0_r83/services/mediaresourcemanager.tar.gz",
+      "archive": "mediaresourcemanager-android13-r83.tar.gz",
+      "sha256": "8752ae0255d3f77fdb969b0df9bec7d7aaab63b119500237a9f531aaa88aa6dd"
+    },
+    "mediautils_headers": {
+      "url": "https://android.googlesource.com/platform/frameworks/av/+archive/refs/tags/android-13.0.0_r83/media/utils/include.tar.gz",
+      "archive": "mediautils-android13-r83-include.tar.gz",
+      "sha256": "c4cf3ee98eb749f01feeda3dfe076f84941dc683cf2516abd2ae624c9b21b064"
+    },
+    "battery_header": {
+      "url": "https://android.googlesource.com/platform/frameworks/native/+/android-13.0.0_r83/libs/binder/include_batterystats/batterystats/IBatteryStats.h?format=TEXT",
+      "archive": "IBatteryStats-android13-r83.h",
+      "base64": true,
+      "sha256": "6c987f5018c1548366d12b78a12f05d11a629cfc28e10f3243abc5fab948e8d2"
+    },
+    "aidl_darwin": {
+      "url": "https://android.googlesource.com/platform/prebuilts/build-tools/+/refs/heads/android13-release/darwin-x86/bin/aidl?format=TEXT",
+      "archive": "aidl-android13-darwin",
+      "base64": true,
+      "sha256": "b87069e020252f040f0638fa2c362d90c09ae8c0ecd02a0b802408d73db97578"
+    }
   }
 }

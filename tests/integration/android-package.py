@@ -27,7 +27,8 @@ def main():
         before = output.read_bytes()
         with tarfile.open(output) as archive:
             entries = archive.getmembers()
-            assert entries[0].name == ".trames-android.json" and len(entries) == 7
+            assert entries[0].name == ".trames-android.json" and len(entries) == 8
+            assert archive.getmember("system/bin/trames-media-service").mode == 0o755
             manifest = json.load(archive.extractfile(entries[0]))
             assert manifest["package_kind"] == "adapters"
             assert manifest["images"] == json.loads((ROOT / "runtime/scripts/android-images.json").read_text())
@@ -39,7 +40,8 @@ def main():
             source_manifest = json.load(archive.extractfile(".trames-android/SOURCES.json"))
             assert source_manifest["archive"] == sources.name
         with tarfile.open(sources) as archive:
-            assert set(archive.getnames()) == {"trames-ipad.tar.gz", "trames-runtime.tar.gz", "GPL-3.0.txt"}
+            assert set(archive.getnames()) == {"trames-ipad.tar.gz", "trames-runtime.tar.gz", "GPL-3.0.txt", "android-media-sources.tar.gz"}
+            assert hashlib.sha256(archive.extractfile("android-media-sources.tar.gz").read()).hexdigest() == result["sources"]["android_media"]["sha256"]
         assert result["sha256"] == hashlib.sha256(before).hexdigest()
         try:
             module.package(args.components, output, sources)

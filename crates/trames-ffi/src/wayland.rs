@@ -370,6 +370,7 @@ unsafe fn frame_image(
                 ImageInfo {
                     kind: 2,
                     address: gpu.metal_texture() as u64,
+                    alpha: u32::from(image.buffer.has_alpha()),
                     width,
                     height,
                     x: image.x,
@@ -431,6 +432,9 @@ mod tests {
         fn ready(&self) -> std::io::Result<bool> {
             Ok(true)
         }
+        fn has_alpha(&self) -> bool {
+            true
+        }
     }
     #[test]
     fn image_v1_keeps_its_record_size_and_v2_returns_viewport_geometry() {
@@ -485,6 +489,7 @@ mod tests {
         // SAFETY: both versions receive their exact caller-owned native records.
         unsafe {
             assert_eq!(trames_wayland_frame_image(handle, 0, &mut record.image), 0);
+            assert_eq!(record.image.alpha, 1);
             assert_eq!(record.guard, 0x1234_5678_90ab_cdef);
             assert_eq!(
                 trames_wayland_frame_image_v2(handle, 0, &mut record.image, &mut geometry),
@@ -492,6 +497,7 @@ mod tests {
             );
         }
         assert_eq!(record.image.width, 100);
+        assert_eq!(record.image.alpha, 1);
         assert_eq!(record.guard, 0x1234_5678_90ab_cdef);
         assert_eq!((geometry.width, geometry.height), (30, 10));
         assert_eq!(geometry.source, [0.1, 0.2, 0.5, 0.25]);

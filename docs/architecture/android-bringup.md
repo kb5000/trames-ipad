@@ -49,9 +49,9 @@ host exit status even when the original command itself returns zero. An explicit
 ### Small adapter package and upstream composition
 
 The optional package built by `scripts/package-android.py` now contains only
-three ARM64 adapter binaries, graphics-selection properties, a manifest, the
-GPL text and source-location metadata: seven regular files, approximately
-107 KB compressed. Android system/vendor, APKs, user data and source tarballs
+four ARM64 adapter binaries, graphics-selection properties, a manifest, the
+GPL text and source-location metadata: eight regular files, under 1 MiB
+compressed. Android system/vendor, APKs, user data and source tarballs
 are not in this adapter archive. Matching iPad/runtime source exports are a
 separate `-sources.tar.gz` artifact; publish it with the adapters and checksum
 sidecars. Linux remains the default and no Android image is added to either
@@ -104,7 +104,7 @@ original Calendar application through native graphics. A native ext4 fixture
 checks UID/GID, executable permissions, hardlinks, relative/absolute symlinks
 and mutable-data exclusion. Import tests reject unsupported image recipes,
 duplicate/unexpected payloads and wrong hashes before opening upstream images;
-the packaging check verifies the seven-file payload and separate source bundle.
+the current packaging check verifies the eight-file payload and separate source bundle.
 iPad FFI cross-compilation and an unsigned Dev application build pass. Physical
 iPad Android/download acceptance remains pending.
 
@@ -982,3 +982,63 @@ Shared-runtime local CI passes on macOS and native ARM64 Linux (7/7 each);
 the Mac product workflow passes 12/12. iPad/CLI all-feature Clippy, iOS ARM64
 FFI cross-check and all 13 FFI tests pass.
 Stable product installations and environments are unchanged.
+
+
+## Desktop repair: alpha, Gallery and network selection (2026-11-15)
+
+Android native-image buffers retain their producer's alpha contract. RGBA and
+BGRA planes use premultiplied blending; RGBX planes stay opaque. Both the Mac
+presenter and iPad frame ABI consume the shared capability metadata. No pixel
+readback, extra guest copy or new scheduler/coordinator is introduced. The real
+Metal shaders for both products pass transparent, half-transparent and opaque
+pixel checks (`tests/fixtures/wayland-alpha-metal.m`).
+
+Gallery's boot ANR was in the original camera-count query, not its drawing code.
+The profile now defaults to Android's own `config.disable_cameraservice=true`
+because no camera is forwarded; explicit image properties still win. The image
+also ships 32-bit OMX/mediaserver entrypoints. A small ARM64 media adapter
+registers its existing `libstagefright_omx` objects and compiles the unmodified
+Android 13 resource-manager/observer sources missing from the 64-bit image.
+Original Codec2 software codecs remain enabled. Without both services,
+MediaProvider blocks in `MediaCodec.native_setup` during its HDR capability
+probe and is killed for failing to publish its providers.
+
+The adapter runs under the original Android init as user `media`. Init stops
+the unusable original media/OMX launchers and disabled camera services; no host
+service or polling loop substitutes for them. `media.player` is not fabricated:
+the framework retains its normal local-codec-list fallback. Pinned source and
+VNDK header inputs are recorded in `scripts/android-upstream.json`; upstream
+source material goes in the separate source export, not the adapter payload.
+The macOS build uses Google's pinned x86_64 host AIDL executable through
+Rosetta at build time only; other hosts can pass an Android 13 compiler with
+`--aidl`. The runtime and guest adapters remain ARM64.
+
+The Mac and iPad Android entrypoints now select the existing guest-managed IP
+uplink instead of a read-only native interface snapshot. netd can preserve the
+IP link's intrinsic `IFF_NOARP` while changing its up/down state. Android still
+performs its original Ethernet, IpClient, routing and resolver setup. Ordinary
+Linux native networking is unchanged; the guest cannot configure a host NIC.
+
+Native mouse events stay unmodified. A real Mac right click was observed as
+Android InputReader `ButtonState=0x2`, followed by `0x0` on release. Android 13
+maps this to Secondary; Back/Side buttons are separate and synthesize the
+platform Back key. Trames does not remap right clicks to Back. Window resizing
+already follows xdg configure → original Waydroid HWC hotplug → Android display
+configuration: a live check changed the physical display from 3840×1856 to
+2048×1536 with matching InputReader coordinate bounds.
+
+Gallery is accepted through its real Timeline UI (empty library). This is not
+an emulated-storage/FUSE, camera, general video-playback or Android CTS pass.
+The lack of emulated external storage remains a separate limitation.
+
+
+Final cold-boot acceptance: init reports `trames-media=running`, original OMX,
+resource-manager and observer services are registered, and the unusable media,
+OMX and camera launchers are stopped. Gallery cold-launch reports 1,212 ms.
+ConnectivityService selects validated Ethernet network 100, with actual gateway
+DNS, and the owner confirms the original Jelly browser displays Example Domain
+over HTTPS. No private photos or browser session data are part of the evidence.
+Shared-runtime local CI passes on both macOS and native ARM64 Linux (7/7 each),
+Mac product CI passes 12/12, and the iPad/CLI workspace tests, all-feature Clippy
+and ARM64 iOS FFI check pass. See the sanitized
+[validation record](../validation/android-desktop-20261115.json).

@@ -881,7 +881,12 @@ fn run(
         "full" | "host" => NetworkMode::Full,
         _ => return Err("invalid network mode".into()),
     };
-    vfs.configure_network(mode).map_err(|e| e.to_string())?;
+    if android {
+        vfs.configure_managed_uplink(mode)
+    } else {
+        vfs.configure_network(mode)
+    }
+    .map_err(|e| e.to_string())?;
     let mut environment: Vec<String> = if android {
         trames_distro::android::environment()
     } else {

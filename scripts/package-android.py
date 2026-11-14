@@ -19,6 +19,7 @@ COMPONENTS = {
     "vendor/lib64/hw/vulkan.trames.so": "vulkan.trames.so",
     "vendor/lib64/hw/gralloc.trames.so": "gralloc.trames.so",
     "vendor/bin/hw/trames-hal-service": "trames-hal-service",
+    "system/bin/trames-media-service": "trames-media-service",
 }
 
 
@@ -40,6 +41,10 @@ def package(components, output, source_output):
     revision = lambda repo: subprocess.check_output(["git", "-C", str(repo), "rev-parse", "HEAD"], text=True).strip()
     provenance = {"trames-ipad": revision(ROOT), "trames-runtime": revision(ROOT / "runtime")}
     sources = dict(archive=source_output.name, repositories={name: dict(revision=rev, url=f"https://github.com/kb5000/{name}/archive/{rev}.tar.gz") for name, rev in provenance.items()})
+    upstream = components / "android-media-sources.tar.gz"
+    sources["android_media"] = dict(archive=upstream.name,
+                                    sha256=hashlib.sha256(upstream.read_bytes()).hexdigest(),
+                                    inputs=json.loads((ROOT / "scripts/android-upstream.json").read_text())["media_service_inputs"])
     metadata = dict(schema=1, package_kind="adapters", target="android", abi="arm64-v8a", android_api=33,
                     graphics_contract=1, images=pins,
                     components={"/"+name: dict(size=len(value), sha256=hashlib.sha256(value).hexdigest()) for name, value in data.items()},
@@ -54,10 +59,11 @@ def package(components, output, source_output):
             for repo, name in [(ROOT, "trames-ipad"), (ROOT / "runtime", "trames-runtime")]:
                 add(archive, name+".tar.gz", subprocess.check_output(["git", "-C", str(repo), "archive", "--format=tar.gz", "HEAD"]))
             add(archive, "GPL-3.0.txt", (ROOT / "LICENSE").read_bytes())
+            add(archive, upstream.name, upstream.read_bytes())
         with partial.open("xb") as raw, gzip.GzipFile(filename="", fileobj=raw, mode="wb", mtime=0, compresslevel=6) as compressed, tarfile.open(fileobj=compressed, mode="w|") as archive:
             add(archive, ".trames-android.json", (json.dumps(metadata, indent=2)+"\n").encode())
             for name, value in data.items():
-                add(archive, name, value, 0o755 if name.startswith("vendor/bin/") else 0o644)
+                add(archive, name, value, 0o755 if name.startswith(("vendor/bin/", "system/bin/")) else 0o644)
             add(archive, "vendor/waydroid.prop", b"ro.hardware.vulkan=trames\nro.hardware.egl=angle\nro.hardware.gralloc=trames\n")
             add(archive, ".trames-android/GPL-3.0.txt", (ROOT / "LICENSE").read_bytes())
             add(archive, ".trames-android/SOURCES.json", (json.dumps(sources, indent=2)+"\n").encode())
