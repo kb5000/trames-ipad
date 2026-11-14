@@ -1,0 +1,18 @@
+name: Android adapters
+on:
+  push:
+    paths: ['accelerator/android/hwc*', 'accelerator/android/buffer.h', 'scripts/build-android-hwcomposer.py', 'tests/native/android-hwc*', '.github/workflows/android-adapters.yml']
+  pull_request:
+    paths: ['accelerator/android/hwc*', 'accelerator/android/buffer.h', 'scripts/build-android-hwcomposer.py', 'tests/native/android-hwc*', '.github/workflows/android-adapters.yml']
+permissions:
+  contents: read
+jobs:
+  events:
+    strategy:
+      matrix:
+        os: [ubuntu-24.04, macos-15]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: bash tests/native/android-hwc-events.sh
+      - run: python3 -c "import ast,pathlib; ast.parse(pathlib.Path('scripts/build-android-hwcomposer.py').read_text())"

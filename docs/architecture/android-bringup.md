@@ -49,8 +49,8 @@ host exit status even when the original command itself returns zero. An explicit
 ### Small adapter package and upstream composition
 
 The optional package built by `scripts/package-android.py` now contains only
-four ARM64 adapter binaries, graphics-selection properties, a manifest, the
-GPL text and source-location metadata: eight regular files, under 1 MiB
+five ARM64 adapter binaries, graphics-selection properties, a manifest, the
+GPL text and source-location metadata: nine regular files, under 1 MiB
 compressed. Android system/vendor, APKs, user data and source tarballs
 are not in this adapter archive. Matching iPad/runtime source exports are a
 separate `-sources.tar.gz` artifact; publish it with the adapters and checksum
@@ -84,6 +84,7 @@ does not enable outbound guest traffic. Old full-rootfs packages remain
 importable through the original path.
 
 ```sh
+python3 scripts/build-android-hwcomposer.py
 python3 scripts/package-android.py \
   --output target/android-packages/Trames-Android-13-arm64-adapters.tar.gz
 trames env create android --target android \
@@ -772,6 +773,7 @@ runner containing this change for executable HAL helpers and probes.
 ```sh
 python3 scripts/build-vulkan-android.py --shader /path/to/compute.spv
 python3 scripts/build-android-hal-service.py --rootfs /path/to/waydroid-rootfs.tar
+python3 scripts/build-android-hwcomposer.py
 
 # Use a signed Mac runner. debug run --fs is offline; stop this store first.
 RUNNER=/path/to/signed/trames-mac-run
@@ -779,11 +781,13 @@ STORE=/path/to/isolated/android-desktop-store
 "$RUNNER" debug run --storage "$STORE" --rootfs /path/to/waydroid-rootfs.tar --fs ls /
 "$RUNNER" debug run --storage "$STORE" --fs put --replace target/vulkan-android/vulkan.trames.so /vendor/lib64/hw/vulkan.trames.so
 "$RUNNER" debug run --storage "$STORE" --fs put --replace target/vulkan-android/gralloc.trames.so /vendor/lib64/hw/gralloc.trames.so
+"$RUNNER" debug run --storage "$STORE" --fs put --replace target/vulkan-android/hwcomposer.trames.so /vendor/lib64/hw/hwcomposer.trames.so
 "$RUNNER" debug run --storage "$STORE" --fs put --replace target/vulkan-android/trames-hal-service /vendor/bin/hw/trames-hal-service
 ```
 
 Supply a vendor overlay containing `ro.hardware.vulkan=trames`,
-`ro.hardware.egl=angle` and `ro.hardware.gralloc=trames`. Do not set
+`ro.hardware.egl=angle`, `ro.hardware.gralloc=trames` and
+`ro.hardware.hwcomposer=trames`. Do not set
 `ro.boot.init_rc` for a full desktop: that would select the foundation fixture
 instead of the image's real boot scripts. Run with windows enabled:
 
@@ -1042,3 +1046,56 @@ Shared-runtime local CI passes on both macOS and native ARM64 Linux (7/7 each),
 Mac product CI passes 12/12, and the iPad/CLI workspace tests, all-feature Clippy
 and ARM64 iOS FFI check pass. See the sanitized
 [validation record](../validation/android-desktop-20261115.json).
+
+## Desktop resize and provider lifetime follow-up (2026-11-15)
+
+Android's physical display is embedded in one native window. The Mac presenter
+clips its root and child planes to that window; ordinary Linux popup windows
+keep their out-of-parent placement. Android configure notifications coalesce
+for 150 ms during native animation, then flush immediately at the end of a live
+resize. This uses the existing main run loop, with no polling or new thread.
+
+The adapter bundle additionally selects `hwcomposer.trames.so`. This small
+public HWC1 wrapper retains the original Waydroid composer, its buffers, input
+and vsync thread. It coalesces primary-display reconnect callbacks onto that
+existing callback source rather than reentering SurfaceFlinger inline from
+composition. It temporarily clamps stale resize source crops to the actual
+native buffer, then restores the caller's geometry. Ordinary valid frames do
+not allocate, copy or read back pixels. The wrapper is specific to the pinned
+Waydroid HWC1 image; it is not a general HWC2 implementation.
+
+Two independent producer metadata races were observed. A new display crop
+could exceed an old target buffer, correctly causing a `wp_viewport` protocol
+error. Separately, Waydroid's HIDL size/stride hints could disagree with its
+attached native image and disconnect `android_wlegl`. The retained image FD is
+the geometry authority: textures and viewport bounds use its actual ImageInfo,
+not those duplicate hints. Unsupported or incompatible pixel formats still
+fail. General Wayland viewport validation stays unchanged. A real Metal/FD
+regression fails with the previous exact-size check, succeeds with a retained
+65x37 plane and stale 1088x780 metadata, and still rejects BGRA interpretation
+of RGBA storage.
+
+Files additionally exposed Binder object releases stranded on an ordinary
+provider worker after its synchronous call returned. Initial owner acquisitions
+still precede the exporting thread's completion/reply; subsequent releases go
+to the existing process Binder queue. Another pool thread can reclaim them even
+if the exporter never reads again. This common fix applies equally to iPad and
+Mac and adds no coordinator. It addresses the observed JNI table overflow of
+more than 50,000 ContentObserver transports, without increasing the table limit.
+
+Files navigation is distinct from usable Android shared storage. The current
+image has no emulated external storage because `/dev/fuse` is not implemented.
+Original DocumentsUI repeatedly retries its missing primary root, and Downloads
+or bugreport content can report unavailable. The UI, Binder and graphics fixes
+do not claim a functioning shared-storage filesystem or an Android CTS pass.
+
+The concentrated follow-up checks pass: runtime CI on macOS and native ARM64
+Linux (7/7 each), Mac product CI (13/13), iPad workspace tests/Clippy and ARM64
+FFI compilation. Native tests cover the real Metal scene, resize coalescing,
+actual FD/image geometry and the public HWC adapter on both host and Android
+ARM64. Foreground notification → Settings interaction was automated and visibly
+confirmed again using the installed, uninstrumented build. A service-start
+SystemUI ANR occurred during concurrent CI; its main thread was still running
+initialization, and an obsolete ANR input window subsequently remained. This
+cold-start/load condition is recorded, not claimed fully resolved by a successful
+foreground click. See the [follow-up record](../validation/android-desktop-followup-20261115.json).

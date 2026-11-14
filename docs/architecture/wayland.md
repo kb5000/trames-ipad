@@ -364,3 +364,20 @@ provides the same query for SHM and GPU storage. The iPad frame record keeps its
 existing ABI size and alpha field. This fixes black cursor rectangles without
 readback or copies. The independent Metal pixel fixture uses each product's
 actual shader, including the opaque/RGBX case.
+
+### Embedded Android display resizing (2026-11-15)
+
+Mac clips every plane of Android's physical display to its native content area,
+including the old landscape buffer during a new portrait configuration. Root
+planes always remain clipped; ordinary Linux descendant popups can still extend
+outside their parent. Android alone coalesces native resize notifications on the
+existing main run loop and flushes at the end of live resizing. No shared iPad
+frame ABI is changed.
+
+For `android_wlegl`, retained native image storage supplies its own dimensions
+and pitch. Waydroid's separately delivered HIDL metadata can briefly describe a
+new display while its buffer is still old. Those geometry hints cannot resize
+or address the retained image, and no longer disconnect it. Pixel interpretation
+must still match the native plane. Viewport source bounds continue to use the
+actual attached buffer; the small pinned HWC adapter repairs out-of-bounds
+producer crops before sending them.

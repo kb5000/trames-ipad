@@ -20,6 +20,7 @@ COMPONENTS = {
     "vendor/lib64/hw/gralloc.trames.so": "gralloc.trames.so",
     "vendor/bin/hw/trames-hal-service": "trames-hal-service",
     "system/bin/trames-media-service": "trames-media-service",
+    "vendor/lib64/hw/hwcomposer.trames.so": "hwcomposer.trames.so",
 }
 
 
@@ -64,7 +65,7 @@ def package(components, output, source_output):
             add(archive, ".trames-android.json", (json.dumps(metadata, indent=2)+"\n").encode())
             for name, value in data.items():
                 add(archive, name, value, 0o755 if name.startswith(("vendor/bin/", "system/bin/")) else 0o644)
-            add(archive, "vendor/waydroid.prop", b"ro.hardware.vulkan=trames\nro.hardware.egl=angle\nro.hardware.gralloc=trames\n")
+            add(archive, "vendor/waydroid.prop", b"ro.hardware.vulkan=trames\nro.hardware.egl=angle\nro.hardware.gralloc=trames\nro.hardware.hwcomposer=trames\n")
             add(archive, ".trames-android/GPL-3.0.txt", (ROOT / "LICENSE").read_bytes())
             add(archive, ".trames-android/SOURCES.json", (json.dumps(sources, indent=2)+"\n").encode())
         source_partial.rename(source_output)

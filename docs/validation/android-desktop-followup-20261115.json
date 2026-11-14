@@ -1,0 +1,98 @@
+{
+  "date": "2026-11-15",
+  "runtime": "b9625cdcda7cfd3354da635c50cd14e10a5a70e8",
+  "checks": {
+    "runtime_macos": {
+      "complete": true,
+      "steps": 7,
+      "statuses": [
+        "passed",
+        "passed",
+        "passed",
+        "passed",
+        "passed",
+        "passed",
+        "passed"
+      ]
+    },
+    "runtime_linux_arm64": {
+      "complete": true,
+      "steps": 7,
+      "statuses": [
+        "passed",
+        "passed",
+        "passed",
+        "passed",
+        "passed",
+        "passed",
+        "passed"
+      ]
+    },
+    "mac_product": {
+      "complete": true,
+      "steps": 13,
+      "statuses": [
+        "passed",
+        "passed",
+        "passed",
+        "passed",
+        "passed",
+        "passed",
+        "passed",
+        "passed",
+        "passed",
+        "passed",
+        "passed",
+        "passed",
+        "passed"
+      ]
+    },
+    "ipad_workspace_clippy": true,
+    "ipad_workspace_tests": true,
+    "ipad_arm64_ffi_check": true,
+    "native_hwc_events_host_and_android_arm64": true,
+    "native_metal_scene_and_resize": true,
+    "native_image_real_fd_regression": {
+      "fixed_passes": true,
+      "old_exact_geometry_check_fails": true,
+      "wrong_pixel_format_rejected": true
+    }
+  },
+  "android": {
+    "automated_without_owner_clicks": true,
+    "hwc_adapter": {
+      "size": 9392,
+      "sha256": "f1e255d3c41e7f3d7d532d90025f5ba03c1ffb857b60b9b6505f70af4459819f",
+      "ordinary_frames_allocate_or_copy": false,
+      "extra_thread": false
+    },
+    "resize": {
+      "twenty_portrait_native_zoom_transitions": true,
+      "composer_surfaceflinger_system_server_unchanged": true,
+      "stale_crop_correction_exercised": true,
+      "linux_popup_behavior_preserved": true
+    },
+    "notification": {
+      "clean_production_build_mouse_settings_click": true,
+      "actual_settings_ui_seen": true,
+      "input_focus_settings_confirmed": true,
+      "acceptance_condition": "Native window raised and visible; framework initialization complete"
+    },
+    "files": {
+      "provider_worker_release_regression": true,
+      "navigation_observed": true,
+      "no_new_jni_overflow_during_soak": true,
+      "file_contents_accepted": false,
+      "missing_feature": "Android emulated external storage / FUSE"
+    }
+  },
+  "remaining_observations": [
+    "A cold boot during concurrent CI produced a SystemUI service-start ANR with its main thread still initializing. A stale ANR input window was observed afterwards; this is not declared fully resolved. Subsequent foreground cold-boot acceptance passed with and without temporary tracing.",
+    "Waydroid documents a raw-handle-address buffer-cache reuse risk. This follow-up did not prove that risk caused the observed stalls and adds no per-frame identity check.",
+    "Physical iPad Android desktop was not tested."
+  ],
+  "deployment": {
+    "mac_stable_and_dev_installed": true,
+    "debian_and_docker_restarted": false
+  }
+}

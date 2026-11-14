@@ -27,8 +27,10 @@ def main():
         before = output.read_bytes()
         with tarfile.open(output) as archive:
             entries = archive.getmembers()
-            assert entries[0].name == ".trames-android.json" and len(entries) == 8
+            assert entries[0].name == ".trames-android.json" and len(entries) == 9
             assert archive.getmember("system/bin/trames-media-service").mode == 0o755
+            assert archive.getmember("vendor/lib64/hw/hwcomposer.trames.so").mode == 0o644
+            assert b'ro.hardware.hwcomposer=trames\n' in archive.extractfile('vendor/waydroid.prop').read()
             manifest = json.load(archive.extractfile(entries[0]))
             assert manifest["package_kind"] == "adapters"
             assert manifest["images"] == json.loads((ROOT / "runtime/scripts/android-images.json").read_text())
