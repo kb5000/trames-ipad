@@ -97,5 +97,44 @@
   "deployment": {
     "mac_stable_and_dev_installed": true,
     "debian_and_docker_restarted": false
+  },
+  "recurring_shade_and_phone_followup": {
+    "runtime_revision": "60338f5",
+    "mac_revision": "9a8ef6f",
+    "captured_failure": "NotificationShade present in WindowManager and SurfaceFlinger, absent from InputDispatcher; NO_WINDOW focus request",
+    "binder_correction": "Forward strong/weak references to dead objects without rejecting the enclosing live parcel; calls to dead targets still fail",
+    "regression_failed_before": true,
+    "binder_tests_macos": 23,
+    "binder_tests_native_arm64_linux": 23,
+    "runtime_macos_local_ci": "7/7 passed",
+    "mac_local_ci": "13/13 passed",
+    "ios_arm64_ffi_check": "passed",
+    "real_native_scene_test": "passed again because its Objective-C include changed",
+    "initial_output_scale": 2,
+    "android_density_dpi": 360,
+    "native_window_sizes": [
+      [
+        1004,
+        1856
+      ],
+      [
+        1004,
+        1570
+      ]
+    ],
+    "phone_display_override": [
+      720,
+      1560
+    ],
+    "phone_footer_fully_visible": true,
+    "phone_footer_mouse_settings_click": true,
+    "browser_recreation_cycles": 8,
+    "new_window_focus_updates_observed": true,
+    "forced_systemui_recreation": true,
+    "settings_mouse_click_after_recreation": true,
+    "new_android_crash_log_empty": true,
+    "startup_note": "Framework and SystemUI initialization can still be slow. No claim of general Android startup-performance or CTS conformance.",
+    "android_override_reset_after_test": true,
+    "debian_and_docker_restarted": false
   }
 }

@@ -1106,3 +1106,29 @@ Downloads and its content query returned
 the original ContentProvider. The app remained alive. This confirms a missing
 Android external-storage volume, rather than a native click being lost; full
 file-content acceptance remains open.
+
+### Recurring shade input and phone density (2026-11-15)
+
+The recurring notification failure was captured after an already-running
+session: WindowManager and SurfaceFlinger contained the new NotificationShade,
+but InputDispatcher still held old application windows and rejected the focus
+request with `NO_WINDOW`. This is distinct from the earlier startup ANR.
+
+Binder parcel translation incorrectly rejected references whose exporting
+process had exited. A window-info update containing one retained dead input
+token therefore failed as a whole. Dead objects remain transferable identities;
+only invoking a dead transaction target must return `BR_DEAD_REPLY`. Strong
+reference validation and original buffer lifetime pinning remain in place.
+This follows the separation between `binder_translate_handle` and transaction
+target lookup in the [Android Binder implementation](https://android.googlesource.com/kernel/common/+/refs/heads/android14-6.1/drivers/android/binder.c).
+The common-runtime ABI regression covers strong and weak dead-token transfers
+inside a live batch, and verifies that an actual call to the dead token fails.
+It fails on the previous implementation and passes with the correction.
+
+Mac now publishes its real main-screen output scale before starting guest
+clients. Waydroid HWC calibrates immutable Android display density during its
+first registry roundtrip; publishing scale only after the first native window
+was too late. On a 2x display the unmodified HWC now initializes at 360 dpi,
+rather than retaining its 180 dpi 1x default. No per-frame work or new thread is
+added. A 720x1560 logical display override and native phone-shaped window were
+used to inspect the shade footer and exercise its Settings button.
