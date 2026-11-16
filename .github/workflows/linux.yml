@@ -1263,6 +1263,7 @@ jobs:
         run: |
           bash scripts/build-qemu-oracle.sh
           echo "$GITHUB_WORKSPACE/target/qemu-oracle/bin" >> "$GITHUB_PATH"
+      - run: python3 runtime/scripts/build-guest-cli.py
       - run: cargo fmt --all --check
       - name: Verify common Linux and execution backend dependency boundaries
         run: |

@@ -763,6 +763,17 @@ fn run(
             .bridge
             .configure(control_policy(config, authorization.as_ref())?)
             .map_err(|e| format!("host capability policy: {e}"))?;
+        let denied = model::Grant::default();
+        let grant = authorization
+            .as_ref()
+            .map(|a| a.for_environment(&config.environment.uuid))
+            .transpose()
+            .map_err(|e| e.to_string())?
+            .unwrap_or(&denied);
+        session
+            .bridge
+            .describe(model::control_info(config, grant, "ipados"))
+            .map_err(|e| format!("host control metadata: {e}"))?;
     } else {
         session
             .bridge

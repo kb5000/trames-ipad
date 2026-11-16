@@ -95,8 +95,10 @@ is shared. Without an explicit host profile the runtime reads guest
 stores and pending package preparation; boot settings are loaded from TOML.
 Host-owned `grants-<installation-id>.toml` records are stored separately in the
 app's authorization directory and are bound to the manifest UUID. New
-owner-created environments retain basic clipboard integration; other command
-capabilities require explicit grants. Clipboard controls use
+owner-created environments allow the platform-supported clipboard, Files and
+host UI controls by default; existing explicit denials remain intact. Guest
+permission commands are read-only, and OS privacy/folder authorizations still
+apply. The old per-request Trames consent sheet is removed. Clipboard controls use
 `/dev/trames/clipboard`, independently of host UI, CLI, and execution.
 
 The iPad embedding supports Linux shell/systemd and Android manifests and
@@ -165,3 +167,19 @@ a guest player or override Firefox's media preferences.
 
 Physical acceptance and the artifact hashes are recorded in
 [the 2026-11-14 graphics/video validation](../validation/ipad-graphics-video-20261114.json).
+
+## Injected guest CLI
+
+Linux environments receive the shared static ARM64 command at
+`/usr/local/bin/trames` and `/usr/bin/trames`; Android uses `/system/bin/trames`.
+It has no guest package dependency. `trames --help`, `status`, `doctor`,
+`permissions`, `clipboard get|set`, `files ls|cp` and `host open|gui` use the
+same command model as Mac. Use `--json` for scripts, or `TRAMES_LANGUAGE=zh`
+for Chinese help without changing the environment locale.
+
+Files transfers use `share:PROVIDER_ID/relative/path`, with IDs listed by
+`trames files ls`. The existing Files adapter supports individual files up to
+1 GiB; recursive/no-clobber provider copies report unsupported. Host command
+execution, delegated Mac CLI, dynamic host mounts and port administration
+remain unsupported on iPad. Newly started sessions attach the control metadata;
+running sessions retain their original runtime until restarted.

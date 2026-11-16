@@ -118,7 +118,9 @@ pub unsafe extern "C" fn trames_environment_config(
                             .ok_or("environment UUID required")?
                             .into(),
                         grant: model::Grant {
-                            clipboard: request["clipboard"].as_bool().unwrap_or(false),
+                            clipboard: request["clipboard"].as_bool().unwrap_or(true),
+                            host_ui: true,
+                            files: true,
                             ..Default::default()
                         },
                     };

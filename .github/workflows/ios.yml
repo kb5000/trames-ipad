@@ -27,6 +27,8 @@ jobs:
         with:
           toolchain: nightly-2026-10-16
           targets: aarch64-apple-ios
+      - name: Build shared guest CLI
+        run: python3 runtime/scripts/build-guest-cli.py
       - name: Validate bundled instance manifest refresh and iOS embedding build
         if: needs.scope.outputs.native_scope == 'zink-foundation'
         run: |
@@ -85,6 +87,8 @@ jobs:
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: nightly-2026-10-16
+      - name: Build shared guest CLI
+        run: python3 runtime/scripts/build-guest-cli.py
       - name: Validate affected Apple VFS and scheduler modules
         if: needs.scope.outputs.runtime_apple_modules_reused != 'true'
         run: |
@@ -197,6 +201,8 @@ jobs:
         with:
           toolchain: nightly-2026-10-16
           targets: aarch64-apple-ios
+      - name: Build shared guest CLI
+        run: python3 runtime/scripts/build-guest-cli.py
       - name: Validate proc identity, socket timeouts, scheduler deadlines and iOS FFI
         if: needs.scope.outputs.docker_default_remount != 'true'
         run: |
@@ -224,6 +230,8 @@ jobs:
         with:
           toolchain: nightly-2026-10-16
           targets: aarch64-apple-ios
+      - name: Build shared guest CLI
+        run: python3 runtime/scripts/build-guest-cli.py
       - name: Validate overlay storage, Apple file IO and iOS FFI
         run: |
           if [[ '${{ needs.scope.outputs.storage_proc_only }}' == true ]]; then
@@ -246,6 +254,8 @@ jobs:
         with:
           toolchain: nightly-2026-10-16
           targets: aarch64-apple-ios
+      - name: Build shared guest CLI
+        run: python3 runtime/scripts/build-guest-cli.py
       - name: Validate affected Apple kernel and network modules
         if: needs.scope.outputs.isolation_retry != 'true'
         run: |
@@ -273,6 +283,8 @@ jobs:
         with:
           toolchain: nightly-2026-10-16
           targets: aarch64-apple-ios
+      - name: Build shared guest CLI
+        run: python3 runtime/scripts/build-guest-cli.py
       - name: Validate affected Apple network modules and iOS FFI
         run: |
           if [[ '${{ needs.scope.outputs.docker_network }}' == true ]]; then
@@ -365,6 +377,8 @@ jobs:
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: nightly-2026-10-16
+      - name: Build shared guest CLI
+        run: python3 runtime/scripts/build-guest-cli.py
       - name: Validate hardware mappings and signal recovery before app builds
         run: CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-target}" cargo test --manifest-path runtime/Cargo.toml -p trames-memory --locked
   guest-musl:
@@ -503,6 +517,8 @@ jobs:
         with:
           name: xwayland-device-inputs
           path: target/vulkan-guest/
+      - name: Build shared guest CLI
+        run: python3 runtime/scripts/build-guest-cli.py
       - name: Build native Rust embedding library
         if: needs.scope.outputs.frontend_only != 'true' && needs.scope.outputs.targeted != 'true'
         run: cargo build -p trames-ffi --release --locked

@@ -102,6 +102,7 @@ struct WorkspaceView: View {
             }.workspaceFrame("body")
         }
         .coordinateSpace(name:"workspace")
+        .onReceive(NotificationCenter.default.publisher(for:Notification.Name("TramesShowEnvironments"))) { _ in environmentsSheet=true }
         .onPreferenceChange(WorkspaceFramesKey.self) { frames=$0 }
         .overlay(alignment:.topLeading) {
             if let item=draggedTab,let session=workspace.session(for:item) {
@@ -115,7 +116,6 @@ struct WorkspaceView: View {
                 .opacity(pictureInPicture.item != nil ? 1 : 0.01).allowsHitTesting(false).accessibilityHidden(true)
         }
         .background(.black)
-        .background { if let owner=workspace.localOwner {BridgeConsentPresenter(controller:owner.bridge)} }
         .sheet(isPresented: $filesSheet) { if let session = workspace.current { TransferView(session: session) } }
         .sheet(isPresented:$environmentsSheet) {EnvironmentManagerView(workspace:workspace)}
         .sheet(isPresented: $settingsSheet) { SettingsView(workspace: workspace) }

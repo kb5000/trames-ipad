@@ -24,6 +24,7 @@ record = json.loads((native / 'build.json').read_text())
 payload.check_native_inputs(record['inputs'], args.target)
 if digest(native / 'libMoltenVK.a') != record['library_sha256']:
     parser.error('native MoltenVK binary does not match its build record')
+subprocess.run(['python3', str(ROOT/'runtime/scripts/build-guest-cli.py')],cwd=ROOT,check=True)
 environment = dict(os.environ, TRAMES_MOLTENVK_STATIC_DIR=str(native), IPHONEOS_DEPLOYMENT_TARGET='17.0')
 sdk = 'iphonesimulator' if args.target.endswith('-sim') else 'iphoneos'
 environment['SDKROOT'] = subprocess.check_output(['xcrun', '--sdk', sdk, '--show-sdk-path'],
