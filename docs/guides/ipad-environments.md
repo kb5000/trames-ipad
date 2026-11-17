@@ -49,6 +49,20 @@ Implementation and container policy live in the shared runtime's
 See the [validation record](../validation/ipad-environments-20261102.json) for
 physical iPad checks, production FFI coverage and the systemd idle-CPU comparison.
 
+## Experimental Android environments
+
+In **+ → Linux 环境 → 新建环境**, select **Android** and choose the ARM64
+Trames adapter archive from Files. The adapter archive is small; initial setup
+separately downloads approximately 1 GB of pinned official Waydroid images and
+checks their sizes and SHA-256 digests before importing them. Keep the app in the
+foreground during preparation. Physical iPad desktop compatibility remains
+experimental and is not implied by successful installation of the app.
+
+Bootstrap downloads allow one hour for the entire transfer, with a 60-second
+inactivity timeout and at most three attempts for transient network errors. A
+slow but active image download no longer expires after one minute. Retries
+restart the current download; byte-range resume is not implemented.
+
 ## Application language and guest locale
 
 The app supports English and Simplified Chinese, including environment setup,
