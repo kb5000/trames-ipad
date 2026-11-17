@@ -28,8 +28,10 @@ public enum ConnectivityRetry {
         #if canImport(Darwin)
         configuration.waitsForConnectivity=true
         #endif
-        configuration.timeoutIntervalForRequest=30
-        configuration.timeoutIntervalForResource=60
+        configuration.timeoutIntervalForRequest=60
+        // This is the entire transfer's deadline, not an inactivity timeout.
+        // Android images can approach 1 GB; active downloads must outlive a minute.
+        configuration.timeoutIntervalForResource=60*60
         let session=URLSession(configuration:configuration)
         defer {session.invalidateAndCancel()}
         return try await perform {try await session.download(from:url)}
