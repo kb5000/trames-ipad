@@ -136,3 +136,29 @@
 "导入 Trames Android ARM64 适配包，首次安装会下载官方 Waydroid 镜像。Android 桌面仍为实验性；iPad 真机兼容性待验证。" = "Import a Trames Android ARM64 adapter package. Initial installation downloads official Waydroid images. Android desktop support is experimental; physical iPad compatibility has not been verified.";
 
 "Android 镜像大小或 SHA-256 校验失败" = "Android image size or SHA-256 verification failed";
+
+// Cold environment preparation progress and diagnostics.
+"无法保存准备日志：%@" = "Could not save preparation log: %@";
+"%llu 项" = "%llu entries";
+"准备环境" = "Preparing environment";
+"下载镜像" = "Downloading image";
+"校验镜像" = "Verifying image";
+"镜像校验完成" = "Image verified";
+"等待安装任务开始" = "Waiting for installer to start";
+"打开环境存储" = "Opening environment storage";
+"环境存储已就绪" = "Environment storage ready";
+"读取适配组件与归档" = "Reading adapters and archive";
+"解包镜像" = "Unpacking image";
+"镜像解包完成" = "Image unpacked";
+"导入文件" = "Importing files";
+"文件导入完成" = "Files imported";
+"保存环境存储" = "Saving environment storage";
+"检查环境启动文件" = "Checking environment startup files";
+"环境导入完成" = "Environment imported";
+"发布环境存储" = "Publishing environment storage";
+"环境准备完成" = "Environment ready";
+"环境准备失败" = "Environment preparation failed";
+"诊断" = "Diagnostics";
+"共享环境准备日志" = "Share environment preparation log";
+"安装环境软件" = "Installing environment packages";
+"启动环境" = "Starting environment";

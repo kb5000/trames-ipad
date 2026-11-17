@@ -527,6 +527,11 @@ jobs:
         env:
           TRAMES_RUST_LIB_DIR: ${{ github.workspace }}/target/release
         run: bash scripts/test-swift-ssh.sh
+      - name: Test streamed setup progress and installer cancellation
+        if: needs.scope.outputs.frontend_only != 'true' && needs.scope.outputs.targeted != 'true'
+        env:
+          TRAMES_RUST_LIB_DIR: ${{ github.workspace }}/target/release
+        run: python3 scripts/test-swift-bootstrap.py
       - name: Validate affected native modules or the complete Apple core
         if: needs.scope.outputs.frontend_only != 'true' && needs.scope.outputs.skip_native != 'true'
         run: |

@@ -302,6 +302,46 @@ pub unsafe extern "C" fn trames_environment_install(pointer: *const u8, length: 
         result.map(|_| 0).unwrap_or_else(error)
     })
 }
+/// Cold installation only. The callback executes synchronously on the caller's
+/// thread, owns no store/session handle, and must not unwind or reenter this
+/// installer. Its JSON bytes and context are never retained after this call.
+/// Returning zero cancels at the next bounded progress checkpoint.
+/// # Safety
+/// Input follows `bytes`; callback/context must remain valid until return.
+#[no_mangle]
+pub unsafe extern "C" fn trames_environment_install_progress(
+    pointer: *const u8,
+    length: u32,
+    callback: Option<unsafe extern "C" fn(*const u8, u32, *mut std::ffi::c_void) -> i32>,
+    context: *mut std::ffi::c_void,
+) -> i32 {
+    boundary(|| {
+        let result = (|| {
+            let options: Options =
+                serde_json::from_slice(unsafe { bytes(pointer, length) }.map_err(str::to_string)?)
+                    .map_err(|e| e.to_string())?;
+            let mut report =
+                |event: &trames_distro::progress::InstallProgress| -> std::io::Result<()> {
+                    if let Some(callback) = callback {
+                        let json = serde_json::to_vec(event)?;
+                        // SAFETY: the caller keeps context/callback live for this
+                        // synchronous invocation; json lives through the callback.
+                        if unsafe { callback(json.as_ptr(), json.len() as u32, context) } == 0 {
+                            // Read/copy helpers retry Interrupted; cancellation
+                            // must leave those loops rather than consume more data.
+                            return Err(std::io::Error::other("installation cancelled"));
+                        }
+                    }
+                    Ok(())
+                };
+            session::install_with_progress(
+                options,
+                callback.map(|_| &mut report as &mut trames_distro::progress::Callback<'_>),
+            )
+        })();
+        result.map(|_| 0).unwrap_or_else(error)
+    })
+}
 /// # Safety
 /// Input is a UTF-8 archive path (`bytes`); output follows `copy`. Returns zero
 /// for a legacy rootfs, or JSON describing pinned upstream downloads. No I/O
@@ -737,6 +777,53 @@ pub unsafe extern "C" fn trames_last_error(pointer: *mut u8, capacity: u32) -> i
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn installer_callback_runs_on_caller_and_cancels_before_creating_storage() {
+        struct Observer {
+            stages: Vec<String>,
+            thread: std::thread::ThreadId,
+            same_thread: bool,
+        }
+        unsafe extern "C" fn report(
+            bytes: *const u8,
+            count: u32,
+            context: *mut std::ffi::c_void,
+        ) -> i32 {
+            // SAFETY: this test lends the live observer and ABI-owned JSON for
+            // exactly this synchronous callback invocation.
+            let observer = unsafe { &mut *context.cast::<Observer>() };
+            observer.same_thread = std::thread::current().id() == observer.thread;
+            let event: serde_json::Value = serde_json::from_slice(unsafe {
+                std::slice::from_raw_parts(bytes, count as usize)
+            })
+            .unwrap();
+            observer
+                .stages
+                .push(event["stage"].as_str().unwrap().into());
+            0
+        }
+        let store =
+            std::env::temp_dir().join(format!("trames-progress-test-{}", std::process::id()));
+        assert!(!store.exists());
+        let input=serde_json::to_vec(&serde_json::json!({"store":store,"rootfs":"/absent/archive","volume_total":1<<30,"volume_available":1<<30})).unwrap();
+        let mut observer = Observer {
+            stages: Vec::new(),
+            thread: std::thread::current().id(),
+            same_thread: false,
+        };
+        let result = unsafe {
+            trames_environment_install_progress(
+                input.as_ptr(),
+                input.len() as u32,
+                Some(report),
+                (&mut observer as *mut Observer).cast(),
+            )
+        };
+        assert_eq!(result, -1);
+        assert_eq!(observer.stages, ["store"]);
+        assert!(observer.same_thread);
+        assert!(!store.exists());
+    }
     #[test]
     fn abi_rejects_invalid_buffers_config_and_closed_handles() {
         assert_eq!(trames_abi_version(), 3);

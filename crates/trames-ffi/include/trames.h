@@ -13,7 +13,8 @@ extern "C" {
  * At most 8 workers (including workers finishing cancellation), 64 KiB queues.
  * Input/output return bytes accepted/drained, including 0 for backpressure.
  * Transfer and timezone synchronization block; run them on a background queue.
- * No callbacks into Swift.
+ * Session operations do not call Swift. The opt-in cold installer below has a
+ * synchronous caller-thread progress callback, never a runtime service thread.
  */
 uint32_t trames_abi_version(void);
 int32_t trames_environment_config(const uint8_t *json,uint32_t length,uint8_t *output,uint32_t capacity);
@@ -25,6 +26,11 @@ int32_t trames_session_display_attach(uint64_t handle, void *metal_layer, uint32
 int32_t trames_session_display_detach(uint64_t handle);
 int32_t trames_session_display_status(uint64_t handle, uint8_t *json, uint32_t capacity);
 int32_t trames_environment_install(const uint8_t *json, uint32_t length);
+/* Progress JSON is borrowed only during callback; callback/context are valid
+ * through this blocking call and never retained. Return 0 to cancel, 1 to
+ * continue. Do not unwind/reenter installation from the callback. */
+typedef int32_t (*TramesInstallProgressCallback)(const uint8_t *json, uint32_t length, void *context);
+int32_t trames_environment_install_progress(const uint8_t *json, uint32_t length, TramesInstallProgressCallback callback, void *context);
 int32_t trames_android_package_plan(const uint8_t *path, uint32_t length, uint8_t *output, uint32_t capacity);
 /* Destructive native-only store reset, {"store":"/authorized/private/store"}.
  * Serialize against new opens; returns 1 while a worker owns the lock, 0 after

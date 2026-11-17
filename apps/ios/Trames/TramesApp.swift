@@ -206,6 +206,11 @@ struct SettingsView: View {
                     }
                 }
                 Section(L10n.text("后台行为")) { Text(L10n.text("进入后台后暂停本地 Linux；返回前台后继续。Files 采用独立副本导入和导出。")).font(.caption) }
+                if FileManager.default.fileExists(atPath:PreparationDiagnostics.logURL.path) {
+                    Section(L10n.text("诊断")) {
+                        ShareLink(item:PreparationDiagnostics.logURL) {Label(L10n.text("共享环境准备日志"),systemImage:"square.and.arrow.up")}
+                    }
+                }
                 Section("GPU") {
                     Toggle(L10n.text("Vulkan 计算与图形（实验）"), isOn: $vulkan)
                     Text(L10n.text("下次打开本地终端生效。需在 Linux 安装 vulkan-loader；支持选定计算、图形和 Wayland 接口。Wayland 应用各自显示为 App 内窗口，调整窗口大小会请求应用改变分辨率。窗口也可停靠到顶部标签栏。")).font(.caption)

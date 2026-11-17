@@ -1,0 +1,63 @@
+{
+  "date": "2026-11-18",
+  "scope": "iPad environment preparation progress, diagnostics, cancellation and Android boot adapter corrections",
+  "runtime_revision": "59589c37c946c0c6494c9a5ef4e11ff0b5145ce8",
+  "device": {
+    "model": "iPad Air 11-inch (M3)",
+    "os": "iPadOS 27.0.1",
+    "channel": "Dev",
+    "version": "1.5.4",
+    "build": 55,
+    "physical_boot_observation_build": 54
+  },
+  "checks": {
+    "shared_runtime_macos_ci": {
+      "passed": 8,
+      "total": 8
+    },
+    "distro_unit_tests": {
+      "passed": 31
+    },
+    "ffi_unit_tests": {
+      "passed": 17
+    },
+    "ffi_clippy": "passed, warnings denied",
+    "swift_bootstrap_tests": {
+      "passed": 8,
+      "method": "7 selected cases plus the subsequently added native cancellation case"
+    },
+    "streaming_download": "real progress before EOF, complete file retained after delegate return",
+    "long_active_download": "65 seconds, beyond former 60-second whole-transfer deadline",
+    "download_cancellation": "passed",
+    "native_installer_cancellation": "same caller thread, no storage created after first callback rejects",
+    "ios_native_archive": "source-checked ARM64 device build passed",
+    "signed_device_build_and_install": "passed",
+    "localization": "English and Simplified Chinese string files passed plutil",
+    "production_execution_boundaries": "passed",
+    "final_native_cancellation_semantics": "uses a non-retryable I/O error so Rust copy/read helpers do not swallow cancellation as Interrupted"
+  },
+  "physical_observations": [
+    "Dev 53 rendered timestamped preparation/startup/failure lines; its single JSONL file was read back successfully using devicectl.",
+    "Current environment had already been imported. It failed during boot in 0.846 seconds with ENOTDIR, rather than continuing to download.",
+    "A local regression reproduced ENOTDIR when the Linux timezone writer encountered Android /etc -> /system/etc. Android boot and live updates now skip this Linux-only file injection.",
+    "Dev 54 log records prepare, boot and ready in 0.556 seconds. Timestamped terminal output and a Waydroid window were visible.",
+    "The ready event means the embedding has handed control to guest execution. Android desktop first-frame acceptance is pending; the Waydroid surface was black at observation.",
+    "Dev 54 subsequently aborted after roughly 205 seconds of Android execution. The device crash report identifies Rust allocation failure in trames_memory::parallel::snapshot::Memory::update_parallel_snapshot, reached through parallel_view and prepare_views. This is a host allocation failure, not a download timeout or proof of desktop readiness."
+  ],
+  "diagnostics": {
+    "path": "Documents/Diagnostics/environment-preparation.jsonl",
+    "previous": "environment-preparation.previous.jsonl",
+    "maximum_bytes_per_file": 2097152,
+    "normal_update_interval_ms": 500,
+    "export": "Settings > Diagnostics > Share environment preparation log"
+  },
+  "limitations": [
+    "No additional cold reimport of the approximately 1 GB images was performed after adding progress; native ext4/metadata fixtures, real streaming fixtures and physical startup logging cover the affected boundaries.",
+    "No Android desktop or application performance success is claimed.",
+    "Byte-range download resume and Android timezone property synchronization are not implemented.",
+    "No Linux ARM64 CI rerun for this revision; the complete common runtime macOS workflow passed locally.",
+    "Stable iPad build 51 and all Mac apps/environments were left unchanged.",
+    "Android first boot remains blocked by the separately captured host allocation failure in parallel memory snapshot construction; no fix for that memory subsystem is included here.",
+    "The Settings ShareLink is compiled, but its share sheet could not be manually accepted before the independent Android allocation failure. Single-file log readback from the device succeeded."
+  ]
+}

@@ -99,7 +99,7 @@ public final class LocalSession: @unchecked Sendable {
         struct Plan:Decodable {let images:[AndroidImageDownload]}
         return try JSONDecoder().decode(Plan.self,from:Data(output.prefix(Int(count)))).images
     }
-    public static func install(store: URL, rootfs: URL, total: UInt64, available: UInt64, muslLibc: URL? = nil, storeOwnerLock: URL? = nil, distribution: String = "alpine", sha256: String? = nil, androidImages: URL? = nil) throws {
+    public static func install(store: URL, rootfs: URL, total: UInt64, available: UInt64, muslLibc: URL? = nil, storeOwnerLock: URL? = nil, distribution: String = "alpine", sha256: String? = nil, androidImages: URL? = nil, progress:(@Sendable(InstallationProgress)->Void)? = nil) throws {
         var options: [String:Any] = ["store":store.path, "rootfs":rootfs.path, "volume_total":total, "volume_available":available]
         if let muslLibc { options["musl_libc"] = muslLibc.path }
         options["distro"] = distribution
@@ -108,7 +108,17 @@ public final class LocalSession: @unchecked Sendable {
         if let androidImages {options["android_images"] = androidImages.path}
         if let storeOwnerLock { options["store_owner_lock"] = storeOwnerLock.path }
         let data = try JSONSerialization.data(withJSONObject: options)
-        let result = data.withUnsafeBytes { trames_environment_install($0.bindMemory(to: UInt8.self).baseAddress, UInt32($0.count)) }
+        let observer=progress.map(InstallationCallback.init)
+        let result=withExtendedLifetime(observer) {
+            data.withUnsafeBytes { bytes -> Int32 in
+                if let observer {
+                    return trames_environment_install_progress(bytes.bindMemory(to:UInt8.self).baseAddress,UInt32(bytes.count),installationCallback,Unmanaged.passUnretained(observer).toOpaque())
+                }
+                return trames_environment_install(bytes.bindMemory(to:UInt8.self).baseAddress,UInt32(bytes.count))
+            }
+        }
+        if let failure=observer?.failure {throw failure}
+        try Task.checkCancellation()
         if result < 0 { throw lastError() }
     }
     public func close() {

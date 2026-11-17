@@ -63,6 +63,35 @@ inactivity timeout and at most three attempts for transient network errors. A
 slow but active image download no longer expires after one minute. Retries
 restart the current download; byte-range resume is not implemented.
 
+Preparation prints timestamped progress for download, checksum verification,
+ZIP decompression, ext4 file import, storage synchronization, validation and
+publication. Byte percentages appear only when a total is known; file import
+shows actual bytes, entry count and the most recent file instead of a fabricated
+overall percentage. Normal updates are limited to twice per second, with
+immediate stage boundaries. A stage label alone is not proof of forward progress;
+check whether the timestamp and counters are advancing.
+
+Use **Settings → Diagnostics → Share environment preparation log** to export
+the current JSON Lines journal, including failures and the last native installer
+checkpoint. It is kept at `Documents/Diagnostics/environment-preparation.jsonl`;
+the preceding preparation has a `.previous.jsonl` sibling. Each file is bounded
+to 2 MiB. Native progress callbacks execute synchronously on the existing import
+worker and are never retained. They add no coordinator, polling timer or normal
+guest execution overhead. Closing the preparing terminal propagates cancellation
+to the installer at progress checkpoints.
+
+The journal's `ready` event means that host preparation has completed and the
+guest session can execute. It does **not** mean that Android has finished its
+first boot or that its desktop has drawn a frame. Subsequent Android service
+startup is separate from image download/import.
+
+Android uses its own init target and timezone service. The iPad adapter keeps
+the separate Linux init selector at `shell` and skips Linux TZif file injection
+for Android, including live host timezone updates. Android timezone property
+synchronization is not implemented; Linux timezone synchronization is unchanged.
+The physical-device diagnostics and current acceptance limits are recorded in
+[the preparation validation](../validation/ipad-preparation-progress-20261118.json).
+
 ## Application language and guest locale
 
 The app supports English and Simplified Chinese, including environment setup,

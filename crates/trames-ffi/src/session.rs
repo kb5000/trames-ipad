@@ -81,17 +81,46 @@ pub struct HostTimezone {
     pub identifier: String,
     pub data: Vec<u8>,
 }
+fn apply_host_timezone(
+    vfs: &mut Vfs,
+    target: trames_distro::boot::Target,
+    timezone: &HostTimezone,
+) -> Result<(), String> {
+    // Android owns its timezone through its property service and tzdata APEX.
+    // Linux TZif injection must not write through Android's /etc -> /system/etc.
+    if target == trames_distro::boot::Target::Android {
+        return Ok(());
+    }
+    trames_distro::synchronize_timezone(vfs, &timezone.identifier, &timezone.data)
+        .map_err(|e| format!("install Linux timezone: {e}"))
+}
 enum Command {
     Transfer(Transfer),
     Timezone(HostTimezone, mpsc::SyncSender<Result<(), String>>),
 }
 pub fn install(options: Options) -> Result<(), String> {
+    install_with_progress(options, None)
+}
+pub fn install_with_progress<'a>(
+    options: Options,
+    callback: Option<&'a mut trames_distro::progress::Callback<'a>>,
+) -> Result<(), String> {
     if !options.store.is_absolute() || options.store.exists() {
         return Err("installation requires an absent absolute staging directory".into());
     }
     let archive = options.rootfs.as_ref().ok_or("rootfs archive required")?;
+    let mut progress = trames_distro::progress::Reporter::new(callback);
+    progress
+        .event("store", "", 0, 0, 0)
+        .map_err(|e| e.to_string())?;
     let mut vfs = open_store(&options)?;
-    install_image(&options, archive, &mut vfs)?;
+    progress
+        .event("store_ready", "", 0, 0, 0)
+        .map_err(|e| e.to_string())?;
+    install_image_with_progress(&options, archive, &mut vfs, &mut progress)?;
+    progress
+        .event("complete", "", 0, 0, 0)
+        .map_err(|e| e.to_string())?;
     Ok(())
 }
 fn default_distro() -> String {
@@ -105,6 +134,22 @@ fn install_image(
     archive: &std::path::Path,
     vfs: &mut Vfs,
 ) -> Result<(), String> {
+    install_image_with_progress(
+        options,
+        archive,
+        vfs,
+        &mut trames_distro::progress::Reporter::new(None),
+    )
+}
+fn install_image_with_progress(
+    options: &Options,
+    archive: &std::path::Path,
+    vfs: &mut Vfs,
+    progress: &mut trames_distro::progress::Reporter<'_>,
+) -> Result<(), String> {
+    progress
+        .event("archive", &options.distro, 0, 0, 0)
+        .map_err(|e| e.to_string())?;
     let mut reader = File::open(archive).map_err(|e| e.to_string())?;
     match options.distro.as_str() {
         "alpine" => {
@@ -122,11 +167,12 @@ fn install_image(
                 .android_images
                 .as_deref()
                 .ok_or("Android upstream image cache is required")?;
-            trames_distro::android_package::install(
+            trames_distro::android_package::install_with_progress(
                 archive,
                 images,
                 vfs,
                 options.rootfs_sha256.as_deref(),
+                progress,
             )
             .map_err(|e| e.to_string())?;
         }
@@ -136,6 +182,9 @@ fn install_image(
         }
         _ => return Err("unsupported distribution".into()),
     }
+    progress
+        .event("validate", &options.distro, 0, 0, 0)
+        .map_err(|e| e.to_string())?;
     if options.target == trames_distro::boot::Target::Android {
         trames_distro::android::validate_image(vfs).map_err(|e| e.to_string())?;
     } else {
@@ -199,6 +248,7 @@ pub struct Session {
     pub cancelled: AtomicBool,
     pub paused: AtomicBool,
     pub multiple_terminals: bool,
+    target: trames_distro::boot::Target,
     pub next_terminal: AtomicU64,
     commands: mpsc::SyncSender<Command>,
     transfers: Mutex<BTreeMap<u64, TransferTicket>>,
@@ -319,6 +369,7 @@ impl Session {
             cancelled: AtomicBool::new(false),
             paused: AtomicBool::new(options.initially_paused),
             multiple_terminals: options.multiple_terminals,
+            target: options.target,
             next_terminal: AtomicU64::new(2),
             commands,
             transfers: Mutex::new(BTreeMap::new()),
@@ -380,6 +431,9 @@ impl Session {
         Ok(token)
     }
     pub fn synchronize_timezone(&self, timezone: HostTimezone) -> Result<(), String> {
+        if self.target == trames_distro::boot::Target::Android {
+            return Ok(());
+        }
         let (response, receiver) = mpsc::sync_channel(1);
         self.commands
             .try_send(Command::Timezone(timezone, response))
@@ -666,7 +720,7 @@ fn run(
         install_image(&options, archive, &mut vfs)?;
     }
     trames_distro::environment::install_cli_for(&mut vfs, options.target)
-        .map_err(|e| e.to_string())?;
+        .map_err(|e| format!("install guest CLI: {e}"))?;
     use trames_distro::environment as model;
     let mut defaults = model::Manifest::new(&options.distro);
     let authorization = options
@@ -785,7 +839,8 @@ fn run(
         return Err("session cancelled".into());
     }
     if android {
-        trames_distro::android::prepare(&mut vfs).map_err(|e| e.to_string())?;
+        trames_distro::android::prepare(&mut vfs)
+            .map_err(|e| format!("prepare Android boot: {e}"))?;
     }
     if options.distro == "alpine" {
         if let Some(libc) = &options.musl_libc {
@@ -882,8 +937,7 @@ fn run(
         }
     }
     if let Some(timezone) = &options.timezone {
-        trames_distro::synchronize_timezone(&mut vfs, &timezone.identifier, &timezone.data)
-            .map_err(|e| e.to_string())?;
+        apply_host_timezone(&mut vfs, options.target, timezone)?;
     }
     let mode = match options.network.as_str() {
         "off" | "none" => NetworkMode::Off,
@@ -1182,9 +1236,7 @@ impl Adapter {
                 let _ = command.result.send(result);
             }
             Command::Timezone(timezone, response) => {
-                let result =
-                    trames_distro::synchronize_timezone(vfs, &timezone.identifier, &timezone.data)
-                        .map_err(|e| e.to_string());
+                let result = apply_host_timezone(vfs, session.target, &timezone);
                 Self::snapshot_session(session, vfs);
                 let _ = response.send(result);
             }
@@ -1752,6 +1804,46 @@ impl GuestOutput for Adapter {
 #[cfg(test)]
 mod memory_tests {
     use super::*;
+    #[test]
+    fn android_timezone_preserves_the_system_namespace_and_linux_still_receives_rules() {
+        use trames_distro::boot::Target;
+        use trames_vfs::AT_FDCWD;
+        let mut android = Vfs::default();
+        android
+            .import_file(b"/system/etc/original", b"keep".to_vec())
+            .unwrap();
+        android
+            .symlink_at(b"/system/etc", AT_FDCWD, b"/etc")
+            .unwrap();
+        let mut rules = vec![0; 44];
+        rules[..4].copy_from_slice(b"TZif");
+        let timezone = HostTimezone {
+            identifier: "Etc/UTC".into(),
+            data: rules,
+        };
+        // The Linux-only writer fails on this real Android namespace shape.
+        assert!(trames_distro::synchronize_timezone(
+            &mut android,
+            &timezone.identifier,
+            &timezone.data
+        )
+        .unwrap_err()
+        .to_string()
+        .contains("errno 20"));
+        let before = android.capacity().nodes_used;
+        apply_host_timezone(&mut android, Target::Android, &timezone).unwrap();
+        assert_eq!(android.capacity().nodes_used, before);
+        assert_eq!(
+            android.readlink_at(AT_FDCWD, b"/etc").unwrap(),
+            b"/system/etc"
+        );
+        assert!(android.stat_at(AT_FDCWD, b"/system/etc/localtime").is_err());
+        let mut linux = Vfs::default();
+        apply_host_timezone(&mut linux, Target::Linux, &timezone).unwrap();
+        let fd = linux.open_at(AT_FDCWD, b"/etc/localtime", 0, 0).unwrap();
+        assert_eq!(linux.read(fd, 16384).unwrap(), timezone.data);
+        linux.close(fd).unwrap();
+    }
     fn test_adapter(init_monitor: Option<trames_distro::systemd::Monitor>) -> Adapter {
         let (commands, receiver) = mpsc::sync_channel(8);
         let session = Arc::new(Session {
@@ -1778,6 +1870,7 @@ mod memory_tests {
             cancelled: AtomicBool::new(false),
             paused: AtomicBool::new(false),
             multiple_terminals: false,
+            target: trames_distro::boot::Target::Linux,
             next_terminal: AtomicU64::new(2),
             commands,
             transfers: Mutex::new(BTreeMap::new()),

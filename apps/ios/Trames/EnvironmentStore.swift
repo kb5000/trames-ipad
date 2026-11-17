@@ -48,7 +48,7 @@ actor EnvironmentStore {
         authorizationRoot.appendingPathComponent(profile.id=="alpine" ? "environment-owner.lock" : "environment-\(profile.id)-owner.lock")
     }
     private func source(_ profile:RootfsEnvironment) -> URL {authorizationRoot.appendingPathComponent("rootfs-\(profile.id).archive")}
-    private func androidImages(archive:URL,output:@escaping @Sendable(Data)->Void) async throws -> URL? {
+    private func androidImages(archive:URL,diagnostics:PreparationDiagnostics) async throws -> URL? {
         let images=try await Task.detached(priority:.userInitiated) {try LocalSession.androidImages(rootfs:archive)}.value
         guard !images.isEmpty else {return nil}
         let cache=authorizationRoot.appendingPathComponent("android-images",isDirectory:true)
@@ -56,11 +56,13 @@ actor EnvironmentStore {
         for image in images {
             try Task.checkCancellation()
             let destination=cache.appendingPathComponent(image.filename)
-            if try await Self.verifiedAndroidImage(destination,image:image) {continue}
-            output(Data(L10n.text("正在下载 %@…\r\n",image.filename).utf8))
-            let (temporary,response)=try await ConnectivityRetry.download(from:image.url)
+            if try await Self.verifiedAndroidImage(destination,image:image,diagnostics:diagnostics) {continue}
+            diagnostics.report(InstallationProgress(stage:"download",item:image.filename,total:image.size))
+            let (temporary,response)=try await ConnectivityRetry.download(from:image.url,progress:{done,total in
+                diagnostics.report(InstallationProgress(stage:"download",item:image.filename,completed:UInt64(max(0,done)),total:total>0 ? UInt64(total) : image.size))
+            })
             defer {try? FileManager.default.removeItem(at:temporary)}
-            guard (response as? HTTPURLResponse)?.statusCode==200,try await Self.verifiedAndroidImage(temporary,image:image) else {throw TramesError.message(L10n.text("Android 镜像大小或 SHA-256 校验失败"))}
+            guard (response as? HTTPURLResponse)?.statusCode==200,try await Self.verifiedAndroidImage(temporary,image:image,diagnostics:diagnostics) else {throw TramesError.message(L10n.text("Android 镜像大小或 SHA-256 校验失败"))}
             try Task.checkCancellation()
             // An invalid cached file is replaced only after the complete new
             // download passes. Every environment keeps separate writable data.
@@ -69,14 +71,24 @@ actor EnvironmentStore {
         }
         return cache
     }
-    private nonisolated static func verifiedAndroidImage(_ file:URL,image:AndroidImageDownload) async throws -> Bool {
-        try await Task.detached(priority:.utility) {
+    private nonisolated static func verifiedAndroidImage(_ file:URL,image:AndroidImageDownload,diagnostics:PreparationDiagnostics) async throws -> Bool {
+        let task=Task.detached(priority:.utility) {
             guard FileManager.default.fileExists(atPath:file.path),(try file.resourceValues(forKeys:[.fileSizeKey])).fileSize.map(UInt64.init)==image.size else {return false}
             let handle=try FileHandle(forReadingFrom:file);defer {try? handle.close()}
             var hash=SHA256()
-            while let bytes=try handle.read(upToCount:65536),!bytes.isEmpty {try Task.checkCancellation();hash.update(data:bytes)}
-            return hash.finalize().map {String(format:"%02x",$0)}.joined()==image.sha256
-        }.value
+            var completed:UInt64=0,last=Date()
+            diagnostics.report(InstallationProgress(stage:"verify_cache",item:image.filename,total:image.size))
+            while let bytes=try handle.read(upToCount:65536),!bytes.isEmpty {
+                try Task.checkCancellation();hash.update(data:bytes);completed+=UInt64(bytes.count)
+                if Date().timeIntervalSince(last)>=0.5 {
+                    last=Date();diagnostics.report(InstallationProgress(stage:"verify_cache",item:image.filename,completed:completed,total:image.size))
+                }
+            }
+            let valid=hash.finalize().map {String(format:"%02x",$0)}.joined()==image.sha256
+            if valid {diagnostics.report(InstallationProgress(stage:"verified",item:image.filename,completed:completed,total:image.size))}
+            return valid
+        }
+        return try await withTaskCancellationHandler(operation:{try await task.value},onCancel:{task.cancel()})
     }
     func create(name:String,distribution:String,initMode:String,packages:String,archive:URL?,sha256:String?) async throws -> RootfsEnvironment {
         let name=name.trimmingCharacters(in:.whitespacesAndNewlines)
@@ -127,73 +139,88 @@ actor EnvironmentStore {
         let requested=profile?.id ?? "alpine"
         var profile=try profiles().first(where:{$0.id==requested}) ?? profile ?? RootfsCatalog.alpine.environments[0]
         let began=generation
-        let musl=profile.distro=="alpine" ? try Self.muslLibrary() : nil
-        let active=try profile.storeURL(in:root)
-        let lock=ownerLock(profile)
-        let values=try root.resourceValues(forKeys:[.volumeTotalCapacityKey,.volumeAvailableCapacityForImportantUsageKey])
-        guard let total=values.volumeTotalCapacity,let available=values.volumeAvailableCapacityForImportantUsage,total>0,available>=0 else {throw TramesError.message("Cannot determine device storage capacity")}
-        if !FileManager.default.fileExists(atPath:active.path) {
-            let archive:URL
-            if ["custom","android"].contains(profile.distro) {archive=source(profile)}
-            else {
-                output(Data(L10n.text("正在下载 %@…\r\n", String(describing: profile.name)).utf8))
-                let (download,response)=try await ConnectivityRetry.download(from:profile.distro=="debian" ? Self.debianURL : Self.archiveURL)
-                guard (response as? HTTPURLResponse)?.statusCode==200,(try download.resourceValues(forKeys:[.fileSizeKey])).fileSize ?? Int.max <= 64*1024*1024 else {try? FileManager.default.removeItem(at:download);throw TramesError.message(L10n.text("rootfs 下载无效"))}
-                archive=download
-            }
-            defer {if !["custom","android"].contains(profile.distro) {try? FileManager.default.removeItem(at:archive)}}
-            try Task.checkCancellation();guard generation==began,!resetting else {throw CancellationError()}
-            let staging=root.appendingPathComponent("install-\(UUID().uuidString)",isDirectory:true)
-            let distribution=profile.distro,sha=profile.sourceSHA256
-            let images=distribution=="android" ? try await androidImages(archive:archive,output:output) : nil
-            try Task.checkCancellation();guard generation==began,!resetting else {throw CancellationError()}
-            output(Data(L10n.text("正在导入 %@…\r\n", String(describing: profile.name)).utf8))
-            do {
-                try await Task.detached(priority:.userInitiated) {try LocalSession.install(store:staging,rootfs:archive,total:UInt64(total),available:UInt64(available),muslLibc:musl,storeOwnerLock:lock,distribution:distribution,sha256:sha,androidImages:images)}.value
-                try Task.checkCancellation();guard generation==began,!resetting else {throw CancellationError()}
-                try FileManager.default.createDirectory(at:active.deletingLastPathComponent(),withIntermediateDirectories:true)
-                try FileManager.default.moveItem(at:staging,to:active)
-            } catch {try? FileManager.default.removeItem(at:staging);throw error}
-        }
-        if profile.needsSetup==true,!maintenance {
-            output(Data(L10n.text("正在准备 Debian 软件，请保持应用前台；输出会实时显示。\r\n").utf8))
-            let setup=try LocalSession(store:active,rootfs:nil,total:UInt64(total),available:UInt64(available),pureAccelerator:true,memoryBudgetMiB:memoryBudgetMiB,processMemoryBudgetMiB:processMemoryBudgetMiB,initiallyPaused:preparationPaused,storeOwnerLock:lock,distribution:"debian",debianPackages:profile.packages ?? "standard",prepareSystemd:profile.boot=="systemd")
-            preparation=setup
-            do {
-                while true {
-                    try Task.checkCancellation()
-                    let bytes=try setup.receive();if !bytes.isEmpty {output(bytes)}
-                    let status=try setup.status()
-                    if status.phase=="exited" {
-                        // Drain the final output before replacing the session.
-                        let tail=try setup.receive();if !tail.isEmpty {output(tail)}
-                        guard status.exit_code==0 else {throw TramesError.message(L10n.text("Debian 软件安装失败（%@）。可打开维护终端修复，或重新打开以重试。", String(describing: status.exit_code ?? 255)))}
-                        break
+        let diagnostics=PreparationDiagnostics(environment:profile.name,output:output)
+        do {
+            let musl=profile.distro=="alpine" ? try Self.muslLibrary() : nil
+            let active=try profile.storeURL(in:root)
+            let lock=ownerLock(profile)
+            let values=try root.resourceValues(forKeys:[.volumeTotalCapacityKey,.volumeAvailableCapacityForImportantUsageKey])
+            guard let total=values.volumeTotalCapacity,let available=values.volumeAvailableCapacityForImportantUsage,total>0,available>=0 else {throw TramesError.message("Cannot determine device storage capacity")}
+            if !FileManager.default.fileExists(atPath:active.path) {
+                let staging=root.appendingPathComponent("install-\(UUID().uuidString)",isDirectory:true)
+                do {
+                    let archive:URL
+                    if ["custom","android"].contains(profile.distro) {archive=source(profile)}
+                    else {
+                        output(Data(L10n.text("正在下载 %@…\r\n", String(describing: profile.name)).utf8))
+                        let name=profile.name
+                        let (download,response)=try await ConnectivityRetry.download(from:profile.distro=="debian" ? Self.debianURL : Self.archiveURL,progress:{done,total in
+                            diagnostics.report(InstallationProgress(stage:"download",item:name,completed:UInt64(max(0,done)),total:UInt64(max(0,total))))
+                        })
+                        guard (response as? HTTPURLResponse)?.statusCode==200,(try download.resourceValues(forKeys:[.fileSizeKey])).fileSize ?? Int.max <= 64*1024*1024 else {try? FileManager.default.removeItem(at:download);throw TramesError.message(L10n.text("rootfs 下载无效"))}
+                        archive=download
                     }
-                    if ["failed","cancelled"].contains(status.phase) {throw TramesError.message(status.error ?? L10n.text("Debian 软件准备已停止"))}
-                    try await Task.sleep(for:.milliseconds(50))
-                }
-            } catch {setup.close();preparation=nil;throw error}
-            setup.close();preparation=nil
-            profile.needsSetup=false;try replace(profile)
-        }
-        try Task.checkCancellation();guard generation==began,!resetting else {throw CancellationError()}
-        let icd=Bundle.main.url(forResource:"libtrames_vulkan_icd",withExtension:"so",subdirectory:"GuestVulkan")
-        if vulkan,icd==nil {throw TramesError.message("Missing bundled Vulkan compute driver")}
-        let retryUntil=Date().addingTimeInterval(10)
-        while true {
-            try Task.checkCancellation()
-            let local=try LocalSession(store:active,rootfs:nil,total:UInt64(total),available:UInt64(available),network:"host",useVolumeBudget:useVolumeBudget,muslLibc:musl,pureAccelerator:true,vulkanICD:icd,memoryBudgetMiB:memoryBudgetMiB,processMemoryBudgetMiB:processMemoryBudgetMiB,multipleTerminals:profile.bootTarget == "linux",initiallyPaused:true,storeOwnerLock:lock,distribution:profile.distro,initMode:maintenance ? "shell" : profile.boot,target:profile.bootTarget,environmentConfig: !maintenance && FileManager.default.fileExists(atPath:configuration(profile).path) ? configuration(profile):nil,environmentGrants: !maintenance && FileManager.default.fileExists(atPath:grants(profile).path) ? grants(profile):nil)
-            do {
-                var status=try local.status()
-                while status.phase=="starting" {try await Task.sleep(for:.milliseconds(20));status=try local.status()}
-                if status.phase=="failed" {
-                    if status.error?.contains("errno 16")==true,Date()<retryUntil {local.close();try await Task.sleep(for:.milliseconds(50));continue}
-                    throw TramesError.message(status.error ?? L10n.text("Linux 环境启动失败"))
-                }
-                try Task.checkCancellation();return local
-            } catch {local.close();throw error}
-        }
+                    defer {if !["custom","android"].contains(profile.distro) {try? FileManager.default.removeItem(at:archive)}}
+                    try Task.checkCancellation();guard generation==began,!resetting else {throw CancellationError()}
+                    let distribution=profile.distro,sha=profile.sourceSHA256
+                    let images=distribution=="android" ? try await androidImages(archive:archive,diagnostics:diagnostics) : nil
+                    try Task.checkCancellation();guard generation==began,!resetting else {throw CancellationError()}
+                    diagnostics.report(InstallationProgress(stage:"queued",item:profile.name))
+                    let task=Task.detached(priority:.userInitiated) {
+                        try LocalSession.install(store:staging,rootfs:archive,total:UInt64(total),available:UInt64(available),muslLibc:musl,storeOwnerLock:lock,distribution:distribution,sha256:sha,androidImages:images,progress:{diagnostics.report($0)})
+                    }
+                    try await withTaskCancellationHandler(operation:{try await task.value},onCancel:{task.cancel()})
+                    try Task.checkCancellation();guard generation==began,!resetting else {throw CancellationError()}
+                    diagnostics.report(InstallationProgress(stage:"publish",item:profile.name))
+                    try FileManager.default.createDirectory(at:active.deletingLastPathComponent(),withIntermediateDirectories:true)
+                    try FileManager.default.moveItem(at:staging,to:active)
+                } catch {try? FileManager.default.removeItem(at:staging);throw error}
+            }
+            if profile.needsSetup==true,!maintenance {
+                diagnostics.report(InstallationProgress(stage:"packages",item:profile.name))
+                output(Data(L10n.text("正在准备 Debian 软件，请保持应用前台；输出会实时显示。\r\n").utf8))
+                let setup=try LocalSession(store:active,rootfs:nil,total:UInt64(total),available:UInt64(available),pureAccelerator:true,memoryBudgetMiB:memoryBudgetMiB,processMemoryBudgetMiB:processMemoryBudgetMiB,initiallyPaused:preparationPaused,storeOwnerLock:lock,distribution:"debian",debianPackages:profile.packages ?? "standard",prepareSystemd:profile.boot=="systemd")
+                preparation=setup
+                do {
+                    while true {
+                        try Task.checkCancellation()
+                        let bytes=try setup.receive();if !bytes.isEmpty {output(bytes)}
+                        let status=try setup.status()
+                        if status.phase=="exited" {
+                            // Drain the final output before replacing the session.
+                            let tail=try setup.receive();if !tail.isEmpty {output(tail)}
+                            guard status.exit_code==0 else {throw TramesError.message(L10n.text("Debian 软件安装失败（%@）。可打开维护终端修复，或重新打开以重试。", String(describing: status.exit_code ?? 255)))}
+                            break
+                        }
+                        if ["failed","cancelled"].contains(status.phase) {throw TramesError.message(status.error ?? L10n.text("Debian 软件准备已停止"))}
+                        try await Task.sleep(for:.milliseconds(50))
+                    }
+                } catch {setup.close();preparation=nil;throw error}
+                setup.close();preparation=nil
+                profile.needsSetup=false;try replace(profile)
+            }
+            try Task.checkCancellation();guard generation==began,!resetting else {throw CancellationError()}
+            let icd=Bundle.main.url(forResource:"libtrames_vulkan_icd",withExtension:"so",subdirectory:"GuestVulkan")
+            if vulkan,icd==nil {throw TramesError.message("Missing bundled Vulkan compute driver")}
+            let retryUntil=Date().addingTimeInterval(10)
+            diagnostics.report(InstallationProgress(stage:"boot",item:profile.bootTarget))
+            // TOML's Android boot target owns /init. The embedding's separate Linux
+            // init selector remains "shell"; forwarding "android" rejects startup.
+            let linuxInit=profile.bootTarget == "android" ? "shell" : profile.boot
+            while true {
+                try Task.checkCancellation()
+                let local=try LocalSession(store:active,rootfs:nil,total:UInt64(total),available:UInt64(available),network:"host",useVolumeBudget:useVolumeBudget,muslLibc:musl,pureAccelerator:true,vulkanICD:icd,memoryBudgetMiB:memoryBudgetMiB,processMemoryBudgetMiB:processMemoryBudgetMiB,multipleTerminals:profile.bootTarget == "linux",initiallyPaused:true,storeOwnerLock:lock,distribution:profile.distro,initMode:maintenance ? "shell" : linuxInit,target:profile.bootTarget,environmentConfig: !maintenance && FileManager.default.fileExists(atPath:configuration(profile).path) ? configuration(profile):nil,environmentGrants: !maintenance && FileManager.default.fileExists(atPath:grants(profile).path) ? grants(profile):nil)
+                do {
+                    var status=try local.status()
+                    while status.phase=="starting" {try await Task.sleep(for:.milliseconds(20));status=try local.status()}
+                    if status.phase=="failed" {
+                        if status.error?.contains("errno 16")==true,Date()<retryUntil {local.close();try await Task.sleep(for:.milliseconds(50));continue}
+                        throw TramesError.message(status.error ?? L10n.text("Linux 环境启动失败"))
+                    }
+                    try Task.checkCancellation();diagnostics.finish();return local
+                } catch {local.close();throw error}
+            }
+        } catch {diagnostics.finish(error:error);throw error}
     }
     func reset(profile:RootfsEnvironment? = nil) async throws {
         guard !resetting else {throw TramesError.message(L10n.text("Linux 环境正在重置"))}
