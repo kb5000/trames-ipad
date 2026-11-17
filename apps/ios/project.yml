@@ -99,7 +99,7 @@ targets:
         GENERATE_INFOPLIST_FILE: NO
         INFOPLIST_FILE: TramesFileProvider/Info.plist
         PRODUCT_BUNDLE_IDENTIFIER: org.trames.Trames.FileProvider
-        CODE_SIGN_ENTITLEMENTS: Trames.entitlements
+        CODE_SIGN_ENTITLEMENTS: TramesFileProvider.entitlements
         APPLICATION_EXTENSION_API_ONLY: YES
         SKIP_INSTALL: YES
         ARCHS: arm64

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 import Foundation
 import OSLog
+import os
 import TramesKit
 
 /// One cold preparation's terminal output and bounded, shareable event journal.
@@ -41,8 +42,12 @@ final class PreparationDiagnostics:@unchecked Sendable {
     func report(_ event:InstallationProgress) {
         lock.lock();defer {lock.unlock()}
         let now=Date(),elapsed=now.timeIntervalSince(began)
-        let record:[String:Any] = ["time":now.ISO8601Format(),"elapsed_seconds":elapsed,"environment":environment,
+        var record:[String:Any] = ["time":now.ISO8601Format(),"elapsed_seconds":elapsed,"environment":environment,
             "stage":event.stage,"item":event.item,"path":event.path,"completed":event.completed,"total":event.total,"files":event.files]
+        // Advisory OS headroom at an existing preparation event, not a cached
+        // guest RAM quota and not a new runtime polling or service thread.
+        record["host_available_bytes"]=os_proc_available_memory()
+        record["host_physical_bytes"]=ProcessInfo.processInfo.physicalMemory
         if var data=try? JSONSerialization.data(withJSONObject:record,options:[.sortedKeys]) {
             data.append(10)
             if written+data.count>2*1024*1024 {

@@ -239,10 +239,11 @@ functions have void signatures; invalid/unsupported recording parameters abort
 the experimental guest ICD with a diagnostic rather than fake success.
 
 Limits include 16,384 retained native objects per context and 64 in-flight
-submissions. Explicitly memory-capped sessions retain the 64 MiB allocation
-bound and a shared native allocation / coherent-baseline quota equal to one
-eighth of the selected guest memory limit, capped at 1 GiB (1 GiB guest →
-128 MiB; 4 GiB guest → 512 MiB). Their reported native heaps are capped by
+submissions. Explicitly memory-capped sessions use the selected guest memory
+limit for the shared native allocation / coherent-baseline quota and maximum
+individual allocation. The former one-eighth partition, 1 GiB aggregate ceiling
+and 64 MiB individual ceiling are removed: Android's ANGLE/HWUI allocations
+can fail under those extra limits even when guest CPU pages fit. Their reported native heaps are capped by
 that quota. Selecting a limit reserves no storage; live allocations and mapping
 baselines charge it and release it at final drop.
 

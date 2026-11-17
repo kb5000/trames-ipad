@@ -162,3 +162,5 @@
 "共享环境准备日志" = "Share environment preparation log";
 "安装环境软件" = "Installing environment packages";
 "启动环境" = "Starting environment";
+"采集 Android 诊断日志" = "Collect Android diagnostic logs";
+"共享 Android 诊断日志" = "Share Android diagnostic logs";

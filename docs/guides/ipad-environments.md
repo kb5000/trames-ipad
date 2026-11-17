@@ -85,6 +85,41 @@ guest session can execute. It does **not** mean that Android has finished its
 first boot or that its desktop has drawn a frame. Subsequent Android service
 startup is separate from image download/import.
 
+The application requests Apple's increased-memory-limit entitlement on supported
+devices. This changes the host application's possible headroom, not the guest
+memory budget, and does not reserve physical RAM. The Files extension keeps its
+separate App Group entitlement without this application-only request. Preparation
+events record advisory `host_available_bytes` and `host_physical_bytes`; remaining
+headroom can vary and must not be interpreted as allocated memory or a guarantee.
+
+With an Android environment selected, **Settings → Diagnostics → Collect Android
+diagnostics** preserves a non-consuming snapshot of the existing bounded Trames
+kernel log, queries original Android properties and input/display state, captures
+one-shot warning/crash `logcat -d`, and reads recent ANR, tombstone and DropBox files through the existing Files
+snapshot reader. Logcat runs on existing guest execution workers; completion
+wakes the calling background queue without polling or a persistent helper.
+Each service dump has a five-second timeout; the fixed script contains no
+interpolated command or guest input. Capture is limited to one request per session
+and 45 seconds. If the guest cannot
+complete logcat, the export still includes previously saved crash files and the
+capture error. This does not restart Android, open another filesystem writer, or
+pause its execution. The JSON export contains at most 64 files, 2 MiB per file
+and 16 MiB of source bytes, with truncation markers. Repeated `_wtf` warnings have
+lower priority than crash/ANR records. **Share Android diagnostics** exports the
+result from `Documents/Diagnostics/android-<environment UUID>.json`; it is not
+uploaded automatically. The source files may change during a live capture, so
+this is diagnostic evidence rather than a transactional filesystem backup.
+
+The iPad interpreter boot profile defaults `ro.hw_timeout_multiplier` to `5`
+when the image has no explicit value. Android 13's original foreground service
+deadline becomes 100 seconds rather than 20 seconds; guest clocks and execution
+speed are unchanged. Physical traces showed runnable SystemUI initialization
+still in its service constructors at the original deadline. This is Android's
+existing slow-hardware policy, not a claim that every ANR is harmless or that a
+rendering crash has been repaired. The Mac HVF product keeps its original policy.
+See AOSP's [Build property](https://github.com/aosp-mirror/platform_frameworks_base/blob/android-13.0.0_r1/core/java/android/os/Build.java)
+and [service deadlines](https://github.com/aosp-mirror/platform_frameworks_base/blob/android-13.0.0_r1/services/core/java/com/android/server/am/ActiveServices.java).
+
 Android uses its own init target and timezone service. The iPad adapter keeps
 the separate Linux init selector at `shell` and skips Linux TZif file injection
 for Android, including live host timezone updates. Android timezone property

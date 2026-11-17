@@ -1,0 +1,87 @@
+{
+  "date": "2026-11-18",
+  "status": "physical-interactive-smoke-passed",
+  "runtime": "7ecf9bdd06b85e50e0fc0a628e376becbde2dcf2",
+  "source_base": "b8b9ba2",
+  "device": {
+    "model": "iPad Air 11-inch M3",
+    "os": "iPadOS 27.0.1",
+    "guest_total_mib": 4096,
+    "guest_process_mib": 4096,
+    "comparison_total_mib": 6144,
+    "comparison_process_mib": 4096
+  },
+  "changes": [
+    "Bound production decoded instruction caches to existing execution engines instead of every guest task",
+    "Request increased-memory-limit for the application, keep File Provider App Group entitlements separate",
+    "Expose explicit Android ANR/tombstone/DropBox snapshot export and one-shot original logcat on existing guest workers",
+    "Use Android ro.hw_timeout_multiplier=5 only for this interpreter embedding when no explicit image override exists",
+    "Explicit GPU budgets now follow configured memory instead of the former one-eighth/1 GiB aggregate and 64 MiB individual ceilings; host-managed mode unchanged"
+  ],
+  "allocation_sample": {
+    "duration_seconds_each": 35,
+    "baseline_cache_page_mib": 314.06,
+    "candidate_cache_page_mib": 48.08,
+    "cache_page_reduction_percent": 84.69,
+    "baseline_live_heap_mib": 480.18,
+    "candidate_live_heap_mib": 214.79,
+    "caveat": "Live allocation bytes, not calibrated physical footprint; Android startup phases differ."
+  },
+  "memory_capability": {
+    "main_signature_and_embedded_profile": true,
+    "file_provider_has_increased_limit": false,
+    "baseline_advisory_available_bytes": 5315426464,
+    "candidate_advisory_available_bytes": 8571746488,
+    "physical_bytes": 8013987840,
+    "caveat": "Advisory remaining allocation headroom, not reserved or guaranteed physical RAM."
+  },
+  "validation": {
+    "cpu_and_ffi_baseline": [
+      48,
+      17
+    ],
+    "ffi_after_diagnostics": 21,
+    "interpreter_timeout_policy": 1,
+    "kernel_conformance_passed": 490,
+    "kernel_conformance_ignored": 3,
+    "kernel_conformance_note": "474 passed in original workspace run; only 16 network failures rerun with network access, all passed. Unchanged suites reused; after the GPU policy change the affected Vulkan and session budget regressions were rerun.",
+    "other_workspace": "4 compute, 2 register-state and 1 tail-stack tests passed; four manual Wayland fixtures remain ignored.",
+    "clippy": "CPU/FFI all targets passed; upstream smoltcp warnings retained",
+    "ios_release_build": "1.5.4 (65), physical device build, guest payload and execution boundaries passed",
+    "host_app_survival": "Dev 57 retained the same physical process during Android guest UI restarts; Dev 56 without capability still had an OOM after the cache fix. No broad Android stability claim.",
+    "diagnostic_export": "Dev 63 exported original input/window state and filtered Android logcat without errors, including the next system_server/zygote restart. Dev 64 also captures the original non-consuming bounded Trames kernel log.",
+    "hardware_bitmap_probe": "Isolated Mac Android passed sampled-only AHB allocation, EGL image, CPU upload, real fence and sampled pixel checks. Not physical iPad acceptance.",
+    "direct_skia_vulkan_experiment": "Isolated Mac Android RenderThread aborted; not applied to installed environments. Test environment stopped.",
+    "physical_interaction": "Dev 63: real clicks opened Calendar, its drawer and Home. A subsequent dock application launch remained on its splash; system_server and zygote exited and Android restarted while host PID 12904 remained alive.",
+    "timeout_policy": "Dev 63 original getprop confirmed 5, boot_completed=1. Input dispatch enabled, not frozen, with responsive window channels. This does not establish stability.",
+    "transparent_overlay_experiment": "Isolated UIKit/SwiftUI iPadOS 27 simulator hit-test passed with both default clear-stroke overlay and hit-testing disabled; no speculative product overlay change.",
+    "dev64_kernel_capture": "Original bounded non-consuming kernel log includes guest-memory Limit faults in SystemUI, logd, binder workers and gralloc upload workers; this proves configured guest memory quota contributes to restart cascades. Java null-check faults alone are not treated as crashes.",
+    "dev64_6g_comparison": "Capture at 22:13 UTC after 21:53 UTC restart: no guest-memory Limit faults or zygote service deaths in the retained kernel log. Jelly loaded Google and opened its menu through actual pointer input. Earlier SystemUI KeyButtonDrawable crash still occurred with ANGLE out-of-device-memory warnings.",
+    "gpu_budget_regressions": "66 Vulkan unit tests and original session budget selection passed; clippy passed. Dev 65 physical acceptance captured no ANGLE device-memory errors or KeyButtonDrawable crashes.",
+    "dev65_interaction": "Real pointer input opened Jelly and loaded Google, pulled down the SystemUI notification/quick-settings shade, and opened Android Settings from its gear. Final log acceptance pending.",
+    "dev65_acceptance": {
+      "captured_utc": "2026-11-17T22:57:47Z",
+      "diagnostic_errors": [],
+      "truncated": false,
+      "guest_memory_limit_faults_in_retained_kernel_log": 0,
+      "zygote_service_deaths_in_retained_kernel_log": 0,
+      "android_fatal_exceptions_in_captured_logcat": 0,
+      "angle_out_of_device_memory_in_captured_logcat": 0,
+      "interaction": "Actual pointer opened Jelly/Google, dragged down the notification shade and opened Android Settings from its gear; original window dump confirms focused SettingsHomepageActivity. No claim of broad long-duration stability."
+    }
+  },
+  "open_issues": [
+    "Broader application coverage and long-duration stability remain unverified",
+    "Android native crash_dump clone support, network BPF maps and memory/PSS reports need separate validation; this change does not claim to repair them",
+    "CPU resident-page and native GPU budgets still have separate counters; they are not one combined physical-RSS allowance"
+  ],
+  "deployment": {
+    "ipad_dev": "1.5.4 (65)",
+    "ipad_stable": "unchanged",
+    "mac_apps": "unchanged",
+    "existing_guest_data": "preserved",
+    "temporary_mac_test": "isolated APFS clone, network disabled, stopped after diagnostics"
+  },
+  "evidence_directory": "target/ipad-android-memory-20261118",
+  "privacy": "Raw diagnostic logs, provisioning data and traces remain in ignored local target storage; no raw user logs published."
+}

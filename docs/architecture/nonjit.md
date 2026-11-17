@@ -56,7 +56,7 @@ checks still compare value and state snapshots against the independent oracle.
 
 ## Decoded execution
 
-Each CPU owns 128 code-page slots arranged as 64 two-way sets, each containing at most
+Each runtime execution worker owns 128 code-page slots arranged as 64 two-way sets, each containing at most
 1,024 generation-tagged decoded instructions. The full virtual page number is hashed;
 the most recently used way is probed first and the least recent way is replaced.
 replacing one slot advances its generation without allocating or clearing the
@@ -65,7 +65,17 @@ and decoded, so cold or inaccessible instructions are never speculatively read.
 Execution stays in the selected page across branches and reference fallbacks,
 looking up a page again only at a page transition, scheduler/syscall boundary,
 or code-epoch change. This removes per-basic-block lookup and repeated prefix
-allocation. Fork copies architectural state and starts with an empty cache.
+allocation. Guest tasks retain architectural state and per-task decode counters;
+sleeping tasks do not retain the worker's decoded page arrays. Switching tasks
+or address spaces reuses the existing engine cache after the same memory/page
+identity checks. Fork copies architectural state without decoded storage. The
+standalone `Cpu::run_slice` API retains its own bounded cache; entering a runtime
+engine releases any previously warmed standalone task cache.
+
+On the current ARM64 build, a full worker cache holds approximately 6 MiB of
+decoded arrays. Its storage therefore scales with existing execution workers,
+not Android's population of sleeping Linux threads. No global cache, TLS,
+coordination thread, lock or extra instruction-level validation is added.
 
 Common arithmetic, logical masks, bitfields, conditionals, shifts, multiply/divide,
 and scalar/vector loads and stores are decoded once. Immediates, scaled offsets,

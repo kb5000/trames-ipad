@@ -176,6 +176,9 @@ struct SettingsView: View {
         }
     }
     @State private var resetConfirmation = false
+    @State private var collectingAndroidDiagnostics = false
+    @State private var androidDiagnosticsURL:URL?
+    @State private var diagnosticsError:String?
     var body: some View {
         NavigationStack {
             Form {
@@ -209,6 +212,26 @@ struct SettingsView: View {
                 if FileManager.default.fileExists(atPath:PreparationDiagnostics.logURL.path) {
                     Section(L10n.text("诊断")) {
                         ShareLink(item:PreparationDiagnostics.logURL) {Label(L10n.text("共享环境准备日志"),systemImage:"square.and.arrow.up")}
+                        if workspace.selectedEnvironment.bootTarget == "android",let root=RootfsLocations.sharedRoot {
+                            Button(L10n.text("采集 Android 诊断日志")) {
+                                let profile=workspace.selectedEnvironment
+                                let local=workspace.local?.local
+                                collectingAndroidDiagnostics=true
+                                Task {
+                                    defer {collectingAndroidDiagnostics=false}
+                                    do {androidDiagnosticsURL=try await Task.detached(priority:.utility) {
+                                        var warning:String?
+                                        do {try local?.captureAndroidLogcat()}
+                                        catch {warning=error.localizedDescription}
+                                        return try AndroidDiagnostics.capture(root:root,environment:profile,logcatError:warning)
+                                    }.value}
+                                    catch {diagnosticsError=error.localizedDescription}
+                                }
+                            }.disabled(collectingAndroidDiagnostics)
+                            if collectingAndroidDiagnostics {ProgressView()}
+                            if let androidDiagnosticsURL {ShareLink(item:androidDiagnosticsURL) {Label(L10n.text("共享 Android 诊断日志"),systemImage:"square.and.arrow.up")}}
+                            if let diagnosticsError {Text(diagnosticsError).foregroundStyle(.red)}
+                        }
                     }
                 }
                 Section("GPU") {

@@ -646,6 +646,25 @@ impl Cache {
 }
 
 impl Cpu {
+    pub(super) fn run_worker_cached(
+        &mut self,
+        engine: &mut super::Engine,
+        memory: &mut impl CpuMemory,
+        budget: u64,
+    ) -> SliceOutcome {
+        // One cache per existing execution owner, not per Linux task. No TLS,
+        // cross-worker lock, or new thread is needed. Memory identities include
+        // the original mm and code generations; flags/registers remain per CPU.
+        // A caller may have warmed the standalone API before handing this CPU
+        // to a runtime. Release that old per-task working set on the transition.
+        if !self.decoded.slots.is_empty() {
+            self.decoded.slots = Vec::new();
+        }
+        engine.decoded.stats = self.decoded.stats;
+        let result = self.execute_cached(memory, budget, &mut engine.decoded);
+        self.decoded.stats = engine.decoded.stats;
+        result
+    }
     pub(super) fn run_cached(&mut self, memory: &mut impl CpuMemory, budget: u64) -> SliceOutcome {
         // Move the derived cache out once per slice; architectural state stays
         // directly accessible throughout execution, with no copy or FFI bounce.
@@ -657,6 +676,16 @@ impl Cpu {
                 stats: super::DecodeStats::default(),
             },
         );
+        let result = self.execute_cached(memory, budget, &mut cache);
+        self.decoded = cache;
+        result
+    }
+    fn execute_cached(
+        &mut self,
+        memory: &mut impl CpuMemory,
+        budget: u64,
+        cache: &mut Cache,
+    ) -> SliceOutcome {
         // Initialize once per execution slice, outside hot code-page lookups.
         if cache.slots.is_empty() && budget != 0 {
             cache.slots.resize_with(SLOTS, || None);
@@ -665,9 +694,8 @@ impl Cpu {
         // Common handlers may retain it in host locals; fallback/exit boundaries
         // publish it before any architectural observer can see CPU state.
         let mut flags = self.condition_flags;
-        let result = self.cached_slice(memory, budget, &mut cache, &mut flags);
+        let result = self.cached_slice(memory, budget, cache, &mut flags);
         self.condition_flags = flags;
-        self.decoded = cache;
         result
     }
     fn cached_slice(
@@ -1564,6 +1592,100 @@ mod tests {
             cpu.run_slice(&mut memory, 1);
             assert_eq!(cpu.x(0), value);
         }
+    }
+    #[test]
+    fn runtime_worker_cache_is_shared_by_tasks_without_retaining_task_working_sets() {
+        use trames_engine::Cpu as Backend;
+        let mut memory = memory(&[0xd28000a0]); // mov x0, #5
+        let mut engine = super::super::Engine::default();
+        let mut tasks: Vec<_> = (0..128).map(|_| Cpu::new(0x1000, 0)).collect();
+        for task in &mut tasks {
+            assert!(matches!(
+                Backend::run(task, &mut engine, &mut memory, 1),
+                SliceOutcome::Yield { instructions: 1 }
+            ));
+            assert_eq!(task.x(0), 5);
+            assert_eq!(task.decode_stats().lookups, 1);
+            assert!(
+                task.decoded.slots.is_empty(),
+                "Sleeping guest tasks own no decoded pages"
+            );
+        }
+        assert_eq!(engine.decoded.slots.iter().flatten().count(), 1);
+        assert_eq!(
+            tasks
+                .iter()
+                .map(|t| t.decode_stats().instructions)
+                .sum::<u64>(),
+            1,
+            "Same-mm tasks reuse decoded instructions"
+        );
+        let pointer = engine
+            .decoded
+            .slots
+            .iter()
+            .flatten()
+            .next()
+            .unwrap()
+            .instructions
+            .as_ptr();
+        tasks[0].pc = 0x1000;
+        Backend::run(&mut tasks[0], &mut engine, &mut memory, 1);
+        assert_eq!(tasks[0].decode_stats().lookups, 2);
+        assert_eq!(tasks[1].decode_stats().lookups, 1);
+        assert_eq!(
+            engine
+                .decoded
+                .slots
+                .iter()
+                .flatten()
+                .next()
+                .unwrap()
+                .instructions
+                .as_ptr(),
+            pointer
+        );
+        // Identical VA/epochs in another mm must never execute the old word.
+        let mut other = super::tests::memory(&[0xd28000e0]); // mov x0, #7
+        tasks[1].pc = 0x1000;
+        Backend::run(&mut tasks[1], &mut engine, &mut other, 1);
+        assert_eq!(tasks[1].x(0), 7);
+        tasks[0].pc = 0x1000;
+        Backend::run(&mut tasks[0], &mut engine, &mut memory, 1);
+        assert_eq!(tasks[0].x(0), 5);
+    }
+    #[test]
+    fn runtime_engine_migration_preserves_fault_accounting_and_rechecks_execute_access() {
+        use trames_engine::Cpu as Backend;
+        let mut memory = memory(&[0xd28000a0, 0]); // mov; invalid instruction
+        let mut task = Cpu::new(0x1000, 0);
+        // Switching from standalone execution must release the task cache too.
+        task.run_slice(&mut memory, 1);
+        assert!(!task.decoded.slots.is_empty());
+        let mut first = super::super::Engine::default();
+        task.pc = 0x1000;
+        assert!(matches!(
+            Backend::run(&mut task, &mut first, &mut memory, 2),
+            SliceOutcome::Fault(_)
+        ));
+        assert_eq!(task.fault_retired(), 1);
+        assert!(task.decoded.slots.is_empty());
+        let mut second = super::super::Engine::default();
+        task.pc = 0x1000;
+        assert!(matches!(
+            Backend::run(&mut task, &mut second, &mut memory, 1),
+            SliceOutcome::Yield { instructions: 1 }
+        ));
+        assert_eq!(task.fault_retired(), 0);
+        memory.protect(0x1000, PAGE_SIZE, Permissions::R).unwrap();
+        task.pc = 0x1000;
+        assert!(matches!(
+            Backend::run(&mut task, &mut first, &mut memory, 1),
+            SliceOutcome::Fault(CpuFault::Memory {
+                error: trames_memory::MemoryError::Permission { .. },
+                ..
+            })
+        ));
     }
     #[test]
     fn page_cache_is_bounded_and_warm_words_do_not_hide_branch_alignment_faults() {

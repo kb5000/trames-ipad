@@ -97,6 +97,7 @@ fn apply_host_timezone(
 enum Command {
     Transfer(Transfer),
     Timezone(HostTimezone, mpsc::SyncSender<Result<(), String>>),
+    AndroidLogcat(mpsc::SyncSender<Result<Arc<trames_linux::HostProcess>, String>>),
 }
 pub fn install(options: Options) -> Result<(), String> {
     install_with_progress(options, None)
@@ -253,6 +254,8 @@ pub struct Session {
     commands: mpsc::SyncSender<Command>,
     transfers: Mutex<BTreeMap<u64, TransferTicket>>,
     next_transfer: AtomicU64,
+    diagnostic_busy: AtomicBool,
+    diagnostic_launch: Mutex<crate::android_logcat::LaunchQueue>,
 }
 impl trames_vfs::ReadinessDriver for Session {
     fn notification_only(&self) -> bool {
@@ -374,6 +377,8 @@ impl Session {
             commands,
             transfers: Mutex::new(BTreeMap::new()),
             next_transfer: AtomicU64::new(1),
+            diagnostic_busy: AtomicBool::new(false),
+            diagnostic_launch: Mutex::new(Default::default()),
         });
         let driver: Arc<dyn trames_vfs::ReadinessDriver> = session.clone();
         session
@@ -411,6 +416,32 @@ impl Session {
             })
             .map_err(|e| e.to_string())?;
         Ok(session)
+    }
+    pub fn capture_android_logcat(&self) -> Result<(), String> {
+        if self.target != trames_distro::boot::Target::Android {
+            return Err("Android diagnostics require an Android environment".into());
+        }
+        if self.diagnostic_busy.swap(true, Ordering::Acquire) {
+            return Err("Android diagnostics are already running".into());
+        }
+        struct Busy<'a>(&'a AtomicBool);
+        impl Drop for Busy<'_> {
+            fn drop(&mut self) {
+                self.0.store(false, Ordering::Release);
+            }
+        }
+        let _busy = Busy(&self.diagnostic_busy);
+        let began = Instant::now();
+        let timeout = Duration::from_secs(45);
+        let (response, receiver) = mpsc::sync_channel(1);
+        self.commands
+            .try_send(Command::AndroidLogcat(response))
+            .map_err(|_| "local session is busy or closed")?;
+        self.notify_host();
+        let process = receiver
+            .recv_timeout(timeout)
+            .map_err(|_| "Android logcat launch timed out or session closed")??;
+        crate::android_logcat::wait(&process, timeout.saturating_sub(began.elapsed()))
     }
     pub fn begin_transfer(&self) -> Result<u64, String> {
         let mut transfers = self.transfers.lock().map_err(|_| "transfer lock failed")?;
@@ -841,6 +872,7 @@ fn run(
     if android {
         trames_distro::android::prepare(&mut vfs)
             .map_err(|e| format!("prepare Android boot: {e}"))?;
+        crate::android_boot::interpreter_timeouts(&mut vfs)?;
     }
     if options.distro == "alpine" {
         if let Some(libc) = &options.musl_libc {
@@ -1240,6 +1272,19 @@ impl Adapter {
                 Self::snapshot_session(session, vfs);
                 let _ = response.send(result);
             }
+            Command::AndroidLogcat(response) => {
+                let result = crate::android_logcat::prepare(vfs).and_then(|launch| {
+                    let process = launch.process.clone();
+                    let mut pending = session
+                        .diagnostic_launch
+                        .lock()
+                        .map_err(|_| "diagnostic queue unavailable")?;
+                    pending.insert(launch)?;
+                    session.notify_host();
+                    Ok(process)
+                });
+                let _ = response.send(result);
+            }
         }
     }
     fn snapshot(&self, vfs: &Vfs) {
@@ -1428,6 +1473,9 @@ fn fail_command(command: Command, error: String) {
         Command::Timezone(_, reply) => {
             let _ = reply.send(Err(error));
         }
+        Command::AndroidLogcat(reply) => {
+            let _ = reply.send(Err(error));
+        }
     }
 }
 
@@ -1575,6 +1623,9 @@ impl Write for CancelWriter<'_> {
     }
 }
 impl GuestOutput for Adapter {
+    fn host_spawn(&mut self) -> Option<trames_linux::HostSpawn> {
+        self.session.diagnostic_launch.lock().ok()?.take()
+    }
     fn bind_host_files(
         &mut self,
         _: Arc<dyn trames_linux::FileExecutor>,
@@ -1586,6 +1637,9 @@ impl GuestOutput for Adapter {
         self.session.paused.load(Ordering::Acquire)
     }
     fn finish_host(&mut self) {
+        if let Ok(mut launches) = self.session.diagnostic_launch.lock() {
+            launches.close();
+        }
         if let Some(command) = self.pending.take() {
             fail_command(
                 command,
@@ -1875,6 +1929,8 @@ mod memory_tests {
             commands,
             transfers: Mutex::new(BTreeMap::new()),
             next_transfer: AtomicU64::new(1),
+            diagnostic_busy: AtomicBool::new(false),
+            diagnostic_launch: Mutex::new(Default::default()),
         });
         Adapter {
             session: session.clone(),

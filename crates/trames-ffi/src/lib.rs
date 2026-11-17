@@ -3,6 +3,8 @@
 //! All runtime/VFS objects stay on their owning worker. Only bounded byte copies
 //! require unsafe code; callers own and keep their C buffers valid for each call.
 #![recursion_limit = "512"]
+mod android_boot;
+mod android_logcat;
 mod clipboard;
 mod session;
 mod terminals;
@@ -26,6 +28,18 @@ fn error(message: impl ToString) -> i32 {
 }
 fn boundary(f: impl FnOnce() -> i32) -> i32 {
     catch_unwind(AssertUnwindSafe(f)).unwrap_or_else(|_| error("embedding ABI panicked"))
+}
+/// Explicit Android diagnostics. Blocks only the calling background queue;
+/// logcat executes as an ordinary guest process on existing execution workers.
+#[no_mangle]
+pub extern "C" fn trames_session_android_logcat(handle: u64) -> i32 {
+    boundary(|| {
+        session(handle)
+            .map_err(str::to_string)
+            .and_then(|s| s.capture_android_logcat())
+            .map(|()| 0)
+            .unwrap_or_else(error)
+    })
 }
 fn registry() -> &'static Mutex<BTreeMap<u64, Arc<Session>>> {
     REGISTRY.get_or_init(Mutex::default)

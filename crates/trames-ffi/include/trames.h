@@ -43,6 +43,11 @@ int32_t trames_session_status(uint64_t handle, uint8_t *json, uint32_t capacity)
 int32_t trames_session_resize(uint64_t handle, uint16_t rows, uint16_t columns);
 int32_t trames_session_gpu_suspended(uint64_t handle, uint32_t suspended);
 int32_t trames_session_pause(uint64_t handle, uint32_t paused);
+/* Explicit Android-only diagnostic: original property/input/display queries
+ * and one-shot warning/crash logcat (no interpolated command or guest input),
+ * saved to /data/local/tmp/trames-logcat.txt. Blocks up to 45 seconds; call on
+ * a background queue. One capture/session; no persistent process or polling. */
+int32_t trames_session_android_logcat(uint64_t handle);
 /* Opt-in {"multiple_terminals":true}: one Linux/init/VFS/network, independent
  * guest PTYs/shells. Legacy input/output/resize address terminal 1. Closing a
  * terminal sends its PTY hangup, never cancels the environment. At most 32 live

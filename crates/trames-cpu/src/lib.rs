@@ -59,6 +59,14 @@ pub struct Flags {
 
 pub use trames_engine::{CpuFault, DecodeStats, SliceOutcome};
 
+/// Host-worker execution resources. Sleeping guest tasks keep architectural
+/// state and counters, not a multi-megabyte decoded instruction working set.
+/// The existing memory/page identities validate reuse across task/mm changes.
+#[derive(Default, Debug)]
+pub struct Engine {
+    decoded: cached::Cache,
+}
+
 #[derive(Default, Clone, Debug)]
 pub struct Cpu {
     native_calls: bool,
@@ -415,9 +423,29 @@ impl Cpu {
         SliceOutcome::Fault(error)
     }
     pub fn run_slice(&mut self, memory: &mut impl CpuMemory, budget: u64) -> SliceOutcome {
+        self.run_slice_with_engine(memory, budget, None)
+    }
+    fn run_with_engine(
+        &mut self,
+        engine: &mut Engine,
+        memory: &mut impl CpuMemory,
+        budget: u64,
+    ) -> SliceOutcome {
+        self.run_slice_with_engine(memory, budget, Some(engine))
+    }
+    fn run_slice_with_engine(
+        &mut self,
+        memory: &mut impl CpuMemory,
+        budget: u64,
+        engine: Option<&mut Engine>,
+    ) -> SliceOutcome {
         self.fault_retired = 0;
         let scope = trames_compute::Scope::new(self.fpcr, self.fpsr);
-        let result = self.run_cached(&mut *memory.cpu_slice(), budget);
+        let result = if let Some(engine) = engine {
+            self.run_worker_cached(engine, &mut *memory.cpu_slice(), budget)
+        } else {
+            self.run_cached(&mut *memory.cpu_slice(), budget)
+        };
         self.fpsr |= trames_compute::status();
         drop(scope);
         result
@@ -916,7 +944,7 @@ mod native_tests {
 }
 
 impl trames_engine::Cpu for Cpu {
-    type Engine = ();
+    type Engine = Engine;
     const FEATURES: trames_execution::Features = trames_execution::Features {
         hwcap: HWCAP,
         hwcap2: HWCAP2,
@@ -965,15 +993,20 @@ impl trames_engine::Cpu for Cpu {
     fn decode_stats(&self) -> DecodeStats {
         self.decode_stats()
     }
-    fn run(&mut self, _: &mut (), memory: &mut trames_memory::Memory, budget: u64) -> SliceOutcome {
-        self.run_slice(memory, budget)
+    fn run(
+        &mut self,
+        engine: &mut Engine,
+        memory: &mut trames_memory::Memory,
+        budget: u64,
+    ) -> SliceOutcome {
+        self.run_with_engine(engine, memory, budget)
     }
     fn run_parallel(
         &mut self,
-        _: &mut (),
+        engine: &mut Engine,
         memory: &mut trames_memory::parallel::View,
         budget: u64,
     ) -> SliceOutcome {
-        self.run_slice(memory, budget)
+        self.run_with_engine(engine, memory, budget)
     }
 }

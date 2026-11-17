@@ -51,7 +51,27 @@ int main(void){
     const GLfloat triangle[]={-1,-1,3,-1,-1,3};GLuint vertices;glGenBuffers(1,&vertices);glBindBuffer(GL_ARRAY_BUFFER,vertices);glBufferData(GL_ARRAY_BUFFER,sizeof(triangle),triangle,GL_STATIC_DRAW);glVertexAttribPointer(0,2,GL_FLOAT,GL_FALSE,0,0);glEnableVertexAttribArray(0);glViewport(0,0,65,37);glDrawArrays(GL_TRIANGLES,0,3);glFinish();check(glGetError()==GL_NO_ERROR,"native draw completion");
     void *nativePixels=NULL;check(!AHardwareBuffer_lock(buffer,AHARDWAREBUFFER_USAGE_CPU_READ_OFTEN,-1,NULL,&nativePixels),"native CPU consumer");
     unsigned char *color=nativePixels;printf("AHB CPU pixel=%u,%u,%u,%u\n",color[0],color[1],color[2],color[3]);check(abs((int)color[0]-64)<=1&&abs((int)color[1]-128)<=1&&abs((int)color[2]-191)<=1&&color[3]==255,"AHB native GPU storage pixels");
-    check(!AHardwareBuffer_unlock(buffer,NULL),"native CPU release");glDeleteBuffers(1,&vertices);glDeleteProgram(program);glDeleteShader(vertex);glDeleteShader(fragment);glDeleteFramebuffers(1,&frame);glDeleteTextures(1,&texture);destroyImage(display,image);AHardwareBuffer_release(buffer);
+    check(!AHardwareBuffer_unlock(buffer,NULL),"native CPU release");
+    // Match HWUI's Bitmap.copy(HARDWARE): sampled-only AHB, EGL native image,
+    // CPU texture upload, and a real EGL fence. A render-target-only probe
+    // cannot validate the navigation icon/shadow upload used by SystemUI.
+    desc.usage=AHARDWAREBUFFER_USAGE_GPU_SAMPLED_IMAGE;
+    AHardwareBuffer *bitmap=NULL;check(!AHardwareBuffer_allocate(&desc,&bitmap),"HWUI sampled-only allocation");
+    EGLImageKHR bitmapImage=createImage(display,EGL_NO_CONTEXT,EGL_NATIVE_BUFFER_ANDROID,clientBuffer(bitmap),imageAttrs);check(bitmapImage!=EGL_NO_IMAGE_KHR,"HWUI EGL image");
+    GLuint bitmapTexture;glGenTextures(1,&bitmapTexture);glActiveTexture(GL_TEXTURE0);glBindTexture(GL_TEXTURE_2D,bitmapTexture);imageTarget(GL_TEXTURE_2D,bitmapImage);check(glGetError()==GL_NO_ERROR,"HWUI EGL texture");
+    unsigned char upload[65*37*4];for(size_t i=0;i<sizeof(upload);i+=4){upload[i]=17;upload[i+1]=85;upload[i+2]=153;upload[i+3]=255;}
+    glPixelStorei(GL_UNPACK_ALIGNMENT,1);glTexSubImage2D(GL_TEXTURE_2D,0,0,0,65,37,GL_RGBA,GL_UNSIGNED_BYTE,upload);check(glGetError()==GL_NO_ERROR,"HWUI CPU texture upload");
+    PFNEGLCREATESYNCKHRPROC createSync=(void*)eglGetProcAddress("eglCreateSyncKHR");
+    PFNEGLCLIENTWAITSYNCKHRPROC waitSync=(void*)eglGetProcAddress("eglClientWaitSyncKHR");
+    PFNEGLDESTROYSYNCKHRPROC destroySync=(void*)eglGetProcAddress("eglDestroySyncKHR");
+    check(createSync&&waitSync&&destroySync,"HWUI EGL fence functions");EGLSyncKHR uploaded=createSync(display,EGL_SYNC_FENCE_KHR,NULL);check(uploaded!=EGL_NO_SYNC_KHR,"HWUI upload fence");glFlush();check(waitSync(display,uploaded,0,2000000000)==EGL_CONDITION_SATISFIED_KHR,"HWUI upload fence completion");destroySync(display,uploaded);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+    glDetachShader(program,fragment);glDeleteShader(fragment);fragment=glCreateShader(GL_FRAGMENT_SHADER);
+    fragmentSource="precision mediump float;uniform sampler2D bitmap;void main(){gl_FragColor=texture2D(bitmap,vec2(.5));}";
+    glShaderSource(fragment,1,&fragmentSource,NULL);glCompileShader(fragment);glAttachShader(program,fragment);glLinkProgram(program);glGetProgramiv(program,GL_LINK_STATUS,&linked);check(linked,"HWUI bitmap sampling shader");glUseProgram(program);glUniform1i(glGetUniformLocation(program,"bitmap"),0);
+    glDrawArrays(GL_TRIANGLES,0,3);glReadPixels(16,16,1,1,GL_RGBA,GL_UNSIGNED_BYTE,pixels);check(glGetError()==GL_NO_ERROR,"HWUI hardware bitmap sampling");check(pixels[0]==17&&pixels[1]==85&&pixels[2]==153&&pixels[3]==255,"HWUI uploaded bitmap pixels");
+    glDeleteTextures(1,&bitmapTexture);destroyImage(display,bitmapImage);AHardwareBuffer_release(bitmap);puts("android-egl: PASS HWUI sampled-only hardware bitmap upload, fence and pixels");
+    glDeleteBuffers(1,&vertices);glDeleteProgram(program);glDeleteShader(vertex);glDeleteShader(fragment);glDeleteFramebuffers(1,&frame);glDeleteTextures(1,&texture);destroyImage(display,image);AHardwareBuffer_release(buffer);
     puts("android-egl: PASS original AHardwareBuffer/EGL native image GPU-to-CPU pixels");
     eglMakeCurrent(display,EGL_NO_SURFACE,EGL_NO_SURFACE,EGL_NO_CONTEXT);eglDestroyContext(display,context);eglDestroySurface(display,surface);eglTerminate(display);puts("android-egl: PASS original EGL/ANGLE pbuffer pixels");return 0;
 }

@@ -129,6 +129,9 @@ public final class LocalSession: @unchecked Sendable {
         lock.lock(); defer { lock.unlock() }
         guard handle != 0 else { throw TramesError.message("Local session closed") }; return handle
     }
+    public func captureAndroidLogcat() throws {
+        guard trames_session_android_logcat(try currentHandle()) == 0 else {throw Self.lastError()}
+    }
     public func send(_ data: Data, terminal: UInt64 = 1) throws -> Int {
         guard data.count <= 65536 else { throw TramesError.message("Input chunk exceeds 64 KiB") }
         let h = try currentHandle()
