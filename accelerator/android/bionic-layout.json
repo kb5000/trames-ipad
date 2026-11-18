@@ -376,6 +376,178 @@
         "offset": 826900,
         "original": "fd7bbea9"
       }
+    },
+    "memmem": {
+      "body": {
+        "address": 857616,
+        "offset": 857616,
+        "original": "fd7bbda9"
+      }
+    },
+    "strstr": {
+      "body": {
+        "address": 858864,
+        "offset": 858864,
+        "original": "fd7bbea9"
+      }
+    },
+    "strcasestr": {
+      "body": {
+        "address": 889120,
+        "offset": 889120,
+        "original": "fd7bbca9"
+      }
+    },
+    "strspn": {
+      "body": {
+        "address": 889656,
+        "offset": 889656,
+        "original": "e80300aa"
+      }
+    },
+    "strcspn": {
+      "body": {
+        "address": 889288,
+        "offset": 889288,
+        "original": "e80300aa"
+      }
+    },
+    "strpbrk": {
+      "body": {
+        "address": 889508,
+        "offset": 889508,
+        "original": "09004039"
+      }
+    },
+    "strcasecmp": {
+      "body": {
+        "address": 888984,
+        "offset": 888984,
+        "original": "89faffd0"
+      }
+    },
+    "strncasecmp": {
+      "body": {
+        "address": 889040,
+        "offset": 889040,
+        "original": "420200b4"
+      }
+    },
+    "strsep": {
+      "body": {
+        "address": 889576,
+        "offset": 889576,
+        "original": "e80300aa"
+      }
+    },
+    "strtok_r": {
+      "body": {
+        "address": 889844,
+        "offset": 889844,
+        "original": "600000b5"
+      }
+    },
+    "strtol": {
+      "body": {
+        "address": 633620,
+        "offset": 633620,
+        "original": "fd7bbfa9"
+      }
+    },
+    "strtoll": {
+      "body": {
+        "address": 633696,
+        "offset": 633696,
+        "original": "fd7bbfa9"
+      }
+    },
+    "strtoul": {
+      "body": {
+        "address": 634272,
+        "offset": 634272,
+        "original": "fd7bbfa9"
+      }
+    },
+    "strtoull": {
+      "body": {
+        "address": 634800,
+        "offset": 634800,
+        "original": "fd7bbfa9"
+      }
+    },
+    "strtoimax": {
+      "body": {
+        "address": 633716,
+        "offset": 633716,
+        "original": "fd7bbfa9"
+      }
+    },
+    "strtoumax": {
+      "body": {
+        "address": 634820,
+        "offset": 634820,
+        "original": "fd7bbfa9"
+      }
+    },
+    "atoi": {
+      "body": {
+        "address": 633592,
+        "offset": 633592,
+        "original": "fd7bbfa9"
+      }
+    },
+    "atol": {
+      "body": {
+        "address": 633640,
+        "offset": 633640,
+        "original": "fd7bbfa9"
+      }
+    },
+    "atoll": {
+      "body": {
+        "address": 633668,
+        "offset": 633668,
+        "original": "fd7bbfa9"
+      }
+    },
+    "strtod": {
+      "body": {
+        "address": 779140,
+        "offset": 779140,
+        "original": "ff8304d1"
+      }
+    },
+    "strtof": {
+      "body": {
+        "address": 791200,
+        "offset": 791200,
+        "original": "ffc300d1"
+      }
+    },
+    "atof": {
+      "body": {
+        "address": 568724,
+        "offset": 568724,
+        "original": "e1031faa"
+      }
+    }
+  },
+  "references": {
+    "trames_bionic_errno": 567504,
+    "trames_jemalloc_sizes": 159680
+  },
+  "jemalloc": {
+    "pop": {
+      "address": 311680,
+      "offset": 311680,
+      "original": "e803152a",
+      "resume": 311784
+    },
+    "push": {
+      "address": 320392,
+      "offset": 320392,
+      "original": "09050011",
+      "resume": 322300
     }
   }
 }

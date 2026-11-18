@@ -20,7 +20,9 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
 ORIGINAL_SHA256 = "6aa289f3b6042793ccacd873ce3724dcaae240943112eec126f7be654f01e6cc"
-FUNCTIONS = "memcpy memmove memset memcmp strlen memchr memrchr strnlen strcmp strncmp strchr strrchr strchrnul strcpy stpcpy strncpy stpncpy strcat strncat mempcpy strlcpy strlcat".split()
+FUNCTIONS = ("memcpy memmove memset memcmp strlen memchr memrchr strnlen strcmp strncmp "
+             "strchr strrchr strchrnul strcpy stpcpy strncpy stpncpy strcat strncat mempcpy strlcpy strlcat").split()
+FUNCTIONS += "memmem strstr strcasestr strspn strcspn strpbrk strcasecmp strncasecmp strsep strtok_r strtol strtoll strtoul strtoull strtoimax strtoumax atoi atol atoll strtod strtof atof".split()
 IFUNCS = "memchr stpcpy strchr strchrnul strcmp strcpy strlen strncmp strrchr".split()
 
 
@@ -73,6 +75,17 @@ def branch(source, target):
 
 def displaced(word, source, destination):
     """Relocate precisely one entry instruction, never an arbitrary code block."""
+    if word & 0x1f000000 == 0x10000000:
+        immediate = ((word >> 29) & 3) | (((word >> 5) & 0x7ffff) << 2)
+        if immediate & 0x100000: immediate -= 0x200000
+        target = ((source & -4096) + (immediate << 12)) if word & 0x80000000 else source + immediate
+        delta = ((target & -4096) - (destination & -4096)) >> 12
+        if not -(1 << 20) <= delta < (1 << 20): raise ValueError('ADRP relocation out of range')
+        register = word & 31
+        adrp = 0x90000000 | ((delta & 3) << 29) | (((delta >> 2) & 0x7ffff) << 5) | register
+        if word & 0x80000000: return [adrp, branch(destination + 4, source + 4)]
+        add = 0x91000000 | ((target & 4095) << 10) | (register << 5) | register
+        return [adrp, add, branch(destination + 8, source + 4)]
     # CBZ/CBNZ or B.cond: inverted short branch skips a long-range B.
     if word & 0x7e000000 == 0x34000000 or word & 0xff000010 == 0x54000000:
         immediate = (word >> 5) & 0x7ffff
@@ -89,7 +102,7 @@ def displaced(word, source, destination):
     return [word, branch(destination + 4, source + 4)]
 
 
-def build(original, output, cc):
+def build(original, output, cc, jemalloc=False):
     layout_path = ROOT / "accelerator/android/bionic-layout.json"
     layout = json.loads(layout_path.read_text())
     if layout["original_sha256"] != ORIGINAL_SHA256 or set(layout["functions"]) != set(FUNCTIONS):
@@ -105,13 +118,16 @@ def build(original, output, cc):
     # Relocated original entry prefixes are private fallback functions. They
     # resume the untouched body; no clone of allocator, TLS or Bionic C state.
     targets = {name: entry.get("bulk", entry["body"])["address"] for name, entry in layout["functions"].items()}
+    if jemalloc:
+        targets.update({"jemalloc_" + name: entry["address"] for name, entry in layout['jemalloc'].items()})
     original_entries = sorted(set(targets.values()))
     trampoline_size = 16
     trampolines = {entry: text_address + i * trampoline_size for i, entry in enumerate(original_entries)}
     trampoline_words = []
     for entry in original_entries:
-        body = next(v.get("bulk", v["body"]) for v in layout["functions"].values()
-                    if v.get("bulk", v["body"])["address"] == entry)
+        body = next((v.get("bulk", v["body"]) for v in layout["functions"].values()
+                    if v.get("bulk", v["body"])["address"] == entry), None)
+        if body is None: body = next(v for v in layout['jemalloc'].values() if v['address'] == entry)
         word = int.from_bytes(bytes.fromhex(body["original"]), "little")
         prefix = body.get("prefix", [])
         words = prefix + displaced(word, entry, trampolines[entry] + 4 * len(prefix))
@@ -130,11 +146,21 @@ def build(original, output, cc):
         subprocess.run(compiler + ["-c", str(ROOT / "accelerator/android/bionic.c"), "-o", str(tmp / "wrappers.o")], check=True)
         subprocess.run(compiler + ["-c", str(ROOT / "accelerator/guest/calls.S"), "-o", str(tmp / "calls.o")], check=True)
         subprocess.run(compiler + ["-c", str(ROOT / "accelerator/android/bionic-entry.S"), "-o", str(tmp / "entries.o")], check=True)
+        subprocess.run(compiler + ["-c", str(ROOT / "accelerator/android/bionic-calls.S"), "-o", str(tmp / "bionic-calls.o")], check=True)
+        subprocess.run(compiler + ["-c", str(ROOT / "accelerator/musl/integer-calls.S"), "-o", str(tmp / "integers.o")], check=True)
+        if jemalloc:
+            subprocess.run(compiler + ["-c", str(ROOT / "accelerator/android/bionic-jemalloc.S"), "-o", str(tmp / "jemalloc.o")], check=True)
         script = tmp / "native.ld"
         script.write_text(f"SECTIONS {{ . = {wrapper_address}; .text : {{ *(.text*) *(.rodata*) }} .data : {{ *(.data*) *(.bss*) }} /DISCARD/ : {{ *(.comment) *(.note*) *(.eh_frame*) }} }}\nASSERT(SIZEOF(.data) == 0, \"Bionic wrappers must have no writable host state\")\n")
         command = [str(linker), "-flavor", "gnu", "-m", "aarch64elf", "--no-undefined", "--build-id=none", "--entry=trames_bionic_large_memcpy", "-T", str(script)]
         command += [f"--defsym=trames_orig_{name}={trampolines[entry]}" for name, entry in targets.items()]
-        command += [str(tmp / "wrappers.o"), str(tmp / "calls.o"), str(tmp / "entries.o"), "-o", str(tmp / "payload.so")]
+        command += [f"--defsym=trames_original_small_copy={layout['functions']['memcpy']['body']['address']}"]
+        command += [f"--defsym={name}={address}" for name, address in layout['references'].items()]
+        if jemalloc:
+            command += [f"--defsym=trames_jemalloc_{name}_original={trampolines[entry['address']]}" for name, entry in layout['jemalloc'].items()]
+            command += [f"--defsym=trames_jemalloc_{name}_resume={entry['resume']}" for name, entry in layout['jemalloc'].items()]
+        command += [str(tmp / name) for name in ['wrappers.o', 'calls.o', 'entries.o', 'bionic-calls.o', 'integers.o'] + (['jemalloc.o'] if jemalloc else [])]
+        command += ["-o", str(tmp / "payload.so")]
         subprocess.run(command, check=True)
         payload = Elf((tmp / "payload.so").read_bytes())
         text = payload.sections[".text"]
@@ -171,6 +197,9 @@ def build(original, output, cc):
                 continue
             seen.add(entry["address"])
             patch(name, entry, struct.pack("<I", branch(entry["address"], target)))
+    if jemalloc:
+        for name, entry in layout['jemalloc'].items():
+            patch('jemalloc_' + name, entry, struct.pack('<I', branch(entry['address'], wrappers['trames_jemalloc_' + name]['address'])))
     ph = list(layout["program_headers"])
     segment_size = text_address - address + len(code)
     ph[0] = (6, 4, file_offset, address, address, phnum * 56, phnum * 56, 8)
@@ -195,9 +224,10 @@ def build(original, output, cc):
         (output / "libc-original.so").write_bytes(source)
         (output / "libc-nativecall.so").write_bytes(patched)
     (output / "bionic-nativecall.bin").write_bytes(tail)
-    inputs = [Path(__file__), layout_path, ROOT / "accelerator/android/bionic.c", ROOT / "accelerator/android/bionic-entry.S", ROOT / "accelerator/guest/calls.S"]
+    inputs = [Path(__file__), layout_path, ROOT / "accelerator/android/bionic.c", ROOT / "accelerator/android/bionic-entry.S", ROOT / "accelerator/android/bionic-calls.S", ROOT / "accelerator/android/bionic-jemalloc.S", ROOT / "accelerator/guest/calls.S", ROOT / "accelerator/musl/integer-calls.S"]
     manifest = dict(schema=1, kind="bionic-static", android_api=33, abi="arm64-v8a",
                     original_sha256=ORIGINAL_SHA256, original_size=layout["original_size"], native_profile=65537, functions=FUNCTIONS,
+                    bionic_profile=65545, jemalloc=jemalloc,
                     tail_sha256=hashlib.sha256(tail).hexdigest(), patches=patches,
                     added_code_bytes=len(code), added_file_bytes=len(tail),
                     original_paths=["/system/apex/com.android.runtime/lib64/bionic/libc.so", "/system/lib64/bootstrap/libc.so"],
@@ -213,8 +243,9 @@ def main():
     parser.add_argument("--libc", type=Path, help="also verify and export complete libraries from this pinned original")
     parser.add_argument("--output", type=Path, default=ROOT / "target/bionic-hybrid")
     parser.add_argument("--cc", default=os.environ.get("CC", "clang"))
+    parser.add_argument("--jemalloc", action="store_true", help="experimental native guest-tcache blocks (default: original allocator)")
     args = parser.parse_args()
-    manifest = build(args.libc, args.output.resolve(), args.cc)
+    manifest = build(args.libc, args.output.resolve(), args.cc, jemalloc=args.jemalloc)
     print(json.dumps({k: manifest[k] for k in ["functions", "tail_sha256", "added_code_bytes", "added_file_bytes"]}, indent=2))
 
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Original Android loader, 22 libc functions and cold static-library selection.
+"""Original Android loader, 44 libc functions and cold static-library selection.
 
 Uses small disposable stores; never boots Android or touches a registered
 environment/device. The original libc is an input from the pinned image.
@@ -33,6 +33,7 @@ def main():
     parser.add_argument("--output", type=Path, default=ROOT / "target/bionic-hybrid/acceptance")
     parser.add_argument("--cache", type=Path, default=ROOT / "target/android-toolchain")
     parser.add_argument("--bench-rounds", type=int, default=3)
+    parser.add_argument("--baseline-bundle", type=Path, help="also compare a previously validated static Bionic bundle")
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
     rootfs, output, cache = args.rootfs.resolve(), args.output.resolve(), args.cache.resolve()
@@ -47,11 +48,12 @@ def main():
                     "--ld-path=" + str(cache / "bin/ld.lld"), "-O2", "-fno-builtin", "-mno-outline-atomics",
                     "-Wall", "-Wextra", "-Werror", "-fPIE", "-pie", "-nostdlib", str(lib / "crtbegin_dynamic.o"),
                     str(ROOT / "tests/fixtures/android-bionic.c"), "-L" + str(lib), "-Wl,--no-undefined",
-                    "-Wl,--dynamic-linker,/system/bin/linker64", "-lc", "-ldl", str(lib / "crtend_android.o"),
+                    "-Wl,--dynamic-linker,/system/bin/linker64", "-lc", "-ldl", "-lm", str(lib / "crtend_android.o"),
                     "-o", str(probe)], check=True)
     if args.bench_rounds < 1:
         parser.error("--bench-rounds must be positive")
     results = dict(original_sha256=builder.ORIGINAL_SHA256, manifest=manifest, cases={}, benchmark={},
+                   jemalloc_experiment={},
                    inputs={str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest()
                            for p in [Path(__file__), ROOT / "tests/fixtures/android-bionic.c"]},
                    runner_sha256=hashlib.sha256(args.runner.read_bytes()).hexdigest())
@@ -83,13 +85,36 @@ def main():
             return text, metrics
 
         text, metrics = run("original", "off", imports)
-        assert "PASS Bionic 22 functions" in text and metrics["calls"] == 0
+        assert "PASS Bionic 44 functions" in text and metrics["calls"] == 0
+        numeric_reference = [line for line in text.splitlines() if line.startswith(('NUMERIC ', 'FLOAT '))]
+        run('allocator-original-info', 'off', argument='allocator-info')
+        run('allocator-original-cache-info', 'off', argument='allocator-cache-info')
         select = ["--bionic-bundle", str(bundle)]
         export = Path(temporary) / "selected-libc.so"
         text, metrics = run("nativecall", "pure", select + ["--export", bionic + "/libc.so=" + str(export)])
-        assert "PASS Bionic 22 functions" in text and min(metrics["function_calls"]) > 0
+        assert "PASS Bionic 44 functions" in text and min(metrics["function_calls"]) > 0
+        actual = [line for line in text.splitlines() if line.startswith(('NUMERIC ', 'FLOAT '))]
+        if actual != numeric_reference:
+            differences = [dict(original=x, native=y) for x, y in zip(numeric_reference, actual) if x != y]
+            (output / 'numeric-differences.json').write_text(json.dumps(differences, indent=2))
+            raise RuntimeError('Bionic numeric differential mismatch: ' + str(differences[:3]))
         assert metrics["calls"] == metrics["worker_calls"] and not metrics["rejected"] and not metrics["faults"]
         assert export.read_bytes() == (bundle / "libc-nativecall.so").read_bytes()
+        run('allocator-native-info', 'pure', select, argument='allocator-info')
+        run('allocator-native-cache-info', 'pure', select, argument='allocator-cache-info')
+        run('allocator-original-cache-stress', 'off', select, argument='allocator-cache-stress')
+        experimental = output / 'jemalloc-bundle'
+        results['jemalloc_manifest'] = builder.build(original, experimental, 'clang', jemalloc=True)
+        allocator_select = ['--bionic-bundle', str(experimental)]
+        text, cache_metrics = run('allocator-native-cache-stress', 'pure', allocator_select, argument='allocator-cache-stress')
+        assert min(cache_metrics['bionic_operations'][10:12]) > 0 and not cache_metrics['faults']
+        allocator_variants = [('original', 'off', select), ('nativecall', 'pure', select),
+                              ('jemalloc', 'pure', allocator_select)]
+        for round in range(args.bench_rounds):
+            for variant, accelerator, selection in allocator_variants[::1 if round % 2 == 0 else -1]:
+                text, _ = run(f'allocator-{variant}-cache-bench-{round + 1}', accelerator, selection, argument='allocator-cache-bench')
+                line = next(line for line in text.splitlines() if line.startswith('BENCH malloc-free-64 '))
+                results['jemalloc_experiment'].setdefault(variant, []).append(int(line.split()[-1]))
         run("nativecall-noop", "pure", select)
         # Same executable code with harmless trailing, unmapped bytes gives a
         # distinct installed variant. Exercise real provenance-based upgrade
@@ -102,12 +127,12 @@ def main():
         (upgrade / "manifest.json").write_text(json.dumps(upgraded_manifest))
         (upgrade / "bionic-nativecall.bin").write_bytes(upgraded_tail)
         text, _ = run("variant-upgrade", "pure", ["--bionic-bundle", str(upgrade)])
-        assert "PASS Bionic 22 functions" in text
+        assert "PASS Bionic 44 functions" in text
         text, _ = run("variant-downgrade", "pure", select)
-        assert "PASS Bionic 22 functions" in text
+        assert "PASS Bionic 44 functions" in text
         restored = Path(temporary) / "restored-libc.so"
         text, metrics = run("restored", "off", select + ["--export", bionic + "/libc.so=" + str(restored)])
-        assert "PASS Bionic 22 functions" in text and metrics["calls"] == 0
+        assert "PASS Bionic 44 functions" in text and metrics["calls"] == 0
         assert restored.read_bytes() == original.read_bytes()
         # Tail corruption is rejected before either libc is replaced.
         bad = Path(temporary) / "bad-bundle"
@@ -137,10 +162,12 @@ def main():
         assert preserved.read_bytes() == original.read_bytes()
         prefix[2] = str(store)
         # Compare exactly the same Bionic binary/fixture under the interpreter.
-        variants = [("original", "off"), ("nativecall", "pure")]
+        variants = [("original", "off", select), ("nativecall", "pure", select)]
+        if args.baseline_bundle:
+            variants.append(('previous22', 'pure', ['--bionic-bundle', str(args.baseline_bundle.resolve())]))
         for round in range(args.bench_rounds):
-            for variant, accelerator in variants[::1 if round % 2 == 0 else -1]:
-                text, _ = run(f"bench-{variant}-{round + 1}", accelerator, select, argument="bench")
+            for variant, accelerator, selection in variants[::1 if round % 2 == 0 else -1]:
+                text, _ = run(f"bench-{variant}-{round + 1}", accelerator, selection, argument="bench")
                 for line in text.splitlines():
                     if line.startswith("BENCH "):
                         _, name, size, count, ns = line.split()
@@ -151,6 +178,8 @@ def main():
         for sample in variants.values():
             sample["nanoseconds"] = statistics.median(sample["samples_ns"])
         variants["speedup"] = variants["original"]["nanoseconds"] / variants["nativecall"]["nanoseconds"]
+        if 'previous22' in variants:
+            variants['previous_speedup'] = variants['previous22']['nanoseconds'] / variants['nativecall']['nanoseconds']
     (output / "summary.json").write_text(json.dumps(results, indent=2) + "\n")
     print(json.dumps(dict(cases={k: v["exit"] for k, v in results["cases"].items()}, benchmark=results["benchmark"]), indent=2))
 

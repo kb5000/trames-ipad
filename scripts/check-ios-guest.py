@@ -63,7 +63,7 @@ def rust_sources():
                                      'runtime/Cargo.toml', 'runtime/Cargo.lock']}
     for folder in ['crates', 'runtime/crates', 'runtime/vendor', '.cargo']:
         paths.update(p for p in (ROOT / folder).rglob('*')
-                     if p.suffix in ('.rs', '.toml', '.lock', '.json', '.c', '.h', '.m', '.mm', '.S'))
+                     if p.suffix in ('.rs', '.toml', '.lock', '.json', '.c', '.h', '.m', '.mm', '.S', '.py'))
     return {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest()
             for p in sorted(paths) if p.is_file()}
 
@@ -98,7 +98,8 @@ def check_bionic(directory):
     if (manifest.get('kind') != 'bionic-static'
             or manifest.get('original_sha256') != builder.ORIGINAL_SHA256
             or manifest.get('functions') != builder.FUNCTIONS
-            or manifest.get('native_profile') != 65537):
+            or manifest.get('native_profile') != 65537
+            or manifest.get('bionic_profile') != 65545):
         raise ValueError('Unpaired Android Bionic adapter')
     tail = (directory / 'bionic-nativecall.bin').read_bytes()
     if (len(tail) != manifest['added_file_bytes']

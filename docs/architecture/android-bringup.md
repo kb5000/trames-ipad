@@ -772,10 +772,11 @@ greater-than-96-byte forward/backward branches, leaving the entire short-copy
 path unchanged. Other sized operations below 128 bytes branch to original code
 before saving a C frame. String prefixes stop at NUL and page boundaries;
 aligned short `strlen` has a separate register-only entry. Larger operations
-use the existing pure module's 1 MiB bounds and original-code fallback. The
+use bounded native entries and original-code fallback (the extended streaming
+behavior is described below). The
 fallback continuations restore scratch registers required by the original
-forward/backward copy bodies. No allocator, locale, I/O or guest callback is
-redirected to Darwin libc. Calls use the executing worker and shared guest
+forward/backward copy bodies. Guest allocations, locale, I/O and guest callbacks
+are not redirected to Darwin libc. Calls use the executing worker and shared guest
 memory model without a coordinator or new locks.
 
 Stored installation provenance permits restoring an older derivative on an
@@ -1212,3 +1213,80 @@ was too late. On a 2x display the unmodified HWC now initializes at 360 dpi,
 rather than retaining its 180 dpi 1x default. No per-frame work or new thread is
 added. A 720x1560 logical display override and native phone-shaped window were
 used to inspect the shade footer and exercise its Settings button.
+
+
+#### Extended Bionic batch: streaming and conversion
+
+The static derivative now adapts **44 public functions**. The additional 22 are
+`memmem`, `strstr`, `strcasestr`, `strspn`, `strcspn`, `strpbrk`, `strcasecmp`,
+`strncasecmp`, `strsep`, `strtok_r`, `strtol`, `strtoll`, `strtoul`, `strtoull`,
+`strtoimax`, `strtoumax`, `atoi`, `atol`, `atoll`, `strtod`, `strtof` and `atof`.
+This remains whole-library cold selection, rather than per-call interposition.
+No runtime architecture query or additional coordinator is introduced.
+
+Large memory/string operations continue through bounded 1 MiB native entries.
+Copy/move/fill preserve direction and continue only the unprocessed range after
+a no-effect fallback; a backward overlapping move never restarts a completed
+suffix. Long string scans and copies no longer fall back wholesale solely
+because the input exceeded the entry budget. The original short-copy entries
+remain intact. Streaming helpers are out of line so their loop state does not
+expand the common small-call frame.
+
+The Bionic-specific module is `0x10009`: substring search (1–3), set spans and
+search (4–6), ASCII case comparison (7–8), floating conversion (9), bounded
+ordinary string comparison (10), experimental guest-jemalloc cache pop/push
+(11–12), and continued character search (13). Integer conversion reuses module
+`0x10004`, with Bionic's original no-digits/invalid-base errno behavior.
+Character-set tables, substring failure tables and numeric scratch belong to
+the current call. No cache retains guest pointers across entries. KMP handles
+repeated-prefix inputs in linear time; unmatched prefixes reuse the existing
+vector byte scan. Patterns/sets beyond the 64 KiB scratch budget retain the
+original library path. Tokenizer cursor writes remain caller-owned and do not
+gain a global lock.
+
+Floating results use the pinned original Bionic/OpenBSD gdtoa algorithm from
+`android-13.0.0_r83`, not the host system `strtod`. The bounded existing scanner
+only determines whether another input fragment is needed. Per-invocation
+scratch replaces shared gdtoa caches; host errno and FP state are restored.
+The guest receives exact bits, end position, errno and FP status flags. Any
+nonzero guest FPCR retains the original-image code, including its historical
+non-nearest rounding behavior. Original files, archive hashes and licensing are
+retained under `runtime/crates/trames-native/upstream/bionic-android13`; the iOS
+Notices include the corresponding Lucent and Apache notices.
+
+The jemalloc experiment is **off by default**. `build-bionic-hybrid.py
+--jemalloc` additionally adapts two pinned internal cache-hit blocks while
+retaining the original guest TSD, bins, low-water mark, allocation statistics,
+event ticker, arenas, refill/flush, mutexes and fork handling. The free adapter
+uses the retained bin pointer, because the original flush can clobber its size
+class register. It does not allocate guest objects from Darwin malloc or
+change jemalloc's cache policy. In this pinned image `opt.tcache` defaults to
+false. The fixture explicitly enables the current thread's cache through the
+original jemalloc control routine for the experiment only. Both the original
+and adapted library are tested with this same setting. The tiny cache blocks
+were slower through NativeCall, so production keeps the original blocks.
+
+Representative median speedups **against the previous 22-function variant**:
+
+| Operation | Input | Speedup |
+| --- | --- | ---: |
+| `memcpy` | 2 MiB | 30.3x |
+| overlapping `memmove` | 2 MiB | 67.7x |
+| `strlen` | 2 MiB | 218.4x |
+| `strcpy` | 2 MiB | 30.2x |
+| `strcasestr` | 64 KiB | 390.1x |
+| `strspn` / `strcspn` | 64 KiB | 127.5x / 225.4x |
+| `strcasecmp` | 64 KiB | 124.6x |
+| `strtoll` / `strtod` | numeric token | 3.8x / 16.3x |
+
+The already accelerated `memmem`/`strstr` paths stayed near the previous
+variant after adding vector prefix skips. Existing small calls remained close
+to the preceding implementation. Native jemalloc cache blocks took 49.0 ms
+versus 38.8 ms for the original blocks for 20,000 matched-cache-policy
+allocation/free pairs (about 26% slower). This is why they remain disabled.
+
+Validation, source hashes and alternating three-round comparisons are recorded
+in [the extended validation record](../validation/android-bionic-extended-20261118.json).
+They are Mac-hosted interpreter microbenchmarks; Android UI responsiveness and
+physical-iPad behavior have not been measured in this batch. No iPad was woken,
+installed or monitored for these checks.

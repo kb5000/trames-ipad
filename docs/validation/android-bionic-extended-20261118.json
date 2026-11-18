@@ -1,0 +1,1171 @@
+{
+  "schema": 1,
+  "date": "2026-11-18",
+  "scope": "Extended static Bionic derivative, Mac-hosted ARM64 interpreter using original Android loader; local Linux/GCC and unsigned iOS link",
+  "original_libc_sha256": "6aa289f3b6042793ccacd873ce3724dcaae240943112eec126f7be654f01e6cc",
+  "functions": [
+    "memcpy",
+    "memmove",
+    "memset",
+    "memcmp",
+    "strlen",
+    "memchr",
+    "memrchr",
+    "strnlen",
+    "strcmp",
+    "strncmp",
+    "strchr",
+    "strrchr",
+    "strchrnul",
+    "strcpy",
+    "stpcpy",
+    "strncpy",
+    "stpncpy",
+    "strcat",
+    "strncat",
+    "mempcpy",
+    "strlcpy",
+    "strlcat",
+    "memmem",
+    "strstr",
+    "strcasestr",
+    "strspn",
+    "strcspn",
+    "strpbrk",
+    "strcasecmp",
+    "strncasecmp",
+    "strsep",
+    "strtok_r",
+    "strtol",
+    "strtoll",
+    "strtoul",
+    "strtoull",
+    "strtoimax",
+    "strtoumax",
+    "atoi",
+    "atol",
+    "atoll",
+    "strtod",
+    "strtof",
+    "atof"
+  ],
+  "native_profile": 65545,
+  "jemalloc_default": false,
+  "added_code_bytes": 16748,
+  "added_library_bytes": 19692,
+  "guest_code_sha256": "8dd72ea19de0f36f75c82172b991ef190ccbda5a990c776391b8f1ee8a515222",
+  "source_sha256": {
+    "accelerator/android/bionic-calls.S": "92c95bd00241d5c8f46cda2c9d8eed0d3b3284588232b6c4744f31a59f4f6d38",
+    "accelerator/android/bionic-entry.S": "8ece68a6264611e75204390f3722c87b0ce8dc18db55712dab2ce62e8bcc0e93",
+    "accelerator/android/bionic-jemalloc.S": "d06a614bdca0aed097b912ea02677ab85ab060c8101002328365fe41a0a32afe",
+    "accelerator/android/bionic-layout.json": "d2d3eba303baef6e6c8accb97524fccfa9eb7fd9693eef79d8bb81f01b8db609",
+    "accelerator/android/bionic.c": "d286150331357e28ca953c2c1886f3d4da281b33ccd65c5292b26cb7f271bce1",
+    "accelerator/guest/calls.S": "2653d9b961d5bab1f12e235c7e939ccd78ab7854f78bfb360bf408c5fd5682c3",
+    "accelerator/musl/integer-calls.S": "96269df52f45ed7a498d34ff1c90ef995e1a9740ddf4d0c823153e78eb7cacd2",
+    "runtime/crates/trames-accel/src/bionic.rs": "8b198f0a8a677aaaf82496fad60439a7402c328f4f50032d92a958365180b036",
+    "runtime/crates/trames-accel/src/lib.rs": "09dfd5530418ad90e615ee1c511b06499f4d87a7a839c3d0e3eb70483a5c62a4",
+    "runtime/crates/trames-accel/src/native.rs": "11aed536e7dc14a0294815dab0e9a1781b81185ea4d7ba151f772d1a202e3260",
+    "runtime/crates/trames-accel/src/numeric.rs": "68ef87c0952957c53b48c75004d4a41714c6bc34e600153039576aac758f59e7",
+    "runtime/crates/trames-native/bionic/driver.c": "6fa93f451af77c46953d23f2455e095b83ce3f3c87e6bf8aea9899ca7ddfbc2f",
+    "runtime/crates/trames-native/bionic/gdtoa-state.h": "0665319933513bab6b07eaa756e3db27d1e35ddbed8e49d2a0253146bb888062",
+    "runtime/crates/trames-native/bionic/generate.py": "71749198de73fcbe85de3aa50ee0bb6624885fa38346317c5c95bb65493a827f",
+    "runtime/crates/trames-native/bionic/shim.h": "101e9effb4c3f246a655083475ed7452e782e1e632ba0bcc1546e52e47bc43c8",
+    "runtime/crates/trames-native/build.rs": "dc6bfd24c60958b2f018eaeea4c4d8bba13f6788970f8db68cf8b03122046eb1",
+    "runtime/crates/trames-native/src/parse.rs": "7fd7ab38be707756a81869005cd0aae1d1f1468bc49ee148b3754d950c2ba542",
+    "runtime/crates/trames-native/upstream/bionic-android13/NOTICE.txt": "b8d7de32cedac85d1d1f7069715cd82191366083bdc52036c93ec91e12c2cd67",
+    "runtime/crates/trames-native/upstream/bionic-android13/arith.h": "ab94601187dca2b144fcc17e2768c670fc99969c5519ff6e05336c11111b3d25",
+    "runtime/crates/trames-native/upstream/bionic-android13/gd_qnan.h": "3f0f669b63120cd951bed3ce618fb055684359a472fdde61a54778a823097a41",
+    "runtime/crates/trames-native/upstream/bionic-android13/gdtoa.h": "7368ce941c118180fc14e698e17d66ad47a52abb80d19d1fadf02afcdf26eca4",
+    "runtime/crates/trames-native/upstream/bionic-android13/gdtoa_fltrnds.h": "370f7621e16c280350e9b350048f53a6425fc8b6d4dc700f8583169f4a881208",
+    "runtime/crates/trames-native/upstream/bionic-android13/gdtoaimp.h": "d2c18f90dbb7f711a3b22b6dd7804a82f095d11741955eecfaa1bb44ff4e4db3",
+    "runtime/crates/trames-native/upstream/bionic-android13/gethex.c": "fb2b02844289f804e202826919119f48c10a25df2b268b8b0bf2ad47b5be69b2",
+    "runtime/crates/trames-native/upstream/bionic-android13/gmisc.c": "39a52bd7651ae5281bc9a1e7b3d2a81f51ade634593772cd7f9237d6057902d8",
+    "runtime/crates/trames-native/upstream/bionic-android13/hd_init.c": "5d787a46e06719178356de20ccc4e9f65961e723351b5c8a43a63b95832c7247",
+    "runtime/crates/trames-native/upstream/bionic-android13/hexnan.c": "982f08614289beaa17172cb1ae85d2a95035bbbcdbb73817eb7896da16eda2dd",
+    "runtime/crates/trames-native/upstream/bionic-android13/misc.c": "fd5481a6571bd9c0d65d2d73a408546e48c9f05fd1f9ecd4ace695de8d76d648",
+    "runtime/crates/trames-native/upstream/bionic-android13/provenance.json": "94ef4eec958fc053c4db20464dbb0759b1d91d57505b467f36a72161adb52ac7",
+    "runtime/crates/trames-native/upstream/bionic-android13/smisc.c": "0f1a095daf34407d8b2ef5b55d6e25c49f896b9a64d6e2fc32ecf5e0e1b0d371",
+    "runtime/crates/trames-native/upstream/bionic-android13/strtod.c": "2040fe285e8cfe163ea3698691a77d6982d8b21bbbc3533e19dac3959368e148",
+    "runtime/crates/trames-native/upstream/bionic-android13/strtodg.c": "ff64601a4b23fefdf5459f72195616935c742c21d47bcdbcffb0a3b104c3f30a",
+    "runtime/crates/trames-native/upstream/bionic-android13/strtof.c": "176000d0ff3812e3cf62c132b9d20e654b70f66ba2cdd8995d3bf8f0fec8a919",
+    "runtime/crates/trames-native/upstream/bionic-android13/strtord.c": "2750fa3bff541ff0d8ed13f9a6099acc6c3f89a20e9f87fab53216197acceaf3",
+    "runtime/crates/trames-native/upstream/bionic-android13/sum.c": "cdc1aed326017dbbaa84f0476e48035efd8355d8bfbdb2c45599132a882ef6c1",
+    "runtime/crates/trames-native/upstream/bionic-android13/ulp.c": "69e25108aa7c6d0c8ff0a63da291cc83fa4c25b60bc65b8d6ff82e9e3b2132e1",
+    "scripts/build-bionic-hybrid.py": "ed5cee3b9b6fd860c7ea10ab437f5895daba55fd3e19036ed962b4abfb717d1a",
+    "scripts/check-ios-guest.py": "d08c17a5f3bf5fe41f207161cfdf3d433bad85f75fbcbfff475fdc4c196d908b",
+    "tests/fixtures/android-bionic.c": "e6507792b1f1586edb74a3378fc96b9cac0a5b68910838ed94ed545f09f73171",
+    "tests/integration/bionic.py": "1fd38e25cd41e4aee5fbcd6dee6ff6d491c71083b52a7454611d9dbe51a9786a"
+  },
+  "runner_sha256": "428449fe488842d08f3f17d6b6335b902f6a93739da1cb6279b75b504b7ae661",
+  "functional_checks_per_run": 4351727,
+  "case_exit_codes": {
+    "original": 0,
+    "allocator-original-info": 0,
+    "allocator-original-cache-info": 0,
+    "nativecall": 0,
+    "allocator-native-info": 0,
+    "allocator-native-cache-info": 0,
+    "allocator-original-cache-stress": 0,
+    "allocator-native-cache-stress": 0,
+    "allocator-original-cache-bench-1": 0,
+    "allocator-nativecall-cache-bench-1": 0,
+    "allocator-jemalloc-cache-bench-1": 0,
+    "allocator-jemalloc-cache-bench-2": 0,
+    "allocator-nativecall-cache-bench-2": 0,
+    "allocator-original-cache-bench-2": 0,
+    "allocator-original-cache-bench-3": 0,
+    "allocator-nativecall-cache-bench-3": 0,
+    "allocator-jemalloc-cache-bench-3": 0,
+    "nativecall-noop": 0,
+    "variant-upgrade": 0,
+    "variant-downgrade": 0,
+    "restored": 0,
+    "corrupt-resource": 125,
+    "forget-record": 0,
+    "partial-install": 125,
+    "recover-original": 0,
+    "after-recovery": 0,
+    "unsupported-image": 125,
+    "unsupported-preserved": 0,
+    "bench-original-1": 0,
+    "bench-nativecall-1": 0,
+    "bench-previous22-1": 0,
+    "bench-previous22-2": 0,
+    "bench-nativecall-2": 0,
+    "bench-original-2": 0,
+    "bench-original-3": 0,
+    "bench-nativecall-3": 0,
+    "bench-previous22-3": 0
+  },
+  "native_metrics": {
+    "calls": 8401,
+    "worker_calls": 8401,
+    "bionic_calls": 299,
+    "bionic_operations": [
+      14,
+      11,
+      10,
+      4,
+      7,
+      3,
+      6,
+      6,
+      214,
+      12,
+      0,
+      0,
+      12
+    ],
+    "bionic_fallbacks": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "bionic_nanoseconds": [
+      185288,
+      192874,
+      220709,
+      574125,
+      1247208,
+      488708,
+      1938832,
+      1971084,
+      458793,
+      1625250,
+      0,
+      0,
+      1898123
+    ],
+    "checkpoint_retries": 0,
+    "function_calls": [
+      1042,
+      45,
+      3827,
+      32,
+      716,
+      12,
+      12,
+      317,
+      431,
+      10,
+      272,
+      258,
+      16,
+      20,
+      15,
+      10,
+      18,
+      15,
+      8
+    ],
+    "function_fallbacks": [
+      1,
+      0,
+      0,
+      0,
+      8,
+      0,
+      0,
+      2,
+      4,
+      2,
+      4,
+      2,
+      2,
+      4,
+      2,
+      2,
+      3,
+      2,
+      1
+    ],
+    "integer_calls": 1026,
+    "integer_conversions": 1026,
+    "allocator_calls": 0,
+    "allocator_load_callbacks": 0,
+    "allocator_page_callbacks": 0,
+    "allocator_direct_loads": 0,
+    "allocator_journal_writes": 0,
+    "allocator_allocations": 0,
+    "allocator_slot_reservations": 0,
+    "allocator_frees": 0,
+    "allocator_free_resumes": 0,
+    "callback_calls": 0,
+    "callback_requests": 0,
+    "callback_yields": 0,
+    "callback_sorts": 0,
+    "callback_searches": 0,
+    "callback_state_bytes": 0,
+    "numeric_calls": 0,
+    "numeric_conversions": 0,
+    "numeric_replays": 7,
+    "numeric_input_bytes": 62914,
+    "numeric_result_bytes": 21552,
+    "fallbacks": 39,
+    "rejected": 0,
+    "validation_hits": 8339,
+    "validation_misses": 62,
+    "faults": 0,
+    "bytes_read": 114216765,
+    "bytes_written": 47792297,
+    "direct_bytes_read": 114216765,
+    "direct_bytes_written": 47792297,
+    "buffered_bytes_read": 0,
+    "buffered_bytes_written": 0,
+    "nanoseconds": 15918836
+  },
+  "benchmark": {
+    "memcpy-short": {
+      "original": {
+        "bytes": 32,
+        "count": 20000,
+        "samples_ns": [
+          3053875,
+          3423334,
+          3158542
+        ],
+        "nanoseconds": 3158542
+      },
+      "nativecall": {
+        "bytes": 32,
+        "count": 20000,
+        "samples_ns": [
+          3400583,
+          3343292,
+          3245000
+        ],
+        "nanoseconds": 3343292
+      },
+      "previous22": {
+        "bytes": 32,
+        "count": 20000,
+        "samples_ns": [
+          3311750,
+          3209542,
+          3269084
+        ],
+        "nanoseconds": 3269084
+      },
+      "speedup": 0.9447400944936907,
+      "previous_speedup": 0.9778039130294333
+    },
+    "memcpy-4k": {
+      "original": {
+        "bytes": 4096,
+        "count": 4000,
+        "samples_ns": [
+          34996291,
+          35396208,
+          34753000
+        ],
+        "nanoseconds": 34996291
+      },
+      "nativecall": {
+        "bytes": 4096,
+        "count": 4000,
+        "samples_ns": [
+          1540208,
+          1700042,
+          1636208
+        ],
+        "nanoseconds": 1636208
+      },
+      "previous22": {
+        "bytes": 4096,
+        "count": 4000,
+        "samples_ns": [
+          1809250,
+          1769958,
+          1768750
+        ],
+        "nanoseconds": 1769958
+      },
+      "speedup": 21.38865657666996,
+      "previous_speedup": 1.081743885862922
+    },
+    "memcpy-64k": {
+      "original": {
+        "bytes": 65536,
+        "count": 1000,
+        "samples_ns": [
+          135839375,
+          135759958,
+          135335041
+        ],
+        "nanoseconds": 135759958
+      },
+      "nativecall": {
+        "bytes": 65536,
+        "count": 1000,
+        "samples_ns": [
+          1972125,
+          2192625,
+          1869459
+        ],
+        "nanoseconds": 1972125
+      },
+      "previous22": {
+        "bytes": 65536,
+        "count": 1000,
+        "samples_ns": [
+          2072250,
+          1890583,
+          2019541
+        ],
+        "nanoseconds": 2019541
+      },
+      "speedup": 68.83942853520948,
+      "previous_speedup": 1.0240431007162325
+    },
+    "memmove-4k": {
+      "original": {
+        "bytes": 4096,
+        "count": 4000,
+        "samples_ns": [
+          34533250,
+          35226916,
+          35527834
+        ],
+        "nanoseconds": 35226916
+      },
+      "nativecall": {
+        "bytes": 4096,
+        "count": 4000,
+        "samples_ns": [
+          1596125,
+          1717709,
+          1549833
+        ],
+        "nanoseconds": 1596125
+      },
+      "previous22": {
+        "bytes": 4096,
+        "count": 4000,
+        "samples_ns": [
+          1564792,
+          1550708,
+          1542959
+        ],
+        "nanoseconds": 1550708
+      },
+      "speedup": 22.070273944709843,
+      "previous_speedup": 0.9715454616649698
+    },
+    "memset-4k": {
+      "original": {
+        "bytes": 4096,
+        "count": 4000,
+        "samples_ns": [
+          10684458,
+          10795709,
+          11027833
+        ],
+        "nanoseconds": 10795709
+      },
+      "nativecall": {
+        "bytes": 4096,
+        "count": 4000,
+        "samples_ns": [
+          1274167,
+          1287834,
+          1275125
+        ],
+        "nanoseconds": 1275125
+      },
+      "previous22": {
+        "bytes": 4096,
+        "count": 4000,
+        "samples_ns": [
+          1219083,
+          1269834,
+          1301834
+        ],
+        "nanoseconds": 1269834
+      },
+      "speedup": 8.466392706597393,
+      "previous_speedup": 0.9958506028820704
+    },
+    "memcmp-4k": {
+      "original": {
+        "bytes": 4096,
+        "count": 4000,
+        "samples_ns": [
+          35174084,
+          35230125,
+          34775167
+        ],
+        "nanoseconds": 35174084
+      },
+      "nativecall": {
+        "bytes": 4096,
+        "count": 4000,
+        "samples_ns": [
+          1567750,
+          1420625,
+          1468750
+        ],
+        "nanoseconds": 1468750
+      },
+      "previous22": {
+        "bytes": 4096,
+        "count": 4000,
+        "samples_ns": [
+          1531500,
+          1478500,
+          1636916
+        ],
+        "nanoseconds": 1531500
+      },
+      "speedup": 23.9483125106383,
+      "previous_speedup": 1.042723404255319
+    },
+    "strlen-1k": {
+      "original": {
+        "bytes": 1023,
+        "count": 4000,
+        "samples_ns": [
+          31356125,
+          31153625,
+          31784250
+        ],
+        "nanoseconds": 31356125
+      },
+      "nativecall": {
+        "bytes": 1023,
+        "count": 4000,
+        "samples_ns": [
+          1147583,
+          1221084,
+          1065375
+        ],
+        "nanoseconds": 1147583
+      },
+      "previous22": {
+        "bytes": 1023,
+        "count": 4000,
+        "samples_ns": [
+          1180042,
+          1139792,
+          1265500
+        ],
+        "nanoseconds": 1180042
+      },
+      "speedup": 27.323622779354523,
+      "previous_speedup": 1.0282846643772172
+    },
+    "strcmp-1k": {
+      "original": {
+        "bytes": 1023,
+        "count": 4000,
+        "samples_ns": [
+          21674458,
+          20154083,
+          21346458
+        ],
+        "nanoseconds": 21346458
+      },
+      "nativecall": {
+        "bytes": 1023,
+        "count": 4000,
+        "samples_ns": [
+          3312625,
+          3404292,
+          3227458
+        ],
+        "nanoseconds": 3312625
+      },
+      "previous22": {
+        "bytes": 1023,
+        "count": 4000,
+        "samples_ns": [
+          3204250,
+          3092166,
+          3170583
+        ],
+        "nanoseconds": 3170583
+      },
+      "speedup": 6.443970567148409,
+      "previous_speedup": 0.9571210143013471
+    },
+    "strchr-1k": {
+      "original": {
+        "bytes": 1023,
+        "count": 4000,
+        "samples_ns": [
+          66548459,
+          61962458,
+          66534417
+        ],
+        "nanoseconds": 66534417
+      },
+      "nativecall": {
+        "bytes": 1023,
+        "count": 4000,
+        "samples_ns": [
+          2682083,
+          2902000,
+          2681916
+        ],
+        "nanoseconds": 2682083
+      },
+      "previous22": {
+        "bytes": 1023,
+        "count": 4000,
+        "samples_ns": [
+          2694125,
+          2724750,
+          2624542
+        ],
+        "nanoseconds": 2694125
+      },
+      "speedup": 24.80699404157142,
+      "previous_speedup": 1.0044897939400086
+    },
+    "strcpy-1k": {
+      "original": {
+        "bytes": 1023,
+        "count": 4000,
+        "samples_ns": [
+          13026375,
+          12804208,
+          13363042
+        ],
+        "nanoseconds": 13026375
+      },
+      "nativecall": {
+        "bytes": 1023,
+        "count": 4000,
+        "samples_ns": [
+          1549541,
+          1543250,
+          1466167
+        ],
+        "nanoseconds": 1543250
+      },
+      "previous22": {
+        "bytes": 1023,
+        "count": 4000,
+        "samples_ns": [
+          1481292,
+          1475833,
+          1456625
+        ],
+        "nanoseconds": 1475833
+      },
+      "speedup": 8.44087153734003,
+      "previous_speedup": 0.9563149198120849
+    },
+    "strlcpy-1k": {
+      "original": {
+        "bytes": 1023,
+        "count": 4000,
+        "samples_ns": [
+          141930167,
+          141960084,
+          144566292
+        ],
+        "nanoseconds": 141960084
+      },
+      "nativecall": {
+        "bytes": 1023,
+        "count": 4000,
+        "samples_ns": [
+          2550209,
+          2488042,
+          2253166
+        ],
+        "nanoseconds": 2488042
+      },
+      "previous22": {
+        "bytes": 1023,
+        "count": 4000,
+        "samples_ns": [
+          2299084,
+          2331584,
+          2525709
+        ],
+        "nanoseconds": 2331584
+      },
+      "speedup": 57.05694839556567,
+      "previous_speedup": 0.9371160133148878
+    },
+    "strlen-short": {
+      "original": {
+        "bytes": 5,
+        "count": 20000,
+        "samples_ns": [
+          2824041,
+          2845875,
+          2922375
+        ],
+        "nanoseconds": 2845875
+      },
+      "nativecall": {
+        "bytes": 5,
+        "count": 20000,
+        "samples_ns": [
+          2207333,
+          2172375,
+          2094416
+        ],
+        "nanoseconds": 2172375
+      },
+      "previous22": {
+        "bytes": 5,
+        "count": 20000,
+        "samples_ns": [
+          2076083,
+          2222708,
+          2200083
+        ],
+        "nanoseconds": 2200083
+      },
+      "speedup": 1.3100293457621266,
+      "previous_speedup": 1.0127547039530467
+    },
+    "memmem-64k": {
+      "original": {
+        "bytes": 65536,
+        "count": 100,
+        "samples_ns": [
+          73949125,
+          73311542,
+          73546083
+        ],
+        "nanoseconds": 73546083
+      },
+      "nativecall": {
+        "bytes": 65536,
+        "count": 100,
+        "samples_ns": [
+          181417,
+          171375,
+          203875
+        ],
+        "nanoseconds": 181417
+      },
+      "previous22": {
+        "bytes": 65536,
+        "count": 100,
+        "samples_ns": [
+          182750,
+          185083,
+          165042
+        ],
+        "nanoseconds": 182750
+      },
+      "speedup": 405.397967114438,
+      "previous_speedup": 1.0073477127281347
+    },
+    "strstr-64k": {
+      "original": {
+        "bytes": 65536,
+        "count": 100,
+        "samples_ns": [
+          97159666,
+          95975625,
+          96431791
+        ],
+        "nanoseconds": 96431791
+      },
+      "nativecall": {
+        "bytes": 65536,
+        "count": 100,
+        "samples_ns": [
+          301208,
+          304334,
+          315416
+        ],
+        "nanoseconds": 304334
+      },
+      "previous22": {
+        "bytes": 65536,
+        "count": 100,
+        "samples_ns": [
+          354542,
+          322333,
+          293750
+        ],
+        "nanoseconds": 322333
+      },
+      "speedup": 316.8617078604428,
+      "previous_speedup": 1.0591422581768715
+    },
+    "strcasestr-64k": {
+      "original": {
+        "bytes": 65536,
+        "count": 100,
+        "samples_ns": [
+          163734875,
+          165700750,
+          167706625
+        ],
+        "nanoseconds": 165700750
+      },
+      "nativecall": {
+        "bytes": 65536,
+        "count": 100,
+        "samples_ns": [
+          418000,
+          440875,
+          410916
+        ],
+        "nanoseconds": 418000
+      },
+      "previous22": {
+        "bytes": 65536,
+        "count": 100,
+        "samples_ns": [
+          162450875,
+          163057959,
+          163438708
+        ],
+        "nanoseconds": 163057959
+      },
+      "speedup": 396.4132775119617,
+      "previous_speedup": 390.0908110047847
+    },
+    "strspn-64k": {
+      "original": {
+        "bytes": 65536,
+        "count": 100,
+        "samples_ns": [
+          238012708,
+          241651833,
+          238332959
+        ],
+        "nanoseconds": 238332959
+      },
+      "nativecall": {
+        "bytes": 65536,
+        "count": 100,
+        "samples_ns": [
+          2346709,
+          1801500,
+          1864083
+        ],
+        "nanoseconds": 1864083
+      },
+      "previous22": {
+        "bytes": 65536,
+        "count": 100,
+        "samples_ns": [
+          237641375,
+          236236792,
+          238758292
+        ],
+        "nanoseconds": 237641375
+      },
+      "speedup": 127.85533637718922,
+      "previous_speedup": 127.48433143803146
+    },
+    "strcspn-64k": {
+      "original": {
+        "bytes": 65536,
+        "count": 100,
+        "samples_ns": [
+          359325291,
+          379882750,
+          375111375
+        ],
+        "nanoseconds": 375111375
+      },
+      "nativecall": {
+        "bytes": 65536,
+        "count": 100,
+        "samples_ns": [
+          1625500,
+          1693292,
+          1535208
+        ],
+        "nanoseconds": 1625500
+      },
+      "previous22": {
+        "bytes": 65536,
+        "count": 100,
+        "samples_ns": [
+          366344875,
+          369364500,
+          363844916
+        ],
+        "nanoseconds": 366344875
+      },
+      "speedup": 230.76676407259305,
+      "previous_speedup": 225.37365426022762
+    },
+    "strcasecmp-64k": {
+      "original": {
+        "bytes": 65536,
+        "count": 100,
+        "samples_ns": [
+          384439709,
+          387152541,
+          382967334
+        ],
+        "nanoseconds": 384439709
+      },
+      "nativecall": {
+        "bytes": 65536,
+        "count": 100,
+        "samples_ns": [
+          3385042,
+          3141792,
+          3050375
+        ],
+        "nanoseconds": 3141792
+      },
+      "previous22": {
+        "bytes": 65536,
+        "count": 100,
+        "samples_ns": [
+          391377833,
+          373532542,
+          391948666
+        ],
+        "nanoseconds": 391377833
+      },
+      "speedup": 122.36319559028733,
+      "previous_speedup": 124.57152892362066
+    },
+    "strtoll": {
+      "original": {
+        "bytes": 19,
+        "count": 10000,
+        "samples_ns": [
+          12146833,
+          12085041,
+          12430542
+        ],
+        "nanoseconds": 12146833
+      },
+      "nativecall": {
+        "bytes": 19,
+        "count": 10000,
+        "samples_ns": [
+          3167667,
+          3089125,
+          3178791
+        ],
+        "nanoseconds": 3167667
+      },
+      "previous22": {
+        "bytes": 19,
+        "count": 10000,
+        "samples_ns": [
+          12196000,
+          11900833,
+          11905792
+        ],
+        "nanoseconds": 11905792
+      },
+      "speedup": 3.83463066035666,
+      "previous_speedup": 3.758536487579029
+    },
+    "strtod": {
+      "original": {
+        "bytes": 24,
+        "count": 4000,
+        "samples_ns": [
+          129720458,
+          130371375,
+          130915167
+        ],
+        "nanoseconds": 130371375
+      },
+      "nativecall": {
+        "bytes": 24,
+        "count": 4000,
+        "samples_ns": [
+          7933000,
+          8308125,
+          7917375
+        ],
+        "nanoseconds": 7933000
+      },
+      "previous22": {
+        "bytes": 24,
+        "count": 4000,
+        "samples_ns": [
+          130170625,
+          128127667,
+          129095958
+        ],
+        "nanoseconds": 129095958
+      },
+      "speedup": 16.43405710323963,
+      "previous_speedup": 16.273283499306693
+    },
+    "memcpy-2m": {
+      "original": {
+        "bytes": 2097152,
+        "count": 20,
+        "samples_ns": [
+          87304542,
+          84922250,
+          85236167
+        ],
+        "nanoseconds": 85236167
+      },
+      "nativecall": {
+        "bytes": 2097152,
+        "count": 20,
+        "samples_ns": [
+          2847166,
+          2900875,
+          2616666
+        ],
+        "nanoseconds": 2847166
+      },
+      "previous22": {
+        "bytes": 2097152,
+        "count": 20,
+        "samples_ns": [
+          88111708,
+          84752209,
+          86342125
+        ],
+        "nanoseconds": 86342125
+      },
+      "speedup": 29.93719614521949,
+      "previous_speedup": 30.325637844790222
+    },
+    "memmove-2m": {
+      "original": {
+        "bytes": 2097152,
+        "count": 20,
+        "samples_ns": [
+          86914834,
+          86788500,
+          85533458
+        ],
+        "nanoseconds": 86788500
+      },
+      "nativecall": {
+        "bytes": 2097152,
+        "count": 20,
+        "samples_ns": [
+          1271000,
+          1430708,
+          1253500
+        ],
+        "nanoseconds": 1271000
+      },
+      "previous22": {
+        "bytes": 2097152,
+        "count": 20,
+        "samples_ns": [
+          87001416,
+          84250500,
+          86092917
+        ],
+        "nanoseconds": 86092917
+      },
+      "speedup": 68.28363493312352,
+      "previous_speedup": 67.73636270653029
+    },
+    "strlen-2m": {
+      "original": {
+        "bytes": 2097152,
+        "count": 20,
+        "samples_ns": [
+          310144000,
+          311906583,
+          313944417
+        ],
+        "nanoseconds": 311906583
+      },
+      "nativecall": {
+        "bytes": 2097152,
+        "count": 20,
+        "samples_ns": [
+          1452542,
+          1433208,
+          1398417
+        ],
+        "nanoseconds": 1433208
+      },
+      "previous22": {
+        "bytes": 2097152,
+        "count": 20,
+        "samples_ns": [
+          313266958,
+          309971375,
+          313075208
+        ],
+        "nanoseconds": 313075208
+      },
+      "speedup": 217.62827377463705,
+      "previous_speedup": 218.44366484139078
+    },
+    "strcpy-2m": {
+      "original": {
+        "bytes": 2097152,
+        "count": 20,
+        "samples_ns": [
+          121350250,
+          123103250,
+          124627333
+        ],
+        "nanoseconds": 123103250
+      },
+      "nativecall": {
+        "bytes": 2097152,
+        "count": 20,
+        "samples_ns": [
+          4099375,
+          4193792,
+          3860959
+        ],
+        "nanoseconds": 4099375
+      },
+      "previous22": {
+        "bytes": 2097152,
+        "count": 20,
+        "samples_ns": [
+          124600834,
+          122202416,
+          123730375
+        ],
+        "nanoseconds": 123730375
+      },
+      "speedup": 30.029760634243026,
+      "previous_speedup": 30.182741271535296
+    },
+    "malloc-free-64": {
+      "original": {
+        "bytes": 64,
+        "count": 20000,
+        "samples_ns": [
+          1414746292,
+          1389621834,
+          1395845625
+        ],
+        "nanoseconds": 1395845625
+      },
+      "nativecall": {
+        "bytes": 64,
+        "count": 20000,
+        "samples_ns": [
+          1376809333,
+          1404867416,
+          1404641375
+        ],
+        "nanoseconds": 1404641375
+      },
+      "previous22": {
+        "bytes": 64,
+        "count": 20000,
+        "samples_ns": [
+          1379851375,
+          1400662417,
+          1378396583
+        ],
+        "nanoseconds": 1379851375
+      },
+      "speedup": 0.9937380813661423,
+      "previous_speedup": 0.9823513670882719
+    }
+  },
+  "previous22_guest_code_sha256": "050693bde89c9fe732e59e51bb947272dd51916d9ea87b7e685d8a40b98230d4",
+  "jemalloc_experiment": {
+    "method": "Only the fixture enables the original current-thread cache using pinned je_mallctl. All three variants share this setting. Production cache policy is unchanged.",
+    "cache_enabled_samples_ns": {
+      "original": [
+        38900125,
+        38494083,
+        39252084
+      ],
+      "nativecall": [
+        38800250,
+        38347875,
+        39739208
+      ],
+      "jemalloc": [
+        49040708,
+        47441542,
+        49903792
+      ]
+    },
+    "median_ns": {
+      "original": 38900125,
+      "nativecall": 38800250,
+      "jemalloc": 49040708
+    },
+    "overhead_vs_original_cache_blocks": 0.2639276293322852,
+    "successful_native_operations": {
+      "11": 117,
+      "12": 1662
+    }
+  },
+  "validation": {
+    "accel_unit_tests": 26,
+    "native_unit_tests_macos": 7,
+    "native_unit_tests_linux_gcc": 7,
+    "ffi_unit_tests": 21,
+    "project_layout_tests": 3,
+    "clippy": "passed for accel/native all targets with warnings denied",
+    "ios_rust": "release compile and source-checked stage passed",
+    "ios_app": "unsigned iphoneos Release build passed",
+    "numeric": "Exact bits/end/errno/status differential against pinned original: 28 edge tokens across all four rounding modes; 256 varied decimal/exponent tokens, integer bases and boundaries; page-crossing and guard-page input",
+    "boundaries": "verified at integration"
+  },
+  "limitations": [
+    "Microbenchmarks are not Android UI speedups or physical iPad measurements.",
+    "Mac hardware execution retains its original Bionic; this variant targets the interpreter embedding.",
+    "Nonzero guest FPCR and numeric input/pattern/set budgets beyond supported bounded paths retain original guest implementations.",
+    "The optional jemalloc experiment only lowers selected cache-hit blocks; it does not lower full arena allocation or enable thread caches.",
+    "Three alternating rounds are medians; small unchanged paths retain measurement variation."
+  ],
+  "runtime_revision": "7d904c9449d97358e8a25117c054339cd7c29bab",
+  "runtime_commit": "7d904c9449d97358e8a25117c054339cd7c29bab"
+}
