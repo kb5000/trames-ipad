@@ -12,5 +12,6 @@ apps/ios/build/
 
 /apps/ios/Trames/GuestMusl/
 /apps/ios/Trames/GuestBionic/
+/apps/ios/Trames/GuestGlibc/
 /apps/ios/Trames/GuestVulkan/
 /apps/ios/Trames/GuestVideo/

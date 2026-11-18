@@ -38,6 +38,7 @@ pub struct Options {
     pub debian_setup: Option<DebianSetup>,
     pub musl_libc: Option<PathBuf>,
     pub bionic_bundle: Option<PathBuf>,
+    pub glibc_bundle: Option<PathBuf>,
     pub volume_total: u64,
     pub volume_available: u64,
     #[serde(default = "default_rows")]
@@ -878,6 +879,12 @@ fn run(
         trames_distro::android::prepare(&mut vfs)
             .map_err(|e| format!("prepare Android boot: {e}"))?;
         crate::android_boot::interpreter_timeouts(&mut vfs)?;
+    }
+    if !android {
+        if let Some(bundle) = &options.glibc_bundle {
+            trames_distro::glibc::install_if_supported(bundle, &mut vfs, options.pure_accelerator)
+                .map_err(|e| format!("prepare Debian glibc: {e}"))?;
+        }
     }
     if options.distro == "alpine" {
         if let Some(libc) = &options.musl_libc {

@@ -190,7 +190,7 @@ static void extended_suite(void) {
     for (unsigned i = 0; i < sizeof(integers) / sizeof(*integers); ++i) {
         const char *s = integers[i]; char *end;
         for (unsigned j = 0; j < sizeof(bases) / sizeof(*bases); ++j) {
-#define INTEGER(function) do { errno = 123; uint64_t value = (uint64_t)p_##function(s, &end, bases[j]); mix(value); mix((uintptr_t)(end - s)); mix((unsigned)errno); } while (0)
+#define INTEGER(function) do { errno = 123; end=(char *)s; uint64_t value = (uint64_t)p_##function(s, &end, bases[j]); mix(value); mix((uintptr_t)(end - s)); mix((unsigned)errno); } while (0)
             INTEGER(strtol); INTEGER(strtoll); INTEGER(strtoul); INTEGER(strtoull); INTEGER(strtoimax); INTEGER(strtoumax);
         }
         errno = 123; mix((uint32_t)p_atoi(s)); mix((unsigned)errno);
@@ -398,6 +398,9 @@ int main(int argc, char **argv) {
 #ifdef __ANDROID__
 #define LIBC_NAME "Bionic"
 #define EXTRA_CHECKS "original FORTIFY, "
+#elif defined(__GLIBC__)
+#define LIBC_NAME "glibc"
+#define EXTRA_CHECKS ""
 #else
 #define LIBC_NAME "musl"
 #define EXTRA_CHECKS ""

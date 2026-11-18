@@ -32,7 +32,7 @@ public struct AndroidImageDownload: Decodable, Sendable {
 public final class LocalSession: @unchecked Sendable {
     private let lock = NSLock()
     private var handle: UInt64
-    public init(store: URL, rootfs: URL?, total: UInt64, available: UInt64, network: String = "host", useVolumeBudget: Bool = false, muslLibc: URL? = nil, bionicBundle: URL? = nil, pureAccelerator: Bool = false, vulkanICD: URL? = nil, memoryBudgetMiB: Int = 1024, processMemoryBudgetMiB: Int = 512, multipleTerminals: Bool = false, initiallyPaused: Bool = false, storeOwnerLock: URL? = nil, distribution: String = "alpine", initMode: String = "shell", command: [String]? = nil, debianPackages: String? = nil, prepareSystemd: Bool = false, target: String = "linux", environmentConfig: URL? = nil, environmentGrants: URL? = nil) throws {
+    public init(store: URL, rootfs: URL?, total: UInt64, available: UInt64, network: String = "host", useVolumeBudget: Bool = false, muslLibc: URL? = nil, bionicBundle: URL? = nil, glibcBundle: URL? = nil, pureAccelerator: Bool = false, vulkanICD: URL? = nil, memoryBudgetMiB: Int = 1024, processMemoryBudgetMiB: Int = 512, multipleTerminals: Bool = false, initiallyPaused: Bool = false, storeOwnerLock: URL? = nil, distribution: String = "alpine", initMode: String = "shell", command: [String]? = nil, debianPackages: String? = nil, prepareSystemd: Bool = false, target: String = "linux", environmentConfig: URL? = nil, environmentGrants: URL? = nil) throws {
         guard memoryBudgetMiB > 0, processMemoryBudgetMiB > 0,
               processMemoryBudgetMiB <= memoryBudgetMiB,
               memoryBudgetMiB <= (1 << 28) else { throw TramesError.message("Invalid guest memory budget") }
@@ -46,6 +46,7 @@ public final class LocalSession: @unchecked Sendable {
         if let debianPackages { options["debian_setup"] = ["packages":debianPackages,"systemd":prepareSystemd] }
         if let muslLibc { options["musl_libc"] = muslLibc.path }
         if let bionicBundle { options["bionic_bundle"] = bionicBundle.path }
+        if let glibcBundle {options["glibc_bundle"] = glibcBundle.path}
         options["memory_budget_bytes"] = UInt64(memoryBudgetMiB) << 20
         options["process_memory_budget_bytes"] = UInt64(processMemoryBudgetMiB) << 20
         options["pure_accelerator"] = pureAccelerator

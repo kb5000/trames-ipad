@@ -110,6 +110,21 @@ def check_bionic(directory):
             raise ValueError('Stale Android Bionic adapter; run scripts/build-bionic-hybrid.py')
 
 
+def check_glibc(directory):
+    manifest=json.loads((directory/'manifest.json').read_text());builder=module('build-glibc-hybrid')
+    if (manifest.get('kind')!='glibc-static' or manifest.get('version')!=builder.VERSION
+            or manifest.get('original_sha256')!=builder.ORIGINAL_SHA256
+            or manifest.get('loader_sha256')!=builder.LOADER_SHA256
+            or manifest.get('glibc_profile')!=65546):
+        raise ValueError('Unpaired Debian glibc adapter')
+    tail=(directory/'glibc-nativecall.bin').read_bytes()
+    if len(tail)!=manifest['added_file_bytes'] or hashlib.sha256(tail).hexdigest()!=manifest['tail_sha256']:
+        raise ValueError('Debian glibc code differs from its manifest')
+    for path,expected in manifest['inputs_sha256'].items():
+        if hashlib.sha256((ROOT/path).read_bytes()).hexdigest()!=expected:
+            raise ValueError('Stale Debian glibc adapter; run scripts/build-glibc-hybrid.py')
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('directory', type=Path, nargs='?',
@@ -117,6 +132,7 @@ if __name__ == '__main__':
     parser.add_argument('--rust-dir', type=Path, help='also verify the staged native Rust archive')
     parser.add_argument('--video-dir', type=Path, help='also verify paired VA-API/FFmpeg resources')
     parser.add_argument('--bionic-dir', type=Path, help='also verify the static Android libc adapter')
+    parser.add_argument('--glibc-dir',type=Path,help='also verify the pinned Debian libc adapter')
     args = parser.parse_args()
     try:
         check(args.directory.resolve())
@@ -126,5 +142,7 @@ if __name__ == '__main__':
             check_video(args.video_dir.resolve())
         if args.bionic_dir:
             check_bionic(args.bionic_dir.resolve())
+        if args.glibc_dir:
+            check_glibc(args.glibc_dir.resolve())
     except (OSError, ValueError, KeyError) as error:
         parser.exit(1, str(error) + '\n')

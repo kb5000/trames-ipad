@@ -21,6 +21,9 @@ cp target/musl-hybrid/libc.so target/musl-hybrid/manifest.json target/musl-hybri
 python3 scripts/build-bionic-hybrid.py
 mkdir -p apps/ios/Trames/GuestBionic
 cp target/bionic-hybrid/manifest.json target/bionic-hybrid/bionic-nativecall.bin target/bionic-hybrid/GPL-3.0.txt apps/ios/Trames/GuestBionic/
+python3 scripts/build-glibc-hybrid.py
+mkdir -p apps/ios/Trames/GuestGlibc
+cp target/glibc-hybrid/bundle/manifest.json target/glibc-hybrid/bundle/glibc-nativecall.bin target/glibc-hybrid/bundle/GPL-3.0.txt apps/ios/Trames/GuestGlibc/
 [[ -f target/vulkan-guest/libtrames_vulkan_icd.so && -f target/vulkan-guest/manifest.json ]]
 python3 scripts/check-guest-vulkan.py
 mkdir -p apps/ios/Trames/GuestVulkan

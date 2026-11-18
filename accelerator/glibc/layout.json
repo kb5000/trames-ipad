@@ -1,0 +1,768 @@
+{
+  "schema": 1,
+  "version": "2.41-12+deb13u4",
+  "original_sha256": "70fa4c4cf57eabeb96097cce47582d02379c4cd1de3db3e98ade4dd7089a1b13",
+  "loader_sha256": "1b882eddacd494b060413a8aa4f0a4754ee3f84775e68cecbf8a86092b59cca6",
+  "original_size": 1716616,
+  "build_id": "5f3926d9963ff284b8173bf3601bbb00c3abad16",
+  "debug_sha256": "3cf853fd9227eb5d218d6f056164f90d8aac157c11821d0677e54c01ac04d1f6",
+  "program_headers": [
+    [
+      6,
+      4,
+      64,
+      64,
+      64,
+      728,
+      728,
+      8
+    ],
+    [
+      3,
+      4,
+      1685536,
+      1685536,
+      1685536,
+      27,
+      27,
+      8
+    ],
+    [
+      1,
+      5,
+      0,
+      0,
+      0,
+      1685563,
+      1685563,
+      65536
+    ],
+    [
+      1,
+      6,
+      1691776,
+      1757312,
+      1757312,
+      17816,
+      69520,
+      65536
+    ],
+    [
+      2,
+      6,
+      1702536,
+      1768072,
+      1768072,
+      528,
+      528,
+      8
+    ],
+    [
+      4,
+      4,
+      792,
+      792,
+      792,
+      32,
+      32,
+      8
+    ],
+    [
+      4,
+      4,
+      824,
+      824,
+      824,
+      36,
+      36,
+      4
+    ],
+    [
+      4,
+      4,
+      1685504,
+      1685504,
+      1685504,
+      32,
+      32,
+      4
+    ],
+    [
+      7,
+      4,
+      1691776,
+      1757312,
+      1757312,
+      40,
+      152,
+      16
+    ],
+    [
+      1685382483,
+      4,
+      792,
+      792,
+      792,
+      32,
+      32,
+      8
+    ],
+    [
+      1685382480,
+      4,
+      1479288,
+      1479288,
+      1479288,
+      27964,
+      27964,
+      4
+    ],
+    [
+      1685382481,
+      6,
+      0,
+      0,
+      0,
+      0,
+      0,
+      16
+    ],
+    [
+      1685382482,
+      4,
+      1691776,
+      1757312,
+      1757312,
+      12160,
+      12160,
+      1
+    ]
+  ],
+  "functions": {
+    "memcpy": {
+      "entry": 639392,
+      "site": 639396,
+      "offset": 639396,
+      "original": "800800f0004047f901004239",
+      "ifunc": true,
+      "fallback": 668480,
+      "wrapper": "memcpy"
+    },
+    "memmove": {
+      "entry": 641344,
+      "site": 641348,
+      "offset": 641348,
+      "original": "800800f0004047f901004239",
+      "ifunc": true,
+      "fallback": 668800,
+      "wrapper": "memmove"
+    },
+    "memset": {
+      "entry": 641728,
+      "site": 641732,
+      "offset": 641732,
+      "original": "800800f0004047f901004239",
+      "ifunc": true,
+      "fallback": 671040,
+      "wrapper": "memset"
+    },
+    "memcmp": {
+      "entry": 638912,
+      "site": 638916,
+      "offset": 638916,
+      "original": "5f4000f1",
+      "ifunc": false,
+      "fallback": 638916,
+      "wrapper": "memcmp"
+    },
+    "strlen": {
+      "entry": 653440,
+      "site": 653444,
+      "offset": 653444,
+      "original": "82080090424047f9210000b0",
+      "ifunc": true,
+      "fallback": 672704,
+      "wrapper": "strlen"
+    },
+    "memchr": {
+      "entry": 638848,
+      "site": 638852,
+      "offset": 638852,
+      "original": "a1080090214047f9200000f0",
+      "ifunc": true,
+      "fallback": 667072,
+      "wrapper": "memchr"
+    },
+    "memrchr": {
+      "entry": 641536,
+      "site": 641540,
+      "offset": 641540,
+      "original": "0800028b",
+      "ifunc": false,
+      "fallback": 641540,
+      "wrapper": "memrchr"
+    },
+    "strnlen": {
+      "entry": 654656,
+      "site": 654660,
+      "offset": 654660,
+      "original": "02ec7c92",
+      "ifunc": false,
+      "fallback": 654660,
+      "wrapper": "strnlen"
+    },
+    "strcmp": {
+      "entry": 645760,
+      "site": 645764,
+      "offset": 645764,
+      "original": "2a0000cb",
+      "ifunc": false,
+      "fallback": 645764,
+      "wrapper": "strcmp"
+    },
+    "strncmp": {
+      "entry": 653860,
+      "site": 653864,
+      "offset": 653864,
+      "original": "a20e00b4",
+      "ifunc": false,
+      "fallback": 653864,
+      "wrapper": "strncmp"
+    },
+    "strchr": {
+      "entry": 645376,
+      "site": 645380,
+      "offset": 645380,
+      "original": "02ec7c92",
+      "ifunc": false,
+      "fallback": 645380,
+      "wrapper": "strchr"
+    },
+    "strrchr": {
+      "entry": 654912,
+      "site": 654916,
+      "offset": 654916,
+      "original": "02ec7c92",
+      "ifunc": false,
+      "fallback": 654916,
+      "wrapper": "strrchr"
+    },
+    "strchrnul": {
+      "entry": 645568,
+      "site": 645572,
+      "offset": 645572,
+      "original": "02ec7c92",
+      "ifunc": false,
+      "fallback": 645572,
+      "wrapper": "strchrnul"
+    },
+    "strcpy": {
+      "entry": 649792,
+      "site": 649796,
+      "offset": 649796,
+      "original": "22ec7c92",
+      "ifunc": false,
+      "fallback": 649796,
+      "wrapper": "strcpy"
+    },
+    "stpcpy": {
+      "entry": 642240,
+      "site": 642244,
+      "offset": 642244,
+      "original": "22ec7c92",
+      "ifunc": false,
+      "fallback": 642244,
+      "wrapper": "stpcpy"
+    },
+    "strncpy": {
+      "entry": 654368,
+      "site": 654368,
+      "offset": 654368,
+      "original": "3f2303d5",
+      "ifunc": false,
+      "fallback": 654368,
+      "wrapper": "strncpy"
+    },
+    "stpncpy": {
+      "entry": 642592,
+      "site": 642592,
+      "offset": 642592,
+      "original": "3f2303d5",
+      "ifunc": false,
+      "fallback": 642592,
+      "wrapper": "stpncpy"
+    },
+    "strcat": {
+      "entry": 645280,
+      "site": 645280,
+      "offset": 645280,
+      "original": "3f2303d5",
+      "ifunc": false,
+      "fallback": 645280,
+      "wrapper": "strcat"
+    },
+    "strncat": {
+      "entry": 653728,
+      "site": 653728,
+      "offset": 653728,
+      "original": "3f2303d5",
+      "ifunc": false,
+      "fallback": 653728,
+      "wrapper": "strncat"
+    },
+    "mempcpy": {
+      "entry": 641472,
+      "site": 641472,
+      "offset": 641472,
+      "original": "3f2303d5",
+      "ifunc": false,
+      "fallback": 641472,
+      "wrapper": "mempcpy"
+    },
+    "strlcpy": {
+      "entry": 653312,
+      "site": 653312,
+      "offset": 653312,
+      "original": "3f2303d5",
+      "ifunc": false,
+      "fallback": 653312,
+      "wrapper": "strlcpy"
+    },
+    "strlcat": {
+      "entry": 653152,
+      "site": 653152,
+      "offset": 653152,
+      "original": "3f2303d5",
+      "ifunc": false,
+      "fallback": 653152,
+      "wrapper": "strlcat"
+    },
+    "memmem": {
+      "entry": 640640,
+      "site": 640640,
+      "offset": 640640,
+      "original": "3f2303d5",
+      "ifunc": false,
+      "fallback": 640640,
+      "wrapper": "memmem"
+    },
+    "strstr": {
+      "entry": 657188,
+      "site": 657188,
+      "offset": 657188,
+      "original": "3f2303d5",
+      "ifunc": false,
+      "fallback": 657188,
+      "wrapper": "strstr"
+    },
+    "strcasestr": {
+      "entry": 644256,
+      "site": 644256,
+      "offset": 644256,
+      "original": "3f2303d5",
+      "ifunc": false,
+      "fallback": 644256,
+      "wrapper": "strcasestr"
+    },
+    "strspn": {
+      "entry": 655648,
+      "site": 655648,
+      "offset": 655648,
+      "original": "3f2303d5",
+      "ifunc": false,
+      "fallback": 655648,
+      "wrapper": "strspn"
+    },
+    "strcspn": {
+      "entry": 650112,
+      "site": 650112,
+      "offset": 650112,
+      "original": "3f2303d5",
+      "ifunc": false,
+      "fallback": 650112,
+      "wrapper": "strcspn"
+    },
+    "strpbrk": {
+      "entry": 654848,
+      "site": 654848,
+      "offset": 654848,
+      "original": "3f2303d5",
+      "ifunc": false,
+      "fallback": 654848,
+      "wrapper": "strpbrk"
+    },
+    "strcasecmp": {
+      "entry": 642720,
+      "site": 642724,
+      "offset": 642724,
+      "original": "e70300aa",
+      "ifunc": false,
+      "fallback": 642724,
+      "wrapper": "strcasecmp"
+    },
+    "strncasecmp": {
+      "entry": 653504,
+      "site": 653508,
+      "offset": 653508,
+      "original": "5f0000f1",
+      "ifunc": false,
+      "fallback": 653508,
+      "wrapper": "strncasecmp"
+    },
+    "strsep": {
+      "entry": 655200,
+      "site": 655200,
+      "offset": 655200,
+      "original": "3f2303d5",
+      "ifunc": false,
+      "fallback": 655200,
+      "wrapper": "strsep"
+    },
+    "strtok_r": {
+      "entry": 658048,
+      "site": 658048,
+      "offset": 658048,
+      "original": "3f2303d5",
+      "ifunc": false,
+      "fallback": 658048,
+      "wrapper": "strtok_r"
+    },
+    "strtol": {
+      "entry": 284448,
+      "site": 284452,
+      "offset": 284452,
+      "original": "450b00d0",
+      "ifunc": false,
+      "fallback": 284452,
+      "wrapper": "strtol"
+    },
+    "strtoll": {
+      "entry": 284448,
+      "site": 284452,
+      "offset": 284452,
+      "original": "450b00d0",
+      "ifunc": false,
+      "fallback": 284452,
+      "wrapper": "strtol"
+    },
+    "strtoul": {
+      "entry": 296896,
+      "site": 296900,
+      "offset": 296900,
+      "original": "250b00f0",
+      "ifunc": false,
+      "fallback": 296900,
+      "wrapper": "strtoul"
+    },
+    "strtoull": {
+      "entry": 296896,
+      "site": 296900,
+      "offset": 296900,
+      "original": "250b00f0",
+      "ifunc": false,
+      "fallback": 296900,
+      "wrapper": "strtoul"
+    },
+    "strtoimax": {
+      "entry": 284448,
+      "site": 284452,
+      "offset": 284452,
+      "original": "450b00d0",
+      "ifunc": false,
+      "fallback": 284452,
+      "wrapper": "strtol"
+    },
+    "strtoumax": {
+      "entry": 296896,
+      "site": 296900,
+      "offset": 296900,
+      "original": "250b00f0",
+      "ifunc": false,
+      "fallback": 296900,
+      "wrapper": "strtoul"
+    },
+    "atoi": {
+      "entry": 229792,
+      "site": 229792,
+      "offset": 229792,
+      "original": "3f2303d5",
+      "ifunc": false,
+      "fallback": 229792,
+      "wrapper": "atoi"
+    },
+    "atol": {
+      "entry": 229856,
+      "site": 229860,
+      "offset": 229860,
+      "original": "42018052",
+      "ifunc": false,
+      "fallback": 229860,
+      "wrapper": "atol"
+    },
+    "atoll": {
+      "entry": 229888,
+      "site": 229892,
+      "offset": 229892,
+      "original": "42018052",
+      "ifunc": false,
+      "fallback": 229892,
+      "wrapper": "atoll"
+    },
+    "strtod": {
+      "entry": 264128,
+      "site": 264132,
+      "offset": 264132,
+      "original": "630b00f0",
+      "ifunc": false,
+      "fallback": 264132,
+      "wrapper": "strtod"
+    },
+    "strtof": {
+      "entry": 274240,
+      "site": 274244,
+      "offset": 274244,
+      "original": "630b00b0",
+      "ifunc": false,
+      "fallback": 274244,
+      "wrapper": "strtof"
+    },
+    "atof": {
+      "entry": 229760,
+      "site": 229764,
+      "offset": 229764,
+      "original": "010080d2",
+      "ifunc": false,
+      "fallback": 229764,
+      "wrapper": "atof"
+    },
+    "strcasecmp_l": {
+      "entry": 642816,
+      "site": 642820,
+      "offset": 642820,
+      "original": "e70300aa",
+      "ifunc": false,
+      "fallback": 642820,
+      "wrapper": "strcasecmp_l"
+    },
+    "strncasecmp_l": {
+      "entry": 653632,
+      "site": 653636,
+      "offset": 653636,
+      "original": "5f0000f1",
+      "ifunc": false,
+      "fallback": 653636,
+      "wrapper": "strncasecmp_l"
+    },
+    "strtol_l": {
+      "entry": 285868,
+      "site": 285872,
+      "offset": 285872,
+      "original": "e50303aa",
+      "ifunc": false,
+      "fallback": 285872,
+      "wrapper": "strtol_l"
+    },
+    "strtoll_l": {
+      "entry": 285868,
+      "site": 285872,
+      "offset": 285872,
+      "original": "e50303aa",
+      "ifunc": false,
+      "fallback": 285872,
+      "wrapper": "strtol_l"
+    },
+    "strtoul_l": {
+      "entry": 298176,
+      "site": 298180,
+      "offset": 298180,
+      "original": "e50303aa",
+      "ifunc": false,
+      "fallback": 298180,
+      "wrapper": "strtoul_l"
+    },
+    "strtoull_l": {
+      "entry": 298176,
+      "site": 298180,
+      "offset": 298180,
+      "original": "e50303aa",
+      "ifunc": false,
+      "fallback": 298180,
+      "wrapper": "strtoul_l"
+    },
+    "strtod_l": {
+      "entry": 273832,
+      "site": 273836,
+      "offset": 273836,
+      "original": "e30302aa",
+      "ifunc": false,
+      "fallback": 273836,
+      "wrapper": "strtod_l"
+    },
+    "strtof_l": {
+      "entry": 284040,
+      "site": 284044,
+      "offset": 284044,
+      "original": "e30302aa",
+      "ifunc": false,
+      "fallback": 284044,
+      "wrapper": "strtof_l"
+    },
+    "__isoc23_strtol": {
+      "entry": 284480,
+      "site": 284484,
+      "offset": 284484,
+      "original": "450b00d0",
+      "ifunc": false,
+      "fallback": 284484,
+      "wrapper": "__isoc23_strtol"
+    },
+    "__isoc23_strtoll": {
+      "entry": 284480,
+      "site": 284484,
+      "offset": 284484,
+      "original": "450b00d0",
+      "ifunc": false,
+      "fallback": 284484,
+      "wrapper": "__isoc23_strtol"
+    },
+    "__isoc23_strtoul": {
+      "entry": 296928,
+      "site": 296932,
+      "offset": 296932,
+      "original": "250b00f0",
+      "ifunc": false,
+      "fallback": 296932,
+      "wrapper": "__isoc23_strtoul"
+    },
+    "__isoc23_strtoull": {
+      "entry": 296928,
+      "site": 296932,
+      "offset": 296932,
+      "original": "250b00f0",
+      "ifunc": false,
+      "fallback": 296932,
+      "wrapper": "__isoc23_strtoul"
+    },
+    "__isoc23_strtoimax": {
+      "entry": 284480,
+      "site": 284484,
+      "offset": 284484,
+      "original": "450b00d0",
+      "ifunc": false,
+      "fallback": 284484,
+      "wrapper": "__isoc23_strtol"
+    },
+    "__isoc23_strtoumax": {
+      "entry": 296928,
+      "site": 296932,
+      "offset": 296932,
+      "original": "250b00f0",
+      "ifunc": false,
+      "fallback": 296932,
+      "wrapper": "__isoc23_strtoul"
+    },
+    "__isoc23_strtol_l": {
+      "entry": 285888,
+      "site": 285892,
+      "offset": 285892,
+      "original": "e50303aa",
+      "ifunc": false,
+      "fallback": 285892,
+      "wrapper": "__isoc23_strtol_l"
+    },
+    "__isoc23_strtoll_l": {
+      "entry": 285888,
+      "site": 285892,
+      "offset": 285892,
+      "original": "e50303aa",
+      "ifunc": false,
+      "fallback": 285892,
+      "wrapper": "__isoc23_strtol_l"
+    },
+    "__isoc23_strtoul_l": {
+      "entry": 298208,
+      "site": 298212,
+      "offset": 298212,
+      "original": "e50303aa",
+      "ifunc": false,
+      "fallback": 298212,
+      "wrapper": "__isoc23_strtoul_l"
+    },
+    "__isoc23_strtoull_l": {
+      "entry": 298208,
+      "site": 298212,
+      "offset": 298212,
+      "original": "e50303aa",
+      "ifunc": false,
+      "fallback": 298212,
+      "wrapper": "__isoc23_strtoul_l"
+    },
+    "__strtol_internal": {
+      "entry": 284416,
+      "site": 284420,
+      "offset": 284420,
+      "original": "450b00d0",
+      "ifunc": false,
+      "fallback": 284420,
+      "wrapper": "__strtol_internal"
+    },
+    "__strtoll_internal": {
+      "entry": 284416,
+      "site": 284420,
+      "offset": 284420,
+      "original": "450b00d0",
+      "ifunc": false,
+      "fallback": 284420,
+      "wrapper": "__strtol_internal"
+    },
+    "__strtoul_internal": {
+      "entry": 296864,
+      "site": 296868,
+      "offset": 296868,
+      "original": "250b00f0",
+      "ifunc": false,
+      "fallback": 296868,
+      "wrapper": "__strtoul_internal"
+    },
+    "__strtoull_internal": {
+      "entry": 296864,
+      "site": 296868,
+      "offset": 296868,
+      "original": "250b00f0",
+      "ifunc": false,
+      "fallback": 296868,
+      "wrapper": "__strtoul_internal"
+    },
+    "__strtod_internal": {
+      "entry": 264096,
+      "site": 264100,
+      "offset": 264100,
+      "original": "630b00f0",
+      "ifunc": false,
+      "fallback": 264100,
+      "wrapper": "__strtod_internal"
+    },
+    "__strtof_internal": {
+      "entry": 274208,
+      "site": 274212,
+      "offset": 274212,
+      "original": "630b00b0",
+      "ifunc": false,
+      "fallback": 274212,
+      "wrapper": "__strtof_internal"
+    }
+  },
+  "references": {
+    "trames_errno_location": 140928,
+    "trames_ctype_tolower_loc": 196064,
+    "trames_uselocale": 193472,
+    "trames_C_tolower": 1346912,
+    "trames_global_locale": 1774400
+  },
+  "upstream": {
+    "libc_package_sha256": "8784eda966b189c777a384dac5ce009e8fc9b52d006926c5a013e7fa8aa688cc",
+    "debug_package_sha256": "baddf9f4195707f5cf74b32da8b215d4fc808d5a4825c2c0e72d8168e7434143",
+    "source_sha256": "f24aa441021121a79266f0d75242706cab8843a47901fefe74527491807f1998",
+    "debian_patch_sha256": "dda4153511bfd543502d18e5bc9323110996fe9c531f14ae3fad6eb17f027c7d"
+  }
+}

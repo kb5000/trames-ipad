@@ -1,0 +1,1238 @@
+{
+  "date": "2026-11-18",
+  "scope": "Pinned Debian 13 glibc 2.41-12+deb13u4, 44 primary functions and 68 GNU aliases; shared worker memory and existing pure transport. No device operation.",
+  "base": {
+    "ipad": "673d294fedb9d9e64bc804603074c68193c9c53c",
+    "runtime": "f4fda7aaec91c57c2fb56ceed638728ffade8b19"
+  },
+  "pair": {
+    "version": "2.41-12+deb13u4",
+    "original_sha256": "70fa4c4cf57eabeb96097cce47582d02379c4cd1de3db3e98ade4dd7089a1b13",
+    "loader_sha256": "1b882eddacd494b060413a8aa4f0a4754ee3f84775e68cecbf8a86092b59cca6",
+    "build_id": "5f3926d9963ff284b8173bf3601bbb00c3abad16",
+    "native_profile": 65537,
+    "glibc_profile": 65546,
+    "functions": [
+      "memcpy",
+      "memmove",
+      "memset",
+      "memcmp",
+      "strlen",
+      "memchr",
+      "memrchr",
+      "strnlen",
+      "strcmp",
+      "strncmp",
+      "strchr",
+      "strrchr",
+      "strchrnul",
+      "strcpy",
+      "stpcpy",
+      "strncpy",
+      "stpncpy",
+      "strcat",
+      "strncat",
+      "mempcpy",
+      "strlcpy",
+      "strlcat",
+      "memmem",
+      "strstr",
+      "strcasestr",
+      "strspn",
+      "strcspn",
+      "strpbrk",
+      "strcasecmp",
+      "strncasecmp",
+      "strsep",
+      "strtok_r",
+      "strtol",
+      "strtoll",
+      "strtoul",
+      "strtoull",
+      "strtoimax",
+      "strtoumax",
+      "atoi",
+      "atol",
+      "atoll",
+      "strtod",
+      "strtof",
+      "atof",
+      "strcasecmp_l",
+      "strncasecmp_l",
+      "strtol_l",
+      "strtoll_l",
+      "strtoul_l",
+      "strtoull_l",
+      "strtod_l",
+      "strtof_l",
+      "__isoc23_strtol",
+      "__isoc23_strtoll",
+      "__isoc23_strtoul",
+      "__isoc23_strtoull",
+      "__isoc23_strtoimax",
+      "__isoc23_strtoumax",
+      "__isoc23_strtol_l",
+      "__isoc23_strtoll_l",
+      "__isoc23_strtoul_l",
+      "__isoc23_strtoull_l",
+      "__strtol_internal",
+      "__strtoll_internal",
+      "__strtoul_internal",
+      "__strtoull_internal",
+      "__strtod_internal",
+      "__strtof_internal"
+    ],
+    "added_code_bytes": 14768,
+    "added_file_bytes": 19256,
+    "tail_sha256": "563f2b74acec2f0b45f78897c3fe227bbf06b4045da73da00fccf82ebf98c7ee",
+    "inputs_sha256": {
+      "scripts/build-glibc-hybrid.py": "f718a24f2f7c7832c31c021bfde168e6675aba19ed775736bf36445791d0c27c",
+      "scripts/build-bionic-hybrid.py": "ed5cee3b9b6fd860c7ea10ab437f5895daba55fd3e19036ed962b4abfb717d1a",
+      "accelerator/glibc/layout.json": "b82e8b42837b7362c3f3bc4f6425d2f2bdbc9917eaa14f9094d02edd4999a52a",
+      "accelerator/glibc/glibc.c": "167ccbf0dd3a093edf7df673ae99ad6817559aae6c88e0b840fde370857ec181",
+      "accelerator/glibc/calls.S": "267d67d7a85d8a96437fc7d0be0e764243f5c5dca30dfc782467cc10f0d61532",
+      "accelerator/guest/calls.S": "0914eb2bfdbfcf221ef3031358777809ff9d5b2ec3241c079a21eaf696eb9d29"
+    },
+    "upstream": {
+      "libc_package_sha256": "8784eda966b189c777a384dac5ce009e8fc9b52d006926c5a013e7fa8aa688cc",
+      "debug_package_sha256": "baddf9f4195707f5cf74b32da8b215d4fc808d5a4825c2c0e72d8168e7434143",
+      "source_sha256": "f24aa441021121a79266f0d75242706cab8843a47901fefe74527491807f1998",
+      "debian_patch_sha256": "dda4153511bfd543502d18e5bc9323110996fe9c531f14ae3fad6eb17f027c7d"
+    }
+  },
+  "checks": {
+    "runtime_unit_tests": {
+      "accel": 28,
+      "distro": 37,
+      "native": 10,
+      "hosts": [
+        "macOS ARM64",
+        "Linux ARM64"
+      ]
+    },
+    "frontend_unit_tests": 21,
+    "linux_lint_and_cli": "passed",
+    "mac_frontend_clippy": "passed",
+    "rustfmt": "passed; also normalized preexisting whitespace in three shared memory/search files",
+    "bionic_regression": "passed, including original/derived/restore, numeric ABI, guest allocator/thread/fork and cold partial recovery",
+    "ios_rust": "Release aarch64-apple-ios compiled with source-checked existing MoltenVK",
+    "ios_app": "unsigned Release build passed, embedded GuestGlibc and GNU notice match final resources",
+    "ios_install": "not performed; iPad not contacted",
+    "unchanged_acceptance": "Broad CPU/Linux/network/graphics acceptance reused; no coordinator, CPU execution, syscall or GPU implementation changed"
+  },
+  "differential": {
+    "lines": 7338,
+    "common_checks": 4351727,
+    "random_decimal_pairs": 4096,
+    "rounding_modes": 4,
+    "fields": [
+      "value bits",
+      "end pointer",
+      "errno",
+      "FP exception flags"
+    ],
+    "oracle": "same-version Debian ARM64 glibc under independent QEMU",
+    "real_locales": [
+      "C",
+      "C.UTF-8",
+      "tr_TR.ISO-8859-9",
+      "fr_FR.UTF-8"
+    ],
+    "mac_inputs": {
+      "/Users/main/dev/trames/target/glibc-hybrid/binary/usr/lib/aarch64-linux-gnu/libc.so.6": "70fa4c4cf57eabeb96097cce47582d02379c4cd1de3db3e98ade4dd7089a1b13",
+      "target/local-ci/io/glibc-hybrid/glibc-probe": "d0da0850468664cb74e880f20715d3796979ca36f484aeb57260ff4eacad40e1",
+      "/Users/main/dev/trames/target/release/trames-run": "32a4fafdcca4636eae74b63f8c7030ab78070c0b2c1d491121685200d91f2cd1",
+      "/Users/main/dev/trames/tests/integration/glibc.py": "40d16c8e05051012cade60daf67924bc690c7d5662bdd06c0dd5829dd6b57e3b",
+      "/Users/main/dev/trames/tests/fixtures/glibc.c": "581b6ef0ae811a735c8dbaf45c1cdce8d854a012ec20c3e4783b60a8a737d8e2",
+      "/Users/main/dev/trames/tests/fixtures/android-bionic.c": "69a165ce04b0f184499049a11f4c4d24a30d5de63a0e709496280a7985c3901e"
+    },
+    "linux_inputs": {
+      "/home/main.guest/trames-glibc-ci-20261118/target/glibc-hybrid/sysroot/usr/lib/aarch64-linux-gnu/libc.so.6": "70fa4c4cf57eabeb96097cce47582d02379c4cd1de3db3e98ade4dd7089a1b13",
+      "/home/main.guest/trames-glibc-ci-20261118/target/glibc-hybrid/fixtures/glibc-probe": "d0da0850468664cb74e880f20715d3796979ca36f484aeb57260ff4eacad40e1",
+      "target/trames-run": "68e0cdde76a911097c4c6ca19016a80a0cdecd03ddec277c23ee898ad534107d",
+      "/home/main.guest/trames-glibc-ci-20261118/tests/integration/glibc.py": "40d16c8e05051012cade60daf67924bc690c7d5662bdd06c0dd5829dd6b57e3b",
+      "/home/main.guest/trames-glibc-ci-20261118/tests/fixtures/glibc.c": "581b6ef0ae811a735c8dbaf45c1cdce8d854a012ec20c3e4783b60a8a737d8e2",
+      "/home/main.guest/trames-glibc-ci-20261118/tests/fixtures/android-bionic.c": "69a165ce04b0f184499049a11f4c4d24a30d5de63a0e709496280a7985c3901e"
+    },
+    "mac_cases": {
+      "original": {
+        "exit": 0,
+        "calls": 0,
+        "worker_calls": 0,
+        "glibc_operations": [
+          0,
+          0
+        ],
+        "faults": 0,
+        "rejected": 0
+      },
+      "native-1-True": {
+        "exit": 0,
+        "calls": 59748,
+        "worker_calls": 59748,
+        "glibc_operations": [
+          3741,
+          2278
+        ],
+        "faults": 0,
+        "rejected": 0
+      },
+      "native-4-True": {
+        "exit": 0,
+        "calls": 59748,
+        "worker_calls": 59748,
+        "glibc_operations": [
+          3741,
+          2278
+        ],
+        "faults": 0,
+        "rejected": 0
+      },
+      "native-4-False": {
+        "exit": 0,
+        "calls": 59748,
+        "worker_calls": 59748,
+        "glibc_operations": [
+          3741,
+          2278
+        ],
+        "faults": 0,
+        "rejected": 0
+      },
+      "idempotent": {
+        "exit": 0,
+        "calls": 51710,
+        "worker_calls": 51710,
+        "glibc_operations": [
+          10000,
+          4000
+        ],
+        "faults": 0,
+        "rejected": 0
+      },
+      "preload": {
+        "exit": 0,
+        "calls": 6,
+        "worker_calls": 6,
+        "glibc_operations": [
+          2,
+          0
+        ],
+        "faults": 0,
+        "rejected": 0
+      },
+      "variant-upgrade": {
+        "exit": 0,
+        "calls": 51710,
+        "worker_calls": 51710,
+        "glibc_operations": [
+          10000,
+          4000
+        ],
+        "faults": 0,
+        "rejected": 0
+      },
+      "variant-downgrade": {
+        "exit": 0,
+        "calls": 51710,
+        "worker_calls": 51710,
+        "glibc_operations": [
+          10000,
+          4000
+        ],
+        "faults": 0,
+        "rejected": 0
+      },
+      "corrupt-resource": {
+        "exit": 125,
+        "calls": 0,
+        "worker_calls": 0,
+        "glibc_operations": [
+          0,
+          0
+        ],
+        "faults": 0,
+        "rejected": 0
+      },
+      "after-corrupt": {
+        "exit": 0,
+        "calls": 51710,
+        "worker_calls": 51710,
+        "glibc_operations": [
+          10000,
+          4000
+        ],
+        "faults": 0,
+        "rejected": 0
+      },
+      "restored": {
+        "exit": 0,
+        "calls": 0,
+        "worker_calls": 0,
+        "glibc_operations": [
+          0,
+          0
+        ],
+        "faults": 0,
+        "rejected": 0
+      },
+      "staging-conflict": {
+        "exit": 125,
+        "calls": 0,
+        "worker_calls": 0,
+        "glibc_operations": [
+          0,
+          0
+        ],
+        "faults": 0,
+        "rejected": 0
+      },
+      "cleanup": {
+        "exit": 0,
+        "calls": 0,
+        "worker_calls": 0,
+        "glibc_operations": [
+          0,
+          0
+        ],
+        "faults": 0,
+        "rejected": 0
+      },
+      "after-conflict": {
+        "exit": 0,
+        "calls": 0,
+        "worker_calls": 0,
+        "glibc_operations": [
+          0,
+          0
+        ],
+        "faults": 0,
+        "rejected": 0
+      },
+      "unknown-libc": {
+        "exit": 125,
+        "calls": 0,
+        "worker_calls": 0,
+        "glibc_operations": [
+          0,
+          0
+        ],
+        "faults": 0,
+        "rejected": 0
+      },
+      "unknown-libc-preserved": {
+        "exit": 0,
+        "calls": 0,
+        "worker_calls": 0,
+        "glibc_operations": [
+          0,
+          0
+        ],
+        "faults": 0,
+        "rejected": 0
+      },
+      "wrong-loader": {
+        "exit": 125,
+        "calls": 0,
+        "worker_calls": 0,
+        "glibc_operations": [
+          0,
+          0
+        ],
+        "faults": 0,
+        "rejected": 0
+      },
+      "wrong-loader-preserved": {
+        "exit": 0,
+        "calls": 0,
+        "worker_calls": 0,
+        "glibc_operations": [
+          0,
+          0
+        ],
+        "faults": 0,
+        "rejected": 0
+      },
+      "bench-original-1": {
+        "exit": 0,
+        "calls": 0,
+        "worker_calls": 0,
+        "glibc_operations": [
+          0,
+          0
+        ],
+        "faults": 0,
+        "rejected": 0
+      },
+      "bench-native-1": {
+        "exit": 0,
+        "calls": 51710,
+        "worker_calls": 51710,
+        "glibc_operations": [
+          10000,
+          4000
+        ],
+        "faults": 0,
+        "rejected": 0
+      },
+      "bench-native-2": {
+        "exit": 0,
+        "calls": 51710,
+        "worker_calls": 51710,
+        "glibc_operations": [
+          10000,
+          4000
+        ],
+        "faults": 0,
+        "rejected": 0
+      },
+      "bench-original-2": {
+        "exit": 0,
+        "calls": 0,
+        "worker_calls": 0,
+        "glibc_operations": [
+          0,
+          0
+        ],
+        "faults": 0,
+        "rejected": 0
+      },
+      "bench-original-3": {
+        "exit": 0,
+        "calls": 0,
+        "worker_calls": 0,
+        "glibc_operations": [
+          0,
+          0
+        ],
+        "faults": 0,
+        "rejected": 0
+      },
+      "bench-native-3": {
+        "exit": 0,
+        "calls": 51710,
+        "worker_calls": 51710,
+        "glibc_operations": [
+          10000,
+          4000
+        ],
+        "faults": 0,
+        "rejected": 0
+      }
+    },
+    "linux_cases": {
+      "original": {
+        "exit": 0,
+        "calls": 0,
+        "worker_calls": 0,
+        "glibc_operations": [
+          0,
+          0
+        ],
+        "faults": 0,
+        "rejected": 0
+      },
+      "native-1-True": {
+        "exit": 0,
+        "calls": 59748,
+        "worker_calls": 59748,
+        "glibc_operations": [
+          3741,
+          2278
+        ],
+        "faults": 0,
+        "rejected": 0
+      },
+      "native-4-True": {
+        "exit": 0,
+        "calls": 59748,
+        "worker_calls": 59748,
+        "glibc_operations": [
+          3741,
+          2278
+        ],
+        "faults": 0,
+        "rejected": 0
+      },
+      "native-4-False": {
+        "exit": 0,
+        "calls": 59748,
+        "worker_calls": 59748,
+        "glibc_operations": [
+          3741,
+          2278
+        ],
+        "faults": 0,
+        "rejected": 0
+      },
+      "idempotent": {
+        "exit": 0,
+        "calls": 51710,
+        "worker_calls": 51710,
+        "glibc_operations": [
+          10000,
+          4000
+        ],
+        "faults": 0,
+        "rejected": 0
+      },
+      "preload": {
+        "exit": 0,
+        "calls": 6,
+        "worker_calls": 6,
+        "glibc_operations": [
+          2,
+          0
+        ],
+        "faults": 0,
+        "rejected": 0
+      },
+      "variant-upgrade": {
+        "exit": 0,
+        "calls": 51710,
+        "worker_calls": 51710,
+        "glibc_operations": [
+          10000,
+          4000
+        ],
+        "faults": 0,
+        "rejected": 0
+      },
+      "variant-downgrade": {
+        "exit": 0,
+        "calls": 51710,
+        "worker_calls": 51710,
+        "glibc_operations": [
+          10000,
+          4000
+        ],
+        "faults": 0,
+        "rejected": 0
+      },
+      "corrupt-resource": {
+        "exit": 125,
+        "calls": 0,
+        "worker_calls": 0,
+        "glibc_operations": [
+          0,
+          0
+        ],
+        "faults": 0,
+        "rejected": 0
+      },
+      "after-corrupt": {
+        "exit": 0,
+        "calls": 51710,
+        "worker_calls": 51710,
+        "glibc_operations": [
+          10000,
+          4000
+        ],
+        "faults": 0,
+        "rejected": 0
+      },
+      "restored": {
+        "exit": 0,
+        "calls": 0,
+        "worker_calls": 0,
+        "glibc_operations": [
+          0,
+          0
+        ],
+        "faults": 0,
+        "rejected": 0
+      },
+      "staging-conflict": {
+        "exit": 125,
+        "calls": 0,
+        "worker_calls": 0,
+        "glibc_operations": [
+          0,
+          0
+        ],
+        "faults": 0,
+        "rejected": 0
+      },
+      "cleanup": {
+        "exit": 0,
+        "calls": 0,
+        "worker_calls": 0,
+        "glibc_operations": [
+          0,
+          0
+        ],
+        "faults": 0,
+        "rejected": 0
+      },
+      "after-conflict": {
+        "exit": 0,
+        "calls": 0,
+        "worker_calls": 0,
+        "glibc_operations": [
+          0,
+          0
+        ],
+        "faults": 0,
+        "rejected": 0
+      },
+      "unknown-libc": {
+        "exit": 125,
+        "calls": 0,
+        "worker_calls": 0,
+        "glibc_operations": [
+          0,
+          0
+        ],
+        "faults": 0,
+        "rejected": 0
+      },
+      "unknown-libc-preserved": {
+        "exit": 0,
+        "calls": 0,
+        "worker_calls": 0,
+        "glibc_operations": [
+          0,
+          0
+        ],
+        "faults": 0,
+        "rejected": 0
+      },
+      "wrong-loader": {
+        "exit": 125,
+        "calls": 0,
+        "worker_calls": 0,
+        "glibc_operations": [
+          0,
+          0
+        ],
+        "faults": 0,
+        "rejected": 0
+      },
+      "wrong-loader-preserved": {
+        "exit": 0,
+        "calls": 0,
+        "worker_calls": 0,
+        "glibc_operations": [
+          0,
+          0
+        ],
+        "faults": 0,
+        "rejected": 0
+      }
+    },
+    "bionic_cases": {
+      "original": 0,
+      "allocator-original-info": 0,
+      "allocator-original-cache-info": 0,
+      "nativecall": 0,
+      "allocator-native-info": 0,
+      "allocator-native-cache-info": 0,
+      "allocator-original-cache-stress": 0,
+      "allocator-native-cache-stress": 0,
+      "allocator-original-cache-bench-1": 0,
+      "allocator-nativecall-cache-bench-1": 0,
+      "allocator-jemalloc-cache-bench-1": 0,
+      "nativecall-noop": 0,
+      "variant-upgrade": 0,
+      "variant-downgrade": 0,
+      "restored": 0,
+      "corrupt-resource": 125,
+      "forget-record": 0,
+      "partial-install": 125,
+      "recover-original": 0,
+      "after-recovery": 0,
+      "unsupported-image": 125,
+      "unsupported-preserved": 0,
+      "bench-original-1": 0,
+      "bench-nativecall-1": 0
+    }
+  },
+  "benchmark": {
+    "host": "ARM64 macOS cached interpreter, same original Debian libc, alternating original/native, median of three samples",
+    "samples": {
+      "memcpy-short": {
+        "original": {
+          "bytes": 32,
+          "count": 20000,
+          "samples_ns": [
+            3057250,
+            3394666,
+            3145000
+          ],
+          "nanoseconds": 3145000
+        },
+        "native": {
+          "bytes": 32,
+          "count": 20000,
+          "samples_ns": [
+            4037208,
+            3948500,
+            4087417
+          ],
+          "nanoseconds": 4037208
+        },
+        "speedup": 0.7790037075127167
+      },
+      "memcpy-4k": {
+        "original": {
+          "bytes": 4096,
+          "count": 4000,
+          "samples_ns": [
+            1198792,
+            1253209,
+            1225625
+          ],
+          "nanoseconds": 1225625
+        },
+        "native": {
+          "bytes": 4096,
+          "count": 4000,
+          "samples_ns": [
+            1965583,
+            1951459,
+            2090750
+          ],
+          "nanoseconds": 1965583
+        },
+        "speedup": 0.6235427351579659
+      },
+      "memcpy-64k": {
+        "original": {
+          "bytes": 65536,
+          "count": 1000,
+          "samples_ns": [
+            2932750,
+            2939833,
+            3115333
+          ],
+          "nanoseconds": 2939833
+        },
+        "native": {
+          "bytes": 65536,
+          "count": 1000,
+          "samples_ns": [
+            2898708,
+            3059125,
+            3085333
+          ],
+          "nanoseconds": 3059125
+        },
+        "speedup": 0.961004535610673
+      },
+      "memmove-4k": {
+        "original": {
+          "bytes": 4096,
+          "count": 4000,
+          "samples_ns": [
+            1277791,
+            1461750,
+            1291708
+          ],
+          "nanoseconds": 1291708
+        },
+        "native": {
+          "bytes": 4096,
+          "count": 4000,
+          "samples_ns": [
+            1688167,
+            1813000,
+            1861042
+          ],
+          "nanoseconds": 1813000
+        },
+        "speedup": 0.7124699393270821
+      },
+      "memset-4k": {
+        "original": {
+          "bytes": 4096,
+          "count": 4000,
+          "samples_ns": [
+            917750,
+            904792,
+            880292
+          ],
+          "nanoseconds": 904792
+        },
+        "native": {
+          "bytes": 4096,
+          "count": 4000,
+          "samples_ns": [
+            1307209,
+            1422833,
+            1375083
+          ],
+          "nanoseconds": 1375083
+        },
+        "speedup": 0.6579908267355498
+      },
+      "memcmp-4k": {
+        "original": {
+          "bytes": 4096,
+          "count": 4000,
+          "samples_ns": [
+            169445250,
+            168815292,
+            169312459
+          ],
+          "nanoseconds": 169312459
+        },
+        "native": {
+          "bytes": 4096,
+          "count": 4000,
+          "samples_ns": [
+            1714000,
+            1787875,
+            1846250
+          ],
+          "nanoseconds": 1787875
+        },
+        "speedup": 94.70038956862197
+      },
+      "strlen-1k": {
+        "original": {
+          "bytes": 1023,
+          "count": 4000,
+          "samples_ns": [
+            30771792,
+            33748750,
+            31332667
+          ],
+          "nanoseconds": 31332667
+        },
+        "native": {
+          "bytes": 1023,
+          "count": 4000,
+          "samples_ns": [
+            1327959,
+            1304375,
+            1359000
+          ],
+          "nanoseconds": 1327959
+        },
+        "speedup": 23.594604200882706
+      },
+      "strcmp-1k": {
+        "original": {
+          "bytes": 1023,
+          "count": 4000,
+          "samples_ns": [
+            19783542,
+            19800542,
+            19481083
+          ],
+          "nanoseconds": 19783542
+        },
+        "native": {
+          "bytes": 1023,
+          "count": 4000,
+          "samples_ns": [
+            1717667,
+            1628375,
+            1733584
+          ],
+          "nanoseconds": 1717667
+        },
+        "speedup": 11.517681832392425
+      },
+      "strchr-1k": {
+        "original": {
+          "bytes": 1023,
+          "count": 4000,
+          "samples_ns": [
+            60947125,
+            62045208,
+            60434083
+          ],
+          "nanoseconds": 60947125
+        },
+        "native": {
+          "bytes": 1023,
+          "count": 4000,
+          "samples_ns": [
+            1569833,
+            1609167,
+            1619417
+          ],
+          "nanoseconds": 1609167
+        },
+        "speedup": 37.87495331435457
+      },
+      "strcpy-1k": {
+        "original": {
+          "bytes": 1023,
+          "count": 4000,
+          "samples_ns": [
+            51710167,
+            52315042,
+            51642958
+          ],
+          "nanoseconds": 51710167
+        },
+        "native": {
+          "bytes": 1023,
+          "count": 4000,
+          "samples_ns": [
+            1776208,
+            1912167,
+            1848000
+          ],
+          "nanoseconds": 1848000
+        },
+        "speedup": 27.9816920995671
+      },
+      "strlcpy-1k": {
+        "original": {
+          "bytes": 1023,
+          "count": 4000,
+          "samples_ns": [
+            46324625,
+            46565542,
+            46251417
+          ],
+          "nanoseconds": 46324625
+        },
+        "native": {
+          "bytes": 1023,
+          "count": 4000,
+          "samples_ns": [
+            1835875,
+            1949625,
+            1955542
+          ],
+          "nanoseconds": 1949625
+        },
+        "speedup": 23.760787330896967
+      },
+      "strlen-short": {
+        "original": {
+          "bytes": 5,
+          "count": 20000,
+          "samples_ns": [
+            2803667,
+            2873542,
+            2722209
+          ],
+          "nanoseconds": 2803667
+        },
+        "native": {
+          "bytes": 5,
+          "count": 20000,
+          "samples_ns": [
+            4082625,
+            4075708,
+            4151625
+          ],
+          "nanoseconds": 4082625
+        },
+        "speedup": 0.6867314534153884
+      },
+      "memmem-64k": {
+        "original": {
+          "bytes": 65536,
+          "count": 100,
+          "samples_ns": [
+            80433333,
+            82514917,
+            82027416
+          ],
+          "nanoseconds": 82027416
+        },
+        "native": {
+          "bytes": 65536,
+          "count": 100,
+          "samples_ns": [
+            202709,
+            163500,
+            163417
+          ],
+          "nanoseconds": 163500
+        },
+        "speedup": 501.69673394495413
+      },
+      "strstr-64k": {
+        "original": {
+          "bytes": 65536,
+          "count": 100,
+          "samples_ns": [
+            94904959,
+            96750750,
+            93797875
+          ],
+          "nanoseconds": 94904959
+        },
+        "native": {
+          "bytes": 65536,
+          "count": 100,
+          "samples_ns": [
+            290625,
+            278000,
+            281167
+          ],
+          "nanoseconds": 281167
+        },
+        "speedup": 337.5394658690387
+      },
+      "strcasestr-64k": {
+        "original": {
+          "bytes": 65536,
+          "count": 100,
+          "samples_ns": [
+            212005292,
+            219299333,
+            212075375
+          ],
+          "nanoseconds": 212075375
+        },
+        "native": {
+          "bytes": 65536,
+          "count": 100,
+          "samples_ns": [
+            393500,
+            388500,
+            519667
+          ],
+          "nanoseconds": 393500
+        },
+        "speedup": 538.9463151207116
+      },
+      "strspn-64k": {
+        "original": {
+          "bytes": 65536,
+          "count": 100,
+          "samples_ns": [
+            97237292,
+            99038792,
+            96732375
+          ],
+          "nanoseconds": 97237292
+        },
+        "native": {
+          "bytes": 65536,
+          "count": 100,
+          "samples_ns": [
+            161875,
+            159000,
+            240916
+          ],
+          "nanoseconds": 161875
+        },
+        "speedup": 600.6936957528958
+      },
+      "strcspn-64k": {
+        "original": {
+          "bytes": 65536,
+          "count": 100,
+          "samples_ns": [
+            95888916,
+            95704291,
+            93685208
+          ],
+          "nanoseconds": 95704291
+        },
+        "native": {
+          "bytes": 65536,
+          "count": 100,
+          "samples_ns": [
+            258625,
+            277209,
+            337458
+          ],
+          "nanoseconds": 277209
+        },
+        "speedup": 345.242365868352
+      },
+      "strcasecmp-64k": {
+        "original": {
+          "bytes": 65536,
+          "count": 100,
+          "samples_ns": [
+            399552791,
+            411885500,
+            401564292
+          ],
+          "nanoseconds": 401564292
+        },
+        "native": {
+          "bytes": 65536,
+          "count": 100,
+          "samples_ns": [
+            3000500,
+            3123958,
+            3212875
+          ],
+          "nanoseconds": 3123958
+        },
+        "speedup": 128.54343496295405
+      },
+      "strtoll": {
+        "original": {
+          "bytes": 19,
+          "count": 10000,
+          "samples_ns": [
+            14185917,
+            14356292,
+            14185917
+          ],
+          "nanoseconds": 14185917
+        },
+        "native": {
+          "bytes": 19,
+          "count": 10000,
+          "samples_ns": [
+            5450709,
+            5492584,
+            5616542
+          ],
+          "nanoseconds": 5492584
+        },
+        "speedup": 2.582740109209072
+      },
+      "strtod": {
+        "original": {
+          "bytes": 24,
+          "count": 4000,
+          "samples_ns": [
+            34921750,
+            35102042,
+            34684625
+          ],
+          "nanoseconds": 34921750
+        },
+        "native": {
+          "bytes": 24,
+          "count": 4000,
+          "samples_ns": [
+            9777292,
+            10277000,
+            10217333
+          ],
+          "nanoseconds": 10217333
+        },
+        "speedup": 3.417892908061233
+      },
+      "memcpy-2m": {
+        "original": {
+          "bytes": 2097152,
+          "count": 20,
+          "samples_ns": [
+            2450333,
+            2529916,
+            2442667
+          ],
+          "nanoseconds": 2450333
+        },
+        "native": {
+          "bytes": 2097152,
+          "count": 20,
+          "samples_ns": [
+            2408916,
+            2441709,
+            2624917
+          ],
+          "nanoseconds": 2441709
+        },
+        "speedup": 1.003531952415296
+      },
+      "memmove-2m": {
+        "original": {
+          "bytes": 2097152,
+          "count": 20,
+          "samples_ns": [
+            3078750,
+            3127000,
+            3075750
+          ],
+          "nanoseconds": 3078750
+        },
+        "native": {
+          "bytes": 2097152,
+          "count": 20,
+          "samples_ns": [
+            1872083,
+            1747584,
+            1706625
+          ],
+          "nanoseconds": 1747584
+        },
+        "speedup": 1.7617178916721599
+      },
+      "strlen-2m": {
+        "original": {
+          "bytes": 2097152,
+          "count": 20,
+          "samples_ns": [
+            309910875,
+            307904000,
+            312429458
+          ],
+          "nanoseconds": 309910875
+        },
+        "native": {
+          "bytes": 2097152,
+          "count": 20,
+          "samples_ns": [
+            1035458,
+            965042,
+            1243167
+          ],
+          "nanoseconds": 1035458
+        },
+        "speedup": 299.2983539651053
+      },
+      "strcpy-2m": {
+        "original": {
+          "bytes": 2097152,
+          "count": 20,
+          "samples_ns": [
+            532525084,
+            516649750,
+            537206958
+          ],
+          "nanoseconds": 532525084
+        },
+        "native": {
+          "bytes": 2097152,
+          "count": 20,
+          "samples_ns": [
+            3382542,
+            3416125,
+            3635292
+          ],
+          "nanoseconds": 3416125
+        },
+        "speedup": 155.88571378389256
+      },
+      "malloc-free-64": {
+        "original": {
+          "bytes": 64,
+          "count": 20000,
+          "samples_ns": [
+            25396666,
+            25295375,
+            25114375
+          ],
+          "nanoseconds": 25295375
+        },
+        "native": {
+          "bytes": 64,
+          "count": 20000,
+          "samples_ns": [
+            24423291,
+            25236500,
+            25712208
+          ],
+          "nanoseconds": 25236500
+        },
+        "speedup": 1.0023329304776811
+      }
+    },
+    "limitations": [
+      "Not physical-iPad or host-native libc results.",
+      "Original glibc short calls are fast; wrapper cost regresses several small calls.",
+      "4 KiB memcpy/memmove/memset do not improve in this fixture; 2 MiB memcpy is near parity.",
+      "ptmalloc and stateful libc algorithms remain original.",
+      "Non-C locales, grouped conversion and nonzero guest FPCR keep original algorithms."
+    ]
+  },
+  "runtime_revision": "7f408e32bcefd3744d17bb20317c857cd67ca5af"
+}

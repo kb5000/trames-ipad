@@ -1288,6 +1288,14 @@ jobs:
         run: |
           cargo test -p trames-compute -p trames-native -p trames-cpu -p trames-memory -p trames-accel -p trames-vfs -p trames-core --target aarch64-unknown-linux-musl --locked
           cargo build -p trames-cli --target aarch64-unknown-linux-musl --release --locked
+      - name: Compare pinned Debian 13 glibc aliases, locales and complete native calls
+        run: |
+          sudo apt-get install --yes gcc-aarch64-linux-gnu
+          cargo build -p trames-cli --release --locked
+          python3 scripts/prepare-glibc.py
+          python3 scripts/build-glibc-fixtures.py
+          qemu-aarch64 -cpu max -L target/glibc-hybrid/sysroot -E LOCPATH="$PWD/target/glibc-hybrid/sysroot/usr/lib/locale" target/glibc-hybrid/fixtures/glibc-probe > target/glibc-hybrid/oracle.stdout
+          python3 tests/integration/glibc.py --oracle target/glibc-hybrid/oracle.stdout --bench-rounds 0
       - run: python3 tests/differential/run.py
       - run: python3 tests/differential/m1.py
       - run: python3 tests/differential/lazy_flags.py
