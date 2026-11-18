@@ -337,3 +337,24 @@ per-VM fork charges remain conservative rather than exact physical RSS/PSS.
 The [Firefox memory investigation](../validation/firefox-memory.md) records the
 original Scudo ELF, the 512MiB BSS oracle, budgets, complete/partial diagnostics
 and the remaining first-frame failure.
+
+## Complete native ranges (2026-11-18)
+
+Pure copy/fill can coalesce adjacent mappings in one retained host allocation
+under the same sole-executor private epoch used by CPU instructions. The cold
+private-frame classifier is unchanged. COW peers, retained readonly forks,
+registered pins and shared frames keep their existing exclusion. No native-only
+permission, per-call refcount query or new service thread is introduced.
+
+Disjoint run discovery uses both endpoint allocation boundaries before walking
+pages. Raw callbacks receive bounded pointers into retained allocations, never
+slices covering unrelated pages. Overlapping moves keep the existing fast
+union-guard CPU memmove within the complete native entry; discovering two
+coalesced overlapping runs was slower in the paired benchmark. The pinned
+memcpy alone is not a large-overlap memmove. Shared ranges keep the existing
+region guards. Existing cold uniqueness certificates skip alias indexing even
+when peer workers prevent unlocked access; they do not grant new byte authority.
+Other ranges use a call-owned hash index instead of a tree. Physical aliases
+select original native-call fallback before effects; ordinary CPU copy APIs
+retain their source snapshot semantics. Allocation failures are handled before
+guest writes.

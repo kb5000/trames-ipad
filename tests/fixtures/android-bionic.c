@@ -117,6 +117,7 @@ static void *worker(void *argument) {
     return NULL;
 }
 
+#ifdef __ANDROID__
 static void fortify(void) {
     typedef void *(*checked_copy)(void *, const void *, size_t, size_t);
     checked_copy copy = (checked_copy)dlsym(RTLD_DEFAULT, "__memcpy_chk");
@@ -128,6 +129,8 @@ static void fortify(void) {
     int status = 0; CHECK(waitpid(child, &status, 0) == child);
     CHECK(WIFSIGNALED(status) && WTERMSIG(status) == SIGABRT);
 }
+
+#endif
 
 static uint64_t numeric_hash = UINT64_C(1469598103934665603);
 static void mix(uint64_t value) { numeric_hash = (numeric_hash ^ value) * UINT64_C(1099511628211); }
@@ -171,6 +174,15 @@ static void extended_suite(void) {
     free(a); free(b);
     LOAD(strtol); LOAD(strtoll); LOAD(strtoul); LOAD(strtoull); LOAD(strtoimax); LOAD(strtoumax);
     LOAD(strtod); LOAD(strtof); LOAD(atoi); LOAD(atol); LOAD(atoll); LOAD(atof);
+    // Patterns and character sets beyond the former 64 KiB scratch limit.
+    size_t pn=65536+17;char *pattern=malloc(pn+1),*hay=malloc(pn*2+32);CHECK(pattern && hay);
+    memset(pattern,'A',pn);pattern[0]='B';pattern[pn-1]='Z';pattern[pn]=0;
+    memset(hay,'c',pn*2+31);hay[pn*2+31]=0;memcpy(hay+pn+7,pattern,pn);
+    CHECK(p_memmem(hay,pn*2+31,pattern,pn)==hay+pn+7);
+    CHECK(p_strstr(hay,pattern)==hay+pn+7);
+    pattern[0]='b';pattern[pn-1]='z';CHECK(p_strcasestr(hay,pattern)==hay+pn+7);
+    memset(pattern,'c',pn);pattern[pn]=0;CHECK(p_strspn(hay,pattern)==pn+7);
+    free(pattern);free(hay);
     const char *integers[] = {"", "x", " +", "0", "-0", "0x", "0xG", "  -0x7f!", "09", "0b11", "z!",
         "9223372036854775807!", "9223372036854775808", "-9223372036854775808", "-9223372036854775809",
         "18446744073709551615", "18446744073709551616", "-18446744073709551616"};
@@ -337,6 +349,7 @@ static void benchmark(void) {
     (void)sink;
 }
 
+#ifdef __ANDROID__
 // Pinned-image diagnostics only. Public Android libc hides jemalloc mallctl;
 // production adapters never change allocator configuration.
 static void allocator_cache(void) {
@@ -348,7 +361,10 @@ static void allocator_cache(void) {
     printf("ALLOCATOR cache-enable=%d\n", error); CHECK(error == 0);
 }
 
+#endif
+
 int main(int argc, char **argv) {
+#ifdef __ANDROID__
     if (argc == 2 && !strcmp(argv[1], "allocator-cache-bench")) { allocator_cache(); benchmark(); return 0; }
     if (argc == 2 && !strcmp(argv[1], "allocator-cache-stress")) allocator_cache();
     if (argc == 2 && (!strcmp(argv[1], "allocator-info") || !strcmp(argv[1], "allocator-cache-info"))) {
@@ -363,6 +379,7 @@ int main(int argc, char **argv) {
             tsd ? tsd[9] : 255, tsd ? tsd[10] : 255, tsd ? tsd[11] : 255);
         free(allocation); return 0;
     }
+#endif
     if (argc == 2 && !strcmp(argv[1], "bench")) { benchmark(); return 0; }
     if (argc == 2 && !strcmp(argv[1], "cleanup")) {
         return unlink("/system/lib64/bootstrap/libc.so.trames-new") != 0;
@@ -370,10 +387,21 @@ int main(int argc, char **argv) {
     if (argc == 2 && !strcmp(argv[1], "forget-record")) {
         return unlink("/system/lib64/.trames-bionic.json") != 0;
     }
-    suite(); fortify(); extended_suite(); allocator_lifetimes();
+    suite();
+#ifdef __ANDROID__
+    fortify();
+#endif
+    extended_suite(); allocator_lifetimes();
     pthread_t threads[4];
     for (uintptr_t i = 0; i < 4; ++i) CHECK(pthread_create(&threads[i], NULL, worker, (void *)i) == 0);
     for (unsigned i = 0; i < 4; ++i) { void *result; CHECK(pthread_join(threads[i], &result) == 0 && result == NULL); }
-    printf("PASS Bionic 44 functions, %lu checks, guard pages, original FORTIFY, parallel TLS\n", checks);
+#ifdef __ANDROID__
+#define LIBC_NAME "Bionic"
+#define EXTRA_CHECKS "original FORTIFY, "
+#else
+#define LIBC_NAME "musl"
+#define EXTRA_CHECKS ""
+#endif
+    printf("PASS " LIBC_NAME " 44 functions, %lu checks, guard pages, " EXTRA_CHECKS "parallel TLS\n", checks);
     return 0;
 }

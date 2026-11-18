@@ -36,28 +36,29 @@ FILE. ASCII classification follows original musl without host locale state.
 
 Short input borrows the checked resident guest page directly without input
 allocation. A longer prefix on the same page expands the direct borrow. Across
-pages, the module gathers at most 64 KiB and reruns the bounded original scan;
+pages, the module grows call-owned scratch and reruns the fragment scan;
 this staging is explicit. It never reads an unmapped following page after a
 reached delimiter/NUL. Live backings keep coherent snapshots and EOF checks.
 
 No borrowed slice or host pointer survives native return. Result storage is
-preflighted as directly writable; shared/backed stack output selects original
-conversion before writes. Ceiling fallback also precedes result/errno/end writes.
+preflighted through the existing one-shot output rules. Unsupported backing and
+scratch-allocation failure select original conversion before result/errno/end writes.
 Signals, threads, fork and nested qsort comparators use ordinary guest execution
 between native calls. There is no persistent host operation or handle.
 
 Native arithmetic uses hardware binary64/binary32 at nearest rounding. Explicit
 guest rounding directions select original conversion. Host errno, FP control and
-exception status are saved/restored even on early parser exits. Guest FP exception
-flags are not synthesized for the internal native arithmetic. The owner's native
+exception status are saved/restored even on early parser exits. New paired musl wrappers return native FP exception flags in the 24-byte
+pure-ID-32 result and OR them into guest FPSR; the old 16-byte module result
+remains supported for earlier libraries. The owner's native
 FP speed preference applies; this does not claim a strict binary128/exception-flag
 implementation. Differential checks allow one ULP for the nearest native value,
 but require exact signs/zero/infinity classes, errno and end position.
 
 Metrics separately count numeric calls, completed conversions, replays, supplied
-input fragments and 16-byte result commits. Supplied-byte counters are not exact
-physical loads. Work is bounded by the 64 KiB input window and fixed 53-bit scan
-tables; replays also cost work. Existing instruction budgets retire one virtual
+input fragments and result commits. Supplied-byte counters are not exact
+physical loads. The former 64 KiB input ceiling is removed; fixed 53-bit scan tables and
+fragment replays remain. Existing instruction budgets retire one virtual
 HLT per return, and the bounded immediate-return scheduling policy is retained.
 
 The portable native build needs a C compiler and archiver. Apple targets use clang

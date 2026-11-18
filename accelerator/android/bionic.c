@@ -8,7 +8,7 @@ struct result { uintptr_t value, fallback; };
 #define CALL(n) extern __attribute__((visibility("hidden"))) struct result trames_call_##n(uintptr_t, uintptr_t, size_t)
 CALL(1); CALL(2); CALL(3); CALL(4); CALL(5); CALL(6); CALL(7);
 CALL(8); CALL(9); CALL(10); CALL(11); CALL(12); CALL(13);
-CALL(14); CALL(15); CALL(16); CALL(17); CALL(18); CALL(19);
+CALL(14); CALL(15); CALL(16); CALL(17); CALL(18); CALL(19); CALL(29); CALL(30);
 #define BCALL(n) extern __attribute__((visibility("hidden"))) struct result trames_bionic_call_##n(uintptr_t, uintptr_t, size_t)
 BCALL(1); BCALL(2); BCALL(3); BCALL(4); BCALL(5); BCALL(6); BCALL(7); BCALL(8); BCALL(9); BCALL(10); BCALL(13);
 #define ORIGINAL(type, name, args) extern __attribute__((visibility("hidden"))) type trames_orig_##name args
@@ -40,8 +40,6 @@ extern __attribute__((visibility("hidden"))) size_t trames_bionic_strlen(const c
 // Sized short calls stay in the original Bionic routines. Prefixes align before
 // word loads, so a NUL beside a protected page never reads the following page.
 #define BULK 128
-#define CHUNK (1024 * 1024)
-#define STRING_CHUNK CHUNK
 #define PREFIX 16
 static inline __attribute__((always_inline)) size_t prefix(const char *s) {
     typedef size_t __attribute__((__may_alias__)) word;
@@ -63,100 +61,21 @@ static inline __attribute__((always_inline)) size_t prefix(const char *s) {
     }
     return PREFIX;
 }
-static __attribute__((noinline)) size_t stream_length(const char *s, size_t bound) {
-    size_t offset = 0;
-    while (offset < bound) {
-        size_t count = bound - offset < STRING_CHUNK ? bound - offset : STRING_CHUNK;
-        struct result r = trames_call_8((uintptr_t)s + offset, count, 0);
-        if (r.fallback) return offset + trames_orig_strnlen(s + offset, bound - offset);
-        if (r.value < count) return offset + r.value;
-        offset += count;
-    }
-    return offset;
-}
 
-static __attribute__((noinline)) void *stream_memcpy(void *d, const void *s, size_t n) {
-    void *start = d;
-    while (n) {
-        size_t count = n < CHUNK ? n : CHUNK;
-        struct result r = trames_call_1((uintptr_t)d, (uintptr_t)s, count);
-        if (r.fallback) {
-            if (n <= 96) trames_original_small_copy(d, s, n); else trames_orig_memcpy(d, s, n);
-            break;
-        }
-        d = (char *)d + count; s = (const char *)s + count; n -= count;
-    }
-    return start;
+// Every complete request crosses the native entry once. Backing admission may
+// select original code before effects; byte count never selects a continuation.
+#define BULK_MEMORY(name, id, original) \
+void *trames_bionic_large_##name(void *d, const void *s, size_t n) { \
+    struct result r = trames_call_##id((uintptr_t)d, (uintptr_t)s, n); \
+    return r.fallback ? original(d, s, n) : (void *)r.value; \
 }
-static __attribute__((noinline)) void *stream_memmove(void *d, const void *s, size_t n) {
-    void *start = d;
-    if ((uintptr_t)d > (uintptr_t)s && (uintptr_t)d - (uintptr_t)s < n) {
-        // The original backward-copy continuation is only selected here.
-        while (n) {
-            size_t count = n < CHUNK ? n : CHUNK, offset = n - count;
-            struct result r = trames_call_2((uintptr_t)d + offset, (uintptr_t)s + offset, count);
-            if (r.fallback) {
-                if (n <= 96) trames_original_small_copy(d, s, n); else trames_orig_memmove(d, s, n);
-                break;
-            }
-            n = offset;
-        }
-    } else {
-        // Resume the original forward-copy continuation only for the remaining
-        // suffix after a no-effect native fallback.
-        while (n) {
-            size_t count = n < CHUNK ? n : CHUNK;
-            struct result r = trames_call_2((uintptr_t)d, (uintptr_t)s, count);
-            if (r.fallback) {
-                if (n <= 96) trames_original_small_copy(d, s, n); else trames_orig_memcpy(d, s, n);
-                break;
-            }
-            d = (char *)d + count; s = (const char *)s + count; n -= count;
-        }
-    }
-    return start;
-}
-static __attribute__((noinline)) void *stream_memset(void *d, int c, size_t n) {
-    void *start = d;
-    while (n) {
-        size_t count = n < CHUNK ? n : CHUNK;
-        struct result r = trames_call_3((uintptr_t)d, (uintptr_t)c, count);
-        if (r.fallback) { trames_orig_memset(d, c, n); break; }
-        d = (char *)d + count; n -= count;
-    }
-    return start;
-}
-
-void *trames_bionic_large_memcpy(void *d, const void *s, size_t n) {
-    if (n > CHUNK) return stream_memcpy(d, s, n);
-    struct result r = trames_call_1((uintptr_t)d, (uintptr_t)s, n);
-    if (!r.fallback) return (void *)r.value;
-    return n <= 96 ? trames_original_small_copy(d, s, n) : trames_orig_memcpy(d, s, n);
-}
-void *trames_bionic_large_memmove(void *d, const void *s, size_t n) {
-    if (n > CHUNK) return stream_memmove(d, s, n);
-    struct result r = trames_call_2((uintptr_t)d, (uintptr_t)s, n);
-    if (!r.fallback) return (void *)r.value;
-    return n <= 96 ? trames_original_small_copy(d, s, n) : trames_orig_memmove(d, s, n);
-}
+BULK_MEMORY(memcpy, 1, trames_orig_memcpy)
+BULK_MEMORY(memmove, 2, trames_orig_memmove)
 void *trames_bionic_large_memset(void *d, int c, size_t n) {
-    if (n > CHUNK) return stream_memset(d, c, n);
     struct result r = trames_call_3((uintptr_t)d, (uintptr_t)c, n);
-    if (!r.fallback) return (void *)r.value;
-    return trames_orig_memset(d, c, n);
-}
-static __attribute__((noinline)) int compare_stream(const void *a, const void *b, size_t n) {
-    while (n) {
-        size_t count = n < CHUNK ? n : CHUNK;
-        struct result r = trames_call_4((uintptr_t)a, (uintptr_t)b, count);
-        if (r.fallback) return trames_orig_memcmp(a, b, n);
-        if ((int)r.value) return (int)r.value;
-        a = (const char *)a + count; b = (const char *)b + count; n -= count;
-    }
-    return 0;
+    return r.fallback ? trames_orig_memset(d, c, n) : (void *)r.value;
 }
 int trames_bionic_large_memcmp(const void *a, const void *b, size_t n) {
-    if (n > CHUNK) return compare_stream(a, b, n);
     struct result r = trames_call_4((uintptr_t)a, (uintptr_t)b, n);
     return r.fallback ? trames_orig_memcmp(a, b, n) : (int)r.value;
 }
@@ -164,266 +83,150 @@ size_t trames_bionic_unaligned_strlen(const char *s) {
     size_t n = prefix(s);
     if (n < PREFIX) return n;
     struct result r = trames_call_5((uintptr_t)s, 0, 0);
-    return r.fallback ? stream_length(s, SIZE_MAX) : r.value;
+    return r.fallback ? trames_orig_strlen(s) : r.value;
 }
 size_t trames_bionic_long_strlen(const char *s) {
     struct result r = trames_call_5((uintptr_t)s, 0, 0);
-    return r.fallback ? stream_length(s, SIZE_MAX) : r.value;
+    return r.fallback ? trames_orig_strlen(s) : r.value;
 }
 #define SEARCH(name, id) \
 void *trames_bionic_large_##name(const void *s, int c, size_t n) { \
-    while (n) { \
-        size_t count = n < CHUNK ? n : CHUNK, offset = id == 7 ? n - count : 0; \
-        struct result r = trames_call_##id((uintptr_t)s + offset, (uintptr_t)c, count); \
-        if (r.fallback) return trames_orig_##name(s, c, n); \
-        if (r.value) return (void *)r.value; \
-        n -= count; if (id != 7) s = (const char *)s + count; \
-    } \
-    return NULL; \
+    struct result r = trames_call_##id((uintptr_t)s, (uintptr_t)c, n); \
+    return r.fallback ? trames_orig_##name(s, c, n) : (void *)r.value; \
 }
 SEARCH(memchr, 6)
 SEARCH(memrchr, 7)
 size_t trames_bionic_large_strnlen(const char *s, size_t n) {
-    size_t len = prefix(s);
-    if (len < PREFIX) return len;
+    size_t len = prefix(s); if (len < PREFIX) return len;
     struct result r = trames_call_8((uintptr_t)s, n, 0);
-    if (!r.fallback) return r.value;
-    return stream_length(s, n);
+    return r.fallback ? trames_orig_strnlen(s, n) : r.value;
 }
 int trames_bionic_strcmp(const char *a, const char *b) {
-    for (size_t i = 0; i < PREFIX; ++i) {
-        unsigned char x = (unsigned char)a[i], y = (unsigned char)b[i];
-        if (x != y || !x) return (int)x - (int)y;
+    for (size_t i=0; i<PREFIX; ++i) {
+        unsigned char x=a[i], y=b[i]; if (x!=y || !x) return (int)x-(int)y;
     }
-    struct result r = trames_call_9((uintptr_t)a, (uintptr_t)b, 0);
-    if (!r.fallback) return (int)r.value;
-    for (;;) {
-        r = trames_bionic_call_10((uintptr_t)a, (uintptr_t)b, SIZE_MAX);
-        if (r.fallback) return trames_orig_strcmp(a, b);
-        if (r.value != UINTPTR_MAX) return (int)r.value;
-        a += CHUNK; b += CHUNK;
-    }
+    struct result r=trames_call_9((uintptr_t)a,(uintptr_t)b,0);
+    return r.fallback ? trames_orig_strcmp(a,b) : (int)r.value;
 }
 int trames_bionic_large_strncmp(const char *a, const char *b, size_t n) {
-    for (size_t i = 0; i < PREFIX; ++i) {
-        unsigned char x = (unsigned char)a[i], y = (unsigned char)b[i];
-        if (x != y || !x) return (int)x - (int)y;
+    for (size_t i=0; i<PREFIX; ++i) {
+        unsigned char x=a[i], y=b[i]; if (x!=y || !x) return (int)x-(int)y;
     }
-    struct result r = trames_call_10((uintptr_t)a, (uintptr_t)b, n);
-    if (!r.fallback) return (int)r.value;
-    for (;;) {
-        r = trames_bionic_call_10((uintptr_t)a, (uintptr_t)b, n);
-        if (r.fallback) return trames_orig_strncmp(a, b, n);
-        if (r.value != UINTPTR_MAX) return (int)r.value;
-        a += CHUNK; b += CHUNK; n -= CHUNK;
-    }
+    struct result r=trames_call_10((uintptr_t)a,(uintptr_t)b,n);
+    return r.fallback ? trames_orig_strncmp(a,b,n) : (int)r.value;
 }
-#define CHAR_SEARCH(name, id) \
-char *trames_bionic_##name(const char *s, int c) { \
-    for (size_t i = 0; i < PREFIX; ++i) { \
-        unsigned char x = (unsigned char)s[i]; \
-        if (x == (unsigned char)c) return (char *)s + i; \
-        if (!x) return id == 13 ? (char *)s + i : NULL; \
+#define CHAR_SEARCH(name,id) \
+char *trames_bionic_##name(const char *s,int c) { \
+    for (size_t i=0;i<PREFIX;++i) { \
+        unsigned char x=s[i]; if(x==(unsigned char)c) return (char *)s+i; \
+        if(!x) return id==13 ? (char *)s+i : NULL; \
     } \
-    struct result r = trames_call_##id((uintptr_t)s, (uintptr_t)c, 0); \
-    if (!r.fallback) return (char *)r.value; \
-    for (;;) { \
-        r = trames_bionic_call_13((uintptr_t)s, (uintptr_t)c, id == 13); \
-        if (r.fallback) return trames_orig_##name(s, c); \
-        if (r.value != UINTPTR_MAX) return (char *)r.value; \
-        s += CHUNK; \
-    } \
+    struct result r=trames_call_##id((uintptr_t)s,(uintptr_t)c,0); \
+    return r.fallback ? trames_orig_##name(s,c) : (char *)r.value; \
 }
-CHAR_SEARCH(strchr, 11)
-CHAR_SEARCH(strchrnul, 13)
-char *trames_bionic_strrchr(const char *s, int c) {
-    if (prefix(s) < PREFIX) return trames_orig_strrchr(s, c);
-    struct result r = trames_call_12((uintptr_t)s, (uintptr_t)c, 0);
-    return r.fallback ? trames_bionic_large_memrchr(s, c, stream_length(s, SIZE_MAX) + 1) : (char *)r.value;
+CHAR_SEARCH(strchr,11)
+CHAR_SEARCH(strchrnul,13)
+char *trames_bionic_strrchr(const char *s,int c) {
+    if(prefix(s)<PREFIX) return trames_orig_strrchr(s,c);
+    struct result r=trames_call_12((uintptr_t)s,(uintptr_t)c,0);
+    return r.fallback ? trames_orig_strrchr(s,c) : (char *)r.value;
 }
-// Keep rare streaming state out of the original common-call frame.
-static __attribute__((noinline)) char *copy_string_stream(char *d, const char *s, unsigned end) {
-    size_t len = stream_length(s, SIZE_MAX);
-    trames_bionic_large_memcpy(d, s, len + 1);
-    return end ? d + len : d;
+#define COPY(name,id) \
+char *trames_bionic_##name(char *d,const char *s) { \
+    if(prefix(s)<PREFIX) return trames_orig_##name(d,s); \
+    struct result r=trames_call_##id((uintptr_t)d,(uintptr_t)s,0); \
+    return r.fallback ? trames_orig_##name(d,s) : (char *)r.value; \
 }
-static __attribute__((noinline)) char *copy_sized_string_stream(char *d, const char *s, size_t n, unsigned end) {
-    size_t len = stream_length(s, n);
-    trames_bionic_large_memcpy(d, s, len);
-    if (len < n) trames_bionic_large_memset(d + len, 0, n - len);
-    return end ? d + len : d;
+COPY(strcpy,14)
+COPY(stpcpy,15)
+#define SIZED_COPY(name,id) \
+char *trames_bionic_large_##name(char *d,const char *s,size_t n) { \
+    struct result r=trames_call_##id((uintptr_t)d,(uintptr_t)s,n); \
+    return r.fallback ? trames_orig_##name(d,s,n) : (char *)r.value; \
 }
-#define COPY(name, id) \
-char *trames_bionic_##name(char *d, const char *s) { \
-    if (prefix(s) == PREFIX) { \
-        struct result r = trames_call_##id((uintptr_t)d, (uintptr_t)s, 0); \
-        if (!r.fallback) return (char *)r.value; \
-        return copy_string_stream(d, s, id == 15); \
-    } \
-    return trames_orig_##name(d, s); \
+SIZED_COPY(strncpy,16)
+SIZED_COPY(stpncpy,17)
+char *trames_bionic_strcat(char *d,const char *s) {
+    if(prefix(d)<PREFIX && prefix(s)<PREFIX) return trames_orig_strcat(d,s);
+    struct result r=trames_call_18((uintptr_t)d,(uintptr_t)s,0);
+    return r.fallback ? trames_orig_strcat(d,s) : (char *)r.value;
 }
-COPY(strcpy, 14)
-COPY(stpcpy, 15)
-#define SIZED_COPY(name, id) \
-char *trames_bionic_large_##name(char *d, const char *s, size_t n) { \
-    struct result r = trames_call_##id((uintptr_t)d, (uintptr_t)s, n); \
-    if (!r.fallback) return (char *)r.value; \
-    return copy_sized_string_stream(d, s, n, id == 17); \
+char *trames_bionic_strncat(char *d,const char *s,size_t n) {
+    if(!n) return d;
+    if(n<BULK && prefix(d)<PREFIX) return trames_orig_strncat(d,s,n);
+    struct result r=trames_call_19((uintptr_t)d,(uintptr_t)s,n);
+    return r.fallback ? trames_orig_strncat(d,s,n) : (char *)r.value;
 }
-SIZED_COPY(strncpy, 16)
-SIZED_COPY(stpncpy, 17)
-char *trames_bionic_strcat(char *d, const char *s) {
-    if (prefix(d) == PREFIX || prefix(s) == PREFIX) {
-        struct result r = trames_call_18((uintptr_t)d, (uintptr_t)s, 0);
-        if (!r.fallback) return (char *)r.value;
-        trames_bionic_strcpy(d + stream_length(d, SIZE_MAX), s);
-        return d;
-    }
-    return trames_orig_strcat(d, s);
+void *trames_bionic_large_mempcpy(void *d,const void *s,size_t n) {
+    struct result r=trames_call_1((uintptr_t)d,(uintptr_t)s,n);
+    return r.fallback ? trames_orig_mempcpy(d,s,n) : (char *)d+n;
 }
-char *trames_bionic_strncat(char *d, const char *s, size_t n) {
-    // n == 0 does not inspect s, including an inaccessible source pointer.
-    if (n && (n >= BULK || prefix(d) == PREFIX)) {
-        struct result r = trames_call_19((uintptr_t)d, (uintptr_t)s, n);
-        if (!r.fallback) return (char *)r.value;
-        size_t tail = stream_length(d, SIZE_MAX), len = stream_length(s, n);
-        trames_bionic_large_memcpy(d + tail, s, len); d[tail + len] = 0;
-        return d;
-    }
-    return trames_orig_strncat(d, s, n);
+size_t trames_bionic_strlcpy(char *d,const char *s,size_t n) {
+    if(prefix(s)<PREFIX) return trames_orig_strlcpy(d,s,n);
+    struct result r=trames_call_29((uintptr_t)d,(uintptr_t)s,n);
+    return r.fallback ? trames_orig_strlcpy(d,s,n) : r.value;
 }
-void *trames_bionic_large_mempcpy(void *d, const void *s, size_t n) {
-    trames_bionic_large_memcpy(d, s, n);
-    return (char *)d + n;
+size_t trames_bionic_large_strlcat(char *d,const char *s,size_t n) {
+    struct result r=trames_call_30((uintptr_t)d,(uintptr_t)s,n);
+    return r.fallback ? trames_orig_strlcat(d,s,n) : r.value;
 }
-static __attribute__((noinline)) size_t bounded_copy_stream(char *d, const char *s, size_t n) {
-    size_t length = stream_length(s, SIZE_MAX);
-    if (n) { size_t copy = length < n - 1 ? length : n - 1; trames_bionic_large_memcpy(d, s, copy); d[copy] = 0; }
-    return length;
+#define BDECL(type,name,args) ORIGINAL(type,name,args)
+BDECL(void *,memmem,(const void *,size_t,const void *,size_t));
+BDECL(char *,strstr,(const char *,const char *));
+BDECL(char *,strcasestr,(const char *,const char *));
+BDECL(size_t,strspn,(const char *,const char *));
+BDECL(size_t,strcspn,(const char *,const char *));
+BDECL(char *,strpbrk,(const char *,const char *));
+BDECL(int,strcasecmp,(const char *,const char *));
+BDECL(int,strncasecmp,(const char *,const char *,size_t));
+void *trames_bionic_memmem(const void *hay,size_t count,const void *needle,size_t n) {
+    if(!n) return (void *)hay;
+    if(n>count) return NULL;
+    if(count<BULK) return trames_orig_memmem(hay,count,needle,n);
+    uintptr_t request[4]={(uintptr_t)hay,count,(uintptr_t)needle,n};
+    struct result r=trames_bionic_call_1((uintptr_t)request,0,0);
+    return r.fallback ? trames_orig_memmem(hay,count,needle,n) : (void *)r.value;
 }
-size_t trames_bionic_strlcpy(char *d, const char *s, size_t n) {
-    if (prefix(s) < PREFIX) return trames_orig_strlcpy(d, s, n);
-    struct result len = trames_call_5((uintptr_t)s, 0, 0);
-    if (len.fallback) return bounded_copy_stream(d, s, n);
-    if (n) {
-        size_t copy = len.value < n - 1 ? len.value : n - 1;
-        struct result r = trames_call_1((uintptr_t)d, (uintptr_t)s, copy);
-        if (r.fallback) return trames_orig_strlcpy(d, s, n);
-        d[copy] = 0;
-    }
-    return len.value;
+#define SUBSTRING(name,id) \
+char *trames_bionic_##name(const char *s,const char *needle) { \
+    if(!*needle) return (char *)s; \
+    if(prefix(s)<PREFIX) return trames_orig_##name(s,needle); \
+    struct result r=trames_bionic_call_##id((uintptr_t)s,(uintptr_t)needle,0); \
+    return r.fallback ? trames_orig_##name(s,needle) : (char *)r.value; \
 }
-size_t trames_bionic_large_strlcat(char *d, const char *s, size_t n) {
-    struct result dst = trames_call_8((uintptr_t)d, n, 0);
-    if (dst.fallback) dst.value = stream_length(d, n);
-    struct result src = trames_call_5((uintptr_t)s, 0, 0);
-    if (src.fallback) src.value = stream_length(s, SIZE_MAX);
-    if (dst.value < n) {
-        size_t room = n - dst.value - 1;
-        size_t copy = src.value < room ? src.value : room;
-        struct result r = trames_call_1((uintptr_t)d + dst.value, (uintptr_t)s, copy);
-        if (r.fallback) trames_bionic_large_memcpy(d + dst.value, s, copy);
-        d[dst.value + copy] = 0;
-    }
-    return dst.value + src.value;
+SUBSTRING(strstr,2)
+SUBSTRING(strcasestr,3)
+#define SPAN(type,name,id) \
+type trames_bionic_##name(const char *s,const char *set) { \
+    if(prefix(s)<PREFIX) return trames_orig_##name(s,set); \
+    struct result r=trames_bionic_call_##id((uintptr_t)s,(uintptr_t)set,0); \
+    return r.fallback ? trames_orig_##name(s,set) : (type)r.value; \
 }
-
-ORIGINAL(void *, memmem, (const void *, size_t, const void *, size_t));
-ORIGINAL(char *, strstr, (const char *, const char *));
-ORIGINAL(char *, strcasestr, (const char *, const char *));
-ORIGINAL(size_t, strspn, (const char *, const char *));
-ORIGINAL(size_t, strcspn, (const char *, const char *));
-ORIGINAL(char *, strpbrk, (const char *, const char *));
-ORIGINAL(int, strcasecmp, (const char *, const char *));
-ORIGINAL(int, strncasecmp, (const char *, const char *, size_t));
-void *trames_bionic_memmem(const void *hay, size_t count, const void *needle, size_t n) {
-    if (!n) return (void *)hay;
-    if (n > count) return NULL;
-    if (count < BULK || n > 65536) return trames_orig_memmem(hay, count, needle, n);
-    uintptr_t offset = 0;
-    while (count - offset >= n) {
-        uintptr_t request[4] = {(uintptr_t)hay + offset, count - offset, (uintptr_t)needle, n};
-        struct result r = trames_bionic_call_1((uintptr_t)request, 0, 0);
-        if (r.fallback) return trames_orig_memmem((const char *)hay + offset, count - offset, needle, n);
-        if (r.value != UINTPTR_MAX) return (void *)r.value;
-        offset += CHUNK - n + 1;
-    }
-    return NULL;
+SPAN(size_t,strspn,4)
+SPAN(size_t,strcspn,5)
+SPAN(char *,strpbrk,6)
+static unsigned char lower(unsigned char c) { return c>='A' && c<='Z' ? c+32 : c; }
+int trames_bionic_strcasecmp(const char *a,const char *b) {
+    for(size_t i=0;i<PREFIX;++i) { unsigned char x=lower(a[i]),y=lower(b[i]); if(x!=y || !x) return (int)x-(int)y; }
+    struct result r=trames_bionic_call_7((uintptr_t)a,(uintptr_t)b,0);
+    return r.fallback ? trames_orig_strcasecmp(a,b) : (int)r.value;
 }
-#define SUBSTRING(name, id) \
-char *trames_bionic_##name(const char *s, const char *needle) { \
-    if (!*needle) return (char *)s; \
-    if (prefix(s) < PREFIX) return trames_orig_##name(s, needle); \
-    size_t n = trames_bionic_strlen(needle); \
-    if (n > 65536) return trames_orig_##name(s, needle); \
-    for (;;) { \
-        struct result r = trames_bionic_call_##id((uintptr_t)s, (uintptr_t)needle, n); \
-        if (r.fallback) return trames_orig_##name(s, needle); \
-        if (r.value != UINTPTR_MAX) return (char *)r.value; \
-        s += CHUNK - n + 1; \
-    } \
+int trames_bionic_strncasecmp(const char *a,const char *b,size_t n) {
+    if(n<BULK) return trames_orig_strncasecmp(a,b,n);
+    struct result r=trames_bionic_call_8((uintptr_t)a,(uintptr_t)b,n);
+    return r.fallback ? trames_orig_strncasecmp(a,b,n) : (int)r.value;
 }
-SUBSTRING(strstr, 2)
-SUBSTRING(strcasestr, 3)
-#define SPAN(name, id) \
-size_t trames_bionic_##name(const char *s, const char *set) { \
-    if (prefix(s) < PREFIX) return trames_orig_##name(s, set); \
-    size_t offset = 0; \
-    for (;;) { \
-        struct result r = trames_bionic_call_##id((uintptr_t)s + offset, (uintptr_t)set, 0); \
-        if (r.fallback) return offset + trames_orig_##name(s + offset, set); \
-        if (r.value != UINTPTR_MAX) return offset + r.value; \
-        offset += CHUNK; \
-    } \
-}
-SPAN(strspn, 4)
-SPAN(strcspn, 5)
-char *trames_bionic_strpbrk(const char *s, const char *set) {
-    if (prefix(s) < PREFIX) return trames_orig_strpbrk(s, set);
-    for (;;) {
-        struct result r = trames_bionic_call_6((uintptr_t)s, (uintptr_t)set, 0);
-        if (r.fallback) return trames_orig_strpbrk(s, set);
-        if (r.value != UINTPTR_MAX) return (char *)r.value;
-        s += CHUNK;
-    }
-}
-static inline unsigned char lower(unsigned char c) { return c >= 'A' && c <= 'Z' ? c + 32 : c; }
-int trames_bionic_strcasecmp(const char *a, const char *b) {
-    for (size_t i = 0; i < PREFIX; ++i) {
-        unsigned char x = lower((unsigned char)a[i]), y = lower((unsigned char)b[i]);
-        if (x != y || !x) return (int)x - (int)y;
-    }
-    for (;;) {
-        struct result r = trames_bionic_call_7((uintptr_t)a, (uintptr_t)b, 0);
-        if (r.fallback) return trames_orig_strcasecmp(a, b);
-        if (r.value != UINTPTR_MAX) return (int)r.value;
-        a += CHUNK; b += CHUNK;
-    }
-}
-int trames_bionic_strncasecmp(const char *a, const char *b, size_t n) {
-    if (n < BULK) return trames_orig_strncasecmp(a, b, n);
-    for (;;) {
-        struct result r = trames_bionic_call_8((uintptr_t)a, (uintptr_t)b, n);
-        if (r.fallback) return trames_orig_strncasecmp(a, b, n);
-        if (r.value != UINTPTR_MAX) return (int)r.value;
-        a += CHUNK; b += CHUNK; n -= CHUNK;
-    }
-}
-char *trames_bionic_strsep(char **state, const char *set) {
-    char *start = *state;
-    if (!start) return NULL;
-    size_t len = trames_bionic_strcspn(start, set);
-    if (start[len]) { start[len] = 0; *state = start + len + 1; } else *state = NULL;
+char *trames_bionic_strsep(char **state,const char *set) {
+    char *start=*state; if(!start) return NULL;
+    size_t n=trames_bionic_strcspn(start,set);
+    if(start[n]) { start[n]=0; *state=start+n+1; } else *state=NULL;
     return start;
 }
-char *trames_bionic_strtok_r(char *s, const char *set, char **state) {
-    if (!s) s = *state;
-    if (!s) return NULL;
-    s += trames_bionic_strspn(s, set);
-    if (!*s) { *state = NULL; return NULL; }
-    char *start = s;
-    s += trames_bionic_strcspn(s, set);
-    if (*s) { *s++ = 0; *state = s; } else *state = NULL;
+char *trames_bionic_strtok_r(char *s,const char *set,char **state) {
+    if(!s) s=*state; if(!s) return NULL;
+    s+=trames_bionic_strspn(s,set); if(!*s) { *state=NULL; return NULL; }
+    char *start=s; s+=trames_bionic_strcspn(s,set);
+    if(*s) { *s++=0; *state=s; } else *state=NULL;
     return start;
 }
 

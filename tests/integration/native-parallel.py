@@ -29,15 +29,14 @@ with tempfile.TemporaryDirectory(prefix='trames-native-parallel-') as folder:
         native,runtime=[json.loads(line.split(': ',1)[1]) for line in result.stderr.decode().splitlines()]
         assert native['faults']==0 and native['rejected']==0 and native['checkpoint_retries']==0,native
         if enabled:
-            assert all(native['function_calls']) and not any(native['function_fallbacks']),native
+            assert all(native['function_calls'][:19]) and not any(native['function_fallbacks']),native
             assert native['integer_conversions']>500 and native['numeric_conversions']>=32,native
             if not shared:assert native['callback_sorts']>=8 and native['callback_searches']>=4,native
-            if cpus>1:
-                assert native['worker_calls']>1000,native
-                # Short calls may not overlap in every host schedule; the worker/page
-                # guard unit tests enforce simultaneous peer progress deterministically.
-                assert runtime['peak_parallel_native_calls']>=1,runtime
-            else:assert native['worker_calls']==0 and runtime['peak_parallel_native_calls']==0,(native,runtime)
+            assert native['worker_calls']==native['calls'] and native['worker_calls']>1000,native
+            # Single-CPU execution also uses the worker after coordinator removal.
+            # Region tests enforce actual overlap deterministically; this fixture
+            # requires progress without assuming a particular host schedule.
+            assert runtime['peak_parallel_native_calls']>=1,runtime
         else:assert native['calls']==0 and native['worker_calls']==0,native
         rows.append(dict(enabled=enabled,cpus=cpus,shared_stack=shared,memory=memory,native=native,runtime=runtime))
         print(f'PASS native pthread cpus={cpus} enabled={enabled} shared_stack={shared} memory={memory}: all 19 entries, FP/errno, parsing and nested callbacks; worker_calls={native["worker_calls"]} native_overlap={runtime["peak_parallel_native_calls"]}',flush=True)

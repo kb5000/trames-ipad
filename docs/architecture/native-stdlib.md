@@ -22,12 +22,13 @@ all have the required 64-bit width.
 
 Public strtol, strtoul, strtoll, strtoull, strtoimax and strtoumax share this entry;
 the six existing `__*_internal` aliases retain their exported names. Original
-strtol.c is compiled with private symbol/weak-alias names for fallback. atoi,
-atol, atoll, wide-character conversion and scanf's original intscan stay guest.
+strtol.c is compiled with private symbol/weak-alias names for fallback.
+`atoi`/`atol`/`atoll` now use pure ID 31 with musl's original wrapping negative
+accumulation and no errno update; wide conversion and scanf's intscan stay guest.
 
 The floating module's page transport is reused: direct resident reads for a short
-prefix, expanding borrows within a page, bounded gathering/replay across pages,
-and original fallback at the 64 KiB ceiling. Delimiters/NUL stop before the next
+prefix, expanding borrows within a page, and call-owned gathering/replay across
+reached pages without the former 64 KiB input ceiling. Delimiters/NUL stop before the next
 unmapped page. Base 1, >36 and negative bases return EINVAL/end-at-source without
 reading the source, including NULL. Shared/live output frames select original
 before writes. The guest wrapper alone updates guest TLS errno and the caller's
@@ -51,9 +52,9 @@ Unbounded copies first scan through NUL, then preflight the entire destination.
 Bounded copies read at most n bytes, copy the exact reached source, and zero-pad
 through n after early NUL. strcpy/strncpy return the destination; stpcpy/stpncpy
 return the terminator/truncation pointer. n=0 dereferences neither pointer. An
-unbounded string reaching the ceiling, or n>64 KiB, falls back before effects.
-Directly writable output is required; shared/live or write-only mappings select original before
-writes. Original source objects and private fallbacks remain byte-for-byte pinned.
+unsupported output backing selects original before effects; input size alone
+does not cause fallback. The existing one-shot output rules handle shared and
+write-only mappings. Original source objects and private fallbacks remain byte-for-byte pinned.
 
 Copy/fill uses the existing checked memory API and original Arm native assembly.
 COW, live EOF checks and executable-page decode-token invalidation retain their
@@ -64,10 +65,11 @@ restrict-qualified overlapping copies defined.
 Long strcpy/stpcpy inputs use native transport after a 64-byte local HASZERO
 prefix; strncpy/stpncpy bounds below 128 stay local. Searches use a 64-byte local
 prefix. These are current conservative policies, not universal speed guarantees.
-Native work remains bounded and the existing cooperative return policy remains.
+Complete native requests return through the existing scheduling boundary; only
+actual memory mapping boundaries divide internal byte transport.
 
-Metrics add integer entry/completion counts and extend per-pure-function counts
-to 17. The existing numeric replay/input/result-byte counters now describe the
+Metrics retain integer entry/completion counts and extend per-pure-function
+counts to 32. The existing numeric replay/input/result-byte counters now describe the
 shared integer/floating scan transport; completed numeric_conversions continues
 to count floats separately from integer_conversions. Supplied bytes are not exact
 physical loads. Originals, MIT/Arm notices and hashes remain under the project's

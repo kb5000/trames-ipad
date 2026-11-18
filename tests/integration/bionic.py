@@ -34,6 +34,7 @@ def main():
     parser.add_argument("--cache", type=Path, default=ROOT / "target/android-toolchain")
     parser.add_argument("--bench-rounds", type=int, default=3)
     parser.add_argument("--baseline-bundle", type=Path, help="also compare a previously validated static Bionic bundle")
+    parser.add_argument("--baseline-runner", type=Path, help="paired previous runner for a product before/after comparison")
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
     rootfs, output, cache = args.rootfs.resolve(), args.output.resolve(), args.cache.resolve()
@@ -57,6 +58,10 @@ def main():
                    inputs={str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest()
                            for p in [Path(__file__), ROOT / "tests/fixtures/android-bionic.c"]},
                    runner_sha256=hashlib.sha256(args.runner.read_bytes()).hexdigest())
+    if args.baseline_runner:
+        results["baseline_runner_sha256"] = hashlib.sha256(args.baseline_runner.read_bytes()).hexdigest()
+    if args.baseline_bundle:
+        results["baseline_manifest"] = json.loads((args.baseline_bundle / "manifest.json").read_text())
     with tempfile.TemporaryDirectory(prefix="stores-", dir=output) as temporary:
         store = Path(temporary) / "store"
         prefix = [str(args.runner.resolve()), "--storage", str(store), "--cpus", "4", "--metrics",
@@ -69,8 +74,9 @@ def main():
                  "/bionic-probe": probe}
         imports = [part for guest, host in files.items() for part in ["--exec-file", guest + "=" + str(host)]]
 
-        def run(name, accelerator, extra=(), argument=None, expected=0):
+        def run(name, accelerator, extra=(), argument=None, expected=0, runner=None):
             command = prefix + ["--accelerator", accelerator] + list(extra)
+            if runner: command[0] = str(runner.resolve())
             command += ["--guest", "/system/bin/linker64", "/bionic-probe"] + ([argument] if argument else [])
             done = subprocess.run(command, capture_output=True, text=True, timeout=120)
             text = done.stdout + done.stderr
@@ -92,7 +98,7 @@ def main():
         select = ["--bionic-bundle", str(bundle)]
         export = Path(temporary) / "selected-libc.so"
         text, metrics = run("nativecall", "pure", select + ["--export", bionic + "/libc.so=" + str(export)])
-        assert "PASS Bionic 44 functions" in text and min(metrics["function_calls"]) > 0
+        assert "PASS Bionic 44 functions" in text and min(metrics["function_calls"][:19]) > 0
         actual = [line for line in text.splitlines() if line.startswith(('NUMERIC ', 'FLOAT '))]
         if actual != numeric_reference:
             differences = [dict(original=x, native=y) for x, y in zip(numeric_reference, actual) if x != y]
@@ -164,10 +170,11 @@ def main():
         # Compare exactly the same Bionic binary/fixture under the interpreter.
         variants = [("original", "off", select), ("nativecall", "pure", select)]
         if args.baseline_bundle:
-            variants.append(('previous22', 'pure', ['--bionic-bundle', str(args.baseline_bundle.resolve())]))
+            variants.append(('previous', 'pure', ['--bionic-bundle', str(args.baseline_bundle.resolve())]))
         for round in range(args.bench_rounds):
             for variant, accelerator, selection in variants[::1 if round % 2 == 0 else -1]:
-                text, _ = run(f"bench-{variant}-{round + 1}", accelerator, selection, argument="bench")
+                text, _ = run(f"bench-{variant}-{round + 1}", accelerator, selection, argument="bench",
+                              runner=args.baseline_runner if variant == "previous" else None)
                 for line in text.splitlines():
                     if line.startswith("BENCH "):
                         _, name, size, count, ns = line.split()
@@ -178,8 +185,8 @@ def main():
         for sample in variants.values():
             sample["nanoseconds"] = statistics.median(sample["samples_ns"])
         variants["speedup"] = variants["original"]["nanoseconds"] / variants["nativecall"]["nanoseconds"]
-        if 'previous22' in variants:
-            variants['previous_speedup'] = variants['previous22']['nanoseconds'] / variants['nativecall']['nanoseconds']
+        if 'previous' in variants:
+            variants['previous_speedup'] = variants['previous']['nanoseconds'] / variants['nativecall']['nanoseconds']
     (output / "summary.json").write_text(json.dumps(results, indent=2) + "\n")
     print(json.dumps(dict(cases={k: v["exit"] for k, v in results["cases"].items()}, benchmark=results["benchmark"]), indent=2))
 

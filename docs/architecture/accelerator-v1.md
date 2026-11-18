@@ -52,22 +52,25 @@ The CPU emits a typed exit and holds the HLT PC. Prior instructions are accounte
 for separately. A committed result advances PC by four and retires exactly one
 HLT; a backend memory fault leaves PC/input registers unchanged and uses existing
 Linux signals with the precise guest data address. Callee-saved GPRs, SP, TLS,
-flags and guest FP/vector state are retained. Calls are synchronous and at most
-1 MiB per bulk range/string scan (64 KiB for callback/numeric parsing); scheduling/cancellation resumes between calls. Unsupported
-larger work uses a typed return, then the original interpreted guest function.
+flags and guest FP/vector state are retained. Pure calls are synchronous and process complete memory/string/numeric requests
+without a byte ceiling; scheduling/cancellation resumes between calls. The separate
+callback-sort state budget remains 64 KiB. Unsupported backing uses a typed return
+to original guest code before effects.
 
 ## Memory and original code
 
 `trames-accel::native` validates guest memory in safe Rust. The development
 follow-up uses scoped direct page slices for ordinary guest memory; directional
 copy and host within-page memmove preserve overlap. Backed copies retain one
-bounded source snapshot, and resident shared writes borrow coherent fragments with backing hooks.
+source snapshot in the ordinary memory API; raw native calls instead select
+original execution for non-virtual aliases. Resident shared writes borrow coherent
+fragments with backing hooks.
 Unknown backings retain bounded staging.
 This supports COW, shared aliases and code-cache invalidation. The complete
 [optimization queue](../roadmap/musl-optimization.md) describes the direct and
 buffered cases. New full-musl entries require function bits from private auxv
 key `0x54520002`; old hosts without it retain original fallback for new calls.
-Copies/fills preflight the complete bounded data ranges. Ordinary pointer/protection/
+Copies/fills preflight the complete data ranges. Ordinary pointer/protection/
 EOF faults therefore precede writes; backing I/O errors may expose prior page writes.
 This does not promise the exact partial-store order of every upstream instruction.
 

@@ -1364,6 +1364,7 @@ jobs:
           python3 tests/integration/musl-hybrid.py
           python3 tests/integration/numeric.py
           python3 tests/integration/stdlib.py
+          python3 tests/integration/libc-unbounded.py --probe tests/fixtures/bin/musl-extended --bench-rounds 0
           python3 tests/integration/allocator.py | tee target/allocator-workflow.log
           python3 tests/integration/native-parallel.py | tee target/native-parallel-workflow.log
           python3 tests/integration/region-memory.py | tee target/region-memory-workflow.log

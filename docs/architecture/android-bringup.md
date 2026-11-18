@@ -1224,13 +1224,12 @@ The static derivative now adapts **44 public functions**. The additional 22 are
 This remains whole-library cold selection, rather than per-call interposition.
 No runtime architecture query or additional coordinator is introduced.
 
-Large memory/string operations continue through bounded 1 MiB native entries.
-Copy/move/fill preserve direction and continue only the unprocessed range after
-a no-effect fallback; a backward overlapping move never restarts a completed
-suffix. Long string scans and copies no longer fall back wholesale solely
-because the input exceeded the entry budget. The original short-copy entries
-remain intact. Streaming helpers are out of line so their loop state does not
-expand the common small-call frame.
+Large memory/string operations now use one complete native entry. There is no
+1 MiB entry ceiling or guest-side continuation state. Real mapping boundaries
+are handled inside the common CPU/native memory transport, with compatible
+private allocations coalesced through raw pointers under the existing execution
+authority. The original short-copy entries remain intact. `strlcpy`/`strlcat`
+include scanning and copying in one entry.
 
 The Bionic-specific module is `0x10009`: substring search (1–3), set spans and
 search (4–6), ASCII case comparison (7–8), floating conversion (9), bounded
@@ -1240,12 +1239,13 @@ ordinary string comparison (10), experimental guest-jemalloc cache pop/push
 Character-set tables, substring failure tables and numeric scratch belong to
 the current call. No cache retains guest pointers across entries. KMP handles
 repeated-prefix inputs in linear time; unmatched prefixes reuse the existing
-vector byte scan. Patterns/sets beyond the 64 KiB scratch budget retain the
-original library path. Tokenizer cursor writes remain caller-owned and do not
+vector byte scan. Patterns and numeric scratch no longer have fixed input-size ceilings. Scratch
+grows from reached valid pages; allocation failure selects original code before
+guest writes. Set spans build their fixed 256-byte membership table directly. Tokenizer cursor writes remain caller-owned and do not
 gain a global lock.
 
 Floating results use the pinned original Bionic/OpenBSD gdtoa algorithm from
-`android-13.0.0_r83`, not the host system `strtod`. The bounded existing scanner
+`android-13.0.0_r83`, not the host system `strtod`. The fragment scanner
 only determines whether another input fragment is needed. Per-invocation
 scratch replaces shared gdtoa caches; host errno and FP state are restored.
 The guest receives exact bits, end position, errno and FP status flags. Any
@@ -1290,3 +1290,17 @@ in [the extended validation record](../validation/android-bionic-extended-202611
 They are Mac-hosted interpreter microbenchmarks; Android UI responsiveness and
 physical-iPad behavior have not been measured in this batch. No iPad was woken,
 installed or monitored for these checks.
+
+#### Complete-request shared libc follow-up (2026-11-18)
+
+The musl equivalents now share these algorithms, including long inputs, instead
+of falling back at the former byte ceiling. Bionic module IDs and original-image
+selection stay compatible. Pure IDs 20–32 extend musl; old feature bits and old
+16-byte numeric results remain valid. The [paired validation record](../validation/libc-complete-20261118.json)
+compares the previous complete product, the new native path and original guest
+execution, including FP results/status, overlap, guard pages and shared-memory
+threads. This batch does not wake or operate the iPad.
+
+New Bionic resources must be paired with this runtime, including pure IDs 29/30.
+The backward compatibility claim is old Bionic resources on the new runtime;
+musl additionally negotiates new functions when used with an older host.

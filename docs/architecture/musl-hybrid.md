@@ -29,11 +29,17 @@ the original implementation. The wrappers/initializer have no stack protector.
 Known-size operations below 128 bytes stay in the original guest implementation.
 Enabled strlen first scans a bounded 64-byte aligned-word prefix using musl's
 HASZERO algorithm; an early NUL returns without host entry. Aligned words cannot
-cross a page. Larger work uses NativeCall v1, including its 1 MiB pure memory/string limits and
-typed original-code fallback. Disabled Trames sessions and ordinary Linux/QEMU
+cross a page. Larger work uses one NativeCall v1 entry for the complete request,
+without an input-size ceiling or guest continuation loop. Actual mapping boundaries
+remain inside the native memory transport; unsupported backing uses typed original-code fallback. Disabled Trames sessions and ordinary Linux/QEMU
 use original routines and never execute the virtual HLT.
 
-This is a complete hybrid libc/loader; current development adapts nineteen pure functions and adds [resumable sort/search callbacks](native-callbacks.md). Stateful
+This is a complete hybrid libc/loader. Current development adapts 35 public
+memory/string/plain-integer functions using 32 pure entry IDs (bitmap `0xffffffff`),
+and adds [resumable sort/search callbacks](native-callbacks.md).
+The extended set includes substring/set/case search, BSD bounded copies,
+`mempcpy`, locale aliases and `atoi`/`atol`/`atoll`. `strsep`/`strtok_r` reuse
+the accelerated spans through their unchanged original algorithms. Stateful
 native TLS/I/O and allocator cold paths remain future work requiring exact layout
 and ownership contracts. The [original-source mallocng profile](native-allocator.md)
 implements existing-group allocation and atomic fast free while preserving the
@@ -93,3 +99,34 @@ original fallback on earlier hosts.
 
 [Coherent backing and bulk memory](bulk-native.md) adds gated strcat/strncat,
 resident shared page borrows and bounded NEON fragment scans/comparisons.
+
+## Complete requests (2026-11-18)
+
+Bionic and musl share the same search/set/case implementation and the CPU's
+existing memory admission. Copy/fill coalesce adjacent private mappings only
+within one retained host allocation under the existing sole-executor proof.
+Raw pointers do not manufacture cross-page Rust slices. Shared pages keep the
+CPU's existing guards; no function-wide lock, coordinator or service thread is added.
+Virtual overlap uses directional native moves. Non-virtual physical aliases
+select original execution before effects, rather than snapshotting arbitrary
+input into a host allocation. Unrelated aliases do not disable ordinary copies.
+
+Search-pattern and floating-input scratch grows only from reached valid pages;
+allocation failure selects the original routine before guest writes. There is
+no 1 MiB memory/string ceiling or 64 KiB pattern/numeric ceiling. The separate
+resumable callback-sort state budget remains unchanged.
+
+New musl floating wrappers use pure ID 32 with a 24-byte result including FPSR.
+They preserve host FP/errno state, propagate guest exception flags, and select
+original code for nonzero guest FPCR. Existing numeric module `0x10003` keeps
+its 16-byte ABI for old libraries. See the paired measurement record in
+[complete-request validation](../validation/libc-complete-20261118.json).
+
+Three-round medians against the frozen previous product on the same ARM64 Mac
+showed musl 2 MiB memcpy at about 106 us (40x faster), strlen at 52 us (106x),
+and the 64 KiB one-character strspn at 1.9 us (510x). The large ratios include
+removing the previous interpreter fallback; they are not comparisons against
+native host libc. Bionic strspn improved about 12x and long strlen about 1.4x.
+Bionic 2 MiB overlapping memmove remains a regression in this fixture: about
+93 us versus 63 us previously. Complete-request dispatch does not remove all
+page transport/metadata cost, and these results do not claim a universal speedup.
