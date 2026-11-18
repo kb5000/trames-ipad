@@ -12,13 +12,9 @@ final class BridgeController: ObservableObject {
         guard let local else { return }
         if let running, !local.bridgeActive(running) { task?.cancel() }
         guard running == nil, let request = try local.pollBridge() else { return }
-        if UserDefaults.standard.object(forKey: "bridgeEnabled") as? Bool == false {
-            try local.rejectBridge(request.ticket, error: BridgeFailure(code: "denied", message: "Native Bridge is disabled in settings"))
-        } else {
-            // Environment admission, OS permissions and retained Files folder
-            // authorizations decide access; no per-request Trames consent.
-            executeHost(request,local:local)
-        }
+        // The environment policy, OS permissions and retained Files bookmarks
+        // decide access. There is no second, stale app-global permission gate.
+        executeHost(request,local:local)
     }
 
     private func executeHost(_ host:BridgeHostRequest,local:LocalSession) {

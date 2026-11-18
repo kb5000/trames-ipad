@@ -34,6 +34,16 @@ final class WorkspaceModel: ObservableObject {
         pictureInPicture.onError={ [weak self] in self?.error=$0 }
 
         #if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("--environment-ui-acceptance") {
+            do {
+                let root=try FileManager.default.url(for:.applicationSupportDirectory,in:.userDomainMask,appropriateFor:nil,create:true).appendingPathComponent("configuration-ui-acceptance",isDirectory:true)
+                if ProcessInfo.processInfo.arguments.contains("--environment-ui-reset"),FileManager.default.fileExists(atPath:root.path) {try FileManager.default.removeItem(at:root)}
+                let store=try EnvironmentStore(storageRoot:root);environment=store
+                directories=try ScopedDirectories(file:root.appendingPathComponent("folder-grants.json"))
+                Task {do {try await store.seedConfigurationUIFixtures();profiles=try await store.profiles();selectedEnvironmentID="alpine"}catch{self.error=error.localizedDescription}}
+            } catch {self.error=error.localizedDescription}
+            return
+        }
         if ProcessInfo.processInfo.arguments.contains("--workspace-ui-acceptance") || ProcessInfo.processInfo.arguments.contains("--keyboard-ui-acceptance") {
             let session=TerminalSession(title:"Alpine",isLocal:true)
             session.state="工作区交互验收";add(session)
@@ -229,14 +239,13 @@ final class WorkspaceModel: ObservableObject {
         session.pause(!appActive);session.bridge.directories=directories;add(session)
         session.startLocal(environment,useVolumeBudget:UserDefaults.standard.bool(forKey:"useVolumeBudget"),profile:profile,maintenance:maintenance,after:previous)
     }
-    func createEnvironment(name:String,distribution:String,initMode:String,packages:String,archive:URL?,sha256:String?) async throws {
-        guard let environment else {throw TramesError.message(L10n.text("环境存储不可用"))}
-        let profile=try await environment.create(name:name,distribution:distribution,initMode:initMode,packages:packages,archive:archive,sha256:sha256)
-        try await refreshEnvironments();openEnvironment(profile)
+    func stopEnvironment(_ profile:RootfsEnvironment) {
+        guard profile.id==selectedEnvironmentID else{return};stopLocal()
     }
-    func configureBoot(_ profile:RootfsEnvironment,mode:String) async throws {
-        guard let environment else {return}
-        _=try await environment.setBoot(profile,mode:mode);try await refreshEnvironments()
+    func createEnvironment(name:String,distribution:String,initMode:String,packages:String,archive:URL?,sha256:String?,configuration:EnvironmentConfiguration? = nil) async throws -> RootfsEnvironment {
+        guard let environment else {throw TramesError.message(L10n.text("环境存储不可用"))}
+        let profile=try await environment.create(name:name,distribution:distribution,initMode:initMode,packages:packages,archive:archive,sha256:sha256,configuration:configuration)
+        try await refreshEnvironments();return profile
     }
     func resetLocal() {
         guard let environment,!resetting else {return}

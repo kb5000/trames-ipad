@@ -8,7 +8,8 @@ import TramesKit
 final class ClipboardBridgeTests:XCTestCase {
     func testGuestClipboardRequestsAutomaticallyReachTheSystemPasteboard() async throws {
         let defaults=UserDefaults.standard,previous=defaults.object(forKey:"bridgeEnabled")
-        defaults.set(true,forKey:"bridgeEnabled")
+        // A stale former global setting must not override the environment grant.
+        defaults.set(false,forKey:"bridgeEnabled")
         let pasteboard=UIPasteboard.general,oldItems=pasteboard.items
         let directory=FileManager.default.temporaryDirectory.appendingPathComponent("clipboard-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at:directory,withIntermediateDirectories:true)
@@ -38,7 +39,6 @@ final class ClipboardBridgeTests:XCTestCase {
             let marker="\r\nCLIP_REPLY_\(index):"
             while Date()<deadline {
                 try controller.poll()
-                XCTAssertNil(controller.challenge,"Clipboard requests must not open an extra App confirmation")
                 output+=String(decoding:try native.receive(),as:UTF8.self)
                 if let range=output.range(of:marker),output[range.upperBound...].contains("\r\n") { break }
                 try await Task.sleep(for:.milliseconds(20))

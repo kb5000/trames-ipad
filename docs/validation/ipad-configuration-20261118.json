@@ -1,0 +1,96 @@
+{
+  "date": "2026-11-18",
+  "base": "1ecf5b1384b72493777064380c41b12cebf690fa",
+  "runtime_unchanged": "7f408e32bcefd3744d17bb20317c857cd67ca5af",
+  "scope": "iPad environment configuration parity with supported Mac manager settings; original shared TOML/authorization codec, no guest locale changes or execution/coordinator redesign.",
+  "implementation": [
+    "Full-screen adaptive sidebar and overview/configuration/files/permissions/activity pages.",
+    "Per-environment CPU, memory, startup/session, native components and host/no-network controls.",
+    "TOML draft edit/import/export and fresh identity on creation.",
+    "Single allow/deny control per supported capability, independent local grant and OS/Files authority.",
+    "Lossless schema tree and original Boolean serialization; validation before writes, stale-write rejection and best-effort I/O rollback.",
+    "Saved settings apply on next start, including normal Debian preparation.",
+    "Configured auto memory uses host-managed limits and original provider callback with actual host metadata; no new thread, polling or fixed guest pool.",
+    "New environment creation remains stopped and keeps primary action visible above the keyboard.",
+    "Current environment stop/restart uses the existing workspace lifecycle; no data reset or new runtime control path."
+  ],
+  "checks": {
+    "rust_ffi_tests": {
+      "passed": 24,
+      "failed": 0
+    },
+    "rust_ffi_clippy_all_targets_all_features": "passed on macOS",
+    "swift_package": {
+      "configuration_and_existing_tests": 6,
+      "real_guest_settings_test": 1,
+      "failed": 0
+    },
+    "real_guest": [
+      "actual one-core /proc/cpuinfo",
+      "configured /tmp cwd",
+      "256 MiB MemTotal",
+      "auto MemTotal exceeds old 1 GiB limit on this host"
+    ],
+    "simulator": {
+      "device": "iPad Pro 13-inch (M5)",
+      "runtime": "iOS 27.0",
+      "sdk": "27.2",
+      "app_unit_tests": 5,
+      "ui_tests": 4,
+      "failed": 0,
+      "cases": [
+        "Independent profiles, persisted systemd setup flag, fresh imported identity and non-escalating editor merge.",
+        "Locale catalogs and existing clipboard transfer with former app-global Bridge disabled.",
+        "Chinese CPU/memory/permission save, other-environment isolation, discard/cancel, relaunch persistence.",
+        "English Android configuration and actual environment creation with portrait soft keyboard visible.",
+        "Existing English/Chinese app Settings entry flows."
+      ],
+      "evidence": [
+        "target/ipad-config/manager-ui-first.xcresult (passed clipboard and language tests reused)",
+        "target/ipad-config/manager-ui-final.xcresult (final configuration, locale and manager tests passed)"
+      ]
+    },
+    "builds": {
+      "simulator": "Debug app and tests passed",
+      "physical_target": "unsigned Release compiled; no signing/install/launch/device contact"
+    },
+    "resources": "Existing source-checked guest resources reused; current simulator MoltenVK built from cached inputs.",
+    "broader_acceptance": "Unchanged CPU/Linux/network/GPU acceptance reused; no broad guest or device rerun."
+  },
+  "limits": [
+    "One local iPad environment runs at a time; opening another stops the previous runtime.",
+    "Bridge/port publishing, host command/CLI and direct host folder mounts remain unavailable on iPad.",
+    "Permissions and configuration edits apply on next start, not live revocation.",
+    "Configuration/grant/catalog replacement is atomic per file, not a multi-file power-loss transaction.",
+    "Physical-iPad live behavior and audio capture were not tested in this iteration."
+  ],
+  "screenshots": [
+    "assets/ipad-environment-manager-20261118.png",
+    "assets/ipad-environment-create-20261118.png"
+  ],
+  "inputs_sha256": {
+    "apps/ios/Trames/BridgeController.swift": "404d0ff49565aada179295aa7a0be2fb521af68433b78764d8c1d7eff79be00b",
+    "apps/ios/Trames/EnvironmentEditorView.swift": "9a4d48a0dc747693746a49646a82f241e1710727eb63d4e880af0d7069cadef9",
+    "apps/ios/Trames/EnvironmentManagerView.swift": "b67b959448f6f8a9ee45dfcb0452b25ba0d0971ea15ed35b44bc00141a664e2e",
+    "apps/ios/Trames/EnvironmentStore.swift": "51deccc31181d4558862a7a697e89a57addb64fabbe6872a9dc3e1638151c340",
+    "apps/ios/Trames/FolderGrantsView.swift": "66f97f197800fa5b4a7cdd4e3a11e7a97f110ffd3af799dd468b8ac5715f5d00",
+    "apps/ios/Trames/TerminalSession.swift": "0b071eefbbe2cb1247a7e520a17d84a81462ba29d57e7bcf00290c31602646e7",
+    "apps/ios/Trames/TramesApp.swift": "d8a267f99f35834bdc6cfeab1ed4c53f6cba3b727099680420d8cc3a19746825",
+    "apps/ios/Trames/WorkspaceModel.swift": "b71111b2b4a34576c9839a30ef0f1dd32728df52b05fbcf5a9957bf9b5d2228f",
+    "apps/ios/Trames/en.lproj/InfoPlist.strings": "e835379c323e72d17b82c10fceb5b9ab32714c304dba68305d81720b5fcd4dce",
+    "apps/ios/Trames/zh-Hans.lproj/InfoPlist.strings": "50edf1d087a5c6acba6d5c2c176e5fe6a5b87d4d4b0aa50e08c429dc04656105",
+    "apps/ios/Trames-Info.plist": "b3463e590697d7aee20a315935705c8124ef54256859b90fb0429f2e94cbb2d8",
+    "apps/ios/TramesFileSystem/en.lproj/Localizable.strings": "d2d52ae17aeccf83b7f7f3d07fe07df8f406397384761c94b3dab90aaadd07dc",
+    "apps/ios/TramesFileSystem/zh-Hans.lproj/Localizable.strings": "c6dc9ab3fdb9e641933c42c703e9138c7ee31073d5ba849f655f29b311b64ca9",
+    "apps/ios/TramesKit/Sources/TramesKit/EnvironmentConfiguration.swift": "cf3a77b88ab0cdd2d980d16ffd5361ff91b1e1f3a6d2c7157490a2eb6e52b904",
+    "apps/ios/TramesKit/Tests/TramesKitTests/EnvironmentConfigurationTests.swift": "962cb00b6ac09e4a239baf769bef47f91813604687375e6f0d43f20343b672b9",
+    "apps/ios/TramesTests/ClipboardBridgeTests.swift": "49f093be301def566b5140630f133a5a9c2f4bfd3b800bfc02806d45a2958cb3",
+    "apps/ios/TramesTests/EnvironmentConfigurationTests.swift": "0449cb20ba8bc966aa3bf4887f45f92355b692c5a67e7bec535e335d7650e6dd",
+    "apps/ios/TramesUITests/EnvironmentManagerTests.swift": "1cea83763be7772734ac2dd11233936d4e2c3a65c87292e1daa985e50362b6b5",
+    "apps/ios/TramesUITests/LaunchTests.swift": "1ae932073dccc9c9caf1def292553de32cfa2d81cfb4519b6abf3616551b8a7a",
+    "crates/trames-ffi/Cargo.toml": "ea7e9b5c4cd2fa3ba6925bea1c7524234c6a29be4606b31bfc93cfb65362f60d",
+    "crates/trames-ffi/src/host_memory.rs": "0af818b22cea1ba5395043c6f16b9a8d5646c041ae313219c26813c32331967f",
+    "crates/trames-ffi/src/lib.rs": "8697080ef3fdab2ad00eefddbf4a41157dec384e03e9b9c983877e6f0727da6d",
+    "crates/trames-ffi/src/session.rs": "1f6d6f3c3d64bf5be9b05428d493984d7c55bef4523f511aa1e9c13c392330d8"
+  }
+}

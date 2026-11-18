@@ -1,11 +1,14 @@
 # Linux environments on iPad
 
-Open **+ → Linux 环境 → 新建 Linux 环境**. Existing Alpine data keeps its original
+Open **+ → Linux Environments → New Environment**. Existing Alpine data keeps its original
 store and Files identity. New environments have independent software and files;
 one local environment runs at a time. Switching stops the current Linux session.
 Returning from the background resumes the selected session.
 
-Choose Alpine, Debian 13, or a custom ARM64 Linux rootfs. The built-in distributions
+Choose Alpine, Debian 13, Android, or a custom ARM64 Linux rootfs. Creation saves
+an independent profile; select **Open Environment** when ready to install/start
+it. Creating or inspecting another profile does not stop the current environment.
+The built-in distributions
 use immutable source URLs and checked SHA-256 digests. Debian defaults to daily
 tools: certificates, Git/SSH clients, editors, download/network/process utilities
 and archive tools. The development profile also installs compilers, Python,
@@ -13,10 +16,70 @@ CMake and Ninja; the base profile leaves those optional packages out. Package
 setup runs in the guest and streams its output into the terminal.
 
 Debian can start with a shell or original systemd as PID 1. Selecting systemd
-installs systemd and D-Bus when needed. In the environment's **更多** menu, change
-the boot mode for its next start. **打开维护终端** temporarily starts a shell and
+installs systemd and D-Bus when needed. In **Configuration → Startup and Sessions**,
+change the boot mode for its next start. **Open Maintenance Terminal** temporarily starts a shell and
 skips pending package setup, so a stopped or interrupted installation can be
 repaired. Reopening normally retries the configured preparation.
+
+## Per-environment configuration
+
+The full-screen manager uses a sidebar and five pages: **Overview**,
+**Configuration**, **Files and Sharing**, **Host Access**, and **Activity**.
+It adapts to landscape/portrait and smaller windows. New Environment keeps its
+primary action above the soft keyboard. UI text supports English and Chinese;
+this does not change guest LANG or locale.
+
+Each environment has its own host TOML profile, using the same Rust schema and
+codec as Mac/CLI. Configure CPU cores (all available by default), demand-backed
+memory, an optional extra limit, boot mode, literal shell arguments, working
+directory, application windows, Vulkan, VA-API, thunking, audio input/output and
+host/no-network mode. The former app-global memory, Vulkan and Bridge switches
+no longer override an environment profile. App Settings retains device-specific
+storage, folder authorizations and diagnostics.
+
+`memory = "auto"` uses host-managed accounting instead of silently inheriting
+the old 1 GiB/512 MiB embedding defaults. It allocates no pool in advance. Guest
+memory information comes from the actual host; on physical iOS, availability
+also reflects Apple's public per-process memory allowance. iPadOS still decides
+how much resident memory the app may use. A concrete size (or `memory_limit`)
+sets the common runtime's aggregate/per-process quota. Legacy embedding callers
+without a TOML keep their explicit/default budgets. Normal Debian package
+preparation receives the environment's configuration too; maintenance deliberately
+provides a repair session independently of a broken profile.
+
+Edits are drafts until **Save Configuration**. They apply at the next start;
+saving does not restart a running environment. Use **More → Restart Environment**
+to apply changes to the active environment, or **Stop Environment** to stop it
+without deleting its files. Unsaved changes require a save,
+discard or cancel decision before switching or closing the editor. External
+file changes are detected before overwriting a draft. Configuration validation
+finishes before writing, and each file replacement is atomic; multiple profile,
+authorization and catalog files are not a power-loss transaction.
+
+**Edit TOML**, **Import TOML** and **Export TOML** are in Overview. Import into an
+existing environment keeps its identity and installed image. **Create from TOML**
+creates a new identity; custom/Android images still require an explicit Files
+archive selection. Imported archive digests populate the checksum field.
+Unedited schema fields, arrays, capability scopes and cross-platform settings
+survive the Swift editor. Arguments are separate literal tokens, not a shell
+command to split or evaluate.
+
+Host Access shows a single permission switch for clipboard, file transfers and
+host UI actions. Saving synchronizes the request and independent local grant.
+Missing authorizations are denied; imported TOML never raises an existing local
+grant. Allowed operations run without another Trames confirmation; iPadOS
+permissions and retained Files folder bookmarks still apply. Microphone input
+also requires the system microphone permission.
+
+Trames bridge attachments/port publication, direct host folder mounts, host
+command execution and the host Trames CLI remain Mac-only. The iPad UI identifies
+these limitations rather than offering an enabled but ineffective control.
+Keeping a cross-platform TOML field does not enable its unavailable backend.
+
+The [configuration validation record](../validation/ipad-configuration-20261118.json)
+covers real isolated guest CPU/memory/cwd results, authority and conflict tests,
+simulator interaction in both languages, and unsigned physical-target compilation.
+No physical iPad was contacted or updated for this iteration.
 
 Custom rootfs import uses a Files-selected `tar` or `tar.gz` copy, with an optional
 SHA-256. The archive root must contain executable `/bin/sh`, `setsid` on the normal

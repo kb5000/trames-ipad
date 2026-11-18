@@ -74,10 +74,7 @@ final class TerminalSession: NSObject, ObservableObject, Identifiable, TerminalV
             do {
                 await previous?.waitUntilClosed()
                 try Task.checkCancellation()
-                let gpu = UserDefaults.standard.object(forKey: "vulkanCompute") as? Bool ?? true
-                let memory = UserDefaults.standard.object(forKey: "guestMemoryMiB") as? Int ?? 1024
-                let processMemory = UserDefaults.standard.object(forKey: "guestProcessMemoryMiB") as? Int ?? 512
-                let local = try await environment.start(profile:profile,useVolumeBudget:useVolumeBudget,vulkan:gpu,memoryBudgetMiB:memory,processMemoryBudgetMiB:min(processMemory,memory),maintenance:maintenance) { [weak self] bytes in
+                let local = try await environment.start(profile:profile,useVolumeBudget:useVolumeBudget,maintenance:maintenance) { [weak self] bytes in
                     Task { @MainActor in self?.terminal.feed(byteArray:Array(bytes)[...]) }
                 }
                 guard let self, !self.closed else { local.close(); return }
@@ -227,7 +224,7 @@ final class TerminalSession: NSObject, ObservableObject, Identifiable, TerminalV
         if !errors.isEmpty {onFileProviderError?(L10n.text("部分 Files 编辑未写回，修改副本已保留。\n")+errors.prefix(4).joined(separator:"\n"))}
     }
     private func synchronizeClipboard() {
-        guard environmentOwner == nil,!paused,local != nil,UserDefaults.standard.object(forKey:"bridgeEnabled") as? Bool != false else { return }
+        guard environmentOwner == nil,!paused,local != nil else { return }
         // change notifications carry no clipboard text; actual reads happen
         // only when a Wayland client requests the text offer.
         try? local?.waylandCommand(["op":"clipboard_changed"])

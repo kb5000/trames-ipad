@@ -6,6 +6,7 @@
 mod android_boot;
 mod android_logcat;
 mod clipboard;
+mod host_memory;
 mod session;
 mod terminals;
 mod wayland;
@@ -152,6 +153,24 @@ pub unsafe extern "C" fn trames_environment_config(
                         .map_err(|e| e.to_string())?;
                     c.validate().map_err(|e| e.to_string())?;
                     model::encode(&c).map_err(|e| e.to_string())?.into_bytes()
+                }
+                "authorization-decode" => {
+                    let auth: model::Authorization =
+                        model::decode(request["toml"].as_str().ok_or("TOML is required")?)
+                            .map_err(|e| e.to_string())?;
+                    auth.for_environment(&auth.environment_uuid)
+                        .map_err(|e| e.to_string())?;
+                    serde_json::to_vec(&auth).map_err(|e| e.to_string())?
+                }
+                "authorization-encode" => {
+                    let auth: model::Authorization =
+                        serde_json::from_value(request["value"].clone())
+                            .map_err(|e| e.to_string())?;
+                    auth.for_environment(&auth.environment_uuid)
+                        .map_err(|e| e.to_string())?;
+                    model::encode(&auth)
+                        .map_err(|e| e.to_string())?
+                        .into_bytes()
                 }
                 _ => return Err("unknown configuration action".into()),
             };
@@ -888,5 +907,18 @@ mod environment_config_tests {
         assert!(
             codec(serde_json::json!({"action":"decode","toml":"[resources]\ncpuz=4"})).is_err()
         );
+    }
+    #[test]
+    fn host_authorizations_use_original_boolean_codec_and_do_not_accept_config_files() {
+        let uuid = "e478757e-f5ab-40d9-aa62-d048b27da7a3";
+        let text = codec(serde_json::json!({"action":"authorization-encode","value":{
+            "environment_uuid":uuid,"grant":{"clipboard":true,"files":false}
+        }}))
+        .unwrap();
+        let value:serde_json::Value=serde_json::from_slice(&codec(serde_json::json!({"action":"authorization-decode","toml":String::from_utf8(text).unwrap()})).unwrap()).unwrap();
+        assert_eq!(value["grant"]["clipboard"], true);
+        assert_eq!(value["grant"]["files"], false);
+        assert!(codec(serde_json::json!({"action":"authorization-encode","value":{"environment_uuid":uuid,"grant":{"clipboard":0}}})).is_err());
+        assert!(codec(serde_json::json!({"action":"authorization-decode","toml":"version=1\n[environment]\nname='test'"})).is_err());
     }
 }

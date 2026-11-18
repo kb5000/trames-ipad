@@ -13,7 +13,7 @@ struct FolderGrantsView: View {
             Section(L10n.text("添加目录授权")) {
                 Toggle(L10n.text("允许 Linux 导出新文件到此目录"), isOn: $writable)
                 Button(L10n.text("选择 Files 目录")) { chooser = true }
-                Text(L10n.text("默认仅允许导入。每次复制仍会询问；目标已存在时拒绝覆盖，每个文件最多 1 GiB。")).font(.caption)
+                Text(L10n.text("授权目录后，文件传输按环境权限直接执行。目标已存在时拒绝覆盖。")).font(.caption)
             }
             Section(L10n.text("已授权目录")) {
                 ForEach(grants) { grant in

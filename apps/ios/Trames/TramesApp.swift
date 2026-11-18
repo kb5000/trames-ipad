@@ -117,7 +117,7 @@ struct WorkspaceView: View {
         }
         .background(.black)
         .sheet(isPresented: $filesSheet) { if let session = workspace.current { TransferView(session: session) } }
-        .sheet(isPresented:$environmentsSheet) {EnvironmentManagerView(workspace:workspace)}
+        .fullScreenCover(isPresented:$environmentsSheet) {EnvironmentManagerView(workspace:workspace)}
         .sheet(isPresented: $settingsSheet) { SettingsView(workspace: workspace) }
         .alert("Trames", isPresented: Binding(get: { workspace.error != nil }, set: { if !$0 { workspace.error = nil } })) {
             Button(L10n.text("好")) { workspace.error = nil }
@@ -166,15 +166,7 @@ struct SettingsView: View {
     @ObservedObject var workspace: WorkspaceModel
     @Environment(\.dismiss) private var dismiss
     @AppStorage("useVolumeBudget") private var volume = false
-    @AppStorage("vulkanCompute") private var vulkan = true
-    @AppStorage("bridgeEnabled") private var bridge = true
-    @AppStorage("guestMemoryMiB") private var memoryTotal = 1024
-    @AppStorage("guestProcessMemoryMiB") private var memoryProcess = 512
-    private var memoryChoices: [Int] {
-        [256, 512, 1024, 2048, 3072, 4096, 6144, 8192, 12288, 16384].filter {
-            (UInt64($0) << 20) <= ProcessInfo.processInfo.physicalMemory
-        }
-    }
+    @State private var managingEnvironments=false
     @State private var resetConfirmation = false
     @State private var collectingAndroidDiagnostics = false
     @State private var androidDiagnosticsURL:URL?
@@ -182,32 +174,17 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section(L10n.text("本地内存")) {
-                    Picker(L10n.text("Linux 总预算"), selection: $memoryTotal) {
-                        ForEach(memoryChoices, id: \.self) { value in
-                            Text(ByteCountFormatter.string(fromByteCount: Int64(value) << 20, countStyle: .binary)).tag(value)
-                        }
-                    }
-                    .onChange(of: memoryTotal) { _, value in memoryProcess = min(memoryProcess, value) }
-                    Picker(L10n.text("单进程预算"), selection: $memoryProcess) {
-                        ForEach(memoryChoices.filter { $0 <= memoryTotal }, id: \.self) { value in
-                            Text(ByteCountFormatter.string(fromByteCount: Int64(value) << 20, countStyle: .binary)).tag(value)
-                        }
-                    }
-                    Text(L10n.text("默认总预算 1 GiB、单进程 512 MiB。内存按需使用，不会预先分配；请为 iPadOS 和其他应用留出空间。下次打开本地终端生效。")).font(.caption)
+                Section(L10n.text("环境配置")) {
+                    LabeledContent(L10n.text("当前环境"),value:workspace.selectedEnvironment.name)
+                    Button(L10n.text("管理环境配置"),systemImage:"slider.horizontal.3") {managingEnvironments=true}
+                    Text(L10n.text("CPU、内存、原生组件、网络与访问权限分别保存在每个环境的 TOML 配置中。")).font(.caption).foregroundStyle(.secondary)
                 }
                 Section(L10n.text("本地磁盘")) {
                     Toggle(L10n.text("使用设备卷容量作为存储预算"), isOn: $volume)
                     Text(L10n.text("默认预算 16 GiB；启用后按应用所在卷的总容量计算。实际可用空间仍受系统剩余容量限制，下次打开本地终端生效。")).font(.caption)
                     Button(L10n.text("重置 Linux 环境"),role:.destructive) {resetConfirmation=true}.disabled(workspace.resetting)
                 }
-                Section(L10n.text("Linux 与 iPad")) {
-                    Toggle(L10n.text("允许 Linux 发起原生访问请求"), isOn: $bridge)
-                    Text(L10n.text("文本剪贴板自动与 iPad 互通，读取由 iPadOS 请求权限。其他原生请求仍需逐次允许；关闭后所有新请求都会被拒绝。")).font(.caption)
-                    if let directories = workspace.directories {
-                        NavigationLink(L10n.text("Files 目录授权")) { FolderGrantsView(store: directories) }
-                    }
-                }
+                if let directories=workspace.directories {Section(L10n.text("设备目录授权")) {NavigationLink(L10n.text("Files 目录授权")) {FolderGrantsView(store:directories)}}}
                 Section(L10n.text("后台行为")) { Text(L10n.text("进入后台后暂停本地 Linux；返回前台后继续。Files 采用独立副本导入和导出。")).font(.caption) }
                 if FileManager.default.fileExists(atPath:PreparationDiagnostics.logURL.path) {
                     Section(L10n.text("诊断")) {
@@ -234,11 +211,8 @@ struct SettingsView: View {
                         }
                     }
                 }
-                Section("GPU") {
-                    Toggle(L10n.text("Vulkan 计算与图形（实验）"), isOn: $vulkan)
-                    Text(L10n.text("下次打开本地终端生效。需在 Linux 安装 vulkan-loader；支持选定计算、图形和 Wayland 接口。Wayland 应用各自显示为 App 内窗口，调整窗口大小会请求应用改变分辨率。窗口也可停靠到顶部标签栏。")).font(.caption)
-                }
             }.navigationTitle(L10n.text("设置")).toolbar { Button(L10n.text("完成")) { dismiss() } }
+                .fullScreenCover(isPresented:$managingEnvironments) {EnvironmentManagerView(workspace:workspace)}
                 .alert(L10n.text("重置 Linux 环境？"),isPresented:$resetConfirmation) {
                     Button(L10n.text("删除并重新初始化"),role:.destructive) {dismiss(); workspace.resetLocal()}
                     Button(L10n.text("取消"),role:.cancel) {}

@@ -27,10 +27,10 @@ final class LaunchTests: XCTestCase {
         XCTAssertFalse(app.staticTexts[language == "en" ? "本地内存" : "Local Memory"].exists)
     }
     func testEnglishApplicationLanguage() {
-        checkLanguage("en",actions:"New or manage sessions",settings:"Settings",memory:"Local Memory",done:"Done")
+        checkLanguage("en",actions:"New or manage sessions",settings:"Settings",memory:"Environment Configuration",done:"Done")
     }
     func testChineseApplicationLanguage() {
-        checkLanguage("zh-Hans",actions:"新建或管理会话",settings:"设置",memory:"本地内存",done:"完成")
+        checkLanguage("zh-Hans",actions:"新建或管理会话",settings:"设置",memory:"环境配置",done:"完成")
     }
     func testWorkspaceTabsDetachDockAndTerminalTitleRemainsVisible() {
         let app=launchApp(["--workspace-ui-acceptance"])

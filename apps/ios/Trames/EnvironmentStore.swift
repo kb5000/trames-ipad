@@ -24,13 +24,14 @@ actor EnvironmentStore {
     private var starting = false
     private var preparation: LocalSession?
     private var preparationPaused=false
-    init() throws {
-        let privateRoot=try FileManager.default.url(for:.applicationSupportDirectory,in:.userDomainMask,appropriateFor:nil,create:true).appendingPathComponent("Trames",isDirectory:true)
+    init(storageRoot:URL? = nil) throws {
+        let privateRoot=try storageRoot ?? FileManager.default.url(for:.applicationSupportDirectory,in:.userDomainMask,appropriateFor:nil,create:true).appendingPathComponent("Trames",isDirectory:true)
+        let sharedRoot=storageRoot == nil ? RootfsLocations.sharedRoot : nil
         authorizationRoot=privateRoot
         try FileManager.default.createDirectory(at:privateRoot,withIntermediateDirectories:true)
-        let newCatalog = !FileManager.default.fileExists(atPath:privateRoot.appendingPathComponent("roots.json").path) && !FileManager.default.fileExists(atPath:(RootfsLocations.sharedRoot ?? privateRoot).appendingPathComponent("roots.json").path)
-        root=try RootfsLocations.prepare(privateRoot:privateRoot,sharedRoot:RootfsLocations.sharedRoot)
-        UserDefaults.standard.set(root==RootfsLocations.sharedRoot,forKey:"rootfsFileProviderAvailable")
+        let newCatalog = !FileManager.default.fileExists(atPath:privateRoot.appendingPathComponent("roots.json").path) && !FileManager.default.fileExists(atPath:(sharedRoot ?? privateRoot).appendingPathComponent("roots.json").path)
+        root=try RootfsLocations.prepare(privateRoot:privateRoot,sharedRoot:sharedRoot)
+        if storageRoot == nil {UserDefaults.standard.set(root==RootfsLocations.sharedRoot,forKey:"rootfsFileProviderAvailable")}
         try FileManager.default.createDirectory(at:root,withIntermediateDirectories:true)
         try FileManager.default.createDirectory(at:root.appendingPathComponent("environments",isDirectory:true),withIntermediateDirectories:true)
         if !FileManager.default.fileExists(atPath:root.appendingPathComponent("roots.json").path) {try RootfsCatalog.alpine.save(root)}
@@ -98,7 +99,7 @@ actor EnvironmentStore {
         }
         return try await withTaskCancellationHandler(operation:{try await task.value},onCancel:{task.cancel()})
     }
-    func create(name:String,distribution:String,initMode:String,packages:String,archive:URL?,sha256:String?) async throws -> RootfsEnvironment {
+    func create(name:String,distribution:String,initMode:String,packages:String,archive:URL?,sha256:String?,configuration:EnvironmentConfiguration? = nil) async throws -> RootfsEnvironment {
         let name=name.trimmingCharacters(in:.whitespacesAndNewlines)
         guard !name.isEmpty,name.utf8.count<=255,!name.contains("/"),!name.utf8.contains(0),["alpine","debian","custom","android"].contains(distribution),["shell","systemd"].contains(initMode),["minimal","standard","development"].contains(packages),distribution != "alpine" || initMode=="shell" else {throw TramesError.message(L10n.text("环境配置无效"))}
         if distribution == "android", initMode != "shell" {throw TramesError.message("Android uses its own init")}
@@ -114,7 +115,12 @@ actor EnvironmentStore {
         do {
             let previous=try profiles()
             guard previous.count<64 else {throw TramesError.message(L10n.text("环境数量已达上限"))}
-            try writeConfiguration(profile)
+            if var configuration {
+                guard configuration.string("environment.type")==profile.bootTarget else {throw TramesError.message(L10n.text("导入配置的系统类型与此环境不一致"))}
+                configuration.set("environment.uuid",.string(id));configuration.set("environment.name",.string(name));configuration.set("image.distribution",.string(distribution));configuration.set("image.sha256",.string(digest ?? ""));configuration.set("boot.mode",.string(distribution=="android" ? "android":initMode))
+                let path=self.configuration(profile);try FileManager.default.createDirectory(at:path.deletingLastPathComponent(),withIntermediateDirectories:true)
+                try configuration.toml().write(to:path,options:.atomic)
+            } else {try writeConfiguration(profile)}
             try LocalSession.environmentConfig(["action":"grant","uuid":profile.id,"clipboard":true]).write(to:grants(profile),options:.atomic)
             try RootfsCatalog(version:1,environments:previous+[profile]).save(root)
         } catch {try? FileManager.default.removeItem(at:source(profile));throw error}
@@ -129,16 +135,25 @@ actor EnvironmentStore {
     private func replace(_ profile:RootfsEnvironment) throws {
         try RootfsCatalog(version:1,environments:profiles().map {$0.id==profile.id ? profile : $0}).save(root)
     }
-    func setBoot(_ profile:RootfsEnvironment,mode:String) throws -> RootfsEnvironment {
-        guard profile.bootTarget == "linux",["shell","systemd"].contains(mode),profile.distro != "alpine" || mode=="shell" else {throw TramesError.message(L10n.text("此环境不支持 systemd"))}
-        var next=profile;next.initMode=mode
-        if next.distro=="debian",mode=="systemd" {next.needsSetup=true}
-        let path=configuration(profile)
-        if FileManager.default.fileExists(atPath:path.path){
-            let text=try String(contentsOf:path,encoding:.utf8);var value=try JSONSerialization.jsonObject(with:LocalSession.environmentConfig(["action":"decode","toml":text])) as! [String:Any]
-            value["boot"]=["mode":mode];try LocalSession.environmentConfig(["action":"encode","value":value]).write(to:path,options:.atomic)
-        }else{try writeConfiguration(next)}
-        try replace(next);return next
+    private func configurationFiles(_ profile:RootfsEnvironment)->EnvironmentConfigurationFiles {
+        EnvironmentConfigurationFiles(configuration:configuration(profile),authorization:grants(profile))
+    }
+    func configurationSnapshot(_ profile:RootfsEnvironment) throws -> EnvironmentConfigurationSnapshot {
+        let defaults=try LocalSession.environmentConfig(["action":"defaults","distribution":profile.distro,"name":profile.name,"uuid":UUID().uuidString.lowercased(),"init":profile.boot])
+        return try configurationFiles(profile).load(defaults:defaults)
+    }
+    func saveConfiguration(_ profile:RootfsEnvironment,document:EnvironmentConfiguration,permissions:[String:Bool],replacing snapshot:EnvironmentConfigurationSnapshot) throws -> EnvironmentConfigurationSnapshot {
+        guard !starting,!resetting else {throw TramesError.message(L10n.text("环境仍在准备，请稍后再试"))}
+        let saved=try configurationFiles(profile).save(document,permissions:permissions,replacing:snapshot)
+        if profile.distro=="debian",saved.document.string("boot.mode")=="systemd",snapshot.document.string("boot.mode") != "systemd" {
+            var next=profile;next.needsSetup=true;try replace(next)
+        }
+        return saved
+    }
+    func exportedConfiguration(_ profile:RootfsEnvironment,document:EnvironmentConfiguration) throws -> URL {
+        let directory=FileManager.default.temporaryDirectory.appendingPathComponent("environment-config-exports",isDirectory:true)
+        try FileManager.default.createDirectory(at:directory,withIntermediateDirectories:true)
+        let path=directory.appendingPathComponent(profile.id+"-env.toml");try document.toml().write(to:path,options:.atomic);return path
     }
     func pausePreparation(_ paused:Bool) {preparationPaused=paused;try? preparation?.pause(paused)}
     func start(profile:RootfsEnvironment? = nil,useVolumeBudget:Bool,vulkan:Bool=false,memoryBudgetMiB:Int=1024,processMemoryBudgetMiB:Int=512,maintenance:Bool=false,output:@escaping @Sendable(Data)->Void = {_ in}) async throws -> LocalSession {
@@ -186,10 +201,11 @@ actor EnvironmentStore {
                     try FileManager.default.moveItem(at:staging,to:active)
                 } catch {try? FileManager.default.removeItem(at:staging);throw error}
             }
+            let icd=Bundle.main.url(forResource:"libtrames_vulkan_icd",withExtension:"so",subdirectory:"GuestVulkan")
             if profile.needsSetup==true,!maintenance {
                 diagnostics.report(InstallationProgress(stage:"packages",item:profile.name))
                 output(Data(L10n.text("正在准备 Debian 软件，请保持应用前台；输出会实时显示。\r\n").utf8))
-                let setup=try LocalSession(store:active,rootfs:nil,total:UInt64(total),available:UInt64(available),pureAccelerator:true,memoryBudgetMiB:memoryBudgetMiB,processMemoryBudgetMiB:processMemoryBudgetMiB,initiallyPaused:preparationPaused,storeOwnerLock:lock,distribution:"debian",debianPackages:profile.packages ?? "standard",prepareSystemd:profile.boot=="systemd")
+                let setup=try LocalSession(store:active,rootfs:nil,total:UInt64(total),available:UInt64(available),glibcBundle:glibc,pureAccelerator:true,vulkanICD:icd,memoryBudgetMiB:memoryBudgetMiB,processMemoryBudgetMiB:processMemoryBudgetMiB,initiallyPaused:preparationPaused,storeOwnerLock:lock,distribution:"debian",debianPackages:profile.packages ?? "standard",prepareSystemd:profile.boot=="systemd",environmentConfig:FileManager.default.fileExists(atPath:configuration(profile).path) ? configuration(profile):nil,environmentGrants:FileManager.default.fileExists(atPath:grants(profile).path) ? grants(profile):nil)
                 preparation=setup
                 do {
                     while true {
@@ -210,7 +226,6 @@ actor EnvironmentStore {
                 profile.needsSetup=false;try replace(profile)
             }
             try Task.checkCancellation();guard generation==began,!resetting else {throw CancellationError()}
-            let icd=Bundle.main.url(forResource:"libtrames_vulkan_icd",withExtension:"so",subdirectory:"GuestVulkan")
             if vulkan,icd==nil {throw TramesError.message("Missing bundled Vulkan compute driver")}
             let retryUntil=Date().addingTimeInterval(10)
             diagnostics.report(InstallationProgress(stage:"boot",item:profile.bootTarget))
@@ -240,4 +255,13 @@ actor EnvironmentStore {
         try await LocalSession.reset(store:profile.storeURL(in:root),storeOwnerLock:ownerLock(profile))
         if profile.distro=="debian" {var next=profile;next.needsSetup=true;try replace(next)}
     }
+    #if DEBUG
+    func seedConfigurationUIFixtures() throws {
+        guard try profiles().count==1 else{return}
+        let values=[RootfsCatalog.alpine.environments[0],RootfsEnvironment(id:"e478757e-f5ab-40d9-aa62-d048b27da7a3",name:"Debian",store:"environments/debian",distribution:"debian"),RootfsEnvironment(id:"bd0a913b-9568-4da4-9a3b-9d44fa510154",name:"Android",store:"environments/android",distribution:"android",target:"android")]
+        for profile in values.dropFirst() {try writeConfiguration(profile);try LocalSession.environmentConfig(["action":"grant","uuid":profile.id,"clipboard":true]).write(to:grants(profile),options:.atomic)}
+        try RootfsCatalog(version:1,environments:values).save(root)
+    }
+    #endif
+
 }

@@ -3,4 +3,5 @@
 <plist version="1.0"><dict>
 <key>TramesAppGroup</key><string>$(TRAMES_APP_GROUP)</string>
 <key>UIBackgroundModes</key><array><string>audio</string></array>
+<key>NSMicrophoneUsageDescription</key><string>Allow microphone input for applications in environments where you enable audio capture.</string>
 </dict></plist>

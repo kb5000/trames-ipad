@@ -1,1 +1,2 @@
 "NSLocalNetworkUsageDescription" = "允许 Linux 应用连接本地网络中的服务。";
+"NSMicrophoneUsageDescription" = "允许已启用录音的环境内应用使用麦克风。";

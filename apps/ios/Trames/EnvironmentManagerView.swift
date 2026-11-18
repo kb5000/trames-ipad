@@ -1,52 +1,65 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 import SwiftUI
 import UniformTypeIdentifiers
-struct EnvironmentManagerView: View {
+import TramesKit
+struct EnvironmentManagerView:View {
     @ObservedObject var workspace:WorkspaceModel
     @Environment(\.dismiss) private var dismiss
+    @StateObject private var editor=EnvironmentEditor()
+    @State private var selected:String?
     @State private var creating=false
-    @State private var failure:String?
+    @State private var pending:Route?
+    private enum Route {case close,select(String),create,open(RootfsEnvironment,Bool),restart(RootfsEnvironment)}
     var body:some View {
-        NavigationStack {
-            List {
-                Section {
-                    ForEach(workspace.profiles) {profile in
-                        VStack(alignment:.leading,spacing:8) {
-                            HStack {
-                                Text(profile.name).font(.headline)
-                                Spacer()
-                                if profile.id==workspace.selectedEnvironmentID {Text(L10n.text("当前")).foregroundStyle(.mint)}
-                            }
-                            Text("\(profile.distro=="custom" ? L10n.text("自定义 ARM64 Linux") : profile.distro.capitalized) · \(profile.bootTarget == "android" ? "Android" : profile.boot=="systemd" ? "systemd" : "Shell")").font(.caption).foregroundStyle(.secondary)
-                            HStack {
-                                Button(L10n.text("打开")) {workspace.openEnvironment(profile);dismiss()}.buttonStyle(.borderedProminent)
-                                if profile.bootTarget == "linux" {
-                                Menu(L10n.text("更多")) {
-                                    Button(L10n.text("打开维护终端")) {workspace.openEnvironment(profile,maintenance:true);dismiss()}
-                                    if profile.distro != "alpine" {
-                                        Button(profile.boot=="systemd" ? L10n.text("改为 Shell 启动") : L10n.text("改为 systemd 启动")) {
-                                            Task {do {try await workspace.configureBoot(profile,mode:profile.boot=="systemd" ? "shell" : "systemd")} catch {failure=error.localizedDescription}}
-                                        }
-                                    }
-                                }.buttonStyle(.bordered)
-                                }
-                            }
-                        }.padding(.vertical,4)
-                    }
-                } footer:{Text(L10n.text("各环境独立保存文件和软件。切换时停止当前环境；进入后台时暂停，返回前台继续。启动方式修改后，下次打开生效。"))}
-                Section {Button(L10n.text("新建环境"),systemImage:"plus") {creating=true}.accessibilityIdentifier("create-linux-environment")}
-            }.navigationTitle(L10n.text("环境"))
-                .toolbar {Button(L10n.text("完成")) {dismiss()}}
-                .task {do {try await workspace.refreshEnvironments()} catch {failure=error.localizedDescription}}
-                .sheet(isPresented:$creating) {CreateEnvironmentView(workspace:workspace) {dismiss()}}
-                .alert("Trames",isPresented:Binding(get:{failure != nil},set:{if !$0 {failure=nil}})) {Button(L10n.text("好")) {failure=nil}} message:{Text(failure ?? "")}
+        NavigationSplitView {
+            List(selection:Binding(get:{selected},set:{if let id=$0,id != selected {request(.select(id))}})) {
+                Section(L10n.text("环境")) {ForEach(workspace.profiles) {profile in
+                    NavigationLink(value:profile.id) {
+                        HStack(spacing:12) {
+                            Image(systemName:profile.bootTarget=="android" ? "apps.iphone":"terminal").font(.title3).foregroundStyle(.tint).frame(width:26)
+                            VStack(alignment:.leading,spacing:4) {Text(profile.name).font(.headline).lineLimit(1);Text("\(profile.distro.capitalized) · \(profile.bootTarget=="android" ? "Android":profile.boot)").font(.caption).foregroundStyle(.secondary).lineLimit(1)}
+                            Spacer(minLength:0)
+                            if workspace.selectedEnvironmentID==profile.id,workspace.local?.local != nil {Circle().fill(.green).frame(width:7,height:7).accessibilityLabel(L10n.text("当前环境"))}
+                        }.padding(.vertical,7)
+                    }.tag(profile.id).accessibilityIdentifier("environment-row-"+profile.distro)
+                }}
+            }.listStyle(.sidebar).navigationTitle(L10n.text("环境"))
+                .navigationSplitViewColumnWidth(min:240,ideal:280,max:340)
+                .safeAreaInset(edge:.bottom) {Button {request(.create)} label:{Label(L10n.text("新建环境"),systemImage:"plus").frame(maxWidth:.infinity)}.buttonStyle(.bordered).padding().accessibilityIdentifier("create-linux-environment")}
+                .toolbar {ToolbarItem(placement:.topBarLeading) {Button(L10n.text("完成")) {request(.close)}}}
+        } detail: {
+            if let profile=workspace.profiles.first(where:{$0.id==selected}) {
+                EnvironmentDetailView(workspace:workspace,editor:editor,profile:profile,open:{maintenance in request(.open(profile,maintenance))},restart:{request(.restart(profile))},stop:{workspace.stopEnvironment(profile)})
+            } else {ContentUnavailableView(L10n.text("选择一个环境"),systemImage:"square.stack.3d.up",description:Text(L10n.text("独立管理每个环境的资源、组件与访问权限。")))}
+        }.navigationSplitViewStyle(.balanced)
+            .task {do {try await workspace.refreshEnvironments();if selected==nil {selected=workspace.selectedEnvironmentID}}catch{editor.failure=error.localizedDescription}}
+            .sheet(isPresented:$creating) {CreateEnvironmentView(workspace:workspace) {profile in selected=profile.id;creating=false}}
+            .alert(L10n.text("有未保存的更改"),isPresented:Binding(get:{pending != nil},set:{if !$0 {pending=nil}})) {
+                Button(L10n.text("保存并继续")) {guard let route=pending,let profile=workspace.profiles.first(where:{$0.id==selected})else{return};pending=nil;Task {if await editor.save(profile,workspace:workspace) {perform(route)}}}
+                Button(L10n.text("放弃更改"),role:.destructive) {if let route=pending {pending=nil;editor.revert();perform(route)}}
+                Button(L10n.text("取消"),role:.cancel) {pending=nil}
+            }.presentationDetents([.large])
+    }
+    private func request(_ route:Route) {if editor.dirty {pending=route}else{perform(route)}}
+    private func perform(_ route:Route) {
+        switch route {
+        case .close:dismiss()
+        case .select(let id):selected=id
+        case .create:creating=true
+        case .restart(let profile):workspace.openEnvironment(profile);dismiss()
+        case .open(let profile,let maintenance):
+            if !maintenance,workspace.selectedEnvironmentID==profile.id,workspace.local?.local != nil {workspace.openLocal()}
+            else {workspace.openEnvironment(profile,maintenance:maintenance)}
+            dismiss()
         }
     }
 }
 private struct CreateEnvironmentView:View {
     @ObservedObject var workspace:WorkspaceModel
-    let opened:()->Void
+    let created:(RootfsEnvironment)->Void
     @Environment(\.dismiss) private var dismiss
+    @State private var imported:EnvironmentConfiguration?
+    @State private var choosingTOML=false
     @State private var name="Debian"
     @State private var distribution="debian"
     @State private var target="linux"
@@ -61,12 +74,14 @@ private struct CreateEnvironmentView:View {
         NavigationStack {
             Form {
                 Section {
+                    Button(L10n.text("从 TOML 配置创建…"),systemImage:"doc.badge.plus") {choosingTOML=true}
+                    if imported != nil {Label(L10n.text("已导入配置；创建后可继续调整"),systemImage:"checkmark.circle").foregroundStyle(.secondary)}
                     TextField(L10n.text("环境名称"),text:$name).accessibilityIdentifier("environment-name")
-                    Picker(L10n.text("系统"),selection:$target) {Text("Linux").tag("linux");Text("Android").tag("android")}
-                        .onChange(of:target) {_,value in distribution=value == "android" ? "android" : "debian";name=value == "android" ? "Android" : "Debian";boot="shell";archive=nil}
+                    Picker(L10n.text("系统"),selection:$target) {Text("Linux").tag("linux");Text("Android").tag("android")}.disabled(imported != nil)
+                        .onChange(of:target) {_,value in guard imported==nil else{return};distribution=value == "android" ? "android" : "debian";name=value == "android" ? "Android" : "Debian";boot="shell";archive=nil}
                     if target == "linux" {
-                    Picker(L10n.text("发行版"),selection:$distribution) {Text("Alpine").tag("alpine");Text("Debian 13").tag("debian");Text(L10n.text("自定义 rootfs")).tag("custom")}
-                        .onChange(of:distribution) {_,value in name=value=="custom" ? "Linux" : value.capitalized;if value=="alpine" {boot="shell"}}
+                    Picker(L10n.text("发行版"),selection:$distribution) {Text("Alpine").tag("alpine");Text("Debian 13").tag("debian");Text(L10n.text("自定义 rootfs")).tag("custom")}.disabled(imported != nil)
+                        .onChange(of:distribution) {_,value in guard imported==nil else{return};name=value=="custom" ? "Linux" : value.capitalized;if value=="alpine" {boot="shell"}}
                     }
                     if target == "linux",distribution != "alpine" {
                         Picker(L10n.text("启动方式"),selection:$boot) {Text("Shell").tag("shell");Text("systemd").tag("systemd")}
@@ -82,14 +97,26 @@ private struct CreateEnvironmentView:View {
                     }
                 }
                 if let failure {Section {Text(failure).foregroundStyle(.red)}}
-                Section {Button(busy ? L10n.text("正在导入…") : L10n.text("创建并打开")) {
+            }.safeAreaInset(edge:.bottom) {
+                Button(busy ? L10n.text("正在导入…") : L10n.text("创建环境")) {
                     busy=true
-                    Task {do {try await workspace.createEnvironment(name:name,distribution:distribution,initMode:boot,packages:packages,archive:archive,sha256:sha256);dismiss();opened()} catch {failure=error.localizedDescription;busy=false}}
-                }.disabled(busy || name.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty || ["custom","android"].contains(distribution) && archive==nil).accessibilityIdentifier("confirm-create-environment")}
+                    Task {do {let profile=try await workspace.createEnvironment(name:name,distribution:distribution,initMode:boot,packages:packages,archive:archive,sha256:sha256,configuration:imported);dismiss();created(profile)} catch {failure=error.localizedDescription;busy=false}}
+                }.disabled(busy || name.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty || ["custom","android"].contains(distribution) && archive==nil).accessibilityIdentifier("confirm-create-environment")
+                    .buttonStyle(.borderedProminent).frame(maxWidth:.infinity).padding().background(.bar)
             }.disabled(busy).navigationTitle(L10n.text("新建环境")).toolbar {Button(L10n.text("取消")) {dismiss()}.disabled(busy)}
+                .fileImporter(isPresented:$choosingTOML,allowedContentTypes:[.plainText,.data]) {result in
+                    do {
+                        let url=try result.get(),access=url.startAccessingSecurityScopedResource();defer {if access {url.stopAccessingSecurityScopedResource()}}
+                        guard (try url.resourceValues(forKeys:[.fileSizeKey])).fileSize ?? Int.max <= 65536 else {throw TramesError.message(L10n.text("配置文件不能超过 64 KiB"))}
+                        let value=try EnvironmentConfiguration(toml:String(contentsOf:url,encoding:.utf8))
+                        let distro=value.string("image.distribution")
+                        guard ["alpine","debian","custom","android"].contains(distro) else {throw TramesError.message(L10n.text("环境配置无效"))}
+                        imported=value;name=value.string("environment.name");sha256=value.string("image.sha256");distribution=distro;target=value.string("environment.type");boot=value.string("boot.mode")=="systemd" ? "systemd":"shell"
+                    } catch {failure=error.localizedDescription}
+                }
                 .fileImporter(isPresented:$choosing,allowedContentTypes:[.data,.archive,.item]) {result in
                     do {archive=try result.get()} catch {failure=error.localizedDescription}
                 }
-        }.interactiveDismissDisabled(busy)
+        }.interactiveDismissDisabled(busy).presentationDetents([.large])
     }
 }

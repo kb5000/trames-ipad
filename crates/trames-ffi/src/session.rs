@@ -214,6 +214,34 @@ fn memory_limits(options: &Options) -> Result<trames_core::MemoryLimits, String>
     limits.validate().map_err(|e| e.to_string())?;
     Ok(limits)
 }
+fn configured_memory_limits(
+    options: &Options,
+    config: Option<&trames_distro::environment::Manifest>,
+) -> Result<trames_core::MemoryLimits, String> {
+    let Some(config) = config else {
+        return memory_limits(options);
+    };
+    let size = config
+        .resources
+        .memory_limit
+        .as_deref()
+        .unwrap_or(&config.resources.memory);
+    match trames_distro::environment::memory_mib(size).map_err(|e| e.to_string())? {
+        None => Ok(trames_core::MemoryLimits::host_managed()),
+        Some(mib) => {
+            let bytes = usize::try_from(mib)
+                .ok()
+                .and_then(|n| n.checked_mul(1 << 20))
+                .ok_or("memory size overflow")?;
+            let limits = trames_core::MemoryLimits {
+                total: bytes,
+                per_process: bytes,
+            };
+            limits.validate().map_err(|e| e.to_string())?;
+            Ok(limits)
+        }
+    }
+}
 fn default_rows() -> u16 {
     24
 }
@@ -656,6 +684,35 @@ mod control_policy_tests {
     use super::*;
     use trames_bridge::Channel;
     use trames_distro::environment::{Authorization, Grant, Manifest};
+    #[test]
+    fn explicit_environment_memory_replaces_legacy_global_defaults() {
+        let options: Options = serde_json::from_value(serde_json::json!({
+            "store":"unused", "volume_total":1u64<<30, "volume_available":1u64<<30,
+            "memory_budget_bytes":1u64<<30,"process_memory_budget_bytes":512u64<<20
+        }))
+        .unwrap();
+        let mut config = Manifest::new("debian");
+        assert!(configured_memory_limits(&options, Some(&config))
+            .unwrap()
+            .is_host_managed());
+        config.resources.memory = "2GiB".into();
+        let limits = configured_memory_limits(&options, Some(&config)).unwrap();
+        assert_eq!(limits.total, 2usize << 30);
+        assert_eq!(limits.per_process, 2usize << 30);
+        config.resources.memory_limit = Some("768MiB".into());
+        assert_eq!(
+            configured_memory_limits(&options, Some(&config))
+                .unwrap()
+                .total,
+            768usize << 20
+        );
+        assert_eq!(
+            configured_memory_limits(&options, None)
+                .unwrap()
+                .per_process,
+            512usize << 20
+        );
+    }
 
     #[test]
     fn clipboard_needs_a_matching_independent_host_grant() {
@@ -802,22 +859,6 @@ fn run(
                 .resolve(std::thread::available_parallelism().map_or(1, usize::from))
                 .map_err(|e| e.to_string())?,
         );
-        if let Some(mib) = model::memory_mib(
-            config
-                .resources
-                .memory_limit
-                .as_deref()
-                .unwrap_or(&config.resources.memory),
-        )
-        .map_err(|e| e.to_string())?
-        {
-            let bytes = usize::try_from(mib)
-                .ok()
-                .and_then(|n| n.checked_mul(1 << 20))
-                .ok_or("memory size overflow")?;
-            options.memory_budget_bytes = Some(bytes);
-            options.process_memory_budget_bytes = Some(bytes);
-        }
         options.pure_accelerator = config
             .components
             .thunking
@@ -867,7 +908,7 @@ fn run(
             .configure(Default::default())
             .map_err(|e| e.to_string())?;
     }
-    let guest_memory_limits = memory_limits(&options)?;
+    let guest_memory_limits = configured_memory_limits(&options, manifest.as_ref())?;
     if session.cancelled.load(Ordering::Acquire) {
         return Err("session cancelled".into());
     }
@@ -1635,6 +1676,11 @@ impl Write for CancelWriter<'_> {
     }
 }
 impl GuestOutput for Adapter {
+    fn host_memory_source(
+        &self,
+    ) -> Option<Arc<dyn Fn() -> trames_linux::HostMemoryInfo + Send + Sync>> {
+        crate::host_memory::source()
+    }
     fn host_spawn(&mut self) -> Option<trames_linux::HostSpawn> {
         self.session.diagnostic_launch.lock().ok()?.take()
     }
