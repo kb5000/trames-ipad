@@ -728,6 +728,86 @@ Vulkan release adapter waits for actual producer completion on the existing
 resource wait, then returns `-1` for an already completed release; it never
 manufactures an early signalled fence or adds a GPU service/coordinator thread.
 
+### Static Bionic library variants (2026-11-18)
+
+The iPad interpreter can now select a complete replacement `libc.so` before
+starting Android. It covers 22 public functions: `memcpy`, `memmove`, `memset`,
+`memcmp`, `strlen`, `memchr`, `memrchr`, `strnlen`, `strcmp`, `strncmp`, `strchr`,
+`strrchr`, `strchrnul`, `strcpy`, `stpcpy`, `strncpy`, `stpncpy`, `strcat`,
+`strncat`, `mempcpy`, `strlcpy`, and `strlcat`. The existing nineteen-function
+NativeCall pure module supplies the host implementations; the three additional
+interfaces compose those operations without changing guest allocation or TLS.
+
+`scripts/build-bionic-hybrid.py` compiles fixed ARM64 guest code from
+`accelerator/android/bionic.c` and `bionic-entry.S`, using the checked-in layout
+of the pinned Waydroid image's Bionic. It requires neither AOSP nor an Android
+image download. The application bundles only precompiled guest code, a static
+installation recipe and its license. Passing `--libc ORIGINAL` additionally
+checks the actual image/library and exports both complete variants for testing.
+The supported original SHA-256 is
+`6aa289f3b6042793ccacd873ce3724dcaae240943112eec126f7be654f01e6cc`;
+other Bionic builds need a matching layout and validation.
+
+Under exclusive store ownership, `trames_distro::bionic::install` reconstructs
+the selected complete library and replaces the runtime APEX and bootstrap
+inodes before any guest runs. The original ELF's exported symbols and symbol
+versions, relocations, TLS, constructors, allocator, pthreads and FORTIFY code
+are preserved. Installation replaces code at fixed verified locations; it does
+not use `LD_PRELOAD`, symbol lookup or patches to a running process. The added
+segment is RX, not writable executable memory. No host executable code is
+generated. The original build ID remains useful for upstream symbols; the
+resource manifest and resulting SHA-256 distinguish the derivative. New adapter
+frames do not extend the original library's unwind tables.
+
+Library choice is cold/static: `[components] thunking = "on"` selects the
+NativeCall variant in the iPad embedding, and `"off"` restores the original.
+There is no architecture, auxv or capability-bitmap branch inside the adapted
+functions. IFUNC resolvers return their statically selected entries. Bionic's
+private baseline/MTE entries for those functions route to the same adapters.
+Mac hardware execution keeps its original library; these pure-function thunks
+are not automatically enabled for that backend.
+
+Data-size decisions remain local. `memcpy`/`memmove` reuse Bionic's original
+greater-than-96-byte forward/backward branches, leaving the entire short-copy
+path unchanged. Other sized operations below 128 bytes branch to original code
+before saving a C frame. String prefixes stop at NUL and page boundaries;
+aligned short `strlen` has a separate register-only entry. Larger operations
+use the existing pure module's 1 MiB bounds and original-code fallback. The
+fallback continuations restore scratch registers required by the original
+forward/backward copy bodies. No allocator, locale, I/O or guest callback is
+redirected to Darwin libc. Calls use the executing worker and shared guest
+memory model without a coordinator or new locks.
+
+Stored installation provenance permits restoring an older derivative on an
+upgrade or when disabling thunks. Unsupported source bytes and damaged
+resources are rejected before either library is published. Each inode uses
+staging plus rename; the two paths are not a filesystem transaction. A failed
+cold installation does not start the guest and can be retried or restored.
+
+Local acceptance uses the original Android linker and real pinned Bionic, not
+NDK API stubs. It covers 22 functions, 4,344,934 checks per functional run,
+96/128-byte thresholds, over-limit fallback, overlaps/self-copy, high bytes,
+guard pages, FORTIFY aborts, four parallel pthreads/TLS, repeated selection,
+restoration, variant upgrade/downgrade, damaged input and partial-install recovery.
+All nineteen host
+operations were reached directly on workers. Three alternating benchmark rounds
+on the Mac-hosted interpreter measured about 21.2x for 4 KiB copy, 65.7x for
+64 KiB copy, 27.7x for 1 KiB `strlen`, and 58.0x for 1 KiB `strlcpy`; short copy
+was unchanged within measurement variation. These are function microbenchmarks,
+not Android UI speedups or physical-iPad measurements. Native host algorithms
+were unchanged. See [the validation record](../validation/android-bionic-20261118.json).
+
+```sh
+python3 scripts/build-bionic-hybrid.py
+python3 tests/integration/bionic.py --rootfs /path/to/extracted/pinned-waydroid
+# Debug runner: --bionic-bundle target/bionic-hybrid --accelerator pure|off
+```
+
+The iOS frontend packages `GuestBionic`; embedding clients supply the optional
+`bionic_bundle` resource directory. Local shared-runtime/frontend tests, Clippy,
+iOS Rust checks and an unsigned iOS application build passed. The physical iPad
+was left asleep; Android UI/ANR acceptance with this library is still pending.
+
 ### Full-init dependencies and observed stalls
 
 - Binder process work and synchronous thread replies have distinct readiness.

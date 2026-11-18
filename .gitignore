@@ -11,5 +11,6 @@ apps/ios/build/
 *.xcuserstate
 
 /apps/ios/Trames/GuestMusl/
+/apps/ios/Trames/GuestBionic/
 /apps/ios/Trames/GuestVulkan/
 /apps/ios/Trames/GuestVideo/

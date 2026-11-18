@@ -16,6 +16,11 @@ esac
 [[ -f target/musl-hybrid/libc.so && -f target/musl-hybrid/manifest.json ]]
 mkdir -p apps/ios/Trames/GuestMusl
 cp target/musl-hybrid/libc.so target/musl-hybrid/manifest.json target/musl-hybrid/musl-COPYRIGHT.txt target/musl-hybrid/GPL-3.0.txt apps/ios/Trames/GuestMusl/
+# Precompiled guest code and a pinned cold-install recipe only; no AOSP tree,
+# original Android image download, host JIT or runtime symbol interposition.
+python3 scripts/build-bionic-hybrid.py
+mkdir -p apps/ios/Trames/GuestBionic
+cp target/bionic-hybrid/manifest.json target/bionic-hybrid/bionic-nativecall.bin target/bionic-hybrid/GPL-3.0.txt apps/ios/Trames/GuestBionic/
 [[ -f target/vulkan-guest/libtrames_vulkan_icd.so && -f target/vulkan-guest/manifest.json ]]
 python3 scripts/check-guest-vulkan.py
 mkdir -p apps/ios/Trames/GuestVulkan

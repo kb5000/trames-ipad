@@ -92,12 +92,30 @@ def check_video(directory):
             raise ValueError('iOS FFmpeg binary does not match its manifest: ' + name)
 
 
+def check_bionic(directory):
+    manifest = json.loads((directory / 'manifest.json').read_text())
+    builder = module('build-bionic-hybrid')
+    if (manifest.get('kind') != 'bionic-static'
+            or manifest.get('original_sha256') != builder.ORIGINAL_SHA256
+            or manifest.get('functions') != builder.FUNCTIONS
+            or manifest.get('native_profile') != 65537):
+        raise ValueError('Unpaired Android Bionic adapter')
+    tail = (directory / 'bionic-nativecall.bin').read_bytes()
+    if (len(tail) != manifest['added_file_bytes']
+            or hashlib.sha256(tail).hexdigest() != manifest['tail_sha256']):
+        raise ValueError('Android Bionic code differs from its manifest')
+    for path, expected in manifest['sources_sha256'].items():
+        if hashlib.sha256((ROOT / path).read_bytes()).hexdigest() != expected:
+            raise ValueError('Stale Android Bionic adapter; run scripts/build-bionic-hybrid.py')
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('directory', type=Path, nargs='?',
                         default=ROOT / 'apps/ios/Trames/GuestVulkan')
     parser.add_argument('--rust-dir', type=Path, help='also verify the staged native Rust archive')
     parser.add_argument('--video-dir', type=Path, help='also verify paired VA-API/FFmpeg resources')
+    parser.add_argument('--bionic-dir', type=Path, help='also verify the static Android libc adapter')
     args = parser.parse_args()
     try:
         check(args.directory.resolve())
@@ -105,5 +123,7 @@ if __name__ == '__main__':
             check_native(args.rust_dir.resolve())
         if args.video_dir:
             check_video(args.video_dir.resolve())
+        if args.bionic_dir:
+            check_bionic(args.bionic_dir.resolve())
     except (OSError, ValueError, KeyError) as error:
         parser.exit(1, str(error) + '\n')

@@ -37,6 +37,7 @@ pub struct Options {
     pub command: Option<Vec<String>>,
     pub debian_setup: Option<DebianSetup>,
     pub musl_libc: Option<PathBuf>,
+    pub bionic_bundle: Option<PathBuf>,
     pub volume_total: u64,
     pub volume_available: u64,
     #[serde(default = "default_rows")]
@@ -870,6 +871,10 @@ fn run(
         return Err("session cancelled".into());
     }
     if android {
+        if let Some(bundle) = &options.bionic_bundle {
+            trames_distro::bionic::install(bundle, &mut vfs, options.pure_accelerator)
+                .map_err(|e| format!("prepare Android Bionic: {e}"))?;
+        }
         trames_distro::android::prepare(&mut vfs)
             .map_err(|e| format!("prepare Android boot: {e}"))?;
         crate::android_boot::interpreter_timeouts(&mut vfs)?;

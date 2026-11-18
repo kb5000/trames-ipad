@@ -1,0 +1,413 @@
+{
+  "schema": 1,
+  "date": "2026-11-18",
+  "scope": "Static Bionic libc replacement on the Mac-hosted ARM64 interpreter; original Android linker",
+  "original_libc_sha256": "6aa289f3b6042793ccacd873ce3724dcaae240943112eec126f7be654f01e6cc",
+  "functions": [
+    "memcpy",
+    "memmove",
+    "memset",
+    "memcmp",
+    "strlen",
+    "memchr",
+    "memrchr",
+    "strnlen",
+    "strcmp",
+    "strncmp",
+    "strchr",
+    "strrchr",
+    "strchrnul",
+    "strcpy",
+    "stpcpy",
+    "strncpy",
+    "stpncpy",
+    "strcat",
+    "strncat",
+    "mempcpy",
+    "strlcpy",
+    "strlcat"
+  ],
+  "added_code_bytes": 8224,
+  "added_library_bytes": 11168,
+  "guest_code_sha256": "050693bde89c9fe732e59e51bb947272dd51916d9ea87b7e685d8a40b98230d4",
+  "source_sha256": {
+    "accelerator/android/bionic.c": "d731482f6d09bc44d2cf62af418904900bda3e51cfa654b843d3c5184741fea1",
+    "accelerator/android/bionic-entry.S": "8ece68a6264611e75204390f3722c87b0ce8dc18db55712dab2ce62e8bcc0e93",
+    "accelerator/android/bionic-layout.json": "3c823329d37ebb0f2ba7bd4a9252038a704a6a0e862398c9ad8989151eca63e2",
+    "accelerator/guest/calls.S": "2653d9b961d5bab1f12e235c7e939ccd78ab7854f78bfb360bf408c5fd5682c3",
+    "scripts/build-bionic-hybrid.py": "944cc2b89bde376fe282367d349355816ad95801d5da55b58cbfbe6b2b35a3e4",
+    "tests/fixtures/android-bionic.c": "c38a9f0029a55b72af2ebe42e26ebe231ba5ee16e9899128c8e8039bb2d8034e",
+    "tests/integration/bionic.py": "d4743faedceded6c7a3f3d178faa661f23b5115d48284bbb65e68206e83064a7",
+    "runtime/crates/trames-distro/src/bionic.rs": "06c9047ef837afee78d0e76cba0ddf85f5f945c99a5c4d5a17d80e6f8a985d79",
+    "crates/trames-ffi/src/session.rs": "342bcc0394d11ff12342f7e3c8a64721c7448033f1ae52f2287f92e2307d61f5",
+    "crates/trames-cli/src/main.rs": "4e2891318eb7a7b3add3e3b2bcc3c57ad6b25764e8cb61cdb371ac003d670e18"
+  },
+  "functional_checks_per_run": 4344934,
+  "case_exit_codes": {
+    "original": 0,
+    "nativecall": 0,
+    "nativecall-noop": 0,
+    "variant-upgrade": 0,
+    "variant-downgrade": 0,
+    "restored": 0,
+    "corrupt-resource": 125,
+    "forget-record": 0,
+    "partial-install": 125,
+    "recover-original": 0,
+    "after-recovery": 0,
+    "unsupported-image": 125,
+    "unsupported-preserved": 0,
+    "bench-original-1": 0,
+    "bench-nativecall-1": 0,
+    "bench-nativecall-2": 0,
+    "bench-original-2": 0,
+    "bench-original-3": 0,
+    "bench-nativecall-3": 0
+  },
+  "native_metrics": {
+    "calls": 3136,
+    "worker_calls": 3136,
+    "function_calls": [
+      457,
+      29,
+      550,
+      28,
+      715,
+      10,
+      10,
+      266,
+      431,
+      10,
+      272,
+      258,
+      16,
+      18,
+      15,
+      10,
+      18,
+      15,
+      8
+    ],
+    "function_fallbacks": [
+      7,
+      2,
+      2,
+      4,
+      8,
+      2,
+      2,
+      2,
+      4,
+      2,
+      4,
+      2,
+      2,
+      2,
+      2,
+      2,
+      3,
+      2,
+      1
+    ],
+    "rejected": 0,
+    "faults": 0
+  },
+  "peak_parallel_native_calls": 4,
+  "benchmarks": {
+    "memcpy-short": {
+      "original": {
+        "bytes": 32,
+        "count": 20000,
+        "samples_ns": [
+          3231959,
+          3341833,
+          2905708
+        ],
+        "nanoseconds": 3231959
+      },
+      "nativecall": {
+        "bytes": 32,
+        "count": 20000,
+        "samples_ns": [
+          3084792,
+          3137333,
+          3374083
+        ],
+        "nanoseconds": 3137333
+      },
+      "speedup": 1.0301612866724699
+    },
+    "memcpy-4k": {
+      "original": {
+        "bytes": 4096,
+        "count": 4000,
+        "samples_ns": [
+          33905042,
+          34399667,
+          34304917
+        ],
+        "nanoseconds": 34304917
+      },
+      "nativecall": {
+        "bytes": 4096,
+        "count": 4000,
+        "samples_ns": [
+          1615375,
+          1543541,
+          1820417
+        ],
+        "nanoseconds": 1615375
+      },
+      "speedup": 21.236503598235704
+    },
+    "memcpy-64k": {
+      "original": {
+        "bytes": 65536,
+        "count": 1000,
+        "samples_ns": [
+          133830916,
+          132795834,
+          132280709
+        ],
+        "nanoseconds": 132795834
+      },
+      "nativecall": {
+        "bytes": 65536,
+        "count": 1000,
+        "samples_ns": [
+          2138667,
+          2021417,
+          1915250
+        ],
+        "nanoseconds": 2021417
+      },
+      "speedup": 65.6944282154548
+    },
+    "memmove-4k": {
+      "original": {
+        "bytes": 4096,
+        "count": 4000,
+        "samples_ns": [
+          34322041,
+          34071375,
+          34595333
+        ],
+        "nanoseconds": 34322041
+      },
+      "nativecall": {
+        "bytes": 4096,
+        "count": 4000,
+        "samples_ns": [
+          1547458,
+          1584208,
+          1528833
+        ],
+        "nanoseconds": 1547458
+      },
+      "speedup": 22.179626846092106
+    },
+    "memset-4k": {
+      "original": {
+        "bytes": 4096,
+        "count": 4000,
+        "samples_ns": [
+          10781208,
+          10840167,
+          10626500
+        ],
+        "nanoseconds": 10781208
+      },
+      "nativecall": {
+        "bytes": 4096,
+        "count": 4000,
+        "samples_ns": [
+          1253000,
+          1240750,
+          1308125
+        ],
+        "nanoseconds": 1253000
+      },
+      "speedup": 8.604316041500399
+    },
+    "memcmp-4k": {
+      "original": {
+        "bytes": 4096,
+        "count": 4000,
+        "samples_ns": [
+          34419500,
+          35496959,
+          34900750
+        ],
+        "nanoseconds": 34900750
+      },
+      "nativecall": {
+        "bytes": 4096,
+        "count": 4000,
+        "samples_ns": [
+          1535542,
+          1536125,
+          1686500
+        ],
+        "nanoseconds": 1536125
+      },
+      "speedup": 22.719993490113108
+    },
+    "strlen-1k": {
+      "original": {
+        "bytes": 1023,
+        "count": 4000,
+        "samples_ns": [
+          30489667,
+          31035750,
+          30253791
+        ],
+        "nanoseconds": 30489667
+      },
+      "nativecall": {
+        "bytes": 1023,
+        "count": 4000,
+        "samples_ns": [
+          1087125,
+          1217041,
+          1101500
+        ],
+        "nanoseconds": 1101500
+      },
+      "speedup": 27.68013345438039
+    },
+    "strcmp-1k": {
+      "original": {
+        "bytes": 1023,
+        "count": 4000,
+        "samples_ns": [
+          19818458,
+          19786917,
+          19656250
+        ],
+        "nanoseconds": 19786917
+      },
+      "nativecall": {
+        "bytes": 1023,
+        "count": 4000,
+        "samples_ns": [
+          3199708,
+          3213375,
+          3059417
+        ],
+        "nanoseconds": 3199708
+      },
+      "speedup": 6.183975850296339
+    },
+    "strchr-1k": {
+      "original": {
+        "bytes": 1023,
+        "count": 4000,
+        "samples_ns": [
+          62492875,
+          63016583,
+          61258542
+        ],
+        "nanoseconds": 62492875
+      },
+      "nativecall": {
+        "bytes": 1023,
+        "count": 4000,
+        "samples_ns": [
+          2779125,
+          2565416,
+          2776167
+        ],
+        "nanoseconds": 2776167
+      },
+      "speedup": 22.510488382002954
+    },
+    "strcpy-1k": {
+      "original": {
+        "bytes": 1023,
+        "count": 4000,
+        "samples_ns": [
+          13037583,
+          12675083,
+          12938375
+        ],
+        "nanoseconds": 12938375
+      },
+      "nativecall": {
+        "bytes": 1023,
+        "count": 4000,
+        "samples_ns": [
+          1501500,
+          1431333,
+          1633292
+        ],
+        "nanoseconds": 1501500
+      },
+      "speedup": 8.616966366966366
+    },
+    "strlcpy-1k": {
+      "original": {
+        "bytes": 1023,
+        "count": 4000,
+        "samples_ns": [
+          140504958,
+          139664333,
+          139276916
+        ],
+        "nanoseconds": 139664333
+      },
+      "nativecall": {
+        "bytes": 1023,
+        "count": 4000,
+        "samples_ns": [
+          2408917,
+          2455375,
+          2276792
+        ],
+        "nanoseconds": 2408917
+      },
+      "speedup": 57.978059435007516
+    },
+    "strlen-short": {
+      "original": {
+        "bytes": 5,
+        "count": 20000,
+        "samples_ns": [
+          2978625,
+          2778583,
+          2725708
+        ],
+        "nanoseconds": 2778583
+      },
+      "nativecall": {
+        "bytes": 5,
+        "count": 20000,
+        "samples_ns": [
+          2352459,
+          2183209,
+          2146208
+        ],
+        "nanoseconds": 2183209
+      },
+      "speedup": 1.2727059113442643
+    }
+  },
+  "benchmark_method": "Median of three alternating original/nativecall runs per case; same interpreter/fixture, 4 execution workers. Speedup = original time / NativeCall time.",
+  "checks": {
+    "shared_distribution_unit_tests": 33,
+    "embedding_unit_tests": 21,
+    "project_layout_tests": 3,
+    "clippy_shared_distribution": "passed",
+    "clippy_frontends": "passed",
+    "ios_rust_check": "passed",
+    "ios_unsigned_application_build": "passed",
+    "execution_and_coordinator_boundaries": "passed"
+  },
+  "limitations": [
+    "Physical iPad left asleep; no device installation or Android UI/ANR acceptance in this task.",
+    "Only the pinned Android API 33 Bionic image is accepted.",
+    "Pure helpers still use their existing bounded fallback; FORTIFY and guest allocator/TLS remain original.",
+    "Per-inode atomic replacement, not a two-library rootfs transaction.",
+    "The added guest adapter code does not extend original unwind metadata."
+  ],
+  "shared_runtime_revision": "33abb1806ff44dc1eb4e02be7c6d03d21425dcfa"
+}

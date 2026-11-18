@@ -1,0 +1,381 @@
+{
+  "schema": 1,
+  "original_sha256": "6aa289f3b6042793ccacd873ce3724dcaae240943112eec126f7be654f01e6cc",
+  "original_size": 1324832,
+  "program_headers": [
+    [
+      6,
+      4,
+      64,
+      64,
+      64,
+      616,
+      616,
+      8
+    ],
+    [
+      1,
+      4,
+      0,
+      0,
+      0,
+      289924,
+      289924,
+      4096
+    ],
+    [
+      1,
+      5,
+      290816,
+      290816,
+      290816,
+      733392,
+      733392,
+      4096
+    ],
+    [
+      1,
+      6,
+      1028096,
+      1028096,
+      1028096,
+      26736,
+      26736,
+      4096
+    ],
+    [
+      1,
+      6,
+      1054848,
+      1058944,
+      1058944,
+      6040,
+      2205897,
+      4096
+    ],
+    [
+      7,
+      4,
+      1028096,
+      1028096,
+      1028096,
+      8,
+      8,
+      8
+    ],
+    [
+      2,
+      6,
+      1049408,
+      1049408,
+      1049408,
+      448,
+      448,
+      8
+    ],
+    [
+      1685382482,
+      4,
+      1028096,
+      1028096,
+      1028096,
+      26736,
+      28672,
+      1
+    ],
+    [
+      1685382480,
+      4,
+      182716,
+      182716,
+      182716,
+      21060,
+      21060,
+      4
+    ],
+    [
+      1685382481,
+      6,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      4,
+      4,
+      680,
+      680,
+      680,
+      56,
+      56,
+      4
+    ]
+  ],
+  "program_header_offset": 64,
+  "functions": {
+    "memcpy": {
+      "body": {
+        "address": 550992,
+        "offset": 550992,
+        "original": "050001cb"
+      },
+      "bulk": {
+        "address": 550848,
+        "offset": 550848,
+        "original": "090c4092",
+        "prefix": [
+          2332164132,
+          2332164101
+        ]
+      }
+    },
+    "memmove": {
+      "body": {
+        "address": 550992,
+        "offset": 550992,
+        "original": "050001cb"
+      },
+      "bulk": {
+        "address": 551008,
+        "offset": 551008,
+        "original": "c50400b4",
+        "prefix": [
+          3405840389
+        ]
+      }
+    },
+    "memset": {
+      "body": {
+        "address": 551184,
+        "offset": 551184,
+        "original": "200c014e"
+      }
+    },
+    "memcmp": {
+      "body": {
+        "address": 537728,
+        "offset": 537728,
+        "original": "5f2403d5"
+      }
+    },
+    "strlen": {
+      "body": {
+        "address": 541440,
+        "offset": 541440,
+        "original": "5f2403d5"
+      },
+      "resolver": {
+        "address": 995368,
+        "offset": 995368,
+        "original": "2848403989fcffb08afcffb0"
+      },
+      "mte": {
+        "address": 541312,
+        "offset": 541312,
+        "original": "5f2403d5"
+      }
+    },
+    "memchr": {
+      "body": {
+        "address": 537472,
+        "offset": 537472,
+        "original": "5f2403d5"
+      },
+      "resolver": {
+        "address": 995176,
+        "offset": 995176,
+        "original": "2848403989fcffb08afcffb0"
+      },
+      "mte": {
+        "address": 537216,
+        "offset": 537216,
+        "original": "5f2403d5"
+      }
+    },
+    "memrchr": {
+      "body": {
+        "address": 538048,
+        "offset": 538048,
+        "original": "5f2403d5"
+      }
+    },
+    "strnlen": {
+      "body": {
+        "address": 542720,
+        "offset": 542720,
+        "original": "5f2403d5"
+      }
+    },
+    "strcmp": {
+      "body": {
+        "address": 540288,
+        "offset": 540288,
+        "original": "5f2403d5"
+      },
+      "resolver": {
+        "address": 995304,
+        "offset": 995304,
+        "original": "2848403989fcffb08afcffb0"
+      },
+      "mte": {
+        "address": 539968,
+        "offset": 539968,
+        "original": "5f2403d5"
+      }
+    },
+    "strncmp": {
+      "body": {
+        "address": 542208,
+        "offset": 542208,
+        "original": "5f2403d5"
+      },
+      "resolver": {
+        "address": 995400,
+        "offset": 995400,
+        "original": "2848403989fcffb08afcffb0"
+      },
+      "mte": {
+        "address": 541760,
+        "offset": 541760,
+        "original": "5f2403d5"
+      }
+    },
+    "strchr": {
+      "body": {
+        "address": 539712,
+        "offset": 539712,
+        "original": "5f2403d5"
+      },
+      "resolver": {
+        "address": 995240,
+        "offset": 995240,
+        "original": "2848403989fcffb08afcffb0"
+      },
+      "mte": {
+        "address": 539520,
+        "offset": 539520,
+        "original": "5f2403d5"
+      }
+    },
+    "strrchr": {
+      "body": {
+        "address": 543296,
+        "offset": 543296,
+        "original": "5f2403d5"
+      },
+      "resolver": {
+        "address": 995432,
+        "offset": 995432,
+        "original": "2848403989fcffb08afcffb0"
+      },
+      "mte": {
+        "address": 542976,
+        "offset": 542976,
+        "original": "5f2403d5"
+      }
+    },
+    "strchrnul": {
+      "body": {
+        "address": 539328,
+        "offset": 539328,
+        "original": "5f2403d5"
+      },
+      "resolver": {
+        "address": 995272,
+        "offset": 995272,
+        "original": "2848403989fcffb08afcffb0"
+      },
+      "mte": {
+        "address": 539136,
+        "offset": 539136,
+        "original": "5f2403d5"
+      }
+    },
+    "strcpy": {
+      "body": {
+        "address": 540864,
+        "offset": 540864,
+        "original": "5f2403d5"
+      },
+      "resolver": {
+        "address": 995336,
+        "offset": 995336,
+        "original": "2848403989fcff908afcffb0"
+      },
+      "mte": {
+        "address": 540544,
+        "offset": 540544,
+        "original": "5f2403d5"
+      }
+    },
+    "stpcpy": {
+      "body": {
+        "address": 538688,
+        "offset": 538688,
+        "original": "5f2403d5"
+      },
+      "resolver": {
+        "address": 995208,
+        "offset": 995208,
+        "original": "2848403989fcffb08afcffb0"
+      },
+      "mte": {
+        "address": 538304,
+        "offset": 538304,
+        "original": "5f2403d5"
+      }
+    },
+    "strncpy": {
+      "body": {
+        "address": 827176,
+        "offset": 827176,
+        "original": "420800b4"
+      }
+    },
+    "stpncpy": {
+      "body": {
+        "address": 826588,
+        "offset": 826588,
+        "original": "820800b4"
+      }
+    },
+    "strcat": {
+      "body": {
+        "address": 826864,
+        "offset": 826864,
+        "original": "080400d1"
+      }
+    },
+    "strncat": {
+      "body": {
+        "address": 827120,
+        "offset": 827120,
+        "original": "a20100b4"
+      }
+    },
+    "mempcpy": {
+      "body": {
+        "address": 611580,
+        "offset": 611580,
+        "original": "fd7bbea9"
+      }
+    },
+    "strlcpy": {
+      "body": {
+        "address": 827056,
+        "offset": 827056,
+        "original": "e80301aa"
+      }
+    },
+    "strlcat": {
+      "body": {
+        "address": 826900,
+        "offset": 826900,
+        "original": "fd7bbea9"
+      }
+    }
+  }
+}

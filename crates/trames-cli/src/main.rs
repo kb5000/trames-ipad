@@ -177,10 +177,11 @@ fn run() -> Result<u8, Box<dyn std::error::Error>> {
     let mut host_mappings = Vec::new();
     let mut rootfs = None;
     let mut musl_libc = None;
+    let mut bionic_bundle = None;
     let mut guest_path = false;
     let mut extra_env = Vec::new();
     if args.peek().is_some_and(|a| a == "--help" || a == "-h") {
-        println!("Usage: trames-run [--rootfs VERIFIED_ALPINE_TAR_GZ] [--guest] [--env KEY=VALUE] [--virtual-network ID] [--host-map VIRTUAL_IP=HOST_IP] [--network off|loopback|outbound|full] [--storage DIR | --memory] [--storage-budget BYTES|16GiB|auto] [--storage-info] [--memory-budget 1GiB] [--process-memory-budget 512MiB] [--max-instructions N] [--trace-syscalls] [--metrics] [--cpus auto|1..32] [--accelerator pure|off] [--native-bsearch] [--native-allocator] [--wayland] [--vulkan] [--video] [--musl-libc HOST_ELF] [--file /GUEST=HOST] [--exec-file /GUEST=HOST] [--export /GUEST=HOST] [--install-busybox] [--target linux|android] [--android-init] [--pty] [--] ELF [ARG ...]\nDefault native network: full host TCP/UDP access and listeners, subject to host OS permissions; use --network outbound or loopback to restrict it.\n--virtual-network ID selects isolated 10.0.0.ID / fd00::ID and private loopback; ID must be 2..254.\n--host-map explicitly forwards a logical external IP to a trusted host service.\nDefault storage: .trames/storage in the current directory, 16 GiB logical file budget on first creation.\nDefault committed memory: 512 MiB per address space, 1 GiB aggregate; --process-memory-budget and --memory-budget change these limits without preallocation.\nImports copy selected host files; exports create new host files after guest exit.\n--memory selects the ephemeral 16 MiB test backend. auto uses the storage volume's total capacity.");
+        println!("Usage: trames-run [--rootfs VERIFIED_ALPINE_TAR_GZ] [--guest] [--env KEY=VALUE] [--virtual-network ID] [--host-map VIRTUAL_IP=HOST_IP] [--network off|loopback|outbound|full] [--storage DIR | --memory] [--storage-budget BYTES|16GiB|auto] [--storage-info] [--memory-budget 1GiB] [--process-memory-budget 512MiB] [--max-instructions N] [--trace-syscalls] [--metrics] [--cpus auto|1..32] [--accelerator pure|off] [--native-bsearch] [--native-allocator] [--wayland] [--vulkan] [--video] [--musl-libc HOST_ELF] [--bionic-bundle DIR] [--file /GUEST=HOST] [--exec-file /GUEST=HOST] [--export /GUEST=HOST] [--install-busybox] [--target linux|android] [--android-init] [--pty] [--] ELF [ARG ...]\nDefault native network: full host TCP/UDP access and listeners, subject to host OS permissions; use --network outbound or loopback to restrict it.\n--virtual-network ID selects isolated 10.0.0.ID / fd00::ID and private loopback; ID must be 2..254.\n--host-map explicitly forwards a logical external IP to a trusted host service.\nDefault storage: .trames/storage in the current directory, 16 GiB logical file budget on first creation.\nDefault committed memory: 512 MiB per address space, 1 GiB aggregate; --process-memory-budget and --memory-budget change these limits without preallocation.\nImports copy selected host files; exports create new host files after guest exit.\n--memory selects the ephemeral 16 MiB test backend. auto uses the storage volume's total capacity.");
         return Ok(0);
     }
     while let Some(option) = args.peek() {
@@ -209,6 +210,10 @@ fn run() -> Result<u8, Box<dyn std::error::Error>> {
             "--musl-libc" => {
                 args.next();
                 musl_libc = Some(args.next().ok_or("missing musl ELF")?);
+            }
+            "--bionic-bundle" => {
+                args.next();
+                bionic_bundle = Some(args.next().ok_or("missing Bionic bundle directory")?);
             }
             "--accelerator" => {
                 args.next();
@@ -460,6 +465,9 @@ fn run() -> Result<u8, Box<dyn std::error::Error>> {
     }
     if let Some(libc) = musl_libc {
         trames_distro::install_musl(&mut File::open(libc)?, &mut vfs)?;
+    }
+    if let Some(bundle) = bionic_bundle {
+        trames_distro::bionic::install(std::path::Path::new(&bundle), &mut vfs, pure_accelerator)?;
     }
     if guest_path {
         if vfs.stat_at(-100, b"/root").is_err_and(|e| e.0 == 2) {

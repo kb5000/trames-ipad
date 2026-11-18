@@ -9,6 +9,10 @@ actor EnvironmentStore {
         guard let url = Bundle.main.url(forResource:"libc",withExtension:"so",subdirectory:"GuestMusl") else {throw TramesError.message("Missing bundled Linux library")}
         return url
     }
+    static func bionicBundle() throws -> URL {
+        guard let manifest = Bundle.main.url(forResource:"manifest",withExtension:"json",subdirectory:"GuestBionic") else {throw TramesError.message("Missing bundled Android library adapter")}
+        return manifest.deletingLastPathComponent()
+    }
     nonisolated let root: URL
     nonisolated let authorizationRoot: URL
     private var generation: UInt64 = 0
@@ -142,6 +146,7 @@ actor EnvironmentStore {
         let diagnostics=PreparationDiagnostics(environment:profile.name,output:output)
         do {
             let musl=profile.distro=="alpine" ? try Self.muslLibrary() : nil
+            let bionic=profile.bootTarget=="android" ? try Self.bionicBundle() : nil
             let active=try profile.storeURL(in:root)
             let lock=ownerLock(profile)
             let values=try root.resourceValues(forKeys:[.volumeTotalCapacityKey,.volumeAvailableCapacityForImportantUsageKey])
@@ -209,7 +214,7 @@ actor EnvironmentStore {
             let linuxInit=profile.bootTarget == "android" ? "shell" : profile.boot
             while true {
                 try Task.checkCancellation()
-                let local=try LocalSession(store:active,rootfs:nil,total:UInt64(total),available:UInt64(available),network:"host",useVolumeBudget:useVolumeBudget,muslLibc:musl,pureAccelerator:true,vulkanICD:icd,memoryBudgetMiB:memoryBudgetMiB,processMemoryBudgetMiB:processMemoryBudgetMiB,multipleTerminals:profile.bootTarget == "linux",initiallyPaused:true,storeOwnerLock:lock,distribution:profile.distro,initMode:maintenance ? "shell" : linuxInit,target:profile.bootTarget,environmentConfig: !maintenance && FileManager.default.fileExists(atPath:configuration(profile).path) ? configuration(profile):nil,environmentGrants: !maintenance && FileManager.default.fileExists(atPath:grants(profile).path) ? grants(profile):nil)
+                let local=try LocalSession(store:active,rootfs:nil,total:UInt64(total),available:UInt64(available),network:"host",useVolumeBudget:useVolumeBudget,muslLibc:musl,bionicBundle:bionic,pureAccelerator:true,vulkanICD:icd,memoryBudgetMiB:memoryBudgetMiB,processMemoryBudgetMiB:processMemoryBudgetMiB,multipleTerminals:profile.bootTarget == "linux",initiallyPaused:true,storeOwnerLock:lock,distribution:profile.distro,initMode:maintenance ? "shell" : linuxInit,target:profile.bootTarget,environmentConfig: !maintenance && FileManager.default.fileExists(atPath:configuration(profile).path) ? configuration(profile):nil,environmentGrants: !maintenance && FileManager.default.fileExists(atPath:grants(profile).path) ? grants(profile):nil)
                 do {
                     var status=try local.status()
                     while status.phase=="starting" {try await Task.sleep(for:.milliseconds(20));status=try local.status()}
