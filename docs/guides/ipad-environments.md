@@ -21,6 +21,19 @@ change the boot mode for its next start. **Open Maintenance Terminal** temporari
 skips pending package setup, so a stopped or interrupted installation can be
 repaired. Reopening normally retries the configured preparation.
 
+## Appearance
+
+**Settings → Appearance → Interface Style** offers **Follow System** (default),
+**Light**, and **Dark**, matching the Mac manager. The choice is stored in this
+app's local preferences, not an environment profile. Switching updates the
+workspace, floating window chrome, manager and open Settings sheet immediately.
+The iPad terminal's default text, background and cursor follow the same mode;
+terminal contents, scrollback and explicit ANSI colours remain intact.
+Guest Linux/Android application themes and locale are independent.
+
+[Light appearance](../validation/assets/ipad-appearance-light-20261119.png) ·
+[Dark appearance](../validation/assets/ipad-appearance-dark-20261119.png)
+
 ## Per-environment configuration
 
 The full-screen manager uses a sidebar and five pages: **Overview**,
@@ -35,7 +48,7 @@ memory, an optional extra limit, boot mode, literal shell arguments, working
 directory, application windows, Vulkan, VA-API, thunking, audio input/output and
 host/no-network mode. The former app-global memory, Vulkan and Bridge switches
 no longer override an environment profile. App Settings retains device-specific
-storage, folder authorizations and diagnostics.
+storage, folder authorizations, appearance and diagnostics.
 
 `memory = "auto"` uses host-managed accounting instead of silently inheriting
 the old 1 GiB/512 MiB embedding defaults. It allocates no pool in advance. Guest

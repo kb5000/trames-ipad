@@ -63,7 +63,7 @@ struct WorkspaceWindow: View {
                 windowButton("xmark",label:L10n.text("关闭窗口")) { workspace.closeItem(item) }
                     .accessibilityIdentifier("close-window-\(item.token)")
             }.font(.callout).padding(.leading,12).frame(height:44)
-                .background(Color(white:0.16))
+                .background(Color(uiColor:.secondarySystemBackground))
                 .contentShape(Rectangle())
                 .onTapGesture { workspace.focus(item) }
                 .gesture(DragGesture(coordinateSpace:.named("workspace")).onChanged { value in
@@ -95,9 +95,9 @@ struct WorkspaceWindow: View {
                     }.onEnded { _ in resizeOrigin=nil;workspace.saveFrame(item,geometry) })
                 }
             }
-            .background(Color.black)
+            .background(Color(uiColor:.systemBackground))
             .clipShape(RoundedRectangle(cornerRadius:floating ? 10 : 0))
-            .overlay(RoundedRectangle(cornerRadius:floating ? 10 : 0).stroke(floating ? (workspace.layout.focused == item ? Color.mint : Color.white.opacity(0.3)) : .clear))
+            .overlay(RoundedRectangle(cornerRadius:floating ? 10 : 0).stroke(floating ? (workspace.layout.focused == item ? Color.accentColor : Color(uiColor:.separator)) : .clear))
             .shadow(radius:floating ? 12 : 0)
             .offset(x:floating ? displayedGeometry.origin.x : 0,y:floating ? displayedGeometry.origin.y : 0)
             .opacity(visible ? 1 : 0).allowsHitTesting(visible).accessibilityHidden(!visible)

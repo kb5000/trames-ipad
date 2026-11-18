@@ -53,7 +53,6 @@ final class TerminalSession: NSObject, ObservableObject, Identifiable, TerminalV
         terminal.terminalDelegate = self
         terminal.onGridLayout = { [weak self] columns,rows in self?.synchronizeTerminalSize(columns:columns,rows:rows) }
         terminal.accessibilityIdentifier = "terminal-viewport"
-        terminal.backgroundColor = .black
         timezoneObserver = NotificationCenter.default.addObserver(forName: .NSSystemTimeZoneDidChange, object: nil, queue: .main) { [weak self] _ in
             Task { @MainActor in self?.synchronizeTimezone() }
         }
@@ -319,7 +318,7 @@ final class TerminalViewportHost:UIView {
     init(terminal:TerminalViewport) {
         self.terminal=terminal
         super.init(frame:.zero)
-        backgroundColor=terminal.backgroundColor
+        backgroundColor = .systemBackground
         clipsToBounds=true
         terminal.frame=bounds
         addSubview(terminal)

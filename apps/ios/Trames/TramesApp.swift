@@ -4,6 +4,7 @@ import TramesKit
 @main
 struct TramesApp: App {
     @StateObject private var workspace = WorkspaceModel()
+    @AppStorage(InterfaceStyle.defaultsKey) private var interfaceStyle = "system"
     @Environment(\.scenePhase) private var scenePhase
     var body: some Scene {
         WindowGroup {
@@ -12,7 +13,7 @@ struct TramesApp: App {
                     .frame(width:proxy.size.width,height:proxy.size.height)
             }
                 .ignoresSafeArea(.keyboard)
-                .preferredColorScheme(.dark)
+                .preferredColorScheme((InterfaceStyle(rawValue:interfaceStyle) ?? .system).colorScheme)
                 .onChange(of: scenePhase) { _, phase in
                     if phase == .inactive { workspace.inactive() }
                     else if phase == .background { workspace.background() }
@@ -35,7 +36,7 @@ struct WorkspaceView: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                Text("TRAMES").font(.system(.headline, design: .monospaced)).foregroundStyle(.mint)
+                Text("TRAMES").font(.system(.headline, design: .monospaced)).foregroundStyle(Color.accentColor)
                 ScrollView(.horizontal,showsIndicators:false) {
                     HStack(spacing:4) {
                         ForEach(workspace.layout.tabs,id:\.self) { item in
@@ -59,7 +60,7 @@ struct WorkspaceView: View {
                                     }.buttonStyle(.plain).accessibilityLabel(L10n.text("关闭标签页"))
                                         .accessibilityIdentifier("close-tab-\(item.token)")
                                 }
-                                .background(workspace.layout.selected == item ? Color.white.opacity(0.12) : .clear)
+                                .background(workspace.layout.selected == item ? Color.accentColor.opacity(0.14) : .clear)
                                 .clipShape(RoundedRectangle(cornerRadius:6))
                                 .workspaceFrame(item.token)
                             }
@@ -115,7 +116,7 @@ struct WorkspaceView: View {
                 .frame(width:pictureInPicture.item != nil ? 160 : 1,height:pictureInPicture.item != nil ? 100 : 1)
                 .opacity(pictureInPicture.item != nil ? 1 : 0.01).allowsHitTesting(false).accessibilityHidden(true)
         }
-        .background(.black)
+        .background(Color(uiColor:.systemBackground))
         .sheet(isPresented: $filesSheet) { if let session = workspace.current { TransferView(session: session) } }
         .fullScreenCover(isPresented:$environmentsSheet) {EnvironmentManagerView(workspace:workspace)}
         .sheet(isPresented: $settingsSheet) { SettingsView(workspace: workspace) }
@@ -166,6 +167,7 @@ struct SettingsView: View {
     @ObservedObject var workspace: WorkspaceModel
     @Environment(\.dismiss) private var dismiss
     @AppStorage("useVolumeBudget") private var volume = false
+    @AppStorage(InterfaceStyle.defaultsKey) private var interfaceStyle = "system"
     @State private var managingEnvironments=false
     @State private var resetConfirmation = false
     @State private var collectingAndroidDiagnostics = false
@@ -174,6 +176,12 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
+                Section(L10n.text("外观")) {
+                    Picker(L10n.text("界面模式"),selection:$interfaceStyle) {
+                        ForEach(InterfaceStyle.allCases) {style in Text(L10n.text(style.title)).tag(style.rawValue)}
+                    }.accessibilityIdentifier("interface-style")
+                    Text(L10n.text("仅改变 Trames 界面，不改变环境内应用的主题。")).font(.caption).foregroundStyle(.secondary)
+                }
                 Section(L10n.text("环境配置")) {
                     LabeledContent(L10n.text("当前环境"),value:workspace.selectedEnvironment.name)
                     Button(L10n.text("管理环境配置"),systemImage:"slider.horizontal.3") {managingEnvironments=true}
@@ -212,6 +220,9 @@ struct SettingsView: View {
                     }
                 }
             }.navigationTitle(L10n.text("设置")).toolbar { Button(L10n.text("完成")) { dismiss() } }
+                // This sheet is presented by the nested UIKit hosting controller.
+                // Update its presentation preference as well as the app root.
+                .preferredColorScheme((InterfaceStyle(rawValue:interfaceStyle) ?? .system).colorScheme)
                 .fullScreenCover(isPresented:$managingEnvironments) {EnvironmentManagerView(workspace:workspace)}
                 .alert(L10n.text("重置 Linux 环境？"),isPresented:$resetConfirmation) {
                     Button(L10n.text("删除并重新初始化"),role:.destructive) {dismiss(); workspace.resetLocal()}

@@ -6,6 +6,29 @@ import SwiftTerm
 
 @MainActor
 final class TerminalViewportTests: XCTestCase {
+    func testAppearanceChangesTerminalDefaultsWithoutReplacingContent() {
+        let window=UIWindow(frame:CGRect(x:0,y:0,width:320,height:200))
+        let controller=UIViewController();window.rootViewController=controller
+        let view=makeViewport();controller.view.addSubview(view)
+        window.isHidden=false
+        defer {view.updateUiClosed();window.isHidden=true}
+        let terminal=view.getTerminal()
+        let content=(0..<terminal.rows).map {terminal.getLine(row:$0)?.translateToString()}
+        for style:UIUserInterfaceStyle in [.light,.dark,.light] {
+            view.traitOverrides.userInterfaceStyle=style
+            view.layoutIfNeeded()
+            RunLoop.main.run(until:Date(timeIntervalSinceNow:0.05))
+            let traits=UITraitCollection(userInterfaceStyle:style)
+            XCTAssertEqual(view.nativeForegroundColor,UIColor.label.resolvedColor(with:traits))
+            XCTAssertEqual(view.nativeBackgroundColor,UIColor.systemBackground.resolvedColor(with:traits))
+            XCTAssertEqual(view.caretColor,view.nativeForegroundColor)
+            XCTAssertTrue(view.getTerminal() === terminal)
+            XCTAssertEqual((0..<terminal.rows).map {terminal.getLine(row:$0)?.translateToString()},content)
+        }
+        XCTAssertNil(InterfaceStyle.system.colorScheme)
+        XCTAssertEqual(InterfaceStyle.light.colorScheme,.light)
+        XCTAssertEqual(InterfaceStyle.dark.colorScheme,.dark)
+    }
     private func makeViewport() -> TerminalViewport {
         let view = TerminalViewport(frame: CGRect(x: 0, y: 0, width: 320, height: 160),
                                     font: .monospacedSystemFont(ofSize: 14, weight: .regular))

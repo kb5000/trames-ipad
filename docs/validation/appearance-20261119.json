@@ -1,0 +1,67 @@
+{
+  "date": "2026-11-19",
+  "scope": "Native iPad/Mac appearance: Follow System default, Light and Dark; per-application preferences, no guest/runtime changes.",
+  "repositories": {
+    "ipad": {
+      "base": "7ce80860b5a806e9b9cc3b3bdb04b991c0e73c50",
+      "runtime_unchanged": "7f408e32bcefd3744d17bb20317c857cd67ca5af",
+      "inputs_sha256": {
+        "apps/ios/Trames/Appearance.swift": "1bd3d1d4faa236b1a951f29662e9a058bbedd4661d670d603cbf11780d024bdf",
+        "apps/ios/Trames/TerminalSession.swift": "5f60b0b019890c3a2a6460533ad334b2aed84d99cd0ce65ca15a9210cad6b728",
+        "apps/ios/Trames/TerminalViewport.swift": "bd6183a55f97873b87311a3c34886e31bd69693c3cda20d191f68780dcfb8d22",
+        "apps/ios/Trames/TramesApp.swift": "8bbb5cb21da35f52c3c18f9402a7580c304d6230d76e424c2ce570eaf0a11010",
+        "apps/ios/Trames/WorkspaceKeyboardContainer.swift": "ae340c299fb05c7177b990ac874917c5f701916b1a593191bd5df61b6b4811e5",
+        "apps/ios/Trames/WorkspaceWindows.swift": "2b64cb0d19ddf068dd628eded1d4ca303778da147fac8c57d186afdd847180bd",
+        "apps/ios/TramesFileSystem/en.lproj/Localizable.strings": "838a03753ae318bb46379d83f0f450f93260a0cbb6ce89d2c93e5eaad9d2988d",
+        "apps/ios/TramesFileSystem/zh-Hans.lproj/Localizable.strings": "e16f29c73ef49b50273121d8145ca4f98dd10171d21c86c765929a33be3fed38",
+        "apps/ios/TramesTests/TerminalViewportTests.swift": "17fc57e5ec2a4d254c046236118ac2db6b08e6a2186e63820d34c456efc9538c",
+        "apps/ios/TramesUITests/AppearanceTests.swift": "193d4d54587d911fc39285746ba035508a9d601e785ab7a9052df02ff2204dad"
+      }
+    },
+    "mac": {
+      "base": "a0b566876cad88550bfd467f8de262f49246fbf3",
+      "runtime_unchanged": "c2c9fd7c1365db94ff9d4b1235953e9eeac9eaef",
+      "inputs_sha256": {
+        "apps/macos/Resources/en.lproj/Localizable.strings": "69fddd063ebe792afdda25f786970ecd319654242d84aa502f5b29836e6a15ce",
+        "apps/macos/Resources/zh-Hans.lproj/Localizable.strings": "621873799a86d064defb114b98819ce3a1e814ec4591ef029c66dc74d8059d73",
+        "crates/trames-mac/build.rs": "143dd3dbc9d74d29d1a5cda73a3838b7e32f56dd1fd908673753f0cd91dc5199",
+        "crates/trames-mac/src/appearance.h": "b868ad329b855771d3c413544fed5816057bdd1d87bb67cfdc314137f292be0f",
+        "crates/trames-mac/src/manager.m": "37015ef26f6656406e22ac0d964d72641fa513971ae1dfa00ebaf4a1dd1848bc",
+        "crates/trames-mac/src/window.m": "db4efa6e3aa5c153819ded7798ea0ebe0016359ba31a5dff3602953a047e160d",
+        "tests/native/manager-layout.m": "88898ce973ec7f0ca86d8a095800439bde269a0d955fdebf6d8ec81b89713a78"
+      },
+      "commit": "781e10dcaf14d18110b18fd687e4abe02792cf2a"
+    }
+  },
+  "checks": {
+    "ipad": {
+      "unit_tests_passed": 9,
+      "ui_tests_passed": 1,
+      "failed": 0,
+      "initial_result": "target/appearance/ipad-tests.xcresult (unchanged terminal/localization tests reused)",
+      "final_ui_result": "target/appearance/ipad-ui-final.xcresult",
+      "coverage": [
+        "Immediate Settings sheet appearance, including rendered pixel brightness assertions.",
+        "Manager appearance and relaunch persistence.",
+        "Terminal RGB defaults and cursor update without losing contents/scrollback.",
+        "English/Chinese catalog keys and formatting."
+      ],
+      "builds": "Simulator app/tests and unsigned generic-device Release passed."
+    },
+    "mac": {
+      "native_manager": "task-stream.sh passed: appearance choices, persistence, effective appearance and existing task/layout/actions.",
+      "window": "window-scene.sh passed.",
+      "build": "scripts/build-mac.sh: Dev release bundle and signature validation passed.",
+      "os_mouse_dispatch": "Skipped while native test process was inactive; native control actions, hit targets and geometry passed.",
+      "visual": "Light/dark native manager screenshots inspected."
+    },
+    "unchanged_acceptance": "CPU/Linux/network/GPU and physical-device acceptance not rerun for presentation-only changes."
+  },
+  "behavior": [
+    "UIKit/AppKit semantic surfaces, labels, separators and native accents.",
+    "iPad terminal default colours track appearance; explicit terminal ANSI colours remain authored.",
+    "Mac manager notifies lazy native window chrome through a bundle-scoped event, with no poll or new guest execution path.",
+    "Guest-rendered application themes, Linux locale and macOS external Terminal palette are independent."
+  ],
+  "deployment": "Built locally; no installed stable app, running environment or physical iPad was changed."
+}

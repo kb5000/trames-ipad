@@ -23,7 +23,7 @@ final class WorkspaceKeyboardController:UIViewController {
     }
     required init?(coder:NSCoder) { fatalError("init(coder:) has not been implemented") }
     override func loadView() {
-        view=UIView();view.backgroundColor = .black
+        view=UIView();view.backgroundColor = .systemBackground
         addChild(content)
         let child=content.view!
         child.translatesAutoresizingMaskIntoConstraints=false

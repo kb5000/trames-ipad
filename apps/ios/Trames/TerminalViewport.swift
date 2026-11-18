@@ -79,6 +79,7 @@ final class TerminalViewport: TerminalView {
     }
     override func didMoveToWindow() {
         super.didMoveToWindow()
+        applyAppearance()
         if window != nil { scheduleKeyboardFocus() }
     }
 
@@ -93,6 +94,10 @@ final class TerminalViewport: TerminalView {
     }
 
     private func configureScrolling() {
+        registerForTraitChanges([UITraitUserInterfaceStyle.self,UITraitAccessibilityContrast.self]) { (view:TerminalViewport, _:UITraitCollection) in
+            view.applyAppearance()
+        }
+        applyAppearance()
         if UIDevice.current.userInterfaceIdiom == .pad,let accessory=inputAccessoryView as? TerminalAccessory {
             inputAccessoryView=TerminalKeyboardAccessory(accessory:accessory,terminal:self)
         }
@@ -100,6 +105,20 @@ final class TerminalViewport: TerminalView {
         alwaysBounceHorizontal = false
         showsHorizontalScrollIndicator = false
         isDirectionalLockEnabled = true
+    }
+
+    private func applyAppearance() {
+        // SwiftTerm stores concrete terminal RGB defaults, so dynamic UIColors
+        // alone do not follow UIKit traits. Only refresh defaults on a trait
+        // change; preserve text, ANSI palette, scrollback and guest state.
+        let foreground=UIColor.label.resolvedColor(with:traitCollection)
+        let background=UIColor.systemBackground.resolvedColor(with:traitCollection)
+        nativeForegroundColor=foreground
+        nativeBackgroundColor=background
+        backgroundColor=background
+        caretColor=foreground
+        caretTextColor=background
+        setNeedsDisplay()
     }
 
     override var contentSize: CGSize {

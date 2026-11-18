@@ -273,3 +273,9 @@
 "打开终端" = "Open Terminal";
 "重新启动环境" = "Restart Environment";
 "停止环境" = "Stop Environment";
+"外观" = "Appearance";
+"界面模式" = "Interface Style";
+"跟随系统" = "Follow System";
+"亮色" = "Light";
+"暗色" = "Dark";
+"仅改变 Trames 界面，不改变环境内应用的主题。" = "Changes the Trames interface only, leaving application themes inside environments unchanged.";
