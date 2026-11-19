@@ -1,6 +1,7 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 #define _GNU_SOURCE
 #include <errno.h>
+#include <poll.h>
 #include <fcntl.h>
 #include <poll.h>
 #include <signal.h>
@@ -75,9 +76,11 @@ static void signals(void) {
 static void aio(void) {
     aio_context_t context = 0;
     CHECK(syscall(SYS_io_setup, 8, &context) == 0 && context);
-    /* libaio is allowed to inspect the mapped header, and falls back to the
-       syscall when the optional userspace ring magic is not recognized. */
-    volatile unsigned magic = ((unsigned *)(uintptr_t)context)[4]; (void)magic;
+    struct aio_ring {
+        uint32_t id, nr, head, tail, magic, compat, incompat, header_length;
+    } *ring = (struct aio_ring *)(uintptr_t)context;
+    CHECK(ring->magic == 0xa10a10a1 && ring->incompat == 0);
+    CHECK(ring->nr > 8 && ring->header_length == sizeof(*ring));
     char path[] = "/tmp/trames-aio-XXXXXX"; int fd = mkstemp(path); CHECK(fd >= 0);
     int readonly = open(path, O_RDONLY); CHECK(readonly >= 0); unlink(path);
     CHECK(write(fd, "payload", 7) == 7);
@@ -92,6 +95,19 @@ static void aio(void) {
     CHECK(complete.data == 123 && complete.obj == (uintptr_t)&cb && complete.res == 7 && complete.res2 == 0);
     CHECK(strcmp(buffer, "payload") == 0);
     uint64_t count; CHECK(read(event, &count, 8) == 8 && count == 1);
+    /* Consume a second completion in userspace. The following syscall must
+       observe the advanced head and must not return the same record. */
+    cb.aio_data = 124;
+    CHECK(syscall(SYS_io_submit, context, 1, list) == 1);
+    struct pollfd ready = {.fd = event, .events = POLLIN};
+    CHECK(poll(&ready, 1, 5000) == 1 && read(event, &count, 8) == 8 && count == 1);
+    uint32_t head = ring->head;
+    CHECK(head < ring->nr && head != __atomic_load_n(&ring->tail, __ATOMIC_ACQUIRE));
+    complete = ((struct io_event *)(ring + 1))[head];
+    CHECK(complete.data == 124 && complete.obj == (uintptr_t)&cb && complete.res == 7);
+    __atomic_store_n(&ring->head, (head + 1) % ring->nr, __ATOMIC_RELEASE);
+    struct timespec immediate = {0};
+    CHECK(syscall(SYS_io_getevents, context, 0, 1, &complete, &immediate) == 0);
     struct iovec parts[] = {{"abc", 3}, {"xyz", 3}};
     cb = (struct iocb){.aio_lio_opcode = IOCB_CMD_PWRITEV, .aio_fildes = fd, .aio_buf = (uintptr_t)parts, .aio_nbytes = 2, .aio_offset = 7};
     CHECK(syscall(SYS_io_submit, context, 1, list) == 1);
