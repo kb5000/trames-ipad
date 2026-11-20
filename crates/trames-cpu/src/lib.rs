@@ -6,32 +6,26 @@
 use trames_execution::{Aarch64State, Registers};
 use trames_memory::CpuMemory;
 /// Capabilities of the virtual CPU, independent of the host.
-pub const HWCAP: u64 = (1 << 0)
-    | (1 << 1)
-    | (1 << 3)
-    | (1 << 4)
-    | (1 << 5)
-    | (1 << 6)
-    | (1 << 7)
-    | (1 << 8)
-    | (1 << 9)
-    | (1 << 10)
-    | (1 << 12)
-    | (1 << 13)
-    | (1 << 15)
-    | (1 << 16) // FCMA
-    | (1 << 17) // SHA3
-    | (1 << 18) // SM3
-    | (1 << 19) // SM4
-    | (1 << 20)
-    | (1 << 21) // SHA512
-    | (1 << 23) // FHM
-    | (1 << 29) // SB: architectural ordering is provided by the interpreter
-    | (1 << 26)
-    | (1 << 27);
-pub const HWCAP2: u64 =
-    (1 << 7) | (1 << 8) | (1 << 13) | (1 << 14) | (1 << 15) | (1 << 16) | (1 << 34) | (1 << 43); // FlagM2, FRINTTS, I8MM, BF16, DGH, RNG, CSSC, MOPS
-pub const FEATURE_NAMES: &str = "fp asimd aes pmull sha1 sha2 crc32 atomics fphp asimdhp asimdrdm jscvt lrcpc fcma sha3 sm3 sm4 asimddp sha512 asimdfhm ilrcpc flagm sb flagm2 frint i8mm bf16 dgh rng cssc mops";
+macro_rules! linux_features {
+    (hwcap: $first:ident = $first_bit:literal $(, $name:ident = $bit:literal)*;
+     hwcap2: $($name2:ident = $bit2:literal),+) => {
+        pub const HWCAP: u64 = (1 << $first_bit) $(| (1 << $bit))*;
+        pub const HWCAP2: u64 = 0 $(| (1 << $bit2))+;
+        pub const FEATURE_NAMES: &str = concat!(
+            stringify!($first) $(, " ", stringify!($name))* $(, " ", stringify!($name2))+
+        );
+    };
+}
+// Linux AArch64 ELF hwcap bit numbers. The aux vector and procfs must
+// describe the same interpreter, independent of the machine running it.
+linux_features! {
+    hwcap: fp = 0, asimd = 1, aes = 3, pmull = 4, sha1 = 5, sha2 = 6,
+    crc32 = 7, atomics = 8, fphp = 9, asimdhp = 10, asimdrdm = 12,
+    jscvt = 13, fcma = 14, lrcpc = 15, sha3 = 17, sm3 = 18, sm4 = 19,
+    asimddp = 20, sha512 = 21, asimdfhm = 23, ilrcpc = 26, flagm = 27, sb = 29;
+    hwcap2: flagm2 = 7, frint = 8, i8mm = 13, bf16 = 14, dgh = 15,
+    rng = 16, cssc = 34, mops = 43
+}
 mod cached;
 mod compatibility;
 mod crypto;
@@ -950,6 +944,9 @@ impl trames_engine::Cpu for Cpu {
         hwcap2: HWCAP2,
     };
     const FEATURE_NAMES: &'static str = FEATURE_NAMES;
+    fn counter_frequency() -> u64 {
+        extended::COUNTER_HZ
+    }
     const EXACT_INSTRUCTIONS: bool = true;
     fn new(pc: u64, sp: u64) -> Self {
         Self::new(pc, sp)
