@@ -442,8 +442,11 @@ fn run() -> Result<u8, Box<dyn std::error::Error>> {
             trames_distro::install_alpine(&mut File::open(archive)?, &mut vfs)?;
         }
     }
+    if !android_init {
+        trames_distro::boot::prepare_shared_memory(&mut vfs)?;
+    }
     for (guest, host, executable) in files {
-        vfs.import_reader(guest.as_bytes(), &mut File::open(host)?, executable)?;
+        vfs.import_session_reader(guest.as_bytes(), &mut File::open(host)?, executable)?;
     }
     trames_distro::install_resolver(
         &mut vfs,

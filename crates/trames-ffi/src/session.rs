@@ -576,40 +576,6 @@ impl Session {
         }
     }
 }
-fn prepare_runtime_mounts(vfs: &mut Vfs) -> Result<(), String> {
-    let prepare = |vfs: &mut Vfs| -> Result<(), trames_vfs::Errno> {
-        match vfs.mkdir_at(trames_vfs::AT_FDCWD, b"/dev", 0o755) {
-            Ok(()) | Err(trames_vfs::Errno(17)) => {}
-            Err(error) => return Err(error),
-        }
-        for (path, parent, mode, options) in [
-            (
-                b"/run".as_slice(),
-                b"/".as_slice(),
-                0o755,
-                b"mode=755".as_slice(),
-            ),
-            (
-                b"/dev/shm".as_slice(),
-                b"/dev".as_slice(),
-                0o1777,
-                b"size=64m,mode=1777".as_slice(),
-            ),
-        ] {
-            match vfs.mkdir_at(trames_vfs::AT_FDCWD, path, mode) {
-                Ok(()) | Err(trames_vfs::Errno(17)) => {}
-                Err(error) => return Err(error),
-            }
-            if vfs.mount_id_at(trames_vfs::AT_FDCWD, path, false)?
-                == vfs.mount_id_at(trames_vfs::AT_FDCWD, parent, false)?
-            {
-                vfs.mount(Some(b"tmpfs"), path, Some(b"tmpfs"), 0, Some(options))?;
-            }
-        }
-        Ok(())
-    };
-    prepare(vfs).map_err(|error| format!("prepare runtime tmpfs: {error}"))
-}
 fn prepare_guest_defaults(vfs: &mut Vfs, network: &str, distro: &str) -> Result<(), String> {
     trames_distro::systemd::ensure_machine_identity(vfs).map_err(|e| e.to_string())?;
     let resolver = if network == "loopback" {
@@ -958,7 +924,8 @@ fn run(
     // Before Wayland publishes its socket or any terminal/service can run.
     // Mounts belong to this kernel session, shared by all its local terminals.
     if !android {
-        prepare_runtime_mounts(&mut vfs)?;
+        trames_distro::boot::prepare_runtime_mounts(&mut vfs)
+            .map_err(|error| format!("prepare runtime tmpfs: {error}"))?;
         prepare_guest_defaults(&mut vfs, &options.network, &options.distro)?;
     }
     vfs.chdir(if android { b"/" } else { b"/root" })
@@ -2284,7 +2251,7 @@ mod memory_tests {
         ));
         {
             let mut vfs = Vfs::open_disk(&path, DiskOptions::default()).unwrap();
-            prepare_runtime_mounts(&mut vfs).unwrap();
+            trames_distro::boot::prepare_runtime_mounts(&mut vfs).unwrap();
             for file in [b"/run/stale.pid".as_slice(), b"/dev/shm/stale".as_slice()] {
                 let fd = vfs
                     .open_at(trames_vfs::AT_FDCWD, file, 0x41, 0o600)
@@ -2296,7 +2263,7 @@ mod memory_tests {
         }
         {
             let mut vfs = Vfs::open_disk(&path, DiskOptions::default()).unwrap();
-            prepare_runtime_mounts(&mut vfs).unwrap();
+            trames_distro::boot::prepare_runtime_mounts(&mut vfs).unwrap();
             assert!(vfs
                 .stat_at(trames_vfs::AT_FDCWD, b"/run/stale.pid")
                 .is_err());
@@ -2313,7 +2280,7 @@ mod memory_tests {
     #[test]
     fn runtime_tmpfs_precedes_wayland_and_repeated_preparation_preserves_live_files() {
         let mut vfs = Vfs::default();
-        prepare_runtime_mounts(&mut vfs).unwrap();
+        trames_distro::boot::prepare_runtime_mounts(&mut vfs).unwrap();
         for (path, mode) in [
             (b"/run".as_slice(), 0o755),
             (b"/dev/shm".as_slice(), 0o1777),
@@ -2355,7 +2322,7 @@ mod memory_tests {
             .unwrap();
         vfs.write(fd, b"123\n").unwrap();
         vfs.close(fd).unwrap();
-        prepare_runtime_mounts(&mut vfs).unwrap();
+        trames_distro::boot::prepare_runtime_mounts(&mut vfs).unwrap();
         assert_eq!(
             vfs.mount_id_at(trames_vfs::AT_FDCWD, b"/run", false)
                 .unwrap(),
