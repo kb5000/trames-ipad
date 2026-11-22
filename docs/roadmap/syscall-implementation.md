@@ -8,6 +8,41 @@ Per-operation ABI compatibility and product acceptance have separate evidence.
 The audit uses the runtime's `trames-vfs/src/syscall_names.rs` and includes
 specialized session dispatch outside the main syscall tables.
 
+## gVisor compatibility queue, 2026-11-23
+
+The latest rolling inventory has **126 gaps among 13,864 cases that passed on
+native ARM64 Linux**: 13,738 have a passing Trames result (99.09%). The gaps
+comprise ten failures, one timeout, 77 conditional skips and 38 missing result
+records. These are carried-forward per-case results from multiple revisions,
+not a full rerun on the latest commit. The [case ledger](gvisor-gaps-20261123.json)
+records the exact selection and status. The 593 native skips and 73 native
+failures/timeouts/missing results are outside this strict comparison; their
+Trames outcomes are not additional confirmed compatibility failures.
+
+| Remaining group | Cases | Combined implementation and acceptance work |
+| --- | ---: | --- |
+| Landlock v1–v6 | 38 | Join the application-sandboxing batch below. Implement enforced rules and inheritance; feature-detection skips remain open until the assertions run and pass. |
+| iptables / ip6tables result coverage | 38 | Reconcile or rerun the 23 IPv4 and 15 IPv6 missing records against the unchanged original binaries. Do not count these as confirmed implementation failures or subtract them based on revision-query coverage alone. Repair any demonstrated socket-option or filtering gaps in the network batch. |
+| cgroup v2 and cgroup BPF | 17 | Join container resource management and Android memory lifecycle: CPU/cpuset controllers, memory charging/limits, OOM, controller ownership and BPF queries. These extend beyond the missing syscall-entry list. |
+| PIDFD_THREAD | 6 | Extend the process-lifecycle batch with individual-thread identity, exit notification, tracing and exec revival. |
+| Remaining VFS, network, VM and identity behavior | 27 | Fix object semantics in batches: ACL/overlay, link/unlink, proc sysctls, mount-FD overlay use, netlink, FUSE and mapping behavior. Pair with modern mounts, mapping management and affected existing syscalls. |
+| Total | 126 | Keep missing results, conditional skips, failures and timeouts distinct. |
+
+Use one work queue for the syscall roadmap and these original cases. A new
+syscall can close multiple cases; a failing case can instead expose a boundary
+condition in an already implemented syscall. Completing the syscall name list
+therefore does not establish gVisor compatibility, and clearing this fixed
+selection does not establish the newer interfaces absent from the selection.
+
+First reconcile the 38 missing network records and close small existing-ABI
+gaps. Then deliver Landlock, cgroup/PIDFD lifecycle and modern mount support as
+whole dependency batches, keeping the Android image-specific memory and
+backend-dependent synchronization work tied to their actual workloads. Each
+batch updates this ledger, verifies both executors and ordinary workload
+performance, and pushes the validated main commits with paired runtime pins.
+Reserve a broad same-revision rerun for the integration milestone; reuse
+unchanged evidence while implementing individual batches.
+
 ## Delivery order
 
 | Order | Batch | Completion evidence |
@@ -28,6 +63,19 @@ independent of host credentials and resources. [Execution backends](../architect
 
 ## 1. Guest tracing and debugging
 
+Status on 2026-11-23: the ptrace task relationship, ARM64 state mutation,
+software breakpoints, single stepping and proc-memory work are implemented.
+The [ptrace validation](../../runtime/docs/validation/guest-ptrace-mutation-20261123.md)
+closes the twelve remaining process-debugging comparison gaps. The
+[proc-memory follow-up](../../runtime/docs/validation/guest-proc-mem-20261123.md)
+passes all selected proc-memory cases. The sole upstream ptrace skip is its
+Native-platform Yama guard, covered separately in the disposable guest.
+Real GDB launch, software breakpoint, step, register mutation and continued
+exit pass on both executors. The broader stock-tool acceptance checklist below
+still needs explicit evidence for live attach, gdbserver, multithreaded sessions
+and strace fork/exec following; do not mark it complete based only on those
+GDB smoke runs. The six PIDFD_THREAD cases remain in the queue above.
+
 - Complete `ptrace` as a guest task relationship. Share target lookup and
   credential checks with the existing admission code. Implement `TRACEME`,
   `ATTACH`, `SEIZE`, `INTERRUPT` and `DETACH` with the corresponding stopped
@@ -37,8 +85,8 @@ independent of host credentials and resources. [Execution backends](../architect
   Cover `SETOPTIONS`, event messages, syscall stops and the clone, exec and exit
   events used by GDB and `strace -f`. Keep debugger stops distinct from ordinary
   job-control stops. Audit `/proc/PID/mem`, `waitpid` with `__WALL` and any
-  cross-address-space memory access the actual debugger selects. Existing
-  `process_vm_readv` and `process_vm_writev` support only selected local cases.
+  cross-address-space memory access the actual debugger selects, including
+  `process_vm_readv` and `process_vm_writev`.
 - Run the original gVisor tracing-dependent wait and exec cases against native
   ARM64 Linux. With stock GDB and `gdbserver`, launch a small multithreaded
   program, attach to a running instance, hit a breakpoint, read and edit

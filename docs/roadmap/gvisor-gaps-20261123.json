@@ -1,0 +1,647 @@
+{
+  "date": "2026-11-23",
+  "kind": "rolling inventory; not a same-revision full rerun",
+  "native_reference": "target/local-ci/io/gvisor-expanded-20261117/native-final/results.json",
+  "rolling_results": "target/ptrace-mutation/inventory-results.json",
+  "native_passed": 13864,
+  "matched_passed": 13738,
+  "gaps": 126,
+  "status_counts": {
+    "skipped": 77,
+    "failed": 10,
+    "missing": 38,
+    "timeout": 1
+  },
+  "cases": [
+    {
+      "suite": "cgroup2",
+      "case": "Cgroup2Test.CloneIntoCgroupWithControllersIsDisallowed",
+      "status": "skipped"
+    },
+    {
+      "suite": "cgroup2",
+      "case": "Cgroup2Test.CpuLimits",
+      "status": "skipped"
+    },
+    {
+      "suite": "cgroup2",
+      "case": "Cgroup2Test.CpuStat",
+      "status": "skipped"
+    },
+    {
+      "suite": "cgroup2",
+      "case": "Cgroup2Test.CpuStatCountsControllerlessDescendants",
+      "status": "skipped"
+    },
+    {
+      "suite": "cgroup2",
+      "case": "Cgroup2Test.CpuStatDisableReparentsUsage",
+      "status": "skipped"
+    },
+    {
+      "suite": "cgroup2",
+      "case": "Cgroup2Test.CpuStatMigration",
+      "status": "skipped"
+    },
+    {
+      "suite": "cgroup2",
+      "case": "Cgroup2Test.CpuStatSameInstanceMigrationKeepsUsage",
+      "status": "skipped"
+    },
+    {
+      "suite": "cgroup2",
+      "case": "Cgroup2Test.CpusetRejectsImpossibleCpu",
+      "status": "skipped"
+    },
+    {
+      "suite": "cgroup2",
+      "case": "Cgroup2Test.MemoryCurrent",
+      "status": "failed"
+    },
+    {
+      "suite": "cgroup2",
+      "case": "Cgroup2Test.MemoryFilesNotOnRoot",
+      "status": "skipped"
+    },
+    {
+      "suite": "cgroup2",
+      "case": "Cgroup2Test.MemoryIsChargedToNearestAncestorWithController",
+      "status": "failed"
+    },
+    {
+      "suite": "cgroup2",
+      "case": "Cgroup2Test.MemoryLimits",
+      "status": "skipped"
+    },
+    {
+      "suite": "cgroup2",
+      "case": "Cgroup2Test.MemoryOOMGroup",
+      "status": "skipped"
+    },
+    {
+      "suite": "cgroup2",
+      "case": "Cgroup2Test.NoInternalProcesses",
+      "status": "skipped"
+    },
+    {
+      "suite": "cgroup2",
+      "case": "Cgroup2Test.NsdelegateMemoryOOMGroup",
+      "status": "skipped"
+    },
+    {
+      "suite": "cgroup2",
+      "case": "Cgroup2Test.V1MountRejectedWhenControllerEnabledInV2",
+      "status": "failed"
+    },
+    {
+      "suite": "cgroup2_ebpf",
+      "case": "EbpfTest.QueryRevisionStartsAtOne",
+      "status": "skipped"
+    },
+    {
+      "suite": "chown",
+      "case": "ChownTest.ChownRemovesSecurityCapability",
+      "status": "skipped"
+    },
+    {
+      "suite": "eventfd",
+      "case": "EventfdTest.BigWriteFails",
+      "status": "skipped"
+    },
+    {
+      "suite": "fallocate",
+      "case": "AllocateTest.FallocateKeepSize",
+      "status": "skipped"
+    },
+    {
+      "suite": "fuse",
+      "case": "FuseTest.EpollAfterAbort",
+      "status": "skipped"
+    },
+    {
+      "suite": "ip6tables",
+      "case": "GetSockOptRequiresCapNetAdminTests/GetSockOptRequiresCapNetAdminTest.Validate/GetEntriesIPv6Datagram",
+      "status": "missing"
+    },
+    {
+      "suite": "ip6tables",
+      "case": "GetSockOptRequiresCapNetAdminTests/GetSockOptRequiresCapNetAdminTest.Validate/GetEntriesIPv6Raw",
+      "status": "missing"
+    },
+    {
+      "suite": "ip6tables",
+      "case": "GetSockOptRequiresCapNetAdminTests/GetSockOptRequiresCapNetAdminTest.Validate/GetEntriesIPv6Stream",
+      "status": "missing"
+    },
+    {
+      "suite": "ip6tables",
+      "case": "GetSockOptRequiresCapNetAdminTests/GetSockOptRequiresCapNetAdminTest.Validate/GetInfoIPv6Datagram",
+      "status": "missing"
+    },
+    {
+      "suite": "ip6tables",
+      "case": "GetSockOptRequiresCapNetAdminTests/GetSockOptRequiresCapNetAdminTest.Validate/GetInfoIPv6Raw",
+      "status": "missing"
+    },
+    {
+      "suite": "ip6tables",
+      "case": "GetSockOptRequiresCapNetAdminTests/GetSockOptRequiresCapNetAdminTest.Validate/GetInfoIPv6Stream",
+      "status": "missing"
+    },
+    {
+      "suite": "ip6tables",
+      "case": "IP6TablesBasic.GetEntriesShortBuffer",
+      "status": "missing"
+    },
+    {
+      "suite": "ip6tables",
+      "case": "IP6TablesBasic.GetInfoShortBuffer",
+      "status": "missing"
+    },
+    {
+      "suite": "ip6tables",
+      "case": "IP6TablesBasic.MissingTable",
+      "status": "missing"
+    },
+    {
+      "suite": "ip6tables",
+      "case": "IP6TablesTest.InitialEntries",
+      "status": "missing"
+    },
+    {
+      "suite": "ip6tables",
+      "case": "IP6TablesTest.InitialInfo",
+      "status": "missing"
+    },
+    {
+      "suite": "ip6tables",
+      "case": "IP6TablesTest.UserChainTargetCrash",
+      "status": "missing"
+    },
+    {
+      "suite": "ip6tables",
+      "case": "SetSockOpt/SetSockOptRequiresCapNetAdminTest.Validate/SetReplaceIPv6Datagram",
+      "status": "missing"
+    },
+    {
+      "suite": "ip6tables",
+      "case": "SetSockOpt/SetSockOptRequiresCapNetAdminTest.Validate/SetReplaceIPv6Raw",
+      "status": "missing"
+    },
+    {
+      "suite": "ip6tables",
+      "case": "SetSockOpt/SetSockOptRequiresCapNetAdminTest.Validate/SetReplaceIPv6Stream",
+      "status": "missing"
+    },
+    {
+      "suite": "iptables",
+      "case": "GetSockOpt/GetSockOptRequiresCapNetAdminTest.Validate/GetEntriesIPv4Datagram",
+      "status": "missing"
+    },
+    {
+      "suite": "iptables",
+      "case": "GetSockOpt/GetSockOptRequiresCapNetAdminTest.Validate/GetEntriesIPv4Raw",
+      "status": "missing"
+    },
+    {
+      "suite": "iptables",
+      "case": "GetSockOpt/GetSockOptRequiresCapNetAdminTest.Validate/GetEntriesIPv4Stream",
+      "status": "missing"
+    },
+    {
+      "suite": "iptables",
+      "case": "GetSockOpt/GetSockOptRequiresCapNetAdminTest.Validate/GetEntriesIPv6Datagram",
+      "status": "missing"
+    },
+    {
+      "suite": "iptables",
+      "case": "GetSockOpt/GetSockOptRequiresCapNetAdminTest.Validate/GetEntriesIPv6Stream",
+      "status": "missing"
+    },
+    {
+      "suite": "iptables",
+      "case": "GetSockOpt/GetSockOptRequiresCapNetAdminTest.Validate/GetInfoIPv4Datagram",
+      "status": "missing"
+    },
+    {
+      "suite": "iptables",
+      "case": "GetSockOpt/GetSockOptRequiresCapNetAdminTest.Validate/GetInfoIPv4Raw",
+      "status": "missing"
+    },
+    {
+      "suite": "iptables",
+      "case": "GetSockOpt/GetSockOptRequiresCapNetAdminTest.Validate/GetInfoIPv4Stream",
+      "status": "missing"
+    },
+    {
+      "suite": "iptables",
+      "case": "GetSockOpt/GetSockOptRequiresCapNetAdminTest.Validate/GetInfoIPv6Datagram",
+      "status": "missing"
+    },
+    {
+      "suite": "iptables",
+      "case": "GetSockOpt/GetSockOptRequiresCapNetAdminTest.Validate/GetInfoIPv6Stream",
+      "status": "missing"
+    },
+    {
+      "suite": "iptables",
+      "case": "IPTablesBasic.CreateSocket",
+      "status": "missing"
+    },
+    {
+      "suite": "iptables",
+      "case": "IPTablesBasic.GetEntriesShortBuffer",
+      "status": "missing"
+    },
+    {
+      "suite": "iptables",
+      "case": "IPTablesBasic.GetInfoShortBuffer",
+      "status": "missing"
+    },
+    {
+      "suite": "iptables",
+      "case": "IPTablesBasic.OriginalDstErrors",
+      "status": "missing"
+    },
+    {
+      "suite": "iptables",
+      "case": "IPTablesBasic.UserChainTargetCrash",
+      "status": "missing"
+    },
+    {
+      "suite": "iptables",
+      "case": "IPTablesTest.GetEntriesNonexistentTable",
+      "status": "missing"
+    },
+    {
+      "suite": "iptables",
+      "case": "IPTablesTest.GetInfoNonexistentTable",
+      "status": "missing"
+    },
+    {
+      "suite": "iptables",
+      "case": "IPTablesTest.LargeReplacePayload",
+      "status": "missing"
+    },
+    {
+      "suite": "iptables",
+      "case": "SetSockOpt/SetSockOptRequiresCapNetAdminTest.Validate/SetReplaceIPv4Datagram",
+      "status": "missing"
+    },
+    {
+      "suite": "iptables",
+      "case": "SetSockOpt/SetSockOptRequiresCapNetAdminTest.Validate/SetReplaceIPv4Raw",
+      "status": "missing"
+    },
+    {
+      "suite": "iptables",
+      "case": "SetSockOpt/SetSockOptRequiresCapNetAdminTest.Validate/SetReplaceIPv4Stream",
+      "status": "missing"
+    },
+    {
+      "suite": "iptables",
+      "case": "SetSockOpt/SetSockOptRequiresCapNetAdminTest.Validate/SetReplaceIPv6Datagram",
+      "status": "missing"
+    },
+    {
+      "suite": "iptables",
+      "case": "SetSockOpt/SetSockOptRequiresCapNetAdminTest.Validate/SetReplaceIPv6Stream",
+      "status": "missing"
+    },
+    {
+      "suite": "landlock_v1",
+      "case": "LandlockV1Test.AbiVersionIsSupported",
+      "status": "skipped"
+    },
+    {
+      "suite": "landlock_v1",
+      "case": "LandlockV1Test.AddPathBeneathRejectsUnhandledAccess",
+      "status": "skipped"
+    },
+    {
+      "suite": "landlock_v1",
+      "case": "LandlockV1Test.AddRuleRejectsUnknownRuleType",
+      "status": "skipped"
+    },
+    {
+      "suite": "landlock_v1",
+      "case": "LandlockV1Test.CreateRulesetHandlingAllV1RightsSucceeds",
+      "status": "skipped"
+    },
+    {
+      "suite": "landlock_v1",
+      "case": "LandlockV1Test.CreateRulesetRejectsUnknownAccessBits",
+      "status": "skipped"
+    },
+    {
+      "suite": "landlock_v1",
+      "case": "LandlockV1Test.CreateRulesetRejectsUnknownFlags",
+      "status": "skipped"
+    },
+    {
+      "suite": "landlock_v1",
+      "case": "LandlockV1Test.ExecuteOutsideAllowedTreeDenied",
+      "status": "skipped"
+    },
+    {
+      "suite": "landlock_v1",
+      "case": "LandlockV1Test.LayeredRulesetsOnlyIntersect",
+      "status": "skipped"
+    },
+    {
+      "suite": "landlock_v1",
+      "case": "LandlockV1Test.MakeDirOutsideAllowedTreeDenied",
+      "status": "skipped"
+    },
+    {
+      "suite": "landlock_v1",
+      "case": "LandlockV1Test.MakeRegInsideAllowedTreeAllowed",
+      "status": "skipped"
+    },
+    {
+      "suite": "landlock_v1",
+      "case": "LandlockV1Test.MakeRegOutsideAllowedTreeDenied",
+      "status": "skipped"
+    },
+    {
+      "suite": "landlock_v1",
+      "case": "LandlockV1Test.ReadDirOutsideAllowedTreeDenied",
+      "status": "skipped"
+    },
+    {
+      "suite": "landlock_v1",
+      "case": "LandlockV1Test.ReadInsideAllowedTreeAllowed",
+      "status": "skipped"
+    },
+    {
+      "suite": "landlock_v1",
+      "case": "LandlockV1Test.ReadOutsideAllowedTreeDenied",
+      "status": "skipped"
+    },
+    {
+      "suite": "landlock_v1",
+      "case": "LandlockV1Test.RemoveDirInsideAllowedTreeAllowed",
+      "status": "skipped"
+    },
+    {
+      "suite": "landlock_v1",
+      "case": "LandlockV1Test.RemoveDirOutsideAllowedTreeDenied",
+      "status": "skipped"
+    },
+    {
+      "suite": "landlock_v1",
+      "case": "LandlockV1Test.RemoveFileInsideAllowedTreeAllowed",
+      "status": "skipped"
+    },
+    {
+      "suite": "landlock_v1",
+      "case": "LandlockV1Test.RemoveFileOutsideAllowedTreeDenied",
+      "status": "skipped"
+    },
+    {
+      "suite": "landlock_v1",
+      "case": "LandlockV1Test.RestrictSelfRejectsBadFd",
+      "status": "skipped"
+    },
+    {
+      "suite": "landlock_v1",
+      "case": "LandlockV1Test.RestrictSelfWithoutNoNewPrivsFails",
+      "status": "skipped"
+    },
+    {
+      "suite": "landlock_v1",
+      "case": "LandlockV1Test.RestrictionInheritedAcrossFork",
+      "status": "skipped"
+    },
+    {
+      "suite": "landlock_v1",
+      "case": "LandlockV1Test.WriteFileInsideAllowedTreeAllowed",
+      "status": "skipped"
+    },
+    {
+      "suite": "landlock_v1",
+      "case": "LandlockV1Test.WriteFileOutsideAllowedTreeDenied",
+      "status": "skipped"
+    },
+    {
+      "suite": "landlock_v2",
+      "case": "LandlockV2Test.ReferRenameOutOfAllowedTreeDenied",
+      "status": "skipped"
+    },
+    {
+      "suite": "landlock_v2",
+      "case": "LandlockV2Test.ReferRenameWithinAllowedTreeAllowed",
+      "status": "skipped"
+    },
+    {
+      "suite": "landlock_v3",
+      "case": "LandlockV3Test.TruncateInsideAllowedTreeAllowed",
+      "status": "skipped"
+    },
+    {
+      "suite": "landlock_v3",
+      "case": "LandlockV3Test.TruncateOutsideAllowedTreeDenied",
+      "status": "skipped"
+    },
+    {
+      "suite": "landlock_v4",
+      "case": "LandlockV4Test.AddNetPortRuleWithoutHandledNetFails",
+      "status": "skipped"
+    },
+    {
+      "suite": "landlock_v4",
+      "case": "LandlockV4Test.BindTcpAllowedPortAllowed",
+      "status": "skipped"
+    },
+    {
+      "suite": "landlock_v4",
+      "case": "LandlockV4Test.BindTcpDisallowedPortDenied",
+      "status": "skipped"
+    },
+    {
+      "suite": "landlock_v4",
+      "case": "LandlockV4Test.ConnectTcpAllowedPortAllowed",
+      "status": "skipped"
+    },
+    {
+      "suite": "landlock_v4",
+      "case": "LandlockV4Test.ConnectTcpDisallowedPortDenied",
+      "status": "skipped"
+    },
+    {
+      "suite": "landlock_v5",
+      "case": "LandlockV5Test.IoctlDevAllowedWithRule",
+      "status": "skipped"
+    },
+    {
+      "suite": "landlock_v5",
+      "case": "LandlockV5Test.IoctlDevDeniedWithoutRule",
+      "status": "skipped"
+    },
+    {
+      "suite": "landlock_v6",
+      "case": "LandlockV6Test.AbstractUnixScopeAllowsPathnameSocket",
+      "status": "skipped"
+    },
+    {
+      "suite": "landlock_v6",
+      "case": "LandlockV6Test.AbstractUnixScopeBlocksConnectToOutsideSocket",
+      "status": "skipped"
+    },
+    {
+      "suite": "landlock_v6",
+      "case": "LandlockV6Test.SignalScopeAllowsSignalWithinDomain",
+      "status": "skipped"
+    },
+    {
+      "suite": "landlock_v6",
+      "case": "LandlockV6Test.SignalScopeBlocksSignalToOutsideProcess",
+      "status": "skipped"
+    },
+    {
+      "suite": "link",
+      "case": "LinkTest.LinkAtWithEmptyPathNeedsCapDacReadSearch",
+      "status": "skipped"
+    },
+    {
+      "suite": "link",
+      "case": "LinkTest.LinkAtWithEmptyPathNeedsNoCapForAtFcwd",
+      "status": "skipped"
+    },
+    {
+      "suite": "link",
+      "case": "LinkTest.LinkAtWithEmptyPathNeedsNoCapForSameCreds",
+      "status": "skipped"
+    },
+    {
+      "suite": "lseek",
+      "case": "LseekTest.SeekDataAndSeekHole",
+      "status": "skipped"
+    },
+    {
+      "suite": "membarrier",
+      "case": "MembarrierTest.GlobalExpedited",
+      "status": "skipped"
+    },
+    {
+      "suite": "mmap_eternal",
+      "case": "MmapEternalTest.PageTableLeak",
+      "status": "timeout"
+    },
+    {
+      "suite": "mount_fd",
+      "case": "OpenTreeTest.OpenTreeCloneAsOverlayLowerdir",
+      "status": "skipped"
+    },
+    {
+      "suite": "mount_fd",
+      "case": "OpenTreeTest.OpenTreeCloneFromAnotherUserNamespaceAsOverlayLowerdir",
+      "status": "skipped"
+    },
+    {
+      "suite": "pidfd",
+      "case": "PidfdTest.PidfdThreadExecRevival",
+      "status": "skipped"
+    },
+    {
+      "suite": "pidfd",
+      "case": "PidfdTest.PidfdThreadLeaderDelayedNotification",
+      "status": "skipped"
+    },
+    {
+      "suite": "pidfd",
+      "case": "PidfdTest.PidfdThreadSubthreadNotification",
+      "status": "skipped"
+    },
+    {
+      "suite": "pidfd",
+      "case": "PidfdTest.PidfdThreadTracedLeaderNotification",
+      "status": "skipped"
+    },
+    {
+      "suite": "pidfd",
+      "case": "PidfdTest.PidfdThreadTracedSubthreadNotification",
+      "status": "skipped"
+    },
+    {
+      "suite": "pidfd",
+      "case": "PidfdTest.PidfdThreadTracksSingleThread",
+      "status": "skipped"
+    },
+    {
+      "suite": "posix_acl",
+      "case": "All/PosixACLTest.DeviceFileModeUnaffectedByPostCopyUpParentDefaultACL/OverlayLower",
+      "status": "failed"
+    },
+    {
+      "suite": "posix_acl",
+      "case": "All/PosixACLTest.SetACLEmpty/OverlayLower",
+      "status": "skipped"
+    },
+    {
+      "suite": "posix_acl",
+      "case": "All/PosixACLTest.SetACLEmpty/OverlayUpper",
+      "status": "skipped"
+    },
+    {
+      "suite": "posix_acl",
+      "case": "All/PosixACLTest.SetACLEmpty/Tmpfs",
+      "status": "skipped"
+    },
+    {
+      "suite": "proc",
+      "case": "ProcSysVmMaxmapCount.HasNumericValue",
+      "status": "failed"
+    },
+    {
+      "suite": "proc_net",
+      "case": "ProcSysNetIpv4Recovery.CanReadAndWrite",
+      "status": "failed"
+    },
+    {
+      "suite": "proc_net",
+      "case": "ProcSysNetIpv4Recovery.Exists",
+      "status": "failed"
+    },
+    {
+      "suite": "proc_net",
+      "case": "ProcSysNetIpv6.FilesExist",
+      "status": "failed"
+    },
+    {
+      "suite": "socket_netlink_netfilter",
+      "case": "NetlinkNetfilterTest.DestroyNonexistentChain",
+      "status": "skipped"
+    },
+    {
+      "suite": "socket_netlink_netfilter",
+      "case": "NetlinkNetfilterTest.DestroyNonexistentTable",
+      "status": "skipped"
+    },
+    {
+      "suite": "socket_netlink_route",
+      "case": "NetlinkRouteTest.NewRouteUnsupportedType",
+      "status": "failed"
+    },
+    {
+      "suite": "socket_netlink_route",
+      "case": "NetlinkRouteTest.VethAddRefusedPeerNetnsLeavesNothing",
+      "status": "skipped"
+    },
+    {
+      "suite": "uidgid",
+      "case": "UidGidRootTest.SetresuidNoopKeepsFilesystemIDs",
+      "status": "skipped"
+    },
+    {
+      "suite": "unlink",
+      "case": "UnlinkTest.ChdirProcSelfFdParentDeleted",
+      "status": "failed"
+    },
+    {
+      "suite": "vdso",
+      "case": "VvarTest.WriteVvar",
+      "status": "skipped"
+    }
+  ]
+}
