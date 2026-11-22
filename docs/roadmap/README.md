@@ -1,5 +1,9 @@
 # Delivery roadmap
 
+The [Linux ARM64 syscall roadmap](syscall-implementation.md) tracks the
+remaining syscall work, its dependencies and the acceptance criteria for the
+shared Mac and iPad runtime.
+
 Android container bring-up is being prepared using existing Waydroid ARM64
 images and HWC. The [foundation implementation plan](../architecture/android-bringup.md)
 records the source-audited Binder, shared-memory, boot, permissive/no-SELinux,
