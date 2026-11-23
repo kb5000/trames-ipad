@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Guest cgroup v2 domains; this does not claim resource controllers."""
+"""Guest cgroup v2 domains, pids and device-program lifecycle."""
 import os
 from pathlib import Path
 import subprocess

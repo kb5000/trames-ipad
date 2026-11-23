@@ -47,14 +47,14 @@ int main(int argc,char **argv) {
         assert(count(CG "/lab/leaf/cgroup.procs")==1 && count(CG "/lab/leaf/cgroup.threads")==1); return 0;
     }
     struct statfs fs; assert(statfs(CG,&fs)==0 && (unsigned long)fs.f_type==0x63677270UL);
-    expect(CG "/cgroup.controllers","pids\n"); expect("/proc/self/cgroup","0::/\n");
+    expect(CG "/cgroup.controllers","cpuset cpu memory pids\n"); expect("/proc/self/cgroup","0::/\n");
     char text[8192]; read_file("/proc/self/mountinfo",text,sizeof text); assert(strstr(text," /sys/fs/cgroup rw,") && strstr(text," - cgroup2 cgroup2 rw"));
     assert(mkdir(CG "/lab",0755)==0 && mkdir(CG "/lab/leaf",0755)==0);
     expect(CG "/lab/cgroup.type","domain\n"); expect(CG "/lab/cgroup.events","populated 0\nfrozen 0\n");
     expect(CG "/lab/cgroup.stat","nr_descendants 1\nnr_dying_descendants 0\n");
     DENIED(rmdir(CG "/lab"),ENOTEMPTY);
     int f=open(CG "/lab/cgroup.subtree_control",O_WRONLY); assert(f>=0);
-    DENIED(write(f,"+memory",7),EOPNOTSUPP); assert(write(f,"\n",1)==1); close(f);
+    DENIED(write(f,"+memory",7),ENOENT); assert(write(f,"\n",1)==1); close(f);
     DENIED(open(CG "/lab/injected",O_CREAT|O_WRONLY,0600),EPERM);
     f=open(CG "/lab/cgroup.procs",O_RDWR); assert(f>=0);
     DENIED(write(f,"-1",2),EINVAL); DENIED(write(f,"1 2",3),EINVAL); DENIED(write(f,"999999",6),ESRCH);

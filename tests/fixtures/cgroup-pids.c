@@ -23,7 +23,7 @@ static void waited(pid_t pid) { int status; assert(waitpid(pid,&status,0)==pid &
 static _Atomic int ready, release;
 static void *member(void *unused) { (void)unused; atomic_store(&ready,1); while(!atomic_load(&release))sched_yield(); return NULL; }
 int main(void) {
-    expect(ROOT "/cgroup.controllers","pids\n");
+    expect(ROOT "/cgroup.controllers","cpuset cpu memory pids\n");
     assert(mkdir(CG,0755)==0 && mkdir(CG "/leaf",0755)==0);
     DENIED(access(CG "/pids.max",F_OK),ENOENT);
     int ctrl=open(CG "/cgroup.subtree_control",O_WRONLY); assert(ctrl>=0);
@@ -32,7 +32,7 @@ int main(void) {
     expect(CG "/pids.max","max\n"); expect(CG "/pids.current","0\n");
     put(CG "/cgroup.subtree_control","+pids");
     expect(CG "/leaf/pids.max","max\n"); expect(CG "/cgroup.subtree_control","pids\n");
-    DENIED(write(ctrl,"-pids +memory",13),EOPNOTSUPP);
+    DENIED(write(ctrl,"-pids +memory",13),ENOENT);
     expect(CG "/cgroup.subtree_control","pids\n");
     int rootctrl=open(ROOT "/cgroup.subtree_control",O_WRONLY); assert(rootctrl>=0);
     DENIED(write(rootctrl,"-pids",5),EBUSY);
