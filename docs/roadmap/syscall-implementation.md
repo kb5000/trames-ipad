@@ -10,7 +10,7 @@ specialized session dispatch outside the main syscall tables.
 
 ## gVisor compatibility queue, 2026-11-23
 
-The latest rolling inventory has **126 gaps among 13,864 cases that passed on
+The November 23 rolling inventory recorded **126 gaps among 13,864 cases that passed on
 native ARM64 Linux**: 13,738 have a passing Trames result (99.09%). The gaps
 comprise ten failures, one timeout, 77 conditional skips and 38 missing result
 records. These are carried-forward per-case results from multiple revisions,
@@ -19,14 +19,17 @@ records the exact selection and status. The 593 native skips and 73 native
 failures/timeouts/missing results are outside this strict comparison; their
 Trames outcomes are not additional confirmed compatibility failures.
 
+The [33-case validation](../../runtime/docs/validation/gvisor-misc-pidfd-thread-20261123.md)
+closed the six PIDFD_THREAD cases and the 27 miscellaneous cases on both
+Trames executors. It used the upstream userspace-kernel test mode for 20
+cases. The following 93 cases remain in scope from the November 23 ledger.
+
 | Remaining group | Cases | Combined implementation and acceptance work |
 | --- | ---: | --- |
 | Landlock v1–v6 | 38 | Join the application-sandboxing batch below. Implement enforced rules and inheritance; feature-detection skips remain open until the assertions run and pass. |
 | iptables / ip6tables result coverage | 38 | Reconcile or rerun the 23 IPv4 and 15 IPv6 missing records against the unchanged original binaries. Do not count these as confirmed implementation failures or subtract them based on revision-query coverage alone. Repair any demonstrated socket-option or filtering gaps in the network batch. |
 | cgroup v2 and cgroup BPF | 17 | Join container resource management and Android memory lifecycle: CPU/cpuset controllers, memory charging/limits, OOM, controller ownership and BPF queries. These extend beyond the missing syscall-entry list. |
-| PIDFD_THREAD | 6 | Extend the process-lifecycle batch with individual-thread identity, exit notification, tracing and exec revival. |
-| Remaining VFS, network, VM and identity behavior | 27 | Fix object semantics in batches: ACL/overlay, link/unlink, proc sysctls, mount-FD overlay use, netlink, FUSE and mapping behavior. Pair with modern mounts, mapping management and affected existing syscalls. |
-| Total | 126 | Keep missing results, conditional skips, failures and timeouts distinct. |
+| Total | 93 | Keep missing results, conditional skips, failures and timeouts distinct. |
 
 Use one work queue for the syscall roadmap and these original cases. A new
 syscall can close multiple cases; a failing case can instead expose a boundary
@@ -34,8 +37,8 @@ condition in an already implemented syscall. Completing the syscall name list
 therefore does not establish gVisor compatibility, and clearing this fixed
 selection does not establish the newer interfaces absent from the selection.
 
-First reconcile the 38 missing network records and close small existing-ABI
-gaps. Then deliver Landlock, cgroup/PIDFD lifecycle and modern mount support as
+First reconcile the 38 missing network records. Then deliver Landlock,
+cgroup lifecycle and modern mount support as
 whole dependency batches, keeping the Android image-specific memory and
 backend-dependent synchronization work tied to their actual workloads. Each
 batch updates this ledger, verifies both executors and ordinary workload
