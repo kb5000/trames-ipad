@@ -12,6 +12,36 @@
     "missing": 38,
     "timeout": 1
   },
+  "closure": {
+    "date": "2026-11-23",
+    "kind": "rolling closure of the original snapshot below; not a same-revision full rerun",
+    "matched_passed": 13864,
+    "gaps": 0,
+    "original_gaps_verified_on_both_executors": 126,
+    "case_evidence": "target/gvisor-user-chain-20261123/closure-results.json",
+    "batches": [
+      {
+        "cases": 33,
+        "validation": "../../runtime/docs/validation/gvisor-misc-pidfd-thread-20261123.md"
+      },
+      {
+        "cases": 38,
+        "validation": "../../runtime/docs/validation/gvisor-landlock-20261123.md"
+      },
+      {
+        "cases": 17,
+        "validation": "../../runtime/docs/validation/gvisor-cgroup-controllers-20261123.md"
+      },
+      {
+        "cases": 36,
+        "validation": "../../runtime/docs/validation/gvisor-iptables-20261123.md"
+      },
+      {
+        "cases": 2,
+        "validation": "../../runtime/docs/validation/gvisor-iptables-20261123.md#userchaintargetcrash-closure"
+      }
+    ]
+  },
   "cases": [
     {
       "suite": "cgroup2",

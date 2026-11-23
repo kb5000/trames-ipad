@@ -10,12 +10,12 @@ specialized session dispatch outside the main syscall tables.
 
 ## gVisor compatibility queue, 2026-11-23
 
-The November 23 rolling inventory recorded **126 gaps among 13,864 cases that passed on
-native ARM64 Linux**: 13,738 have a passing Trames result (99.09%). The gaps
-comprise ten failures, one timeout, 77 conditional skips and 38 missing result
-records. These are carried-forward per-case results from multiple revisions,
-not a full rerun on the latest commit. The [case ledger](gvisor-gaps-20261123.json)
-records the exact selection and status. The 593 native skips and 73 native
+The November 23 rolling comparison now has **13,864/13,864 native ARM64
+Linux-passing cases with passing Trames results**, with zero remaining gaps
+in this fixed selection. These are carried-forward per-case results from
+multiple revisions, not a full rerun on the latest commit. The
+[case ledger](gvisor-gaps-20261123.json) retains the original 126-gap snapshot
+and records its closure. The 593 native skips and 73 native
 failures/timeouts/missing results are outside this strict comparison; their
 Trames outcomes are not additional confirmed compatibility failures.
 
@@ -28,11 +28,12 @@ closed 38 more cases across ABI v1–v6 on both executors. The
 closed the 17 controller, resource accounting and BPF revision cases.
 The [iptables and ip6tables validation](../../runtime/docs/validation/gvisor-iptables-20261123.md)
 closed 36 of the 38 missing network records on both executors. The cumulative
-strict comparison now has 13,862 passes among 13,864 native ARM64 Linux passes.
-
-| Remaining group | Cases | Validation status |
-| --- | ---: | --- |
-| iptables / ip6tables historical crash regressions | 2 | One IPv4 case and one IPv6 case have no Trames result. The Runtime now keeps chain labels outside rule execution. Local regressions cover invalid offsets and atomic rejection in both families. |
+strict comparison was then 13,862/13,864. The
+[UserChainTargetCrash follow-up](../../runtime/docs/validation/gvisor-iptables-20261123.md#userchaintargetcrash-closure)
+verified the final IPv4 and IPv6 crash regressions on both executors using
+the existing fix. An evidence audit matched all 126 original gaps to passing
+results on both executors. Regression tests cover invalid chain destinations,
+atomic rejection and legitimate chain-body entry and return.
 
 Use one work queue for the syscall roadmap and these original cases. A new
 syscall can close multiple cases; a failing case can instead expose a boundary
