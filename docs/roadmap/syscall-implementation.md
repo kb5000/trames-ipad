@@ -32,7 +32,7 @@ strict comparison now has 13,862 passes among 13,864 native ARM64 Linux passes.
 
 | Remaining group | Cases | Validation status |
 | --- | ---: | --- |
-| iptables / ip6tables historical crash regressions | 2 | One IPv4 case and one IPv6 case have no Trames result. Stock legacy tools verified ordinary user-chain execution in both families. |
+| iptables / ip6tables historical crash regressions | 2 | One IPv4 case and one IPv6 case have no Trames result. The Runtime now keeps chain labels outside rule execution. Local regressions cover invalid offsets and atomic rejection in both families. |
 
 Use one work queue for the syscall roadmap and these original cases. A new
 syscall can close multiple cases; a failing case can instead expose a boundary
