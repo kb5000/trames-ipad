@@ -25,13 +25,14 @@ Trames executors. It used the upstream userspace-kernel test mode for 20
 cases. The [Landlock validation](../../runtime/docs/validation/gvisor-landlock-20261123.md)
 closed 38 more cases across ABI v1–v6 on both executors. The
 [cgroup v2 and BPF validation](../../runtime/docs/validation/gvisor-cgroup-controllers-20261123.md)
-closed the 17 controller, resource accounting and BPF revision cases. The
-following 38 records remain in scope from the November 23 ledger.
+closed the 17 controller, resource accounting and BPF revision cases.
+The [iptables and ip6tables validation](../../runtime/docs/validation/gvisor-iptables-20261123.md)
+closed 36 of the 38 missing network records on both executors. The cumulative
+strict comparison now has 13,862 passes among 13,864 native ARM64 Linux passes.
 
-| Remaining group | Cases | Combined implementation and acceptance work |
+| Remaining group | Cases | Validation status |
 | --- | ---: | --- |
-| iptables / ip6tables result coverage | 38 | Reconcile or rerun the 23 IPv4 and 15 IPv6 missing records against the unchanged original binaries. Do not count these as confirmed implementation failures or subtract them based on revision-query coverage alone. Repair any demonstrated socket-option or filtering gaps in the network batch. |
-| Total | 38 | Keep missing results, conditional skips, failures and timeouts distinct. |
+| iptables / ip6tables historical crash regressions | 2 | One IPv4 case and one IPv6 case have no Trames result. Stock legacy tools verified ordinary user-chain execution in both families. |
 
 Use one work queue for the syscall roadmap and these original cases. A new
 syscall can close multiple cases; a failing case can instead expose a boundary
@@ -39,9 +40,9 @@ condition in an already implemented syscall. Completing the syscall name list
 therefore does not establish gVisor compatibility, and clearing this fixed
 selection does not establish the newer interfaces absent from the selection.
 
-First reconcile the 38 missing network records. Deliver modern mount support
-as a whole dependency batch. Keep Android image-specific memory behavior and
-backend-dependent synchronization tied to their actual workloads. Each
+Deliver modern mount support as a whole dependency batch. Keep Android
+image-specific memory behavior and backend-dependent synchronization tied to
+their actual workloads. Each
 batch updates this ledger, verifies both executors and ordinary workload
 performance, and pushes the validated main commits with paired runtime pins.
 Reserve a broad same-revision rerun for the integration milestone; reuse
