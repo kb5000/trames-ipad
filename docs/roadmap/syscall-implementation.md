@@ -22,14 +22,15 @@ Trames outcomes are not additional confirmed compatibility failures.
 The [33-case validation](../../runtime/docs/validation/gvisor-misc-pidfd-thread-20261123.md)
 closed the six PIDFD_THREAD cases and the 27 miscellaneous cases on both
 Trames executors. It used the upstream userspace-kernel test mode for 20
-cases. The following 93 cases remain in scope from the November 23 ledger.
+cases. The [Landlock validation](../../runtime/docs/validation/gvisor-landlock-20261123.md)
+closed 38 more cases across ABI v1–v6 on both executors. The following 55
+cases remain in scope from the November 23 ledger.
 
 | Remaining group | Cases | Combined implementation and acceptance work |
 | --- | ---: | --- |
-| Landlock v1–v6 | 38 | Join the application-sandboxing batch below. Implement enforced rules and inheritance; feature-detection skips remain open until the assertions run and pass. |
 | iptables / ip6tables result coverage | 38 | Reconcile or rerun the 23 IPv4 and 15 IPv6 missing records against the unchanged original binaries. Do not count these as confirmed implementation failures or subtract them based on revision-query coverage alone. Repair any demonstrated socket-option or filtering gaps in the network batch. |
 | cgroup v2 and cgroup BPF | 17 | Join container resource management and Android memory lifecycle: CPU/cpuset controllers, memory charging/limits, OOM, controller ownership and BPF queries. These extend beyond the missing syscall-entry list. |
-| Total | 93 | Keep missing results, conditional skips, failures and timeouts distinct. |
+| Total | 55 | Keep missing results, conditional skips, failures and timeouts distinct. |
 
 Use one work queue for the syscall roadmap and these original cases. A new
 syscall can close multiple cases; a failing case can instead expose a boundary
@@ -37,9 +38,9 @@ condition in an already implemented syscall. Completing the syscall name list
 therefore does not establish gVisor compatibility, and clearing this fixed
 selection does not establish the newer interfaces absent from the selection.
 
-First reconcile the 38 missing network records. Then deliver Landlock,
-cgroup lifecycle and modern mount support as
-whole dependency batches, keeping the Android image-specific memory and
+First reconcile the 38 missing network records. Then deliver cgroup lifecycle
+and modern mount support as whole dependency batches, keeping the Android
+image-specific memory and
 backend-dependent synchronization work tied to their actual workloads. Each
 batch updates this ledger, verifies both executors and ordinary workload
 performance, and pushes the validated main commits with paired runtime pins.
@@ -173,7 +174,7 @@ can attribute them to the guest and measurements confirm the result.
 | Filesystem identity and events | `fanotify_init`, `fanotify_mark`, `name_to_handle_at`, `open_by_handle_at` | Build on guest inode and mount identity. Add the fanotify event and file-handle modes used by the target tool. Verify mount namespace visibility, permission checks, rename and stale handles, including supported shared-directory semantics. |
 | File and pipe I/O | `cachestat`, `vmsplice`, `io_cancel` | Use real guest cache residency for `cachestat`. Reuse pipe backpressure and account for page lifetime with `vmsplice`. AIO cancellation must coordinate with the accepted request and publish one completion across cancel, I/O completion and teardown. |
 | Process and queue utilities | `kcmp`, `mq_notify`, `vhangup` | Compare retained guest resources for `kcmp`, deliver one-shot queue notification for `mq_notify`, and use guest PTY lifetime and job control for `vhangup`. Test with the actual diagnostic, libc or login caller. |
-| Application sandboxing and keys | `landlock_create_ruleset`, `landlock_add_rule`, `landlock_restrict_self`, `add_key`, `request_key`, `lsm_get_self_attr`, `lsm_set_self_attr`, `lsm_list_modules` | Enforce advertised Landlock access rules across guest lookups, exec and inheritance. Add creation and lookup to existing guest keyrings. Report attributes for security modules that the runtime actually provides. Verify positive and negative access cases. [Linux Landlock ABI](https://docs.kernel.org/userspace-api/landlock.html) |
+| Application security attributes and keys | `add_key`, `request_key`, `lsm_get_self_attr`, `lsm_set_self_attr`, `lsm_list_modules` | Add creation and lookup to existing guest keyrings. Report attributes for security modules that the runtime provides, including Landlock where applicable. Verify positive and negative access cases. |
 | Mapping management and seals | `process_madvise`, `mseal` | Reuse pidfd permission checks and existing VM advice and mapping mutation paths. For `mseal`, verify every supported map mutation respects the seal, plus range, inheritance and failure behavior. Prioritize when a target workload exercises either interface. |
 | Quotas and time administration | `quotactl`, `quotactl_fd`, `clock_settime`, `settimeofday`, `adjtimex`, `clock_adjtime` | Tie quota operations to a guest filesystem with enforceable quotas. Implement time setting or discipline only against a defined guest clock model, with consistent realtime timer behavior. |
 | Backend-dependent memory features | `remap_file_pages`, `migrate_pages`, `move_pages`, `pkey_mprotect`, `pkey_alloc`, `pkey_free`, `memfd_secret`, `map_shadow_stack` | Defer until a guest workload needs the interface and the backend can provide its observable semantics. Page placement depends on available guest NUMA nodes. Protection keys, secret memory and shadow stacks require their corresponding access and execution guarantees. |
