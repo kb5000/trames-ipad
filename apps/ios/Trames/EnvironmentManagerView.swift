@@ -9,7 +9,9 @@ struct EnvironmentManagerView:View {
     @State private var selected:String?
     @State private var creating=false
     @State private var pending:Route?
-    private enum Route {case close,select(String),create,open(RootfsEnvironment,Bool),restart(RootfsEnvironment)}
+    @State private var deleting:RootfsEnvironment?
+    @State private var deletingNow=false
+    private enum Route {case close,select(String),create,open(RootfsEnvironment,Bool),restart(RootfsEnvironment),delete(RootfsEnvironment)}
     var body:some View {
         NavigationSplitView {
             List(selection:Binding(get:{selected},set:{if let id=$0,id != selected {request(.select(id))}})) {
@@ -22,6 +24,7 @@ struct EnvironmentManagerView:View {
                             if workspace.selectedEnvironmentID==profile.id,workspace.local?.local != nil {Circle().fill(.green).frame(width:7,height:7).accessibilityLabel(L10n.text("当前环境"))}
                         }.padding(.vertical,7)
                     }.tag(profile.id).accessibilityIdentifier("environment-row-"+profile.distro)
+                        .contextMenu {Button(L10n.text("删除环境…"),systemImage:"trash",role:.destructive) {request(.delete(profile))}}
                 }}
             }.listStyle(.sidebar).navigationTitle(L10n.text("环境"))
                 .navigationSplitViewColumnWidth(min:240,ideal:280,max:340)
@@ -29,7 +32,7 @@ struct EnvironmentManagerView:View {
                 .toolbar {ToolbarItem(placement:.topBarLeading) {Button(L10n.text("完成")) {request(.close)}}}
         } detail: {
             if let profile=workspace.profiles.first(where:{$0.id==selected}) {
-                EnvironmentDetailView(workspace:workspace,editor:editor,profile:profile,open:{maintenance in request(.open(profile,maintenance))},restart:{request(.restart(profile))},stop:{workspace.stopEnvironment(profile)})
+                EnvironmentDetailView(workspace:workspace,editor:editor,profile:profile,open:{maintenance in request(.open(profile,maintenance))},restart:{request(.restart(profile))},stop:{workspace.stopEnvironment(profile)},delete:{request(.delete(profile))})
             } else {ContentUnavailableView(L10n.text("选择一个环境"),systemImage:"square.stack.3d.up",description:Text(L10n.text("独立管理每个环境的资源、组件与访问权限。")))}
         }.navigationSplitViewStyle(.balanced)
             .task {do {try await workspace.refreshEnvironments();if selected==nil {selected=workspace.selectedEnvironmentID}}catch{editor.failure=error.localizedDescription}}
@@ -39,6 +42,22 @@ struct EnvironmentManagerView:View {
                 Button(L10n.text("放弃更改"),role:.destructive) {if let route=pending {pending=nil;editor.revert();perform(route)}}
                 Button(L10n.text("取消"),role:.cancel) {pending=nil}
             }.presentationDetents([.large])
+            .confirmationDialog(L10n.text("删除环境？"),isPresented:Binding(get:{deleting != nil},set:{if !$0 {deleting=nil}}),titleVisibility:.visible,presenting:deleting) {profile in
+                Button(L10n.text("删除环境"),role:.destructive) {
+                    deletingNow=true
+                    Task {
+                        defer {deletingNow=false}
+                        do {
+                            try await workspace.deleteEnvironment(profile)
+                            if selected==profile.id {editor.revert();selected=workspace.profiles.first?.id}
+                        } catch {editor.failure=error.localizedDescription}
+                    }
+                }
+                Button(L10n.text("取消"),role:.cancel) {}
+            } message: {profile in Text(L10n.text("将永久删除「%@」的软件、文件和配置，且无法恢复。正在运行的会话将先关闭；其他环境不受影响。",profile.name))}
+            .disabled(deletingNow || workspace.resetting)
+            .interactiveDismissDisabled(deletingNow || workspace.resetting)
+            .overlay {if deletingNow {ProgressView(L10n.text("正在删除环境…")).padding().background(.regularMaterial,in:RoundedRectangle(cornerRadius:12))}}
     }
     private func request(_ route:Route) {if editor.dirty {pending=route}else{perform(route)}}
     private func perform(_ route:Route) {
@@ -46,6 +65,7 @@ struct EnvironmentManagerView:View {
         case .close:dismiss()
         case .select(let id):selected=id
         case .create:creating=true
+        case .delete(let profile):deleting=profile
         case .restart(let profile):workspace.openEnvironment(profile);dismiss()
         case .open(let profile,let maintenance):
             if !maintenance,workspace.selectedEnvironmentID==profile.id,workspace.local?.local != nil {workspace.openLocal()}

@@ -21,6 +21,13 @@ change the boot mode for its next start. **Open Maintenance Terminal** temporari
 skips pending package setup, so a stopped or interrupted installation can be
 repaired. Reopening normally retries the configured preparation.
 
+To remove an environment, select it and choose **More → Delete Environment…**,
+or press and hold its sidebar row. Confirming permanently removes that
+environment's private files, profile, host grants, imported rootfs archive and
+pending Files edits. Its active sessions close before deletion; other
+environments and the original file selected for import are preserved. The last
+environment can also be deleted: the app stays empty until you create another.
+
 ## Appearance
 
 **Settings → Appearance → Interface Style** offers **Follow System** (default),

@@ -75,7 +75,7 @@ struct WorkspaceView: View {
                     Label(L10n.text("新建或管理会话"), systemImage: "plus")
                         .labelStyle(.iconOnly).frame(minWidth: 44, minHeight: 44)
                 }.accessibilityIdentifier("session-actions").confirmationDialog(L10n.text("新建或管理会话"), isPresented: $sessionActions, titleVisibility: .visible) {
-                    Button(L10n.text("新建终端"),systemImage:"terminal") {workspace.openLocal()}
+                    Button(L10n.text("新建终端"),systemImage:"terminal") {if workspace.profiles.isEmpty {environmentsSheet=true}else{workspace.openLocal()}}
                     Button(L10n.text("Linux 环境"),systemImage:"square.stack.3d.up") {environmentsSheet=true}
                     Button("Files", systemImage: "folder") { filesSheet = true }
                     Button(L10n.text("设置"), systemImage: "gear") { settingsSheet = true }
@@ -95,7 +95,9 @@ struct WorkspaceView: View {
                 }.frame(width:proxy.size.width,height:proxy.size.height,alignment:.topLeading)
                 .overlay {
                     if workspace.layout.selected == nil && workspace.layout.floating.isEmpty {
-                        ContentUnavailableView(L10n.text("打开一个终端"),systemImage:"terminal",description:Text(L10n.text("从顶部标签栏恢复窗口，或选择 Linux 环境。")))
+                        if workspace.profiles.isEmpty {
+                            ContentUnavailableView {Label(L10n.text("尚未创建环境"),systemImage:"square.stack.3d.up")} actions: {Button(L10n.text("新建环境")) {environmentsSheet=true}}
+                        } else {ContentUnavailableView(L10n.text("打开一个终端"),systemImage:"terminal",description:Text(L10n.text("从顶部标签栏恢复窗口，或选择 Linux 环境。")))}
                     }
                 }
             .onAppear { workspace.updateViewport(proxy.size) }
@@ -183,14 +185,14 @@ struct SettingsView: View {
                     Text(L10n.text("仅改变 Trames 界面，不改变环境内应用的主题。")).font(.caption).foregroundStyle(.secondary)
                 }
                 Section(L10n.text("环境配置")) {
-                    LabeledContent(L10n.text("当前环境"),value:workspace.selectedEnvironment.name)
+                    if workspace.profiles.isEmpty {Text(L10n.text("尚未创建环境"))}else{LabeledContent(L10n.text("当前环境"),value:workspace.selectedEnvironment.name)}
                     Button(L10n.text("管理环境配置"),systemImage:"slider.horizontal.3") {managingEnvironments=true}
                     Text(L10n.text("CPU、内存、原生组件、网络与访问权限分别保存在每个环境的 TOML 配置中。")).font(.caption).foregroundStyle(.secondary)
                 }
                 Section(L10n.text("本地磁盘")) {
                     Toggle(L10n.text("使用设备卷容量作为存储预算"), isOn: $volume)
                     Text(L10n.text("默认预算 16 GiB；启用后按应用所在卷的总容量计算。实际可用空间仍受系统剩余容量限制，下次打开本地终端生效。")).font(.caption)
-                    Button(L10n.text("重置 Linux 环境"),role:.destructive) {resetConfirmation=true}.disabled(workspace.resetting)
+                    Button(L10n.text("重置 Linux 环境"),role:.destructive) {resetConfirmation=true}.disabled(workspace.resetting || workspace.profiles.isEmpty)
                 }
                 if let directories=workspace.directories {Section(L10n.text("设备目录授权")) {NavigationLink(L10n.text("Files 目录授权")) {FolderGrantsView(store:directories)}}}
                 Section(L10n.text("后台行为")) { Text(L10n.text("进入后台后暂停本地 Linux；返回前台后继续。Files 采用独立副本导入和导出。")).font(.caption) }

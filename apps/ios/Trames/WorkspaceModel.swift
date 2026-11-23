@@ -8,7 +8,7 @@ final class WorkspaceModel: ObservableObject {
     @Published private(set) var localOwner: TerminalSession?
     @Published private(set) var profiles = RootfsCatalog.alpine.environments
     @Published private(set) var selectedEnvironmentID = "alpine"
-    var selectedEnvironment:RootfsEnvironment {profiles.first(where:{$0.id==selectedEnvironmentID}) ?? RootfsCatalog.alpine.environments[0]}
+    var selectedEnvironment:RootfsEnvironment {profiles.first(where:{$0.id==selectedEnvironmentID}) ?? profiles.first ?? RootfsCatalog.alpine.environments[0]}
     private var terminalSequence = 0
     @Published private(set) var layout = WorkspaceTabs()
     private var observedModes: [WorkspaceItemID:String] = [:]
@@ -67,7 +67,7 @@ final class WorkspaceModel: ObservableObject {
                 do {
                     profiles=try await environment.profiles()
                     let saved=UserDefaults.standard.string(forKey:"activeEnvironmentID") ?? "alpine"
-                    selectedEnvironmentID=profiles.contains(where:{$0.id==saved}) ? saved : "alpine"
+                    selectedEnvironmentID=profiles.contains(where:{$0.id==saved}) ? saved : profiles.first?.id ?? ""
                     openLocal()
                 } catch {self.error=error.localizedDescription}
             }
@@ -200,7 +200,7 @@ final class WorkspaceModel: ObservableObject {
         }
     }
     func openLocal() {
-        guard !resetting else { return }
+        guard !resetting,!profiles.isEmpty else { return }
         if let owner=localOwner {
             terminalSequence+=1
             let session=TerminalSession(title:"\(owner.environmentName) \(terminalSequence)",isLocal:true)
@@ -229,6 +229,10 @@ final class WorkspaceModel: ObservableObject {
     }
     func refreshEnvironments() async throws {
         if let environment {profiles=try await environment.profiles()}
+        if !profiles.contains(where:{$0.id==selectedEnvironmentID}) {
+            selectedEnvironmentID=profiles.first?.id ?? ""
+            UserDefaults.standard.set(selectedEnvironmentID,forKey:"activeEnvironmentID")
+        }
     }
     func openEnvironment(_ profile:RootfsEnvironment,maintenance:Bool=false) {
         guard let environment,!resetting else {return}
@@ -243,12 +247,26 @@ final class WorkspaceModel: ObservableObject {
         guard profile.id==selectedEnvironmentID else{return};stopLocal()
     }
     func createEnvironment(name:String,distribution:String,initMode:String,packages:String,archive:URL?,sha256:String?,configuration:EnvironmentConfiguration? = nil) async throws -> RootfsEnvironment {
+        guard !resetting else {throw TramesError.message(L10n.text("环境仍在准备，请稍后再试"))}
         guard let environment else {throw TramesError.message(L10n.text("环境存储不可用"))}
         let profile=try await environment.create(name:name,distribution:distribution,initMode:initMode,packages:packages,archive:archive,sha256:sha256,configuration:configuration)
         try await refreshEnvironments();return profile
     }
+    func deleteEnvironment(_ profile:RootfsEnvironment) async throws {
+        guard let environment,!resetting else {throw TramesError.message(L10n.text("环境仍在准备，请稍后再试"))}
+        resetting=true;defer {resetting=false}
+        if localOwner?.environmentID==profile.id {
+            let previous=localOwner
+            if let item=pictureInPicture.item,item.session==previous?.id {pictureInPicture.stop()}
+            stopLocal();await previous?.waitUntilClosed()
+        }
+        do {try await environment.delete(profile)}
+        catch {try? await refreshEnvironments();throw error}
+        try await refreshEnvironments()
+        FileProviderService.environmentsChanged()
+    }
     func resetLocal() {
-        guard let environment,!resetting else {return}
+        guard let environment,!resetting,!profiles.isEmpty else {return}
         let profile=selectedEnvironment,previous=localOwner
         resetting=true;stopLocal()
         Task {

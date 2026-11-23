@@ -70,6 +70,7 @@ struct EnvironmentDetailView:View {
     let open:(Bool)->Void
     let restart:()->Void
     let stop:()->Void
+    let delete:()->Void
     @State private var page:EnvironmentPage = .overview
     @State private var editingTOML=false
     @State private var importing=false
@@ -84,15 +85,15 @@ struct EnvironmentDetailView:View {
                 }
                 Spacer(minLength:12)
                 Button(L10n.text(workspace.selectedEnvironmentID==profile.id && workspace.local != nil ? "打开终端":"打开环境"),systemImage:"terminal") {open(false)}.buttonStyle(.borderedProminent).accessibilityIdentifier("open-environment")
-                if profile.bootTarget=="linux" || workspace.selectedEnvironmentID==profile.id && workspace.local != nil {
                     Menu {
                         if workspace.selectedEnvironmentID==profile.id,workspace.local != nil {
                             Button(L10n.text("重新启动环境"),systemImage:"arrow.clockwise") {restart()}
                             Button(L10n.text("停止环境"),systemImage:"stop.circle",role:.destructive) {stop()}
                         }
                         if profile.bootTarget=="linux" {Button(L10n.text("打开维护终端")) {open(true)}}
+                        Divider()
+                        Button(L10n.text("删除环境…"),systemImage:"trash",role:.destructive) {delete()}.accessibilityIdentifier("delete-environment")
                     } label:{Image(systemName:"ellipsis.circle").font(.title2)}.accessibilityLabel(L10n.text("更多"))
-                }
             }.padding()
             ScrollView(.horizontal) {
                 HStack(spacing:6) {ForEach(EnvironmentPage.allCases) {item in

@@ -100,6 +100,7 @@ actor EnvironmentStore {
         return try await withTaskCancellationHandler(operation:{try await task.value},onCancel:{task.cancel()})
     }
     func create(name:String,distribution:String,initMode:String,packages:String,archive:URL?,sha256:String?,configuration:EnvironmentConfiguration? = nil) async throws -> RootfsEnvironment {
+        guard !resetting else {throw TramesError.message(L10n.text("环境仍在准备，请稍后再试"))}
         let name=name.trimmingCharacters(in:.whitespacesAndNewlines)
         guard !name.isEmpty,name.utf8.count<=255,!name.contains("/"),!name.utf8.contains(0),["alpine","debian","custom","android"].contains(distribution),["shell","systemd"].contains(initMode),["minimal","standard","development"].contains(packages),distribution != "alpine" || initMode=="shell" else {throw TramesError.message(L10n.text("环境配置无效"))}
         if distribution == "android", initMode != "shell" {throw TramesError.message("Android uses its own init")}
@@ -113,6 +114,7 @@ actor EnvironmentStore {
             try await ScopedFiles.stage(selected:archive,destination:source(profile))
         }
         do {
+            guard !resetting else {throw TramesError.message(L10n.text("环境仍在准备，请稍后再试"))}
             let previous=try profiles()
             guard previous.count<64 else {throw TramesError.message(L10n.text("环境数量已达上限"))}
             if var configuration {
@@ -156,11 +158,25 @@ actor EnvironmentStore {
         let path=directory.appendingPathComponent(profile.id+"-env.toml");try document.toml().write(to:path,options:.atomic);return path
     }
     func pausePreparation(_ paused:Bool) {preparationPaused=paused;try? preparation?.pause(paused)}
+    func delete(_ requested:RootfsEnvironment) async throws {
+        guard !starting,!resetting else {throw TramesError.message(L10n.text("环境仍在准备，请稍后再试"))}
+        let catalog=try RootfsCatalog.load(root)
+        guard let profile=catalog.environments.first(where:{$0.id==requested.id}) else {throw RootfsCatalogError.noSuchItem}
+        resetting=true;generation &+= 1;defer {resetting=false}
+        // The native reset waits for the same owner lock as every store open.
+        try await LocalSession.reset(store:profile.storeURL(in:root),storeOwnerLock:ownerLock(profile))
+        try RootfsCatalog(version:1,environments:catalog.environments.filter{$0.id != profile.id}).save(root)
+        try RootfsEditStore(root:root).discard(environment:profile.id)
+        for path in [configuration(profile),grants(profile),source(profile)] {
+            if FileManager.default.fileExists(atPath:path.path) {try FileManager.default.removeItem(at:path)}
+        }
+        // Retain the lock inode so concurrent openers always share one lock.
+    }
     func start(profile:RootfsEnvironment? = nil,useVolumeBudget:Bool,vulkan:Bool=false,memoryBudgetMiB:Int=1024,processMemoryBudgetMiB:Int=512,maintenance:Bool=false,output:@escaping @Sendable(Data)->Void = {_ in}) async throws -> LocalSession {
         guard !resetting,!starting else {throw TramesError.message(L10n.text("环境仍在准备，请稍后再试"))}
         starting=true;defer {starting=false}
-        let requested=profile?.id ?? "alpine"
-        var profile=try profiles().first(where:{$0.id==requested}) ?? profile ?? RootfsCatalog.alpine.environments[0]
+        let availableProfiles=try profiles(),requested=profile?.id ?? availableProfiles.first?.id
+        guard var profile=availableProfiles.first(where:{$0.id==requested}) else {throw RootfsCatalogError.noSuchItem}
         let began=generation
         let diagnostics=PreparationDiagnostics(environment:profile.name,output:output)
         do {
@@ -249,7 +265,8 @@ actor EnvironmentStore {
     }
     func reset(profile:RootfsEnvironment? = nil) async throws {
         guard !resetting else {throw TramesError.message(L10n.text("Linux 环境正在重置"))}
-        let profile=try profile ?? profiles().first(where:{$0.id=="alpine"}) ?? RootfsCatalog.alpine.environments[0]
+        let availableProfiles=try profiles(),requested=profile?.id ?? availableProfiles.first?.id
+        guard let profile=availableProfiles.first(where:{$0.id==requested}) else {throw RootfsCatalogError.noSuchItem}
         guard !["custom","android"].contains(profile.distro) || FileManager.default.fileExists(atPath:source(profile).path) else {throw TramesError.message(L10n.text("请重新导入此自定义 rootfs"))}
         resetting=true;generation &+= 1;defer {resetting=false}
         try await LocalSession.reset(store:profile.storeURL(in:root),storeOwnerLock:ownerLock(profile))

@@ -54,6 +54,9 @@ enum FileProviderService {
         replay=(id,task)
         return await task.value
     }
+    static func environmentsChanged() {
+        lastCheck=0;lastVersion="invalidated";poll()
+    }
     static func poll() {
         let now=ProcessInfo.processInfo.systemUptime
         guard now-lastCheck>=2,UserDefaults.standard.bool(forKey:"rootfsFileProviderAvailable"),let root=RootfsLocations.sharedRoot else {return}

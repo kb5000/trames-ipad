@@ -82,6 +82,18 @@ struct RootfsEditStore {
             if request(base.identifier)==nil {try save(base,stateURL(base.identifier))}
         }
     }
+    func discard(environment:String) throws {
+        let files=(try? FileManager.default.contentsOfDirectory(at:states,includingPropertiesForKeys:nil)) ?? []
+        for file in files where file.pathExtension=="json" {
+            guard let seed=try? decode(RootfsEditBase.self,file),seed.environment==environment,file==stateURL(seed.identifier) else {continue}
+            try locked(seed.identifier) {
+                guard base(seed.identifier)?.environment==environment else {return}
+                let directory=folder(seed.identifier)
+                if FileManager.default.fileExists(atPath:directory.path) {try FileManager.default.removeItem(at:directory)}
+                try FileManager.default.removeItem(at:file)
+            }
+        }
+    }
     func retainError(_ id:String,_ error:Error) {
         try? locked(id) {
             guard var value=base(id) else {return}
