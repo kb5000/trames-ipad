@@ -279,3 +279,8 @@
 "亮色" = "Light";
 "暗色" = "Dark";
 "仅改变 Trames 界面，不改变环境内应用的主题。" = "Changes the Trames interface only, leaving application themes inside environments unchanged.";
+"USB 文件共享" = "USB File Sharing";
+"电脑连接 iPad 后，在 Apple Devices 或 Finder 的「文件」中选择 Trames。添加文件后，在这里选择它，再点「导入到 Linux」。导出的文件也会出现在电脑的同一列表中。" = "Connect your iPad to your computer and select Trames under Files in Apple Devices or Finder. Add a file there, select it here, then tap Import to Linux. Exported files appear in the same list on your computer.";
+"选择 USB 共享文件" = "Choose USB Shared File";
+"导出到 USB 共享目录" = "Export to USB Shared Folder";
+"已导出到 USB 共享目录：%@" = "Exported to USB shared folder: %@";

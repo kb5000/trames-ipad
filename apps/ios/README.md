@@ -21,6 +21,13 @@ forwarding, agents, jump hosts and arbitrary SSH config execution are future wor
 
 Files import uses a security-scoped, coordinated stream copied to private
 staging. Export uses the system document exporter with a private staging copy.
+USB file sharing is enabled for the app's `Documents` directory in Apple Devices
+on Windows and Finder on macOS. In the terminal's Files panel, choose a USB shared
+file and then import it to the entered Linux path, or export that Linux file
+directly to the USB shared directory. Exports retain the guest filename and move
+the completed staging file into Documents without replacing an existing file.
+The USB directory is a transfer area; the File Provider continues to expose the
+Linux environment separately in the iPad Files app.
 There is no live POSIX mount of a provider URL. Transfers never silently
 truncate an existing file. A failed remote upload may leave a partial file if
 its cleanup request cannot reach the server.
