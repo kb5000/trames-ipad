@@ -96,22 +96,19 @@ GDB smoke runs. The six PIDFD_THREAD cases remain in the queue above.
 
 ## 2. Modern mount administration
 
-- Implement `mount_setattr`, `fspick`, `statmount` and `listmount` around the
-  existing VFS mount objects and mount namespaces. Reuse the descriptor mount
-  path for selection, reconfiguration, detached trees and attachment.
-  `statmount` and `listmount` must agree with `statx` and procfs where the
-  interfaces overlap. Preserve the distinction between unique mount IDs and
-  legacy IDs used by procfs.
-- Cover recursive read-only and related per-mount flags, propagation and
-  `MOUNT_ATTR_IDMAP` on the supported guest filesystems. Apply the ID mapping
-  consistently to ownership queries, permission checks and file creation.
-  Validate the whole requested update before publishing it. Reject unsupported
-  filesystem and flag combinations with the Linux ABI error.
-- Run original mount and namespace cases, then test a Debian systemd environment
-  with stock OCI tools. Check recursive bind trees, mapped and unmapped IDs,
-  denied mutations, namespace teardown and existing mount fallback. Exercise
-  isolated private storage and existing shared directory behavior.
-  [OCI mount configuration](https://github.com/opencontainers/runtime-spec/blob/main/config.md)
+| Caller and operation | Syscalls and acceptance |
+| --- | --- |
+| util-linux 2.41.5 `mount -o rbind,ro=recursive,noexec=recursive` | **Verified.** The original tool calls `open_tree`, `mount_setattr(AT_EMPTY_PATH\|AT_RECURSIVE)` and `move_mount`. Both target levels reject writes and report the new VFS flags. The source stays writable. [Validation](../../runtime/docs/validation/guest-mount-setattr-20261123.md) |
+| runc recursive mount options | The runc 1.3.0 source uses `mount_setattr(AT_RECURSIVE)` through an opened target's proc FD. The shared fixture exercises that path. Acceptance for the full OCI startup with these options is pending. [runc source](https://github.com/opencontainers/runc/blob/v1.3.0/libcontainer/rootfs_linux.go#L1231) |
+| OCI ID-mapped bind mounts | `mount_setattr(MOUNT_ATTR_IDMAP)` needs mount-local UID/GID translation through permission checks, ownership queries and creation. Verify mapped and unmapped IDs, namespace authority and private/shared storage. [OCI mount configuration](https://github.com/opencontainers/runtime-spec/blob/main/config.md) |
+| util-linux filesystem reconfiguration | `fspick` selects the original superblock for `fsconfig(FSCONFIG_CMD_RECONFIGURE)`. Verify that changes reach bind aliases and that an individual mount's attributes remain independent. [libmount source](https://github.com/util-linux/util-linux/blob/v2.41.5/libmount/src/hook_mount.c) |
+| `findmnt --kernel=listmount` | `listmount` and `statmount` enumerate and describe the visible mount tree. Check parent IDs, pagination, namespace visibility and agreement with `statx` and procfs. Preserve the distinct legacy IDs in procfs. [findmnt manual](https://github.com/util-linux/util-linux/blob/v2.41.5/misc-utils/findmnt.8.adoc) |
+
+`mount_setattr` supports read-only, nosuid, nodev, noexec and atime flags on
+attached and detached trees. ID mapping, propagation changes through this
+syscall and nosymfollow remain pending. The original mount and mount-FD
+suites are carried into validation for this batch. The two overlay mount-FD
+skips remain in the gVisor queue.
 
 ## 3. Android memory lifecycle
 
@@ -151,6 +148,9 @@ GDB smoke runs. The six PIDFD_THREAD cases remain in the queue above.
   gVisor no-libc fixture before treating that suite as coverage. Run a stock
   glibc workload with the same CPU setup and measure the selected fast path.
   [Linux rseq ABI](https://docs.kernel.org/userspace-api/rseq.html)
+  Debian's util-linux mount invokes `rseq` during glibc startup and completes
+  the tested workload through the existing fallback. Record this use as a
+  performance dependency when selecting the first workload for `rseq`.
 
 ## 5. Guest performance tooling
 
