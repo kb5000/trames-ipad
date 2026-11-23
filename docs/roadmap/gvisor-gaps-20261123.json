@@ -673,5 +673,16 @@
       "case": "VvarTest.WriteVvar",
       "status": "skipped"
     }
-  ]
+  ],
+  "full_rerun": {
+    "date": "2026-11-23",
+    "cases": 14530,
+    "groups": 254,
+    "production_runtime_revision": "ede0384f3ccb3d62a893c3e5e068d8bdea58e069",
+    "native_passed": 13965,
+    "mac_matched_passed": 13965,
+    "interpreter_matched_passed": 13965,
+    "remaining_gaps": 0,
+    "validation": "../../runtime/docs/validation/gvisor-full-20261123.md"
+  }
 }

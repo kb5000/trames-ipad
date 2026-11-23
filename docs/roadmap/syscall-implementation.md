@@ -10,14 +10,16 @@ specialized session dispatch outside the main syscall tables.
 
 ## gVisor compatibility queue, 2026-11-23
 
-The November 23 rolling comparison now has **13,864/13,864 native ARM64
-Linux-passing cases with passing Trames results**, with zero remaining gaps
-in this fixed selection. These are carried-forward per-case results from
-multiple revisions, not a full rerun on the latest commit. The
-[case ledger](gvisor-gaps-20261123.json) retains the original 126-gap snapshot
-and records its closure. The 593 native skips and 73 native
-failures/timeouts/missing results are outside this strict comparison; their
-Trames outcomes are not additional confirmed compatibility failures.
+The [full rerun](../../runtime/docs/validation/gvisor-full-20261123.md)
+executed all **14,530 enabled cases across 254 groups** on the same Trames
+production sources and refreshed the native Linux reference. With the
+documented upstream test modes, network fixtures, CPU prerequisite and
+isolated follow-ups, **both executors passed all 13,965 native-passing cases**.
+No confirmed gap remains in this fixed selection. This replaces the earlier
+cross-revision rolling comparison; it does not establish every Linux behavior.
+The [case ledger](gvisor-gaps-20261123.json) retains the original 126-gap
+snapshot and records both its rolling closure and the completed full rerun.
+Native nonpassing cases remain outside the strict passing oracle.
 
 The [33-case validation](../../runtime/docs/validation/gvisor-misc-pidfd-thread-20261123.md)
 closed the six PIDFD_THREAD cases and the 27 miscellaneous cases on both
