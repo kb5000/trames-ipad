@@ -2,8 +2,9 @@
 
 The [Trames Linux KVM plan](trames-linux-kvm.md) proposes a third product sharing
 the same runtime: Linux arm64 first, with explicit guest-architecture boundaries
-for a later amd64 backend. It records source research, KVM risks, implementation
-batches and acceptance gates; implementation has not started.
+for a later amd64 backend. Graphics/audio/video API bridges and complete 4 KiB
+host/guest operation are core delivery requirements. It records source research,
+KVM risks, implementation batches and acceptance gates; implementation has not started.
 
 The [Linux ARM64 syscall roadmap](syscall-implementation.md) tracks the
 remaining syscall work, its dependencies and the acceptance criteria for the
