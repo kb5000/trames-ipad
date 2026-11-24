@@ -2,9 +2,9 @@ name: Linux runtime
 on:
   push:
     branches: [main]
-    paths-ignore: ['apps/ios/**', 'docs/**', '.github/workflows/ios.yml', 'scripts/ios-ci-scope.py', '.github/workflows/linux.yml', '.github/ios-validation-plan.json', 'scripts/publish-ios-build35.py', '.github/workflows/publish-ios-build35.yml']
+    paths-ignore: ['apps/ios/**', 'docs/**', '.github/workflows/ios.yml', '.github/workflows/ios-embedding.yml', 'scripts/ios-ci-scope.py', '.github/workflows/linux.yml', '.github/ios-validation-plan.json', 'scripts/publish-ios-build35.py', '.github/workflows/publish-ios-build35.yml']
   pull_request:
-    paths-ignore: ['apps/ios/**', 'docs/**', '.github/workflows/ios.yml', 'scripts/ios-ci-scope.py', '.github/workflows/linux.yml', '.github/ios-validation-plan.json', 'scripts/publish-ios-build35.py', '.github/workflows/publish-ios-build35.yml']
+    paths-ignore: ['apps/ios/**', 'docs/**', '.github/workflows/ios.yml', '.github/workflows/ios-embedding.yml', 'scripts/ios-ci-scope.py', '.github/workflows/linux.yml', '.github/ios-validation-plan.json', 'scripts/publish-ios-build35.py', '.github/workflows/publish-ios-build35.yml']
 permissions:
   contents: read
   actions: read
@@ -897,7 +897,7 @@ jobs:
   release-core:
     needs: scope
     if: needs.scope.outputs.native_scope == 'release-core' || needs.scope.outputs.native_scope == 'release-cross'
-    runs-on: ubuntu-24.04
+    runs-on: macos-15
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
@@ -908,8 +908,6 @@ jobs:
           toolchain: nightly-2026-10-16
           components: rustfmt, clippy
           targets: aarch64-apple-ios
-      - name: Install LLVM archiver for the iOS cross target
-        run: sudo apt-get update && sudo apt-get install --yes clang llvm
       - name: Check release workspace formatting, lints and all Rust tests
         if: needs.scope.outputs.native_scope != 'release-cross'
         run: |
@@ -918,7 +916,7 @@ jobs:
           cargo test --workspace --all-features --locked
       - name: Complete release iOS cross compile
         run: |
-          cargo check -p trames-core -p trames-distro -p trames-ffi --target aarch64-apple-ios --locked
+          SDKROOT="$(xcrun --sdk iphoneos --show-sdk-path)" cargo check -p trames-core -p trames-distro -p trames-ffi --target aarch64-apple-ios --locked
   docker-default-lifecycle:
     needs: scope
     if: needs.scope.outputs.native_scope == 'docker-default-lifecycle'
@@ -1250,7 +1248,7 @@ jobs:
         with:
           toolchain: nightly-2026-10-16
           components: rustfmt, clippy, rust-src
-          targets: aarch64-apple-ios,aarch64-unknown-linux-musl
+          targets: aarch64-unknown-linux-musl
       - name: Install independent AArch64 oracle and cross assembler
         run: |
           sudo apt-get update
@@ -1282,8 +1280,6 @@ jobs:
           cargo test -Zbuild-std --manifest-path runtime/Cargo.toml -p trames-memory -p trames-kernel -p trames-accel --target x86_64-unknown-linux-gnu --locked --lib --tests
       - name: Check original-source native allocator C with address and undefined behavior sanitizers
         run: bash scripts/check-native-allocator.sh
-      - name: Compile core and both network backends for iOS (no SDK link or device test)
-        run: cargo check -p trames-core -p trames-distro -p trames-ffi --target aarch64-apple-ios --locked
       - name: Execute ARM64 compute, memory and native worker tests under the independent oracle
         run: |
           cargo test -p trames-compute -p trames-native -p trames-cpu -p trames-memory -p trames-accel -p trames-vfs -p trames-core --target aarch64-unknown-linux-musl --locked

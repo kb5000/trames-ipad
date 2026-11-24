@@ -27,7 +27,6 @@ REQUIRED = {
     'Check region and task signal races with fully instrumented Rust standard library',
     'Test the pinned common runtime workspace',
     'Check original-source native allocator C with address and undefined behavior sanitizers',
-    'Compile core and both network backends for iOS (no SDK link or device test)',
     'Execute ARM64 compute, memory and native worker tests under the independent oracle',
 }
 

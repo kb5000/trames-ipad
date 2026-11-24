@@ -17,22 +17,7 @@ pub struct ProcessMemory {
 
 pub fn process() -> std::io::Result<ProcessMemory> {
     #[cfg(target_vendor = "apple")]
-    let (resident_bytes, physical_footprint_bytes) = {
-        let mut usage: libc::rusage_info_v2 = unsafe { std::mem::zeroed() };
-        // SAFETY: SDK structure and complete local writable output buffer. This
-        // only queries the calling process; it neither pauses nor walks workers.
-        if unsafe {
-            libc::proc_pid_rusage(
-                libc::getpid(),
-                libc::RUSAGE_INFO_V2,
-                (&mut usage as *mut libc::rusage_info_v2).cast(),
-            )
-        } != 0
-        {
-            return Err(std::io::Error::last_os_error());
-        }
-        (usage.ri_resident_size, Some(usage.ri_phys_footprint))
-    };
+    let (resident_bytes, physical_footprint_bytes) = apple::process()?;
     #[cfg(not(target_vendor = "apple"))]
     let (resident_bytes, physical_footprint_bytes) = {
         let statm = std::fs::read_to_string("/proc/self/statm")?;
@@ -87,6 +72,25 @@ pub fn source() -> Option<Arc<dyn Fn() -> HostMemoryInfo + Send + Sync>> {
 #[cfg(target_vendor = "apple")]
 mod apple {
     use trames_linux::HostMemoryInfo;
+    // Public mach/task_info.h TASK_VM_INFO rev1 prefix. Later SDK revisions
+    // append fields; requesting this prefix supports both iOS and macOS without
+    // macOS-only libproc APIs. Its resident_size and phys_footprint offsets are
+    // 16 and 144 bytes, with a 38-natural_t input/output count.
+    #[repr(C)]
+    #[derive(Default)]
+    struct TaskVmInfoRev1 {
+        _virtual_size: u64,
+        _region_count: i32,
+        _page_size: i32,
+        resident_size: u64,
+        _resident_size_peak: u64,
+        _sizes: [u64; 14],
+        phys_footprint: u64,
+    }
+    const _: () = {
+        assert!(std::mem::size_of::<TaskVmInfoRev1>() == 152);
+        assert!(std::mem::offset_of!(TaskVmInfoRev1, phys_footprint) == 144);
+    };
     // SDK Mach ABI. libc deprecates its convenience accessors, not these OS APIs.
     unsafe extern "C" {
         fn mach_host_self() -> libc::mach_port_t;
@@ -95,6 +99,30 @@ mod apple {
             name: libc::mach_port_t,
         ) -> libc::kern_return_t;
         static mach_task_self_: libc::mach_port_t;
+    }
+
+    pub fn process() -> std::io::Result<(u64, Option<u64>)> {
+        let mut info = TaskVmInfoRev1::default();
+        let expected = (std::mem::size_of::<TaskVmInfoRev1>()
+            / std::mem::size_of::<libc::natural_t>())
+            as libc::mach_msg_type_number_t;
+        let mut count = expected;
+        // SAFETY: the SDK's rev1-sized output and matching word count; the send
+        // right names only this calling process and is not acquired or retained.
+        let status = unsafe {
+            libc::task_info(
+                mach_task_self_,
+                22, // TASK_VM_INFO
+                (&mut info as *mut TaskVmInfoRev1).cast(),
+                &mut count,
+            )
+        };
+        if status != libc::KERN_SUCCESS || count < expected {
+            return Err(std::io::Error::other(format!(
+                "task_info(TASK_VM_INFO): status={status}, count={count}, expected={expected}"
+            )));
+        }
+        Ok((info.resident_size, Some(info.phys_footprint)))
     }
 
     pub fn physical_bytes() -> std::io::Result<usize> {
@@ -168,6 +196,19 @@ mod apple {
 }
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn process_accounting_queries_the_current_process() {
+        let value = super::process().unwrap();
+        assert_eq!(value.pid, std::process::id());
+        assert!(value.resident_bytes > 0);
+        #[cfg(target_vendor = "apple")]
+        assert!(value
+            .physical_footprint_bytes
+            .is_some_and(|bytes| bytes > 0));
+        #[cfg(not(target_vendor = "apple"))]
+        assert_eq!(value.physical_footprint_bytes, None);
+    }
+
     #[test]
     fn live_accounting_has_real_capacity_without_reserving_guest_ram() {
         let read = super::source().unwrap();

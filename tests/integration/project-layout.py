@@ -18,6 +18,16 @@ local_ci = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(local_ci)
 
 class RuntimeInputs(unittest.TestCase):
+    def test_apple_target_builds_use_an_apple_sdk_host(self):
+        for path in (root / '.github/workflows').glob('*.yml'):
+            workflow = local_ci.load_workflow(path)
+            for name, job in workflow.get('jobs', {}).items():
+                for step in job.get('steps', []):
+                    command = str(step.get('run', ''))
+                    if re.search(r'\bcargo\s+(?:check|build|test|clippy)\b.*--target\s+aarch64-apple-', command):
+                        with self.subTest(workflow=path.name, job=name):
+                            self.assertIn('macos', str(job['runs-on']))
+
     def test_common_cargo_targets_select_their_own_workspace(self):
         common = {p.name for p in (root / 'runtime/crates').iterdir() if p.is_dir()}
         for path in (root / '.github/workflows').glob('*.yml'):
