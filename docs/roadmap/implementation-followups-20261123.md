@@ -1,8 +1,36 @@
 # 临时实施清单：兼容性迭代后的剩余工作
 
-日期：2026-11-23。用途：作为后续实现、定位和验收的工作队列；完成一项后在本页更新状态并链接验证记录。这里保留待办和完成标准，具体设计在对应批次开始时结合源码和目标负载确定。
+日期：2026-11-23；当前状态核对：2026-11-24。用途：作为后续实现、定位和验收的工作队列；完成一项后在本页更新状态并链接验证记录。这里保留待办和完成标准，具体设计在对应批次开始时结合源码和目标负载确定。
 
-当前共 12 项：01 已完成；02 有本地候选，整批尚未交付；03—12 仍待实现、补全或验收。候选通过的定向测试只作为阶段证据，不勾选整项完成。
+当前共 12 项：01 已完成；09 的共享实现和本地行为验证已完成，仍需实际产品／真机交付验收；02—08、10—12 仍有实现、工具验收或测量工作。已合入实现及其通过证据不能自动关闭整项。
+
+## 当前剩余工作摘要
+
+已发布修复基线：Runtime `42e5834`，iPad `3d966002`，Mac `2a99558`。Runtime 的 Linux／macOS CI 均已通过。核对时 iPad 产品 CI 在 Ubuntu 的 iOS 交叉检查中失败：`trames-graphics` 编译 `native/image.mm` 需要 `xcrun`，当前宿主没有该工具。修正 Apple 原生构建的宿主／SDK 检查安排是下一轮交付阻塞；不能将这次失败当作新的 guest syscall 差异。Mac 产品构建随后也已通过。
+
+| 项目 | 已有实现／证据 | 仍需迭代 |
+| --- | --- | --- |
+| 02 FUSE | 目录、路径续行、命名空间、元数据、截断／追加／同步写、xattr、异步页来源及原 OFD 结果续接已合入；已覆盖回归通过 | mmap／共享写回、完整缓存与通知、剩余权限／协议边界、宿主 ACL／capability 映射及 O_PATH symlink xattr；真实 FUSE 程序、吞吐及两端验收 |
+| 03 现代挂载 | nosymfollow、传播属性、tmpfs fspick／重配置已有实现；递归属性及挂载查询已有真实工具证据 | ID-mapped mount 的 UID／GID／权限／创建依赖，其余文件系统重配置，真实 runc／OCI 启动验收 |
+| 04 cgroup | 映射 cache／别名及匿名 fork COW 的物理页归属、计费和写准入已有实现及回归 | 非 mmap 文件 IO 的 cache 计费、物理回收及 dirty／pinned 页、native extent 动态计费，真正的 IO controller 和压力验收 |
+| 05 Android 内存 | 已确认仓库镜像的 API 33／arm64-v8a 声明；既有 cgroup 基础可复用 | 确认 ART collector／lmkd reaper 实际路径，实施 userfaultfd／process_mrelease，验证 GC 尾延迟及退出回收 |
+| 06 调试工具 | ptrace／proc memory 原版用例闭环；GDB 启动、软件断点、单步及寄存器修改已有证据 | live attach、多线程、gdbserver、strace -f、拒绝访问及异常退出会话；硬件断点／观察点、SVE／SME 单独列支持范围 |
+| 07 futex2／rseq | 四个 futex2 接口及 rseq 注册／中止／迁移／信号／fork／exec 已有实现；已覆盖单元／解释器检查通过 | 原版 no-libc ARM64 runfile、Linux 自测和真实调用程序，两种执行后端的生命周期及旧 futex 性能验收 |
+| 08 perf | 软件时钟计数／基本采样、FD／控制／映射环、输出重定向、继承／exec 和部分动态策略已有实现及回归 | 采样中断／开销预算、内核生产者、其余事件与 CPU／cgroup 作用域、映射／权限细节，原版 perf stat／record 验收 |
+| 09 动态任务上限 | 默认 65,536、可写 proc、manifest／CLI／FFI／两端启动共享准入资源；实际 guest 初始化、动态读写及拒绝 fork 已验证 | 实际 Mac/HVF 产品运行及物理 iPad、安装应用的配置交付验收；共享实现不再按未实现排队 |
+| 10 allocator | 默认关闭的实验路径；固定输入和轮换对照驱动为 WIP | 完成短调用／竞争及 Vim／Python 等真实负载对照，定位既有倒退后再决定默认开关 |
+| 11 存储持久化 | 同步写结果／偏移问题已修；ACK、P99、崩溃重开测量驱动为 WIP | 等持久性单／多写者、包安装／容器层、写放大及恢复验收；依据测量选择 WAL 或其他布局 |
+| 12 空闲内存 | FFI 进程快照入口已合入；宿主采样及 iPad 场景仍有 WIP | 固定配置的启动峰值／稳定空闲／停止释放，区分 RSS／physical footprint，干净启动和物理 iPad 基线 |
+
+已关闭的旧问题不再作为待修项：UserChainTargetCrash、旧 ptrace／proc memory／PIDFD_THREAD 缺口、批量挂起原因、原 22 个稳定失败、共享 OFD 偏移竞争、threads-max worker 读回问题，以及后续 Linux 网络节点栈溢出和进程测试额度／完成条件问题。具体证据见[候选修复记录](../validation/candidate-batch-20261124.md)。
+
+固定 gVisor 集合的最近一次全量及复核仍为两端各 14,014 通过，其中 13,965／13,965 个 Linux 原生通过项全部对齐。当前修复只复查受影响集合；163 个通过项与全量台账重合，不累加成新用例。当前提交的完整 254 组、实际 HVF／物理 iPad 及真实程序验收仍需在相应集成／交付节点收口。
+
+推进依赖顺序仍为 FUSE → 现代挂载 → cgroup／Android 内存；调试／同步／perf 的已知缺口与调用方一并登记。每轮先完成全部已知实施问题及依赖，再集中验证；纯工具／测量项先备齐场景，不逐个 bug 展开一轮矩阵。全程不新增协调／服务线程或轮询消息总线。
+
+## 历史实施与验证记录
+
+以下阶段记录保留形成时的“候选／未执行／未交付”描述；现状以本页摘要及其链接的后续验证记录为准。
 
 2026-11-24 恢复后的实现阶段统一记录在[当前实现批次](implementation-batch-20261124.md)。FUSE 元数据／回复边界、截断／追加／同步写、xattr 写事务与写前权限清理、异步页等待及文件／AIO／io_uring 原结果输出续接、部分现代挂载、映射页及匿名 fork COW 的 cgroup 归属、futex2／rseq、动态任务上限，以及 perf 计数／基本采样环／输出重定向／继承／exec／部分动态策略已有新增候选，真实调试会话及 allocator／存储／内存测量入口已部分准备。完整清单中的缓存／mmap、ID-mapped mount、回收／IO 控制、Android 内存、perf 生产者／完整作用域／映射策略等依赖仍未完成。所有者随后要求先验证现有候选，当前已进入集中验证检查点；以下历史通过结果不覆盖新增修改。
 
@@ -42,7 +70,7 @@
 
 ### 02 — FUSE 完整文件系统操作
 
-- [ ] 状态：进行中；目录、传输协议及命名空间候选已通过 guest daemon 验证，尚未完成整批实现和交付。
+- [ ] 状态：进行中；目录、传输协议、命名空间及数据续接已合入并通过已覆盖验证，完整 mmap／写回和整批程序验收未完成。
 - 本批范围：目录枚举、创建／删除、rename、通用符号链接遍历，以及通过 FUSE 文件句柄的文件映射。
 - 已交付版本的数据请求上限为 4 KiB；候选依据 INIT 的 `max_write` 协商请求大小，并设置 128 KiB 上限，已验证 16 KiB 请求及短传输。继续验证并发、取消、关闭和页生命周期。
 - 完成标准：上述操作与 guest daemon 正确交互，覆盖失败、并发及卸载／退出；选定真实 FUSE 程序做端到端验收，并测量实际文件传输吞吐。SSHFS、`rclone mount` 或 Android 存储路径须分别有证据后再声明支持。
@@ -105,8 +133,8 @@
 
 ### 03 — 现代挂载剩余语义与 OCI 验收
 
-- [ ] 状态：实现＋实际工具验收。
-- 剩余范围：ID-mapped mount、`nosymfollow`、通过 `mount_setattr` 修改传播属性，以及 `fspick`／文件系统重配置。
+- [ ] 状态：已有部分实现及验证，仍需补齐依赖和实际工具验收。
+- 剩余实现重点为 ID-mapped mount，以及 tmpfs 以外的文件系统重配置。`nosymfollow`、传播属性与 tmpfs `fspick`／重配置已合入，仍需整批 OCI 场景验收。
 - `mount_setattr` 的已验证递归属性修改，以及 `statmount`／`listmount`／原版 findmnt 查询，不再按未实现项处理。
 - 完成标准：挂载局部 UID／GID 映射贯穿权限、所有权查询和创建；检查 namespace 权限、共享／私有存储及失败回滚。重配置正确影响同一文件系统的别名，并保持各挂载属性独立。用实际 runc／OCI 配置验收对应启动路径。
 - 依据：[挂载属性](../../runtime/docs/validation/guest-mount-setattr-20261123.md)、[挂载查询](../../runtime/docs/validation/guest-mount-query-20261123.md)、[路线图](syscall-implementation.md#2-modern-mount-administration)。
@@ -114,7 +142,7 @@
 ### 04 — cgroup 资源管理补全
 
 - [ ] 状态：实现＋记账和压力验收。
-- CPU／cpuset、匿名内存控制、OOM group 等已有实现；剩余重点是共享 page cache、私有 COW 页的归属与计费，以及内存回收行为。
+- CPU／cpuset、匿名内存控制、OOM group、映射 cache／别名及 fork COW 页的基本归属与计费已有实现；剩余重点是非 mmap IO、native extent 的动态计费及实际内存回收行为。
 - IO controller 尚未实现：当前 `io.max` 提供空视图并拒绝写入，不能将其作为已生效的 IO 限流。
 - 完成标准：覆盖共享、fork／COW、迁移、退出和祖先限额的计费与释放；在真实压力下验证计数、限流／回收及 OOM 行为。IO 控制按选定实际负载实现并验证限流效果。
 - 依据：[cgroup 控制器记录](../../runtime/docs/validation/gvisor-cgroup-controllers-20261123.md)、[当前 cgroup 实现](../../runtime/crates/trames-vfs/src/cgroup.rs)。
@@ -138,7 +166,7 @@
 
 ### 07 — futex2 与 rseq
 
-- [ ] 状态：待实现。
+- [ ] 状态：基础实现已合入并通过已覆盖检查；原版 helper／自测、真实程序和两后端验收未完成。
 - futex2：`futex_waitv`、`futex_wait`、`futex_wake`、`futex_requeue`，复用现有等待队列及 private／shared key。
 - rseq：同时处理线程注册、CPU 身份、迁移、抢占、信号中止和线程退出；恢复原始 no-libc 测试依赖后再作为覆盖依据。
 - 完成标准：Linux 自测及真实调用程序通过，覆盖唤醒／重排／超时／信号竞态和共享别名；两种 CPU 后端语义一致，并验证旧 futex 正常路径性能。rseq 的优先级结合实际程序收益确定。
@@ -146,8 +174,8 @@
 
 ### 08 — guest perf 工具链
 
-- [ ] 状态：待实现。
-- 实现 `perf_event_open` 的选定 guest 软件事件、事件 FD、读／控制操作，以及支持的采样环。
+- [ ] 状态：软件时钟事件、FD／控制及基本采样环等已合入；完整生产者／作用域和原版工具验收未完成。
+- 补齐 `perf_event_open` 的剩余选定事件、采样中断／开销预算、CPU／cgroup 作用域及映射／权限依赖；不将基本环和计数回归等同于 perf 工具可用。
 - 完成标准：原版 `perf stat`／`perf record` 对任务 CPU 时间、上下文切换等选定事件可用，计数及采样可核对。硬件 PMU 需后端能够准确归属 guest 并通过测量后再宣布支持。
 - 依据：[性能工具路线图](syscall-implementation.md#5-guest-performance-tooling)。
 
@@ -155,8 +183,8 @@
 
 ### 09 — 动态任务上限
 
-- [ ] 默认 65,536 已完成；可写 `/proc/sys/kernel/threads-max` 与启动配置接口已有本地候选，尚未验证／交付。
-- 候选采用 `[kernel.sysctl]` 的 `"kernel.threads-max"` 键及 `--sysctl kernel.threads-max=VALUE`。VFS proc 读写、session 准入与两端启动配置共用一个原子资源；`pid_max`、`RLIMIT_NPROC`、cgroup `pids.max` 保持独立，不预分配资源。
+- [ ] 默认 65,536、可写 `/proc/sys/kernel/threads-max` 及启动配置共享实现已合入，实际 guest 初始化／动态读写／降低上限后拒绝 fork 已通过；实际产品及真机交付验收仍待完成。
+- 实现采用 `[kernel.sysctl]` 的 `"kernel.threads-max"` 键及 `--sysctl kernel.threads-max=VALUE`。VFS proc 读写、session 准入与两端启动配置共用一个原子资源；`pid_max`、`RLIMIT_NPROC`、cgroup `pids.max` 保持独立，不预分配资源。
 - 完成标准：读写、权限、持久配置初始化及任务准入行为一致，两端均有验证。
 - 依据：[配置与候选状态](../guides/ipad-environments.md#task-capacity-and-live-configuration)。
 
