@@ -269,25 +269,38 @@ host-mount administration are unavailable on iPad; Files permissions remain
 security-scoped platform authorizations. Unsupported settings fail rather than
 silently selecting a different network or mounting an arbitrary host path.
 
-## Task capacity and planned live configuration
+## Task capacity and live configuration
 
-The shared default is now 65,536 admitted tasks for both Linux and Android. The
-former Linux-only default of 256 could reject ordinary Firefox renderer thread
-creation with `EAGAIN`. This ceiling is atomic admission metadata: it does not
-preallocate tasks, guest memory or host execution threads. Existing lower
-embedding-supplied limits remain effective.
+The shared default is 65,536 admitted tasks for Linux and Android. Admission
+counts tasks as they are created; raising the limit does not preallocate guest
+memory, task objects or host threads. Existing embedding-supplied limits are the
+initial value unless a manifest sysctl overrides them.
 
-Owner decision, 2026-11-14: add Linux-compatible live sysctl administration. That
-configuration interface remains planned; increasing the default does not make
-`threads-max` writable yet.
+The current implementation candidate makes `/proc/sys/kernel/threads-max`
+writable by root in the initial user namespace. The proc file, session task
+admission and this startup declaration share the same atomic resource:
 
-The intended interface is `/proc/sys/kernel/threads-max`, with a proposed
-`[kernel.sysctl]` manifest table providing boot-time values. Guest `sysctl -w`
-and manifest initialization must update the same environment-owned capacity.
-`pid_max`, per-UID `RLIMIT_NPROC`, and cgroup `pids.max` remain distinct controls.
-Increasing capacity must not preallocate tasks, memory, or host threads. The
-schema will be settled in the implementation task; do not add
-a second independent `resources.tasks` quota or a coordinator/service thread.
+```toml
+[kernel.sysctl]
+"kernel.threads-max" = 65536
+```
+
+The manifest currently accepts only `kernel.threads-max`, with values from 1
+to 1,073,741,823. Unsupported names and out-of-range values fail startup rather
+than silently selecting a different limit. The command-line spelling is
+`--sysctl kernel.threads-max=65536`.
+
+Lowering the value does not terminate existing tasks. New tasks are rejected
+while the admitted count has reached the current ceiling; increasing it makes
+capacity available immediately. Runtime proc snapshots do not overwrite a value
+set by the manifest or guest. `pid_max`, per-UID `RLIMIT_NPROC`, and cgroup
+`pids.max` remain separate admission controls.
+
+The shared candidate passed the combined build/regression checkpoint, including
+real guest initialization, live writes and rejection of a fork after lowering
+the ceiling. Mac product/HVF source compatibility was compiled against the same
+runtime. Physical-device validation and installed-app release acceptance remain
+open; no coordinator or resource-service thread is introduced.
 
 ## Alpine Firefox graphics payload
 

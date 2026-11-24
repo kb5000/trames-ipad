@@ -4,6 +4,16 @@
 
 当前共 12 项：01 已完成；02 有本地候选，整批尚未交付；03—12 仍待实现、补全或验收。候选通过的定向测试只作为阶段证据，不勾选整项完成。
 
+2026-11-24 恢复后的实现阶段统一记录在[当前实现批次](implementation-batch-20261124.md)。FUSE 元数据／回复边界、截断／追加／同步写、xattr 写事务与写前权限清理、异步页等待及文件／AIO／io_uring 原结果输出续接、部分现代挂载、映射页及匿名 fork COW 的 cgroup 归属、futex2／rseq、动态任务上限，以及 perf 计数／基本采样环／输出重定向／继承／exec／部分动态策略已有新增候选，真实调试会话及 allocator／存储／内存测量入口已部分准备。完整清单中的缓存／mmap、ID-mapped mount、回收／IO 控制、Android 内存、perf 生产者／完整作用域／映射策略等依赖仍未完成。所有者随后要求先验证现有候选，当前已进入集中验证检查点；以下历史通过结果不覆盖新增修改。
+
+实现约束：整个清单不额外引入协调线程、资源服务线程或轮询消息总线；复用现有执行器和 readiness，阻塞等待交还执行槽。
+
+现有候选的集中检查点已完成，见[2026-11-24 验证记录](../validation/candidate-batch-20261124.md)：解释器／FFI 533 项通过，受影响原版 gVisor 覆盖全部 162 个 Linux 参考通过项；内部仍有 22 项稳定失败、共享 OFD 偏移间歇失败、threads-max 端到端失败及静态检查阻塞。下一实现批次统一处理这些跨领域问题及其依赖，当前不勾选整批完成。
+
+上述当前失败批次现已修复并集中复验：受影响四库 1760 项、产品 533 项通过；共享 OFD 偏移连续 20 次通过，任务上限具备实际 guest 前后反例，严格 Clippy 和受影响原版 gVisor 对照通过。具体修正及未覆盖门槛见同一验证记录，12 项总目标仍未完成。
+
+性能记录更正（2026-11-24）：下文历史长探针的纳秒换算存在跨秒错误，其原百分比不再作为定量性能结论；旧记录保留，后续以修正探针的结果为准。短探针与功能测试不受影响，详见[FUSE 验证记录](../../runtime/docs/validation/fuse-complete-progress-20261123.md#performance-timing-correction-2026-11-24)。
+
 ## 当前基线
 
 - 已对 Mac HVF、Mac 上运行的产品解释器和原生 Linux 重跑固定的 254 组、14,530 个启用用例。采用记录中的上游测试模式、网络夹具、CPU 前提和单例复核后，两端均通过全部 13,965 个原生通过项。
@@ -39,7 +49,59 @@
 - 依据：[FUSE 文件操作记录](../../runtime/docs/validation/gvisor-fuse-files-20261121.md)。
 - 2026-11-23 本地候选进展：目录根和后代支持 OPENDIR／READDIR／RELEASEDIR／FSYNCDIR；目录 cookie 在 guest 拷贝后逐条提交，短缓冲区、部分 EFAULT、dup 共享偏移、FD 复用及迟到／取消的句柄清理已有定向回归。mkdir、mknod、symlink、unlink/rmdir、rename 和原子 CREATE 候选已接入异步请求，包含 CREATE 的 MKNOD＋OPEN 回退、rename2 的 ENOSYS 处理、sticky 权限、错误路径及 mount writer 生命周期。
 - 阶段证据：扩展后的同一 guest daemon/client ELF 在原生 Linux及解释器 1／2／4 CPU 通过；27 项 FUSE 和 18 项 Linux 文件路径定向测试通过。原始 gVisor FUSE 组为 22 通过、2 个既有夹具跳过。产物位于 `target/fuse-complete-20261123`。候选源码、fixture 与阶段记录仍在本地工作区，尚未包含在已交付 Runtime `47b7435` 中；阶段记录路径为 `runtime/docs/validation/fuse-complete-progress-20261123.md`。
-- 下一步：通用路径遍历（符号链接跟随、跨挂载、目录 FD、cwd）、共享 fs_struct 语义及异步 mmap；之后完成真实程序、吞吐、正常负载性能与两端整批验收。创建／删除和 rename 已有候选，但随本批一并验收后才能关闭。
+- 下一步：补齐其余路径调用方、挂载 writer／权限及错误顺序审计，并接入异步 mmap；之后完成真实程序、吞吐、正常负载性能与两端整批验收。现有阶段证据随本批一并验收后才能关闭整项。
+- 目录身份进展：候选已将目录 FD／cwd 接入 VFS inode 与共享 fs_struct，验证相对查找、chdir/fchdir、重命名后的 cwd、删除 cwd 后返回父目录，以及 FD 复用和权限失败；同时修正冷路径缓存延长 FUSE 连接寿命、导致卸载后 daemon 无法退出的问题。扩展后的同一 ELF 在原生 Linux和解释器 1／2／4 CPU 通过；33 项 FUSE、133 项相关路径／挂载／proc 测试通过（选集有重叠）。保留原始失败及修复后证据。仍需通用符号链接／跨挂载遍历及其余目录 FD 操作，不据此关闭本项。整个候选复用现有 worker、对象同步和 readiness，不额外引入协调或资源服务线程。
+- 路径续行进展：metadata/open/access/chdir 已保留同一次 VFS 遍历状态跨 daemon 等待，验证符号链接、`.`／`..`、跨普通文件系统及 FUSE 连接、openat2 作用域、原 FD 预留与取消清理，以及 FUSE 子目录的 open_tree/move_mount 绑定和挂载边界。最终同一 ELF 在原生 Linux及解释器 1／2／4 CPU 通过；42 项 FUSE 和 18 项 Linux 文件路径测试通过。仍需将创建／删除／rename 的父目录遍历和其余路径调用方接入，补共享 fs_struct／挂载属性采样、mmap、真实程序和最终验收。详细证据继续记录在本地阶段文档，不勾选整项完成。
+
+- 父目录续行进展：创建／删除／rename 已移除 FUSE 私有父目录遍历，复用公共 PathWalk；等待期间保留原目录身份，解析后再判断实际挂载、只读准入和 EXDEV。新增父目录符号链接、挂载遮盖、转到普通存储及共享 umask 变化的对照；同一 ELF 在原生 Linux和解释器 1／2／4 CPU 通过。760 项相关 VFS（含 48 项 FUSE）和 18 项 Linux 文件路径测试通过，原始 FUSE 组仍为 22 通过、2 夹具跳过。仍需其他路径调用方、atomic CREATE 的 umask 阶段、动态挂载属性、错误顺序、mmap 和整批验收；不勾选完成。
+
+- open/create 状态进展：现存末级符号链接的 O_CREAT|O_EXCL 已按 Linux 返回 EEXIST；access 在 LOOKUP 等待后读取当前只读／noexec 属性；CREATE 与 ENOSYS→MKNOD 回退重新采样共享 umask，并保留原父目录到创建回调结束。原生 Linux 反证纠正了额外的 VFS umask 处理假设，最终同一 ELF 在原生 Linux和解释器 1／2／4 CPU 通过。51 项 FUSE 回归通过；其余未变路径复用前一阶段验证，原始 FUSE 组仍为 22 通过、2 夹具跳过。保留失败实验和修复后证据；整批仍未交付。
+
+- native 路径调度进展：续行进入 hostfs／私有卷／overlay I/O 前，保留原遍历和 FD 预留并交还执行槽，由现有 native executor 执行；重新进入 FUSE 时改等新的 daemon 请求，不对已完成请求发送中断。hostfs 启用时 56 项 FUSE 回归通过；763 项相关 VFS、18 项 Linux 文件路径测试及解释器 1／2／4 CPU 同 ELF 对照通过。guest ELF 未变，复用对应原生 Linux 结果；原始 FUSE 组仍为 22 通过、2 夹具跳过。仍需 proc 的 typed original／owner 回退和其余路径调用方；本阶段不新增线程，不勾选整批完成。
+
+- proc／原资源回退进展：缺少 proc 元数据或 legacy TTY 资源时，保留原路径续行与 FD 预留，经已有 owner checkpoint 后回到正常调度，可继续等待 daemon／native 阶段，不重走原始 FUSE 路径。修正 proc-fd 重新打开 FUSE 普通文件时丢失文件能力的问题，保留原 inode／句柄并发起新 OPEN，验证独立偏移、源 FD 关闭复用和清理。63 项含 hostfs 的 FUSE、770 项相关 VFS、18 项 Linux 文件路径和 4 项解释器文件调度测试通过；扩展后的同一 ELF 在原生 Linux及解释器 1／2／4 CPU 通过。原始 FUSE 组仍为 22 通过、2 夹具跳过；仍需其余路径调用方（含 proc magic jump 后的 access）、异步 mmap、真实程序和整批验收，不新增协调线程、不勾选完成。
+
+- access 最终 inode 进展：proc magic jump 后保留实际文件／目录身份，向原 nodeid 发起 ACCESS，跨 owner 等待保留 real／effective IDs；修正零 mask 的 F_OK 委托，并覆盖 fd 关闭复用、取消、ENOSYS、实时只读／noexec 和已删除 bind root 的 allow_other。宿主目标在已解析 inode 上交给现有 native executor，通过原 fd 刷新权限，避免重查被替换路径。72 项含 hostfs 的 FUSE、778 项相关 VFS、18 项 Linux 文件路径和 4 项解释器文件调度测试通过；同一扩展 ELF 在原生 Linux及解释器 1／2／4 CPU 通过，原始 FUSE 组保持 22 通过、2 夹具跳过。仍需其余路径调用方、完整权限／writer 生命周期、异步 mmap、真实程序和最终验收；不新增线程，不勾选整批完成。
+
+- access 错误顺序补充：按 Linux 顺序先检查 noexec，再接收 ACCESS 的权限结果，成功后读取当前只读属性；避免提前 EROFS 掩盖 daemon 的 EACCES／EPERM，不为 access 获取 writer。daemon 在 ACCESS 回调期间实际 remount 的同一 ELF 对照在原生 Linux和解释器 1／2／4 CPU 通过。最新累计为 73 项含 hostfs 的 FUSE、779 项相关 VFS，通过 all-target／all-feature clippy；原始 FUSE 组保持 22 通过、2 夹具跳过。前一阶段 18 项 Linux 文件路径、4 项调度和执行边界结果按未受影响范围复用。此补充纠正上一阶段只读检查的阶段，整批继续待办。
+
+- chdir 最终目标进展：复现并修正 FUSE→proc-fd→hostfs 在 native 等待期间因原路径被替换而切换到新目录的问题。最终 descriptor／inode 和宿主目录能力保留到 cwd 发布，proc-cwd 目标换目录后也不重定向；fchdir 复用同一检查，并通过原能力刷新 search 权限。新增 FUSE GETATTR／ACCESS 期间 rename、fd 复用、拒绝／取消清理及 ENOTDIR 回归。79 项含 hostfs 的 FUSE、默认 782／hostfs 826 项相关 VFS、18 项 Linux 文件路径及 4 项调度测试通过；同一 ELF 在原生 Linux和解释器 1／2／4 CPU 通过，原始 FUSE 组保持 22 通过、2 夹具跳过。普通路径长探针中位变化约 -0.01%／+1.40%／-0.24%。仍需 proc 跳转后带剩余组件的目录能力审计、其余权限／writer 生命周期、异步 mmap 和整批验收；不新增线程，整项保持未完成。
+
+- proc 目录剩余组件进展：修正跳转后带子路径、`.`／`..` 或尾斜杠时丢失原目录身份的问题；hostfs 保留原生目录能力，内存／私有卷保留原 inode，覆盖等待期间 fd 关闭复用、rename、同名替换、已删除目录和挂载遮盖。父目录写操作及普通硬链接在现有命名空间锁内重定位原目录，不新增协调线程或轮询总线。84 项含 hostfs 的 FUSE、默认 785／hostfs 833 项相关 VFS、18 项 Linux 文件路径及 4 项调度测试通过；同一 ELF 在原生 Linux和解释器 1／2／4 CPU 通过，原始 FUSE 组保持 22 通过、2 夹具跳过。普通路径长探针中位变化约 -0.47%／-0.16%／+0.11%。仍需其余路径调用方（含经 FUSE 符号链接解析 mount 目标）、完整权限／writer 生命周期、异步 mmap、真实程序和整批验收；整项保持未完成。
+
+- 传统挂载路径进展：mount／umount／pivot_root 已接入 FUSE 续行，等待期间释放现有 mount-admin 锁，并保留每个路径参数的原对象。source／target 即使同名也分别接受；bind 后续复用同一次 source 解析，hostfs 参数经历另一个 FUSE 等待后会重新交给现有 native executor。94 项含 hostfs 的 FUSE、默认 794／hostfs 843 项相关 VFS及 4 项调度测试通过，18 项未受后续调整影响的直接文件测试复用；同一扩展 ELF 在原生 Linux和解释器 1／2／4 CPU 通过，原始 FUSE 组保持 22 通过、2 夹具跳过。普通路径长探针中位变化约 -0.09%／-0.87%／-0.83%。未新增协调线程。仍需 FUSE 普通文件 bind 能力、现代 mount-FD 及其他路径调用方、权限／writer 审计、异步 mmap、真实程序和整批验收；不勾选完成。
+
+- FUSE 普通文件 bind 进展：保留原 nodeid／generation，支持路径及 proc-fd 来源、O_PATH fstat、源 FD 关闭／unlink 后重新打开、读写及只读 remount；普通文件也可覆盖 FUSE 文件。修正 GETATTR 等待重放、路径缓存清空后的 ENOENT，以及 proc 元数据投影拖住卸载连接的问题。真实挂载／OFD／FLUSH 共享连接使用权，冷缓存不延长其活动寿命；不新增协调线程。104 项含 hostfs 的 FUSE、默认 804／hostfs 853 项相关 VFS、19 项直接文件及 4 项调度测试通过；同一 ELF 在原生 Linux及解释器 1／2／4 CPU 通过，原始 FUSE 组仍为 22 通过、2 夹具跳过。普通路径长探针中位变化为 stat -0.53%、open/close +2.16%、getcwd +0.19%。详见[阶段记录](../../runtime/docs/validation/fuse-complete-progress-20261123.md#regular-file-bind-and-connection-lifetime-checkpoint)。仍需现代 mount-FD 及其他路径调用方、权限／writer 审计、异步 mmap、真实程序和整批验收，整项保持未完成。
+
+- 现代 mount-FD 路径进展：open_tree／move_mount／mount_setattr 的目录和普通文件参数已接入同一续行机制，覆盖空路径原 FD、关闭复用、另一参数等待时保留已接受源、属性修改、取消和 native 调度。112 项含 hostfs 的 FUSE、默认 811／hostfs 861 项相关 VFS通过；同一扩展 ELF 在原生 Linux及解释器 1／2／4 CPU 通过。原始 mount／mount_fd 158 项中，153 首跑通过，另两项按既有 userspace ABI 模式复核通过，三个原生也跳过的用例保留；FUSE 组仍为 22 通过、2 夹具跳过。普通路径长探针中位变化 -1.03%／-1.04%／-0.83%。另已取得明确失败对照：NOFOLLOW 的 FUSE 符号链接树及空路径 readlink 探针在 Linux 通过，Trames 在 open_tree 返回 EINVAL；继续补该 inode 能力，不将本阶段等同于全部现代挂载已完成。详见[阶段记录](../../runtime/docs/validation/fuse-complete-progress-20261123.md#modern-mount-fd-directory-and-regular-file-continuation-checkpoint)。未新增协调线程，整项继续待办。
+
+- 符号链接 inode 进展（2026-11-24）：已修复上轮 NOFOLLOW 差异，支持克隆／非克隆树 FD、O_PATH、空路径 readlink、源链接删除替换和绑定链接的相对／绝对遍历；同时修复 READLINK 等待时父目录 rename／同名替换导致误用新目录的问题。原失败 ELF 原样复测通过；扩展后的同一 ELF 在 Linux及解释器 1／2／4 CPU 通过，120 项含 hostfs 的 FUSE、默认 818／hostfs 869 项相关 VFS通过。原始 FUSE／mount／mount_fd 共 182 个身份按已有 ABI 和 fusectl 夹具复核后，178 通过、4 原始跳过，覆盖全部 177 个原生通过项；额外通过项的未连接 FUSE clone errno 在参考内核为 EPERM、当前／上游预期为 EINVAL，保留待错误审计。修正计时后的普通探针中位变化为 stat -1.16%、open/close +1.23%、getcwd +1.39%，历史长探针百分比已标注失效。详见[阶段记录](../../runtime/docs/validation/fuse-complete-progress-20261123.md#daemon-leaf-inodes-and-symlink-capabilities-checkpoint-2026-11-24)。未新增协调线程；其他路径消费者、权限／writer、异步 mmap、真实程序和整批验收仍待完成。
+
+- statfs／chroot 进展（2026-11-24）：两者已接入保留原对象的续行，STATFS 使用目标 nodeid 并在回复后读取当前挂载标志；chroot 等待 ACCESS 后只发布原 fs_struct 的 root，保留 cwd 和目录 FD，hostfs 根保留原生目录能力。同时修复退出 CPU 返回记录继续持有文件等待、父任务 waitpid 后 daemon 仍可读到未发请求的竞态，并用确定性失败／成功回归验证。127 项含 hostfs 的 FUSE、默认 824／hostfs 876 项相关 VFS、19 项直接文件、4 项文件调度及 29 项运行队列测试通过；同一扩展 ELF 在 Linux及解释器 1／2／4 CPU 通过。原版 gVisor 301 个身份合并后 296 通过、5 原始跳过，覆盖全部 294 个参考内核通过项；FUSE 另补单核、四核各 23 通过、1 原始跳过。未连接 clone 在隔离 Linux 夹具仍返回 EPERM，根因未定，保留错误审计。普通路径两轮有效计时分别测到 stat +2.06%／+5.99%、open/close +5.03%／+2.26%、getcwd +3.64%／+1.51%，两轮均保留，性能门槛仍待定位。详见[阶段记录](../../runtime/docs/validation/fuse-complete-progress-20261123.md#statfs-chroot-and-retired-wait-checkpoint-2026-11-24)。未新增协调线程；hardlink／属性／xattr、非普通文件数据行为、权限／writer、异步 mmap、真实程序和整批交付仍待完成。
+
+- 普通路径性能排查（2026-11-24）：补充同一 runner 的 A/A 对照、相同指令／syscall／等待计数诊断，以及工作量加长十倍的有效时钟探针。去掉目录等待对象中重复的 root／cwd 状态，使 ARM64 `resolve_walk` 的局部栈预留从 0xa80 恢复到基线 0xa70；127 项 FUSE、原版 FUSE／chroot 36 项（35 通过、1 原始跳过）、解释器 1／2／4 CPU 同 ELF及 clippy／执行边界检查通过。三版本长探针按六种顺序平衡测量，当前版相对 leaf 基线为 stat +0.61%、open/close -1.27%、getcwd -2.03%，相对前一版为 -0.96%, -2.54%, -0.12%；未复现短探针原先 2%—6% 的同等幅度，但不把全部差异归因于 16 字节，也不替代真实 FUSE 负载和吞吐验收。旧数据完整保留，未新增协调线程。详见[阶段记录](../../runtime/docs/validation/fuse-complete-progress-20261123.md#ordinary-pathname-controls-and-continuation-state-size-checkpoint-2026-11-24)。下一批继续 hardlink 的原 source inode／空路径 FD 保留、LINK 回复及取消引用清理；整项仍未完成。
+
+- hardlink 进展（2026-11-24）：LINK 已保留原 source inode、挂载及空路径 FD，覆盖等待期间 rename／替换、O_PATH 和数据 OFD、符号链接跟随、保护策略、最后 unlink 后拒绝恢复，以及取消／晚回复 lookup 引用清理。按原生结果修正不同 nodeid 回复和默认权限委托，并修复 ENOSYS 缓存掩盖跨挂载 EXDEV 的错误顺序。最终同一 ELF 在 Linux及解释器 1／2／4 CPU 通过；139 项 FUSE 和当前 clippy／边界检查通过，未受最终窄改影响的 835／888 项 VFS、19 项直接文件和 4 项调度结果复用。本轮重跑原版 FUSE／link／symlink／unlink 共 103 个身份，经既有 ABI 复核后 102 通过、1 原始跳过；合并账本为 380 个身份、375 通过、5 跳过，覆盖全部 373 个参考通过项，其中 277 项复用未受影响的历史结果。普通长探针 getcwd +3.83% 与独立 getcwd +0.91% 均保留；栈帧拆分试验未证实稳定收益，已撤回并保留三版本数据，性能门槛仍开放。未新增协调线程，整批尚未提交、更新 pin 或发布。详见[阶段记录](../../runtime/docs/validation/fuse-complete-progress-20261123.md#hardlink-original-source-and-protocol-checkpoint-2026-11-24)。下一组继续 SETATTR／xattr 和原 inode 续行；metadata 并发次序、非普通文件数据、权限／writer、异步 mmap、通知、真实程序／吞吐及整批验收仍待完成。
+
+- chmod／chown／utimens 进展（2026-11-24）：路径、数据 FD 和 O_PATH 空路径已向原 inode 发送 SETATTR，保留挂载 writer，覆盖取消、拒绝及畸形回复；修复目录 OFD 在修改属性后仍读到旧缓存的问题。842 项默认 VFS、895 项 hostfs VFS（含 146 项 FUSE）及 clippy／边界检查通过，同一夹具在 Linux和解释器 1／2／4 CPU 通过。本轮原版属性／FUSE 88 个身份为 87 通过、1 原始跳过；合并账本为 444 个身份、439 通过、5 跳过，覆盖全部 437 个参考通过项，其中 356 项复用未受影响结果。普通调用曾测到约 57% 的路径保留开销，第一次调整后仍慢约 39%—46%；两轮均保留，继续移除常规解析中的额外调度预查和共享状态借用后，长样本 chmod／chown／utimens 对照为 -2.83%／+0.13%／-0.92%。该内存后端测量不替代持久存储、真实应用和吞吐验收。未新增协调线程，整批尚未提交／更新 pin／发布。详见[阶段记录](../../runtime/docs/validation/fuse-complete-progress-20261123.md#chmod-chown-and-timestamp-setattr-checkpoint-2026-11-24)。下一组继续 xattr 的协议、缓冲区容量和原对象保留，其余 FUSE 门槛仍待完成。
+
+- xattr／ACL／capability 进展（2026-11-24）：GET／SET／LIST／REMOVE 已使用原 inode、OFD 和实际缓冲区容量，覆盖查询、长度／列表校验、逐操作 ENOSYS 缓存、取消及 mount writer 生命周期；补齐 legacy ACL 和 chown 清除 capability，并修复空属性名与无效 value 的错误顺序。保留初始 ENOTSUP、四个原生语义差异和 EFAULT／ERANGE 反例，24 个诊断结果已成为严格断言，同一最终 ELF 在 Linux及解释器 1／2／4 CPU 通过。856 项默认 VFS、909 项 hostfs VFS（含 160 项 FUSE）、19 项直接文件和 clippy／边界检查通过。当前 260 个原版身份经三项既有 ABI 复核后为 247 通过、13 原始跳过，覆盖全部 246 个参考通过项；与 356 项未受影响结果合并后共 616 个身份、599 通过、17 跳过，覆盖全部 597 个参考通过项。普通内存后端 3M 迭代长样本 SET／GET／LIST／REMOVE+SET 为 -1.81%／-3.60%／-0.19%／+1.80%，短样本也保留，不替代持久存储和真实应用验收。详见[阶段记录](../../runtime/docs/validation/fuse-complete-progress-20261123.md#xattr-acl-and-capability-wire-checkpoint-2026-11-24)。未新增协调线程；hostfs xattr 仍返回 EOPNOTSUPP，完整 ACL／权限／错误审计、属性并发、异步 mmap、真实程序／吞吐和整批交付仍待完成。
+
+- hostfs 数据属性进展（2026-11-24）：普通原生 GET／SET／LIST／REMOVE 已移除统一 EOPNOTSUPP，保留实际 inode／FD 和原挂载 writer，覆盖关闭复用、rename／unlink、只读准入、trusted 名称过滤及独立 host chmod 后的权限刷新。默认 856／hostfs 914 项完整 VFS 回归通过，随后新增两项测试的六项 host xattr 定向组通过；Linux 原生 xattr 20、hostfs 23、native 路径 19 项通过（选集有重叠）。同一 FUSE 夹具在解释器 1／2／4 CPU 通过；260 个原版身份复核后仍为 247 通过／13 原始跳过。CLI 未启用 hostfs，其结果证明共享普通／FUSE 路径；hostfs 行为由启用该特性的 Mac／Linux VFS 验证，尚不作为 guest host-mount 或 HVF 验收。保留 symlink ELOOP、交叉链接失败及磁盘保护结果，补齐 musl renameat2 的直接 syscall 路径。普通 xattr 的 3M 迭代长对照 SET／GET／LIST／REMOVE+SET 为 +1.30%／+2.38%／+0.45%／-0.10%，数据保留，真实性能门槛继续开放。详见[阶段记录](../../runtime/docs/validation/fuse-complete-progress-20261123.md#native-host-data-xattr-interoperability-checkpoint-2026-11-24)。未新增协调线程；host ACL／capability 身份转换、Linux O_PATH 链接属性以及其余 FUSE 门槛仍待完成，整批未提交或发布。
+
+- FUSE 本地 mode 权限进展（2026-11-24）：支持 `default_permissions`，在原 inode／目录和原凭据上完成 search、open、access、chdir、属性／xattr 和父目录变更检查，过期或缓存拒绝时经现有等待路径刷新 GETATTR；补齐受保护硬链接和跨父目录 rename 的写权限。保留 mount EINVAL、open intent 丢失和两项错误放行反例，严格同一 ELF 在 Linux及解释器 1／2／4 CPU 通过，原 delegated 夹具及 24 项属性诊断保持通过。866 项默认 VFS、926 项 hostfs VFS（含 171 项 FUSE）及当前十项定向权限、clippy／格式／执行边界检查通过。当前 535 个原版身份为 522 通过／13 原始跳过，覆盖全部 521 个参考通过项；合并未受影响结果后为 812 个身份、795 通过／17 跳过，覆盖全部 793 个参考通过项。普通长样本 stat／open-close／getcwd 为 +0.84%／+2.09%／+0.75%，RAM 后端 chmod／chown／utimens 为 -1.26%／-0.96%／-0.48%，原始样本保留，性能门槛继续开放。详见[阶段记录](../../runtime/docs/validation/fuse-complete-progress-20261123.md#local-fuse-mode-permissions-checkpoint-2026-11-24)。未新增协调线程；sticky 目录 O_CREAT、协商 POSIX ACL、属性并发／错误审计、host 权限映射、异步 mmap、真实程序和整批交付仍待完成，02 保持未勾选。
+
+- sticky O_CREAT／proc FD 进展（2026-11-24）：复用已有保护策略，保留最终父目录和原 inode，补齐 FUSE 文件绑定到外部 sticky 目录后的检查；严格区分本地权限与 daemon 委托，保留 O_EXCL 等错误顺序。同时补上降权／不可 dump 后同线程组访问 proc FD 目录的 search 例外，其他进程和 fdinfo 不误放行。保留两项原生前后反例及中间 proc 重开失败，同一最终 ELF 在 Linux 两种模式和解释器 1／2／4 CPU 均通过；旧属性夹具及 24 项诊断保持通过。当前 172 项 FUSE、三项进程凭据及 clippy／格式／runtime 边界检查通过，命名空间选集的一项沙箱网络拒绝单独复跑通过。受影响原版 242 个身份为 239 通过／3 原始跳过，覆盖全部 238 个参考通过项；合并 730 项未受影响结果后，账本为 972 个身份、953 通过／19 跳过，覆盖全部 951 个参考通过项。磁盘保护停止和缓存清理记录均保留，性能沿用上阶段原始观测，不声称当前版完成真实负载门槛。详见[阶段记录](../../runtime/docs/validation/fuse-complete-progress-20261123.md#sticky-o_creat-and-same-group-proc-fd-search-checkpoint-2026-11-24)。未新增协调线程；完整 POSIX ACL、权限／属性并发审计、非普通数据、异步 mmap、通知、真实程序及整批交付仍待完成，02 保持待办。
+
+- 协商 POSIX ACL 进展（2026-11-24）：INIT 协商后自动启用本地权限，原对象／凭据贯穿初始化、GETATTR 和 ACL 等待；补齐命名用户／mask、映射命名空间、DONT_MASK、扩展 SETXATTR 的 SGID 意图，以及创建、父目录变更、硬链接、移动源目录、NOW 时间和用户 xattr 的检查。按原生反例修正根 inode 不缓存 ACL、GETATTR 失效及晚回复不能恢复旧缓存，未新增协调线程。同一最终扩展 ELF 在 Linux 三种模式和解释器 1／2／4 CPU 的九种组合通过，旧属性夹具 24 项诊断保持通过。最终 FUSE 单测的首次 176 通过／1 项测试预期错误，与随后五项定向通过合并覆盖全部 177 个身份；此前完整默认 898／hostfs 958 项（各一项既有忽略）按未变范围复用，clippy／格式／执行边界通过。受影响原版 695 个身份含六项明确复用的 ABI 结果，共 680 通过／15 跳过，覆盖全部 679 个参考通过项；最终缓存修改重跑 FUSE 23 通过／1 跳过，合并账本仍为 972 个身份、953 通过／19 跳过及全部 951 个参考通过项，非新一轮全量。前一 ACL runner 的普通 stat／open-close／getcwd 长对照为 -0.91%／-2.34%／-1.34%，RAM chmod／chown／utimens 为 +1.01%／+0.72%／-2.59%，保留版本和原样本，不作为最终 runner 或真实 FUSE 吞吐验收。详见[阶段记录](../../runtime/docs/validation/fuse-complete-progress-20261123.md#negotiated-posix-acl-and-cache-lifetime-checkpoint-2026-11-24)。ACL 错误／命名空间及属性并发审计、host 权限映射、非普通数据、异步 mmap、通知、真实程序及整批交付仍待完成；02 保持待办，未提交／更新 pin／发布。
+
+- ACL 格式／公开缓存进展（2026-11-24）：分开 daemon ACL 解码与设置校验，按 Linux 保留非标准 entry 的读取／权限结果、EIO 传播、所有权与语义校验顺序，以及版本／长度组合错误的优先级。公开 access/default ACL 与权限检查共享原 inode 缓存，全局 ID 按读取者命名空间输出；晚回复不恢复已失效缓存，未新增协调线程。保留两轮原生通过而旧候选失败的同 ELF 反例，最终夹具的 21 类输入在 Linux 三种模式和解释器 1／2／4 CPU 九组组合全部通过，逐项返回值、errno、ID 和查询次数一致；旧属性夹具 24 项诊断保持通过。最终完整 hostfs VFS 961 通过／一项既有忽略，含全部 179 项 FUSE 和七项 ACL，clippy／格式通过；前一默认配置的 901 项及边界检查按未变范围保留。最终原版 xattr／ACL／FUSE 182 个身份经既有 ABI 复核后为 169 通过／13 跳过，覆盖全部 168 个参考通过项；与 790 个未受影响结果合并后仍为 972 个身份、953 通过／19 跳过及全部 951 个参考通过项，非全量重跑。详见[阶段记录](../../runtime/docs/validation/fuse-complete-progress-20261123.md#acl-backing-format-public-cache-and-namespace-checkpoint-2026-11-24)。下一步用原生探针验证同版本并发填充／取消归属，再推进属性版本和 bad-inode；其余 FUSE 门槛及整批交付仍待完成，02 保持待办。
+
+- ACL 并发填充／取消进展（2026-11-24）：原生握手探针证实同版本并发读取的后回复会误覆盖缓存，已补上每种 ACL 的请求填充归属；跟随请求仍独立发出并使用各自回复，错误／取消仅释放自己的归属，不提升旧跟随者，也不影响替代请求。沿用原 inode 对象锁和失效版本，未新增协调线程。最终 12 场景同 ELF 在 Linux 初始／映射命名空间和解释器 1／2／4 CPU 六组组合通过，覆盖公开读取与权限检查的双向交叠、回复顺序、负缓存、错误、信号取消和替代填充；前一 21 类夹具九组及旧属性 24 项诊断也保持原生一致。当前 182 项 FUSE（含十项 ACL）、clippy／格式／边界检查通过，782 项未变的 VFS 通过结果复用；原版 FUSE 23 通过／1 跳过，覆盖全部 22 个原生通过项。保留旧 runner 的同 ELF 失败及仅生成对象缓存的清理记录；合并账本仍为 972 个身份、953 通过／19 跳过及全部 951 个参考通过项。详见[阶段记录](../../runtime/docs/validation/fuse-complete-progress-20261123.md#concurrent-acl-fill-and-cancellation-ownership-checkpoint-2026-11-24)。下一组转向属性请求版本和 bad-inode；其余 FUSE 验收／交付及 03–12 仍待完成。
+
+- 属性版本／bad-inode 进展（2026-11-24）：新增 13 场景原生握手夹具，修复晚到 GETATTR 覆盖新缓存、并发 SETATTR 的过期行为、错误类型／大小回复的持续 EIO，以及 nodeid 代次／类型复用；补齐原 FD 的 `faccessat2(AT_EMPTY_PATH)` 依赖，沿用对象同步和现有等待机制，不增加协调线程。相同 ELF 在原生初始／映射命名空间、解释器 1／2／4 CPU 六组组合逐项一致；ACL 并发六组、前一 ACL 夹具九组和旧属性 24 项诊断也保持原生一致。VFS 合并复测 968 通过／1 忽略，最终 185 项 FUSE、Linux 调用路径、clippy／格式／边界检查通过；原版 FUSE＋access 为 42 通过／1 跳过，累计账本仍为 972 身份、953 通过／19 跳过。普通路径性能及完整证据见[阶段记录](../../runtime/docs/validation/fuse-complete-progress-20261123.md#metadata-request-epochs-and-bad-inode-checkpoint-2026-11-24)。仍需审计 LOOKUP 提前返回、错误优先级、其他元数据／协议边界及整批工具／平台验收；02 和 03–12 保持未完成。
+
+- LOOKUP 提前返回进展（2026-11-24）：原生 16 场景确认 EEXIST／ENOTDIR／ELOOP 和符号链接跟随之前也要发布有效 LOOKUP 的规范属性与身份；候选已调整顺序，并保留坏 inode 的 O_PATH／排他创建优先级，实际操作继续返回 EIO。新夹具和前一属性并发夹具均在初始／映射命名空间、解释器 1／2／4 CPU 六组组合逐项匹配原生；当前 188 项 FUSE、定向 ACL、clippy／格式／边界检查通过，783 项未变的非 FUSE 结果复用。原版 FUSE 与普通文件四组按各自匹配的 ABI 模式合并为 173 通过／1 跳过，累计账本保持 953 通过／19 跳过。未增加协调线程，未更新提交或 runtime 引用。下一组继续审计 root／无效 nodeid、代次及协议／错误边界，整批工具／平台验收仍待完成；详见[阶段记录](../../runtime/docs/validation/fuse-complete-progress-20261123.md#lookup-early-return-publication-checkpoint-2026-11-24)。
 
 ### 03 — 现代挂载剩余语义与 OCI 验收
 
@@ -93,10 +155,10 @@
 
 ### 09 — 动态任务上限
 
-- [ ] 默认 65,536 已完成；可写 `/proc/sys/kernel/threads-max` 与启动配置接口待实现。
-- `[kernel.sysctl]` 仍是拟议 schema。启动值和运行中写入应作用于同一个环境容量；`pid_max`、`RLIMIT_NPROC`、cgroup `pids.max` 保持独立，不预分配资源。
+- [ ] 默认 65,536 已完成；可写 `/proc/sys/kernel/threads-max` 与启动配置接口已有本地候选，尚未验证／交付。
+- 候选采用 `[kernel.sysctl]` 的 `"kernel.threads-max"` 键及 `--sysctl kernel.threads-max=VALUE`。VFS proc 读写、session 准入与两端启动配置共用一个原子资源；`pid_max`、`RLIMIT_NPROC`、cgroup `pids.max` 保持独立，不预分配资源。
 - 完成标准：读写、权限、持久配置初始化及任务准入行为一致，两端均有验证。
-- 依据：[已有计划](../guides/ipad-environments.md#task-capacity-and-planned-live-configuration)。
+- 依据：[配置与候选状态](../guides/ipad-environments.md#task-capacity-and-live-configuration)。
 
 ### 10 — 原生 allocator 性能
 
@@ -117,10 +179,13 @@
 
 ## 每批交付规则
 
-1. 开始时核对源码与已有后续记录，明确本批范围、依赖、触发程序及完成标准。
-2. 一批完成相关子系统、依赖和调用方回退路径；等待释放执行槽，遵守现有 guest 内存、并发及对象级同步原则，不新增协调／资源服务线程或轮询消息总线。
-3. 按改动范围运行共享 Runtime、Mac 和解释器验证，补 gVisor 未覆盖的真实工具／负载；平台相关项目做真机验收。对照受影响正常负载的性能。
-4. 复用未变源码的通过证据；文档、记录及测试等待方式调整不触发完整 CPU、Linux、网络、图形重验。完整检查及全量 gVisor 放在相应集成／发版节点。
-5. 更新本页状态、验证记录和遗留限制，提交并推送 `main`；涉及 Runtime 时同步两端配套引用，保留已测试提交身份。
+所有者于 2026-11-24 修正迭代方式：一轮先完成当前所有已知问题的实现，再统一进入测试验证；问题属于不同领域也先分别实现，不再采用“修一个问题就展开一轮验证”的流程。
+
+1. 开始时核对源码与已有后续记录，统一列出当前全部已知问题、实现缺口、依赖、触发程序及完成标准；不得只挑容易验证的部分作为本轮完成范围。
+2. 先完成清单内全部问题及其依赖、调用方和回退路径。跨领域分别落地，实现阶段不穿插构建、原生对照、CPU／命名空间矩阵或性能验收；行为疑点先通过源码和协议资料调查，待验证假设集中记录。
+3. 实现全部完成后固定候选源码和产物身份，再按受影响范围集中构建、运行共享 Runtime、Mac 和解释器测试，补 gVisor 未覆盖的真实工具／负载及正常负载性能验证；平台相关项目做真机验收。
+4. 验证发现的问题先汇总，作为下一轮实现清单；同样先全部修复，再统一重跑受影响项目和失败项，不退回逐个修复、逐个展开验证的循环。
+5. 全程遵守现有 guest 内存、并发及对象级同步原则；阻塞等待交还执行槽，不新增协调／资源服务线程或轮询消息总线。复用未变源码的通过证据；文档、记录及测试等待方式调整不触发完整 CPU、Linux、网络、图形重验。完整检查及全量 gVisor 留在相应集成／发版节点。
+6. 本批实现和验证全部完成后更新本页状态、验证记录和遗留限制，提交并推送 `main`；涉及 Runtime 时同步两端配套引用，保留已测试提交身份。
 
 本清单之外的 syscall、CPU 扩展及产品功能继续由各自路线图管理。此处不把所有未实现接口自动提升为本轮必做项。

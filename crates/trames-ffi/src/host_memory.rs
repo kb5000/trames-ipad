@@ -3,6 +3,60 @@
 //! polling thread or additional allocation policy is introduced.
 use std::sync::Arc;
 use trames_linux::HostMemoryInfo;
+
+/// An explicit caller-thread diagnostic, including after the last session closes.
+/// This is process accounting: an embedded guest shares the app's host process,
+/// so these bytes must never be presented as guest RSS or added to guest RSS.
+#[derive(serde::Serialize)]
+pub struct ProcessMemory {
+    pid: u32,
+    resident_bytes: u64,
+    physical_footprint_bytes: Option<u64>,
+    runtime_workers: usize,
+}
+
+pub fn process() -> std::io::Result<ProcessMemory> {
+    #[cfg(target_vendor = "apple")]
+    let (resident_bytes, physical_footprint_bytes) = {
+        let mut usage: libc::rusage_info_v2 = unsafe { std::mem::zeroed() };
+        // SAFETY: SDK structure and complete local writable output buffer. This
+        // only queries the calling process; it neither pauses nor walks workers.
+        if unsafe {
+            libc::proc_pid_rusage(
+                libc::getpid(),
+                libc::RUSAGE_INFO_V2,
+                (&mut usage as *mut libc::rusage_info_v2).cast(),
+            )
+        } != 0
+        {
+            return Err(std::io::Error::last_os_error());
+        }
+        (usage.ri_resident_size, Some(usage.ri_phys_footprint))
+    };
+    #[cfg(not(target_vendor = "apple"))]
+    let (resident_bytes, physical_footprint_bytes) = {
+        let statm = std::fs::read_to_string("/proc/self/statm")?;
+        let pages = statm
+            .split_whitespace()
+            .nth(1)
+            .and_then(|s| s.parse::<u64>().ok())
+            .ok_or_else(|| std::io::Error::other("invalid process resident size"))?;
+        // SAFETY: sysconf has no pointer arguments.
+        let page_size = unsafe { libc::sysconf(libc::_SC_PAGESIZE) };
+        let resident = pages
+            .checked_mul(u64::try_from(page_size).unwrap_or(0))
+            .filter(|_| page_size > 0)
+            .ok_or_else(|| std::io::Error::other("invalid host page size or resident size"))?;
+        (resident, None)
+    };
+    Ok(ProcessMemory {
+        pid: std::process::id(),
+        resident_bytes,
+        physical_footprint_bytes,
+        runtime_workers: crate::session::worker_count(),
+    })
+}
+
 pub fn source() -> Option<Arc<dyn Fn() -> HostMemoryInfo + Send + Sync>> {
     #[cfg(target_vendor = "apple")]
     {

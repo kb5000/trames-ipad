@@ -19,6 +19,9 @@ use trames_vfs::{DiskOptions, NetworkMode, Vfs, VolumeSpace};
 
 pub const QUEUE_LIMIT: usize = trames_distro::terminals::QUEUE_LIMIT;
 static WORKERS: AtomicUsize = AtomicUsize::new(0);
+pub(crate) fn worker_count() -> usize {
+    WORKERS.load(Ordering::Relaxed)
+}
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Options {
@@ -803,6 +806,10 @@ fn run(
     let mut cpu_count = None;
     let mut login = None;
     if let Some(config) = &manifest {
+        config
+            .kernel
+            .apply(&vfs)
+            .map_err(|e| format!("kernel configuration: {e}"))?;
         if config.environment.kind != options.target {
             return Err("environment type differs from the installed image".into());
         }

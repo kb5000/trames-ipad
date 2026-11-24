@@ -40,6 +40,12 @@ uint64_t trames_session_open(const uint8_t *json, uint32_t length);
 int32_t trames_session_input(uint64_t handle, const uint8_t *bytes, uint32_t length);
 int32_t trames_session_output(uint64_t handle, uint8_t *bytes, uint32_t capacity);
 int32_t trames_session_status(uint64_t handle, uint8_t *json, uint32_t capacity);
+/* Explicit caller-thread process accounting, including before open/after close.
+ * JSON: pid, resident_bytes, physical_footprint_bytes (null off Apple), and
+ * runtime_workers (includes asynchronous close still finishing). Embedded
+ * manager/runtime/guest share this process; this is not guest-only RSS. No
+ * polling thread, guest wake, or session handle is required. */
+int32_t trames_process_memory(uint8_t *json, uint32_t capacity);
 int32_t trames_session_resize(uint64_t handle, uint16_t rows, uint16_t columns);
 int32_t trames_session_gpu_suspended(uint64_t handle, uint32_t suspended);
 int32_t trames_session_pause(uint64_t handle, uint32_t paused);

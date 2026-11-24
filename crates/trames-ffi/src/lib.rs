@@ -734,6 +734,21 @@ pub unsafe extern "C" fn trames_session_status(
         result.unwrap_or_else(error)
     })
 }
+/// Explicit process memory snapshot, available before opening and after closing
+/// a session. Runs on the caller and does not wake guest execution workers.
+/// # Safety
+/// See `copy`. Output is UTF-8 JSON without a trailing NUL.
+#[no_mangle]
+pub unsafe extern "C" fn trames_process_memory(pointer: *mut u8, capacity: u32) -> i32 {
+    boundary(|| {
+        let result = (|| {
+            let memory = host_memory::process().map_err(|e| e.to_string())?;
+            let data = serde_json::to_vec(&memory).map_err(|e| e.to_string())?;
+            unsafe { copy(pointer, capacity, &data) }.map_err(str::to_string)
+        })();
+        result.unwrap_or_else(error)
+    })
+}
 /// # Safety
 /// See `bytes`. Blocking: call on a native transfer queue, never on the UI thread.
 /// The host path must be authorized by the embedding app (Files security scope).
