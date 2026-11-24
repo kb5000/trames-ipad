@@ -3,6 +3,8 @@
 状态：调研与实施建议，尚未开始实现。日期：2026-11-24。
 范围修订：图形、音频、视频 API 桥接属于 arm64 产品核心交付；完整 4 KiB 环境是共享
 runtime 与 KVM 后端的必过配置。
+执行约束修订：不改写应用/库已装载的执行代码；采用原始指令硬件执行和异常适配，
+以现有 HVF 的同线程、mailbox 路径作为设计参考。
 
 本轮交付是计划；创建 `trames-linux` 仓库、实现后端、部署 Linux 测试机另属实施阶段。
 现有 runtime 的迭代继续进行，Linux 产品通过明确的 runtime commit 与它共同演进。
@@ -19,6 +21,11 @@ Linux 宿主集成与产品入口；Linux guest 的进程、文件、网络、�
 KVM 负责执行 guest 指令，Trames 负责 guest Linux ABI 与共享 API 桥接。
 后续增加 **Linux amd64 宿主运行 Linux amd64 用户程序**；把宿主 OS、执行后端、
 guest 架构作为三个独立维度，新增代码不将 Linux/KVM 等同于 AArch64。
+
+产品执行不依赖修改已装载的 `svc`/`syscall`、识别 libc wrapper 或替换 JIT 指令。
+静态/动态 ELF、内联 syscall、guest 自身动态生成代码都通过原有架构入口执行。
+产品装载自己的 EL1/ring-0 适配层及标准 vDSO 属于正常执行环境构造；不将适配代码
+植入或替换应用指令。二进制重写、热 patch 和仅拦截 libc 函数不作为产品执行后端。
 
 跨 ISA 执行不由本计划中的 KVM 后端提供；例如 arm64 宿主执行 amd64 ELF 需要另外的
 解释器或动态翻译后端。配置必须明确报告不支持的宿主/guest 架构组合。
@@ -80,8 +87,9 @@ flowchart TB
     R --> M[宿主视频后端 / PipeWire 或 ALSA]
 ```
 
-宿主程序仍是普通用户态进程，使用内核 KVM 接口取得硬件执行能力。guest 特权层只做
-异常、页表、寄存器和返回适配，不在里面再实现 Linux syscall、VFS 或调度器。
+宿主程序仍是普通用户态进程，使用内核 KVM 接口取得硬件执行能力。guest 特权层负责
+异常、页表、寄存器和返回适配，不独立维护另一套 Linux syscall、VFS 或调度器语义。
+后文的 guest 轻量快路径仅作为受共享 runtime 契约约束的后续研究项。
 这与已有 Mac 产品的分工一致。gVisor 的 KVM 平台也采用进程模型与用户态内核的组合，
 可作设计参照，但无需复制它的整套进入/退出机制。[gVisor 官方平台说明](https://gvisor.dev/docs/architecture_guide/platforms/)
 
@@ -91,13 +99,16 @@ flowchart TB
 至宿主 → 共享 runtime dispatch → 写入结果或 signal frame → EL1 恢复 → `eret`。
 `svc` 首先进入 guest EL1，不能把它假定为一次直接面向用户态 VMM 的 KVM exit。
 
-退出通道建议以 **保留的 MMIO doorbell + 每 vCPU mailbox** 为基础实现；仅在 EL1
-可访问的映射中放置 mailbox、vector、页表与 doorbell，guest EL0 无权改写。
-doorbell 使用固定宽度的简单访存，不接受 guest 提供的宿主指针。
+退出通道优先原型验证 **HVC/SMCCC 转发 + 每 vCPU mailbox**，与现有 HVF 的机制对齐；
+同时保留 **MMIO doorbell + 同一 mailbox** 作为标准接口兼容性基线。HVC 是否更快由
+同机实测决定，不能依据名字或异常条数预先排序。只有 EL1 可访问 mailbox、vector、
+页表与 doorbell，guest EL0 无权读写其私有控制状态。
 
-另一条候选是 SMCCC filter 将明确选择的调用转发至用户态，作为能力可用时的可选路径。
-普通 `hvc #imm` 不直接继承 HVF 的退出约定；先证明 KVM 上的路由和恢复行为。
-SMCCC filter 必须在首次执行前配置，并避开内核保留的 function ID 范围。
+SMCCC filter 将明确选择的调用转发为 `KVM_EXIT_HYPERCALL`。普通 `hvc #imm` 不直接
+继承 HVF 的退出约定；Linux 适配层选择合法的 SMCCC function ID 与 conduit，先证明
+KVM 上的路由和恢复行为。filter 必须在首次执行前配置，并避开保留/冲突范围。
+实际 syscall 号、参数和状态置于 mailbox，HVC 仅携带受控路由标识；普通路径不为
+取每个参数单独调用 `KVM_GET_ONE_REG`。MMIO 同样只传固定宽度通知，不传宿主指针。
 [KVM ARM VM/SMCCC 控制接口](https://docs.kernel.org/virt/kvm/devices/vm.html#group-kvm-arm-vm-smccc-ctrl)
 
 MMIO/相关退出的内核待完成操作，要按 KVM 契约重新进入 `KVM_RUN` 完成后，才允许保存
@@ -206,6 +217,64 @@ runtime 的页语义；为该资源分配满足要求的 backing，或采用明�
 跨边界 native 访问、fork-COW 后单页回收、部分文件映射，以及相同 backing 在 CPU、
 GPU 和视频消费者间的生命周期。使用真正 `_SC_PAGESIZE == 4096` 的 Linux 机器，
 记录 backend 确实使用 KVM；不能靠修改探测返回值或降级成解释器来替代验收。
+
+### 3.6 不改写代码的硬件执行与低固定成本路径
+
+这里的目标是普通指令直接硬件执行、syscall 仅承担必要的异常/退出/处理/恢复成本。
+这不等于一次 syscall 只有一条普通指令的成本。HVF 与 KVM 都存在 guest/host 状态
+切换；KVM 的用户态返回和重新进入仍有不可忽略的固定成本。
+
+已核对的 Mac 路径是 `svc → EL1 save → hvc → hv_vcpu_run 返回 → 当前线程 runtime`，
+由 EL1 将状态存入私有 mailbox，宿主通过它取得结果。它并非每条 `svc` 由 HVF 直接
+交给宿主，也不是通过另一个资源线程处理。Linux 首先复用这一分工和正确性边界。
+
+| 层次 | Linux 基线与优化要求 |
+| --- | --- |
+| 普通用户指令/访存 | 直接由 CPU/MMU 执行，不插入重写、单步或每指令软件分派 |
+| guest syscall 入口 | 原始 `svc` 进入产品自己的 EL1 vector；不依赖 syscall 所在库或地址模式 |
+| 状态交接 | 每 vCPU 固定布局 mailbox，首次配置好映射和恢复入口；宿主 RAM 与 guest 访问使用同一 owner |
+| 退出通道 | 比较 SMCCC/HVC 与 MMIO；避免附带模拟通用设备、解释 guest I/O 指令或多余寄存器 ioctl |
+| runtime 处理 | 退出后继续由原 worker 执行共享 dispatcher；短 syscall 不转交协调/服务线程 |
+| 恢复 | 尽可能从适配层固定的后续指令恢复，结果写入 mailbox 后重入；遵守 KVM 待完成操作契约 |
+| 映射与时钟 | 地址空间未变时复用页表/ASID；仅在真正需要时更新 TLB、timer 和执行控制 |
+| 完整状态 | 首版保证全部状态可正确保存；后续冷热拆分必须同时覆盖 task 迁移、clone、signal、ptrace 与抢占 |
+
+同一 mailbox 在 vCPU 运行期间由该执行者拥有、退出后才由宿主访问，不把它改成跨线程
+轮询消息总线。不为每个寄存器加原子/屏障；保留真实异步中断和共享资源所需的同步。
+如果优化为某些状态驻留 vCPU，必须在跨 worker 或对外观察前完整物化，不能返回一份
+实际仍依赖已复用 vCPU 的可移动 task snapshot。
+
+测量明确区分 guest EL0→EL1 异常、guest/host world switch、宿主用户/内核边界、实际
+宿主线程调度，以及资源处理耗时。硬件退出可以在同一个 worker 上往返，不等于每次
+都发生一次宿主线程调度。每个实现同时报告进入次数、寄存器 ioctl、mailbox 字节、
+TLB/timer 更新、实际 context switch、wall time 与 host CPU；不以线程数推断开销。
+
+后续可以评估两类减少退出次数的路径，但不作为 L0/L1 的必要前提：
+
+1. **标准 vDSO/用户态快路径**：由共享 runtime 正常提供 vDSO，正确配置时钟域；
+   让已有 guest libc 按正常 ABI 使用它，不替换调用点。普通未竞争用户态原子/futex
+   路径照常执行，只有真正需要内核语义时进入 syscall。
+2. **guest 特权层轻量处理**：对可严格保持同一语义的只读查询，评估由共享 runtime
+   提供状态和规则、在 EL1 直接返回。例如未受 tracing/seccomp 等拦截要求约束的
+   task 身份查询。guest filter、ptrace stop、计数、信号/生命周期与并发更新规则都要
+   一致；任何条件不满足就走宿主 dispatcher。不能手写一份长期分叉的“简化内核”，
+   更不能将普通 I/O、futex 唤醒、clone 或 mmap 假设成无需宿主处理。
+
+后一项需要先解决共享规则的编译/生成边界和一致性证据，不能为了省一次退出在 EL1
+复制现有 syscall 实现。GPU/媒体只在原 API 允许的边界内批处理，保持调用顺序、返回
+和资源生命周期；不能为提高跑分合并具有独立可见语义的 syscall。
+
+硬件的特殊 trap 能力与 Linux 用户态接口另行区分：ARM FGT 可以涉及 SVC 的 trap，
+但此次核对的 Linux `handle_svc()` 将其用于 nested virtualization 的异常转发，没有
+提供本产品可直接使用的通用 SVC-to-userspace 处理路径。不能把“CPU 有该能力”视为
+标准 KVM 上已有一个可开启的产品开关。
+[Linux ARM64 KVM 异常处理源码](https://github.com/torvalds/linux/blob/master/arch/arm64/kvm/handle_exit.c)
+若以后研究专用 KVM UAPI/内核扩展，应独立记录硬件覆盖、宿主依赖和维护成本；普通
+用户态产品的基线仍为标准 KVM。仅换一个用户态包装库不能消除硬件退出本身的成本。
+
+未来 amd64 保留原始 `syscall`，由 guest LSTAR/ring-0 入口与架构专用退出适配完成。
+通用 mailbox/事件契约可共享，HVC 不是跨架构接口；x86 的 I/O exit 等通道按其标准
+KVM 契约单独测量，不要求 amd64 仿造 ARM 异常层级。
 
 ## 4. 仓库与多架构边界
 
@@ -451,8 +520,9 @@ provider 可在契约稳定后交错实现，最终统一验收，不能把 L3a/
 
 ### 6.1 L0 必须回答的问题
 
-1. 保留 MMIO 退出与可选 SMCCC 路径是否都能保存并恢复完整上下文？每次退出需要几次
-   ioctl/寄存器拷贝？MMIO completion 是否在任何 task handoff 前完成？
+1. SMCCC/HVC 与 MMIO 基线是否都能保存并恢复完整上下文？同机延迟和 host CPU 差别
+   如何？每次往返需要几次 KVM_RUN、寄存器 ioctl 与拷贝？待完成操作是否在 task
+   handoff 前完成，正常同 task 恢复是否能避免不必要的额外重入？
 2. KVM 能否在全部既有硬件借用边界下共享 canonical backing，并在 revoke 确认后安全
    产生宿主引用、释放/复用物理页？arena 的 slot 使用量是否有界？
 3. signal kick、entry gate、deadline、vCPU 销毁的竞态是否闭合？在 EL1 部分保存/恢复
