@@ -369,7 +369,10 @@ unsafe fn frame_image(
                 let (width, height) = gpu.dimensions();
                 ImageInfo {
                     kind: 2,
-                    address: gpu.metal_texture() as u64,
+                    address: match gpu.native_handle().metal_texture() {
+                        Ok(handle) => handle as u64,
+                        Err(_) => return error("native frame is not a Metal texture"),
+                    },
                     alpha: u32::from(image.buffer.has_alpha()),
                     width,
                     height,
@@ -426,8 +429,9 @@ mod tests {
         fn dimensions(&self) -> (u32, u32) {
             (100, 50)
         }
-        fn metal_texture(&self) -> usize {
-            0
+        fn native_handle(&self) -> trames_wayland::NativeHandle {
+            // ABI metadata fixture only: this sentinel is never sent to Metal.
+            trames_wayland::NativeHandle::MetalTexture(1)
         }
         fn ready(&self) -> std::io::Result<bool> {
             Ok(true)
