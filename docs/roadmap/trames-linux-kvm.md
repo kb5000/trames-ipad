@@ -1,6 +1,6 @@
 # Trames Linux：共享 runtime 与 KVM 执行后端计划
 
-状态：已开始实施，独立产品仓库已建立，首批 KVM transport 原型通过实测。
+状态：实施中，独立产品仓库、KVM transport 与共享 runtime 前台执行基础已建立。
 日期：2026-11-24。完整 L0 与产品验收仍未完成。
 范围修订：图形、音频、视频 API 桥接属于 arm64 产品核心交付；完整 4 KiB 环境是共享
 runtime 与 KVM 后端的必过配置。
@@ -11,8 +11,12 @@ runtime 与 KVM 后端的必过配置。
 记录见 [实施台账](https://github.com/kb5000/trames-linux/blob/main/docs/implementation.md)
 和 [验证记录](https://github.com/kb5000/trames-linux/blob/main/docs/validation/l0-20261124.md)。
 已复用 Mac 上现有的 arm64 Linux 调试 VM，并启用嵌套虚拟化；没有另行采购机器。
-HVC/SMCCC 与 MMIO 各通过 10,000 次往返、4 KiB 权限/fault 修复与 deadline 测试；
-共享 session、并发借用/COW/回收、完整抢占和真实 GPU/音视频仍按下述门槛推进。
+HVC/SMCCC 与 MMIO 各通过 10,000 次往返、4 KiB 权限/fault 修复与 deadline 测试。
+后续批次已接入共享 `Cpu`/worker-local `Engine`、canonical 页/范围与借用撤销、
+fork/COW/回收、部分 EL1 抢占恢复和静态/动态 ELF 前台入口；实测记录见
+[共享 session 验证](https://github.com/kb5000/trames-linux/blob/main/docs/validation/session-20261124.md)。
+真实 GPU/音视频、外部映射 FD/image/sync 契约、更多调试与兼容性仍按下述门槛推进；
+当前基础用例通过不等于完整 L0 或产品已验收。
 现有 runtime 的迭代继续进行，Linux 产品通过明确的 runtime commit 与它共同演进。
 
 ## 1. 建议与产品边界
