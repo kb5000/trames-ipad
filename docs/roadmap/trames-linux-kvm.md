@@ -1,12 +1,18 @@
 # Trames Linux：共享 runtime 与 KVM 执行后端计划
 
-状态：调研与实施建议，尚未开始实现。日期：2026-11-24。
+状态：已开始实施，独立产品仓库已建立，首批 KVM transport 原型通过实测。
+日期：2026-11-24。完整 L0 与产品验收仍未完成。
 范围修订：图形、音频、视频 API 桥接属于 arm64 产品核心交付；完整 4 KiB 环境是共享
 runtime 与 KVM 后端的必过配置。
 执行约束修订：不改写应用/库已装载的执行代码；采用原始指令硬件执行和异常适配，
 以现有 HVF 的同线程、mailbox 路径作为设计参考。
 
-本轮交付是计划；创建 `trames-linux` 仓库、实现后端、部署 Linux 测试机另属实施阶段。
+实施仓库：[trames-linux](https://github.com/kb5000/trames-linux)。首批代码与真实 KVM
+记录见 [实施台账](https://github.com/kb5000/trames-linux/blob/main/docs/implementation.md)
+和 [验证记录](https://github.com/kb5000/trames-linux/blob/main/docs/validation/l0-20261124.md)。
+已复用 Mac 上现有的 arm64 Linux 调试 VM，并启用嵌套虚拟化；没有另行采购机器。
+HVC/SMCCC 与 MMIO 各通过 10,000 次往返、4 KiB 权限/fault 修复与 deadline 测试；
+共享 session、并发借用/COW/回收、完整抢占和真实 GPU/音视频仍按下述门槛推进。
 现有 runtime 的迭代继续进行，Linux 产品通过明确的 runtime commit 与它共同演进。
 
 ## 1. 建议与产品边界
@@ -63,7 +69,8 @@ HEAD 用于标记调研基线。runtime 工作树存在正在进行的 FUSE、�
 | `graphics::Image`、`wayland::GpuImage` 仍要求 `metal_texture()`；video/audio 非 Apple 实现不提供实际设备服务 | 先解除公共接口对 Metal 的依赖，再实现 Linux 图像、解码器与 PCM 后端 |
 | runtime 宿主页探测接受 4–64 KiB，Vulkan shared memory 已查询宿主 granule | 已有可复用的粒度处理；仍需按全链路验收，不能把个别 Linux 分支视为完整 4 KiB 支持 |
 
-源码入口见文末。本文是源码与官方接口调研，没有运行 KVM、测量性能或证明产品兼容性。
+源码入口见文末。本节记录规划阶段的源码与官方接口调研；实施后的 KVM 原型实测另见
+文首验证记录。当前没有证明完整产品兼容性，也不能用嵌套 VM 的往返耗时推断裸机上限。
 
 ## 3. 执行架构
 
