@@ -835,12 +835,22 @@ name = "trames-cli"
 version = "1.5.4"
 dependencies = [
  "serde_json",
+ "trames-cli-common",
  "trames-core",
  "trames-distro",
  "trames-elf",
  "trames-linux",
  "trames-net",
  "trames-vfs",
+]
+
+[[package]]
+name = "trames-cli-common"
+version = "0.1.0"
+dependencies = [
+ "libc",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

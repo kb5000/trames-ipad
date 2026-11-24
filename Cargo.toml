@@ -7,9 +7,10 @@ members = [
     "crates/trames-ffi",
     "crates/trames-compute",
 ]
-exclude = ["runtime"]
+exclude = ["runtime", "cli"]
 
 [workspace.dependencies]
+trames-cli-common = { path = "cli/crates/trames-cli-common" }
 trames-vulkan = { path = "runtime/crates/trames-vulkan" }
 trames-video = { path = "runtime/crates/trames-video" }
 trames-graphics = { path = "runtime/crates/trames-graphics" }

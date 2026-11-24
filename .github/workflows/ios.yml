@@ -406,7 +406,7 @@ jobs:
           PKG_CONFIG_SYSROOT_DIR="$PWD/target/mesa-egl/sdk" \
           PKG_CONFIG_LIBDIR="$PWD/target/mesa-egl/sdk/usr/lib/pkgconfig" \
           TRAMES_BUILD_JOBS=4 TRAMES_FFMPEG_OUTPUT="$PWD/target/video-ffmpeg" bash runtime/scripts/build-video-ffmpeg.sh \
-            --enable-cross-compile --arch=aarch64 --target-os=linux --cc="$PWD/target/mesa-egl/musl-cc" \
+            --enable-cross-compile --arch=aarch64 --target-os=linux --cc="$PWD/target/mesa-egl/musl-cc" --strip=aarch64-linux-gnu-strip \
             --disable-programs --disable-avdevice --disable-avfilter --disable-avformat --disable-postproc
           python3 scripts/prepare-ios-video.py target/video-guest target/video-ffmpeg/install
           python3 scripts/build-xwayland-native.py
