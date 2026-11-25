@@ -33,6 +33,19 @@ ABI 检查保持编译时执行，生产路径没有新增协调/服务线程。
 软件 Vulkan/PCM 已有单独证据；真实 GPU/音视频、裸机性能、完整 4 KiB 媒体链路、
 持久环境管理及 amd64 guest ABI 继续按原计划推进。
 
+同日第八批已接入 Linux Vulkan headless 和 X11 固定显示窗口，共享 runtime 保留
+Metal/XCB/Wayland 原生 target 及其连接、surface 生命周期。窗口事件接入原有 host wait，
+关闭窗口取消原会话；未新增协调/服务线程。SDK 安装已适配 host mount、chroot 与目录
+别名；KVM 通过编译期 CPU 能力声明区分专用 FD 缓冲区直接共享与普通 Vulkan 内存的
+既有 coherent 回退，并传递到多个原生 instance/device 图。
+
+现有 4 KiB ARM64 嵌套 KVM 上的软件 WSI/headless 验收 **13/13**，包含两种 transport、
+单/四 worker、实际 X11 像素、双 swapchain 和关闭退出；原生 Wayland target 生命周期
+单独验证。Mac workspace 与 iOS ARM64 FFI 检查通过，Apple target 路径保留。
+原始证据和范围见 [图形呈现验收](https://github.com/kb5000/trames-linux/blob/main/docs/validation/presentation-20261125.md)。
+这还不是完整 guest 桌面：输入/剪贴板、Wayland/Xwayland/Zink、DMA-BUF/fence 以及
+物理 GPU、视频与音频时钟仍按后续门槛推进；软件像素通过不能代替硬件性能验收。
+
 
 ## 1. 建议与产品边界
 
