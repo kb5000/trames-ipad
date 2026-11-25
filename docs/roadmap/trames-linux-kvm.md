@@ -1,7 +1,7 @@
 # Trames Linux：共享 runtime 与 KVM 执行后端计划
 
-状态：实施中，独立产品仓库、KVM transport 与共享 runtime 前台执行基础已建立。
-日期：2026-11-24。完整 L0 与产品验收仍未完成。
+状态：实施中；共享 CLI、4 KiB KVM 执行与首批 IP/systemd/Docker 工作流已通过自动化验收。
+日期：2026-11-25。完整图形音视频、裸机性能与产品验收仍未完成。
 范围修订：图形、音频、视频 API 桥接属于 arm64 产品核心交付；完整 4 KiB 环境是共享
 runtime 与 KVM 后端的必过配置。
 执行约束修订：不改写应用/库已装载的执行代码；采用原始指令硬件执行和异常适配，
@@ -18,6 +18,21 @@ fork/COW/回收、部分 EL1 抢占恢复和静态/动态 ELF 前台入口；实
 真实 GPU/音视频、外部映射 FD/image/sync 契约、更多调试与兼容性仍按下述门槛推进；
 当前基础用例通过不等于完整 L0 或产品已验收。
 现有 runtime 的迭代继续进行，Linux 产品通过明确的 runtime commit 与它共同演进。
+
+2026-11-25 更新：共用独立 `trames-cli`；普通文件/JIT、ICMP、keyring、pidfd、
+ramfs/debugfs 与 overlay 生命周期修复已进入共享 runtime。KVM 增加有界的每 mm 页表缓存、
+每 worker/mm ASID 隔离及已完成通知的抢占恢复。应用和库的执行指令保持原样，
+ABI 检查保持编译时执行，生产路径没有新增协调/服务线程。
+
+在现有真实 4 KiB ARM64 嵌套 KVM 上，两种 transport × 单/四 worker：基础命令工作流
+48/48，IP 地址/路由/namespace/bridge 8/8，systemd PID 1 4/4，Docker 生命周期
+4/4；containerd 额外完成每配置 20 次、共 80 次真实 Connect/Shutdown 启停。
+这些是声明范围内的工作流验收，不代表任意 Linux 软件或完整 cgroup 控制器支持。
+原始日志、构建身份、原生对照与修复前失败见
+[本批验证记录](https://github.com/kb5000/trames-linux/blob/main/docs/validation/ip-systemd-docker-20261125.md)。
+软件 Vulkan/PCM 已有单独证据；真实 GPU/音视频、裸机性能、完整 4 KiB 媒体链路、
+持久环境管理及 amd64 guest ABI 继续按原计划推进。
+
 
 ## 1. 建议与产品边界
 
