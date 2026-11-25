@@ -22,15 +22,16 @@ p.add_argument('--profiles', nargs='+', choices=['lowlevel', 'writeback', 'highl
 p.add_argument('--repeats-per-block', type=int, default=2)
 p.add_argument('--blocks', type=int, default=2)
 p.add_argument('--min-free-gib', type=float, default=3)
+p.add_argument('--ordinary-scale', type=int, default=1, help='Multiply the ordinary client fixed work; requires the matching client for values above one')
 p.add_argument('--baseline-writeback', action='store_true', help='Require negotiated writeback in both artifacts')
 a = p.parse_args()
-assert a.blocks >= 2 and a.repeats_per_block >= 2 and all(n > 0 for n in a.cpus)
+assert a.blocks >= 2 and a.repeats_per_block >= 2 and all(n > 0 for n in a.cpus) and 1 <= a.ordinary_scale <= 100
 a.output.mkdir(parents=True, exist_ok=False)
 def sha(path): return hashlib.sha256(path.read_bytes()).hexdigest()
 inputs = {n: str(getattr(a, n).resolve()) for n in ('baseline','candidate','rootfs','client','workload')}
 inputs.update({n: str((a.tools/n).resolve()) for n in ('passthrough_ll','passthrough')})
 assert sha(Path(inputs['baseline'])) != sha(Path(inputs['candidate'])), 'identical A/B artifacts'
-report = dict(passed=False, profile='release', measured_daemon_debug=False, baseline_writeback=a.baseline_writeback,
+report = dict(passed=False, profile='release', measured_daemon_debug=False, baseline_writeback=a.baseline_writeback, ordinary_scale=a.ordinary_scale,
               timing='client CLOCK_MONOTONIC nanoseconds; content verification included in reads',
               order='AB then BA per profile/CPU; separate warmup sample 0 in every process',
               environment=dict(system=platform.system(),release=platform.release(),machine=platform.machine(),logical_cpus=os.cpu_count()),
@@ -52,7 +53,7 @@ def run(label, profile, cpus, block, diagnostic=False):
         command+=['--export',f'/tmp/{name}={a.output.resolve()}/{prefix}-{name}']
     repeats=0 if diagnostic else a.repeats_per_block
     workers=1 if diagnostic else cpus
-    command+=['--guest','--','/bin/sh','/opt/fuse-tool/workload.sh',profile,str(repeats),str(workers),str(int(diagnostic))]
+    command+=['--guest','--','/bin/sh','/opt/fuse-tool/workload.sh',profile,str(repeats),str(workers),str(int(diagnostic)),str(1 if diagnostic else a.ordinary_scale)]
     began=time.monotonic()
     load_before=os.getloadavg()
     with (a.output/(prefix+'.stdout')).open('w') as stdout,(a.output/(prefix+'.stderr')).open('w') as stderr:
@@ -102,8 +103,9 @@ try:
                 for label in (('baseline','candidate') if block%2==0 else ('candidate','baseline')):
                     run(label,profile,cpus,block)
     assert all(r['complete'] for r in report['runs']), 'incomplete or failed measurement scope'
-    checksums={r['checksum'] for r in report['rows'] if r['kind']=='ordinary'}
-    assert len(checksums)==1,checksums
+    for diagnostic in (True, False):
+        checksums={r['checksum'] for r in report['rows'] if r['kind']=='ordinary' and r['diagnostic']==diagnostic}
+        assert len(checksums)==1,(diagnostic,checksums)
     transfers=[r for r in report['rows'] if r['kind']=='transfer' and not r['diagnostic'] and r['sample']>0]
     for r in transfers: r['write_sync_ns']=r['write_ns']+r['sync_ns']
     for profile in a.profiles:
