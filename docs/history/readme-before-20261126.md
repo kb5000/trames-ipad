@@ -1,0 +1,397 @@
+# Historical README — before the English redesign
+
+This is the previous repository README, retained as an engineering and release-history record. Statements such as “current” or “latest” refer to their original development context and may be obsolete. Use the [current README](../../README.md) for product and installation guidance.
+
+Original source: [`12af83b6`](https://github.com/project-trames/trames-ipad/blob/12af83b68d4ab736468edd165976f124c4a67b72/README.md). The text below is preserved; relative Markdown links have been adjusted for this location.
+
+---
+
+# Trames iPad
+
+This repository owns the iPad application, CPU interpreter, native interpreter
+helpers and product integration. Shared Linux userspace code is maintained in
+[trames-runtime](https://github.com/kb5000/trames-runtime), pinned as the `runtime/`
+submodule. The hardware-execution Mac product is
+[trames-mac](https://github.com/kb5000/trames-mac).
+
+Clone with `git clone --recurse-submodules https://github.com/kb5000/trames-ipad.git`.
+After switching revisions, run `git submodule update --init`. Both products pin
+exact runtime revisions; no common Linux source is maintained in this repository.
+
+
+[Trames 1.2.0（build 33）](https://github.com/kb5000/trames/releases/tag/v1.2.0) · [下载 unsigned IPA](https://github.com/kb5000/trames/releases/download/v1.2.0/Trames-1.2.0-build33-unsigned.ipa)。基础 Wayland EGL/GLES2 的 Zink→Metal GPU 窗口、Vulkan 扩展和运行路径优化。[发行说明](../../docs/validation/release-1.2-notes.md) · [验证和源码](../../docs/validation/release-1.2.md)。图形兼容性由 #32 跟踪，Docker 兼容性继续由 #29 跟踪。
+
+[此前 Trames 1.0.0（build 26）](https://github.com/kb5000/trames/releases/tag/v1.0.0) · [下载 unsigned IPA](https://github.com/kb5000/trames/releases/download/v1.0.0/Trames-1.0.0-build26-unsigned.ipa)。点击 **+ → 本地 Alpine 终端** 可创建多个独立终端，支持浮动、调整大小、最小化、停靠和关闭；共享同一 Linux 的文件、进程、网络及软件，工作目录、环境变量和终端尺寸独立。关闭首个终端或全部关闭后再打开，仍使用同一运行环境。包含此前 Wayland／Vulkan、GTK 剪贴板／输入、粘贴权限连贴、窗口／PTY 尺寸及 Files 修复。新增多终端生产回归与 iPad 模拟器验收通过，复用不受影响的成功检查。[发行和验证记录](../../docs/validation/release-1.0.md)。使用 Sideloadly 签名安装；[只读 rootfs File Provider](../../docs/guides/rootfs-files.md) 真机激活仍待正式 App Group 签名。
+
+0.17.0 加入[宿主原生 Wayland](../../docs/architecture/wayland.md)：终端与图形应用共用顶部标签栏，支持拖出浮窗、停靠、调整分辨率及 UIKit 输入法。旧“显示窗口”菜单与固定显示器界面已移除。原版 vkmark 的 13 种场景通过本地功能验收；窗口手势、原版 Weston、vkcube、vkmark 与 Metal 显示通过 **33 项 Apple 模拟器验收**，零失败或跳过。[验证记录](../../docs/validation/wayland-workspace-vkmark.md)、[使用说明](../../docs/guides/wayland.md)、[0.17.0/build 19 发行记录](../../docs/validation/release-0.17.md)，对应 [PR #26](https://github.com/kb5000/trames/pull/26)。
+
+本轮开发：Linux 的总内存/单进程预算已可在 iPad 设置与 CLI 中配置，
+默认仍为 1 GiB / 512 MiB，按需分配。
+[内存配置说明](../../docs/guides/guest-memory.md)。并行内存视图改为增量维护，
+避免 Node 等程序频繁改变小段映射时反复重建整个页表；保留真正多核执行。
+[inotify 文件监听](../../docs/validation/inotify.md)已接入 VFS，并通过真实 Node
+`fs.watch` 验证。[code-server 开发验证](../../docs/guides/code-server.md)继续验收
+编辑和终端，尚未作为 iPad 安装功能发布。
+
+面向 iPadOS 的终端与 Wayland 窗口开发环境，运行未修改的 AArch64 Linux 用户态程序。使用普通开发者签名，架构不依赖越狱、JIT 权限、私有 API 或硬件虚拟化。
+
+主分支新增 [Xwayland 适配](../../docs/architecture/xwayland.md)：原生窗口管理、默认 glamor／Zink GPU 呈现，以及文本剪贴板和基础 XIM 中文输入桥接。独立窗口、调整大小、输入、关闭与呈现像素检查已通过 Linux FFI 验证。[验证范围](../../docs/validation/xwayland.md)；尚未制作包含该功能的 IPA，iPad Metal／UIKit 真机验收和 GLX／DRI3 仍待完成。
+
+**当前交付：iPad 本地 AArch64 Linux、多终端及原生 Wayland／Vulkan 窗口工作区；兼容性以已实现范围和验证记录为准，完整 iPad 真机矩阵仍待补齐。** `trames-run` 执行实际静态／动态 AArch64 ELF，支持 32/64 位标量及选定 SIMD 浮点、虚拟进程、管道、信号和一个虚拟 PTY。交互式 BusyBox `ash` 已在内存和磁盘两种后端验证。Linux CLI 默认保存文件到磁盘，新存储目录的文件预算为 16 GiB。IPv4/IPv6 TCP/UDP、真实 musl DNS，以及具有独立 IP 和回环地址的用户态网络栈已验证；Alpine 3.22.6、动态 musl、经过证书和包签名验证的 HTTPS apk update/add，以及安装后 tree 执行已验证。iPad App、Files 授权和 Bridge 已实现并通过软件验证；SSH/SFTP 保留为独立可选库，当前 App 专注本地 Linux。
+
+0.12.0/build 13 加入[宿主多核执行](../../docs/architecture/multicore.md)：`--cpus auto|1..32` 控制虚拟 CPU 数，默认自动选择。真实 musl pthread 和 Node.js Worker 可并行执行；ARM 原子、独占访问、acquire/release 和屏障已有同步实现。内核及 NativeCall 初期仍集中处理。[验证和跑分](../../docs/validation/multicore.md)记录了收益、单核开销和限制；[下载多核 IPA 与安装说明](../../docs/validation/release-0.12.md)。
+
+后续开发加入[持续 CPU 工作线程](../../docs/validation/continuous-workers.md)：执行段结束后保留 CPU 状态和内存视图继续运行，系统调用、异常及定时调度点再统一停顿；移除每段的消息往返和启动屏障。对应 [Issue #13](https://github.com/kb5000/trames/issues/13)，已打包为 [0.13.0/build 14 IPA](../../docs/validation/release-0.13.md)，0.12.0 保留历史记录。
+
+后续 [guest memory／批量原生优化](../../docs/validation/bulk-native.md)加入共享驻留页直接借用、1 MiB 有界批量路径、ARM64 NEON 扫描比较，以及 musl strcat/strncat；对应 [Issue #15](https://github.com/kb5000/trames/issues/15)。当前开发继续实现 [NativeCall 工作线程并行](../../docs/architecture/parallel-nativecalls.md)：19 个纯函数、整数/浮点解析和排序步骤可在所属 CPU 上执行并继续 guest 代码，独立原生调用不再要求全局停顿；[验证与跑分](../../docs/validation/parallel-nativecalls.md)，[Issue #16](https://github.com/kb5000/trames/issues/16)。0.13.0 安装包保持已交付版本。
+
+进一步的[访存优化](../../docs/architecture/region-memory.md)将同步范围缩到实际触及的 64 字节区段，允许同页独立访问并行；合并脏区段提交、减少映射检查，并为内置后备对象减少单核线程的重复借用。受控 unsafe 保留 ARM 允许的运行结果差异；[验证和原始跑分](../../docs/validation/region-memory.md)，[Issue #17](https://github.com/kb5000/trames/issues/17)。
+
+main 新增[通用解释执行优化](../../docs/validation/execution-efficiency.md)：按引用读取解码记录、保持指令执行与派发循环内联，以及协调线程本地 COW，减少普通程序的派发和写入开销。保留多核同步、权限、fork 和代码失效语义；记录 CoreMark、Vim、Python、GCC 与线程负载的前后对照。
+
+继续加入[选择性惰性标志与短路径](../../docs/validation/lazy-flags.md)：延迟计算算术 C/V，保留 N/Z 的直接读取，解释循环携带局部标志状态，并在解码时简化不更新标志的立即数加减。覆盖条件分支、带进位运算、局部标志修改和信号上下文恢复；设备端 Swift 构建也改为 Release。运行时仍不使用 JIT。
+
+[调度与边界检查实验](../../docs/validation/dispatch-experiments.md)进一步比较固定代码页、unchecked 寄存器索引、状态驻留、紧凑记录，以及真正的 nightly Rust 显式尾调用。按项目决策，完整 `tailhot` 实现现已成为唯一默认解释器，工具链固定为 `nightly-2026-10-16`；没有恢复多后端或引入 JIT。随后加入[权限软 TLB 与 MMU 研究](../../docs/architecture/soft-tlb.md)，将地址与权限校验合为缓存标签比较，保留文件、COW 和多核语义。 现在已接入[硬件保护的 RAM 映射](../../docs/architecture/hardware-mmu.md)与单级直接映射窗口缓存；混合权限页和特殊文件映射继续使用软件路径。
+
+最新 [0.17.0/build 19](../../docs/validation/release-0.17.md) 已发布：**[下载 unsigned IPA](https://github.com/kb5000/trames/releases/download/v0.17.0/Trames-0.17.0-build19-unsigned.ipa)**。原生 Wayland、统一窗口／标签页、输入焦点及 vkmark 修复已合入 main；旧固定显示器界面已移除。主分支 Linux CI 与 Apple 33 项模拟器验收通过，公开 IPA 已重新下载核验；Sideloadly 使用原 Apple ID 与 Bundle ID 覆盖安装可保留数据。
+
+历史 [0.16.0/build 17](../../docs/validation/release-0.16.md) 已发布：**[下载 unsigned IPA](https://github.com/kb5000/trames/releases/download/v0.16.0/Trames-0.16.0-build17-unsigned.ipa)**。合并 guest 内容器、默认宿主直连网络和无 JIT 解释器优化；同一源码的 Linux CI 和 Apple 14 项模拟器验收通过。Sideloadly 覆盖安装可保留数据；磁盘 v3 会升级到旧版无法读取的 v4，安装前先导出重要文件。
+
+历史 [0.15.0/build 16](../../docs/validation/release-0.15.md) 已发布：[下载 unsigned IPA](https://github.com/kb5000/trames/releases/download/v0.15.0/Trames-0.15.0-build16-unsigned.ipa)，用 Sideloadly 覆盖安装可保留数据。本版合并 sudo／时区／匿名 ELF 修复及 Vulkan 原生计算、纹理与浮动显示窗口；同一源码的 Linux CI 与 Apple 14 项模拟器验收均通过。Vulkan 默认关闭，真机验收待实际使用。
+
+[0.14.0/build 15](../../docs/validation/release-0.14.md)已将这些更新与[稀疏脏页提交优化](../../docs/validation/checkpoint-cost.md)打包发布到 [GitHub Release](https://github.com/kb5000/trames/releases/tag/v0.14.0)，可直接下载 unsigned IPA 用 Sideloadly 覆盖安装。原生 malloc/free 保持实验性、默认关闭；普通分配器与并行原生函数使用统一的 guest 访存模型。
+
+后续 main 已补齐[sudo 伪终端与宿主时区同步](../../docs/validation/sudo-timezone.md)：原版 sudo 的默认 `use_pty`、密码认证、提权和嵌套运行通过实际测试；本地 Linux 在启动、回到前台及系统时区变化时接收 iPad 的原始时区规则，保留显式 `TZ` 覆盖。这些更新已随 [0.15.0/build 16](../../docs/validation/release-0.15.md) 交付。
+
+main 进一步修复[匿名 ELF 与 fd 执行](../../docs/validation/fd-exec.md)：`/proc/self/fd/N` 按实际 inode 执行，加入 `execveat`、`AT_EMPTY_PATH` 和 `O_PATH`；关闭原 fd 后仍保留 `/proc/self/exe`。`(deleted)` 只显示一次，仍表示有效的匿名或已取消链接文件。Python `pass_fds` 与 `os.execve(fd)`、23 项原生 Linux 对照通过，同样纳入 0.15.0。
+
+## 快速运行
+
+历史 0.15.0 已加入[实验性 Vulkan 计算、图形与显示桥](../../docs/architecture/vulkan-compute.md)：原版 Linux loader 通过标准 guest ICD 调用原生 Vulkan；iPad 静态链接原版 MoltenVK／Metal。新增标准 `VK_KHR_display` / `VK_KHR_swapchain`，程序可直接提交 GPU 图像到 App 内可拖动、缩放的显示窗口（固定 1024×768 画布）。新增[顶点／索引缓冲、纹理上传与采样、图形描述符和 push constants](../../docs/validation/vulkan-textures.md)，采用原生 Vulkan／Metal 执行。[离屏图形](../../docs/validation/vulkan-render.md)已有真实 Metal 像素验证；[持续显示与窗口验收](../../docs/validation/vulkan-display.md)与新增纹理用例已通过 Apple CI 的 14 项测试，含实际 GPU 像素、拖动缩放、隐藏恢复和运行中关闭。当前仍为选定接口子集，真机验收留待后续版本；[Issue #21](https://github.com/kb5000/trames/issues/21)。
+
+需要 Rust nightly-2026-10-16；交叉构建 BusyBox 和运行差分测试还需要 Python 3、GNU AArch64 GCC/Binutils、Make、curl、bzip2 和 QEMU user-mode。Debian/Ubuntu 可安装：
+
+```sh
+sudo apt-get install gcc-aarch64-linux-gnu binutils-aarch64-linux-gnu qemu-user build-essential curl bzip2
+cargo build --workspace --locked
+bash scripts/build-fixtures.sh
+cargo run -p trames-cli --bin trames-run -- tests/fixtures/bin/hello
+```
+
+实际 guest 输出：
+
+```text
+Hello from Trames!
+```
+
+运行真实 BusyBox：
+
+```sh
+bash scripts/build-busybox.sh
+cargo run -p trames-cli --bin trames-run -- target/busybox-build/busybox echo 'Hello BusyBox'
+cargo run -p trames-cli --bin trames-run -- --file /data/readme=README.md target/busybox-build/busybox cat /data/readme
+cargo run -p trames-cli --bin trames-run -- target/busybox-build/busybox ls /data
+```
+
+构建脚本下载并核对固定版本 musl 1.2.5 和 BusyBox 1.37.0 的 SHA-256，用未修改的上游源码交叉编译精简静态配置。已测 applet 为 `true`、`false`、`echo`、`printf`（字符串/整数）、`basename`、`dirname`、`cat`、`wc`、`head`、`tail`、`pwd` 和 `ls`。这些结果不代表所有 BusyBox 配置、参数或发行版二进制都兼容。
+
+`--file /GUEST=HOST` 流式复制单个文件，并自动创建虚拟父目录；目标 guest 文件必须尚不存在。`--export /GUEST=HOST` 在 guest 退出后导出文件，创建新的宿主文件，不覆盖已有目标。guest 的 `/` 和当前目录属于私有虚拟命名空间。导入后的修改需要显式导出才能写回宿主。`--trace-syscalls` 将系统调用诊断写入 stderr。
+
+运行交互式 shell：
+
+```sh
+cargo run -p trames-cli --bin trames-run -- --storage target/my-system --install-busybox --pty target/busybox-build/busybox ash -i
+```
+
+`--install-busybox` 将该 ELF 安装为 `/bin/busybox` 并建立选定 applet 的硬链接，可在已有存储中重复运行；更新二进制时一并替换其硬链接，已经打开的旧 inode 仍有效。`--exec-file /GUEST=HOST` 导入可执行文件，供虚拟 `execve` 加载。guest 的 fork/exec 均在运行时内部完成。`--pty` 支持 Ctrl-C、Ctrl-Z、Ctrl-D 和作业控制；当前虚拟窗口默认 24×80。
+
+未指定 `--storage` 时，CLI 使用当前宿主目录下的 `.trames/storage`。文件、目录、权限、时间戳、硬链接和符号链接在重启后恢复；存储目录由一个运行实例独占。新目录默认使用 16 GiB 逻辑文件预算，已有目录保留保存的预算；`--storage-budget 16GiB` 可显式设置，`--storage-budget auto` 则取存储卷总容量。可用容量同时受卷剩余空间快照限制，宿主磁盘不足时会返回错误。`--storage-info` 显示启动时的容量。
+
+16 GiB 是配额，不会预分配同等内存或磁盘。普通文件按需读写；导入导出使用 64 KiB 缓冲区。单进程映射内存仍为 64 MiB。`--memory` 可选择临时内存后端，其文件配额仍为 16 MiB。平台 API 已提供容量报告和文件流接口，供后续 iPad Files 授权与文件协调接入；当前尚未完成原生 iPad UI 或设备验证。详见 [存储架构](../../docs/architecture/storage.md)。
+
+跨两次启动验证持久化：
+
+```sh
+target/debug/trames-run --storage target/my-system --install-busybox target/busybox-build/busybox ash -c 'echo saved >/note'
+target/debug/trames-run --storage target/my-system --install-busybox --export /note=target/note.txt target/busybox-build/busybox ash -c 'cat /note'
+```
+
+默认最多执行 10,000,000 条指令，可使用 `trames-run --max-instructions 1000 ELF [ARG ...]` 调整。运行器传递 guest 退出码；加载失败、CPU 故障或超出预算时返回 125，诊断写入 stderr。guest 也能主动返回 125，调用方应同时查看诊断。
+
+iPad 开发版现支持独立的 Alpine、Debian、可选 systemd 和自定义 ARM64 rootfs，可从 **+ → Linux 环境** 管理；原有 Alpine 数据保留。[配置与使用](../../docs/guides/ipad-environments.md)。
+
+## Alpine 和 apk
+
+~~~sh
+bash scripts/build-busybox.sh
+bash scripts/prepare-alpine.sh
+cargo build --release --workspace --locked
+target/release/trames-run --storage target/alpine --rootfs target/alpine-download/alpine-minirootfs-3.22.6-aarch64.tar.gz --guest --max-instructions 100000000 /bin/sh -c 'cat /etc/alpine-release; apk --version'
+target/release/trames-run --storage target/alpine --guest --max-instructions 100000000 /bin/sh
+python3 tests/integration/m3.py
+~~~
+
+`--rootfs` 只接受固定 SHA-256 的上述 Alpine 归档，用于初始化新存储；后续启动仅使用 `--guest`。动态程序的解释器和共享库来自 guest VFS。符号链接持久化，文件私有 mmap 支持 musl 加载库，TLS 使用真实宿主熵源。`--env KEY=VALUE` 显式设置 guest 环境，适用于代理、CA 和库搜索路径。使用公网仓库还需按宿主策略配置 guest DNS／代理及可信 CA；测试套件通过本机 HTTPS 镜像验证原版 TLS 和 Alpine 签名，不会关闭校验。详见 [动态用户态架构](../../docs/architecture/dynamic-userspace.md) 和 [M3 验证](../../docs/validation/m3.md)。
+
+## 网络
+
+网络支持实际 IPv4/IPv6 TCP 和 UDP。宿主 socket 始终非阻塞，guest 阻塞调用挂起当前虚拟进程；fork/dup 共享连接，最后一个持有者关闭后释放。每会话最多 64 个 socket，单次复制最多 1 MiB，UDP 数据报保持完整或显式报告截断。
+
+CLI 与 iPad LocalSession 默认 `--network full` 原生直连：普通 TCP/UDP 不经过 10.0.0.1 网关，允许宿主 loopback 和 LAN 监听；绑定 `0.0.0.0:PORT` 的 guest 服务可通过宿主地址访问。默认 DNS 是仅处理名称解析的 `169.254.0.53`，接入宿主系统 resolver；该地址也可供容器使用。`off`、`loopback`、`outbound` 可显式收紧权限；所有模式受宿主 OS、网络授权与 App 生命周期约束。端口空间与宿主共享，并不是独占网卡或完整 Linux 网络 namespace。详见[原生直连设计](../../docs/architecture/direct-network.md)；iPad Safari/LAN 与后台行为仍需真机验收。
+
+使用 `--virtual-network 2` 可进入独立 IP 网络：环境 2 的地址为 `10.0.0.2`／`fd00::2`，网关与 DNS 为 `10.0.0.1`／`fd00::1`，`127.0.0.1`／`::1` 只指向该环境。不同环境拥有独立端口空间，可监听私有 80／53 端口。库的共享 `Fabric` API 可同时连接多个环境；CLI 每次创建一个环境。TCP／UDP 经 smoltcp 数据包栈处理，外网流量再由网关桥接原生 socket，TLS 始终由 guest 库处理。无需 TUN／VPN 权限。虚拟模式在缺少 `/etc/resolv.conf` 时写入虚拟 DNS，保留已有配置。
+
+~~~sh
+target/release/trames-run --storage target/alpine --virtual-network 2 --guest --max-instructions 100000000 /bin/sh
+~~~
+
+已验证 IPv4／IPv6 大数据报分片重组、TCP 丢包重传、内部 ICMP echo 和 DNS，以及通过网关的真实 Alpine HTTPS apk 安装。当前上限为每个 Fabric 16 个环境、256 个栈句柄（含 backlog）和 64 个原生网关流，每环境 64 个 guest socket。0.2.0 补上 guest raw ICMP、通过原生 ICMP datagram socket 的真实 echo 转发和只读 NETLINK_ROUTE 查询；实际平台权限仍会返回错误。AF_PACKET、组播、DHCP、网络配置修改和完整 Linux 网络控制接口仍未支持。详细行为和资源策略见 [虚拟网络架构](../../docs/architecture/virtual-network.md) 与 [验证记录](../../docs/validation/virtual-network.md)。
+
+DNS 由真实 musl 读取 guest 的 `/etc/resolv.conf`；可用 `--file /etc/resolv.conf=HOST_FILE` 显式导入。已验证 A/AAAA 查询和 UDP 截断后的 TCP 回退。HTTP/TLS 由 guest 程序自己的库处理，运行时不继承宿主代理凭据。已验证原版 Alpine HTTPS 和 apk 的证书、主机名及包签名校验；网络/core/distro 已通过 iOS 目标编译检查，Apple 已构建 IPA，用户已在 iPad 上通过 Sideloadly 安装并启动 0.1.0；新功能仍待真机验收。详细设计、行为和缺口见 [网络架构](../../docs/architecture/network.md)。
+
+## Guest 内容器（开发中）
+
+原版 Alpine `crun` 已可在 guest 内运行配置范围内的 rootful 容器：独立 PID/mount/UTS、tmpfs 和 devpts、前台终端、cgroupfs、pause/resume/kill、pids 进程数限制，以及多个 Alpine rootfs 并行运行；1/4 CPU 自动验收通过。网络共享当前 guest 的直连网络。使用方法见[容器入门](../../docs/guides/guest-containers.md)，接口和限制见[架构说明](../../docs/architecture/guest-containers.md)。[原版 Docker](../../docs/guides/guest-docker.md)在开发分支采用默认 runc、dockerd 自动管理的 containerd 和 overlay2；不要求 crun、专用配置、GOMAXPROCS 或 nofile 参数。标准运行时的 procfs、socket timeout 和安全 reopen 语义见[默认启动路径](../../docs/architecture/docker-defaults.md)，默认 exec/停止/持久化/重启已通过[独立生命周期验证](../../docs/validation/docker-defaults.md)。开发分支 `feat/guest-docker-workflows` 进一步补齐 IPC/net namespace、默认 Docker bridge/NAT/DNS/端口发布和 [overlayfs/overlay2 写时复制存储](../../docs/architecture/overlayfs.md)，正式 1.0.0 build 26 不包含容器新改动，build 27 测试 IPA 包含上一轮网络/overlay2；本轮默认 runc 修正尚未重新打包。user namespace、完整 CPU/memory/io 配额、rootless 和完整 Docker/Podman 工作流仍待扩展。
+
+## Linux 兼容性更新（0.2.0）
+
+增加运行时生成的 `/proc`、`/sys`、`/dev`：进程、内存、挂载、文件描述符、设备、逻辑接口和数据包统计来自实际 guest 状态。原版 Alpine 的 `ps`、`mount`、`df`、`free`、`top`、`ip a`、`ip route` 和 IPv4／IPv6 `ping` 已纳入执行测试。当前挂载与 PTY 能力已在后续迭代扩展，最新范围见[容器基础](../../docs/architecture/guest-containers.md)与[兼容性清单](../../docs/roadmap/compatibility-current.md)。
+
+guest root、UID/GID、目录权限及持久化所有权修复了安装 Vim 的 88 个目录权限更新错误；0.2.0 曾保留旧格式迁移；按项目所有者要求，0.3.0 只接受当前 v3 格式，提供显式重置。共享内存线程、futex 和 POSIX 定时器支持 musl 的 SIGEV_THREAD，默认配置 Vim 已验证编辑、保存、退出和新会话读取。终端横移修复也合入本次大版本。详细范围与限制见 [Linux 兼容性架构](../../docs/architecture/linux-compat.md) 和 [验证记录](../../docs/validation/linux-compat.md)。
+
+## M5 更新（0.3.0 / build 4）
+
+Historical release notes below describe the original single Bridge device.
+Current environments use shared TOML profiles and capability-scoped
+`/dev/trames/*` devices, including `/dev/trames/clipboard`; see the
+[environment guide](../../docs/guides/ipad-environments.md#toml-configuration).
+
+[下载经验证的 unsigned IPA](https://github.com/kb5000/trames/actions/runs/38145322045/artifacts/11704499330)，解压后用 Windows Sideloadly 签名安装。两种 Linux 后端和七项 iPad 模拟器测试通过；[验证记录](../../docs/validation/m5.md) 包含校验和及验收范围。
+
+首次 Alpine 下载会等待网络授权生效，并对暂时的连接／DNS 错误最多尝试三次；界面在此期间显示正在准备环境。
+
+`/dev/trames-bridge` 和 `trames bridge 'JSON'` 提供版本化异步 RPC。剪贴板、打开网页、设备信息和 Files 复制都要在 iPad 上逐次允许。设置可保存、撤销 Files 目录授权，默认只允许导入；复制限制为单文件 1 GiB，拒绝路径穿越、符号链接和覆盖现有文件。
+
+修复磁盘文件一直占用宿主句柄导致的 `I/O error`：关闭的 guest 文件不再保留宿主文件句柄。新环境默认 16 GiB、131,072 个文件/路径，`/usr` 可写。按所有者选择删除未使用的历史迁移，设置增加“重置 Linux 环境”。真实签名的 `apk add python3`、pycache 修复和实际 Python 执行在低句柄上限下验证。
+
+可选 C++ 后端静态编译，设置开关默认关闭；支持的整数块批量执行，访存/浮点/SIMD/系统调用由 Rust 处理。内置 SHA-256 注册表可显式启用/停用，并记录调用指标。尚无动态原生插件加载。设计、资源边界及验证见 [M5 架构](../../docs/architecture/m5.md) 和 [M5 验证](../../docs/validation/m5.md)。
+
+虚拟 DNS 的 `10.0.0.1` 是网关，guest 本机是 `10.0.0.2`。所有者报告的 iPad DNS 错误仍在验证；实际 Apple DNS/HTTPS 已加入测试。手动修改的 resolver 配置不会在重开时改写。
+
+## CPU 参考实现与加速（0.4.0 / build 5）
+
+补齐大量 AArch64 用户态整数 NEON、S/D/FP16 浮点形式、CRC/LSE/RCpc、AES/SHA、
+DotProd/RDM/I8MM 和 FlagM；新增六组独立 QEMU 差分共 253,038 个状态快照。
+auxv 和 `/proc/cpuinfo` 共用已实现的 CPU 能力，未实现的扩展不公布。
+默认 root 会话改用 `/root`，根磁盘标识为 `vda1`，虚拟网络接口为 `eth0`。
+
+正确性验证后优化取指、单页访存与解码分组；Rust 参考后端仍为默认。
+[0.4.0 历史能力范围](../../docs/roadmap/compatibility-0.4.md)和
+[验证与前后跑分](../../docs/validation/reference-0.4.md)记录具体范围。
+
+[下载 0.4.0/build 5 IPA](https://github.com/kb5000/trames/actions/runs/38162066629/artifacts/11711540648)，
+解压后用 Sideloadly 签名安装。两种 Linux 后端和七项 iPad 模拟器测试通过。
+本轮三组前后对照：参考后端整数吞吐约 1.36×、访存约 2.01×；这是 Linux
+CPU 基准，尚不是 iPad 实测速率。
+
+## 验证
+
+Run the complete local CI before pushing a development checkpoint. On an ARM64
+Ubuntu 24.04 host or VM, install the dependencies, Rust toolchain, components and
+targets declared by `.github/workflows/linux.yml`, plus `python3-yaml` and
+`libclang-rt-18-dev`. Use Ubuntu's supported HWE kernel for the native
+memfd/inotify oracle. Then run:
+
+```sh
+python3 scripts/run-local-ci.py --native-arm64 --resume
+```
+
+The local runner reads all shell steps from the workflow's `runtime` job and
+stores individual logs and source-bound results under `target/local-ci/runtime`.
+`--list` shows the plan. Failed steps run again; passed steps are reused only
+when their recorded source, executable and environment inputs match. Setup steps
+replay environment changes. ARM64 runs use native CLI/musl executables and an
+ARM64 ThreadSanitizer target with LLVM compiler-runtime builtins and an
+instrumented Rust standard library, plus full-precision lavapipe sampling;
+pinned QEMU remains the instruction oracle. A partial `--start`/`--stop` run is
+recorded as incomplete. Hosted CI remains the
+final merge/release check.
+
+On macOS, also run the Apple workflow's native checks, OpenSSH/Wayland peers,
+simulator suite, and unsigned simulator/device builds. The existing
+`scripts/build-ios.sh` verifies cached guest artifacts before linking; unchanged
+verified guest sources need not be rebuilt. For the OpenSSH peer on a local
+account without passwordless sudo, use
+`TRAMES_SSH_TEST_UNPRIVILEGED=1 bash scripts/test-swift-ssh.sh`.
+
+以下 Linux 流程需要 AArch64 交叉 GCC/Binutils 和 QEMU 10.0.13。
+浮点、SIMD、libm 差分使用实际 ARM64 构建，避免把 x86 开发机的原生 NaN/异常差异
+当作 ARM 指令错误；完整包安装和开发工具流程使用开发主机构建。
+
+```sh
+cargo fmt --all --check
+cargo clippy --workspace --all-targets --locked -- -D warnings
+cargo build --workspace --locked
+cargo test --workspace --locked
+bash scripts/build-qemu-oracle.sh
+export PATH="$PWD/target/qemu-oracle/bin:$PATH"
+rustup target add aarch64-unknown-linux-musl --toolchain nightly-2026-10-16
+CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER=aarch64-linux-gnu-gcc \
+  cargo build -p trames-cli --target aarch64-unknown-linux-musl --release --locked
+export TRAMES_RUNNER="$PWD/tests/differential/arm-runner.sh"
+python3 tests/differential/run.py
+python3 tests/differential/m1.py
+python3 tests/differential/floating.py
+python3 tests/differential/vector_floating.py
+python3 tests/differential/structures.py
+python3 tests/differential/pairwise_integer.py
+python3 tests/differential/widening_integer.py
+python3 tests/differential/vector_copy_shift.py
+python3 tests/differential/vector_integer.py
+python3 tests/differential/atomics_crc.py
+python3 tests/differential/half_floating.py
+python3 tests/differential/crypto.py
+python3 tests/differential/modern.py
+bash scripts/build-busybox.sh
+python3 tests/integration/busybox.py
+bash scripts/build-m2-fixtures.sh
+python3 tests/integration/m2.py
+python3 tests/integration/terminal.py
+bash scripts/build-storage-fixtures.sh
+python3 tests/integration/storage.py
+bash scripts/build-network-fixtures.sh
+python3 tests/integration/network.py
+bash scripts/build-virtual-network-fixtures.sh
+bash scripts/build-linux-compat-fixtures.sh
+bash scripts/prepare-alpine.sh
+cargo build --release --workspace --locked
+python3 tests/integration/m3.py
+python3 tests/integration/virtual-network.py
+python3 tests/integration/linux-compat.py
+python3 tests/integration/embedding.py
+TRAMES_RUNNER="$PWD/target/release/trames-run" python3 tests/integration/python.py
+python3 tests/differential/frint_rcpc.py
+python3 tests/differential/coverage_extensions.py
+bash scripts/build-cpu-fixtures.sh
+python3 tests/integration/cpu-signals.py
+cargo build -p trames-cpu --example instruction_probe --release --locked
+python3 scripts/audit-instructions.py
+rustup target add aarch64-apple-ios --toolchain nightly-2026-10-16
+cargo check -p trames-core -p trames-distro --target aarch64-apple-ios --locked
+TRAMES_TEST_STORAGE=disk python3 tests/integration/m2.py
+TRAMES_TEST_STORAGE=disk python3 tests/integration/terminal.py
+```
+
+网络测试的本机 DNS peer 需要绑定宿主 53 端口的权限；没有权限时，可参照 [网络验证](../../docs/validation/network.md) 使用 sudo 运行测试。它不改变宿主 DNS 配置。iOS 目标检查只做编译，不链接 Apple SDK。
+
+差分脚本独立运行同一个静态 ELF，比较 Trames 与 QEMU 的 stdout、stderr 和退出码。六组固定程序检查初始栈、BSS、跨页读写、分支、系统调用错误和二进制输出；64 个确定性生成程序比较八个寄存器及 NZCV 的 72 字节内存快照。另有执行预算、非法指令、代码页写保护检查，以及改名并改变 ELF 内容的验证。
+
+M1 再加入 64 个生成程序，对照位域、扩展寄存器运算、乘除、进位、条件选择及 NZCV；固定程序验证成对访存、符号扩展、SIMD 数据传送、exclusive monitor、匿名内存和文件创建/读写。M2 加入 6,860 个浮点用例、159 个结构访存变体、22 个 shell 场景和两个静态 C 程序。存储阶段增加真实文件 ABI、文件管理 applet、48 个整数 SIMD 快照，以及磁盘后端的完整 M2 重跑。网络基础再加入内存/磁盘两种后端的 36 次网络对照、16 项能力/缓冲区预检/会话清理结果，以及 iOS 目标编译检查。M3 再加入 36 次动态程序／TLS／包管理对照和 72 个 widening SIMD 快照。虚拟网络再加入 27 次对照和协议／隔离测试。上述早期阶段共有 554 次 QEMU 程序/场景比较；0.2.0 再增加 musl 线程/定时器比较、CPU 指令快照、完整运行时端点与默认 Vim 编辑验证。0.2.0 时 Rust 单元/集成测试共 115 项，终端交互仍在两种后端各验证 9 项结果；另验证配额、损坏元数据、提交失败回滚、流式复制、宿主范围及强制结束后的恢复。详见 [存储验证](../../docs/validation/storage.md) 和 [网络验证](../../docs/validation/network.md)。
+
+可通过 `AARCH64_AS`、`AARCH64_LD`、`QEMU_AARCH64` 覆盖工具路径，BusyBox 构建另支持 `AARCH64_CC`、`AARCH64_AR`、`AARCH64_RANLIB`；`--runner` 选择运行器，`--seeds` 调整生成程序数量。QEMU 是独立参考，测试通过只证明已测行为。
+
+## M6 开发工具与系统调用（0.5.0 / build 6）
+
+[下载经验证的 0.5.0/build 6 unsigned IPA](https://github.com/kb5000/trames/actions/runs/38170280417/artifacts/11713803470)，
+解压后用 Windows Sideloadly 签名更新。两种 Linux 后端的完整 CI 与七项 iPad 模拟器测试通过；
+包内校验和、设备平台和应用标识已核验，具体记录见下方验证文档。
+
+补齐 epoll/eventfd/timerfd、Unix socketpair、POSIX 文件锁、命名 FIFO 和管道非阻塞设置。
+修复 `adduser` 的 passwd 锁、`su` 后执行程序时身份被重置，以及 `htop` 所需的 `/proc/stat` btime。
+Git 的目录创建也按 Linux 的尾部斜杠语义修正。
+
+验证流程覆盖真实 Alpine Git 提交/合并/克隆、GCC/Clang 编译链接执行、Make 并行构建、
+CMake/CTest，以及 Python asyncio/线程/SQLite/venv。Clang 包的命令为 `clang-19`。
+每进程映射额度为 512 MiB，所有地址空间合计 1 GiB，以容纳 LLVM 和编译子进程。
+[能力与剩余缺口](../../docs/roadmap/compatibility-m6.md) · [验证记录](../../docs/validation/m6.md)。
+
+## 非 JIT 提速（0.7.0 / build 8）
+
+[下载经验证的 0.7.0/build 8 unsigned IPA](https://github.com/kb5000/trames/actions/runs/38205290951/artifacts/11727840985)，
+解压后用相同 Apple ID／有效 bundle ID 的 Windows Sideloadly 覆盖安装，保留当前 Linux 数据。
+默认使用 Rust 缓存解释器，无需启用 JIT；若此前打开了试验性 C++ 开关，关闭它后重新打开本地终端。
+三个 Linux 后端的完整 CI 与七项 iPad 模拟器测试通过；安装包已与实际设备构建逐文件核验。
+
+相对 0.6.0 的缓存后端，在相同磁盘数据上交错测量三组，默认 Vim 启动从 1.94 秒降至 1.78 秒，
+GCC 编译链接运行约快 3%；Python 标准库／SQLite／JSON／hash 工作负载无明显变化。
+这些是 Linux 主机的中位数，iPad 速度仍需真机测量。Vim 保留正常配置与插件，未使用最小启动参数。
+[上一轮 0.5→0.6 的较大提速](../../docs/validation/nonjit-0.6.md)保留为独立批次。
+
+本轮加入代码页的两路缓存、逐页失效校验和比较／跳转合并，并补齐 FRINT32/64 浮点取整、
+LDAPUR/STLUR 等带偏移的 acquire/release 访存。单步参考实现继续用于对照；14 组 QEMU 差分、
+自修改代码、共享内存、权限变化、跨页故障及精确指令预算验证通过。
+显式尾调用已做 Clang/iOS arm64 原型；合成测试较慢，因此默认后端继续使用 Rust 循环分派。
+[设计](../../docs/architecture/nonjit.md) · [尾调用研究](../../docs/architecture/tail-dispatch.md) · [性能与发布验证](../../docs/validation/nonjit-0.7.md)。
+
+## 指令扩展与原生运算（0.8.0 / build 9）
+
+[下载已核验的 0.8.0/build 9 unsigned IPA](https://github.com/kb5000/trames/actions/runs/38236217045/artifacts/11741258008)，
+解压后使用相同 Apple ID／有效 bundle ID 的 Windows Sideloadly 覆盖安装，保留 Linux 数据。
+
+0.8.0/build 9 开始，源码已统一为一个 Rust 缓存解释器，移除 C++ 与尾调用原型。
+浮点、SIMD 和密码运算优先执行静态 ARM64 原生指令，仍无需 JIT。
+本轮增加 CSSC、BF16、复数与扩展乘加、SHA512/SHA3/SM3/SM4、MOPS 和更多访存指令；
+PAC/BTI/MTE 按功能兼容策略处理，实际跳转、访存、写回和清零仍执行。
+CPU 故障可交给 Linux 信号处理器恢复。完整 Linux CI 与七项 iPad 模拟器测试通过；
+IPA 已核验 ARM64 设备目标、版本、执行权限及全部 36 个文件。真机速度仍需实际测量。
+[指令范围与验证](../../docs/validation/instruction-coverage.md) · [当前编码清单](../../docs/validation/instruction-coverage-current.csv) ·
+[当前 CPU/Linux 剩余缺口](../../docs/roadmap/compatibility-current.md) ·
+[系统调用清单](../../docs/validation/compatibility-current-syscalls.csv)。
+
+## 文件接口、共享映射与系统日志（0.9.0 / build 10）
+
+补充 statx、preadv/pwritev、close_range（含 CLOEXEC/UNSHARE）及 syslog。
+`dmesg` 可查看未实现系统调用的名称/编号、参数和 PC，以及 CPU 故障的指令编码。
+`/dev/kmsg` 提供共享、有界的会话日志与独立读取游标；日志不写入磁盘，有限流。
+进一步补齐共享文件/匿名 mmap、EOF/truncate SIGBUS、msync/mremap/mincore/madvise、
+memfd 与 classic seals、文件复制/批量 I/O，以及单 CPU 的调度/亲和性接口。
+目前已实现子集增至 161 个，未实现降至 155 个，另有 2 个废弃条目。
+[下载已核验的 0.9.0/build 10 unsigned IPA](https://github.com/kb5000/trames/actions/runs/38251377309/artifacts/11749317346)。完整 Linux / Apple CI 与七项 iPad 模拟器测试通过。
+解压后用 Windows Sideloadly 签名。磁盘格式和 bundle ID 保持稳定，
+继续使用相同 Sideloadly Apple ID／有效 bundle ID 覆盖安装。
+[发布记录](../../docs/validation/release-0.9.md)。
+[系统日志](../../docs/validation/compatibility-log.md) · [共享映射与 ABI 验证](../../docs/validation/mmap-coverage.md)。
+
+后续开发：[NativeCall v1 纯函数加速](../../docs/architecture/accelerator-v1.md) 已打通 guest ELF 桩库和应用内置原生后端，
+覆盖 `memcpy`、`memmove`、`memset`、`memcmp`、`strlen`，默认关闭；CLI 用 `--accelerator pure` 显式启用。
+直接复用固定版本的 musl / Arm 原始实现，保留 GPL 与上游许可记录。
+[完整 Accelerator RFC](../../docs/architecture/accelerator.md) 的有状态 libc、GPU/video/ML 仍在后续计划中。
+当前 0.9.0 安装包早于这批开发代码，后续合并发布再提供新 IPA。
+
+## 结构与范围
+
+| crate | 当前职责 |
+| --- | --- |
+| `trames-memory` | 4 KiB 稀疏页面、fork 写时复制、内存上限、R/W/X 及映射保护 |
+| `trames-elf` | ELF64/AArch64 ET_EXEC/ET_DYN、PT_INTERP、PT_LOAD、BSS 和加载偏移校验 |
+| `trames-cpu` | 整数/访存/原子操作、标量与 SIMD 浮点、FPCR/FPSR、TLS/NZCV |
+| `trames-compute` | 数值输入的静态 ARM64 原生运算、可选特性检测、宿主浮点状态恢复 |
+| `trames-linux` | 有状态文件描述符、读写/目录/stat、私有/共享文件与匿名 mmap/brk、flock/getrandom、负 errno、字节流 |
+| `trames-net` | 有界非阻塞 TCP/UDP、网络能力、宿主错误翻译和就绪等待 |
+| `trames-vfs` | 共享虚拟命名空间、磁盘/内存文件、配额与容量、打开描述与管道 |
+| `trames-core` | ELF/初始栈、进程调度、exec/wait、信号帧、虚拟 PTY |
+| `trames-distro` | 固定 SHA-256 Alpine/Debian、共享 rootfs 导入和 systemd 准备 |
+| `trames-cli` | `trames-run`，宿主字节流输出和退出码 |
+
+尚不支持重叠 PT_LOAD 页面、完整 AArch64、SVE、备用信号栈、多个 PTY、非零 VTIME、完整需求分页/回收与所有映射扩展。线程、vfork 和 futex 已有选定实现；其余 Linux 缺口见[当前清单](../../docs/roadmap/compatibility-current.md)。未实现的指令明确报告故障，未知系统调用返回 `-ENOSYS`。安全限制及其兼容性影响见 [security](../../docs/security/README.md)。
+
+[工程章程](../../docs/charter.md) · [存储架构](../../docs/architecture/storage.md) · [路线图](../../docs/roadmap/README.md) · [存储验证](../../docs/validation/storage.md) · [BusyBox 构建](../../docs/testing/busybox.md)
+
+## 许可证
+
+Copyright (C) 2026 Trames contributors. 本项目使用 **GNU GPL version 3 or later**（`GPL-3.0-or-later`），完整文本见 [LICENSE](../../LICENSE)。引入 GPL、LGPL、AGPL 或其他依赖时需分别核对许可证和组合方式；网络使用 socket2/nix 的安全接口，依赖许可记录见 [dependencies](../../docs/security/dependencies.md)。GNU Binutils、Rust 和 QEMU 为开发工具，不随运行器链接发布。
+
+The iPad frontend is in [apps/ios](../../apps/ios/README.md), with build scripts and a
+[device acceptance record](../../docs/validation/m4.md). M4 is not accepted until an
+ordinary developer-signed physical iPad run is validated.
+
+0.11.0/build 12 汇总完整标准路径 musl 的 17 个纯函数、整数/浮点解析、
+可嵌套比较器的排序调用、直接 guest 页访问与解释器访存优化。新增真实 Node.js/npm
+兼容测试，并补齐地址预留、进程参数排布、信号与标准流行为；仍使用单一缓存解释器，无宿主 JIT。
+iPad 启动时原子更新随包的标准 libc，保留 Linux 用户数据。
+[0.11.0 安装包与发布记录](../../docs/validation/release-0.11.md) ·
+[Node.js 和内存验证](../../docs/validation/nodejs-memory.md) · [完整 musl 架构](../../docs/architecture/musl-hybrid.md)。
+
+0.12.0/build 13 将[宿主多核执行](../../docs/architecture/multicore.md)打包为一次更新，
+默认按宿主可用逻辑 CPU 数运行，补齐并行原子/屏障、共享 futex 与绑核公平性。
+[0.12.0 安装包、源码与 CI 核验](../../docs/validation/release-0.12.md)。
