@@ -121,8 +121,11 @@ VMAs retaining them participate in read-only and mapping admission. Mapped
 overlay backing layers retain their original providers and mount identities.
 Unsupported filesystems and options such as overlay index/metacopy enabled
 retain explicit rejection boundaries; this does not establish every modern mount
-operation. The measured read/pipe gap and metadata variation remain performance
-follow-ups rather than closed acceptance claims.
+operation. The agreed modern-mount scope and its measured read/pipe/metadata
+follow-ups are now closed: four paired blocks against the pre-mount FUSE
+release improve all four target metrics in every block. Raw timings, CPU-control
+variation and mixed write/sync blocks remain documented in the
+[closeout](../../runtime/docs/validation/modern-mount-closeout-20261126.md).
 
 ## 3. Android memory lifecycle
 

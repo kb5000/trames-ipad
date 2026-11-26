@@ -1,6 +1,8 @@
 # 临时实施清单：兼容性迭代后的剩余工作
 
-当前现代挂载第二批检查点（2026-11-26）：映射 lower／upper overlay 的身份与 copy-up、ACL／capability、硬链接及真实 provider 生命周期，overlay／devpts／mqueue／cgroup2 现代 context，以及真正 O_TMPFILE 已实现并集中验证。两宿主 1700／1708 通过；两执行器同 ELF 342＋234 项及四种实际 OCI 通过，最终两侧 FUSE 各 39 项通过。原版 gVisor 941 身份为 931 通过／10 原始跳过，覆盖全部 926 个原生通过项。固定四配对块相对上一版读取／管道基本持平，写入＋同步 −0.68%、同步 −0.91%；metadata +2.87%，配对块有升有降。功能修复按 main 配对交付；引用计数整理尚未证明消除了先前读取／管道差距，03 的性能后续继续保留。详见[第二批记录](../../runtime/docs/validation/modern-mount-overlay-20261126.md)。以下历史检查点保留其当时状态。
+当前检查点（2026-11-26）：03 现代挂载按约定功能、工具及遗留性能范围收尾。共享挂载快速标记启用默认路径，区域掩码与小型访问辅助内联，保留所有原权限／范围检查与同步，不新增协调线程。最终两宿主 1942／1952 通过、各 5 原有忽略；原版 gVisor 941 身份为 931 通过／10 跳过，覆盖全部 926 个原生通过项；两执行器同 ELF 342＋234、四种 OCI 及各 39 项 FUSE 通过。四配对块直接对照原 FUSE 基线：metadata −31.03%、两种读取 −14.41%／−14.95%、管道 −14.01%，各块方向一致；写入＋同步 −1.28%、同步 −0.48%，块间波动公开保留。详见[收尾验证](../../runtime/docs/validation/modern-mount-closeout-20261126.md)。下一领域为 04 cgroup，未支持的 filesystem 参数不泛化为已支持。
+
+现代挂载第二批历史检查点（2026-11-26）：映射 lower／upper overlay 的身份与 copy-up、ACL／capability、硬链接及真实 provider 生命周期，overlay／devpts／mqueue／cgroup2 现代 context，以及真正 O_TMPFILE 已实现并集中验证。两宿主 1700／1708 通过；两执行器同 ELF 342＋234 项及四种实际 OCI 通过，最终两侧 FUSE 各 39 项通过。原版 gVisor 941 身份为 931 通过／10 原始跳过，覆盖全部 926 个原生通过项。固定四配对块相对上一版读取／管道基本持平，写入＋同步 −0.68%、同步 −0.91%；metadata +2.87%，配对块有升有降。功能修复按 main 配对交付；引用计数整理尚未证明消除了先前读取／管道差距，03 的性能后续继续保留。详见[第二批记录](../../runtime/docs/validation/modern-mount-overlay-20261126.md)。以下历史检查点保留其当时状态。
 
 当前 FUSE 收尾检查点（2026-11-26）：Unix pathname socket、报文／io_uring 原调用续执行、终态错误和原 inode／mount 生命周期已补齐；追加消除路径比较的临时分配。Apple／Linux 按范围合并为 1683／1691 通过、各 2 忽略；最终解释器与签名 Mac HVF 的原版 libfuse 各九组、各 117 项检查通过。最终原版 gVisor 按明确模式合并为 883 身份、867 通过／16 跳过，全部 864 个原生通过项对齐，保留前后产物原始失败和模式依据。最终 26 次长样本全部有效：1／2／4 CPU 元数据相对旧基线分别 −5.28%／−15.45%／−8.69%，其余普通负载最大 +0.65%，写入＋同步最大 +0.95%。实现与所选性能门槛已收尾，按 main 配对交付（Runtime `7d4a9711`）；所有者随后接受模拟器调试并取消真机阻塞，02 按现有解释器／HVF 证据收尾；当前进入 03 现代挂载。详见[本轮收尾记录](../../runtime/docs/validation/fuse-closeout-20261126.md)。下列历史检查点保留各自输入和结果。
 
@@ -20,16 +22,16 @@
 
 日期：2026-11-23；当前状态核对：2026-11-26。用途：作为后续实现、定位和验收的工作队列；完成一项后在本页更新状态并链接验证记录。这里保留待办和完成标准，具体设计在对应批次开始时结合源码和目标负载确定。
 
-当前共 12 项：01、02 已完成；09 的共享实现和本地行为验证已完成，仍需实际产品／真机交付验收；03—08、10—12 仍有实现、工具验收或测量工作。已合入实现及其通过证据不能自动关闭整项。
+当前共 12 项：01、02、03 已按约定范围完成；09 的共享实现和本地行为验证已完成，仍需实际产品／真机交付验收；04—08、10—12 仍有实现、工具验收或测量工作。已合入实现及其通过证据不能自动关闭其他整项。
 
 ## 当前剩余工作摘要
 
-已发布 Runtime 修复基线 `42e5834` 的 Linux／macOS CI 及 Mac 产品 `2a99558` 构建已通过。原 iPad 的 Ubuntu→iOS 检查阻塞已完成本地修复：Apple 原生检查迁到独立 macOS workflow，旧 release-core 同类路径一并纠正，FFI 内存查询改用 iOS／macOS 公共 Mach API；真实 iPhoneOS SDK 编译、25 项 FFI、15 项 CI 范围检查及严格 Clippy 通过。远端专项 CI 随发布确认，见[交付修复记录](../validation/ios-embedding-host-20261124.md)。下一领域为 FUSE。
+已发布 Runtime 修复基线 `42e5834` 的 Linux／macOS CI 及 Mac 产品 `2a99558` 构建已通过。原 iPad 的 Ubuntu→iOS 检查阻塞已完成本地修复：Apple 原生检查迁到独立 macOS workflow，旧 release-core 同类路径一并纠正，FFI 内存查询改用 iOS／macOS 公共 Mach API；真实 iPhoneOS SDK 编译、25 项 FFI、15 项 CI 范围检查及严格 Clippy 通过。远端专项 CI 随发布确认，见[交付修复记录](../validation/ios-embedding-host-20261124.md)。该历史交付阻塞已解除；当前按顺序进入 04 cgroup。
 
 | 项目 | 已有实现／证据 | 仍需迭代 |
 | --- | --- | --- |
 | 02 FUSE | 实现、两宿主检查、解释器／HVF 原版工具及长样本性能已完成并配对交付；所有者 2026-11-26 接受模拟器调试、取消真机阻塞 | 本轮关闭；未运行的物理设备测试不记作通过 |
-| 03 现代挂载 | 映射层 overlay copy-up／ACL／capability／真实 provider、四种现代 context、O_TMPFILE 已补齐；两执行器同 ELF 与四种实际 OCI 通过 | 功能按范围配对交付；读取／管道差距和 metadata +2.87% 波动仍需定位；未实现 filesystem／index／metacopy 参数保留明确支持边界 |
+| 03 现代挂载 | 映射层 overlay、四种现代 context、O_TMPFILE、原 OFD／provider 及 OCI 均验证；最终四配对块对照原 FUSE 基线，metadata／读取／管道每块均改善 | 本轮按约定范围关闭；原始块间波动与未支持 filesystem／index／metacopy 参数边界保留 |
 | 04 cgroup | 映射 cache／别名及匿名 fork COW 的物理页归属、计费和写准入已有实现及回归 | 非 mmap 文件 IO 的 cache 计费、物理回收及 dirty／pinned 页、native extent 动态计费，真正的 IO controller 和压力验收 |
 | 05 Android 内存 | 已确认仓库镜像的 API 33／arm64-v8a 声明；既有 cgroup 基础可复用 | 确认 ART collector／lmkd reaper 实际路径，实施 userfaultfd／process_mrelease，验证 GC 尾延迟及退出回收 |
 | 06 调试工具 | ptrace／proc memory 原版用例闭环；GDB 启动、软件断点、单步及寄存器修改已有证据 | live attach、多线程、gdbserver、strace -f、拒绝访问及异常退出会话；硬件断点／观察点、SVE／SME 单独列支持范围 |
@@ -166,9 +168,10 @@
 
 ### 03 — 现代挂载剩余语义与 OCI 验收
 
-- [ ] 状态：两批计划功能实现及工具验收已完成；读取／管道差距和 metadata 波动仍需性能定位，未将整项按全部 Linux 语义或零性能回退关闭。调试使用解释器／模拟器，两宿主编译检查通过。
+- [x] 状态：约定的现代挂载功能、工具验收及遗留性能范围已收尾。调试使用解释器／模拟器，两宿主和产品构建通过；不泛化为全部 Linux filesystem 参数或每次运行零波动。
 - 本批已实现不可变挂载映射与资源导入、UID／GID／ACL／file capability 视图、创建／SGID、原 OFD 的快速 fstat、合法重配置及别名状态；普通写 OFD／私有 VMA 的真实最后引用参与 writer 准入。原版 runc 1.3.0 的 recursive、idmap 与 recursive-idmap 三种实际启动已在解释器／HVF 通过。详见[本批验证](../../runtime/docs/validation/modern-mounts-20261126.md)。
 - 第二批已补齐映射 lower／upper backing layer 的独立身份视图与 copy-up、ACL／capability、硬链接、原 FD／VMA／底层 writer 生命周期和失败回滚；四种现代 fsopen context 与 O_TMPFILE 已验证。原版 gVisor 941 个身份覆盖全部 926 个原生通过项，Linux 差异用原模式明确记录。详见[第二批验证](../../runtime/docs/validation/modern-mount-overlay-20261126.md)。未支持的 filesystem／index=on／metacopy=on 等选项继续明确拒绝，不泛化为全部 Linux 参数支持。
+- 第三批统一默认配置的共享挂载快速路径，内联采样热点的原区域计算，完成四配对块直接对照：metadata −31.03%、两种读取 −14.41%／−14.95%、管道 −14.01%，四项每块均改善；写入＋同步及同步总体未退化，混合块结果保留。最终两宿主 1942／1952、两执行器同 ELF／OCI／FUSE 和 941 项原版选集通过，见[收尾记录](../../runtime/docs/validation/modern-mount-closeout-20261126.md)。
 - `mount_setattr` 的已验证递归属性修改，以及 `statmount`／`listmount`／原版 findmnt 查询，不再按未实现项处理。
 - 完成标准：挂载局部 UID／GID 映射贯穿权限、所有权查询和创建；检查 namespace 权限、共享／私有存储及失败回滚。重配置正确影响同一文件系统的别名，并保持各挂载属性独立。用实际 runc／OCI 配置验收对应启动路径。
 - 依据：[挂载属性](../../runtime/docs/validation/guest-mount-setattr-20261123.md)、[挂载查询](../../runtime/docs/validation/guest-mount-query-20261123.md)、[路线图](syscall-implementation.md#2-modern-mount-administration)。
