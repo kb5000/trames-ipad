@@ -107,16 +107,18 @@ GDB smoke runs. The six PIDFD_THREAD cases remain in the queue above.
 | Caller and operation | Syscalls and acceptance |
 | --- | --- |
 | util-linux 2.41.5 `mount -o rbind,ro=recursive,noexec=recursive` | **Verified.** The original tool calls `open_tree`, `mount_setattr(AT_EMPTY_PATH\|AT_RECURSIVE)` and `move_mount`. Both target levels reject writes and report the new VFS flags. The source stays writable. [Validation](../../runtime/docs/validation/guest-mount-setattr-20261123.md) |
-| runc recursive mount options | The runc 1.3.0 source uses `mount_setattr(AT_RECURSIVE)` through an opened target's proc FD. The shared fixture exercises that path. Acceptance for the full OCI startup with these options is pending. [runc source](https://github.com/opencontainers/runc/blob/v1.3.0/libcontainer/rootfs_linux.go#L1231) |
-| OCI ID-mapped bind mounts | `mount_setattr(MOUNT_ATTR_IDMAP)` needs mount-local UID/GID translation through permission checks, ownership queries and creation. Verify mapped and unmapped IDs, namespace authority and private/shared storage. [OCI mount configuration](https://github.com/opencontainers/runtime-spec/blob/main/config.md) |
-| util-linux filesystem reconfiguration | `fspick` selects the original superblock for `fsconfig(FSCONFIG_CMD_RECONFIGURE)`. Verify that changes reach bind aliases and that an individual mount's attributes remain independent. [libmount source](https://github.com/util-linux/util-linux/blob/v2.41.5/libmount/src/hook_mount.c) |
+| runc recursive mount options | **Verified on the interpreter and Mac HVF.** Stock runc 1.3.0 boots the recursive read-only/noexec/nosuid OCI fixture. [Validation](../../runtime/docs/validation/modern-mounts-20261126.md) |
+| OCI ID-mapped bind mounts | **Verified for the supported filesystem scope.** Immutable mount-local IDs reach ownership, DAC/ACL, creation, metadata, file capabilities and original OFDs. Stock runc boots idmap and recursive-idmap OCI inputs on both executors. Shifted overlay backing layers remain unsupported. [Validation](../../runtime/docs/validation/modern-mounts-20261126.md) |
+| util-linux filesystem reconfiguration | `fspick` selects the original filesystem for `fsconfig(FSCONFIG_CMD_RECONFIGURE)`. Same-ELF native/interpreter/HVF checks cover ramfs, proc and sysfs aliases, retained FDs, local read-only flags and root-storage isolation; tmpfs/debugfs/devpts/cgroup use their supported parameter paths. [Validation](../../runtime/docs/validation/modern-mounts-20261126.md) |
 | util-linux 2.41.5 `findmnt --kernel=listmount` | **Verified.** `listmount` provides forward and reverse pagination and `statmount` describes each mount. `statx(STATX_MNT_ID_UNIQUE)` returns the same unique ID. The original tool agrees with `mountinfo` on the tested mount tree and selects mounts by unique ID. [Validation](../../runtime/docs/validation/guest-mount-query-20261123.md) |
 
 `mount_setattr` supports read-only, nosuid, nodev, noexec and atime flags on
-attached and detached trees. ID mapping, propagation changes through this
-syscall and nosymfollow remain pending. The original mount and mount-FD
-suites are carried into validation for this batch. The two overlay mount-FD
-skips remain in the gVisor queue.
+attached and detached trees, including nosymfollow and propagation changes.
+ID mapping is supported on detached Root/tmpfs/overlay mounts with one-time
+publication and writer/namespace checks. Ordinary writable OFDs and private
+VMAs retaining them participate in read-only and mapping admission. Unsupported
+filesystem and overlay backing-layer cases retain explicit rejection boundaries;
+this does not establish every modern mount operation.
 
 ## 3. Android memory lifecycle
 
