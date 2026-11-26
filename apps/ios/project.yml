@@ -39,6 +39,7 @@ targets:
       - name: Validate guest graphics resources
         script: |
           cd "$SRCROOT/../.."
+          python3 scripts/prepare-third-party-notices.py --check
           python3 scripts/check-ios-guest.py --video-dir apps/ios/Trames/GuestVideo --bionic-dir apps/ios/Trames/GuestBionic --glibc-dir apps/ios/Trames/GuestGlibc --rust-dir "${TRAMES_RUST_LIB_DIR:-$PWD/target/ios-link/$TRAMES_RUST_TARGET}"
         basedOnDependencyAnalysis: false
     sources:

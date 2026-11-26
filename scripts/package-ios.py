@@ -67,6 +67,10 @@ def package(app: Path, output: Path) -> None:
         header = (extension / executable).read_bytes()[:32]
         if len(header) != 32 or struct.unpack_from("<2I", header) != (0xFEEDFACF, 0x0100000C):
             raise ValueError("Expected an arm64 extension executable")
+    expected_notices = Path(__file__).resolve().parents[1] / 'THIRD_PARTY_NOTICES.txt'
+    bundled_notices = app / 'Rust-dependencies-NOTICES.txt'
+    if not bundled_notices.is_file() or bundled_notices.read_bytes() != expected_notices.read_bytes():
+        raise ValueError('App Rust notices are missing or stale; rebuild before packaging')
     if output.suffix != ".ipa":
         raise ValueError("Output must use the .ipa extension")
     if output.resolve().is_relative_to(app.resolve()):

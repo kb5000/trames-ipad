@@ -1,207 +1,275 @@
-# Network dependency license record
+# Third-party dependencies — Trames iPad
 
-The direct native-network dependencies are pinned; Cargo.lock fixes transitive
-versions and registry checksums. Reviewed package manifest license declarations:
+Reviewed on 2026-11-26. Third-party components keep their own copyright and
+license terms. The project's GPL-3.0-or-later license does not replace them.
 
-| Crate | Locked version | Declared license |
+The complete Rust license texts and copyright notices are collected in
+[THIRD_PARTY_NOTICES.txt](../../THIRD_PARTY_NOTICES.txt). The reviewed source
+origins, package checksums and selected license branches are recorded in
+[third-party/licenses.json](../../third-party/licenses.json). `OR` selects an
+available branch; `AND` retains every applicable additional term, including the
+BSD notice in `encoding_rs` and the Unicode notice in `unicode-ident`.
+
+<!-- BEGIN GENERATED RUST DEPENDENCIES -->
+
+## Rust dependencies
+
+Generated from the committed lockfiles. This is the complete locked closure,
+including optional, build, test and other-target packages; it is not a claim
+that every entry is linked into each product. Project-owned packages are excluded.
+
+| Package | Version | Declared license | Selected license | Scope |
+| --- | --- | --- | --- | --- |
+| adler2 | 2.0.1 | 0BSD OR MIT OR Apache-2.0 | MIT | Main |
+| ahash | 0.8.12 | MIT OR Apache-2.0 | MIT | Main |
+| ash | 0.38.0+1.3.281 | MIT OR Apache-2.0 | MIT | Main |
+| bitflags | 1.3.2 | MIT/Apache-2.0 | MIT | Main |
+| bitflags | 2.13.2 | MIT OR Apache-2.0 | MIT | Main |
+| block-buffer | 0.10.4 | MIT OR Apache-2.0 | MIT | Main |
+| bumpalo | 3.20.3 | MIT OR Apache-2.0 | MIT | Main |
+| byteorder | 1.5.0 | Unlicense OR MIT | MIT | Main |
+| cc | 1.8.0 | MIT OR Apache-2.0 | MIT | Main |
+| cfg-if | 1.0.5 | MIT OR Apache-2.0 | MIT | Main |
+| cfg_aliases | 0.2.2 | MIT | MIT | Main |
+| const-random | 0.1.18 | MIT OR Apache-2.0 | MIT | Main |
+| const-random-macro | 0.1.16 | MIT OR Apache-2.0 | MIT | Main |
+| constant_time_eq | 0.6.1 | CC0-1.0 OR MIT-0 OR Apache-2.0 | MIT | Main |
+| core_detect | 1.0.0 | MIT/Apache-2.0 | MIT | Main |
+| cpufeatures | 0.2.17 | MIT OR Apache-2.0 | MIT | Main |
+| crc | 3.4.0 | MIT OR Apache-2.0 | MIT | Main |
+| crc-catalog | 2.5.0 | MIT OR Apache-2.0 | MIT | Main |
+| crc32fast | 1.5.2 | MIT OR Apache-2.0 | MIT | Main |
+| crunchy | 0.2.4 | MIT | MIT | Main |
+| crypto-common | 0.1.7 | MIT OR Apache-2.0 | MIT | Main |
+| defmt | 0.3.100 | MIT OR Apache-2.0 | MIT | Main |
+| defmt | 1.1.1 | MIT OR Apache-2.0 | MIT | Main |
+| defmt-macros | 1.1.1 | MIT OR Apache-2.0 | MIT | Main |
+| defmt-parser | 1.0.0 | MIT OR Apache-2.0 | MIT | Main |
+| digest | 0.10.7 | MIT OR Apache-2.0 | MIT | Main |
+| downcast-rs | 1.2.1 | MIT/Apache-2.0 | MIT | Main |
+| encoding_rs | 0.8.42 | (Apache-2.0 OR MIT) AND BSD-3-Clause | MIT AND BSD-3-Clause | Main |
+| equivalent | 1.0.3 | Apache-2.0 OR MIT | MIT | Main |
+| errno | 0.3.14 | MIT OR Apache-2.0 | MIT | Main |
+| ext4-view | 1.0.0 | MIT OR Apache-2.0 | MIT | Main |
+| filetime | 0.2.29 | MIT/Apache-2.0 | MIT | Main |
+| find-msvc-tools | 0.1.14 | MIT OR Apache-2.0 | MIT | Main |
+| flate2 | 1.1.10 | MIT OR Apache-2.0 | MIT | Main |
+| generic-array | 0.14.7 | MIT | MIT | Main |
+| gethostname | 1.1.0 | Apache-2.0 | Apache-2.0 | Main |
+| getrandom | 0.2.17 | MIT OR Apache-2.0 | MIT | Main |
+| getrandom | 0.3.4 | MIT OR Apache-2.0 | MIT | Main |
+| getrandom | 0.4.3 | MIT OR Apache-2.0 | MIT | Main |
+| hash32 | 0.3.1 | MIT OR Apache-2.0 | MIT | Main |
+| hashbrown | 0.16.1 | MIT OR Apache-2.0 | MIT | Main |
+| hashbrown | 0.17.1 | MIT OR Apache-2.0 | MIT | Main |
+| heapless | 0.8.0 | MIT OR Apache-2.0 | MIT | Main |
+| indexmap | 2.14.2 | Apache-2.0 OR MIT | MIT | Main |
+| itoa | 1.0.18 | MIT OR Apache-2.0 | MIT | Main |
+| js-sys | 0.3.107 | MIT OR Apache-2.0 | MIT | Main |
+| libc | 0.2.190 | MIT OR Apache-2.0 | MIT | Main |
+| libloading | 0.8.9 | ISC | ISC | Main |
+| linux-raw-sys | 0.12.1 | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | MIT | Main |
+| lock_api | 0.4.14 | MIT OR Apache-2.0 | MIT | Main |
+| log | 0.4.34 | MIT OR Apache-2.0 | MIT | Main |
+| managed | 0.8.0 | 0BSD | 0BSD | Main |
+| memchr | 2.8.3 | Unlicense OR MIT | MIT | Main |
+| miniz_oxide | 0.9.1 | MIT OR Zlib OR Apache-2.0 | MIT | Main |
+| multiversion_no_op | 1.0.0 | Apache-2.0 OR MIT | MIT | Main |
+| nix | 0.31.3 | MIT | MIT | Main |
+| once_cell | 1.21.4 | MIT OR Apache-2.0 | MIT | Main |
+| parking_lot | 0.12.5 | MIT OR Apache-2.0 | MIT | Main |
+| parking_lot_core | 0.9.12 | MIT OR Apache-2.0 | MIT | Main |
+| pkg-config | 0.3.34 | MIT OR Apache-2.0 | MIT | Main |
+| proc-macro2 | 1.0.107 | MIT OR Apache-2.0 | MIT | Main |
+| quick-xml | 0.41.0 | MIT | MIT | Main |
+| quote | 1.0.47 | MIT OR Apache-2.0 | MIT | Main |
+| r-efi | 5.3.0 | MIT OR Apache-2.0 OR LGPL-2.1-or-later | MIT | Main |
+| r-efi | 6.0.0 | MIT OR Apache-2.0 OR LGPL-2.1-or-later | MIT | Main |
+| redox_syscall | 0.5.18 | MIT | MIT | Main |
+| rustix | 1.1.5 | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | MIT | Main |
+| rustversion | 1.0.23 | MIT OR Apache-2.0 | MIT | Main |
+| scopeguard | 1.2.0 | MIT OR Apache-2.0 | MIT | Main |
+| serde | 1.0.229 | MIT OR Apache-2.0 | MIT | Main |
+| serde_core | 1.0.229 | MIT OR Apache-2.0 | MIT | Main |
+| serde_derive | 1.0.229 | MIT OR Apache-2.0 | MIT | Main |
+| serde_json | 1.0.151 | MIT OR Apache-2.0 | MIT | Main |
+| serde_spanned | 1.1.3 | MIT OR Apache-2.0 | MIT | Main |
+| sha2 | 0.10.9 | MIT OR Apache-2.0 | MIT | Main |
+| shlex | 2.0.1 | MIT OR Apache-2.0 | MIT | Main |
+| simd-adler32 | 0.3.10 | MIT | MIT | Main |
+| simdutf8 | 0.1.5 | MIT OR Apache-2.0 | MIT | Main |
+| smallvec | 1.16.3 | MIT OR Apache-2.0 | MIT | Main |
+| smoltcp | 0.12.0 | 0BSD | 0BSD | Main |
+| socket2 | 0.6.1 | MIT OR Apache-2.0 | MIT | Main |
+| stable_deref_trait | 1.2.1 | MIT OR Apache-2.0 | MIT | Main |
+| syn | 2.0.119 | MIT OR Apache-2.0 | MIT | Main |
+| syn | 3.0.7 | MIT OR Apache-2.0 | MIT | Main |
+| tar | 0.4.46 | MIT OR Apache-2.0 | MIT | Main |
+| thiserror | 2.0.21 | MIT OR Apache-2.0 | MIT | Main |
+| thiserror-impl | 2.0.21 | MIT OR Apache-2.0 | MIT | Main |
+| tiny-keccak | 2.0.2 | CC0-1.0 | CC0-1.0 | Main |
+| toml | 1.2.1+spec-1.1.0 | MIT OR Apache-2.0 | MIT | Main |
+| toml_datetime | 1.1.3+spec-1.1.0 | MIT OR Apache-2.0 | MIT | Main |
+| toml_parser | 1.1.5+spec-1.1.0 | MIT OR Apache-2.0 | MIT | Main |
+| toml_writer | 1.2.0+spec-1.1.0 | MIT OR Apache-2.0 | MIT | Main |
+| typed-path | 0.13.0 | MIT OR Apache-2.0 | MIT | Main |
+| typenum | 1.20.1 | MIT OR Apache-2.0 | MIT | Main |
+| unicode-ident | 1.0.26 | (MIT OR Apache-2.0) AND Unicode-3.0 | MIT AND Unicode-3.0 | Main |
+| version_check | 0.9.5 | MIT/Apache-2.0 | MIT | Main |
+| wasi | 0.11.1+wasi-snapshot-preview1 | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | MIT | Main |
+| wasip2 | 1.0.4+wasi-0.2.12 | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | MIT | Main |
+| wasm-bindgen | 0.2.130 | MIT OR Apache-2.0 | MIT | Main |
+| wasm-bindgen-macro | 0.2.130 | MIT OR Apache-2.0 | MIT | Main |
+| wasm-bindgen-macro-support | 0.2.130 | MIT OR Apache-2.0 | MIT | Main |
+| wasm-bindgen-shared | 0.2.130 | MIT OR Apache-2.0 | MIT | Main |
+| wayland-backend | 0.3.17 | MIT | MIT | Main |
+| wayland-protocols | 0.32.13 | MIT | MIT | Main |
+| wayland-scanner | 0.31.11 | MIT | MIT | Main |
+| wayland-server | 0.31.14 | MIT | MIT | Main |
+| wayland-sys | 0.31.11 | MIT | MIT | Main |
+| windows-link | 0.2.1 | MIT OR Apache-2.0 | MIT | Main |
+| windows-sys | 0.60.2 | MIT OR Apache-2.0 | MIT | Main |
+| windows-sys | 0.61.2 | MIT OR Apache-2.0 | MIT | Main |
+| windows-targets | 0.53.5 | MIT OR Apache-2.0 | MIT | Main |
+| windows_aarch64_gnullvm | 0.53.1 | MIT OR Apache-2.0 | MIT | Main |
+| windows_aarch64_msvc | 0.53.1 | MIT OR Apache-2.0 | MIT | Main |
+| windows_i686_gnu | 0.53.1 | MIT OR Apache-2.0 | MIT | Main |
+| windows_i686_gnullvm | 0.53.1 | MIT OR Apache-2.0 | MIT | Main |
+| windows_i686_msvc | 0.53.1 | MIT OR Apache-2.0 | MIT | Main |
+| windows_x86_64_gnu | 0.53.1 | MIT OR Apache-2.0 | MIT | Main |
+| windows_x86_64_gnullvm | 0.53.1 | MIT OR Apache-2.0 | MIT | Main |
+| windows_x86_64_msvc | 0.53.1 | MIT OR Apache-2.0 | MIT | Main |
+| winnow | 1.0.5 | MIT | MIT | Main |
+| wit-bindgen | 0.57.1 | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | MIT | Main |
+| x11rb | 0.13.2 | MIT OR Apache-2.0 | MIT | Main |
+| x11rb-protocol | 0.13.2 | MIT OR Apache-2.0 | MIT | Main |
+| xim | 0.5.0 | MIT | MIT | Main |
+| xim-ctext | 0.4.1 | MIT | MIT | Main |
+| xim-parser | 0.2.2 | MIT | MIT | Main |
+| zerocopy | 0.8.63 | BSD-2-Clause OR Apache-2.0 OR MIT | MIT | Main |
+| zerocopy-derive | 0.8.63 | BSD-2-Clause OR Apache-2.0 OR MIT | MIT | Main |
+| zeroize | 1.9.1 | Apache-2.0 OR MIT | MIT | Main |
+| zeroize_derive | 1.5.0 | Apache-2.0 OR MIT | MIT | Main |
+| zip | 9.5.1 | MIT | MIT | Main |
+| zmij | 1.0.23 | MIT | MIT | Main |
+
+Auxiliary lockfiles: `tests/performance/boundary-cost/Cargo.lock`.
+
+<!-- END GENERATED RUST DEPENDENCIES -->
+
+## Shared Runtime and native sources
+
+The `runtime/` submodule supplies shared Linux semantics and native helpers. Its Git pin identifies the exact source revision.
+
+| Component | Version / source | Terms and distribution |
 | --- | --- | --- |
-| socket2 | 0.6.1 | MIT OR Apache-2.0 |
-| nix | 0.31.3 | MIT |
-| libc | 0.2.190 | MIT OR Apache-2.0 |
-| bitflags | 2.13.2 | MIT OR Apache-2.0 |
-| cfg-if | 1.0.5 | MIT OR Apache-2.0 |
-| cfg_aliases | 0.2.2 | MIT |
+| smoltcp | 0.12.0, `runtime/vendor/smoltcp` | 0BSD; retain original notice. |
+| wayland-backend | 0.3.17, `runtime/vendor/wayland-backend` | MIT; includes documented Trames platform adaptations. |
+| ext4-view | 1.0.0, `runtime/vendor/ext4-view` | MIT OR Apache-2.0; MIT selected. |
+| musl | 1.2.5, `runtime/crates/trames-native/upstream/musl-1.2.5` | MIT and file-level Arm notices; retain `COPYRIGHT`. Trames wrappers have their own GPL terms. |
+| Bionic / gdtoa | Android 13, `runtime/crates/trames-native/upstream/bionic-android13` | Apache/BSD/Lucent notices in the original files and `NOTICE.txt`. |
+| glibc source subset | 2.41, `runtime/crates/trames-native/upstream/glibc-2.41` | LGPL-2.1-or-later; retain original notices and corresponding source for redistributed derivatives. The native build does not compile these C files into the host library. |
+| Wayland protocol XML | Versions pinned by Cargo.lock | Protocol-level copyrights accompany generated protocol code. |
+| xkeyboard-config data | Runtime-pinned data | Preserve `runtime/crates/trames-wayland/data/COPYING.xkeyboard-config`. |
+| xim-rs workspace license | Fixed original upstream revisions | MIT; retained at `runtime/crates/trames-wayland/data/COPYING.xim-rs` for crate archives that omit it. |
 
-These selected MIT/Apache-2.0 terms are compatible with the project's
-GPL-3.0-or-later license. Retain the upstream copyright and license notices when
-distributing their source or compiled components; the Cargo registry packages
-include them. Cargo.lock also contains socket2's Windows-target dependencies,
-which are not compiled for the validated Linux/iOS targets. Windows is not a
-supported Trames target.
+Native adaptations and Rust translations do not erase upstream rights. GPL/LGPL
+source obligations apply to the components carrying those terms; they do not
+change merely because another project component offers a commercial license.
 
-This records license compatibility, not a security audit of dependencies. Native
-FFI and platform-specific unsafe implementations live in the dependencies.
-Owner direction, 2026-10-13: unsafe Rust is permitted at small, audited boundaries.
-The workspace denies `unsafe_op_in_unsafe_fn`, requiring each unsafe operation to
-be explicit even inside an unsafe function. Document pointer validity/lifetime,
-alignment, aliasing, permission checks, thread ownership and failure behavior.
-Prefer checked/scoped interfaces that contain the unsafe implementation; a guest
-virtual address is never sufficient evidence for a valid host pointer. Tests must
-exercise the relevant remap, COW, shared mapping and executable-code invalidation
-boundaries. This replaces the initial blanket unsafe-code prohibition.
-The isolated C caller-buffer boundary and static native compute helpers permit
-reviewed unsafe operations; compute accepts values, never guest memory pointers.
-GNU licensing does not automatically
-make every possible library compatible; each added dependency needs its own
-license review.
+## Project submodules
 
-## M3 archive, digest and entropy dependencies
+`runtime/` and `cli/` are first-party GPL-3.0-or-later Trames repositories,
+not permissively licensed external libraries. Preserve their pinned sources and
+licenses when exporting a product's corresponding source. Cargo resolves the
+shared CLI package from `cli/crates/trames-cli-common`; the Rust table above
+includes its external dependency closure.
 
-Reviewed Cargo manifest declarations for the additional Linux/iOS dependency
-closure (all pinned by Cargo.lock):
+## Swift frontend
 
-| Crate | Version | Declared license |
-| --- | --- | --- |
-| flate2 | 1.1.10 | MIT OR Apache-2.0 |
-| tar | 0.4.46 | MIT OR Apache-2.0 |
-| sha2 | 0.10.9 | MIT OR Apache-2.0 |
-| getrandom | 0.3.4 | MIT OR Apache-2.0 |
-| adler2 | 2.0.1 | 0BSD OR MIT OR Apache-2.0 |
-| block-buffer | 0.10.4 | MIT OR Apache-2.0 |
-| cpufeatures | 0.2.17 | MIT OR Apache-2.0 |
-| crc32fast | 1.5.2 | MIT OR Apache-2.0 |
-| crypto-common | 0.1.7 | MIT OR Apache-2.0 |
-| digest | 0.10.7 | MIT OR Apache-2.0 |
-| filetime | 0.2.29 | MIT/Apache-2.0 |
-| generic-array | 0.14.7 | MIT |
-| miniz_oxide | 0.9.1 | MIT OR Zlib OR Apache-2.0 |
-| simd-adler32 | 0.3.10 | MIT |
-| typenum | 1.20.1 | MIT OR Apache-2.0 |
-| version_check | 0.9.5 | MIT/Apache-2.0 |
+The package resolver is committed at `apps/ios/TramesKit/Package.resolved`.
+Citadel and the Wellz26 SwiftNIO SSH fork are vendored with upstream provenance;
+SwiftTerm is pinned by the Xcode project. Existing original license and NOTICE
+resources are retained under `apps/ios/Trames/Notices/`.
 
-Selected MIT/Apache-2.0/0BSD terms are GPL-3.0-or-later compatible. WASI-specific
-getrandom lockfile packages are not compiled for Linux/iOS. The importer uses
-tar entry parsing into the private VFS, never tar host extraction.
-
-Downloaded Alpine and tree artifacts are test/guest distribution data, not
-linked runtime libraries. Alpine contains packages with independent licenses;
-retain their notices and satisfy relevant source obligations when redistributing
-a rootfs. tree 2.2.1 declares GPL-2.0-or-later. OpenSSL in the guest is Alpine's
-unmodified separately distributed package. A Trames project license does not
-replace the guest distribution's package licenses.
-
-## Userspace packet stack
-
-smoltcp 0.12.0 is pinned with default features disabled. Only std, Medium::Ip,
-IPv4/IPv6, TCP/UDP/ICMP, bounded fragmentation/storage and four logical IP-address
-slots are enabled. Native raw-socket and TUN device features are not enabled.
-Reviewed manifests for its compiled Linux/iOS closure:
-
-| Crate | Version | Declared license |
-| --- | --- | --- |
-| smoltcp | 0.12.0 | 0BSD |
-| managed | 0.8.0 | 0BSD |
-| heapless | 0.8.0 | MIT OR Apache-2.0 |
-| hash32 | 0.3.1 | MIT OR Apache-2.0 |
-| byteorder | 1.5.0 | Unlicense OR MIT |
-| stable_deref_trait | 1.2.1 | MIT OR Apache-2.0 |
-| bitflags | 1.3.2 | MIT/Apache-2.0 |
-
-The selected 0BSD/MIT/Apache-2.0 terms are compatible with GPL-3.0-or-later.
-Preserve upstream source/license notices in redistribution. Existing cfg-if and
-getrandom licenses are recorded above. Optional defmt/proc-macro packages in
-Cargo.lock are not in the compiled Linux/iOS feature closure. This review does
-not substitute for an upstream security audit.
-
-## iPad frontend and embedding ABI
-
-The native Swift closure is pinned in apps/ios/TramesKit/Package.resolved.
-
-| Package | Version | License |
+| Package | Version | License / additional notices |
 | --- | --- | --- |
 | bigint | 5.7.0 | MIT |
-| citadel | 0.12.1 | MIT |
-| swift-asn1 | 1.6.0 | Apache-2.0 (with upstream notices/exceptions) |
-| swift-atomics | 1.3.1 | Apache-2.0 (with upstream notices/exceptions) |
-| swift-collections | 1.6.0 | Apache-2.0 (with upstream notices/exceptions) |
-| swift-crypto | 3.12.3 | Apache-2.0 (with upstream notices/exceptions) |
-| swift-log | 1.11.0 | Apache-2.0 (with upstream notices/exceptions) |
-| swift-nio | 2.81.0 | Apache-2.0 (with upstream notices/exceptions) |
-| swift-nio-ssh | 0.3.4 | Apache-2.0 (with upstream notices/exceptions) |
-| swift-system | 1.6.6 | Apache-2.0 (with upstream notices/exceptions) |
+| swift-asn1 | 1.6.0 | Apache-2.0 with the upstream exceptions and NOTICE files |
+| swift-atomics | 1.3.1 | Apache-2.0 with the upstream exceptions and NOTICE files |
+| swift-collections | 1.6.0 | Apache-2.0 with the upstream exceptions and NOTICE files |
+| swift-crypto | 3.12.3 | Apache-2.0 with the upstream exceptions and NOTICE files; bundled BoringSSL retains its component terms |
+| swift-log | 1.11.0 | Apache-2.0 with the upstream exceptions and NOTICE files |
+| swift-nio | 2.81.0 | Apache-2.0 with the upstream exceptions and NOTICE files |
+| swift-system | 1.6.6 | Apache-2.0 with the upstream exceptions and NOTICE files |
+| citadel | 0.12.1 | MIT; BSD bcrypt/blowfish source notices |
+| swift-nio-ssh | 0.3.4 | Apache-2.0 with the upstream exceptions and NOTICE files |
 | SwiftTerm | 1.20.0 | MIT |
 
-Upstream license/notice files are included in the app resources under Notices.
-Citadel is used for Ed25519 OpenSSH key parsing (including its BSD bcrypt/blowfish
-C code); its terminal/SFTP convenience streams are not used. SwiftNIO SSH uses
-the pinned Wellz26 fork. Swift crypto includes BoringSSL with the notices and
-exceptions retained by its upstream license. The selected MIT/BSD/Apache-2.0
-terms are compatible with GPL-3.0-or-later. Apple system frameworks are platform
-system libraries. No signing credentials are repository dependencies.
+CoreMark's native benchmark sources are Apache-2.0. Keep the EEMBC copyright and
+license; benchmark naming and trademark rules are separate from code licensing.
+Apple SDK frameworks are platform system libraries, not project-owned source.
 
-The embedding JSON boundary adds serde/serde_core/serde_derive 1.0.229,
-serde_json 1.0.151, itoa 1.0.18 (MIT OR Apache-2.0), memchr 2.8.3
-(selected MIT) and zmij 1.0.23 (MIT). Existing proc-macro dependencies retain
-their previously recorded terms. The isolated caller-buffer boundary permits
-unsafe code; C buffer validity is a native caller contract.
+## Vulkan and guest graphics
 
-## Historical M5 build tooling
+The Apple native driver uses MoltenVK 1.4.2 (Apache-2.0). Its complete pinned
+source bundle includes SPIRV-Cross, SPIRV-Headers, SPIRV-Tools, Vulkan-Headers,
+Vulkan-Tools (Apache/MIT as stated by each file), Volk (MIT) and cereal (BSD-3-Clause).
+Original license files accompany the driver source bundle and native notices;
+retain them when embedding or redistributing the driver.
 
-The removed optional C++ interpreter used build-only cc 1.7.0, find-msvc-tools 0.1.14 and
-shlex 2.0.1, each MIT OR Apache-2.0 (selected MIT). They compile project-owned
-GPL-3.0-or-later source and are not linked runtime plugins. Bridge uses the already
-reviewed serde/serde_json/sha2 dependency closure. No dynamic native dependency
-or downloaded native plugin is introduced.
+Guest graphics preparation also uses Mesa 25.1.9 and Xwayland 24.1.9. Their trees
+contain multiple licenses, including MIT/X11, SGI-B and BSL-1.0; retain their
+file-level notices and matching source/build adaptations. These guest ELF files
+are distinct from host-linked Apple frameworks.
 
-## Static native compute
+FFmpeg 7.1.1 in the current guest-video build uses an LGPL-2.1-or-later shared
+configuration without `--enable-gpl` or `--enable-nonfree`. A distribution that
+includes it must include its notices, exact corresponding source, patches and
+build configuration, and honor the LGPL modification/replacement terms.
+Changing those configure flags requires a fresh license review.
 
-`trames-compute` is project-owned GPL-3.0-or-later Rust with static ARM64 inline
-assembly, plus an x86_64 development-host implementation excluded from ARM64
-builds. It adds no runtime library dependency. Optional host instructions use
-Rust feature detection. Architectural entropy reads reuse the reviewed
-getrandom dependency; they do not synthesize random data with a PRNG.
+The staged Alpine acceptance repository contains 78 separately licensed APKs.
+`package-ios.py` excludes `GuestVulkan/wayland-acceptance` from the production IPA;
+these fixtures are not all linked or bundled production dependencies. Downloaded
+Alpine/Debian root filesystems and Android images remain collections of separately
+licensed guest programs. Preserve package notices and satisfy applicable source
+requirements when redistributing an image; the Trames license does not replace them.
 
-## NativeCall pure-memory backend
+## Build tools
 
-`trames-native/upstream/musl-1.2.5` vendors original string routines from the
-SHA-256-pinned musl 1.2.5 release, with byte-level provenance and the full
-[COPYRIGHT](../../crates/trames-native/upstream/musl-1.2.5/COPYRIGHT). They are MIT
-licensed, including the Arm AArch64 memcpy/memset notices. Original upstream
-bytes stay intact. The build script expands register aliases, prefixes private
-symbols and adapts ELF directives for Mach-O, without changing the algorithms.
-Native memcmp/strlen use safe Rust translations; guest fallbacks compile the
-original C/assembly. These MIT terms are compatible with GPL-3.0-or-later.
-
-The app bundles `Trames-native-musl-COPYRIGHT.txt`. Redistributed guest libraries
-must retain that notice and the GPL notice for the Trames wrapper; corresponding
-wrapper/upstream sources and build instructions are in this repository. No
-additional downloaded host library or executable code is used. Only the isolated
-`trames-native` slice boundary permits unsafe operations; guest address
-validation and the dispatcher remain in safe Rust.
-
-Complete guest musl 1.2.5 is built from archive SHA-256
-`a9a118bbe84d8764da0ea0d28b3ab3fae8477fc7e4085d90102b8596fc7c75e4`.
-Original fallback files are unchanged and MIT/Arm notices retained; two checked
-startup hooks and Trames wrappers are GPL-3.0-or-later. The full-library artifact
-contains the original archive, all adaptations/build files and notices. iPad
-bundles the Linux ELF as interpreted guest data. [Integration](../architecture/musl-hybrid.md).
-
-## Native Wayland and shared descriptors
-
-Cargo.lock pins the added dependency closure. The selected MIT terms are
-compatible with GPL-3.0-or-later; protocol XML and keyboard data retain their
-own original notices as well.
-
-| Crate | Version | Selected license |
+| Tool | Pinned version | Terms |
 | --- | --- | --- |
-| wayland-server | 0.31.14 | MIT |
-| wayland-backend | 0.3.17 | MIT |
-| wayland-protocols | 0.32.13 | MIT |
-| wayland-scanner | 0.31.11 | MIT |
-| wayland-sys | 0.31.11 | MIT |
-| rustix | 1.1.5 | MIT |
-| errno | 0.3.14 | MIT |
-| linux-raw-sys | 0.12.1 | MIT |
-| downcast-rs | 1.2.1 | MIT |
-| smallvec | 1.16.3 | MIT |
-| quick-xml | 0.41.0 | MIT |
-| cc | 1.8.0 | MIT |
-| find-msvc-tools | 0.1.14 | MIT |
-| pkg-config | 0.3.34 | MIT |
-| shlex | 2.0.1 | MIT |
+| Meson | 1.12.1 | Apache-2.0 |
+| Mako | 1.4.3 | MIT |
+| packaging | 25.0 | Apache-2.0 OR BSD-2-Clause |
+| PyYAML | 6.0.3 | MIT |
 
-The latter build tools and scanner/parser execute during compilation;
-linux-raw-sys is Linux-specific. wayland-backend is vendored with its original
-license and three documented Apple cfg adaptations. The shared socket adapter
-also credits the original backend. The core, xdg-shell and text-input v1/v3
-protocol copyrights and the original xkeyboard-config keymap notices accompany
-the generated code/data.
+Mako also requires MarkupSafe (`>=2.0`); that transitive version is not currently
+fixed by these four pins. These tools run during builds, not inside the app.
 
-The committed app resource
-`apps/ios/Trames/Notices/Wayland-native-dependencies-NOTICES.txt` includes these
-original notices. On a Linux development machine after Cargo has populated its
-locked packages, `python3 scripts/prepare-wayland-notices.py --check` verifies
-the bundle against original source bytes. Run without `--check` to regenerate.
-The script downloads nothing. Original signed Alpine clients remain guest
-distribution data with their package licenses; the test Darwin Wayland client
-library is not linked into the app.
+## CI tools
+
+GitHub Actions used by this repository: `actions/cache/restore@v4`, `actions/cache/save@v4`, `actions/cache@v4`, `actions/checkout@v4`, `actions/download-artifact@v4`, `actions/upload-artifact@v4`, `dtolnay/rust-toolchain@master`. Their upstream action implementations are MIT-licensed build services, not linked product libraries.
+
+## Updating and checking this record
+
+Use Python 3.9 or later:
+
+```sh
+python3 scripts/prepare-third-party-notices.py --check
+```
+
+After changing dependencies, review the new exact package source and license
+texts, then update `third-party/licenses.json`. Run the script without `--check`
+to refresh this table, the full notice bundle and `third-party/inputs.json`.
+The generator checks original-text hashes and Cargo source checksums, rejects
+unreviewed package versions, and downloads nothing. Its input fingerprints catch
+lockfile drift even when a package is used only by a benchmark or another target.
+The selected branch is a recorded license choice, not a change to upstream terms.
+
+The generated Rust bundle is also an Xcode app resource. After fetching the
+locked Cargo sources, refresh the separate protocol/keymap notice bundle with
+`python3 scripts/prepare-wayland-notices.py`, then verify it with `--check`.
+The Wayland generator requires Python 3.11 or later and uses the local Cargo
+source cache.

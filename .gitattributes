@@ -1,0 +1,4 @@
+
+# Preserve the exact original upstream license text.
+THIRD_PARTY_NOTICES.txt -whitespace
+apps/ios/Trames/Notices/Rust-dependencies-NOTICES.txt -whitespace
