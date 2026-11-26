@@ -9,15 +9,34 @@ archiver="${AARCH64_AR:-aarch64-linux-gnu-ar}"
 ranlib="${AARCH64_RANLIB:-aarch64-linux-gnu-ranlib}"
 jobs="${TRAMES_BUILD_JOBS:-4}"
 mkdir -p "$workspace" "$downloads"
-fetch() {
+fetch() (
     local name="$1" url="$2" digest="$3"
-    if [[ ! -f "$downloads/$name" ]]; then
-        curl --fail --location --silent --show-error "$url" --output "$downloads/$name"
+    shift 3
+    if [[ -f "$downloads/$name" ]]; then
+        (cd "$downloads" && printf '%s  %s\n' "$digest" "$name" | sha256sum --check)
+        return $?
     fi
-    (cd "$downloads" && printf '%s  %s\n' "$digest" "$name" | sha256sum --check)
-}
+    # This variable belongs to the subshell, so it remains available to EXIT
+    # after Bash has unwound the function's local variables.
+    download_partial="$(mktemp "$downloads/.$name.XXXXXX")"
+    trap 'rm -f -- "$download_partial"' EXIT
+    # A failed connection must not publish a partial archive into the cache.
+    # Every origin supplies the exact same pinned bytes; a hash mismatch fails.
+    local origin
+    for origin in "$url" "$@"; do
+        if curl --fail --location --silent --show-error --connect-timeout 10 \
+            --max-time 90 --retry 1 --retry-delay 1 --retry-connrefused \
+            "$origin" --output "$download_partial"; then
+            printf '%s  %s\n' "$digest" "$download_partial" | sha256sum --check || return 1
+            mv "$download_partial" "$downloads/$name"
+            return
+        fi
+    done
+    return 1
+)
 fetch musl-1.2.5.tar.gz https://musl.libc.org/releases/musl-1.2.5.tar.gz a9a118bbe84d8764da0ea0d28b3ab3fae8477fc7e4085d90102b8596fc7c75e4
-fetch busybox-1.37.0.tar.bz2 https://busybox.net/downloads/busybox-1.37.0.tar.bz2 3311dff32e746499f4df0d5df04d7eb396382d7e108bb9250e7b519b837043a4
+fetch busybox-1.37.0.tar.bz2 https://www.busybox.net/downloads/busybox-1.37.0.tar.bz2 3311dff32e746499f4df0d5df04d7eb396382d7e108bb9250e7b519b837043a4 \
+    https://sources.buildroot.net/busybox/busybox-1.37.0.tar.bz2
 if [[ ! -x "$workspace/musl/bin/musl-gcc" ]]; then
     tar -xf "$downloads/musl-1.2.5.tar.gz" -C "$workspace"
     (
