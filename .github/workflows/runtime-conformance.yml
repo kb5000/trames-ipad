@@ -1,0 +1,79 @@
+name: Runtime conformance
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  conformance:
+    name: Kernel conformance (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-15]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    env:
+      CARGO_INCREMENTAL: '0'
+      CARGO_PROFILE_DEV_DEBUG: '0'
+      CARGO_PROFILE_TEST_DEBUG: '0'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: nightly-2026-10-16
+          components: rustfmt, clippy
+          targets: ${{ runner.os == 'Linux' && 'aarch64-unknown-linux-musl' || 'aarch64-apple-darwin' }}
+      - name: Install Linux native and cross-compile prerequisites
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install --yes gcc-aarch64-linux-gnu binutils-aarch64-linux-gnu libasound2-dev ninja-build pkg-config libglib2.0-dev python3-venv
+      - uses: actions/cache@v4
+        if: runner.os == 'Linux'
+        with:
+          path: target/qemu-oracle
+          key: qemu-10.0.13-aarch64-user-ubuntu24.04-4a59b74d-v1
+      - name: Prepare pinned independent ARM64 oracle
+        if: runner.os == 'Linux'
+        run: bash scripts/build-qemu-oracle.sh
+      - name: Record checked-out source identities
+        run: |
+          mkdir -p target/runtime-conformance
+          git rev-parse HEAD > target/runtime-conformance/ipad.commit
+          git -C runtime rev-parse HEAD > target/runtime-conformance/runtime.commit
+          git -C cli rev-parse HEAD > target/runtime-conformance/cli.commit
+          git submodule status --recursive
+          uname -a
+          rustc -Vv
+      - name: Prepare unchanged guest CLI
+        run: python3 runtime/scripts/build-guest-cli.py
+      - name: Check conformance formatting and lints
+        run: |
+          cargo fmt -p trames-core -- --check
+          cargo clippy -p trames-core --test kernel-conformance --no-deps --locked -- -D warnings
+      - name: Run native kernel conformance
+        shell: bash
+        run: |
+          set -o pipefail
+          cargo test -p trames-core --test kernel-conformance --locked 2>&1 | tee target/runtime-conformance/native.log
+      - name: Run ARM64 musl kernel conformance under pinned QEMU
+        if: runner.os == 'Linux'
+        shell: bash
+        env:
+          CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER: aarch64-linux-gnu-gcc
+          CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_RUNNER: target/qemu-oracle/bin/qemu-aarch64 -cpu max
+        run: |
+          set -o pipefail
+          cargo test -p trames-core --test kernel-conformance --target aarch64-unknown-linux-musl --locked 2>&1 | tee target/runtime-conformance/qemu.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: runtime-conformance-${{ matrix.os }}
+          path: target/runtime-conformance/
+          if-no-files-found: warn
+          retention-days: 7
