@@ -25,6 +25,7 @@ settings:
     INFOPLIST_KEY_UILaunchScreen_Generation: YES
     INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
     CODE_SIGN_STYLE: Automatic
+    DEVELOPMENT_TEAM: T73WQBSU73
 packages:
   TramesKit:
     path: TramesKit
