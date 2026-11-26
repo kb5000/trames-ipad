@@ -2,6 +2,12 @@ name: Runtime conformance
 
 on:
   workflow_dispatch:
+    inputs:
+      test_filter:
+        description: Exact Rust test names separated by commas; empty runs the complete target
+        required: false
+        default: ''
+        type: string
 
 permissions:
   contents: read
@@ -19,6 +25,7 @@ jobs:
       CARGO_INCREMENTAL: '0'
       CARGO_PROFILE_DEV_DEBUG: '0'
       CARGO_PROFILE_TEST_DEBUG: '0'
+      CONFORMANCE_TEST_FILTER: ${{ inputs.test_filter }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -59,8 +66,7 @@ jobs:
       - name: Run native kernel conformance
         shell: bash
         run: |
-          set -o pipefail
-          cargo test -p trames-core --test kernel-conformance --locked 2>&1 | tee target/runtime-conformance/native.log
+          python3 scripts/run-kernel-conformance.py --output target/runtime-conformance/native.log
       - name: Run ARM64 musl kernel conformance under pinned QEMU
         if: runner.os == 'Linux'
         shell: bash
@@ -68,8 +74,7 @@ jobs:
           CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER: aarch64-linux-gnu-gcc
           CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_RUNNER: target/qemu-oracle/bin/qemu-aarch64 -cpu max
         run: |
-          set -o pipefail
-          cargo test -p trames-core --test kernel-conformance --target aarch64-unknown-linux-musl --locked 2>&1 | tee target/runtime-conformance/qemu.log
+          python3 scripts/run-kernel-conformance.py --target aarch64-unknown-linux-musl --output target/runtime-conformance/qemu.log
       - uses: actions/upload-artifact@v4
         if: always()
         with:
