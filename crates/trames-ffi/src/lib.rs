@@ -800,17 +800,21 @@ pub unsafe extern "C" fn trames_session_commit_edit(
 }
 #[no_mangle]
 pub extern "C" fn trames_session_close(handle: u64) -> i32 {
-    boundary(|| match registry().lock() {
-        Ok(mut registry) => match registry.remove(&handle) {
+    boundary(|| {
+        let removed = match registry().lock() {
+            Ok(mut registry) => registry.remove(&handle),
+            Err(_) => return error("handle registry unavailable"),
+        };
+        match removed {
             Some(s) => {
                 s.display.detach();
                 s.cancelled.store(true, Ordering::Release);
+                s.console_readiness.notify_locked();
                 s.notify_host();
                 0
             }
             None => error("invalid or closed session handle"),
-        },
-        Err(_) => error("handle registry unavailable"),
+        }
     })
 }
 /// # Safety

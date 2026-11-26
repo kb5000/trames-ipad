@@ -1,6 +1,8 @@
 # 临时实施清单：兼容性迭代后的剩余工作
 
-当前检查点（2026-11-26）：03 现代挂载按约定功能、工具及遗留性能范围收尾。共享挂载快速标记启用默认路径，区域掩码与小型访问辅助内联，保留所有原权限／范围检查与同步，不新增协调线程。最终两宿主 1942／1952 通过、各 5 原有忽略；原版 gVisor 941 身份为 931 通过／10 跳过，覆盖全部 926 个原生通过项；两执行器同 ELF 342＋234、四种 OCI 及各 39 项 FUSE 通过。四配对块直接对照原 FUSE 基线：metadata −31.03%、两种读取 −14.41%／−14.95%、管道 −14.01%，各块方向一致；写入＋同步 −1.28%、同步 −0.48%，块间波动公开保留。详见[收尾验证](../../runtime/docs/validation/modern-mount-closeout-20261126.md)。下一领域为 04 cgroup，未支持的 filesystem 参数不泛化为已支持。
+当前检查点（2026-11-27）：04 cgroup 功能及必要调用方已集中验证完成，主线整合后的两执行器原版用例、两宿主资源／组合测试及 iOS Rust 产物通过；没有新增协调线程。HVF 固定文件 IO 基准 +7.72% 保留为明确性能优化项，完整记录见[本轮验证](../../runtime/docs/validation/cgroup-resources-20261127.md)及下方领域 04。功能顺序下一领域为 05 Android 内存生命周期。
+
+上一检查点（2026-11-26）：03 现代挂载按约定功能、工具及遗留性能范围收尾。共享挂载快速标记启用默认路径，区域掩码与小型访问辅助内联，保留所有原权限／范围检查与同步，不新增协调线程。最终两宿主 1942／1952 通过、各 5 原有忽略；原版 gVisor 941 身份为 931 通过／10 跳过，覆盖全部 926 个原生通过项；两执行器同 ELF 342＋234、四种 OCI 及各 39 项 FUSE 通过。四配对块直接对照原 FUSE 基线：metadata −31.03%、两种读取 −14.41%／−14.95%、管道 −14.01%，各块方向一致；写入＋同步 −1.28%、同步 −0.48%，块间波动公开保留。详见[收尾验证](../../runtime/docs/validation/modern-mount-closeout-20261126.md)。下一领域为 04 cgroup，未支持的 filesystem 参数不泛化为已支持。
 
 现代挂载第二批历史检查点（2026-11-26）：映射 lower／upper overlay 的身份与 copy-up、ACL／capability、硬链接及真实 provider 生命周期，overlay／devpts／mqueue／cgroup2 现代 context，以及真正 O_TMPFILE 已实现并集中验证。两宿主 1700／1708 通过；两执行器同 ELF 342＋234 项及四种实际 OCI 通过，最终两侧 FUSE 各 39 项通过。原版 gVisor 941 身份为 931 通过／10 原始跳过，覆盖全部 926 个原生通过项。固定四配对块相对上一版读取／管道基本持平，写入＋同步 −0.68%、同步 −0.91%；metadata +2.87%，配对块有升有降。功能修复按 main 配对交付；引用计数整理尚未证明消除了先前读取／管道差距，03 的性能后续继续保留。详见[第二批记录](../../runtime/docs/validation/modern-mount-overlay-20261126.md)。以下历史检查点保留其当时状态。
 
@@ -32,7 +34,7 @@
 | --- | --- | --- |
 | 02 FUSE | 实现、两宿主检查、解释器／HVF 原版工具及长样本性能已完成并配对交付；所有者 2026-11-26 接受模拟器调试、取消真机阻塞 | 本轮关闭；未运行的物理设备测试不记作通过 |
 | 03 现代挂载 | 映射层 overlay、四种现代 context、O_TMPFILE、原 OFD／provider 及 OCI 均验证；最终四配对块对照原 FUSE 基线，metadata／读取／管道每块均改善 | 本轮按约定范围关闭；原始块间波动与未支持 filesystem／index／metacopy 参数边界保留 |
-| 04 cgroup | 映射 cache／别名及匿名 fork COW 的物理页归属、计费和写准入已有实现及回归 | 非 mmap 文件 IO 的 cache 计费、物理回收及 dirty／pinned 页、native extent 动态计费，真正的 IO controller 和压力验收 |
+| 04 cgroup | 已发布映射／匿名页基础；非 mmap 缓存、tmpfs／memfd 计费、资源续接、实时导入／导出／条件编辑、IO 控制文件和私有磁盘数据入口已有未验证候选 | 补全旧入口／loader／导入／元数据后端、dirty 压力写回与真实回收、限额与退役生命周期，再统一验证；见[当前批次](cgroup-batch-20261126.md) |
 | 05 Android 内存 | 已确认仓库镜像的 API 33／arm64-v8a 声明；既有 cgroup 基础可复用 | 确认 ART collector／lmkd reaper 实际路径，实施 userfaultfd／process_mrelease，验证 GC 尾延迟及退出回收 |
 | 06 调试工具 | ptrace／proc memory 原版用例闭环；GDB 启动、软件断点、单步及寄存器修改已有证据 | live attach、多线程、gdbserver、strace -f、拒绝访问及异常退出会话；硬件断点／观察点、SVE／SME 单独列支持范围 |
 | 07 futex2／rseq | 四个 futex2 接口及 rseq 注册／中止／迁移／信号／fork／exec 已有实现；已覆盖单元／解释器检查通过 | 原版 no-libc ARM64 runfile、Linux 自测和真实调用程序，两种执行后端的生命周期及旧 futex 性能验收 |
@@ -178,11 +180,12 @@
 
 ### 04 — cgroup 资源管理补全
 
-- [ ] 状态：实现＋记账和压力验收。
-- CPU／cpuset、匿名内存控制、OOM group、映射 cache／别名及 fork COW 页的基本归属与计费已有实现；剩余重点是非 mmap IO、native extent 的动态计费及实际内存回收行为。
-- IO controller 尚未实现：当前 `io.max` 提供空视图并拒绝写入，不能将其作为已生效的 IO 限流。
-- 完成标准：覆盖共享、fork／COW、迁移、退出和祖先限额的计费与释放；在真实压力下验证计数、限流／回收及 OOM 行为。IO 控制按选定实际负载实现并验证限流效果。
-- 依据：[cgroup 控制器记录](../../runtime/docs/validation/gvisor-cgroup-controllers-20261123.md)、[当前 cgroup 实现](../../runtime/crates/trames-vfs/src/cgroup.rs)。
+- [x] 状态：功能实现及集中验证完成（2026-11-27）；Runtime `8bfc0948` 已推送 main，iPad／Mac 产品 pin 配对同步。
+- 已补全 file／tmpfs／memfd／native 物理页首次归属、共享／fork COW／迁移及退役，dirty 写回／原 mm pin 退休／真实回收，memory.high/max 收紧、通知及原任务 OOM；CPU／cpuset 等既有行为保留。
+- 层级 `io.max`／`io.stat` 接入实际私有磁盘数据与元数据，普通文件、复制／splice、AIO／io_uring、exec 输入及 ELF／栈、实时与同步 host 传输／编辑、overlay copy-up／capability／checkpoint 都保留原资源及进度，取消和等待不新增协调／服务线程。
+- 验证：Runtime Apple 2,773 通过／31 忽略，Linux 2,784 通过／15 忽略；内核组合两侧各 546 通过／3 忽略，FFI 32 通过；两执行器原版 gVisor 各 346 通过／2 原始跳过，覆盖全部 345 原生通过项。实际限速／子进程 OOM、三轮宿主字节释放、Linux／Apple 严格检查和 iOS ARM64 Rust 产物均通过。复用未变证据并核对最终完整清单，没有增加历史全量 gVisor 台账。
+- [ ] 性能优化：最终空闲状态四配对块中，HVF 16 MiB write/fsync/pread 从 39.586 ms 增至 42.644 ms（+7.72%，四块均增长），需后续剖析；解释器三类 +1.16%–2.34%、HVF 元数据／管道 +0.48%／+0.57%。保留全部短／长样本及编译争用样本，不宣称性能完全等价。
+- 依据：[实施日志](cgroup-batch-20261126.md)、[本轮验证与边界](../../runtime/docs/validation/cgroup-resources-20261127.md)、[既有控制器记录](../../runtime/docs/validation/gvisor-cgroup-controllers-20261123.md)。
 
 ### 05 — Android 内存生命周期
 
