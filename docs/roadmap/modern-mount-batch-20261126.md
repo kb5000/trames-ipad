@@ -15,8 +15,18 @@
 
 实现与集中验证见[验证记录](../../runtime/docs/validation/modern-mounts-20261126.md)。最终两宿主按身份合并 1693／1701 通过、各 2 忽略；同 ELF 234 项及原版 runc 三种 OCI 输入均在原生／解释器／HVF 通过。受影响原版 gVisor 为 453 身份、449 通过／4 跳过，覆盖全部 445 个原生通过项；两执行器各三组 libfuse 工具通过。最终 2 CPU 四配对块共 10 次／100 行有效记录：metadata −0.45%、写入＋同步 +0.61%、同步 +0.74%；读取仍有 +3.25%／+3.70%、管道 +2.74%，配对波动和原始失败均保留。实现按 main 配对交付，性能后续与扩展范围继续留在清单。
 
-明确后续：overlay 自身可映射，已映射 backing layer 的 copy-up 仍受共享 upper inode 设计限制，当前返回 EOPNOTSUPP；未实现的 fsopen 类型／参数及独立 O_TMPFILE 不计作已支持。03 的延伸范围不因本批工具通过自动关闭。
+第一批交付时的后续：已映射 backing layer、扩展 fsopen 类型及独立 O_TMPFILE 当时未支持；这些在下述第二批实现。没有声明全部 Linux filesystem 参数均已支持。
 
 依据：[Linux idmapping 模型](https://docs.kernel.org/filesystems/idmappings.html)、[Linux v6.12 挂载属性实现](https://github.com/torvalds/linux/blob/v6.12/fs/namespace.c)、[OCI 1.2.1 挂载配置](https://github.com/opencontainers/runtime-spec/blob/v1.2.1/config.md)。
 
 配对 Runtime 提交：`7617d2aaead28232ed503e31432bea60a9121012`（main）；iPad／Mac 均固定此身份，保留已验证源码及既有依赖许可提交。
+
+## 第二批：映射 overlay、现代构建上下文及匿名文件
+
+所有者已授权继续本领域：实现映射 lower／upper 的独立 inode 视图及双向 copy-up、ACL／capability、硬链接、原 FD／映射／底层 writer 生命周期与失败回滚；补齐 overlay／devpts／mqueue／cgroup2 的现代构建入口，保留设置参数时接受的目录和原 namespace 资源；实现真正未命名的 O_TMPFILE 及一次性可链接权限。性能改动将文件系统不变资源合并为共享 handle，减少普通读写及 worker 复制中的多重引用计数，派生文件系统仍保留独立参数绑定。不新增协调线程，继续沿用 Apple／Linux 编译隔离。
+
+本批实现与集中验证已完成：Apple／Linux 按身份为 1700／1708 通过、各 2 忽略；同一 342 项新增 ELF、234 项原 ELF 和四种实际 runc OCI 在两执行器通过，原生新增同 ELF／组合 OCI 通过。原版 gVisor 941 身份为 931 通过／10 原始跳过，覆盖全部 926 个原生通过项；最终两执行器各三组 FUSE 工具、各 39 项通过。Linux 全工作区、两宿主受影响严格检查及 CLI／Mac HVF／iOS release 构建通过。没有新增协调线程，原始失败与明确 Linux 模式均保留。
+
+四配对块 10 次／100 行性能对照全部有效。相对上一版，写入＋同步 −0.68%、同步 −0.91%、保持打开读取 +0.20%、重新打开读取 −0.45%、管道 +0.20%；metadata 总体 +2.87%，配对块为 −3.25%／+1.20%／−1.66%／+4.37%。引用计数整理尚未证明消除了上一批读取／管道差距，这部分继续留作性能后续，不把有效样本等同于零回退。详见[第二批验证](../../runtime/docs/validation/modern-mount-overlay-20261126.md)，原始目录 `target/validation-modern-mount-overlay-20261126`。功能修复按 main 配对交付；03 的性能后续仍公开保留。
+
+第二批配对 Runtime：`7f80b14c0a134f1878e058c98ab43aa7749ac5df`（main）。功能范围已交付；性能未收敛项按上述原始对照保留，不重复计入全量台账。

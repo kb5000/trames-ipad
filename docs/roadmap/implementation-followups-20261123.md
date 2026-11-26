@@ -1,5 +1,7 @@
 # 临时实施清单：兼容性迭代后的剩余工作
 
+当前现代挂载第二批检查点（2026-11-26）：映射 lower／upper overlay 的身份与 copy-up、ACL／capability、硬链接及真实 provider 生命周期，overlay／devpts／mqueue／cgroup2 现代 context，以及真正 O_TMPFILE 已实现并集中验证。两宿主 1700／1708 通过；两执行器同 ELF 342＋234 项及四种实际 OCI 通过，最终两侧 FUSE 各 39 项通过。原版 gVisor 941 身份为 931 通过／10 原始跳过，覆盖全部 926 个原生通过项。固定四配对块相对上一版读取／管道基本持平，写入＋同步 −0.68%、同步 −0.91%；metadata +2.87%，配对块有升有降。功能修复按 main 配对交付；引用计数整理尚未证明消除了先前读取／管道差距，03 的性能后续继续保留。详见[第二批记录](../../runtime/docs/validation/modern-mount-overlay-20261126.md)。以下历史检查点保留其当时状态。
+
 当前 FUSE 收尾检查点（2026-11-26）：Unix pathname socket、报文／io_uring 原调用续执行、终态错误和原 inode／mount 生命周期已补齐；追加消除路径比较的临时分配。Apple／Linux 按范围合并为 1683／1691 通过、各 2 忽略；最终解释器与签名 Mac HVF 的原版 libfuse 各九组、各 117 项检查通过。最终原版 gVisor 按明确模式合并为 883 身份、867 通过／16 跳过，全部 864 个原生通过项对齐，保留前后产物原始失败和模式依据。最终 26 次长样本全部有效：1／2／4 CPU 元数据相对旧基线分别 −5.28%／−15.45%／−8.69%，其余普通负载最大 +0.65%，写入＋同步最大 +0.95%。实现与所选性能门槛已收尾，按 main 配对交付（Runtime `7d4a9711`）；所有者随后接受模拟器调试并取消真机阻塞，02 按现有解释器／HVF 证据收尾；当前进入 03 现代挂载。详见[本轮收尾记录](../../runtime/docs/validation/fuse-closeout-20261126.md)。下列历史检查点保留各自输入和结果。
 
 最新同步性能与交付检查点：tmpfs 时间／权限／所有权修改错误触发全局持久化已改为原目标文件系统提交，保留原 FD、卸载后 mount、磁盘错误及回滚，不增加协调线程。相同主线 release 对照中同步中位耗时下降约 88%–93%，写入＋同步下降约 24%–34%；全配置对照的写回总耗时均低于既有基线，普通负载最大中位增长 2.22%，短配对对照的最大 9.60% 波动也完整保留。Apple／Linux Runtime 全工作区 CI、产品严格检查、core＋FFI 567 项、iOS 编译及 Mac 接入均通过；原版工具九组、gVisor 485 身份为 475 通过／10 原始跳过，覆盖全部 474 个原生通过项，不新增全量台账计数。新主线 d544939a 集成后，两端受影响四库 1646／1655、core＋FFI 567、Mac 37 及 iOS 编译通过，原版工具和 421 项整组再次通过；最终 2 CPU 同步 0.471 毫秒、写入＋同步 18.412 毫秒，与已修复快照相近。最终短补测普通负载最大增长 7.47%，需后续长样本确认，不用前述旧快照结果替代。本轮累计实现与必要调用方按主线流程配对交付；02 的完整领域／设备验收及 03–12 保持原清单和顺序。详见[同步性能与交付记录](../../runtime/docs/validation/fuse-sync-delivery-20261125.md)。
@@ -27,7 +29,7 @@
 | 项目 | 已有实现／证据 | 仍需迭代 |
 | --- | --- | --- |
 | 02 FUSE | 实现、两宿主检查、解释器／HVF 原版工具及长样本性能已完成并配对交付；所有者 2026-11-26 接受模拟器调试、取消真机阻塞 | 本轮关闭；未运行的物理设备测试不记作通过 |
-| 03 现代挂载 | 挂载映射贯穿所有权、DAC／ACL、创建、属性及执行；非 tmpfs 重配置、普通 OFD writer 和逻辑 superblock 已补齐；两执行器实际 runc 三种 OCI 输入通过 | 本批已按 main 配对交付；保留读取／管道的已量化性能后续，已映射 overlay backing layer 仍拒绝，扩展类型／参数保留支持边界，不宣称所有现代挂载语义完成 |
+| 03 现代挂载 | 映射层 overlay copy-up／ACL／capability／真实 provider、四种现代 context、O_TMPFILE 已补齐；两执行器同 ELF 与四种实际 OCI 通过 | 功能按范围配对交付；读取／管道差距和 metadata +2.87% 波动仍需定位；未实现 filesystem／index／metacopy 参数保留明确支持边界 |
 | 04 cgroup | 映射 cache／别名及匿名 fork COW 的物理页归属、计费和写准入已有实现及回归 | 非 mmap 文件 IO 的 cache 计费、物理回收及 dirty／pinned 页、native extent 动态计费，真正的 IO controller 和压力验收 |
 | 05 Android 内存 | 已确认仓库镜像的 API 33／arm64-v8a 声明；既有 cgroup 基础可复用 | 确认 ART collector／lmkd reaper 实际路径，实施 userfaultfd／process_mrelease，验证 GC 尾延迟及退出回收 |
 | 06 调试工具 | ptrace／proc memory 原版用例闭环；GDB 启动、软件断点、单步及寄存器修改已有证据 | live attach、多线程、gdbserver、strace -f、拒绝访问及异常退出会话；硬件断点／观察点、SVE／SME 单独列支持范围 |
@@ -164,9 +166,9 @@
 
 ### 03 — 现代挂载剩余语义与 OCI 验收
 
-- [ ] 状态：本轮支持范围的实现、工具验收与配对交付已完成；剩余延伸语义保留，未将整项按全部 Linux 语义关闭。调试使用解释器／模拟器，两宿主编译检查通过。
+- [ ] 状态：两批计划功能实现及工具验收已完成；读取／管道差距和 metadata 波动仍需性能定位，未将整项按全部 Linux 语义或零性能回退关闭。调试使用解释器／模拟器，两宿主编译检查通过。
 - 本批已实现不可变挂载映射与资源导入、UID／GID／ACL／file capability 视图、创建／SGID、原 OFD 的快速 fstat、合法重配置及别名状态；普通写 OFD／私有 VMA 的真实最后引用参与 writer 准入。原版 runc 1.3.0 的 recursive、idmap 与 recursive-idmap 三种实际启动已在解释器／HVF 通过。详见[本批验证](../../runtime/docs/validation/modern-mounts-20261126.md)。
-- 保留延伸：当前 overlay 共享 upper inode 的实现仍拒绝已映射 backing layer，需先处理 copy-up 的双向身份边界；当前未实现的 fsopen 类型／参数及独立 O_TMPFILE 创建不计作已支持。现有 Root／tmpfs／overlay 自身映射与拒绝边界保留明确记录。
+- 第二批已补齐映射 lower／upper backing layer 的独立身份视图与 copy-up、ACL／capability、硬链接、原 FD／VMA／底层 writer 生命周期和失败回滚；四种现代 fsopen context 与 O_TMPFILE 已验证。原版 gVisor 941 个身份覆盖全部 926 个原生通过项，Linux 差异用原模式明确记录。详见[第二批验证](../../runtime/docs/validation/modern-mount-overlay-20261126.md)。未支持的 filesystem／index=on／metacopy=on 等选项继续明确拒绝，不泛化为全部 Linux 参数支持。
 - `mount_setattr` 的已验证递归属性修改，以及 `statmount`／`listmount`／原版 findmnt 查询，不再按未实现项处理。
 - 完成标准：挂载局部 UID／GID 映射贯穿权限、所有权查询和创建；检查 namespace 权限、共享／私有存储及失败回滚。重配置正确影响同一文件系统的别名，并保持各挂载属性独立。用实际 runc／OCI 配置验收对应启动路径。
 - 依据：[挂载属性](../../runtime/docs/validation/guest-mount-setattr-20261123.md)、[挂载查询](../../runtime/docs/validation/guest-mount-query-20261123.md)、[路线图](syscall-implementation.md#2-modern-mount-administration)。
