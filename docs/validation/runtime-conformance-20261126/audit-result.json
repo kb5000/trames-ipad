@@ -1,0 +1,30 @@
+{
+  "passed": true,
+  "original_qemu_failures_closed": 18,
+  "native_retirement_failure_closed": 1,
+  "final_unique_passed_per_lane": 542,
+  "original_ignored_per_lane": 3,
+  "cloud_lanes": {
+    "ubuntu-24.04/native": {
+      "reused_passed": 538,
+      "rechecked_passed": 4,
+      "ignored": 3
+    },
+    "ubuntu-24.04/qemu": {
+      "reused_passed": 538,
+      "rechecked_passed": 4,
+      "ignored": 3
+    },
+    "macos-15/native": {
+      "reused_passed": 538,
+      "rechecked_passed": 4,
+      "ignored": 3
+    }
+  },
+  "source_test_only": true,
+  "exact_selection_rejects_empty_matches": true,
+  "production_runtime_changed_by_this_batch": false,
+  "full_product_or_device_release_qualified": false,
+  "runtime": "2c5cc31ad139091de7fdb23c66090ec682d86b29",
+  "ipad_ci": "229838ae74020a8a2c0b6c3ba9ca987cc2131688"
+}

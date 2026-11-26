@@ -1,0 +1,132 @@
+{
+  "runtime": "2c5cc31ad139091de7fdb23c66090ec682d86b29",
+  "runtime_full": "c56e544effbacd42f0ce9b1f444bd6f4231f9ef9",
+  "parent": "235118768f41f919bb9e38d0109038ce872c15a4",
+  "ipad_full": "e962b80411019ba242d5587e74ef337bfd8e9829",
+  "ipad_exact": "229838ae74020a8a2c0b6c3ba9ca987cc2131688",
+  "cli": "8dd30e46dffdaf4fd9c412591edb557748e8d737",
+  "full_run": 45767694663,
+  "exact_run": 45770641227,
+  "source_hashes": {
+    "parent": {
+      "crates/trames-session/src/process.rs": "d196a27b5a337c4983978151c643549e7a072477b3cf26ddde41c91c2277a0e7",
+      "crates/trames-session/src/workers.rs": "572e566455a89f6c4f88789790ac38ad46d6b2f89817a66515e232d207a40a33",
+      "crates/trames-session/src/process_completion_tests.rs": "bd9eb593fa1a9a683580e05bcc6d688dae1a263e31418828f9d2a265e8c0150a",
+      "crates/trames-session/src/process_lifecycle_dispatch.rs": "77f046caa93abe65c099613c72678f456ee3ecabd8a17b34e98f6e7e064911bf",
+      "crates/trames-session/src/process_vm.rs": "285792cf2fb32f325d1a007b655b07ccd73313a0dd8d764b9b9a9d2a0e8babc2",
+      "crates/trames-session/src/process_dispatch_tests.rs": "d18f6db1bdd00f784886dc7bb406ee74ce427742691cbd68664d347e6a00583b",
+      "crates/trames-session/src/process_time_tests.rs": "f8fb53228ddb3873cab36a74eaaba1511a98cdc740b39526f8c14cfc4a2b55cd",
+      "crates/trames-session/src/process_file_advice_tests.rs": "61e70fdf531b14f1b1c7c64b510157621a09861d34ae4a71789902189821d9e4",
+      "crates/trames-session/src/process_published_proc_tests.rs": "6688fefcd01274e205561c418d4cd0fbba854296c7d8bca6a65a292510eaf07d",
+      "crates/trames-session/src/process_source_fault_tests.rs": "10b8ce9d4c987ddbf6ee58e587ef258a63219df2516185fce3bf21e5b7c27e55",
+      "crates/trames-session/src/process_uring_original_tests.rs": "b3cae8a0932638b282b1983005f93cf22cb07518111da2db2d7fe1fbbf1ccd75",
+      "crates/trames-session/src/process_dormant_tests.rs": "6d90b5c44903130f3328980c48b13ae6d676b23194d0f4f5b3356447ba1ad9ef",
+      "crates/trames-session/src/process_ioctl_tests.rs": "fb6754de9c327620aff1f5848a3826272105fbbb1a09691655f2c298d1080880",
+      "crates/trames-session/src/process_lock_tests.rs": "e40f42d46e5d6cc42689a5c20d387ae3a200a136525771c7a8563fb549553640",
+      "crates/trames-session/src/process_statistics_tests.rs": "ddae16735cc058865e3da9560130bf7c318df9330068d86eb8a86d8dac3e46ae",
+      "crates/trames-session/src/process_prctl_tests.rs": "3bf2c31b3e6b5da37b1f1724d51087c013737a58b26da569809f71c62adc9087"
+    },
+    "full": {
+      "crates/trames-session/src/process.rs": "4ef534c2f2654080a4f446009e381d932b9753344feaf2bcaafa1fdaa5ebbee5",
+      "crates/trames-session/src/workers.rs": "3dc3a18bbccf168e0c5beb90ee7121b9a65db9b20ec61a2fc9a05973f63e27cc",
+      "crates/trames-session/src/process_completion_tests.rs": "989a52a6ea9f40e3ce30272ada18b9217c7e564db64e998d22928cdf461db88e",
+      "crates/trames-session/src/process_lifecycle_dispatch.rs": "42c77bde3c8acefc0b6bfdb97400347a999396b693c0186ed4d762e4991ac9b4",
+      "crates/trames-session/src/process_vm.rs": "dc13aa1c5c756bbc122e4aef10738f1c81662e1708768beb682ab95ac46b18ff",
+      "crates/trames-session/src/process_dispatch_tests.rs": "b1937e57f1be3ef88f9929a4d7c6bfc0e5e6e9d5662b38d3b2ac2b0d2f6bb5a7",
+      "crates/trames-session/src/process_time_tests.rs": "eac671d51eee12e6ed9662e430a4cf05e07627736e0673b9ce3a9b4d851862ff",
+      "crates/trames-session/src/process_file_advice_tests.rs": "0bf329dd21b71f691beb81956efd7baef978dcb0c5e3641305d908c46d3fc801",
+      "crates/trames-session/src/process_published_proc_tests.rs": "90ac0ae62642a3d51f0afd148b574fbdf5ea2a6a2c4262656a745180d9077ea3",
+      "crates/trames-session/src/process_source_fault_tests.rs": "29da1b571d592d4a80afa6146a1775c916590ca5970e5981c9cab0281b673693",
+      "crates/trames-session/src/process_uring_original_tests.rs": "5e0f3840f25f49f4f9e3b309680cf01a8bcf48ed2ee31546f2e230f8d25fe0a6",
+      "crates/trames-session/src/process_dormant_tests.rs": "dd4e961d8bae11c1635dd3800d73a8f7dc345f6708826f67bc81a59fdfea3931",
+      "crates/trames-session/src/process_ioctl_tests.rs": "3a50ec9e593f2d9d6591246bdbef3204fce9c9c0455eeed803f95e91a76eb990",
+      "crates/trames-session/src/process_lock_tests.rs": "bc4af366547e2c3dbb5bf25f86fc2a604e323381a63cc32d6025471f43047fb1",
+      "crates/trames-session/src/process_statistics_tests.rs": "27dd550d3c13ff2dc6488efd94be4a9fdc4196d1d454e8d4c59092fece9302ae",
+      "crates/trames-session/src/process_prctl_tests.rs": "3bf2c31b3e6b5da37b1f1724d51087c013737a58b26da569809f71c62adc9087"
+    },
+    "final": {
+      "crates/trames-session/src/process.rs": "4ef534c2f2654080a4f446009e381d932b9753344feaf2bcaafa1fdaa5ebbee5",
+      "crates/trames-session/src/workers.rs": "3dc3a18bbccf168e0c5beb90ee7121b9a65db9b20ec61a2fc9a05973f63e27cc",
+      "crates/trames-session/src/process_completion_tests.rs": "989a52a6ea9f40e3ce30272ada18b9217c7e564db64e998d22928cdf461db88e",
+      "crates/trames-session/src/process_lifecycle_dispatch.rs": "42c77bde3c8acefc0b6bfdb97400347a999396b693c0186ed4d762e4991ac9b4",
+      "crates/trames-session/src/process_vm.rs": "c5c4eaaeb178367fcaf4b27aa250c728f0f2781dd433c7a5d3f89dab76a6c801",
+      "crates/trames-session/src/process_dispatch_tests.rs": "b1937e57f1be3ef88f9929a4d7c6bfc0e5e6e9d5662b38d3b2ac2b0d2f6bb5a7",
+      "crates/trames-session/src/process_time_tests.rs": "eac671d51eee12e6ed9662e430a4cf05e07627736e0673b9ce3a9b4d851862ff",
+      "crates/trames-session/src/process_file_advice_tests.rs": "0bf329dd21b71f691beb81956efd7baef978dcb0c5e3641305d908c46d3fc801",
+      "crates/trames-session/src/process_published_proc_tests.rs": "90ac0ae62642a3d51f0afd148b574fbdf5ea2a6a2c4262656a745180d9077ea3",
+      "crates/trames-session/src/process_source_fault_tests.rs": "29da1b571d592d4a80afa6146a1775c916590ca5970e5981c9cab0281b673693",
+      "crates/trames-session/src/process_uring_original_tests.rs": "5e0f3840f25f49f4f9e3b309680cf01a8bcf48ed2ee31546f2e230f8d25fe0a6",
+      "crates/trames-session/src/process_dormant_tests.rs": "dd4e961d8bae11c1635dd3800d73a8f7dc345f6708826f67bc81a59fdfea3931",
+      "crates/trames-session/src/process_ioctl_tests.rs": "3a50ec9e593f2d9d6591246bdbef3204fce9c9c0455eeed803f95e91a76eb990",
+      "crates/trames-session/src/process_lock_tests.rs": "bc4af366547e2c3dbb5bf25f86fc2a604e323381a63cc32d6025471f43047fb1",
+      "crates/trames-session/src/process_statistics_tests.rs": "27dd550d3c13ff2dc6488efd94be4a9fdc4196d1d454e8d4c59092fece9302ae",
+      "crates/trames-session/src/process_prctl_tests.rs": "5d961e2be997722017800007f87f823b438ec23f51e5e3c34f01cdfc5cc7deba"
+    }
+  },
+  "production_prefixes": [
+    {
+      "path": "process.rs",
+      "prefix_sha256": "4cca884c784869ff4654ca6d46f371b78b271db7da3a6e914d6a6a538ca2a40c"
+    },
+    {
+      "path": "workers.rs",
+      "prefix_sha256": "2f66b34b62da525a88226bde14960e308cae770f69225028d9313b0456998f48"
+    },
+    {
+      "path": "process_lifecycle_dispatch.rs",
+      "prefix_sha256": "da2a184c86f7b692b4d1887753f5c5d549bc7f43a43871f125286f7c7b47ef42"
+    },
+    {
+      "path": "process_vm.rs",
+      "prefix_sha256": "13b5d9aa4960acd3e4786ed86bd158ac91b3229f786457c02974569bca08cb69"
+    }
+  ],
+  "changed_functions": {
+    "process_vm.rs": [
+      "source_exit_publishes_backing_when_only_an_undispatched_mm_owner_remains",
+      "denied_filtered_mapping_preserves_memory_and_applies_its_decision_once",
+      "cohort_return_profile_excludes_local_calls_and_disabled_profiling"
+    ],
+    "process_prctl_tests.rs": [
+      "faulting_source_setname_keeps_the_original_comm_and_completes_once"
+    ]
+  },
+  "affected_cases": [
+    "process::vm::tests::source_exit_publishes_backing_when_only_an_undispatched_mm_owner_remains",
+    "process::vm::tests::denied_filtered_mapping_preserves_memory_and_applies_its_decision_once",
+    "process::vm::tests::cohort_return_profile_excludes_local_calls_and_disabled_profiling",
+    "process::prctl_tests::faulting_source_setname_keeps_the_original_comm_and_completes_once"
+  ],
+  "runtime_test_delta": [
+    "crates/trames-session/src/process.rs",
+    "crates/trames-session/src/process_completion_tests.rs",
+    "crates/trames-session/src/process_dispatch_tests.rs",
+    "crates/trames-session/src/process_dormant_tests.rs",
+    "crates/trames-session/src/process_file_advice_tests.rs",
+    "crates/trames-session/src/process_ioctl_tests.rs",
+    "crates/trames-session/src/process_lifecycle_dispatch.rs",
+    "crates/trames-session/src/process_lock_tests.rs",
+    "crates/trames-session/src/process_prctl_tests.rs",
+    "crates/trames-session/src/process_published_proc_tests.rs",
+    "crates/trames-session/src/process_source_fault_tests.rs",
+    "crates/trames-session/src/process_statistics_tests.rs",
+    "crates/trames-session/src/process_time_tests.rs",
+    "crates/trames-session/src/process_uring_original_tests.rs",
+    "crates/trames-session/src/process_vm.rs",
+    "crates/trames-session/src/workers.rs"
+  ],
+  "followup_delta": [
+    "crates/trames-session/src/process_prctl_tests.rs",
+    "crates/trames-session/src/process_vm.rs"
+  ],
+  "local_v3_base": {
+    ".": "66cb4a458daf6333ee31a21dcce64847dd55bc81",
+    "cli": "8dd30e46dffdaf4fd9c412591edb557748e8d737",
+    "runtime": "7f80b14c0a134f1878e058c98ab43aa7749ac5df"
+  },
+  "local_v4_base": {
+    ".": "e962b80411019ba242d5587e74ef337bfd8e9829",
+    "cli": "8dd30e46dffdaf4fd9c412591edb557748e8d737",
+    "runtime": "c56e544effbacd42f0ce9b1f444bd6f4231f9ef9"
+  }
+}

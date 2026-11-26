@@ -1,0 +1,346 @@
+{
+  "baseline": {
+    "id": 45767694663,
+    "head_sha": "e962b80411019ba242d5587e74ef337bfd8e9829",
+    "status": "completed",
+    "conclusion": "failure",
+    "url": "https://github.com/project-trames/trames-ipad/actions/runs/45767694663",
+    "jobs": [
+      {
+        "id": 139732500191,
+        "name": "Kernel conformance (ubuntu-24.04)",
+        "status": "completed",
+        "conclusion": "failure",
+        "url": "https://github.com/project-trames/trames-ipad/actions/runs/45767694663/job/139732500191",
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run dtolnay/rust-toolchain@master",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Install Linux native and cross-compile prerequisites",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run actions/cache@v4",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Prepare pinned independent ARM64 oracle",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Record checked-out source identities",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Prepare unchanged guest CLI",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Check conformance formatting and lints",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run native kernel conformance",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run ARM64 musl kernel conformance under pinned QEMU",
+            "status": "completed",
+            "conclusion": "failure"
+          },
+          {
+            "name": "Run actions/upload-artifact@v4",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Run actions/cache@v4",
+            "status": "completed",
+            "conclusion": "skipped"
+          },
+          {
+            "name": "Post Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success"
+          }
+        ]
+      },
+      {
+        "id": 139732500471,
+        "name": "Kernel conformance (macos-15)",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/project-trames/trames-ipad/actions/runs/45767694663/job/139732500471",
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run dtolnay/rust-toolchain@master",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Install Linux native and cross-compile prerequisites",
+            "status": "completed",
+            "conclusion": "skipped"
+          },
+          {
+            "name": "Run actions/cache@v4",
+            "status": "completed",
+            "conclusion": "skipped"
+          },
+          {
+            "name": "Prepare pinned independent ARM64 oracle",
+            "status": "completed",
+            "conclusion": "skipped"
+          },
+          {
+            "name": "Record checked-out source identities",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Prepare unchanged guest CLI",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Check conformance formatting and lints",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run native kernel conformance",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run ARM64 musl kernel conformance under pinned QEMU",
+            "status": "completed",
+            "conclusion": "skipped"
+          },
+          {
+            "name": "Run actions/upload-artifact@v4",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success"
+          }
+        ]
+      }
+    ]
+  },
+  "exact": {
+    "id": 45770641227,
+    "head_sha": "229838ae74020a8a2c0b6c3ba9ca987cc2131688",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/project-trames/trames-ipad/actions/runs/45770641227",
+    "jobs": [
+      {
+        "id": 139742173713,
+        "name": "Kernel conformance (ubuntu-24.04)",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/project-trames/trames-ipad/actions/runs/45770641227/job/139742173713",
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run dtolnay/rust-toolchain@master",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Install Linux native and cross-compile prerequisites",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run actions/cache@v4",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Prepare pinned independent ARM64 oracle",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Record checked-out source identities",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Prepare unchanged guest CLI",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Check conformance formatting and lints",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run native kernel conformance",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run ARM64 musl kernel conformance under pinned QEMU",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run actions/upload-artifact@v4",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Run actions/cache@v4",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success"
+          }
+        ]
+      },
+      {
+        "id": 139742174018,
+        "name": "Kernel conformance (macos-15)",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/project-trames/trames-ipad/actions/runs/45770641227/job/139742174018",
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run dtolnay/rust-toolchain@master",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Install Linux native and cross-compile prerequisites",
+            "status": "completed",
+            "conclusion": "skipped"
+          },
+          {
+            "name": "Run actions/cache@v4",
+            "status": "completed",
+            "conclusion": "skipped"
+          },
+          {
+            "name": "Prepare pinned independent ARM64 oracle",
+            "status": "completed",
+            "conclusion": "skipped"
+          },
+          {
+            "name": "Record checked-out source identities",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Prepare unchanged guest CLI",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Check conformance formatting and lints",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run native kernel conformance",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run ARM64 musl kernel conformance under pinned QEMU",
+            "status": "completed",
+            "conclusion": "skipped"
+          },
+          {
+            "name": "Run actions/upload-artifact@v4",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success"
+          }
+        ]
+      }
+    ]
+  }
+}
