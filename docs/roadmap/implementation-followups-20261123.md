@@ -1,6 +1,6 @@
 # 临时实施清单：兼容性迭代后的剩余工作
 
-当前检查点（2026-11-27）：06 真实调试工具按约定范围完成。原版 GDB／gdbserver／strace 在 Linux 对照、解释器和 Mac HVF 各 14/14，两后端单执行槽各 8/8；相关原版 gVisor 各 165 通过、1 原始跳过。原 tracer 任务归属、非 leader exec 通知解锁、SEIZE 新生事件及停止期间待执行 SVC 已修正，无新增协调／服务线程。Apple／Linux kernel 各 204 通过，产品组合 547 通过／3 忽略，严格检查和 iOS ARM64 Rust 构建通过。详见[验证与支持边界](../../runtime/docs/validation/debugger-sessions-20261127.md)。下一领域为 07 futex2／rseq。
+当前检查点（2026-11-27）：07 futex2／rseq 按选定 U32／legacy rseq ABI 完成。修正异步缺页续接、负数 wake 与带超时 SA_RESTART，不新增协调／服务线程。Linux 对照、解释器和 HVF 的原版 gVisor 各 80/80，两后端单槽 rseq 各 13/13；原版 Linux 18 个程序／参数组合全部通过，包含两个原版 200 线程大压力程序。产品组合 553 通过／3 原有忽略，Apple／Linux session 各 16/16；严格检查和 iOS ARM64 构建通过。旧 futex 预热对照未见回退。详见[验证与支持边界](../../runtime/docs/validation/synchronization-20261127.md)。下一领域为 08 guest perf 工具链。
 
 前一检查点：05 Android 内存生命周期已按约定范围完成。UFFD 私有匿名 MISSING、原 mm 的 process_mrelease、全局内存 PSI 及原版 ART／Zygote／lmkd 已集中验证，无新增协调／服务线程。Apple／Linux 资源测试分别 2,364／2,374 通过，各 5 既有忽略；原版 lmkd 连续十轮自动回收约 64 MiB、分配者正常完成。最终 ART 三对中位耗时 405.94→392.18 ms，先前约 15% 倒退未再复现；不宣称 GC 加速。详见[验证与支持边界](../../runtime/docs/validation/android-memory-20261127.md)。
 
@@ -41,7 +41,7 @@
 | 04 cgroup | 功能、调用方、两宿主资源、实际限速／回收及性能已验证并配对交付，见下方领域 04 | 本轮关闭；既有实测开销和支持边界保留 |
 | 05 Android 内存 | UFFD MISSING、mrelease、原版 ART／Zygote／Reaper、真实 PSI 自动回收及性能验收完成，见[验证记录](../../runtime/docs/validation/android-memory-20261127.md) | 本轮按约定范围关闭；WP／MINOR、CPU／IO PSI、swap／file LRU 未提供，宿主压力及物理 iPad 未强制验收 |
 | 06 调试工具 | 原版 GDB live attach、多线程、gdbserver、strace -f、拒绝访问及异常退出已集中验收，两后端含单执行槽 | 本轮关闭；硬件断点／观察点、SVE／SME 保持单独的未支持范围 |
-| 07 futex2／rseq | 四个 futex2 接口及 rseq 注册／中止／迁移／信号／fork／exec 已有实现；已覆盖单元／解释器检查通过 | 原版 no-libc ARM64 runfile、Linux 自测和真实调用程序，两种执行后端的生命周期及旧 futex 性能验收 |
+| 07 futex2／rseq | 选定 U32／legacy rseq ABI 完成：原版 helper 与 Linux 自测、glibc 默认／fallback、单槽／多 CPU 和旧 futex 性能均验收通过 | 本批范围无功能阻塞；可选 NUMA／其他位宽／新 rseq ABI 不广告 |
 | 08 perf | 软件时钟计数／基本采样、FD／控制／映射环、输出重定向、继承／exec 和部分动态策略已有实现及回归 | 采样中断／开销预算、内核生产者、其余事件与 CPU／cgroup 作用域、映射／权限细节，原版 perf stat／record 验收 |
 | 09 动态任务上限 | 默认 65,536、可写 proc、manifest／CLI／FFI／两端启动共享准入资源；实际 guest 初始化、动态读写及拒绝 fork 已验证 | 实际 Mac/HVF 产品运行及物理 iPad、安装应用的配置交付验收；共享实现不再按未实现排队 |
 | 10 allocator | 默认关闭的实验路径；固定输入和轮换对照驱动为 WIP | 完成短调用／竞争及 Vim／Python 等真实负载对照，定位既有倒退后再决定默认开关 |
@@ -211,11 +211,11 @@
 
 ### 07 — futex2 与 rseq
 
-- [ ] 状态：基础实现已合入并通过已覆盖检查；原版 helper／自测、真实程序和两后端验收未完成。
+- [x] 状态：选定 U32 futex2／legacy rseq ABI 完成；原版 helper、Linux 自测、glibc 默认／fallback、两后端单槽／多 CPU 与旧 futex 性能均验收通过。
 - futex2：`futex_waitv`、`futex_wait`、`futex_wake`、`futex_requeue`，复用现有等待队列及 private／shared key。
 - rseq：同时处理线程注册、CPU 身份、迁移、抢占、信号中止和线程退出；恢复原始 no-libc 测试依赖后再作为覆盖依据。
 - 完成标准：Linux 自测及真实调用程序通过，覆盖唤醒／重排／超时／信号竞态和共享别名；两种 CPU 后端语义一致，并验证旧 futex 正常路径性能。rseq 的优先级结合实际程序收益确定。
-- 依据：[线程同步路线图](syscall-implementation.md#4-thread-synchronization)。
+- 依据：[线程同步路线图](syscall-implementation.md#4-thread-synchronization)、[本批实施](synchronization-batch-20261127.md)、[原版工具与性能验收](../../runtime/docs/validation/synchronization-20261127.md)。
 
 ### 08 — guest perf 工具链
 

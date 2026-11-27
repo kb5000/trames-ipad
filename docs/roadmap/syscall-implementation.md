@@ -156,6 +156,13 @@ Status on 2026-11-27: the scoped Android 13/API 33 iteration is complete. Privat
 
 ## 4. Thread synchronization
 
+The selected U32 futex2 / legacy rseq batch is complete: original gVisor
+futex/rseq 80/80 on Linux, interpreter and HVF; original Linux selftests and
+stock glibc fast path / opt-out pass, including 200-thread CPU/mm_cid stress.
+Both-backend single-slot checks and warmed legacy futex/mutex comparisons pass.
+Optional NUMA/other word sizes/new rseq extensions remain unadvertised.
+See [the exact evidence and limits](../../runtime/docs/validation/synchronization-20261127.md).
+
 - Implement `futex_waitv`, `futex_wait`, `futex_wake` and `futex_requeue` on
   the existing private and shared futex keys. A vector wait publishes one
   logical waiter, wakes once with the winning index and removes all of its
