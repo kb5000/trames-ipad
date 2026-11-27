@@ -1,6 +1,8 @@
 # 临时实施清单：兼容性迭代后的剩余工作
 
-当前检查点（2026-11-27）：04 cgroup 功能及必要调用方已集中验证完成，主线整合后的两执行器原版用例、两宿主资源／组合测试及 iOS Rust 产物通过；没有新增协调线程。冷读性能后续已实现并验证，HVF IO 比上一版快 4.01%，相对 cgroup 前基线的中位差距收敛为 +2.63%；完整记录见[收尾验证](../../runtime/docs/validation/cgroup-closeout-20261127.md)及下方领域 04。功能顺序下一领域为 05 Android 内存生命周期。
+当前检查点（2026-11-27）：05 Android 内存生命周期按约定范围完成。UFFD 私有匿名 MISSING、原 mm 的 process_mrelease、全局内存 PSI 及原版 ART／Zygote／lmkd 已集中验证，无新增协调／服务线程。Apple／Linux 资源测试分别 2,364／2,374 通过，各 5 既有忽略；原版 lmkd 连续十轮自动回收约 64 MiB、分配者正常完成。最终 ART 三对中位耗时 405.94→392.18 ms，先前约 15% 倒退未再复现；不宣称 GC 加速。详见[本轮验证与支持边界](../../runtime/docs/validation/android-memory-20261127.md)。下一领域为 06 真实调试工具验收。
+
+上一检查点（2026-11-27）：04 cgroup 功能及必要调用方已集中验证完成，主线整合后的两执行器原版用例、两宿主资源／组合测试及 iOS Rust 产物通过；没有新增协调线程。冷读性能后续已实现并验证，HVF IO 比上一版快 4.01%，相对 cgroup 前基线的中位差距收敛为 +2.63%；完整记录见[收尾验证](../../runtime/docs/validation/cgroup-closeout-20261127.md)及下方领域 04。功能顺序下一领域为 05 Android 内存生命周期。
 
 上一检查点（2026-11-26）：03 现代挂载按约定功能、工具及遗留性能范围收尾。共享挂载快速标记启用默认路径，区域掩码与小型访问辅助内联，保留所有原权限／范围检查与同步，不新增协调线程。最终两宿主 1942／1952 通过、各 5 原有忽略；原版 gVisor 941 身份为 931 通过／10 跳过，覆盖全部 926 个原生通过项；两执行器同 ELF 342＋234、四种 OCI 及各 39 项 FUSE 通过。四配对块直接对照原 FUSE 基线：metadata −31.03%、两种读取 −14.41%／−14.95%、管道 −14.01%，各块方向一致；写入＋同步 −1.28%、同步 −0.48%，块间波动公开保留。详见[收尾验证](../../runtime/docs/validation/modern-mount-closeout-20261126.md)。下一领域为 04 cgroup，未支持的 filesystem 参数不泛化为已支持。
 
@@ -34,8 +36,8 @@
 | --- | --- | --- |
 | 02 FUSE | 实现、两宿主检查、解释器／HVF 原版工具及长样本性能已完成并配对交付；所有者 2026-11-26 接受模拟器调试、取消真机阻塞 | 本轮关闭；未运行的物理设备测试不记作通过 |
 | 03 现代挂载 | 映射层 overlay、四种现代 context、O_TMPFILE、原 OFD／provider 及 OCI 均验证；最终四配对块对照原 FUSE 基线，metadata／读取／管道每块均改善 | 本轮按约定范围关闭；原始块间波动与未支持 filesystem／index／metacopy 参数边界保留 |
-| 04 cgroup | 已发布映射／匿名页基础；非 mmap 缓存、tmpfs／memfd 计费、资源续接、实时导入／导出／条件编辑、IO 控制文件和私有磁盘数据入口已有未验证候选 | 补全旧入口／loader／导入／元数据后端、dirty 压力写回与真实回收、限额与退役生命周期，再统一验证；见[当前批次](cgroup-batch-20261126.md) |
-| 05 Android 内存 | 已确认仓库镜像的 API 33／arm64-v8a 声明；既有 cgroup 基础可复用 | 确认 ART collector／lmkd reaper 实际路径，实施 userfaultfd／process_mrelease，验证 GC 尾延迟及退出回收 |
+| 04 cgroup | 功能、调用方、两宿主资源、实际限速／回收及性能已验证并配对交付，见下方领域 04 | 本轮关闭；既有实测开销和支持边界保留 |
+| 05 Android 内存 | UFFD MISSING、mrelease、原版 ART／Zygote／Reaper、真实 PSI 自动回收及性能验收完成，见[验证记录](../../runtime/docs/validation/android-memory-20261127.md) | 本轮按约定范围关闭；WP／MINOR、CPU／IO PSI、swap／file LRU 未提供，宿主压力及物理 iPad 未强制验收 |
 | 06 调试工具 | ptrace／proc memory 原版用例闭环；GDB 启动、软件断点、单步及寄存器修改已有证据 | live attach、多线程、gdbserver、strace -f、拒绝访问及异常退出会话；硬件断点／观察点、SVE／SME 单独列支持范围 |
 | 07 futex2／rseq | 四个 futex2 接口及 rseq 注册／中止／迁移／信号／fork／exec 已有实现；已覆盖单元／解释器检查通过 | 原版 no-libc ARM64 runfile、Linux 自测和真实调用程序，两种执行后端的生命周期及旧 futex 性能验收 |
 | 08 perf | 软件时钟计数／基本采样、FD／控制／映射环、输出重定向、继承／exec 和部分动态策略已有实现及回归 | 采样中断／开销预算、内核生产者、其余事件与 CPU／cgroup 作用域、映射／权限细节，原版 perf stat／record 验收 |
@@ -189,11 +191,12 @@
 
 ### 05 — Android 内存生命周期
 
-- [ ] 状态：待实现，并需绑定目标 Android 镜像验收。
-- 剩余范围：`userfaultfd`、`process_mrelease`，以及 ART／`lmkd` 实际选择的相关路径。
-- 先确认目标镜像中的 collector、reaper 和调用参数，再确定必须支持的 ABI、故障事件和回收范围。
-- 完成标准：覆盖共享地址空间、并发退出、重复调用、unmap／remap 和故障挂起时的终止；原版 Android 应用压力负载确实使用预期路径。测量 GC 暂停尾延迟及应用终止后的内存下降，并补 Mac 与物理 iPad 验收。
-- 依据：[Android 内存路线图](syscall-implementation.md#3-android-memory-lifecycle)。
+- [x] 状态：2026-11-27 完成实现、调用方和集中验收；固定 Android 13／API 33 镜像，见[实施批次](android-memory-batch-20261127.md)及[验证记录](../../runtime/docs/validation/android-memory-20261127.md)。
+- 覆盖私有匿名 UFFD MISSING、原 OFD／原 mm 控制、真正故障与取消、共享地址空间、unmap／remap／exec／退出、重复 mrelease，以及独立物理租约保留。未声明 WP／MINOR 或额外事件功能。
+- 全局 PSI 使用实际资源及原 worker／readiness；恢复原版 lmkd 默认阈值，连续十轮自行选择 adj=900 缓存目标、回收约 64 MiB，分配者均正常完成。HostManaged 仅保留宿主提示，不加 guest 硬配额。
+- Apple／Linux 资源分别 2,364／2,374 通过、各 5 忽略；两执行器原版 gVisor 按明确模式各 250 通过／6 跳过，不重复累计旧全量台账。iOS Rust、同 ELF 生命周期、原版 Zygote／Reaper 及真实 ART GC 暂停测量完成。
+- 无压力的暂存、锁、均值重算和释放唤醒已按实际测量整理；最终 ART 三对中位耗时 405.94→392.18 ms，实际暂停与 System.gc 调用时间分开报告，不称已启用并发压缩或 GC 加速。
+- 所有者接受模拟器／解释器／Mac HVF 验收；未运行物理 iPad，不将其记作通过。CPU／IO PSI、swap／file LRU 及强制宿主压力另列支持边界。
 
 ### 06 — 真实调试工具完整验收
 

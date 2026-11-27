@@ -129,6 +129,8 @@ variation and mixed write/sync blocks remain documented in the
 
 ## 3. Android memory lifecycle
 
+Status on 2026-11-27: the scoped Android 13/API 33 iteration is complete. Private anonymous userfaultfd MISSING, original-mm process_mrelease, session memory PSI and the unmodified lmkd automatic-reclaim path are implemented without a new coordinator/service thread. Original ART/Zygote/Reaper, ten consecutive automatic-reclaim runs, same-ELF lifecycle checks and paired performance measurements pass. ART still uses concurrent-copying; WP/MINOR/events, CPU/IO PSI, guest swap and file LRU are not advertised. HostManaged remains a host hint rather than a new guest quota. See the [validation and limits](../../runtime/docs/validation/android-memory-20261127.md). The owner accepts simulator/interpreter/Mac validation; physical iPad and forced host-pressure runs were not performed. The original acceptance outline below remains as design context.
+
 - Identify the shipped ART collector and `lmkd` reaping path from guest logs
   and controlled traces. Measure GC pause times and the time for memory use to
   drop after killing an app. Use the same image and workload for before and
@@ -146,7 +148,7 @@ variation and mixed write/sync blocks remain documented in the
   existing fault and wake paths. Cover multiple waiters, unmap, remap, close
   and exit, including termination while a fault is pending. Advertise only
   verified feature bits. Check that the image runs the intended collector and
-  compare application pause tails on a physical iPad as well as on Mac.
+  compare application pause tails on the agreed execution backends; physical iPad remains a separately unperformed validation.
   [AOSP ART collector](https://android.googlesource.com/platform/art/%2B/b4172cda352aee6cd207a354ab9a568988037e09/runtime/gc/collector/mark_compact.cc)
 
 ## 4. Thread synchronization
