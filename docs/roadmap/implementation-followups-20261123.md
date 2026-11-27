@@ -1,6 +1,8 @@
 # 临时实施清单：兼容性迭代后的剩余工作
 
-当前检查点（2026-11-27）：07 futex2／rseq 按选定 U32／legacy rseq ABI 完成。修正异步缺页续接、负数 wake 与带超时 SA_RESTART，不新增协调／服务线程。Linux 对照、解释器和 HVF 的原版 gVisor 各 80/80，两后端单槽 rseq 各 13/13；原版 Linux 18 个程序／参数组合全部通过，包含两个原版 200 线程大压力程序。产品组合 553 通过／3 原有忽略，Apple／Linux session 各 16/16；严格检查和 iOS ARM64 构建通过。旧 futex 预热对照未见回退。详见[验证与支持边界](../../runtime/docs/validation/synchronization-20261127.md)。下一领域为 08 guest perf 工具链。
+当前检查点（2026-11-27）：08 guest software perf 按选定范围完成。真实软件事件生产者、task／task+CPU／CPU-wide／cgroup+CPU、继承／exec、采样预算和原版 stat／record／script 已通过 Linux 对照、解释器与 HVF 单槽／多 CPU 验收。Apple／Linux 按身份复用为 2,349／2,360 通过、各 5 原有忽略；产品 554 通过／3 原有忽略。严格检查与 iOS ARM64 构建通过，没有新增协调／采样线程。最终 160 条性能样本有效并核对采样密度，普通高频 futex 仍有约 3%（5–6ns）实测差值；硬件 PMU／callchain 等不广告。详见[验证与支持边界](../../runtime/docs/validation/perf-20261127.md)。下一领域为 09 动态任务上限的产品配置交付验收。
+
+上一检查点（2026-11-27）：07 futex2／rseq 按选定 U32／legacy rseq ABI 完成。修正异步缺页续接、负数 wake 与带超时 SA_RESTART，不新增协调／服务线程。Linux 对照、解释器和 HVF 的原版 gVisor 各 80/80，两后端单槽 rseq 各 13/13；原版 Linux 18 个程序／参数组合全部通过，包含两个原版 200 线程大压力程序。产品组合 553 通过／3 原有忽略，Apple／Linux session 各 16/16；严格检查和 iOS ARM64 构建通过。旧 futex 预热对照未见回退。详见[验证与支持边界](../../runtime/docs/validation/synchronization-20261127.md)。下一领域为 08 guest perf 工具链。
 
 前一检查点：05 Android 内存生命周期已按约定范围完成。UFFD 私有匿名 MISSING、原 mm 的 process_mrelease、全局内存 PSI 及原版 ART／Zygote／lmkd 已集中验证，无新增协调／服务线程。Apple／Linux 资源测试分别 2,364／2,374 通过，各 5 既有忽略；原版 lmkd 连续十轮自动回收约 64 MiB、分配者正常完成。最终 ART 三对中位耗时 405.94→392.18 ms，先前约 15% 倒退未再复现；不宣称 GC 加速。详见[验证与支持边界](../../runtime/docs/validation/android-memory-20261127.md)。
 
@@ -26,13 +28,13 @@
 
 前一协商写回检查点：WRITEBACK_CACHE 已真正协商启用，原版 libfuse 三种配置 × 1／2／4 CPU 共九组通过；Apple／Linux 两库按身份合并为 1640／1648 通过，产品 565 通过。受影响 gVisor 在明确 CPU 前提下覆盖全部 410 个原生通过项，保留多 CPU 完成顺序假设失败及独立身份核对。见[写回验证记录](../validation/fuse-writeback-20261125.md)。匹配 release 性能、完整领域及最终平台／提交门槛仍开放，保持 01–12 原顺序。
 
-日期：2026-11-23；当前状态核对：2026-11-26。用途：作为后续实现、定位和验收的工作队列；完成一项后在本页更新状态并链接验证记录。这里保留待办和完成标准，具体设计在对应批次开始时结合源码和目标负载确定。
+日期：2026-11-23；当前状态核对：2026-11-27。用途：作为后续实现、定位和验收的工作队列；完成一项后在本页更新状态并链接验证记录。这里保留待办和完成标准，具体设计在对应批次开始时结合源码和目标负载确定。
 
-当前共 12 项：01、02、03 已按约定范围完成；09 的共享实现和本地行为验证已完成，仍需实际产品／真机交付验收；04—08、10—12 仍有实现、工具验收或测量工作。已合入实现及其通过证据不能自动关闭其他整项。
+当前共 12 项：01—08 已按各自约定范围完成；09 的共享实现和本地行为验证已完成，仍需产品配置交付验收，未运行的真机测试不计通过；10—12 仍有实现或测量工作。已合入实现及其通过证据不能自动关闭其他整项。
 
 ## 当前剩余工作摘要
 
-已发布 Runtime 修复基线 `42e5834` 的 Linux／macOS CI 及 Mac 产品 `2a99558` 构建已通过。原 iPad 的 Ubuntu→iOS 检查阻塞已完成本地修复：Apple 原生检查迁到独立 macOS workflow，旧 release-core 同类路径一并纠正，FFI 内存查询改用 iOS／macOS 公共 Mach API；真实 iPhoneOS SDK 编译、25 项 FFI、15 项 CI 范围检查及严格 Clippy 通过。远端专项 CI 随发布确认，见[交付修复记录](../validation/ios-embedding-host-20261124.md)。该历史交付阻塞已解除；当前按顺序进入 04 cgroup。
+已发布 Runtime 修复基线 `42e5834` 的 Linux／macOS CI 及 Mac 产品 `2a99558` 构建已通过。原 iPad 的 Ubuntu→iOS 检查阻塞已完成本地修复：Apple 原生检查迁到独立 macOS workflow，旧 release-core 同类路径一并纠正，FFI 内存查询改用 iOS／macOS 公共 Mach API；真实 iPhoneOS SDK 编译、25 项 FFI、15 项 CI 范围检查及严格 Clippy 通过。远端专项 CI 随发布确认，见[交付修复记录](../validation/ios-embedding-host-20261124.md)。该历史交付阻塞已解除；随后 04—08 的实施与验收见本页各项及顶部检查点，当前按顺序进入 09 产品配置交付验收。
 
 | 项目 | 已有实现／证据 | 仍需迭代 |
 | --- | --- | --- |
@@ -42,7 +44,7 @@
 | 05 Android 内存 | UFFD MISSING、mrelease、原版 ART／Zygote／Reaper、真实 PSI 自动回收及性能验收完成，见[验证记录](../../runtime/docs/validation/android-memory-20261127.md) | 本轮按约定范围关闭；WP／MINOR、CPU／IO PSI、swap／file LRU 未提供，宿主压力及物理 iPad 未强制验收 |
 | 06 调试工具 | 原版 GDB live attach、多线程、gdbserver、strace -f、拒绝访问及异常退出已集中验收，两后端含单执行槽 | 本轮关闭；硬件断点／观察点、SVE／SME 保持单独的未支持范围 |
 | 07 futex2／rseq | 选定 U32／legacy rseq ABI 完成：原版 helper 与 Linux 自测、glibc 默认／fallback、单槽／多 CPU 和旧 futex 性能均验收通过 | 本批范围无功能阻塞；可选 NUMA／其他位宽／新 rseq ABI 不广告 |
-| 08 perf | 软件时钟计数／基本采样、FD／控制／映射环、输出重定向、继承／exec 和部分动态策略已有实现及回归 | 采样中断／开销预算、内核生产者、其余事件与 CPU／cgroup 作用域、映射／权限细节，原版 perf stat／record 验收 |
+| 08 perf | 选定软件事件、真实生产者、完整选定作用域、采样预算、映射与原版 stat／record／script 验收完成 | 硬件 PMU、callchain 等不广告；普通高频调用的约 3% 实测差值明确保留 |
 | 09 动态任务上限 | 默认 65,536、可写 proc、manifest／CLI／FFI／两端启动共享准入资源；实际 guest 初始化、动态读写及拒绝 fork 已验证 | 实际 Mac/HVF 产品运行及物理 iPad、安装应用的配置交付验收；共享实现不再按未实现排队 |
 | 10 allocator | 默认关闭的实验路径；固定输入和轮换对照驱动为 WIP | 完成短调用／竞争及 Vim／Python 等真实负载对照，定位既有倒退后再决定默认开关 |
 | 11 存储持久化 | 同步写结果／偏移问题已修；ACK、P99、崩溃重开测量驱动为 WIP | 等持久性单／多写者、包安装／容器层、写放大及恢复验收；依据测量选择 WAL 或其他布局 |
@@ -219,10 +221,10 @@
 
 ### 08 — guest perf 工具链
 
-- [ ] 状态：软件时钟事件、FD／控制及基本采样环等已合入；完整生产者／作用域和原版工具验收未完成。
-- 补齐 `perf_event_open` 的剩余选定事件、采样中断／开销预算、CPU／cgroup 作用域及映射／权限依赖；不将基本环和计数回归等同于 perf 工具可用。
+- [x] 状态：选定软件事件、真实生产者、task／task+CPU／CPU-wide／cgroup+CPU、采样预算、生命周期／元数据／映射与原版工具验收完成。没有新增协调／服务线程。
+- 原版 Alpine perf stat／record／script 在解释器与 HVF 的单槽／多 CPU 通过；同 ARM64 ABI ELF 对照原生 Linux。硬件 PMU、callchain、寄存器／栈、AUX 和 precise IP 保持支持边界。性能按固定工作量、真实采样密度与旧普通负载核对，完整差值见验证记录。
 - 完成标准：原版 `perf stat`／`perf record` 对任务 CPU 时间、上下文切换等选定事件可用，计数及采样可核对。硬件 PMU 需后端能够准确归属 guest 并通过测量后再宣布支持。
-- 依据：[性能工具路线图](syscall-implementation.md#5-guest-performance-tooling)。
+- 依据：[性能工具路线图](syscall-implementation.md#5-guest-performance-tooling)、[本批实施](perf-batch-20261127.md)、[真实工具与性能记录](../../runtime/docs/validation/perf-20261127.md)。
 
 ## 计划、优化与测量任务
 

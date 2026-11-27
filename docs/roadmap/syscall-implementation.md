@@ -183,6 +183,8 @@ See [the exact evidence and limits](../../runtime/docs/validation/synchronizatio
 
 ## 5. Guest performance tooling
 
+2026-11-27: the selected software-event/tool scope is implemented and validated on Linux reference, interpreter and HVF, including one-slot execution. Stock `perf stat`, `record` and `script` work for the documented modes. Hardware PMU, callchain and precise attribution remain unsupported; measured overhead and exact limits are retained in the [validation record](../../runtime/docs/validation/perf-20261127.md).
+
 Implement `perf_event_open` for guest task software events such as task CPU
 time and scheduler context switches. Expose the event FD, read and control
 operations and the sample ring required by supported `perf record` modes.
