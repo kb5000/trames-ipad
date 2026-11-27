@@ -185,8 +185,8 @@ def main():
         writer.writeheader()
         writer.writerows(rows)
     hwcap, hwcap2, features = subprocess.check_output([str(args.probe), '--features'], text=True).strip().split(' ', 2)
-    sources = sorted((ROOT/'crates/trames-cpu/src').glob('*.rs')) + sorted((ROOT/'crates/trames-compute/src').glob('*.rs'))
-    sources += [ROOT/'runtime/crates/trames-memory/src/lib.rs', ROOT/'runtime/crates/trames-memory/src/backing.rs', ROOT/'runtime/crates/trames-memory/src/reservations.rs', ROOT/'runtime/crates/trames-session/src/process_events.rs',
+    sources = sorted((ROOT/'runtime/crates/trames-interpreter/src').glob('*.rs')) + sorted((ROOT/'runtime/crates/trames-host-compute/src').glob('*.rs'))
+    sources += [ROOT/'crates/trames-cpu/src/lib.rs', ROOT/'crates/trames-compute/src/lib.rs', ROOT/'runtime/crates/trames-memory/src/lib.rs', ROOT/'runtime/crates/trames-memory/src/backing.rs', ROOT/'runtime/crates/trames-memory/src/reservations.rs', ROOT/'runtime/crates/trames-session/src/process_events.rs',
                 ROOT/'runtime/crates/trames-session/src/process.rs', ROOT/'crates/trames-core/src/lib.rs', ROOT/'runtime/crates/trames-memory/src/cpu_memory.rs',
                 ROOT/'runtime/crates/trames-memory/src/parallel.rs', ROOT/'runtime/crates/trames-session/src/workers.rs']
     report = dict(scope=f'{len(rows)} representative encodings; decode acceptance, not exhaustive ISA conformance',

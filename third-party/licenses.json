@@ -27,6 +27,8 @@
     "trames-execution",
     "trames-ffi",
     "trames-graphics",
+    "trames-host-compute",
+    "trames-interpreter",
     "trames-kernel",
     "trames-linux",
     "trames-memory",

@@ -4,7 +4,10 @@ version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
+repository.workspace = true
 
-# Native instructions operate on values, never on guest memory pointers.
-[lints.rust]
-unsafe_op_in_unsafe_fn = "deny"
+[dependencies]
+trames-host-compute = { path = "../../runtime/crates/trames-host-compute" }
+
+[lints]
+workspace = true

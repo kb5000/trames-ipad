@@ -7,11 +7,10 @@ license.workspace = true
 repository.workspace = true
 
 [dependencies]
-trames-engine = { workspace = true }
-trames-execution = { workspace = true }
-trames-memory = { workspace = true }
-getrandom = "=0.3.4"
-trames-compute = { path = "../trames-compute" }
+trames-interpreter = { path = "../../runtime/crates/trames-interpreter" }
 
 [lints]
 workspace = true
+
+[dev-dependencies]
+trames-memory = { workspace = true }
