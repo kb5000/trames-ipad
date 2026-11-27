@@ -276,7 +276,7 @@ counts tasks as they are created; raising the limit does not preallocate guest
 memory, task objects or host threads. Existing embedding-supplied limits are the
 initial value unless a manifest sysctl overrides them.
 
-The current implementation candidate makes `/proc/sys/kernel/threads-max`
+The implementation makes `/proc/sys/kernel/threads-max`
 writable by root in the initial user namespace. The proc file, session task
 admission and this startup declaration share the same atomic resource:
 
@@ -293,14 +293,16 @@ than silently selecting a different limit. The command-line spelling is
 Lowering the value does not terminate existing tasks. New tasks are rejected
 while the admitted count has reached the current ceiling; increasing it makes
 capacity available immediately. Runtime proc snapshots do not overwrite a value
-set by the manifest or guest. `pid_max`, per-UID `RLIMIT_NPROC`, and cgroup
-`pids.max` remain separate admission controls.
+set by the manifest or guest. Cgroup `pids.max` remains a separate admission
+control. `RLIMIT_NPROC` currently returns a fixed compatibility value derived
+from the session ceiling; writable per-UID admission is a separate follow-up.
 
-The shared candidate passed the combined build/regression checkpoint, including
-real guest initialization, live writes and rejection of a fork after lowering
-the ceiling. Mac product/HVF source compatibility was compiled against the same
-runtime. Physical-device validation and installed-app release acceptance remain
-open; no coordinator or resource-service thread is introduced.
+The actual signed Mac/HVF product and iPad simulator application passed the
+1/4 CPU configuration, restart, live-admission and four-round 512-thread
+acceptance. Physical iPad tests were not run and are not counted as passing.
+No coordinator or resource-service thread is introduced. See the
+[task-capacity guide](task-capacity.md) and
+[product validation](../validation/task-capacity-product-20261127.md).
 
 ## Alpine Firefox graphics payload
 
