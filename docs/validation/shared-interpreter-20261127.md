@@ -22,3 +22,10 @@ iOS and ARM64 Linux musl CPU checks, and the complete product boundary script
 against a pristine published Runtime. `trames-core --lib` also compiled against
 that pristine Runtime. Later Android-only alias binding fixes keep the same
 Apple/Linux interpreter implementation; their passed checks are reused.
+
+The paired Linux workflow exposed an older `u64::from(u64)` in the lifecycle
+pidfd test (originating before this extraction). Runtime `393db29685ace8ed635c21f4f6a7f866f8bccdcb`
+removes the redundant conversion. The previously failed `trames-core`
+`kernel-conformance` Clippy target now passes with `--no-deps -- -D warnings`
+against the pristine shared Runtime. No production CPU/session code changed in
+that follow-up; passed software CPU and Android APK checks are reused.
