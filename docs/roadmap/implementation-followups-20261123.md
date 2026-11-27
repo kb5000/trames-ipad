@@ -1,6 +1,8 @@
 # 临时实施清单：兼容性迭代后的剩余工作
 
-当前检查点（2026-11-27）：08 guest software perf 按选定范围完成。真实软件事件生产者、task／task+CPU／CPU-wide／cgroup+CPU、继承／exec、采样预算和原版 stat／record／script 已通过 Linux 对照、解释器与 HVF 单槽／多 CPU 验收。Apple／Linux 按身份复用为 2,349／2,360 通过、各 5 原有忽略；产品 554 通过／3 原有忽略。严格检查与 iOS ARM64 构建通过，没有新增协调／采样线程。最终 160 条性能样本有效并核对采样密度，普通高频 futex 仍有约 3%（5–6ns）实测差值；硬件 PMU／callchain 等不广告。详见[验证与支持边界](../../runtime/docs/validation/perf-20261127.md)。下一领域为 09 动态任务上限的产品配置交付验收。
+当前检查点（2026-11-27）：09 全局动态任务上限的产品交付完成。修正 Mac／Swift 对字面 sysctl 名称的配置访问，实际签名 Mac/HVF 公共 CLI 在 1／4 CPU 的 74 条命令通过；iPad 模拟器三个测试身份通过、零跳过，八个阶段附件确认默认值、动态准入、重启与四轮 512 线程复用。Mac 四项配置回归及严格检查通过，未新增协调线程，Runtime pin 保持 `10dcf23`。详见[本轮验证](../validation/task-capacity-product-20261127.md)。所有者明确将可写 per-UID RLIMIT_NPROC 单列为 13，现有只读兼容值不视为独立 per-UID 限制。下一领域为 10 原生 allocator 性能。
+
+上一检查点（2026-11-27）：08 guest software perf 按选定范围完成。真实软件事件生产者、task／task+CPU／CPU-wide／cgroup+CPU、继承／exec、采样预算和原版 stat／record／script 已通过 Linux 对照、解释器与 HVF 单槽／多 CPU 验收。Apple／Linux 按身份复用为 2,349／2,360 通过、各 5 原有忽略；产品 554 通过／3 原有忽略。严格检查与 iOS ARM64 构建通过，没有新增协调／采样线程。最终 160 条性能样本有效并核对采样密度，普通高频 futex 仍有约 3%（5–6ns）实测差值；硬件 PMU／callchain 等不广告。详见[验证与支持边界](../../runtime/docs/validation/perf-20261127.md)。下一领域为 09 动态任务上限的产品配置交付验收。
 
 上一检查点（2026-11-27）：07 futex2／rseq 按选定 U32／legacy rseq ABI 完成。修正异步缺页续接、负数 wake 与带超时 SA_RESTART，不新增协调／服务线程。Linux 对照、解释器和 HVF 的原版 gVisor 各 80/80，两后端单槽 rseq 各 13/13；原版 Linux 18 个程序／参数组合全部通过，包含两个原版 200 线程大压力程序。产品组合 553 通过／3 原有忽略，Apple／Linux session 各 16/16；严格检查和 iOS ARM64 构建通过。旧 futex 预热对照未见回退。详见[验证与支持边界](../../runtime/docs/validation/synchronization-20261127.md)。下一领域为 08 guest perf 工具链。
 
@@ -30,11 +32,11 @@
 
 日期：2026-11-23；当前状态核对：2026-11-27。用途：作为后续实现、定位和验收的工作队列；完成一项后在本页更新状态并链接验证记录。这里保留待办和完成标准，具体设计在对应批次开始时结合源码和目标负载确定。
 
-当前共 12 项：01—08 已按各自约定范围完成；09 的共享实现和本地行为验证已完成，仍需产品配置交付验收，未运行的真机测试不计通过；10—12 仍有实现或测量工作。已合入实现及其通过证据不能自动关闭其他整项。
+当前共 13 项：01—09 已按各自约定范围完成；10—12 仍有实现或测量工作，新增的 13 可写 per-UID RLIMIT_NPROC 按所有者决定单列后续。未运行的真机测试不计通过。已合入实现及其通过证据不能自动关闭其他整项。
 
 ## 当前剩余工作摘要
 
-已发布 Runtime 修复基线 `42e5834` 的 Linux／macOS CI 及 Mac 产品 `2a99558` 构建已通过。原 iPad 的 Ubuntu→iOS 检查阻塞已完成本地修复：Apple 原生检查迁到独立 macOS workflow，旧 release-core 同类路径一并纠正，FFI 内存查询改用 iOS／macOS 公共 Mach API；真实 iPhoneOS SDK 编译、25 项 FFI、15 项 CI 范围检查及严格 Clippy 通过。远端专项 CI 随发布确认，见[交付修复记录](../validation/ios-embedding-host-20261124.md)。该历史交付阻塞已解除；随后 04—08 的实施与验收见本页各项及顶部检查点，当前按顺序进入 09 产品配置交付验收。
+已发布 Runtime 修复基线 `42e5834` 的 Linux／macOS CI 及 Mac 产品 `2a99558` 构建已通过。原 iPad 的 Ubuntu→iOS 检查阻塞已完成本地修复：Apple 原生检查迁到独立 macOS workflow，旧 release-core 同类路径一并纠正，FFI 内存查询改用 iOS／macOS 公共 Mach API；真实 iPhoneOS SDK 编译、25 项 FFI、15 项 CI 范围检查及严格 Clippy 通过。远端专项 CI 随发布确认，见[交付修复记录](../validation/ios-embedding-host-20261124.md)。该历史交付阻塞已解除；随后 04—08 的实施与验收见本页各项及顶部检查点，09 的产品配置交付已完成，后续按顺序进入 10 原生 allocator 性能。
 
 | 项目 | 已有实现／证据 | 仍需迭代 |
 | --- | --- | --- |
@@ -45,10 +47,11 @@
 | 06 调试工具 | 原版 GDB live attach、多线程、gdbserver、strace -f、拒绝访问及异常退出已集中验收，两后端含单执行槽 | 本轮关闭；硬件断点／观察点、SVE／SME 保持单独的未支持范围 |
 | 07 futex2／rseq | 选定 U32／legacy rseq ABI 完成：原版 helper 与 Linux 自测、glibc 默认／fallback、单槽／多 CPU 和旧 futex 性能均验收通过 | 本批范围无功能阻塞；可选 NUMA／其他位宽／新 rseq ABI 不广告 |
 | 08 perf | 选定软件事件、真实生产者、完整选定作用域、采样预算、映射与原版 stat／record／script 验收完成 | 硬件 PMU、callchain 等不广告；普通高频调用的约 3% 实测差值明确保留 |
-| 09 动态任务上限 | 默认 65,536、可写 proc、manifest／CLI／FFI／两端启动共享准入资源；实际 guest 初始化、动态读写及拒绝 fork 已验证 | 实际 Mac/HVF 产品运行及物理 iPad、安装应用的配置交付验收；共享实现不再按未实现排队 |
+| 09 动态任务上限 | 默认／持久配置、proc 动态准入、Mac/HVF 公共 CLI 与实际 iPad 模拟器应用 1／4 CPU 验收完成；四轮 512 线程复用通过 | 本轮全局资源范围完成；未运行物理 iPad，不计通过；可写 per-UID NPROC 转 13 |
 | 10 allocator | 默认关闭的实验路径；固定输入和轮换对照驱动为 WIP | 完成短调用／竞争及 Vim／Python 等真实负载对照，定位既有倒退后再决定默认开关 |
 | 11 存储持久化 | 同步写结果／偏移问题已修；ACK、P99、崩溃重开测量驱动为 WIP | 等持久性单／多写者、包安装／容器层、写放大及恢复验收；依据测量选择 WAL 或其他布局 |
 | 12 空闲内存 | FFI 进程快照入口已合入；宿主采样及 iPad 场景仍有 WIP | 固定配置的启动峰值／稳定空闲／停止释放，区分 RSS／physical footprint，干净启动和物理 iPad 基线 |
+| 13 per-UID NPROC | 当前仅固定只读兼容值，尚无可写 per-UID 准入 | 所有者明确另列后续；实现、生命周期与 Linux 对照待单独迭代 |
 
 已关闭的旧问题不再作为待修项：UserChainTargetCrash、旧 ptrace／proc memory／PIDFD_THREAD 缺口、批量挂起原因、原 22 个稳定失败、共享 OFD 偏移竞争、threads-max worker 读回问题，以及后续 Linux 网络节点栈溢出和进程测试额度／完成条件问题。具体证据见[候选修复记录](../validation/candidate-batch-20261124.md)。
 
@@ -230,10 +233,10 @@
 
 ### 09 — 动态任务上限
 
-- [ ] 默认 65,536、可写 `/proc/sys/kernel/threads-max` 及启动配置共享实现已合入，实际 guest 初始化／动态读写／降低上限后拒绝 fork 已通过；实际产品及真机交付验收仍待完成。
-- 实现采用 `[kernel.sysctl]` 的 `"kernel.threads-max"` 键及 `--sysctl kernel.threads-max=VALUE`。VFS proc 读写、session 准入与两端启动配置共用一个原子资源；`pid_max`、`RLIMIT_NPROC`、cgroup `pids.max` 保持独立，不预分配资源。
+- [x] 全局动态任务上限的配置交付完成：Mac/HVF 公共 CLI、实际 iPad 模拟器应用和未变解释器在 1／4 CPU 验收通过，覆盖持久配置、重启、动态准入与四轮 512 线程。物理 iPad 未运行，不计通过。
+- 实现采用 `[kernel.sysctl]` 的 `"kernel.threads-max"` 键及 `--sysctl kernel.threads-max=VALUE`。VFS proc 读写、session 准入与两端启动配置共用一个原子资源，不预分配任务或宿主线程。cgroup `pids.max` 继续单独生效；现有 `RLIMIT_NPROC` 是沿用会话上限的只读兼容值，可写 per-UID 控制列为 13。
 - 完成标准：读写、权限、持久配置初始化及任务准入行为一致，两端均有验证。
-- 依据：[配置与候选状态](../guides/ipad-environments.md#task-capacity-and-live-configuration)。
+- 依据：[使用与支持边界](../guides/task-capacity.md)、[本批实施](task-capacity-batch-20261127.md)、[实际产品验收](../validation/task-capacity-product-20261127.md)。
 
 ### 10 — 原生 allocator 性能
 
@@ -251,6 +254,13 @@
 
 - [ ] 尚缺统一的冷启动基线及物理 iPad 测量。此前运行中 Runtime＋Debian shell 的观察不能直接作为干净安装基线。
 - 完成标准：固定 rootfs、启动方式、CPU 和组件配置；分别记录 Runtime／guest 与管理器，并区分 RSS 和 physical footprint。覆盖启动峰值、稳定空闲和停止后的释放。
+
+### 13 — 可写 per-UID RLIMIT_NPROC
+
+- [ ] 所有者于 2026-11-27 明确选择：先完成 09 配置交付，本项另列后续。当前 NPROC 仅返回固定兼容值，未实现可写的独立 per-UID 准入。
+- 后续需统一处理原进程 soft／hard limit、fork／线程组／exec 继承、真实 UID 与 user namespace 计数、凭据变化、并发创建／失败回滚及 zombie 回收，复用对象原子／同步，不引入服务线程。
+- 完成标准：对照原版 Linux，覆盖特权例外、降权、降低／升高限制及多 UID；证明与全局 threads-max、cgroup pids 资源分别生效。现有扩展探针失败不计通过。
+- 依据：[本轮范围决定与失败证据](../validation/task-capacity-product-20261127.md)。
 
 ## 每批交付规则
 

@@ -1,0 +1,1692 @@
+{
+  "scope": "09 global task ceiling product delivery; writable per-UID NPROC deferred explicitly by owner",
+  "passed": true,
+  "source": {
+    "product_base": "2e157d224a23006b96bba95f4916686ff1555b5a",
+    "mac_base": "e4acd9dac78ca7da5c40f942eeb87b1afb2fec49",
+    "runtime_pin": "10dcf23f6e57e3a7a4fa25409754912778712d5a",
+    "ipad_source": {
+      "base_revision": "2e157d224a23006b96bba95f4916686ff1555b5a",
+      "runtime_revision": "10dcf23f6e57e3a7a4fa25409754912778712d5a",
+      "source": "/Users/main/dev/trames/target/validation-task-capacity-20261127/ipad-source",
+      "rust_archive": "/Users/main/dev/trames/target/validation-task-capacity-20261127/frozen-ios-link/aarch64-apple-ios-sim/libtrames_ffi.a",
+      "rust_sha256": "71adf7c0ee2bbb8b5519b78ae2b9cfcf01e214a79f1f8423166c49acd8ca0b06",
+      "source_checked": true,
+      "reason": "Preserve independent FFI memory work; unchanged verified Rust and guest artifacts reused"
+    },
+    "files": {
+      "apps/ios/TramesKit/Sources/TramesKit/EnvironmentConfiguration.swift": "653d2b6b56deb89454d36a05b33197185e9be8ba532db438bef2164ae2be0a14",
+      "apps/ios/TramesTests/EnvironmentConfigurationTests.swift": "f291a24aac1721823ed4a8acfb4ac08a54ffc967856bc522106b7db121e7ddb1",
+      "tests/fixtures/task-limit.c": "2cca54c741113d16a0db3c3e4e9bbd798e8d1a82812d8bbd5302ea4805b1b276",
+      "tests/fixtures/task-capacity.c": "3f7c9b0c9c91c5d9cb248db75cf0ed51c71c7cc96b47a85c5b4b9ae2c0697354",
+      "tests/integration/task-capacity-product.py": "c076e2294347d1079b1ece7ab5a7006c366c6c90786e87c9eb9622a0ec481bc1"
+    },
+    "mac_files": {
+      "crates/trames-mac/src/environments.rs": "ec03513e87a0a2f60f53e1be40e2a1e27df9094c874b4378e8c5a414b836110c",
+      "crates/trames-mac/src/session.rs": "a6cf81fe4e9a34bddcb4580941cc6259c5641a22f12bec8aadaa39fab3495aa7",
+      "crates/trames-mac/src/cli.rs": "cced71e98a8a8e994f371b7fbd2deeeb429279a420bfe323687a0c6e55b11bc1"
+    }
+  },
+  "fixtures": {
+    "rootfs_sha256": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe",
+    "files": {
+      "task-limit": "1d64e9505efbfd374934ec69cc117c6403ce5d8e5c78fe04adf4be2940f04c94",
+      "task-capacity": "ace70d6ed55aeea2acc82e082bf8182b02c60d0a1769f511ca702ff3f1e93257"
+    }
+  },
+  "gates": {
+    "mac_build": {
+      "command": [
+        "env",
+        "CARGO_INCREMENTAL=0",
+        "CARGO_PROFILE_RELEASE_DEBUG=0",
+        "CARGO_BUILD_JOBS=2",
+        "CARGO_NET_OFFLINE=true",
+        "bash",
+        "scripts/build-mac.sh"
+      ],
+      "timeout": 600,
+      "log": "/Users/main/dev/trames/target/validation-task-capacity-20261127/build-mac-c2.log",
+      "exit_code": 0,
+      "elapsed_seconds": 207.04
+    },
+    "mac_clippy": {
+      "command": [
+        "env",
+        "DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer",
+        "CARGO_INCREMENTAL=0",
+        "TRAMES_VULKAN_LINKAGE=external",
+        "CARGO_NET_OFFLINE=true",
+        "cargo",
+        "clippy",
+        "-p",
+        "trames-mac",
+        "--all-targets",
+        "--all-features",
+        "--locked",
+        "--offline",
+        "-j2",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "timeout": 300,
+      "log": "/Users/main/dev/trames/target/validation-task-capacity-20261127/clippy-mac.log",
+      "exit_code": 0,
+      "elapsed_seconds": 79.54
+    },
+    "ios_rust_simulator": {
+      "command": [
+        "env",
+        "DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer",
+        "CARGO_NET_OFFLINE=true",
+        "CARGO_INCREMENTAL=0",
+        "CARGO_PROFILE_RELEASE_DEBUG=0",
+        "CARGO_BUILD_JOBS=2",
+        "python3",
+        "scripts/stage-ios-rust.py",
+        "aarch64-apple-ios-sim",
+        "/Users/main/dev/trames/target/moltenvk-patched/ios-simulator-arm64-efc4d7fc527a33748906"
+      ],
+      "timeout": 600,
+      "log": "/Users/main/dev/trames/target/validation-task-capacity-20261127/ios-simulator-rust.log",
+      "exit_code": 0,
+      "elapsed_seconds": 203.14
+    },
+    "ios_build": {
+      "command": [
+        "env",
+        "DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer",
+        "xcodebuild",
+        "-quiet",
+        "-project",
+        "apps/ios/Trames.xcodeproj",
+        "-scheme",
+        "Trames",
+        "-configuration",
+        "Debug",
+        "-destination",
+        "platform=iOS Simulator,id=883E94BC-25CB-4127-A967-8CCA14FA2258",
+        "-derivedDataPath",
+        "/Users/main/dev/trames/target/bionic-hybrid/DerivedData",
+        "-disableAutomaticPackageResolution",
+        "-skipPackagePluginValidation",
+        "-parallel-testing-enabled",
+        "NO",
+        "-only-testing:TramesTests/LocalTaskCapacityTests",
+        "CODE_SIGNING_ALLOWED=NO",
+        "TRAMES_RUST_LIB_DIR=/Users/main/dev/trames/target/validation-task-capacity-20261127/frozen-ios-link/aarch64-apple-ios-sim",
+        "build-for-testing"
+      ],
+      "timeout": 420,
+      "log": "/Users/main/dev/trames/target/validation-task-capacity-20261127/ios-app-build-c4.log",
+      "exit_code": 0,
+      "elapsed_seconds": 15.51
+    },
+    "ios_product_tests": {
+      "command": [
+        "env",
+        "DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer",
+        "xcodebuild",
+        "-quiet",
+        "test-without-building",
+        "-xctestrun",
+        "/Users/main/dev/trames/target/validation-task-capacity-20261127/task-capacity-c2.xctestrun",
+        "-destination",
+        "platform=iOS Simulator,id=883E94BC-25CB-4127-A967-8CCA14FA2258",
+        "-parallel-testing-enabled",
+        "NO",
+        "-maximum-concurrent-test-simulator-destinations",
+        "1",
+        "-resultBundlePath",
+        "/Users/main/dev/trames/target/validation-task-capacity-20261127/ios-task-capacity-c2.xcresult",
+        "-only-testing:TramesTests/LocalTaskCapacityTests"
+      ],
+      "timeout": 600,
+      "log": "/Users/main/dev/trames/target/validation-task-capacity-20261127/ios-app-tests-c2.log",
+      "exit_code": 0,
+      "elapsed_seconds": 72.3
+    }
+  },
+  "mac_product": {
+    "passed": true,
+    "runner_sha256": "36c64d7b94d227a9f26b6667ea53c9f5eb2b7a081171424e2ee0b0ad499fd31f",
+    "rootfs_sha256": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe",
+    "fixtures": {
+      "task-limit": "1d64e9505efbfd374934ec69cc117c6403ce5d8e5c78fe04adf4be2940f04c94",
+      "task-capacity": "ace70d6ed55aeea2acc82e082bf8182b02c60d0a1769f511ca702ff3f1e93257"
+    },
+    "rows": [
+      {
+        "cpus": 1,
+        "arguments": [
+          "env",
+          "create",
+          "work",
+          "--distro",
+          "alpine",
+          "--rootfs",
+          "/Users/main/dev/trames/target/validation-task-capacity-20261127/mac-product/acceptance-rootfs.tar.gz"
+        ],
+        "exit_code": 0,
+        "stdout": "Created work (custom)\n",
+        "stderr": "Importing custom rootfs…\n",
+        "seconds": 2.394
+      },
+      {
+        "cpus": 1,
+        "arguments": [
+          "-e",
+          "work",
+          "config",
+          "set",
+          "resources.cpus",
+          "1",
+          "network.mode",
+          "none",
+          "components.vulkan",
+          "false",
+          "components.vaapi",
+          "false",
+          "display.windows",
+          "false"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "",
+        "seconds": 0.043
+      },
+      {
+        "cpus": 1,
+        "arguments": [
+          "env",
+          "start",
+          "work"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "Started 1dd5e024-a15c-49c4-8101-2291f2c01b98 in background\n",
+        "seconds": 0.31
+      },
+      {
+        "cpus": 1,
+        "arguments": [
+          "-e",
+          "work",
+          "exec",
+          "--",
+          "/bin/sh",
+          "-ec",
+          "test \"$(grep -c '^processor' /proc/cpuinfo)\" -eq 1"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "",
+        "seconds": 0.015
+      },
+      {
+        "cpus": 1,
+        "arguments": [
+          "-e",
+          "work",
+          "exec",
+          "--",
+          "/opt/trames-task/task-limit",
+          "read",
+          "65536"
+        ],
+        "exit_code": 0,
+        "stdout": "TASK_LIMIT_BOOT:65536\nTASK_LIMIT_READ_OK\n",
+        "stderr": "",
+        "seconds": 0.012
+      },
+      {
+        "cpus": 1,
+        "arguments": [
+          "env",
+          "stop",
+          "work"
+        ],
+        "exit_code": 0,
+        "stdout": "Stopped work\n",
+        "stderr": "",
+        "seconds": 0.426
+      },
+      {
+        "cpus": 1,
+        "arguments": [
+          "-e",
+          "work",
+          "config",
+          "set",
+          "kernel.sysctl.kernel.threads-max",
+          "64"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "",
+        "seconds": 0.038
+      },
+      {
+        "cpus": 1,
+        "arguments": [
+          "-e",
+          "work",
+          "config",
+          "get",
+          "kernel.sysctl.kernel.threads-max"
+        ],
+        "exit_code": 0,
+        "stdout": "64\n",
+        "stderr": "",
+        "seconds": 0.007
+      },
+      {
+        "cpus": 1,
+        "arguments": [
+          "-e",
+          "work",
+          "config",
+          "path"
+        ],
+        "exit_code": 0,
+        "stdout": "/Users/main/dev/trames/target/validation-task-capacity-20261127/mac-product/registry-1/environments/1dd5e024-a15c-49c4-8101-2291f2c01b98/env.toml\n",
+        "stderr": "",
+        "seconds": 0.009
+      },
+      {
+        "cpus": 1,
+        "arguments": [
+          "-e",
+          "work",
+          "config",
+          "set",
+          "kernel.sysctl.kernel.threads-max",
+          "0"
+        ],
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "trames-mac: kernel.threads-max must be 1..=1073741823\n",
+        "seconds": 0.008
+      },
+      {
+        "cpus": 1,
+        "arguments": [
+          "-e",
+          "work",
+          "config",
+          "set",
+          "kernel.sysctl.kernel.threads-max",
+          "-1"
+        ],
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "trames-mac: invalid digit found in string\n",
+        "seconds": 0.009
+      },
+      {
+        "cpus": 1,
+        "arguments": [
+          "-e",
+          "work",
+          "config",
+          "set",
+          "kernel.sysctl.kernel.threads-max",
+          "1.5"
+        ],
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "trames-mac: invalid digit found in string\n",
+        "seconds": 0.007
+      },
+      {
+        "cpus": 1,
+        "arguments": [
+          "-e",
+          "work",
+          "config",
+          "set",
+          "kernel.sysctl.kernel.threads-max",
+          "1073741824"
+        ],
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "trames-mac: kernel.threads-max must be 1..=1073741823\n",
+        "seconds": 0.008
+      },
+      {
+        "cpus": 1,
+        "arguments": [
+          "-e",
+          "work",
+          "config",
+          "set",
+          "kernel.sysctl.kernel.unknown",
+          "2"
+        ],
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "trames-mac: unsupported kernel.sysctl key: kernel.unknown\n",
+        "seconds": 0.008
+      },
+      {
+        "cpus": 1,
+        "arguments": [
+          "env",
+          "start",
+          "work"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "Started 1dd5e024-a15c-49c4-8101-2291f2c01b98 in background\n",
+        "seconds": 0.197
+      },
+      {
+        "cpus": 1,
+        "arguments": [
+          "-e",
+          "work",
+          "exec",
+          "--",
+          "/opt/trames-task/task-limit",
+          "live",
+          "64"
+        ],
+        "exit_code": 0,
+        "stdout": "TASK_LIMIT_BOOT:64\nTASK_LIMIT_LIVE_OK:baseline=2 final=65\n",
+        "stderr": "",
+        "seconds": 0.016
+      },
+      {
+        "cpus": 1,
+        "arguments": [
+          "-e",
+          "work",
+          "exec",
+          "--",
+          "/bin/cat",
+          "/proc/sys/kernel/threads-max"
+        ],
+        "exit_code": 0,
+        "stdout": "65\n",
+        "stderr": "",
+        "seconds": 0.009
+      },
+      {
+        "cpus": 1,
+        "arguments": [
+          "-e",
+          "work",
+          "config",
+          "get",
+          "kernel.sysctl.kernel.threads-max"
+        ],
+        "exit_code": 0,
+        "stdout": "64\n",
+        "stderr": "",
+        "seconds": 0.005
+      },
+      {
+        "cpus": 1,
+        "arguments": [
+          "env",
+          "stop",
+          "work"
+        ],
+        "exit_code": 0,
+        "stdout": "Stopped work\n",
+        "stderr": "",
+        "seconds": 0.428
+      },
+      {
+        "cpus": 1,
+        "arguments": [
+          "env",
+          "start",
+          "work"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "Started 1dd5e024-a15c-49c4-8101-2291f2c01b98 in background\n",
+        "seconds": 0.184
+      },
+      {
+        "cpus": 1,
+        "arguments": [
+          "-e",
+          "work",
+          "exec",
+          "--",
+          "/opt/trames-task/task-limit",
+          "read",
+          "64"
+        ],
+        "exit_code": 0,
+        "stdout": "TASK_LIMIT_BOOT:64\nTASK_LIMIT_READ_OK\n",
+        "stderr": "",
+        "seconds": 0.014
+      },
+      {
+        "cpus": 1,
+        "arguments": [
+          "env",
+          "stop",
+          "work"
+        ],
+        "exit_code": 0,
+        "stdout": "Stopped work\n",
+        "stderr": "",
+        "seconds": 0.427
+      },
+      {
+        "cpus": 1,
+        "arguments": [
+          "-e",
+          "work",
+          "config",
+          "set",
+          "kernel.sysctl.kernel.threads-max",
+          "600"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "",
+        "seconds": 0.035
+      },
+      {
+        "cpus": 1,
+        "arguments": [
+          "env",
+          "start",
+          "work"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "Started 1dd5e024-a15c-49c4-8101-2291f2c01b98 in background\n",
+        "seconds": 0.243
+      },
+      {
+        "cpus": 1,
+        "arguments": [
+          "-e",
+          "work",
+          "exec",
+          "--",
+          "/opt/trames-task/task-capacity",
+          "512"
+        ],
+        "exit_code": 0,
+        "stdout": "task-capacity-round:0 live=513 reaped=512\ntask-capacity-round:1 live=513 reaped=512\ntask-capacity-round:2 live=513 reaped=512\ntask-capacity-round:3 live=513 reaped=512\ntask-capacity-ok: concurrent creation and repeated reuse above 256\n",
+        "stderr": "",
+        "seconds": 2.681
+      },
+      {
+        "cpus": 1,
+        "arguments": [
+          "env",
+          "stop",
+          "work"
+        ],
+        "exit_code": 0,
+        "stdout": "Stopped work\n",
+        "stderr": "",
+        "seconds": 0.323
+      },
+      {
+        "cpus": 1,
+        "arguments": [
+          "debug",
+          "run",
+          "--storage",
+          "/Users/main/dev/trames/target/validation-task-capacity-20261127/mac-product/registry-1/environments/1dd5e024-a15c-49c4-8101-2291f2c01b98/store",
+          "--cpus",
+          "1",
+          "--sysctl",
+          "kernel.threads-max=1",
+          "--no-windows",
+          "--no-pty",
+          "--network",
+          "loopback",
+          "--timeout",
+          "30",
+          "--",
+          "/opt/trames-task/task-limit",
+          "read",
+          "1"
+        ],
+        "exit_code": 0,
+        "stdout": "TASK_LIMIT_BOOT:1\nTASK_LIMIT_READ_OK\n",
+        "stderr": "trames: session ready\n",
+        "seconds": 0.339
+      },
+      {
+        "cpus": 1,
+        "arguments": [
+          "debug",
+          "run",
+          "--storage",
+          "/Users/main/dev/trames/target/validation-task-capacity-20261127/mac-product/registry-1/environments/1dd5e024-a15c-49c4-8101-2291f2c01b98/store",
+          "--cpus",
+          "1",
+          "--sysctl",
+          "kernel.threads-max=1073741823",
+          "--no-windows",
+          "--no-pty",
+          "--network",
+          "loopback",
+          "--timeout",
+          "30",
+          "--",
+          "/opt/trames-task/task-limit",
+          "read",
+          "1073741823"
+        ],
+        "exit_code": 0,
+        "stdout": "TASK_LIMIT_BOOT:1073741823\nTASK_LIMIT_READ_OK\n",
+        "stderr": "trames: session ready\n",
+        "seconds": 0.415
+      },
+      {
+        "cpus": 1,
+        "arguments": [
+          "config",
+          "--global",
+          "set",
+          "defaults.kernel.sysctl.kernel.threads-max",
+          "42",
+          "defaults.resources.cpus",
+          "1",
+          "defaults.network.mode",
+          "none",
+          "defaults.components.vulkan",
+          "false",
+          "defaults.components.vaapi",
+          "false",
+          "defaults.display.windows",
+          "false"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "",
+        "seconds": 0.018
+      },
+      {
+        "cpus": 1,
+        "arguments": [
+          "config",
+          "--global",
+          "get",
+          "defaults.kernel.sysctl.kernel.threads-max"
+        ],
+        "exit_code": 0,
+        "stdout": "42\n",
+        "stderr": "",
+        "seconds": 0.006
+      },
+      {
+        "cpus": 1,
+        "arguments": [
+          "env",
+          "create",
+          "inherited",
+          "--distro",
+          "alpine",
+          "--rootfs",
+          "/Users/main/dev/trames/target/validation-task-capacity-20261127/mac-product/acceptance-rootfs.tar.gz"
+        ],
+        "exit_code": 0,
+        "stdout": "Created inherited (custom)\n",
+        "stderr": "Importing custom rootfs…\n",
+        "seconds": 2.529
+      },
+      {
+        "cpus": 1,
+        "arguments": [
+          "-e",
+          "inherited",
+          "config",
+          "get",
+          "kernel.sysctl.kernel.threads-max"
+        ],
+        "exit_code": 0,
+        "stdout": "42\n",
+        "stderr": "",
+        "seconds": 0.009
+      },
+      {
+        "cpus": 1,
+        "arguments": [
+          "env",
+          "start",
+          "inherited"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "Started dd0d5621-bb33-44f6-813f-f15761afc72d in background\n",
+        "seconds": 0.318
+      },
+      {
+        "cpus": 1,
+        "arguments": [
+          "-e",
+          "inherited",
+          "exec",
+          "--",
+          "/opt/trames-task/task-limit",
+          "read",
+          "42"
+        ],
+        "exit_code": 0,
+        "stdout": "TASK_LIMIT_BOOT:42\nTASK_LIMIT_READ_OK\n",
+        "stderr": "",
+        "seconds": 0.015
+      },
+      {
+        "cpus": 1,
+        "arguments": [
+          "env",
+          "stop",
+          "inherited"
+        ],
+        "exit_code": 0,
+        "stdout": "Stopped inherited\n",
+        "stderr": "",
+        "seconds": 0.429
+      },
+      {
+        "cpus": 1,
+        "arguments": [
+          "env",
+          "stop",
+          "work"
+        ],
+        "exit_code": 0,
+        "stdout": "work is stopped\n",
+        "stderr": "",
+        "seconds": 0.01
+      },
+      {
+        "cpus": 1,
+        "arguments": [
+          "env",
+          "stop",
+          "inherited"
+        ],
+        "exit_code": 0,
+        "stdout": "inherited is stopped\n",
+        "stderr": "",
+        "seconds": 0.009
+      },
+      {
+        "cpus": 4,
+        "arguments": [
+          "env",
+          "create",
+          "work",
+          "--distro",
+          "alpine",
+          "--rootfs",
+          "/Users/main/dev/trames/target/validation-task-capacity-20261127/mac-product/acceptance-rootfs.tar.gz"
+        ],
+        "exit_code": 0,
+        "stdout": "Created work (custom)\n",
+        "stderr": "Importing custom rootfs…\n",
+        "seconds": 1.964
+      },
+      {
+        "cpus": 4,
+        "arguments": [
+          "-e",
+          "work",
+          "config",
+          "set",
+          "resources.cpus",
+          "4",
+          "network.mode",
+          "none",
+          "components.vulkan",
+          "false",
+          "components.vaapi",
+          "false",
+          "display.windows",
+          "false"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "",
+        "seconds": 0.033
+      },
+      {
+        "cpus": 4,
+        "arguments": [
+          "env",
+          "start",
+          "work"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "Started 53dd3737-a61a-4088-8150-59cf17109062 in background\n",
+        "seconds": 0.352
+      },
+      {
+        "cpus": 4,
+        "arguments": [
+          "-e",
+          "work",
+          "exec",
+          "--",
+          "/bin/sh",
+          "-ec",
+          "test \"$(grep -c '^processor' /proc/cpuinfo)\" -eq 4"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "",
+        "seconds": 0.017
+      },
+      {
+        "cpus": 4,
+        "arguments": [
+          "-e",
+          "work",
+          "exec",
+          "--",
+          "/opt/trames-task/task-limit",
+          "read",
+          "65536"
+        ],
+        "exit_code": 0,
+        "stdout": "TASK_LIMIT_BOOT:65536\nTASK_LIMIT_READ_OK\n",
+        "stderr": "",
+        "seconds": 0.02
+      },
+      {
+        "cpus": 4,
+        "arguments": [
+          "env",
+          "stop",
+          "work"
+        ],
+        "exit_code": 0,
+        "stdout": "Stopped work\n",
+        "stderr": "",
+        "seconds": 0.426
+      },
+      {
+        "cpus": 4,
+        "arguments": [
+          "-e",
+          "work",
+          "config",
+          "set",
+          "kernel.sysctl.kernel.threads-max",
+          "64"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "",
+        "seconds": 0.029
+      },
+      {
+        "cpus": 4,
+        "arguments": [
+          "-e",
+          "work",
+          "config",
+          "get",
+          "kernel.sysctl.kernel.threads-max"
+        ],
+        "exit_code": 0,
+        "stdout": "64\n",
+        "stderr": "",
+        "seconds": 0.006
+      },
+      {
+        "cpus": 4,
+        "arguments": [
+          "-e",
+          "work",
+          "config",
+          "path"
+        ],
+        "exit_code": 0,
+        "stdout": "/Users/main/dev/trames/target/validation-task-capacity-20261127/mac-product/registry-4/environments/53dd3737-a61a-4088-8150-59cf17109062/env.toml\n",
+        "stderr": "",
+        "seconds": 0.005
+      },
+      {
+        "cpus": 4,
+        "arguments": [
+          "-e",
+          "work",
+          "config",
+          "set",
+          "kernel.sysctl.kernel.threads-max",
+          "0"
+        ],
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "trames-mac: kernel.threads-max must be 1..=1073741823\n",
+        "seconds": 0.005
+      },
+      {
+        "cpus": 4,
+        "arguments": [
+          "-e",
+          "work",
+          "config",
+          "set",
+          "kernel.sysctl.kernel.threads-max",
+          "-1"
+        ],
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "trames-mac: invalid digit found in string\n",
+        "seconds": 0.005
+      },
+      {
+        "cpus": 4,
+        "arguments": [
+          "-e",
+          "work",
+          "config",
+          "set",
+          "kernel.sysctl.kernel.threads-max",
+          "1.5"
+        ],
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "trames-mac: invalid digit found in string\n",
+        "seconds": 0.005
+      },
+      {
+        "cpus": 4,
+        "arguments": [
+          "-e",
+          "work",
+          "config",
+          "set",
+          "kernel.sysctl.kernel.threads-max",
+          "1073741824"
+        ],
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "trames-mac: kernel.threads-max must be 1..=1073741823\n",
+        "seconds": 0.005
+      },
+      {
+        "cpus": 4,
+        "arguments": [
+          "-e",
+          "work",
+          "config",
+          "set",
+          "kernel.sysctl.kernel.unknown",
+          "2"
+        ],
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "trames-mac: unsupported kernel.sysctl key: kernel.unknown\n",
+        "seconds": 0.005
+      },
+      {
+        "cpus": 4,
+        "arguments": [
+          "env",
+          "start",
+          "work"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "Started 53dd3737-a61a-4088-8150-59cf17109062 in background\n",
+        "seconds": 0.239
+      },
+      {
+        "cpus": 4,
+        "arguments": [
+          "-e",
+          "work",
+          "exec",
+          "--",
+          "/opt/trames-task/task-limit",
+          "live",
+          "64"
+        ],
+        "exit_code": 0,
+        "stdout": "TASK_LIMIT_BOOT:64\nTASK_LIMIT_LIVE_OK:baseline=2 final=65\n",
+        "stderr": "",
+        "seconds": 0.024
+      },
+      {
+        "cpus": 4,
+        "arguments": [
+          "-e",
+          "work",
+          "exec",
+          "--",
+          "/bin/cat",
+          "/proc/sys/kernel/threads-max"
+        ],
+        "exit_code": 0,
+        "stdout": "65\n",
+        "stderr": "",
+        "seconds": 0.015
+      },
+      {
+        "cpus": 4,
+        "arguments": [
+          "-e",
+          "work",
+          "config",
+          "get",
+          "kernel.sysctl.kernel.threads-max"
+        ],
+        "exit_code": 0,
+        "stdout": "64\n",
+        "stderr": "",
+        "seconds": 0.008
+      },
+      {
+        "cpus": 4,
+        "arguments": [
+          "env",
+          "stop",
+          "work"
+        ],
+        "exit_code": 0,
+        "stdout": "Stopped work\n",
+        "stderr": "",
+        "seconds": 0.426
+      },
+      {
+        "cpus": 4,
+        "arguments": [
+          "env",
+          "start",
+          "work"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "Started 53dd3737-a61a-4088-8150-59cf17109062 in background\n",
+        "seconds": 0.254
+      },
+      {
+        "cpus": 4,
+        "arguments": [
+          "-e",
+          "work",
+          "exec",
+          "--",
+          "/opt/trames-task/task-limit",
+          "read",
+          "64"
+        ],
+        "exit_code": 0,
+        "stdout": "TASK_LIMIT_BOOT:64\nTASK_LIMIT_READ_OK\n",
+        "stderr": "",
+        "seconds": 0.018
+      },
+      {
+        "cpus": 4,
+        "arguments": [
+          "env",
+          "stop",
+          "work"
+        ],
+        "exit_code": 0,
+        "stdout": "Stopped work\n",
+        "stderr": "",
+        "seconds": 0.431
+      },
+      {
+        "cpus": 4,
+        "arguments": [
+          "-e",
+          "work",
+          "config",
+          "set",
+          "kernel.sysctl.kernel.threads-max",
+          "600"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "",
+        "seconds": 0.033
+      },
+      {
+        "cpus": 4,
+        "arguments": [
+          "env",
+          "start",
+          "work"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "Started 53dd3737-a61a-4088-8150-59cf17109062 in background\n",
+        "seconds": 0.247
+      },
+      {
+        "cpus": 4,
+        "arguments": [
+          "-e",
+          "work",
+          "exec",
+          "--",
+          "/opt/trames-task/task-capacity",
+          "512"
+        ],
+        "exit_code": 0,
+        "stdout": "task-capacity-round:0 live=513 reaped=512\ntask-capacity-round:1 live=513 reaped=512\ntask-capacity-round:2 live=513 reaped=512\ntask-capacity-round:3 live=513 reaped=512\ntask-capacity-ok: concurrent creation and repeated reuse above 256\n",
+        "stderr": "",
+        "seconds": 3.981
+      },
+      {
+        "cpus": 4,
+        "arguments": [
+          "env",
+          "stop",
+          "work"
+        ],
+        "exit_code": 0,
+        "stdout": "Stopped work\n",
+        "stderr": "",
+        "seconds": 0.124
+      },
+      {
+        "cpus": 4,
+        "arguments": [
+          "debug",
+          "run",
+          "--storage",
+          "/Users/main/dev/trames/target/validation-task-capacity-20261127/mac-product/registry-4/environments/53dd3737-a61a-4088-8150-59cf17109062/store",
+          "--cpus",
+          "4",
+          "--sysctl",
+          "kernel.threads-max=1",
+          "--no-windows",
+          "--no-pty",
+          "--network",
+          "loopback",
+          "--timeout",
+          "30",
+          "--",
+          "/opt/trames-task/task-limit",
+          "read",
+          "1"
+        ],
+        "exit_code": 0,
+        "stdout": "TASK_LIMIT_BOOT:1\nTASK_LIMIT_READ_OK\n",
+        "stderr": "trames: session ready\n",
+        "seconds": 0.055
+      },
+      {
+        "cpus": 4,
+        "arguments": [
+          "debug",
+          "run",
+          "--storage",
+          "/Users/main/dev/trames/target/validation-task-capacity-20261127/mac-product/registry-4/environments/53dd3737-a61a-4088-8150-59cf17109062/store",
+          "--cpus",
+          "4",
+          "--sysctl",
+          "kernel.threads-max=1073741823",
+          "--no-windows",
+          "--no-pty",
+          "--network",
+          "loopback",
+          "--timeout",
+          "30",
+          "--",
+          "/opt/trames-task/task-limit",
+          "read",
+          "1073741823"
+        ],
+        "exit_code": 0,
+        "stdout": "TASK_LIMIT_BOOT:1073741823\nTASK_LIMIT_READ_OK\n",
+        "stderr": "trames: session ready\n",
+        "seconds": 0.045
+      },
+      {
+        "cpus": 4,
+        "arguments": [
+          "config",
+          "--global",
+          "set",
+          "defaults.kernel.sysctl.kernel.threads-max",
+          "42",
+          "defaults.resources.cpus",
+          "4",
+          "defaults.network.mode",
+          "none",
+          "defaults.components.vulkan",
+          "false",
+          "defaults.components.vaapi",
+          "false",
+          "defaults.display.windows",
+          "false"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "",
+        "seconds": 0.015
+      },
+      {
+        "cpus": 4,
+        "arguments": [
+          "config",
+          "--global",
+          "get",
+          "defaults.kernel.sysctl.kernel.threads-max"
+        ],
+        "exit_code": 0,
+        "stdout": "42\n",
+        "stderr": "",
+        "seconds": 0.007
+      },
+      {
+        "cpus": 4,
+        "arguments": [
+          "env",
+          "create",
+          "inherited",
+          "--distro",
+          "alpine",
+          "--rootfs",
+          "/Users/main/dev/trames/target/validation-task-capacity-20261127/mac-product/acceptance-rootfs.tar.gz"
+        ],
+        "exit_code": 0,
+        "stdout": "Created inherited (custom)\n",
+        "stderr": "Importing custom rootfs…\n",
+        "seconds": 0.494
+      },
+      {
+        "cpus": 4,
+        "arguments": [
+          "-e",
+          "inherited",
+          "config",
+          "get",
+          "kernel.sysctl.kernel.threads-max"
+        ],
+        "exit_code": 0,
+        "stdout": "42\n",
+        "stderr": "",
+        "seconds": 0.018
+      },
+      {
+        "cpus": 4,
+        "arguments": [
+          "env",
+          "start",
+          "inherited"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "Started 9190fdc8-697f-4c17-988f-a751dc94bc48 in background\n",
+        "seconds": 0.2
+      },
+      {
+        "cpus": 4,
+        "arguments": [
+          "-e",
+          "inherited",
+          "exec",
+          "--",
+          "/opt/trames-task/task-limit",
+          "read",
+          "42"
+        ],
+        "exit_code": 0,
+        "stdout": "TASK_LIMIT_BOOT:42\nTASK_LIMIT_READ_OK\n",
+        "stderr": "",
+        "seconds": 0.031
+      },
+      {
+        "cpus": 4,
+        "arguments": [
+          "env",
+          "stop",
+          "inherited"
+        ],
+        "exit_code": 0,
+        "stdout": "Stopped inherited\n",
+        "stderr": "",
+        "seconds": 0.13
+      },
+      {
+        "cpus": 4,
+        "arguments": [
+          "env",
+          "stop",
+          "work"
+        ],
+        "exit_code": 0,
+        "stdout": "work is stopped\n",
+        "stderr": "",
+        "seconds": 0.024
+      },
+      {
+        "cpus": 4,
+        "arguments": [
+          "env",
+          "stop",
+          "inherited"
+        ],
+        "exit_code": 0,
+        "stdout": "inherited is stopped\n",
+        "stderr": "",
+        "seconds": 0.017
+      }
+    ],
+    "scenarios": [
+      {
+        "cpus": 1,
+        "passed": true
+      },
+      {
+        "cpus": 4,
+        "passed": true
+      }
+    ],
+    "acceptance_rootfs_sha256": "a2698e2a19bebbe15dc5a03d43d879f74ab202c50cba9dd2727d44f1239eb355"
+  },
+  "mac_units": {
+    "passed": 4,
+    "failed": 0,
+    "timeout": 0,
+    "ignored": 0,
+    "total": 4,
+    "seconds": 0.168
+  },
+  "ios_product_summary": {
+    "devicesAndConfigurations": [
+      {
+        "device": {
+          "architecture": "arm64",
+          "deviceId": "883E94BC-25CB-4127-A967-8CCA14FA2258",
+          "deviceName": "iPad Pro 11-inch (M5)",
+          "modelName": "iPad Pro 11-inch (M5)",
+          "osBuildNumber": "24A434",
+          "osVersion": "27.0",
+          "platform": "iOS Simulator"
+        },
+        "expectedFailures": 0,
+        "failedTests": 0,
+        "passedTests": 2,
+        "skippedTests": 0,
+        "testPlanConfiguration": {
+          "configurationId": "1",
+          "configurationName": "Test Scheme Action"
+        }
+      }
+    ],
+    "environmentDescription": "Trames · Built with macOS 27.0.1",
+    "expectedFailures": 0,
+    "failedTests": 0,
+    "finishTime": 1795790263.49,
+    "passedTests": 2,
+    "result": "Passed",
+    "runtimeWarnings": [
+      {
+        "issueType": "Runtime Warning",
+        "message": "Thread running at User-interactive quality-of-service class waiting on a lower QoS thread running at Default quality-of-service class. Investigate ways to avoid priority inversions",
+        "sourceURL": "file:///Users/main/dev/trames/target/validation-task-capacity-20261127/ipad-source/apps/ios/TramesTests/EnvironmentConfigurationTests.swift"
+      }
+    ],
+    "skippedTests": 0,
+    "startTime": 1795790192.686,
+    "statistics": [],
+    "testFailures": [],
+    "title": "Test - Trames",
+    "topInsights": [],
+    "totalTestCount": 2
+  },
+  "ios_codec_reused": {
+    "nodeIdentifier": "EnvironmentConfigurationTests/testSysctlNamesRemainLiteralThroughDraftAndNativeCodec()",
+    "result": "Passed"
+  },
+  "ios_unique_test_identities": 3,
+  "ios_terminal_stages": [
+    {
+      "cpus": 4,
+      "stage": "capacity",
+      "attachment": "target/validation-task-capacity-20261127/ios-attachments/B54751CF-88FB-4D56-9230-A9724DBEDEAB.txt",
+      "sha256": "757969b69e20eecac1a07823c2435e9b441dc3c1270339cd2678c9cacaadf8c4",
+      "semantic_lines": [
+        "TASK_LIMIT_BOOT:600",
+        "task-capacity-round:0 live=513 reaped=512",
+        "task-capacity-round:1 live=513 reaped=512",
+        "task-capacity-round:2 live=513 reaped=512",
+        "task-capacity-round:3 live=513 reaped=512",
+        "task-capacity-ok: concurrent creation and repeated reuse above 256",
+        "TASK_LIMIT_HOST_DONE:0"
+      ]
+    },
+    {
+      "cpus": 4,
+      "stage": "restart",
+      "attachment": "target/validation-task-capacity-20261127/ios-attachments/08242AD6-3A8D-47D7-9370-042F593D4749.txt",
+      "sha256": "16276c1eeb2e4c7cc77c8aab6cb946d12a899c474e500a5c4edd598b1642fe59",
+      "semantic_lines": [
+        "TASK_LIMIT_BOOT:64",
+        "TASK_LIMIT_HOST_DONE:0"
+      ]
+    },
+    {
+      "cpus": 4,
+      "stage": "configured",
+      "attachment": "target/validation-task-capacity-20261127/ios-attachments/58E202CB-4E01-4C0D-93DF-51613CF93E34.txt",
+      "sha256": "1c427311e62fb3800854506b586e55387f0a25cb87f063e7cce6060bca5aa5f7",
+      "semantic_lines": [
+        "TASK_LIMIT_BOOT:64",
+        "TASK_LIMIT_LIVE_OK:baseline=3 final=65",
+        "TASK_LIMIT_HOST_DONE:0"
+      ]
+    },
+    {
+      "cpus": 4,
+      "stage": "default",
+      "attachment": "target/validation-task-capacity-20261127/ios-attachments/BFA557D0-AD4F-4061-A0D6-223A1AAA42DA.txt",
+      "sha256": "e477b76fcf6b000484fa589a9b317768a9bac34f2cce070ccb6d756f76421656",
+      "semantic_lines": [
+        "TASK_LIMIT_BOOT:65536",
+        "TASK_LIMIT_HOST_DONE:0"
+      ]
+    },
+    {
+      "cpus": 1,
+      "stage": "capacity",
+      "attachment": "target/validation-task-capacity-20261127/ios-attachments/A940BF8B-8F24-4363-8DC2-402B55B46809.txt",
+      "sha256": "1145d9ed026ab04fa1bfc411bf0e2bba638e7b9579aa8b952b989954a3bbd47a",
+      "semantic_lines": [
+        "TASK_LIMIT_BOOT:600",
+        "task-capacity-round:0 live=513 reaped=512",
+        "task-capacity-round:1 live=513 reaped=512",
+        "task-capacity-round:2 live=513 reaped=512",
+        "task-capacity-round:3 live=513 reaped=512",
+        "task-capacity-ok: concurrent creation and repeated reuse above 256",
+        "TASK_LIMIT_HOST_DONE:0"
+      ]
+    },
+    {
+      "cpus": 1,
+      "stage": "restart",
+      "attachment": "target/validation-task-capacity-20261127/ios-attachments/F247334F-D73E-4EB0-A1DF-22D79882B3D7.txt",
+      "sha256": "4378c0cdfe5b462bf8e91134f6e6291c9a08d41d9b4f4fbc6959075d36e045dd",
+      "semantic_lines": [
+        "TASK_LIMIT_BOOT:64",
+        "TASK_LIMIT_HOST_DONE:0"
+      ]
+    },
+    {
+      "cpus": 1,
+      "stage": "configured",
+      "attachment": "target/validation-task-capacity-20261127/ios-attachments/C65F691A-5B14-4A1E-8B65-3EAB3696E797.txt",
+      "sha256": "e5d65941cf83e4d9b75178d959db63c44f81a4c494b9732b229b5b84e467f4cc",
+      "semantic_lines": [
+        "TASK_LIMIT_BOOT:64",
+        "TASK_LIMIT_LIVE_OK:baseline=3 final=65",
+        "TASK_LIMIT_HOST_DONE:0"
+      ]
+    },
+    {
+      "cpus": 1,
+      "stage": "default",
+      "attachment": "target/validation-task-capacity-20261127/ios-attachments/D6EE2BAC-3DA1-4579-985C-2F6DAC0DBF9C.txt",
+      "sha256": "2d08d8816bdf5f1a0ca047b03b21691ad7db6421a9158c6b3748037ffbc21064",
+      "semantic_lines": [
+        "TASK_LIMIT_BOOT:65536",
+        "TASK_LIMIT_HOST_DONE:0"
+      ]
+    }
+  ],
+  "interpreter": [
+    {
+      "cpus": 1,
+      "exit_code": 0,
+      "stdout": "TASK_LIMIT_BOOT:64\nTASK_LIMIT_LIVE_OK:baseline=1 final=65\n",
+      "stderr": ""
+    },
+    {
+      "cpus": 4,
+      "exit_code": 0,
+      "stdout": "TASK_LIMIT_BOOT:64\nTASK_LIMIT_LIVE_OK:baseline=1 final=65\n",
+      "stderr": ""
+    }
+  ],
+  "shared_results_reused": [
+    {
+      "platform": "apple",
+      "artifact": "target/validation-perf-20261127/apple-units-c1/results.jsonl",
+      "crate": "trames_vfs",
+      "test": "sysctl::tests::task_limit_sysctl_retains_one_live_resource_across_fork_and_snapshots",
+      "status": "passed",
+      "exit_code": 0,
+      "seconds": 0.009
+    },
+    {
+      "platform": "apple",
+      "artifact": "target/validation-perf-20261127/apple-units-c1/results.jsonl",
+      "crate": "trames_kernel",
+      "test": "task::tests::concurrent_admission_reserves_capacity_before_publication",
+      "status": "passed",
+      "exit_code": 0,
+      "seconds": 0.007
+    },
+    {
+      "platform": "apple",
+      "artifact": "target/validation-perf-20261127/apple-units-c1/results.jsonl",
+      "crate": "trames_kernel",
+      "test": "task::tests::concurrent_births_allocate_once_and_exhaustion_cannot_wrap",
+      "status": "passed",
+      "exit_code": 0,
+      "seconds": 0.008
+    },
+    {
+      "platform": "apple",
+      "artifact": "target/validation-perf-20261127/apple-units-c1/results.jsonl",
+      "crate": "trames_kernel",
+      "test": "task::tests::live_limit_changes_reuse_existing_admission_without_revoking_tasks",
+      "status": "passed",
+      "exit_code": 0,
+      "seconds": 0.008
+    },
+    {
+      "platform": "apple",
+      "artifact": "target/validation-perf-20261127/apple-units-c1/results.jsonl",
+      "crate": "trames_kernel",
+      "test": "task::tests::source_reap_refunds_once_while_owner_and_directory_still_retain_task",
+      "status": "passed",
+      "exit_code": 0,
+      "seconds": 0.008
+    },
+    {
+      "platform": "apple",
+      "artifact": "target/validation-perf-20261127/conformance-fast/results.jsonl",
+      "crate": "trames-core::kernel-conformance::test",
+      "test": "process::boundary_tests::configured_task_capacity_admits_more_than_256_threads_and_reports_the_limit",
+      "status": "passed",
+      "exit_code": 0,
+      "seconds": 0.05
+    },
+    {
+      "platform": "apple",
+      "artifact": "target/validation-perf-20261127/conformance-fast/results.jsonl",
+      "crate": "trames-core::kernel-conformance::test",
+      "test": "tests::initial_session_retains_configured_task_capacity_when_linux_is_moved",
+      "status": "passed",
+      "exit_code": 0,
+      "seconds": 0.011
+    },
+    {
+      "platform": "linux",
+      "artifact": "target/local-ci/io/perf-20261127/linux-units-c1/results.jsonl",
+      "crate": "trames_vfs",
+      "test": "sysctl::tests::task_limit_sysctl_retains_one_live_resource_across_fork_and_snapshots",
+      "status": "passed",
+      "exit_code": 0,
+      "seconds": 0.011
+    },
+    {
+      "platform": "linux",
+      "artifact": "target/local-ci/io/perf-20261127/linux-units-c1/results.jsonl",
+      "crate": "trames_kernel",
+      "test": "task::tests::live_limit_changes_reuse_existing_admission_without_revoking_tasks",
+      "status": "passed",
+      "exit_code": 0,
+      "seconds": 0.006
+    },
+    {
+      "platform": "linux",
+      "artifact": "target/local-ci/io/perf-20261127/linux-units-c1/results.jsonl",
+      "crate": "trames_kernel",
+      "test": "task::tests::concurrent_admission_reserves_capacity_before_publication",
+      "status": "passed",
+      "exit_code": 0,
+      "seconds": 0.014
+    },
+    {
+      "platform": "linux",
+      "artifact": "target/local-ci/io/perf-20261127/linux-units-c1/results.jsonl",
+      "crate": "trames_kernel",
+      "test": "task::tests::source_reap_refunds_once_while_owner_and_directory_still_retain_task",
+      "status": "passed",
+      "exit_code": 0,
+      "seconds": 0.007
+    },
+    {
+      "platform": "linux",
+      "artifact": "target/local-ci/io/perf-20261127/linux-units-c1/results.jsonl",
+      "crate": "trames_kernel",
+      "test": "task::tests::concurrent_births_allocate_once_and_exhaustion_cannot_wrap",
+      "status": "passed",
+      "exit_code": 0,
+      "seconds": 0.015
+    }
+  ],
+  "shared_source_sha256": {
+    "crates/trames-vfs/src/resource_limits.rs": "ccf738ec535aa88e92a67e8be1680f481a74b622351273f6d497842525adf2b1",
+    "crates/trames-vfs/src/sysctl.rs": "6f674b3747c09b7ee13da59069616aea21428cfd37056f44156a2bf50ec8aa1a",
+    "crates/trames-kernel/src/task.rs": "f80a85411c26eac59e41087350b77b39d16ac6febaf84a8bb5c053ee89a4a68d",
+    "crates/trames-session/src/process_birth.rs": "7959554b286502c18439f54009e59fcb591b067316b49260b21e2e7d41f419fd"
+  },
+  "pre_fix_key_failure": {
+    "runner_sha256": "353881ae67431f6a7d354d73af96328d61798cb8d20a319b9212a9492d0a2b05",
+    "records": [
+      {
+        "action": "get",
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "trames-mac: unknown configuration field\n"
+      },
+      {
+        "action": "set",
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "trames-mac: unknown configuration table\n"
+      }
+    ],
+    "expected_failure": true
+  },
+  "first_ios_summary": {
+    "devicesAndConfigurations": [
+      {
+        "device": {
+          "architecture": "arm64",
+          "deviceId": "883E94BC-25CB-4127-A967-8CCA14FA2258",
+          "deviceName": "iPad Pro 11-inch (M5)",
+          "modelName": "iPad Pro 11-inch (M5)",
+          "osBuildNumber": "24A434",
+          "osVersion": "27.0",
+          "platform": "iOS Simulator"
+        },
+        "expectedFailures": 0,
+        "failedTests": 2,
+        "passedTests": 1,
+        "skippedTests": 0,
+        "testPlanConfiguration": {
+          "configurationId": "1",
+          "configurationName": "Test Scheme Action"
+        }
+      }
+    ],
+    "environmentDescription": "Trames · Built with macOS 27.0.1",
+    "expectedFailures": 0,
+    "failedTests": 2,
+    "finishTime": 1795789469.775,
+    "passedTests": 1,
+    "result": "Failed",
+    "runtimeWarnings": [
+      {
+        "issueType": "Runtime Warning",
+        "message": "Thread running at User-interactive quality-of-service class waiting on a lower QoS thread running at Default quality-of-service class. Investigate ways to avoid priority inversions",
+        "sourceURL": "file:///Users/main/dev/trames/apps/ios/TramesTests/EnvironmentConfigurationTests.swift"
+      }
+    ],
+    "skippedTests": 0,
+    "startTime": 1795789113.885,
+    "statistics": [],
+    "testFailures": [
+      {
+        "failureText": "failed: caught error: \"message(\"Task capacity default/4: running; test \\\"$(grep -c \\'^processor\\' /proc/cpuinfo)\\\" -eq 4 && { chmod 755 /tmp\\r\\r\\n/task-limit /tmp/task-capacity; /tmp/task-limit read 65536; }; printf \\'\\\\nTASK_LI\\r\\r\\nMIT_HOST_DONE:%d\\\\n\\' $?\\r\\nTASK_LIMIT_BOOT:65536\\r\\nTASK_LIMIT_READ_OK\\r\\n\\r\\nTASK_LIMIT_HOST_DONE:0\\r\\ntrames:/# \\u{1B}[6n\")\"",
+        "targetName": "TramesTests",
+        "testIdentifier": 2,
+        "testIdentifierString": "LocalTaskCapacityTests/testProductTaskLimitWithFourCPUs()",
+        "testIdentifierURL": "test://com.apple.xcode/Trames/TramesTests/LocalTaskCapacityTests/testProductTaskLimitWithFourCPUs",
+        "testName": "testProductTaskLimitWithFourCPUs()"
+      },
+      {
+        "failureText": "failed: caught error: \"message(\"Task capacity default/1: running; test \\\"$(grep -c \\'^processor\\' /proc/cpuinfo)\\\" -eq 1 && { chmod 755 /tmp/task-limit /tmp/task-capacity; /tmp/task-limit read 65536; }; printf \\'\\\\nTASK_LIMIT_HOST_DONE:%d\\\\n\\' $?\\r\\ntrames:/# test \\\"$(grep -c \\'^processor\\' /proc/cpuinfo)\\\" -eq 1 && { chmod 755 /tmp\\r\\r\\n/task-limit /tmp/task-capacity; /tmp/task-limit read 65536; }; printf \\'\\\\nTASK_LI\\r\\r\\nMIT_HOST_DONE:%d\\\\n\\' $?\\r\\nTASK_LIMIT_BOOT:65536\\r\\nTASK_LIMIT_READ_OK\\r\\n\\r\\nTASK_LIMIT_HOST_DONE:0\\r\\ntrames:/# \\u{1B}[6n\")\"",
+        "targetName": "TramesTests",
+        "testIdentifier": 3,
+        "testIdentifierString": "LocalTaskCapacityTests/testProductTaskLimitWithOneCPU()",
+        "testIdentifierURL": "test://com.apple.xcode/Trames/TramesTests/LocalTaskCapacityTests/testProductTaskLimitWithOneCPU",
+        "testName": "testProductTaskLimitWithOneCPU()"
+      }
+    ],
+    "title": "Test - Trames",
+    "topInsights": [],
+    "totalTestCount": 3
+  },
+  "deferred_nproc_probe": {
+    "owner_decision": "Complete configuration delivery first; implement writable per-UID RLIMIT_NPROC in a separate batch",
+    "fixture": {
+      "rootfs_sha256": "821565fa8f3953eefd12497b166b4b50add2f7c57fb312e75862f5867e06fefe",
+      "files": {
+        "task-limit": "8ba1bb13ce0910b57e8393253789ae6e9e777f6432bd40eca71f8ad816602eaa",
+        "task-capacity": "ace70d6ed55aeea2acc82e082bf8182b02c60d0a1769f511ca702ff3f1e93257"
+      }
+    },
+    "results": [
+      {
+        "cpus": 1,
+        "exit_code": 134,
+        "stdout": "",
+        "stderr": "task-limit: tests/fixtures/task-limit.c:98: main: Assertion `setrlimit(RLIMIT_NPROC, &limit) == 0' failed.\ntask-limit: tests/fixtures/task-limit.c:33: reap: Assertion `WIFEXITED(status) && WEXITSTATUS(status) == 0' failed.\n"
+      },
+      {
+        "cpus": 4,
+        "exit_code": 134,
+        "stdout": "",
+        "stderr": "task-limit: tests/fixtures/task-limit.c:98: main: Assertion `setrlimit(RLIMIT_NPROC, &limit) == 0' failed.\ntask-limit: tests/fixtures/task-limit.c:33: reap: Assertion `WIFEXITED(status) && WEXITSTATUS(status) == 0' failed.\n"
+      }
+    ],
+    "source": "target/validation-task-capacity-20261127/task-limit-with-nproc-probe.c",
+    "current_implementation": "FixedLimits resource 6 uses the session ceiling; mutating it is unsupported"
+  },
+  "cache_cleanup": {
+    "cache": "/Users/main/dev/trames/target/local-ci/io/fuse-runtime-target-20261125",
+    "retained": "test ELF executables, baseline/delivery runners, source and receipts",
+    "free_before": 2789376000,
+    "free_after": 7249920000,
+    "files_removed": 1751,
+    "logical_bytes_removed": 5769225414
+  },
+  "limitations": [
+    "No physical iPad run",
+    "No claim of writable per-UID RLIMIT_NPROC",
+    "No new gVisor identities or full unrelated matrix",
+    "XCTest QoS warning retained; auxiliary simulator diagnostic collection reported missing default simctl path"
+  ],
+  "artifact_root": "/Users/main/dev/trames/target/validation-task-capacity-20261127"
+}

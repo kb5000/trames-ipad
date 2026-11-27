@@ -13,8 +13,15 @@ public struct EnvironmentConfiguration: Equatable, Sendable {
         let json = try JSONSerialization.jsonObject(with: JSONEncoder().encode(value))
         return try LocalSession.environmentConfig(["action":authorization ? "authorization-encode" : "encode", "value":json])
     }
+    private static func keys(_ path: String) -> [String] {
+        let prefix = "kernel.sysctl."
+        if path.hasPrefix(prefix) {
+            return ["kernel", "sysctl", String(path.dropFirst(prefix.count))]
+        }
+        return path.split(separator:".").map(String.init)
+    }
     public func get(_ path: String) -> BridgeValue {
-        path.split(separator:".").reduce(value) { node, key in
+        Self.keys(path).reduce(value) { node, key in
             if case .object(let object) = node { return object[String(key)] ?? .null }; return .null
         }
     }
@@ -27,7 +34,7 @@ public struct EnvironmentConfiguration: Equatable, Sendable {
             var object: [String:BridgeValue]; if case .object(let old) = node { object = old } else { object = [:] }
             object[key] = replacing(object[key] ?? .null, keys.dropFirst()); return .object(object)
         }
-        value = replacing(value, path.split(separator:".").map(String.init)[...])
+        value = replacing(value, Self.keys(path)[...])
     }
     public static let iPadPermissions = ["clipboard", "files", "host_ui"]
 }
