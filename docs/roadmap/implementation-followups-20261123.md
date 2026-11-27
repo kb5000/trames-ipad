@@ -1,6 +1,8 @@
 # 临时实施清单：兼容性迭代后的剩余工作
 
-当前检查点（2026-11-27）：05 Android 内存生命周期按约定范围完成。UFFD 私有匿名 MISSING、原 mm 的 process_mrelease、全局内存 PSI 及原版 ART／Zygote／lmkd 已集中验证，无新增协调／服务线程。Apple／Linux 资源测试分别 2,364／2,374 通过，各 5 既有忽略；原版 lmkd 连续十轮自动回收约 64 MiB、分配者正常完成。最终 ART 三对中位耗时 405.94→392.18 ms，先前约 15% 倒退未再复现；不宣称 GC 加速。详见[本轮验证与支持边界](../../runtime/docs/validation/android-memory-20261127.md)。下一领域为 06 真实调试工具验收。
+当前检查点（2026-11-27）：06 真实调试工具按约定范围完成。原版 GDB／gdbserver／strace 在 Linux 对照、解释器和 Mac HVF 各 14/14，两后端单执行槽各 8/8；相关原版 gVisor 各 165 通过、1 原始跳过。原 tracer 任务归属、非 leader exec 通知解锁、SEIZE 新生事件及停止期间待执行 SVC 已修正，无新增协调／服务线程。Apple／Linux kernel 各 204 通过，产品组合 547 通过／3 忽略，严格检查和 iOS ARM64 Rust 构建通过。详见[验证与支持边界](../../runtime/docs/validation/debugger-sessions-20261127.md)。下一领域为 07 futex2／rseq。
+
+前一检查点：05 Android 内存生命周期已按约定范围完成。UFFD 私有匿名 MISSING、原 mm 的 process_mrelease、全局内存 PSI 及原版 ART／Zygote／lmkd 已集中验证，无新增协调／服务线程。Apple／Linux 资源测试分别 2,364／2,374 通过，各 5 既有忽略；原版 lmkd 连续十轮自动回收约 64 MiB、分配者正常完成。最终 ART 三对中位耗时 405.94→392.18 ms，先前约 15% 倒退未再复现；不宣称 GC 加速。详见[验证与支持边界](../../runtime/docs/validation/android-memory-20261127.md)。
 
 上一检查点（2026-11-27）：04 cgroup 功能及必要调用方已集中验证完成，主线整合后的两执行器原版用例、两宿主资源／组合测试及 iOS Rust 产物通过；没有新增协调线程。冷读性能后续已实现并验证，HVF IO 比上一版快 4.01%，相对 cgroup 前基线的中位差距收敛为 +2.63%；完整记录见[收尾验证](../../runtime/docs/validation/cgroup-closeout-20261127.md)及下方领域 04。功能顺序下一领域为 05 Android 内存生命周期。
 
@@ -38,7 +40,7 @@
 | 03 现代挂载 | 映射层 overlay、四种现代 context、O_TMPFILE、原 OFD／provider 及 OCI 均验证；最终四配对块对照原 FUSE 基线，metadata／读取／管道每块均改善 | 本轮按约定范围关闭；原始块间波动与未支持 filesystem／index／metacopy 参数边界保留 |
 | 04 cgroup | 功能、调用方、两宿主资源、实际限速／回收及性能已验证并配对交付，见下方领域 04 | 本轮关闭；既有实测开销和支持边界保留 |
 | 05 Android 内存 | UFFD MISSING、mrelease、原版 ART／Zygote／Reaper、真实 PSI 自动回收及性能验收完成，见[验证记录](../../runtime/docs/validation/android-memory-20261127.md) | 本轮按约定范围关闭；WP／MINOR、CPU／IO PSI、swap／file LRU 未提供，宿主压力及物理 iPad 未强制验收 |
-| 06 调试工具 | ptrace／proc memory 原版用例闭环；GDB 启动、软件断点、单步及寄存器修改已有证据 | live attach、多线程、gdbserver、strace -f、拒绝访问及异常退出会话；硬件断点／观察点、SVE／SME 单独列支持范围 |
+| 06 调试工具 | 原版 GDB live attach、多线程、gdbserver、strace -f、拒绝访问及异常退出已集中验收，两后端含单执行槽 | 本轮关闭；硬件断点／观察点、SVE／SME 保持单独的未支持范围 |
 | 07 futex2／rseq | 四个 futex2 接口及 rseq 注册／中止／迁移／信号／fork／exec 已有实现；已覆盖单元／解释器检查通过 | 原版 no-libc ARM64 runfile、Linux 自测和真实调用程序，两种执行后端的生命周期及旧 futex 性能验收 |
 | 08 perf | 软件时钟计数／基本采样、FD／控制／映射环、输出重定向、继承／exec 和部分动态策略已有实现及回归 | 采样中断／开销预算、内核生产者、其余事件与 CPU／cgroup 作用域、映射／权限细节，原版 perf stat／record 验收 |
 | 09 动态任务上限 | 默认 65,536、可写 proc、manifest／CLI／FFI／两端启动共享准入资源；实际 guest 初始化、动态读写及拒绝 fork 已验证 | 实际 Mac/HVF 产品运行及物理 iPad、安装应用的配置交付验收；共享实现不再按未实现排队 |
@@ -200,12 +202,12 @@
 
 ### 06 — 真实调试工具完整验收
 
-- [ ] 状态：主要为待验收，硬件调试资源仍有实现缺口。
-- 已验证：真实 GDB 启动、软件断点、单步、寄存器修改和继续退出；对应 ptrace／proc memory 原始用例已闭环。
-- 待验收：GDB live attach、多线程会话、gdbserver，以及 `strace -f` 跨 fork／exec；包括拒绝访问、被调试任务停止时调试器退出等生命周期。
+- [x] 状态：本轮约定的真实工具验收完成，按 main 配对交付；硬件调试资源保持单独支持边界。
+- 已验证：原版 GDB live attach、多线程、追踪期间 clone、内存与寄存器修改及实际 CPU 单步、detach；原版 gdbserver attach／launch／detach；原版 `strace -f` 跨 fork／exec 和非 leader exec。Linux、解释器与 HVF 各 14/14。
+- 生命周期：无权限且 nondumpable 目标拒绝 attach、调试器停止时被杀后的自动脱离、目标提前退出和多线程目标停止时被杀均通过；两后端单执行槽各 8/8。
 - 硬件断点／观察点以及 SVE／SME 调试寄存器不在当前实现范围内，应单独登记支持范围和后续需求。
 - 完成标准：在两种执行后端上，用原版工具运行上述完整会话并保存输出；平台相关部分补真机验证。
-- 依据：[ptrace 实现与 GDB 验证](../../runtime/docs/validation/guest-ptrace-mutation-20261123.md)、[proc memory 验证](../../runtime/docs/validation/guest-proc-mem-20261123.md)。
+- 依据：[真实工具集中验收与逐项记录](../../runtime/docs/validation/debugger-sessions-20261127.md)、[本轮实施批次](debugger-batch-20261127.md)、[ptrace 实现与 GDB 验证](../../runtime/docs/validation/guest-ptrace-mutation-20261123.md)、[proc memory 验证](../../runtime/docs/validation/guest-proc-mem-20261123.md)。
 
 ### 07 — futex2 与 rseq
 

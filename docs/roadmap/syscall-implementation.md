@@ -71,18 +71,21 @@ independent of host credentials and resources. [Execution backends](../architect
 
 ## 1. Guest tracing and debugging
 
-Status on 2026-11-23: the ptrace task relationship, ARM64 state mutation,
+Status on 2026-11-27: the ptrace task relationship, ARM64 state mutation,
 software breakpoints, single stepping and proc-memory work are implemented.
 The [ptrace validation](../../runtime/docs/validation/guest-ptrace-mutation-20261123.md)
 closes the twelve remaining process-debugging comparison gaps. The
 [proc-memory follow-up](../../runtime/docs/validation/guest-proc-mem-20261123.md)
 passes all selected proc-memory cases. The sole upstream ptrace skip is its
 Native-platform Yama guard, covered separately in the disposable guest.
-Real GDB launch, software breakpoint, step, register mutation and continued
-exit pass on both executors. The broader stock-tool acceptance checklist below
-still needs explicit evidence for live attach, gdbserver, multithreaded sessions
-and strace fork/exec following; do not mark it complete based only on those
-GDB smoke runs. The six PIDFD_THREAD cases remain in the queue above.
+The [stock-tool acceptance](../../runtime/docs/validation/debugger-sessions-20261127.md)
+now passes all 14 original GDB/gdbserver/strace sessions on native ARM64 Linux,
+the interpreter and Mac HVF, with eight further single-slot checks per executor.
+This includes live attach, existing/new threads, memory/register changes,
+actual CPU stepping, detach, denied access, debugger/tracee death and
+`strace -f` across fork/exec and nonleader exec. The related 166-case upstream
+selection has 165 passes and one original skip on each executor. Hardware
+breakpoint/watchpoint and SVE/SME regsets remain outside the supported scope.
 
 - Complete `ptrace` as a guest task relationship. Share target lookup and
   credential checks with the existing admission code. Implement `TRACEME`,
