@@ -1,6 +1,6 @@
 {
   "date": "2026-11-28",
-  "runtime": "8842c81c91bdab71b7bdf286db527e6a94dbef40",
+  "runtime": "7309727cf80298e80a7ae87e088e4c1585658f60",
   "cli": "978a7151472299ca9793ba27954df1b3d18d1a1f",
   "guest": {
     "wire_revision": 22,
@@ -18,10 +18,11 @@
     "signature_verification": "codesign --verify --deep --strict passed",
     "installation": "success",
     "launch": "success",
-    "process_verified": 22749,
+    "process_verified": 22765,
     "data": "existing stable application updated in place; not uninstalled",
-    "app_binary_sha256": "9bd65749a5571dc5f1730beb20d2d816122c5f546f1fc1262290b7a0aa021c9f",
-    "packaged_icd_sha256": "d6d7ecdd3308ca6eb8f3711086eba01ed834335cef7fa7c0a7ff04a2c1949d13"
+    "app_binary_sha256": "c7dd735b0bf28563a1b496798e04e68819ad83fac102bd9d32ad90bbb45a0087",
+    "packaged_icd_sha256": "d6d7ecdd3308ca6eb8f3711086eba01ed834335cef7fa7c0a7ff04a2c1949d13",
+    "source_checked_runtime": "7309727cf80298e80a7ae87e088e4c1585658f60"
   },
   "gpu_comparison_host": "Mac Metal using original source-checked MoltenVK, not iPad measurements",
   "gpu_comparison": [
@@ -116,5 +117,7 @@
   "paired_consumer_compile_checks": {
     "mac": "cargo check -p trames-mac --offline --locked passed",
     "linux": "cargo check -p trames-linux-app --offline --locked passed; existing Linux VM snapshot, not KVM hardware acceptance"
-  }
+  },
+  "runtime_feature_validation_base": "8842c81c91bdab71b7bdf286db527e6a94dbef40",
+  "runtime_followup": "rustfmt module declaration ordering only; implementation unchanged"
 }

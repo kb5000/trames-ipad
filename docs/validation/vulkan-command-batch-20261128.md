@@ -9,8 +9,10 @@ original path. There is no new timer, service thread or batching UI control.
 See the [architecture](../architecture/vulkan-compute.md#command-recording-before-hlt-2026-11-28)
 and [shared backend validation](../../runtime/docs/validation/vulkan-command-batch-20261128.md).
 
-Paired runtime: `8842c81c91bdab71b7bdf286db527e6a94dbef40`.
+Paired runtime: `7309727cf80298e80a7ae87e088e4c1585658f60`.
 Paired CLI: `978a7151472299ca9793ba27954df1b3d18d1a1f`.
+The final runtime revision only reorders module declarations for rustfmt after
+feature validation at `8842c81`; the validated implementation is unchanged.
 The original published JIT/AES changes through `9a69793` are retained by
 fast-forward. The iPad CPU continues to use its existing interpreter backend.
 
