@@ -76,6 +76,7 @@ final class TerminalViewport: TerminalView {
             keyboard.accessibilityIdentifier="terminal-extended-keyboard"
         }
         super.reloadInputViews()
+        (inputAccessoryView as? TerminalKeyboardAccessory)?.refreshKeyboardState()
     }
     override func didMoveToWindow() {
         super.didMoveToWindow()
@@ -93,18 +94,59 @@ final class TerminalViewport: TerminalView {
         configureScrolling()
     }
 
+    private var mouseToast: UILabel?
+    private var mouseToastWork: DispatchWorkItem?
+
     private func configureScrolling() {
         registerForTraitChanges([UITraitUserInterfaceStyle.self,UITraitAccessibilityContrast.self]) { (view:TerminalViewport, _:UITraitCollection) in
             view.applyAppearance()
         }
         applyAppearance()
         if UIDevice.current.userInterfaceIdiom == .pad,let accessory=inputAccessoryView as? TerminalAccessory {
-            inputAccessoryView=TerminalKeyboardAccessory(accessory:accessory,terminal:self)
+            let wrapper=TerminalKeyboardAccessory(accessory:accessory,terminal:self)
+            wrapper.onMouseReportingChanged={ [weak self] enabled in self?.showMouseModeToast(enabled:enabled) }
+            inputAccessoryView=wrapper
         }
         contentInsetAdjustmentBehavior = .never
         alwaysBounceHorizontal = false
         showsHorizontalScrollIndicator = false
         isDirectionalLockEnabled = true
+    }
+
+    private func showMouseModeToast(enabled: Bool) {
+        mouseToastWork?.cancel()
+        let label = mouseToast ?? {
+            let v = UILabel()
+            v.font = .systemFont(ofSize: 13, weight: .medium)
+            v.textColor = .white
+            v.backgroundColor = UIColor.black.withAlphaComponent(0.76)
+            v.textAlignment = .center
+            v.numberOfLines = 1
+            v.layer.cornerRadius = 14
+            v.layer.masksToBounds = true
+            v.isUserInteractionEnabled = false
+            v.translatesAutoresizingMaskIntoConstraints = false
+            v.accessibilityIdentifier = "terminal-mouse-mode-toast"
+            return v
+        }()
+        mouseToast = label
+        let text = L10n.text(enabled ? "鼠标模式：已开启（传给应用）" : "鼠标模式：已关闭（滚屏与选字）")
+        label.text = "  \(text)  "
+        if let host = superview, label.superview !== host {
+            label.removeFromSuperview()
+            host.addSubview(label)
+            NSLayoutConstraint.activate([
+                label.centerXAnchor.constraint(equalTo: host.centerXAnchor),
+                label.bottomAnchor.constraint(equalTo: host.bottomAnchor, constant: -14),
+                label.heightAnchor.constraint(equalToConstant: 28),
+            ])
+        }
+        label.alpha = 1
+        let work = DispatchWorkItem { [weak label] in
+            UIView.animate(withDuration: 0.25) { label?.alpha = 0 }
+        }
+        mouseToastWork = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.6, execute: work)
     }
 
     private func applyAppearance() {

@@ -14,23 +14,28 @@ final class LaunchTests: XCTestCase {
         app.launch()
         return app
     }
-    private func checkLanguage(_ language:String, actions:String, settings:String, memory:String, done:String) {
+    private func checkLanguage(_ language:String, actions:String, manager:String, generalSettings:String, appearance:String, done:String) {
         let app=launchApp(["--workspace-ui-acceptance", "-AppleLanguages", "(\(language))", "-AppleLocale", language == "en" ? "en_US" : "zh_CN"])
         defer {app.terminate()}
         let menu=app.buttons["session-actions"]
         XCTAssertTrue(menu.waitForExistence(timeout:20),app.debugDescription)
         XCTAssertEqual(menu.label,actions)
-        menu.tap()
-        app.buttons[settings].firstMatch.tap()
-        XCTAssertTrue(app.staticTexts[memory].waitForExistence(timeout:5),app.debugDescription)
+        let openManager=app.buttons["open-manager"]
+        XCTAssertTrue(openManager.waitForExistence(timeout:5),app.debugDescription)
+        XCTAssertEqual(openManager.label,manager)
+        openManager.tap()
+        let settingsRow=app.descendants(matching:.any)["manager-row-settings"].firstMatch
+        XCTAssertTrue(settingsRow.waitForExistence(timeout:8),app.debugDescription)
+        settingsRow.tap()
+        XCTAssertTrue(app.staticTexts[appearance].waitForExistence(timeout:5),app.debugDescription)
         XCTAssertTrue(app.buttons[done].exists)
         XCTAssertFalse(app.staticTexts[language == "en" ? "本地内存" : "Local Memory"].exists)
     }
     func testEnglishApplicationLanguage() {
-        checkLanguage("en",actions:"New or manage sessions",settings:"Settings",memory:"Environment Configuration",done:"Done")
+        checkLanguage("en",actions:"New Terminal",manager:"Environments & Settings",generalSettings:"General Settings",appearance:"Appearance",done:"Done")
     }
     func testChineseApplicationLanguage() {
-        checkLanguage("zh-Hans",actions:"新建或管理会话",settings:"设置",memory:"环境配置",done:"完成")
+        checkLanguage("zh-Hans",actions:"新建终端",manager:"环境与设置",generalSettings:"通用设置",appearance:"外观",done:"完成")
     }
     func testWorkspaceTabsDetachDockAndTerminalTitleRemainsVisible() {
         let app=launchApp(["--workspace-ui-acceptance"])
@@ -140,9 +145,11 @@ final class LaunchTests: XCTestCase {
             app.descendants(matching:.any).matching(NSPredicate(format:"identifier BEGINSWITH %@",prefix)).firstMatch
         }
         let state=app.staticTexts["session-state"]
-        let ready=XCTNSPredicateExpectation(predicate:NSPredicate(format:"label == %@","Alpine · 本地"),object:state)
+        let ready=XCTNSPredicateExpectation(predicate:NSPredicate(format:"label == %@","Alpine"),object:state)
         XCTAssertEqual(XCTWaiter.wait(for:[ready],timeout:120),.completed)
         XCTAssertTrue(app.staticTexts["cpu-usage"].waitForExistence(timeout:6))
+        XCTAssertTrue(app.staticTexts["memory-usage"].waitForExistence(timeout:6))
+        XCTAssertTrue(app.staticTexts["disk-usage"].waitForExistence(timeout:6))
         for iteration in 0..<3 {
             let tab=element("tab-terminal-")
             tab.coordinate(withNormalizedOffset:CGVector(dx:0.5,dy:0.5)).press(forDuration:0.15,
@@ -166,7 +173,7 @@ final class LaunchTests: XCTestCase {
             XCTAssertTrue(tab.waitForExistence(timeout:5),app.debugDescription)
             let hidden=XCTNSPredicateExpectation(predicate:NSPredicate(format:"exists == false"),object:title)
             XCTAssertEqual(XCTWaiter.wait(for:[hidden],timeout:5),.completed)
-            app.buttons["新建或管理会话"].tap();app.buttons["设置"].firstMatch.tap()
+            app.buttons["open-manager"].tap()
             XCTAssertTrue(app.buttons["完成"].waitForExistence(timeout:5));app.buttons["完成"].tap()
             tab.tap()
             XCTAssertTrue(state.waitForExistence(timeout:5),app.debugDescription)
@@ -178,17 +185,16 @@ final class LaunchTests: XCTestCase {
     }
     func testSessionMenuContainsOnlyProductFeatures() {
         let app=launchApp(["--workspace-ui-acceptance"])
-        XCTAssertTrue(app.buttons["新建或管理会话"].waitForExistence(timeout:20))
-        app.buttons["新建或管理会话"].tap()
-        XCTAssertTrue(app.buttons["新建终端"].firstMatch.waitForExistence(timeout:5))
-        XCTAssertTrue(app.buttons["Linux 环境"].firstMatch.exists)
-        XCTAssertTrue(app.buttons["Files"].firstMatch.exists);XCTAssertTrue(app.buttons["设置"].firstMatch.exists)
+        XCTAssertTrue(app.buttons["open-manager"].waitForExistence(timeout:20))
+        let newTerminal=app.buttons["session-actions"]
+        XCTAssertTrue(newTerminal.waitForExistence(timeout:20))
+        XCTAssertEqual(newTerminal.label,"新建终端")
         XCTAssertFalse(app.buttons["原生 CoreMark"].exists)
         XCTAssertFalse(app.buttons["SSH 连接"].exists);XCTAssertFalse(app.buttons["Files / SFTP"].exists)
     }
     func testGuestNativeRequestRequiresVisibleConsent() {
         let app=launchApp()
-        let ready=XCTNSPredicateExpectation(predicate:NSPredicate(format:"label == %@","Alpine · 本地"),object:app.staticTexts["session-state"])
+        let ready=XCTNSPredicateExpectation(predicate:NSPredicate(format:"label == %@","Alpine"),object:app.staticTexts["session-state"])
         XCTAssertEqual(XCTWaiter.wait(for:[ready],timeout:120),.completed)
         // Exercise the actual running VM/PTY, rather than only the no-VM
         // workspace gesture fixture, then execute a command through that PTY.
@@ -218,7 +224,7 @@ final class LaunchTests: XCTestCase {
         let app=launchApp()
         XCTAssertTrue(app.staticTexts["TRAMES"].waitForExistence(timeout: 20))
         let state = app.staticTexts["session-state"]
-        let ready = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label == %@", "Alpine · 本地"), object: state)
+        let ready = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label == %@", "Alpine"), object: state)
         XCTAssertEqual(XCTWaiter.wait(for: [ready], timeout: 120), .completed,
             "Alpine state: \(state.exists ? state.label : "missing")")
         XCTAssertTrue(app.staticTexts["cpu-usage"].waitForExistence(timeout:5))
@@ -231,10 +237,8 @@ final class LaunchTests: XCTestCase {
         let exited = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label BEGINSWITH %@", "已退出"), object: state)
         XCTAssertEqual(XCTWaiter.wait(for: [exited], timeout: 30), .completed)
         app.buttons.matching(NSPredicate(format:"identifier BEGINSWITH %@","close-tab-terminal-")).firstMatch.tap()
-        app.buttons["新建或管理会话"].tap()
-        // iPadOS 27 can expose the SwiftUI label as a nested button as well.
-        app.buttons["新建终端"].firstMatch.tap()
-        let reopened = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label == %@", "Alpine · 本地"), object: app.staticTexts["session-state"])
+        app.buttons["session-actions"].tap()
+        let reopened = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label == %@", "Alpine"), object: app.staticTexts["session-state"])
         XCTAssertEqual(XCTWaiter.wait(for: [reopened], timeout: 30), .completed)
     }
 }

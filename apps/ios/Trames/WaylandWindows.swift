@@ -19,7 +19,9 @@ struct WaylandCanvasPane: UIViewRepresentable {
     }
     func updateUIView(_ view: UIView, context: Context) {
         guard let canvas=view as? WaylandCanvas else { return }
+        #if TRAMES_ENABLE_PIP
         workspace.pictureInPicture.register(canvas,for:item)
+        #endif
         canvas.sceneOrigin = .zero;canvas.session=session.local;canvas.windowID=window.id
         canvas.presentationEnabled=visible
         canvas.sendInput={ [weak session] in session?.waylandCommand($0) }

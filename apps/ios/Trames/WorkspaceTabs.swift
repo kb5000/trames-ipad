@@ -5,13 +5,15 @@ import Foundation
 enum WorkspaceItemID: Hashable {
     case terminal(UUID)
     case wayland(UUID, UInt64)
+    case web(UUID)
     var session: UUID {
-        switch self { case .terminal(let id), .wayland(let id, _): return id }
+        switch self { case .terminal(let id), .wayland(let id, _), .web(let id): return id }
     }
     var token: String {
         switch self {
         case .terminal(let id): return "terminal-\(id.uuidString)"
         case .wayland(let id, let window): return "wayland-\(id.uuidString)-\(window)"
+        case .web(let id): return "web-\(id.uuidString)"
         }
     }
 }

@@ -66,6 +66,11 @@ int32_t trames_session_terminal_output(uint64_t session, uint64_t terminal, uint
 int32_t trames_session_terminal_resize(uint64_t session, uint64_t terminal, uint16_t rows, uint16_t columns);
 int32_t trames_session_terminal_status(uint64_t session, uint64_t terminal, uint8_t *json, uint32_t capacity);
 int32_t trames_session_terminal_close(uint64_t session, uint64_t terminal);
+/* Live host directory mount/unmount on a running session. Call on a background queue.
+ * Mount JSON: {"target":"/mnt/iPad/Name","host":"/host/dir","readonly":false}.
+ * Unmount JSON: {"target":"/mnt/iPad/Name"}. */
+int32_t trames_session_mount_host(uint64_t handle, const uint8_t *json, uint32_t length);
+int32_t trames_session_unmount_host(uint64_t handle, const uint8_t *json, uint32_t length);
 /* Host-supplied original timezone rules: {"identifier":"Area/City","data":[TZif bytes]}.
  * Updates /etc/localtime, /etc/timezone and the named zoneinfo file. Does not
  * override guest TZ. Call after resuming; existing libc caches follow normal
@@ -94,6 +99,12 @@ int32_t trames_session_bridge_poll(uint64_t handle, uint8_t *json, uint32_t capa
 int32_t trames_session_bridge_reply(uint64_t handle, const uint8_t *json, uint32_t length);
 int32_t trames_session_bridge_active(uint64_t handle, uint64_t ticket);
 int32_t trames_session_close(uint64_t handle);
+/* Loopback-only SOCKS5 proxy dialing through this session's guest root network
+ * (including virtual Docker bridge subnets without port mapping). Returns the
+ * bound 127.0.0.1 port (>0), or -1 on error. */
+int32_t trames_session_web_proxy_port(uint64_t handle);
+/* Snapshot currently listening TCP ports in the guest root network as JSON. */
+int32_t trames_session_listening_ports(uint64_t handle, uint8_t *json, uint32_t capacity);
 int32_t trames_last_error(uint8_t *bytes, uint32_t capacity);
 /* Native Wayland UI. Frame handles retain bytes/textures until release after GPU completion. */
 typedef struct { uint32_t width, height, images, reserved; uint64_t revision; } TramesWaylandFrameInfo;

@@ -85,7 +85,7 @@ struct RootfsEntry {
     var parent: Data { guard let index=path.lastIndex(of:47),index>0 else { return Data([47]) };return Data(path[..<index]) }
     func identifier(environment:String) -> String { "node/\(environment)/p/\(String(RootfsSnapshot.hash(path),radix:16))" }
 }
-/// Reads the existing atomic v3/v4 manifest without taking its writer lock.
+/// Reads the atomic v3/v4 checkpoint and complete incremental WAL frames without taking its writer lock.
 /// No VFS instance is opened, no recovery runs and no namespace is modified.
 struct RootfsSnapshot {
     let store: URL
@@ -93,7 +93,7 @@ struct RootfsSnapshot {
     let entries: [Data:RootfsEntry]
     static func hash(_ data:Data) -> UInt64 { data.reduce(0xcbf29ce484222325) { ($0 ^ UInt64($1)) &* 0x100000001b3 } }
     init(store:URL) throws {
-        let data=try Data(contentsOf:store.appendingPathComponent("manifest"),options:.mappedIfSafe)
+        let data=try Self.readImage(store)
         guard data.count>=48,data.count<=128*1024*1024 else { throw RootfsCatalogError.invalidStore }
         var tail=Reader(data:Data(data.suffix(8)))
         let checksum=try tail.uint(8)
@@ -132,6 +132,110 @@ struct RootfsSnapshot {
         guard r.offset==body.count,entries[Data([47])]?.kind==0 else { throw RootfsCatalogError.invalidStore }
         for entry in entries.values where entry.path != Data([47]) { guard entries[entry.parent]?.kind==0 else { throw RootfsCatalogError.invalidStore } }
         self.store=store;self.revision=checksum;self.entries=entries
+    }
+    static func signature(store:URL) throws -> String {
+        try ["manifest","manifest.wal"].map { name in
+            let path=store.appendingPathComponent(name).path
+            if name == "manifest.wal", !FileManager.default.fileExists(atPath:path) {return "-"}
+            let a=try FileManager.default.attributesOfItem(atPath:path)
+            return "\(a[.systemFileNumber] ?? "")/\(a[.modificationDate] ?? "")/\(a[.size] ?? "")"
+        }.joined(separator:"/")
+    }
+    private static func readImage(_ store:URL) throws -> Data {
+        // A writer may replace the checkpoint between our two opens. Retry the
+        // pair on a chain mismatch; no writer lock or recovery is acquired.
+        for attempt in 0..<3 {
+            do { return try readImageOnce(store) }
+            catch { if attempt == 2 {throw error} }
+        }
+        throw RootfsCatalogError.invalidStore
+    }
+    private static func readImageOnce(_ store:URL) throws -> Data {
+        var image=try Data(contentsOf:store.appendingPathComponent("manifest"))
+        let url=store.appendingPathComponent("manifest.wal")
+        guard FileManager.default.fileExists(atPath:url.path) else {return image}
+        let size=try FileManager.default.attributesOfItem(atPath:url.path)[.size] as? NSNumber
+        guard let size,size.uint64Value<=260*1024*1024 else {throw RootfsCatalogError.invalidStore}
+        let wal=try Data(contentsOf:url)
+        var r=Reader(data:wal),frames:[Data]=[]
+        while wal.count-r.offset>=16 {
+            guard try r.take(8)==Data("TRMWAL01".utf8) else {throw RootfsCatalogError.invalidStore}
+            let length=try r.uint(8)
+            guard length>=24,length<=256*1024*1024 else {throw RootfsCatalogError.invalidStore}
+            if length+8>wal.count-r.offset {break}
+            let body=try r.take(Int(length)),digest=try r.uint(8)
+            guard Self.hash(body)==digest else {throw RootfsCatalogError.invalidStore}
+            frames.append(body)
+        }
+        let current=Self.hash(image)
+        var first=0
+        for (i,body) in frames.enumerated() {
+            var header=Reader(data:body);_=try header.uint(8)
+            if try header.uint(8)==current {first=i+1}
+        }
+        if first==frames.count {return image}
+        var spans=[JournalSpan(buffer:JournalBuffer(image),start:0,count:image.count)]
+        var imageLength=image.count,expected=current
+        for body in frames.dropFirst(first) {
+            var d=Reader(data:body)
+            guard try d.uint(8)==expected else {throw RootfsCatalogError.invalidStore}
+            let target=try d.uint(8),length=try d.uint(8)
+            guard length>=48,length<=128*1024*1024 else {throw RootfsCatalogError.invalidStore}
+            var ends:[Int]=[],end=0
+            for span in spans {end+=span.count;ends.append(end)}
+            var next:[JournalSpan]=[],produced=0
+            while d.offset<body.count {
+                let tag=try d.uint(1)
+                if tag==0 {
+                    let start=try d.uint(8),count=try d.uint(8)
+                    guard start<=imageLength,count>0,count<=imageLength-Int(start),count<=Int(length)-produced else {throw RootfsCatalogError.invalidStore}
+                    produced+=Int(count)
+                    var at=Int(start),remaining=Int(count),low=0,high=ends.count
+                    while low<high {let mid=(low+high)/2;if ends[mid]<=at {low=mid+1}else{high=mid}}
+                    var index=low
+                    while remaining>0 {
+                        let span=spans[index],base=index==0 ? 0:ends[index-1]
+                        let offset=at-base,n=min(remaining,span.count-offset)
+                        Self.appendSpan(&next,JournalSpan(buffer:span.buffer,start:span.start+offset,count:n))
+                        at+=n;remaining-=n;index+=1
+                    }
+                } else if tag==1 {
+                    let count=try d.uint(8)
+                    guard count>0,count<=Int(length)-produced else {throw RootfsCatalogError.invalidStore}
+                    let bytes=try d.take(Int(count))
+                    Self.appendSpan(&next,JournalSpan(buffer:JournalBuffer(bytes),start:0,count:Int(count)))
+                    produced+=Int(count)
+                } else {throw RootfsCatalogError.invalidStore}
+            }
+            guard produced==Int(length) else {throw RootfsCatalogError.invalidStore}
+            spans=next;imageLength=Int(length);expected=target
+        }
+        image=Self.flatten(spans)
+        guard Self.hash(image)==expected else {throw RootfsCatalogError.invalidStore}
+        return image
+    }
+    private final class JournalBuffer {
+        let data:Data
+        init(_ data:Data) {self.data=data}
+    }
+    private struct JournalSpan {
+        let buffer:JournalBuffer
+        let start:Int
+        var count:Int
+    }
+    private static func flatten(_ spans:[JournalSpan]) -> Data {
+        var data=Data();data.reserveCapacity(spans.reduce(0){$0+$1.count})
+        for span in spans {data.append(span.buffer.data[span.start..<span.start+span.count])}
+        return data
+    }
+    private static func appendSpan(_ spans:inout [JournalSpan],_ span:JournalSpan) {
+        if let last=spans.last,last.buffer===span.buffer,last.start+last.count==span.start {
+            spans[spans.count-1].count+=span.count
+        } else {spans.append(span)}
+        if spans.count>=32768 {
+            let bytes=Self.flatten(spans)
+            spans=[JournalSpan(buffer:JournalBuffer(bytes),start:0,count:bytes.count)]
+        }
     }
     func object(_ entry:RootfsEntry) throws -> URL {
         guard entry.kind==1 else { throw RootfsCatalogError.noSuchItem }

@@ -8,9 +8,9 @@ final class EnvironmentDeletionUITests:XCTestCase {
         // This mode owns a separate, disposable configuration fixture store.
         app.launchArguments=["--ui-acceptance","--environment-ui-acceptance","--environment-ui-reset","-AppleLanguages","(zh-Hans)","-AppleLocale","zh_CN"]
         app.launch();defer {app.terminate()}
-        let actions=app.buttons["session-actions"]
-        XCTAssertTrue(actions.waitForExistence(timeout:20),app.debugDescription)
-        actions.tap();app.buttons["Linux 环境"].firstMatch.tap()
+        let manager=app.buttons["open-manager"]
+        XCTAssertTrue(manager.waitForExistence(timeout:20),app.debugDescription)
+        manager.tap()
         let android=app.descendants(matching:.any).matching(identifier:"environment-row-android").firstMatch
         XCTAssertTrue(android.waitForExistence(timeout:10),app.debugDescription);android.tap()
         let title=app.staticTexts["environment-detail-name"]

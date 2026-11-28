@@ -15,6 +15,31 @@ final class RootfsSnapshotTests:XCTestCase {
         try Data("rootfs fixture".utf8).write(to:snapshot.object(entry))
         return (directory,snapshot)
     }
+    private func hexFixture(_ name:String) throws -> Data {
+        let url=try XCTUnwrap(Bundle(for:Self.self).url(forResource:name,withExtension:"hex",subdirectory:"Fixtures"))
+        let text=Array(try String(contentsOf:url,encoding:.utf8).trimmingCharacters(in:.whitespacesAndNewlines))
+        return Data(try stride(from:0,to:text.count,by:2).map {try XCTUnwrap(UInt8(String(text[$0..<$0+2]),radix:16))})
+    }
+    func testRustJournalChangesRevisionWithoutReplacingManifestAndIgnoresTornTail() throws {
+        let (directory,before)=try fixture();defer {try? FileManager.default.removeItem(at:directory)}
+        let manifest=try Data(contentsOf:directory.appendingPathComponent("manifest"))
+        let signature=try RootfsSnapshot.signature(store:directory)
+        var wal=try hexFixture("rootfs-manifest-wal")
+        wal.append(Data("TRM".utf8))
+        try wal.write(to:directory.appendingPathComponent("manifest.wal"))
+        let after=try RootfsSnapshot(store:directory)
+        XCTAssertEqual(after.entries[Data([47])]?.mode,0o40750)
+        XCTAssertNotEqual(after.revision,before.revision)
+        XCTAssertNotEqual(try RootfsSnapshot.signature(store:directory),signature)
+        XCTAssertEqual(try Data(contentsOf:directory.appendingPathComponent("manifest")),manifest)
+        XCTAssertEqual(after.entries[Data("/alias".utf8)]?.inode,after.entries[Data("/root/readme.txt".utf8)]?.inode)
+        // A committed checkpoint can still have its already-covered WAL.
+        try hexFixture("rootfs-manifest-after-wal").write(to:directory.appendingPathComponent("manifest"))
+        XCTAssertEqual(try RootfsSnapshot(store:directory).revision,after.revision)
+        var corrupt=try hexFixture("rootfs-manifest-wal");corrupt[corrupt.count-1] ^= 1
+        try corrupt.write(to:directory.appendingPathComponent("manifest.wal"))
+        XCTAssertThrowsError(try RootfsSnapshot(store:directory))
+    }
     func testNewNestedEnvironmentResolvesTheExistingRootBeforeMissingChildren() throws {
         let parent=FileManager.default.temporaryDirectory.appendingPathComponent("environment-path-\(UUID().uuidString)",isDirectory:true)
         let actual=parent.appendingPathComponent("actual",isDirectory:true),alias=parent.appendingPathComponent("alias",isDirectory:true)

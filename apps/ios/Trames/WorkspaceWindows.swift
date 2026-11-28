@@ -2,27 +2,58 @@
 import SwiftUI
 
 struct WorkspaceTabLabel: View {
-    @ObservedObject var session: TerminalSession
+    @ObservedObject var workspace: WorkspaceModel
     let item: WorkspaceItemID
     var body: some View {
         switch item {
-        case .terminal: Label(session.title,systemImage:"terminal")
-        case .wayland(_,let id):
-            let window=session.waylandWindows.first { $0.id == id }
-            let title=window?.title ?? ""
-            Label(title.isEmpty ? (window?.app_id.isEmpty == false ? window!.app_id : L10n.text("图形应用")) : title,systemImage:"window.ceiling")
+        case .terminal:
+            if let session = workspace.session(for: item) {
+                TerminalTabLabel(session: session)
+            }
+        case .wayland(_, let id):
+            if let session = workspace.session(for: item) {
+                WaylandTabLabel(session: session, windowID: id)
+            }
+        case .web:
+            if let tab = workspace.webTab(for: item) {
+                WebTabLabel(tab: tab)
+            }
         }
     }
+}
+private struct TerminalTabLabel: View {
+    @ObservedObject var session: TerminalSession
+    var body: some View { Label(session.title, systemImage: "terminal") }
+}
+private struct WaylandTabLabel: View {
+    @ObservedObject var session: TerminalSession
+    let windowID: UInt64
+    var body: some View {
+        let window = session.waylandWindows.first { $0.id == windowID }
+        let title = window?.title ?? ""
+        Label(title.isEmpty ? (window?.app_id.isEmpty == false ? window!.app_id : L10n.text("图形应用")) : title, systemImage: "window.ceiling")
+    }
+}
+private struct WebTabLabel: View {
+    @ObservedObject var tab: WebTabSession
+    var body: some View { Label(tab.title, systemImage: "globe") }
 }
 struct WorkspaceContent: View {
     @ObservedObject var workspace: WorkspaceModel
     let item: WorkspaceItemID
     var body: some View {
-        if let session=workspace.session(for:item) {
-            if case .terminal = item {
-                SessionView(workspace:workspace,session:session)
-            } else if case .wayland(_,let window)=item {
-                WaylandContent(workspace:workspace,session:session,windowID:window,visible:workspace.isVisible(item))
+        switch item {
+        case .terminal:
+            if let session = workspace.session(for: item) {
+                SessionView(workspace: workspace, session: session)
+            }
+        case .wayland(_, let window):
+            if let session = workspace.session(for: item) {
+                WaylandContent(workspace: workspace, session: session, windowID: window, visible: workspace.isVisible(item))
+            }
+        case .web:
+            if let tab = workspace.webTab(for: item) {
+                WebBrowserPane(tab: tab)
             }
         }
     }
@@ -48,14 +79,14 @@ struct WorkspaceWindow: View {
         VStack(spacing:0) {
             if floating {
             HStack(spacing:0) {
-                if let session=workspace.session(for:item) {
-                    WorkspaceTabLabel(session:session,item:item).lineLimit(1)
-                        .accessibilityElement(children:.combine)
-                        .accessibilityIdentifier("window-title-\(item.token)")
-                }
+                WorkspaceTabLabel(workspace: workspace, item: item).lineLimit(1)
+                    .accessibilityElement(children:.combine)
+                    .accessibilityIdentifier("window-title-\(item.token)")
                 Spacer()
+                #if TRAMES_ENABLE_PIP
                 windowButton("pip.enter",label:L10n.text("画中画")) {workspace.preview(item)}
                     .accessibilityIdentifier("pip-\(item.token)")
+                #endif
                 windowButton("minus",label:L10n.text("最小化到标签栏")) { workspace.minimize(item) }
                     .accessibilityIdentifier("minimize-\(item.token)")
                 windowButton("arrow.up.left.and.arrow.down.right",label:L10n.text("停靠为标签页")) { workspace.dock(item) }

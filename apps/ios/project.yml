@@ -41,11 +41,11 @@ targets:
         script: |
           cd "$SRCROOT/../.."
           python3 scripts/prepare-third-party-notices.py --check
-          python3 scripts/check-ios-guest.py --video-dir apps/ios/Trames/GuestVideo --bionic-dir apps/ios/Trames/GuestBionic --glibc-dir apps/ios/Trames/GuestGlibc --rust-dir "${TRAMES_RUST_LIB_DIR:-$PWD/target/ios-link/$TRAMES_RUST_TARGET}"
+          python3 scripts/check-ios-guest.py --video-dir apps/ios/Trames/GuestVideo --glibc-dir apps/ios/Trames/GuestGlibc --rust-dir "${TRAMES_RUST_LIB_DIR:-$PWD/target/ios-link/$TRAMES_RUST_TARGET}"
         basedOnDependencyAnalysis: false
     sources:
       - path: Trames
-        excludes: [GuestMusl, GuestVulkan, GuestVideo, GuestBionic, GuestGlibc]
+        excludes: [GuestMusl, GuestVulkan, GuestVideo, GuestAudio, GuestBionic, GuestGlibc, WindowPictureInPicture.swift]
       - path: TramesFileSystem
       - path: Trames/GuestMusl
         type: folder
@@ -56,16 +56,18 @@ targets:
       - path: Trames/GuestVideo
         type: folder
         buildPhase: resources
-      - path: Trames/GuestGlibc
+      - path: Trames/GuestAudio
         type: folder
         buildPhase: resources
-      - path: Trames/GuestBionic
+      - path: Trames/GuestGlibc
         type: folder
         buildPhase: resources
     dependencies:
       - package: TramesKit
       - package: SwiftTerm
       - target: TramesFileProvider
+        embed: true
+      - target: TramesShareExtension
         embed: true
       - sdk: FileProvider.framework
       # A Rust staticlib bundles MoltenVK's objects, but its system link flags
@@ -79,10 +81,11 @@ targets:
       - sdk: CoreMedia.framework
       - sdk: VideoToolbox.framework
       - sdk: AudioToolbox.framework
-      - sdk: AVKit.framework
       - sdk: AVFoundation.framework
       - sdk: MetalPerformanceShaders.framework
       - sdk: UIKit.framework
+      - sdk: WebKit.framework
+      - sdk: Network.framework
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: org.trames.Trames
@@ -98,7 +101,11 @@ targets:
   TramesFileProvider:
     type: app-extension
     platform: iOS
-    sources: [TramesFileProvider,TramesFileSystem]
+    sources:
+      - path: TramesFileProvider
+      - path: TramesFileSystem
+      - path: Trames/PrivacyInfo.xcprivacy
+        buildPhase: resources
     dependencies:
       - sdk: FileProvider.framework
       - sdk: UniformTypeIdentifiers.framework
@@ -108,6 +115,26 @@ targets:
         INFOPLIST_FILE: TramesFileProvider/Info.plist
         PRODUCT_BUNDLE_IDENTIFIER: org.trames.Trames.FileProvider
         CODE_SIGN_ENTITLEMENTS: TramesFileProvider.entitlements
+        APPLICATION_EXTENSION_API_ONLY: YES
+        SKIP_INSTALL: YES
+        ARCHS: arm64
+        ONLY_ACTIVE_ARCH: YES
+  TramesShareExtension:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: TramesShareExtension
+      - path: Trames/PrivacyInfo.xcprivacy
+        buildPhase: resources
+    dependencies:
+      - sdk: UIKit.framework
+      - sdk: UniformTypeIdentifiers.framework
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: NO
+        INFOPLIST_FILE: TramesShareExtension/Info.plist
+        PRODUCT_BUNDLE_IDENTIFIER: org.trames.Trames.ShareExtension
+        CODE_SIGN_ENTITLEMENTS: TramesShareExtension.entitlements
         APPLICATION_EXTENSION_API_ONLY: YES
         SKIP_INSTALL: YES
         ARCHS: arm64

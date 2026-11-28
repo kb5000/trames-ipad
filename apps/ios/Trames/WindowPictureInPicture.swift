@@ -33,7 +33,9 @@ final class WindowPictureInPicture: NSObject, ObservableObject, AVPictureInPictu
     private var frameCount=0
     private func trace(_ message:String) {
         let line="\(Date()) \(message)\n"
-        let url=FileManager.default.urls(for:.documentDirectory,in:.userDomainMask)[0].appendingPathComponent("pip-debug.txt")
+        let dir=FileManager.default.urls(for:.cachesDirectory,in:.userDomainMask)[0].appendingPathComponent("Diagnostics",isDirectory:true)
+        try? FileManager.default.createDirectory(at:dir,withIntermediateDirectories:true)
+        let url=dir.appendingPathComponent("pip-debug.txt")
         if let handle=try? FileHandle(forWritingTo:url) {defer {try? handle.close()};try? handle.seekToEnd();try? handle.write(contentsOf:Data(line.utf8))}
         else {try? Data(line.utf8).write(to:url)}
     }
@@ -164,7 +166,9 @@ final class WindowPictureInPicture: NSObject, ObservableObject, AVPictureInPictu
         }
         #if DEBUG
         if frameCount==0,let image=context.makeImage(),let data=UIImage(cgImage:image).pngData() {
-            try? data.write(to:FileManager.default.urls(for:.documentDirectory,in:.userDomainMask)[0].appendingPathComponent("pip-first-frame.png"))
+            let dir=FileManager.default.urls(for:.cachesDirectory,in:.userDomainMask)[0].appendingPathComponent("Diagnostics",isDirectory:true)
+            try? FileManager.default.createDirectory(at:dir,withIntermediateDirectories:true)
+            try? data.write(to:dir.appendingPathComponent("pip-first-frame.png"))
         }
         #endif
         context.flush()

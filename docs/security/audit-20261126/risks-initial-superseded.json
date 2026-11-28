@@ -1,0 +1,158 @@
+[
+  {
+    "id": "L01",
+    "severity": "高",
+    "confidence": "已确认脚本缺口；实际发行包待核",
+    "repositories": [
+      "mac"
+    ],
+    "title": "源码打包没有自动包含 cli 子模块",
+    "evidence": "scripts/package-mac.py 仅 git archive 产品与 runtime；git archive 不展开子模块，cli 的 GPL 源码不会由这两个 archive 自动带入。--corresponding-source 可额外补充，故不能据此断言所有已发布 ZIP 都违规。",
+    "recommendation": "逐个核对发行包 Sources 与 BUILD.json；显式提供匹配 cli revision 的源码及完整依赖/构建输入。"
+  },
+  {
+    "id": "L02",
+    "severity": "高",
+    "confidence": "待权属复核",
+    "repositories": [
+      "ipad",
+      "runtime"
+    ],
+    "title": "glibc 原始源码、Rust 转写及 guest 衍生库需要分别审查",
+    "evidence": "runtime/crates/trames-native/upstream/glibc-2.41 含 LGPL-2.1-or-later 文件和 COPYING.LIB；provenance.json 写明 integer grammar translated to Rust；src/glibc.rs 自身标 GPL。build.rs 未直接编译这些 glibc C 文件，因此不能推断整个 App 静态链接 glibc。独立实现行为也不自动构成衍生作品。",
+    "recommendation": "针对转写的表达/代码来源做定向对照；分别确定原始 vendored 源、宿主实现、guest libc/补丁的许可和分发方式，勿直接把全部代码按自有商业许可处理。"
+  },
+  {
+    "id": "L03",
+    "severity": "高",
+    "confidence": "分发闭环待核；本地产物证据已核",
+    "repositories": [
+      "ipad",
+      "runtime",
+      "mac"
+    ],
+    "title": "FFmpeg 修改与源码/替换义务",
+    "evidence": "7.1.1 脚本启用 shared，实际暂存 libavcodec/libavutil 自报 LGPL 2.1+，参数未见 GPL/nonfree。prepare-ios-video.py 复制 LGPL 文本和补丁，但没有单独证明最终 Release 的准确源码、配置/补丁及库替换途径齐备。runtime patch 无独立 SPDX 不能单凭顶层 COPYING 判定所有新增代码许可。",
+    "recommendation": "将确切源码、补丁、完整 configure 与 toolchain 记录绑定到四个 .so；确认补丁授权、允许的替换/逆向修改方式、About/EULA 提示。检查每个实际发行版本而非只看当前脚本。"
+  },
+  {
+    "id": "L04",
+    "severity": "高",
+    "confidence": "发行前法律/权属门槛",
+    "repositories": [
+      "ipad",
+      "runtime"
+    ],
+    "title": "CLA 不能清理旧贡献和第三方权利，也不能包办 App Store",
+    "evidence": "五仓库当前均 GPL-3.0-or-later；CLA 草案尚未生效。glibc/FFmpeg 等并不因签署新 CLA 失去各自许可义务。App Store/签名/分发条款应与实际 GPL/LGPL 组件和用户修改权逐项对照。",
+    "recommendation": "区分自有代码商业再授权和第三方合规；做历史贡献者权属表与交付闭包。不要宣传为商业许可可替代所有第三方许可；尚不能给出商店发行已获许可的结论。"
+  },
+  {
+    "id": "L05",
+    "severity": "中",
+    "confidence": "已确认校验失败；影响有限",
+    "repositories": [
+      "ipad"
+    ],
+    "title": "Wayland notices 与当前 Cargo.lock 不一致",
+    "evidence": "prepare-wayland-notices.py --check 失败；审计副本生成 diff 显示 windows-sys 0.60.2/旧 windows-targets 转为 0.61.2。主要是 Windows-only 闭包，不能直接证明 iPad 运行时漏声明。",
+    "recommendation": "按实际发行 target/features 刷新并验证 notices；保留单独的构建/其他目标附录，避免用全锁文件替代实际交付清单。"
+  },
+  {
+    "id": "L06",
+    "severity": "中",
+    "confidence": "文档覆盖缺口/待产物验证",
+    "repositories": [
+      "ipad",
+      "runtime",
+      "mac",
+      "linux",
+      "cli"
+    ],
+    "title": "缺少五仓统一的实际交付 license 清单与检查",
+    "evidence": "现有 dependencies.md 是历史分段记录，未覆盖本轮 147 个主锁文件包的完整当前表；iPad 已有多份 Swift/Wayland/MoltenVK notices，但没有从这些证据得出所有实际链接 crate 都被聚合到 About/发行包。Mac 本地 bundle Resources 未见统一 notices 目录，包外 source 仍可能含许可证。",
+    "recommendation": "从实际 binary/target/features 生成 THIRD_PARTY_NOTICES 与 source manifest，校验每个闭包；MIT/BSD/Apache/Unicode 等声明不得只用 GPL 根 LICENSE 代替。"
+  },
+  {
+    "id": "L07",
+    "severity": "中",
+    "confidence": "已确认清单层面的多许可条件",
+    "repositories": [
+      "ipad",
+      "runtime",
+      "mac",
+      "linux"
+    ],
+    "title": "SPDX AND 与多许可分支不能简化为 MIT",
+    "evidence": "encoding_rs 为 (Apache-2.0 OR MIT) AND BSD-3-Clause；unicode-ident 为 (MIT OR Apache-2.0) AND Unicode-3.0。r-efi 有可选 LGPL，但也可选 MIT/Apache，并非必须 LGPL。",
+    "recommendation": "逐包记录选择的 OR 分支，保留 AND 附加许可；以实际目标筛除无关 Windows/WASI/EFI 包。"
+  },
+  {
+    "id": "L08",
+    "severity": "中",
+    "confidence": "存在声明但部分包未附顶层许可文件",
+    "repositories": [
+      "ipad",
+      "runtime",
+      "mac",
+      "linux"
+    ],
+    "title": "许可证文本补充要有来源证据",
+    "evidence": "crc-catalog、defmt shim/parser、r-efi、xim 子包部分 registry archives 没有顶层 LICENSE。xim 的上游 MIT 已由现有脚本使用固定哈希 COPYING.xim-rs 补齐，不应再记为完全无许可。",
+    "recommendation": "对其它缺文本项定位同 revision 上游文件，保留 copyright/NOTICE；不是把声明缺文本误判为无授权。"
+  },
+  {
+    "id": "L09",
+    "severity": "中",
+    "confidence": "已发现暂存包；最终分发范围不同",
+    "repositories": [
+      "ipad",
+      "mac",
+      "linux"
+    ],
+    "title": "rootfs/APK/Android 镜像是独立多许可证集合",
+    "evidence": "当前暂存图形资源中解析到 78 个 Alpine 包；含 GPL-2.0-only busybox、LGPL 库和字体。package-ios.py 明确排除 GuestVulkan/wayland-acceptance，因此这78项不能全部算进生产IPA。Android/AOSP 镜像也非单一Apache许可。",
+    "recommendation": "分别为内置资源、测试包、随包rootfs、首次下载镜像维护包级SBOM/源代码义务；不要混淆运行外部guest软件与宿主链接，不要声称GPL2 guest自动使GPL3宿主不兼容。"
+  },
+  {
+    "id": "L10",
+    "severity": "中",
+    "confidence": "组件级条款/使用边界待核",
+    "repositories": [
+      "ipad",
+      "runtime",
+      "mac",
+      "linux"
+    ],
+    "title": "Mesa/Swift crypto/系统库不能只看项目总标签",
+    "evidence": "Mesa 存在 MIT/SGI-B/BSL 等文件级许可；Swift crypto 带 BoringSSL 及独立 notices；libgcc/libstdc++ 的 runtime exception、LLVM exception、字体和X11混合许可须看具体文件。",
+    "recommendation": "保留组件内 notice 与适用例外；系统SDK/动态宿主库、guest重分发库、静态链接库分别判断。"
+  },
+  {
+    "id": "L11",
+    "severity": "中",
+    "confidence": "构建依赖可复现与供应链风险",
+    "repositories": [
+      "ipad",
+      "runtime",
+      "mac",
+      "linux",
+      "cli"
+    ],
+    "title": "CI mutable refs 与 Python 间接依赖未全锁",
+    "evidence": "GitHub Actions 使用 @v4 和 dtolnay/rust-toolchain@master；上游5项目均MIT，但可变ref不是不可变证据。4个图形工具虽固定版本，Mako requires MarkupSafe>=2.0 未固定实际版本。",
+    "recommendation": "保存实际执行的 action SHA 和 build工具完整锁文件/哈希；这属于供应链与审计可追踪性问题，不是已确认许可证冲突。"
+  },
+  {
+    "id": "L12",
+    "severity": "低至中",
+    "confidence": "用途取决于发布内容",
+    "repositories": [
+      "ipad",
+      "mac"
+    ],
+    "title": "CoreMark 与多媒体专利/商标独立于代码许可",
+    "evidence": "CoreMark 源码含 Apache-2.0，但 LICENSE.md 同时有商标可接受使用条件。FFmpeg 的编解码器专利风险不被 LGPL/MIT 清零。",
+    "recommendation": "对外 CoreMark 成绩保留原始算法/参数和可比性；正式视频商业发行按地区、编解码路径另行判断专利，不把软件许可当专利许可。"
+  }
+]

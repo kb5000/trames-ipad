@@ -42,6 +42,67 @@ pub fn process() -> std::io::Result<ProcessMemory> {
     })
 }
 
+/// Compute a conservative guest memory ceiling from the host process's current
+/// available allowance so a runaway guest receives Linux ENOMEM instead of
+/// driving the embedding iOS process into an abrupt Jetsam termination.
+#[cfg_attr(not(all(target_os = "ios", not(target_abi = "sim"))), allow(dead_code))]
+pub fn safe_guest_limit_for_available(available_bytes: usize) -> Option<usize> {
+    const PAGE: usize = 4096;
+    const MIB: usize = 1024 * 1024;
+    const MIN_GUEST: usize = 64 * MIB;
+    const MIN_RESERVE_NORMAL: usize = 256 * MIB;
+    const MIN_RESERVE_TIGHT: usize = 128 * MIB;
+    const FLOOR_RESERVE: usize = 64 * MIB;
+
+    if available_bytes < MIN_GUEST + FLOOR_RESERVE {
+        return None;
+    }
+    let reserve = if available_bytes >= 512 * MIB {
+        (available_bytes / 4).max(MIN_RESERVE_NORMAL)
+    } else {
+        (available_bytes * 3 / 10).max(MIN_RESERVE_TIGHT)
+    };
+    let usable = available_bytes
+        .saturating_sub(reserve)
+        .max(MIN_GUEST)
+        .min(available_bytes.saturating_sub(FLOOR_RESERVE));
+    let aligned = usable & !(PAGE - 1);
+    (aligned >= MIN_GUEST).then_some(aligned)
+}
+
+/// Clamp configured guest memory limits to a host safety cap when present.
+pub fn clamp_guest_limits(
+    limits: trames_core::MemoryLimits,
+    safe_cap: Option<usize>,
+) -> trames_core::MemoryLimits {
+    let Some(cap) = safe_cap else {
+        return limits;
+    };
+    trames_core::MemoryLimits {
+        total: limits.total.min(cap),
+        per_process: limits.per_process.min(cap),
+    }
+}
+
+/// Return a conservative guest memory cap on physical iOS devices based on
+/// `os_proc_available_memory()`. Returns `None` on non-iOS hosts and simulators.
+pub fn ios_safe_guest_limit() -> Option<usize> {
+    #[cfg(all(target_os = "ios", not(target_abi = "sim")))]
+    {
+        unsafe extern "C" {
+            fn os_proc_available_memory() -> usize;
+        }
+        // SAFETY: public Darwin syscall returning this process's remaining
+        // Jetsam memory headroom in bytes; takes no pointers.
+        let available = unsafe { os_proc_available_memory() };
+        safe_guest_limit_for_available(available)
+    }
+    #[cfg(not(all(target_os = "ios", not(target_abi = "sim"))))]
+    {
+        None
+    }
+}
+
 pub fn source() -> Option<Arc<dyn Fn() -> HostMemoryInfo + Send + Sync>> {
     #[cfg(target_vendor = "apple")]
     {
@@ -216,5 +277,45 @@ mod tests {
         assert!(value.total > 0);
         assert!(value.free <= value.available);
         assert!(value.available <= value.total);
+    }
+
+    #[test]
+    fn safe_guest_limit_preserves_host_headroom_and_page_alignment() {
+        const MIB: usize = 1024 * 1024;
+        const GIB: usize = 1024 * MIB;
+        assert_eq!(super::safe_guest_limit_for_available(0), None);
+        assert_eq!(super::safe_guest_limit_for_available(96 * MIB), None);
+
+        // 4 GiB available -> keeps 1 GiB (25%) headroom, 3 GiB for guest.
+        assert_eq!(super::safe_guest_limit_for_available(4 * GIB), Some(3 * GIB));
+
+        // 768 MiB available -> keeps at least 256 MiB headroom, 512 MiB for guest.
+        assert_eq!(
+            super::safe_guest_limit_for_available(768 * MIB),
+            Some(512 * MIB)
+        );
+
+        // 300 MiB available -> tight mode reserves 128 MiB, 172 MiB for guest.
+        let tight = super::safe_guest_limit_for_available(300 * MIB).unwrap();
+        assert_eq!(tight % 4096, 0);
+        assert_eq!(tight, 172 * MIB);
+
+        // Clamping caps both host_managed() and oversized manual budgets.
+        let host_managed = super::clamp_guest_limits(
+            trames_core::MemoryLimits::host_managed(),
+            Some(2 * GIB),
+        );
+        assert_eq!(host_managed.total, 2 * GIB);
+        assert_eq!(host_managed.per_process, 2 * GIB);
+
+        let smaller = super::clamp_guest_limits(
+            trames_core::MemoryLimits {
+                total: 512 * MIB,
+                per_process: 256 * MIB,
+            },
+            Some(2 * GIB),
+        );
+        assert_eq!(smaller.total, 512 * MIB);
+        assert_eq!(smaller.per_process, 256 * MIB);
     }
 }

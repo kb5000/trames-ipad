@@ -1,10 +1,16 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+import Darwin
 import SwiftUI
 import TramesKit
+import UIKit
 @MainActor
 final class WorkspaceModel: ObservableObject {
+    static let criticalAvailableMemoryBytes: UInt64 = 128 << 20
+    #if TRAMES_ENABLE_PIP
     let pictureInPicture=WindowPictureInPicture()
+    #endif
     @Published var sessions: [TerminalSession] = []
+    @Published var webTabs: [WebTabSession] = []
     @Published private(set) var localOwner: TerminalSession?
     @Published private(set) var profiles = RootfsCatalog.alpine.environments
     @Published private(set) var selectedEnvironmentID = "alpine"
@@ -14,24 +20,34 @@ final class WorkspaceModel: ObservableObject {
     private var observedModes: [WorkspaceItemID:String] = [:]
     private var pendingModes: [WorkspaceItemID:String] = [:]
     private var dialogSizes: [WorkspaceItemID:CGSize] = [:]
+    private var memoryWarningObserver: NSObjectProtocol?
+    private var memoryPressureSource: DispatchSourceMemoryPressure?
     /// Stable identity/order across tab, floating and background placement.
     var items: [WorkspaceItemID] {
         let terminals=sessions.map { WorkspaceItemID.terminal($0.id) }
         let graphics=environmentOwners.flatMap { session in session.waylandWindows.map { WorkspaceItemID.wayland(session.id,$0.id) } }
-        return (terminals+graphics).filter { layout.placement($0) != nil }
+        let browsers=webTabs.map { WorkspaceItemID.web($0.id) }
+        return (terminals+graphics+browsers).filter { layout.placement($0) != nil }
     }
     func isVisible(_ id: WorkspaceItemID) -> Bool {
         layout.placement(id) == .floating || layout.selected == id
     }
     @Published var error: String?
     @Published var resetting = false
+    @Published var inboxNotice: (message: String, guestPath: String)?
+    private var inboxNoticeTask: Task<Void, Never>?
+    private var inboxBridge: SharedInboxBridge?
     private var appActive = true
     private(set) var environment: EnvironmentStore?
     private(set) var directories: ScopedDirectories?
+    var mounts: MountStore? { environment?.mountStore }
     init(prepareEnvironment: Bool = true) {
+        #if TRAMES_ENABLE_PIP
         pictureInPicture.onActivityChanged={ [weak self] in self?.applyActivityPolicy() }
         pictureInPicture.onRestore={ [weak self] in self?.activate($0) }
         pictureInPicture.onError={ [weak self] in self?.error=$0 }
+        #endif
+        installMemoryPressureGuards()
 
         #if DEBUG
         if ProcessInfo.processInfo.arguments.contains("--environment-ui-acceptance") {
@@ -56,6 +72,14 @@ final class WorkspaceModel: ObservableObject {
         }
         #endif
         guard prepareEnvironment else { return }
+        let bridge = SharedInboxBridge { [weak self] imported in
+            Task { @MainActor in
+                self?.presentInboxNotice(imported: imported)
+            }
+        }
+        inboxBridge = bridge
+        bridge.startWatching()
+        bridge.drainAndNotify()
         FileProviderService.observeSaves { [weak self] in
             guard let self,self.appActive else {return}
             self.localOwner?.pause(false)
@@ -96,6 +120,9 @@ final class WorkspaceModel: ObservableObject {
         }
         session.onWaylandChanged = { [weak self, weak session] windows in
             guard let self, let session else { return }; self.synchronize(session, windows:windows)
+        }
+        session.onLocalReady = { [weak self] in
+            self?.syncWebProxyPorts()
         }
         sessions.append(session)
         change { $0.insert(.terminal(session.id), as:.tabbed) }
@@ -143,9 +170,34 @@ final class WorkspaceModel: ObservableObject {
     func updateViewport(_ size:CGSize) { change { $0.updateViewport(size) } }
     func saveFrame(_ id: WorkspaceItemID, _ frame: DisplayWindowGeometry) { change { $0.frames[id]=frame } }
     func closeItem(_ id: WorkspaceItemID) {
+        #if TRAMES_ENABLE_PIP
         if pictureInPicture.item == id {pictureInPicture.stop()}
+        #endif
         if case .terminal = id, let session=session(for:id) { close(session) }
         else if case .wayland(_,let window)=id { session(for:id)?.waylandCommand(["op":"close","window":window]) }
+        else if case .web(let tabID)=id {
+            webTabs.removeAll { $0.id == tabID }
+            change { $0.close(id) }
+        }
+    }
+    func webTab(for id: WorkspaceItemID) -> WebTabSession? {
+        guard case .web(let tabID) = id else { return nil }
+        return webTabs.first { $0.id == tabID }
+    }
+    func openWebBrowser(initialURL: String? = nil) {
+        let port = try? localOwner?.local?.webProxyPort()
+        let tab = WebTabSession(initialURL: initialURL, proxyPort: port) { [weak self] in
+            (try? self?.localOwner?.local?.listeningPorts()) ?? []
+        }
+        webTabs.append(tab)
+        change { $0.insert(.web(tab.id), as: .tabbed) }
+    }
+    func syncWebProxyPorts() {
+        let port = try? localOwner?.local?.webProxyPort()
+        for tab in webTabs {
+            tab.updateProxyPort(port)
+            tab.refreshListeningPorts()
+        }
     }
     private func nativeMode(_ id: WorkspaceItemID, _ mode: String) {
         if case .wayland(_,let window)=id {
@@ -214,7 +266,7 @@ final class WorkspaceModel: ObservableObject {
         session.pause(!appActive)
         session.bridge.directories = directories
         add(session)
-        session.startLocal(environment,useVolumeBudget:UserDefaults.standard.bool(forKey:"useVolumeBudget"),profile:selectedEnvironment)
+        session.startLocal(environment,useVolumeBudget:true,profile:selectedEnvironment)
     }
     private func stopLocal() {
         let localSessions=sessions.filter(\.isLocal)
@@ -223,6 +275,7 @@ final class WorkspaceModel: ObservableObject {
         let ids=Set(localSessions.map(\.id)+[localOwner?.id].compactMap{$0})
         sessions.removeAll(where: { $0.isLocal });change {next in for id in ids {next.closeSession(id)}}
         localOwner=nil;terminalSequence=0
+        syncWebProxyPorts()
         observedModes=observedModes.filter{!ids.contains($0.key.session)}
         pendingModes=pendingModes.filter{!ids.contains($0.key.session)}
         dialogSizes=dialogSizes.filter{!ids.contains($0.key.session)}
@@ -241,7 +294,7 @@ final class WorkspaceModel: ObservableObject {
         UserDefaults.standard.set(profile.id,forKey:"activeEnvironmentID")
         let session=TerminalSession(title:profile.name,isLocal:true)
         session.pause(!appActive);session.bridge.directories=directories;add(session)
-        session.startLocal(environment,useVolumeBudget:UserDefaults.standard.bool(forKey:"useVolumeBudget"),profile:profile,maintenance:maintenance,after:previous)
+        session.startLocal(environment,useVolumeBudget:true,profile:profile,maintenance:maintenance,after:previous)
     }
     func stopEnvironment(_ profile:RootfsEnvironment) {
         guard profile.id==selectedEnvironmentID else{return};stopLocal()
@@ -257,7 +310,9 @@ final class WorkspaceModel: ObservableObject {
         resetting=true;defer {resetting=false}
         if localOwner?.environmentID==profile.id {
             let previous=localOwner
+            #if TRAMES_ENABLE_PIP
             if let item=pictureInPicture.item,item.session==previous?.id {pictureInPicture.stop()}
+            #endif
             stopLocal();await previous?.waitUntilClosed()
         }
         do {try await environment.delete(profile)}
@@ -265,34 +320,111 @@ final class WorkspaceModel: ObservableObject {
         try await refreshEnvironments()
         FileProviderService.environmentsChanged()
     }
-    func resetLocal() {
+    func resetEnvironment(_ profile:RootfsEnvironment) {
         guard let environment,!resetting,!profiles.isEmpty else {return}
-        let profile=selectedEnvironment,previous=localOwner
-        resetting=true;stopLocal()
+        let isActive = localOwner?.environmentID == profile.id
+        let previous = isActive ? localOwner : nil
+        resetting=true
+        if isActive {
+            #if TRAMES_ENABLE_PIP
+            if let item=pictureInPicture.item,item.session==previous?.id {pictureInPicture.stop()}
+            #endif
+            stopLocal()
+        }
         Task {
-            do {await previous?.waitUntilClosed();try await environment.reset(profile:profile);try await refreshEnvironments();resetting=false;openLocal()}
-            catch {resetting=false;self.error=error.localizedDescription}
+            do {
+                await previous?.waitUntilClosed()
+                try await environment.reset(profile:profile)
+                try await refreshEnvironments()
+                resetting=false
+                if isActive { openEnvironment(profile) }
+            } catch {
+                resetting=false
+                self.error=error.localizedDescription
+            }
         }
     }
+    func resetLocal() {
+        guard !profiles.isEmpty else {return}
+        resetEnvironment(selectedEnvironment)
+    }
+    deinit {
+        if let memoryWarningObserver { NotificationCenter.default.removeObserver(memoryWarningObserver) }
+        memoryPressureSource?.cancel()
+    }
+    private func installMemoryPressureGuards() {
+        memoryWarningObserver = NotificationCenter.default.addObserver(
+            forName: UIApplication.didReceiveMemoryWarningNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated {
+                _ = self?.handleMemoryPressure(critical: false, availableBytes: Self.currentAvailableMemoryBytes())
+            }
+        }
+        let source = DispatchSource.makeMemoryPressureSource(eventMask: [.warning, .critical], queue: .main)
+        source.setEventHandler { [weak self, weak source] in
+            guard let self, let source else { return }
+            let event = source.data
+            let critical = event.contains(.critical)
+            MainActor.assumeIsolated {
+                _ = self.handleMemoryPressure(critical: critical, availableBytes: Self.currentAvailableMemoryBytes())
+            }
+        }
+        source.resume()
+        memoryPressureSource = source
+    }
+    static func currentAvailableMemoryBytes() -> UInt64 {
+        #if targetEnvironment(simulator)
+        return 0
+        #else
+        return UInt64(os_proc_available_memory())
+        #endif
+    }
+    /// Event-driven low-memory guard to prevent abrupt Jetsam termination.
+    /// Returns true if the active local Linux session was stopped to reclaim memory.
+    @discardableResult
+    func handleMemoryPressure(critical: Bool, availableBytes: UInt64) -> Bool {
+        #if TRAMES_ENABLE_PIP
+        if pictureInPicture.active || pictureInPicture.starting {
+            pictureInPicture.stop()
+        }
+        #endif
+        let criticallyLow = critical || (availableBytes > 0 && availableBytes < Self.criticalAvailableMemoryBytes)
+        guard criticallyLow, localOwner != nil else { return false }
+        stopLocal()
+        error = L10n.text("设备可用内存不足，已保护性停止当前 Linux 环境以防止应用闪退。可重新打开终端，或在环境配置中降低内存上限。")
+        return true
+    }
     func close(_ session: TerminalSession) {
+        #if TRAMES_ENABLE_PIP
         if pictureInPicture.item?.session == session.id {pictureInPicture.stop()}
+        #endif
         session.closeTerminalWindow(); sessions.removeAll { $0.id == session.id }
         change { $0.close(.terminal(session.id)) }
     }
+    #if TRAMES_ENABLE_PIP
     func preview(_ item:WorkspaceItemID) {
         pictureInPicture.toggle(item) { [weak self] in self?.session(for:item) }
     }
+    #endif
     func inactive() {
         // UIKit announces deactivation before it restricts new Metal work.
         for session in environmentOwners {try? session.local?.suspendGPU(true)}
     }
     private func applyActivityPolicy() {
+        #if TRAMES_ENABLE_PIP
         let selected=pictureInPicture.item.flatMap {session(for:$0)}
         let owner=selected?.environmentOwner ?? selected
         for session in environmentOwners {
             let preview=pictureInPicture.keepsRunning && owner?.id == session.id
             session.pause(!appActive && !preview,commitEdits:appActive)
         }
+        #else
+        for session in environmentOwners {
+            session.pause(!appActive,commitEdits:appActive)
+        }
+        #endif
     }
     func background() {
         appActive=false;inactive()
@@ -301,8 +433,33 @@ final class WorkspaceModel: ObservableObject {
     }
     func foreground() {
         appActive=true
+        inboxBridge?.drainAndNotify()
         for session in environmentOwners {try? session.local?.suspendGPU(false)}
         Task {await environment?.pausePreparation(false)}
         applyActivityPolicy()
+    }
+    func dismissInboxNotice() {
+        inboxNoticeTask?.cancel()
+        inboxNoticeTask = nil
+        inboxNotice = nil
+    }
+    private func presentInboxNotice(imported: [String]) {
+        guard !imported.isEmpty else { return }
+        let guestPath: String
+        let message: String
+        if imported.count == 1, let first = imported.first {
+            guestPath = "\(MountStore.inboxGuestPath)/\(first)"
+            message = L10n.text("已保存到 %@", guestPath)
+        } else {
+            guestPath = MountStore.inboxGuestPath
+            message = L10n.text("已保存 %@ 个文件到 %@", String(imported.count), guestPath)
+        }
+        inboxNotice = (message: message, guestPath: guestPath)
+        inboxNoticeTask?.cancel()
+        inboxNoticeTask = Task { @MainActor [weak self] in
+            try? await Task.sleep(for: .seconds(5))
+            guard !Task.isCancelled else { return }
+            self?.inboxNotice = nil
+        }
     }
 }

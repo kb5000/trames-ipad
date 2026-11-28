@@ -1,0 +1,638 @@
+[
+  {
+    "repo": "ipad",
+    "path": "scripts/android-upstream.json",
+    "line": 4,
+    "url_expression": "https://dl.google.com/android/repository/android-ndk-r27d-linux.zip"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/android-upstream.json",
+    "line": 15,
+    "url_expression": "https://android.googlesource.com/platform/system/core/+/refs/tags/android-13.0.0_r83/libcutils/include/cutils/native_handle.h?format=TEXT"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/android-upstream.json",
+    "line": 19,
+    "url_expression": "https://android.googlesource.com/platform/hardware/libhardware/+/refs/tags/android-13.0.0_r83/include/hardware/hardware.h?format=TEXT"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/android-upstream.json",
+    "line": 23,
+    "url_expression": "https://android.googlesource.com/platform/frameworks/native/+/refs/tags/android-13.0.0_r83/vulkan/include/hardware/hwvulkan.h?format=TEXT"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/android-upstream.json",
+    "line": 27,
+    "url_expression": "https://android.googlesource.com/platform/system/core/+/refs/tags/android-13.0.0_r83/libsystem/include/system/graphics-base-v1.0.h?format=TEXT"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/android-upstream.json",
+    "line": 31,
+    "url_expression": "https://android.googlesource.com/platform/system/core/+/refs/tags/android-13.0.0_r83/libsystem/include/system/graphics-base-v1.1.h?format=TEXT"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/android-upstream.json",
+    "line": 35,
+    "url_expression": "https://android.googlesource.com/platform/system/core/+/refs/tags/android-13.0.0_r83/libsystem/include/system/graphics-base-v1.2.h?format=TEXT"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/android-upstream.json",
+    "line": 39,
+    "url_expression": "https://android.googlesource.com/platform/system/core/+/refs/tags/android-13.0.0_r83/libsystem/include/system/graphics-base.h?format=TEXT"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/android-upstream.json",
+    "line": 43,
+    "url_expression": "https://android.googlesource.com/platform/system/core/+/refs/tags/android-13.0.0_r83/libsystem/include/system/graphics-sw.h?format=TEXT"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/android-upstream.json",
+    "line": 47,
+    "url_expression": "https://android.googlesource.com/platform/system/core/+/refs/tags/android-13.0.0_r83/libsystem/include/system/graphics.h?format=TEXT"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/android-upstream.json",
+    "line": 51,
+    "url_expression": "https://android.googlesource.com/platform/hardware/libhardware/+/refs/tags/android-13.0.0_r83/include/hardware/gralloc.h?format=TEXT"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/android-upstream.json",
+    "line": 55,
+    "url_expression": "https://android.googlesource.com/platform/frameworks/native/+/refs/tags/android-13.0.0_r83/vulkan/include/vulkan/vk_android_native_buffer.h?format=TEXT"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/android-upstream.json",
+    "line": 59,
+    "url_expression": "https://android.googlesource.com/platform/hardware/libhardware/+/refs/tags/android-13.0.0_r83/include/hardware/fb.h?format=TEXT"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/android-upstream.json",
+    "line": 64,
+    "url_expression": "https://android.googlesource.com/platform/external/libcxx/+archive/refs/tags/android-13.0.0_r83/include.tar.gz"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/android-upstream.json",
+    "line": 67,
+    "url_expression": "https://android.googlesource.com/platform/external/libcxx/+/refs/tags/android-13.0.0_r83/LICENSE.TXT?format=TEXT"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/android-upstream.json",
+    "line": 72,
+    "url_expression": "https://android.googlesource.com/platform/prebuilts/vndk/v33/+archive/d79ad875113d34c9665a65b8a33dcf7a4fb7dcf1/arm64/include.tar.gz"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/android-upstream.json",
+    "line": 112,
+    "url_expression": "https://android.googlesource.com/platform/frameworks/av/+archive/refs/tags/android-13.0.0_r83/services/mediaresourcemanager.tar.gz"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/android-upstream.json",
+    "line": 117,
+    "url_expression": "https://android.googlesource.com/platform/frameworks/av/+archive/refs/tags/android-13.0.0_r83/media/utils/include.tar.gz"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/android-upstream.json",
+    "line": 122,
+    "url_expression": "https://android.googlesource.com/platform/frameworks/native/+/android-13.0.0_r83/libs/binder/include_batterystats/batterystats/IBatteryStats.h?format=TEXT"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/android-upstream.json",
+    "line": 128,
+    "url_expression": "https://android.googlesource.com/platform/prebuilts/build-tools/+/refs/heads/android13-release/darwin-x86/bin/aidl?format=TEXT"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/build-accelerator-guest.sh",
+    "line": 36,
+    "url_expression": "https://github.com/kb5000/trames"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/build-busybox.sh",
+    "line": 19,
+    "url_expression": "https://musl.libc.org/releases/musl-1.2.5.tar.gz"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/build-busybox.sh",
+    "line": 20,
+    "url_expression": "https://busybox.net/downloads/busybox-1.37.0.tar.bz2"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/build-epoch-services-fixture.sh",
+    "line": 11,
+    "url_expression": "https://musl.libc.org/releases/musl-1.2.5.tar.gz"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/build-musl-hybrid.sh",
+    "line": 11,
+    "url_expression": "https://musl.libc.org/releases/musl-1.2.5.tar.gz"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/build-qemu-oracle.sh",
+    "line": 23,
+    "url_expression": "https://download.qemu.org/qemu-$version.tar.xz"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/build-wayland-client-apple.py",
+    "line": 25,
+    "url_expression": "https://distfiles.alpinelinux.org/distfiles/v3.22/{archive.name}"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/build-xwayland-native.py",
+    "line": 27,
+    "url_expression": "https://www.x.org/releases/individual/xserver/"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/build-zink-egl.py",
+    "line": 33,
+    "url_expression": "https://archive.mesa3d.org/"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/build-zink-egl.py",
+    "line": 117,
+    "url_expression": "https://archive.mesa3d.org/"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/ios-ci-scope.py",
+    "line": 44,
+    "url_expression": "https://api.github.com/repos/{repo}/{path}"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/ios-ci-scope.py",
+    "line": 107,
+    "url_expression": "https://api.github.com/repos/{repo}/"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/ios-ci-scope.py",
+    "line": 136,
+    "url_expression": "https://api.github.com/repos/{repo}/actions/runs/{reuse[platform]}"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/ios-ci-scope.py",
+    "line": 159,
+    "url_expression": "https://api.github.com/repos/{repo}/{path}"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/ios-ci-scope.py",
+    "line": 290,
+    "url_expression": "https://api.github.com/repos/{repo}/{path}"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/ios-ci-scope.py",
+    "line": 327,
+    "url_expression": "https://api.github.com/repos/{repo}/{path}"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/ios-ci-scope.py",
+    "line": 354,
+    "url_expression": "https://api.github.com/repos/{repo}/{path}"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/ios-ci-scope.py",
+    "line": 599,
+    "url_expression": "https://api.github.com/repos/{repo}/actions/{endpoint}"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/ios-ci-scope.py",
+    "line": 641,
+    "url_expression": "https://api.github.com/repos/{repo}/actions/{endpoint}"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/ios-ci-scope.py",
+    "line": 685,
+    "url_expression": "https://api.github.com/repos/{repo}/actions/workflows/{workflow}/runs?status=success&per_page=30"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/ios-ci-scope.py",
+    "line": 721,
+    "url_expression": "https://api.github.com/repos/{repo}/actions/"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/ios-ci-scope.py",
+    "line": 884,
+    "url_expression": "https://api.github.com/repos/{repo}/"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/ios-ci-scope.py",
+    "line": 907,
+    "url_expression": "https://api.github.com/repos/{repo}/"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/ios-ci-scope.py",
+    "line": 937,
+    "url_expression": "https://api.github.com/repos/{repo}/"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/ios-ci-scope.py",
+    "line": 960,
+    "url_expression": "https://api.github.com/repos/{repo}/"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/ios-ci-scope.py",
+    "line": 985,
+    "url_expression": "https://api.github.com/repos/{repo}/"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/ios-ci-scope.py",
+    "line": 1040,
+    "url_expression": "https://api.github.com/repos/{repo}/"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/ios-ci-scope.py",
+    "line": 1063,
+    "url_expression": "https://api.github.com/repos/{repo}/"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/ios-ci-scope.py",
+    "line": 1092,
+    "url_expression": "https://api.github.com/repos/{repo}/"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/ios-ci-scope.py",
+    "line": 1116,
+    "url_expression": "https://api.github.com/repos/{repo}/"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/ios-ci-scope.py",
+    "line": 1270,
+    "url_expression": "https://api.github.com/repos/{repo}/actions/runs/{run_id}"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/ios-ci-scope.py",
+    "line": 1306,
+    "url_expression": "https://api.github.com/repos/{repo}/actions/runs/{run_id}"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/ios-ci-scope.py",
+    "line": 1315,
+    "url_expression": "https://api.github.com/repos/{repo}/actions/runs/{run_id}"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/ios-ci-scope.py",
+    "line": 1324,
+    "url_expression": "https://api.github.com/repos/{repo}/actions/runs/{run_id}"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/ios-ci-scope.py",
+    "line": 1356,
+    "url_expression": "https://api.github.com/repos/{repo}/actions/runs/{reuse["
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/ios-ci-scope.py",
+    "line": 1366,
+    "url_expression": "https://api.github.com/repos/{repo}/actions/runs/{baseline}"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/ios-ci-scope.py",
+    "line": 1378,
+    "url_expression": "https://api.github.com/repos/{repo}/actions/runs/{run_id}/jobs"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/ios-ci-scope.py",
+    "line": 1406,
+    "url_expression": "https://api.github.com/repos/{repo}/actions/runs/{reuse["
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/ios-ci-scope.py",
+    "line": 1417,
+    "url_expression": "https://api.github.com/repos/{repo}/actions/runs/{reuse["
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/ios-ci-scope.py",
+    "line": 1447,
+    "url_expression": "https://api.github.com/repos/{repo}/actions/runs/{run["
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/package-android.py",
+    "line": 44,
+    "url_expression": "https://github.com/kb5000/{name}/archive/{rev}.tar.gz"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/prepare-alpine.sh",
+    "line": 15,
+    "url_expression": "https://dl-cdn.alpinelinux.org/alpine/v3.22/releases/aarch64/alpine-minirootfs-3.22.6-aarch64.tar.gz"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/prepare-alpine.sh",
+    "line": 16,
+    "url_expression": "https://dl-cdn.alpinelinux.org/alpine/v3.22/main/aarch64/tree-2.2.1-r0.apk"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/prepare-alpine.sh",
+    "line": 20,
+    "url_expression": "https://dl-cdn.alpinelinux.org/alpine/v3.22/main/aarch64/APKINDEX.tar.gz"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/prepare-glibc.py",
+    "line": 23,
+    "url_expression": "https://deb.debian.org/debian/pool/main/g/glibc/"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/prepare-wayland-guest.py",
+    "line": 85,
+    "url_expression": "https://dl-cdn.alpinelinux.org/alpine/v3.22/community/aarch64/"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/prepare-worker-ipa.py",
+    "line": 24,
+    "url_expression": "https://api.github.com/repos/{repo}/{path}"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/prepare-zink-guest.py",
+    "line": 79,
+    "url_expression": "https://dl-cdn.alpinelinux.org/alpine/v3.22/releases/aarch64/"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/prepare-zink-guest.py",
+    "line": 127,
+    "url_expression": "https://archive.mesa3d.org/mesa-25.1.9.tar.xz"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/publish-ios-build35.py",
+    "line": 206,
+    "url_expression": "https://github.com/{REPO}/releases/tag/{TAG}"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/publish-ios-release-0.16.py",
+    "line": 169,
+    "url_expression": "https://github.com/{args.repository}.git"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/publish-ios-release-0.16.py",
+    "line": 265,
+    "url_expression": "https://github.com/{args.repository}/releases/tag/{tag}"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/publish-ios-release-0.17.py",
+    "line": 182,
+    "url_expression": "https://github.com/{args.repository}.git"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/publish-ios-release-0.17.py",
+    "line": 219,
+    "url_expression": "https://github.com/{args.repository}.git"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/publish-ios-release-0.17.py",
+    "line": 293,
+    "url_expression": "https://github.com/{args.repository}/releases/tag/{tag}"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/publish-ios-release-1.0.py",
+    "line": 246,
+    "url_expression": "https://github.com/{args.repository}.git"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/publish-ios-release-1.0.py",
+    "line": 252,
+    "url_expression": "https://github.com/{args.repository}.git"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/publish-ios-release-1.0.py",
+    "line": 294,
+    "url_expression": "https://github.com/{args.repository}/releases/tag/{tag}"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/publish-ios-release-1.1.py",
+    "line": 198,
+    "url_expression": "https://github.com/{REPO}/releases/tag/{tag}"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/publish-ios-release-1.2.py",
+    "line": 113,
+    "url_expression": "https://github.com/{REPO}/actions/runs/{graphics["
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/publish-ios-release-1.2.py",
+    "line": 127,
+    "url_expression": "https://github.com/{REPO}/releases/tag/{tag}"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/publish-ios-release.py",
+    "line": 169,
+    "url_expression": "https://github.com/{args.repository}.git"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/publish-ios-release.py",
+    "line": 265,
+    "url_expression": "https://github.com/{args.repository}/releases/tag/{tag}"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/runtime-ci-reuse.py",
+    "line": 51,
+    "url_expression": "https://api.github.com/repos/"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/test-swift-bootstrap.py",
+    "line": 37,
+    "url_expression": "http://127.0.0.1:{server.server_port}"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/vulkan-upstream.json",
+    "line": 7,
+    "url_expression": "https://codeload.github.com/KhronosGroup/Vulkan-Headers/tar.gz/cfebfc96b2b0bce93da7d12f2c14cc01793ae25c"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/vulkan-upstream.json",
+    "line": 11,
+    "url_expression": "https://github.com/KhronosGroup/MoltenVK/releases/download/v1.4.2/MoltenVK-all.tar"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/vulkan-upstream.json",
+    "line": 15,
+    "url_expression": "https://codeload.github.com/KhronosGroup/MoltenVK/tar.gz/db66022459ffb663aa2b50f6b018bc2e124f5edf"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/vulkan-upstream.json",
+    "line": 19,
+    "url_expression": "https://codeload.github.com/KhronosGroup/SPIRV-Cross/tar.gz/6c09849fe88c48eaed08413aa022aaa136a3a057"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/vulkan-upstream.json",
+    "line": 26,
+    "url_expression": "https://codeload.github.com/KhronosGroup/SPIRV-Headers/tar.gz/29981f65241605e08b0ede4cfeb999fe3b723c6a"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/vulkan-upstream.json",
+    "line": 33,
+    "url_expression": "https://codeload.github.com/KhronosGroup/SPIRV-Tools/tar.gz/0d6fd73ca73830ccab5fa1f00ed5ed40124e2c55"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/vulkan-upstream.json",
+    "line": 40,
+    "url_expression": "https://codeload.github.com/zeux/volk/tar.gz/776893306c5d3b22b6185b5d4a258b81d94572bf"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/vulkan-upstream.json",
+    "line": 47,
+    "url_expression": "https://codeload.github.com/KhronosGroup/Vulkan-Headers/tar.gz/e3b1eec08173d6b825cd3ac88c885a63b621504a"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/vulkan-upstream.json",
+    "line": 54,
+    "url_expression": "https://codeload.github.com/KhronosGroup/Vulkan-Tools/tar.gz/8c66b352925cb771f793a4d3220b1321ae0febf1"
+  },
+  {
+    "repo": "ipad",
+    "path": "scripts/vulkan-upstream.json",
+    "line": 61,
+    "url_expression": "https://codeload.github.com/USCiLab/cereal/tar.gz/a56bad8bbb770ee266e930c95d37fff2a5be7fea"
+  },
+  {
+    "repo": "runtime",
+    "path": "scripts/android-images.json",
+    "line": 7,
+    "url_expression": "https://sourceforge.net/projects/waydroid/files/images/system/lineage/waydroid_arm64/lineage-20.0-20260927-VANILLA-waydroid_arm64-system.zip/download"
+  },
+  {
+    "repo": "runtime",
+    "path": "scripts/android-images.json",
+    "line": 15,
+    "url_expression": "https://sourceforge.net/projects/waydroid/files/images/vendor/waydroid_arm64/lineage-20.0-20260927-MAINLINE-waydroid_arm64-vendor.zip/download"
+  },
+  {
+    "repo": "runtime",
+    "path": "scripts/android-images.json",
+    "line": 21,
+    "url_expression": "https://ota.waydro.id/system/lineage/waydroid_arm64/VANILLA.json"
+  },
+  {
+    "repo": "runtime",
+    "path": "scripts/android-images.json",
+    "line": 22,
+    "url_expression": "https://ota.waydro.id/vendor/waydroid_arm64/MAINLINE.json"
+  },
+  {
+    "repo": "runtime",
+    "path": "scripts/build-video-ffmpeg.sh",
+    "line": 13,
+    "url_expression": "https://ffmpeg.org/releases/ffmpeg-7.1.1.tar.xz"
+  },
+  {
+    "repo": "mac",
+    "path": "scripts/benchmark-firefox-navigation.py",
+    "line": 20,
+    "url_expression": "https://en.wikipedia.org/wiki/Firefox"
+  },
+  {
+    "repo": "mac",
+    "path": "scripts/benchmark-firefox-navigation.py",
+    "line": 22,
+    "url_expression": "https://github.com/mozilla-firefox/firefox"
+  },
+  {
+    "repo": "mac",
+    "path": "scripts/benchmark-firefox-navigation.py",
+    "line": 24,
+    "url_expression": "https://www.bilibili.com/"
+  },
+  {
+    "repo": "mac",
+    "path": "scripts/benchmark-firefox-navigation.py",
+    "line": 135,
+    "url_expression": "http://127.0.0.1:{server.server_port}/launch"
+  },
+  {
+    "repo": "mac",
+    "path": "scripts/benchmark-firefox-vulkan.py",
+    "line": 85,
+    "url_expression": "http://127.0.0.1:{server.server_port}/"
+  },
+  {
+    "repo": "linux",
+    "path": "scripts/check-boundaries.py",
+    "line": 9,
+    "url_expression": "https://github.com/project-trames/trames-runtime"
+  }
+]

@@ -1,0 +1,162 @@
+[
+  {
+    "path": "/Users/main/dev/trames/apps/ios/Trames/Notices/SwiftTerm-LICENSE.txt",
+    "bytes": 1336,
+    "sha256": "0dc6bdd99b652c675586854efcacd59de21e2679d64fcaa20424aeb951df6856"
+  },
+  {
+    "path": "/Users/main/dev/trames/apps/ios/Trames/Notices/swift-log-LICENSE.txt.txt",
+    "bytes": 11358,
+    "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  },
+  {
+    "path": "/Users/main/dev/trames/apps/ios/Trames/Notices/Wayland-native-dependencies-NOTICES.txt",
+    "bytes": 636136,
+    "sha256": "dd157a411f2e2d1422a241d138f26c3900f971c1316b24bae10dcd424b62e994"
+  },
+  {
+    "path": "/Users/main/dev/trames/apps/ios/Trames/Notices/swift-atomics-LICENSE.txt.txt",
+    "bytes": 11751,
+    "sha256": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55"
+  },
+  {
+    "path": "/Users/main/dev/trames/apps/ios/Trames/Notices/swift-log-NOTICE.txt.txt",
+    "bytes": 1324,
+    "sha256": "879b241d49b407215a0ad8e1c6a71c358d7b29591b090cf379d37a5f50cff918"
+  },
+  {
+    "path": "/Users/main/dev/trames/apps/ios/Trames/Notices/Citadel-bcrypt-source-notices.txt",
+    "bytes": 5309,
+    "sha256": "ed0b42bee833bfd25eb0cfa09a1d3abb71ef8b9c88397d321fe1da80d87fab1e"
+  },
+  {
+    "path": "/Users/main/dev/trames/apps/ios/Trames/Notices/swift-collections-LICENSE.txt.txt",
+    "bytes": 11751,
+    "sha256": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55"
+  },
+  {
+    "path": "/Users/main/dev/trames/apps/ios/Trames/Notices/swift-asn1-LICENSE.txt.txt",
+    "bytes": 11359,
+    "sha256": "8c6db340475136df3c1201d458fa5755698eace76e510471ecc9d857d6083dac"
+  },
+  {
+    "path": "/Users/main/dev/trames/apps/ios/Trames/Notices/swift-nio-ssh-LICENSE.txt.txt",
+    "bytes": 11358,
+    "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  },
+  {
+    "path": "/Users/main/dev/trames/apps/ios/Trames/Notices/swift-crypto-NOTICE.txt.txt",
+    "bytes": 1565,
+    "sha256": "dce18a16ad00beb4731f57d225f7d29c9dc96d74ca0eeb36c77ac5bbad123e3d"
+  },
+  {
+    "path": "/Users/main/dev/trames/apps/ios/Trames/Notices/Bionic-gdtoa-LICENSE.txt",
+    "bytes": 19457,
+    "sha256": "b8d7de32cedac85d1d1f7069715cd82191366083bdc52036c93ec91e12c2cd67"
+  },
+  {
+    "path": "/Users/main/dev/trames/apps/ios/Trames/Notices/swift-nio-NOTICE.txt.txt",
+    "bytes": 3233,
+    "sha256": "5b701792f9e9ab67f654f1fd413ea09867df4f1aa6e278bd386dbbc5caf3b2c5"
+  },
+  {
+    "path": "/Users/main/dev/trames/apps/ios/Trames/Notices/Citadel-LICENSE.txt",
+    "bytes": 1065,
+    "sha256": "580a39b7c09cba3cd18a5b1e0d4376e9d1ac200d241bda87e95ed74917bc3b31"
+  },
+  {
+    "path": "/Users/main/dev/trames/apps/ios/Trames/Notices/swift-system-LICENSE.txt.txt",
+    "bytes": 11750,
+    "sha256": "2245a990b635558be210fb3eb4f8a6f7a49aebc0fefbf5859146a65ddc7ddcf3"
+  },
+  {
+    "path": "/Users/main/dev/trames/apps/ios/Trames/Notices/swift-asn1-NOTICE.txt.txt",
+    "bytes": 1450,
+    "sha256": "11dd3b3b783e6ec26098dd38ebc962986ea109b85447e28e62867b83bd0f8c5b"
+  },
+  {
+    "path": "/Users/main/dev/trames/apps/ios/Trames/Notices/swift-nio-LICENSE.txt.txt",
+    "bytes": 11358,
+    "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  },
+  {
+    "path": "/Users/main/dev/trames/apps/ios/Trames/Notices/CoreMark-LICENSE.txt",
+    "bytes": 18582,
+    "sha256": "9577b9c846f61fd69a0d8ac965998c6450c7d8969f71f0bb4a931b91aebad28a"
+  },
+  {
+    "path": "/Users/main/dev/trames/apps/ios/Trames/Notices/swift-crypto-LICENSE.txt.txt",
+    "bytes": 11358,
+    "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  },
+  {
+    "path": "/Users/main/dev/trames/apps/ios/Trames/Notices/BigInt-LICENSE.md.txt",
+    "bytes": 1067,
+    "sha256": "c3dfd0dca467f6d198bf365a954d4be6cb6b0e3d848ec724f86e5f579ca38d9e"
+  },
+  {
+    "path": "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/Notices/moltenvk-source-LICENSE.txt",
+    "bytes": 11358,
+    "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  },
+  {
+    "path": "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/Notices/moltenvk-dependency-SPIRV-Tools-LICENSE.txt",
+    "bytes": 11358,
+    "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  },
+  {
+    "path": "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/Notices/moltenvk-dependency-SPIRV-Cross-LICENSE.txt",
+    "bytes": 11358,
+    "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  },
+  {
+    "path": "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/Notices/moltenvk-dependency-Vulkan-Headers-LICENSE.md.txt",
+    "bytes": 495,
+    "sha256": "95ad366d23fadf701d355bc45fb8b82ae2d700239471d35d41286ac3b08ff903"
+  },
+  {
+    "path": "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/Notices/moltenvk-dependency-cereal-LICENSE.txt",
+    "bytes": 1542,
+    "sha256": "58604a126af6a671ea390ee3d5b3e42228aa59b2858fb7af1d5b20b31739ccbb"
+  },
+  {
+    "path": "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/Notices/moltenvk-dependency-Volk-LICENSE.md.txt",
+    "bytes": 1066,
+    "sha256": "04a0693a84f19e53d281ca98bbb0c86ca77251ab13769c6168e6684feb9a1436"
+  },
+  {
+    "path": "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/Notices/moltenvk-dependency-Vulkan-Tools-LICENSE.txt.txt",
+    "bytes": 11358,
+    "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  },
+  {
+    "path": "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/Notices/moltenvk-dependency-SPIRV-Headers-LICENSE.txt",
+    "bytes": 23503,
+    "sha256": "ea43b1de38a6f90c488800d66dec1ed671e68cda530266bc96951fb5b6307613"
+  },
+  {
+    "path": "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/Notices/Mesa-EGL/license.rst",
+    "bytes": 1816,
+    "sha256": "0d1a0472ecc81830e75c20d59b0ea02841e3db21255e0ebad97ab682c54d6615"
+  },
+  {
+    "path": "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/Notices/Xwayland/COPYING",
+    "bytes": 94789,
+    "sha256": "abbb7969df55e399e91104ded4d0a20a1b67de7c01138e63d61b7ed4f81fec0d"
+  },
+  {
+    "path": "/Users/main/dev/trames/runtime/crates/trames-native/upstream/glibc-2.41/COPYING.LIB",
+    "bytes": 26530,
+    "sha256": "dc626520dcd53a22f727af3ee42c770e56c97a64fe3adb063799d8ab032fe551"
+  },
+  {
+    "path": "/Users/main/dev/trames/runtime/crates/trames-native/upstream/bionic-android13/NOTICE.txt",
+    "bytes": 19457,
+    "sha256": "b8d7de32cedac85d1d1f7069715cd82191366083bdc52036c93ec91e12c2cd67"
+  },
+  {
+    "path": "/Users/main/dev/trames/runtime/crates/trames-native/upstream/musl-1.2.5/COPYRIGHT",
+    "bytes": 6204,
+    "sha256": "f9bc4423732350eb0b3f7ed7e91d530298476f8fec0c6c427a1c04ade22655af"
+  }
+]

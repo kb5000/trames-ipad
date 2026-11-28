@@ -44,8 +44,7 @@ final class RootfsFileProvider:NSFileProviderExtension {
     private func catalog() throws -> RootfsCatalog { try RootfsCatalog.load(root()) }
     private func index(_ environment:RootfsEnvironment) throws -> RootfsIndex {
         let store=try environment.storeURL(in:root())
-        let attributes=try FileManager.default.attributesOfItem(atPath:store.appendingPathComponent("manifest").path)
-        let signature="\(attributes[.systemFileNumber] ?? "")/\(attributes[.modificationDate] ?? "")/\(attributes[.size] ?? "")"
+        let signature=try RootfsSnapshot.signature(store:store)
         lock.lock();defer {lock.unlock()}
         if let old=cache[environment.id],old.0==signature {return old.1}
         let snapshot=try RootfsSnapshot(store:store)

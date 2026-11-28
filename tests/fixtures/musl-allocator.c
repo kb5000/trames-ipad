@@ -17,6 +17,7 @@ static pthread_barrier_t barrier;
 static unsigned char *handoff[4][192];
 static unsigned rounds=12;
 static int bench;
+static volatile uintptr_t last_short_pointer;
 static size_t length(unsigned i) { return 1+(i*73)%2048; }
 static unsigned char mark(unsigned owner,unsigned i) { return 1+(owner*19+i)%254; }
 static void *worker(void *arg) {
@@ -58,6 +59,19 @@ static void boundaries(void) {
     errno=EINTR;free(0);assert(errno==EINTR);
 }
 int main(int argc,char **argv) {
+    if(argc>1 && !strcmp(argv[1],"short")) {
+        unsigned long count=argc>2?strtoul(argv[2],0,10):200000;
+        assert(count>0 && count<=2000000);
+        for(unsigned long i=0;i<count;i++) {
+            errno=EDOM;
+            unsigned char *p=malloc(64);assert(p && errno==EDOM);
+            last_short_pointer=(uintptr_t)p;
+            *(volatile unsigned char *)p=(unsigned char)i;
+            assert(*(volatile unsigned char *)p==(unsigned char)i);
+            errno=E2BIG;free(p);assert(errno==E2BIG);
+        }
+        assert(last_short_pointer);puts("musl-allocator-ok");return 0;
+    }
     if(argc>1 && !strcmp(argv[1],"exec-probe")) {
         assert(argc==3 && getauxval(0x54520007)==strtoul(argv[2],0,10));
         boundaries();_exit(0);

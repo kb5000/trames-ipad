@@ -1,0 +1,116 @@
+[
+  {
+    "name": "meson",
+    "version": "1.12.1",
+    "source": "https://pypi.org/pypi/meson/1.12.1/json",
+    "license": "Apache License, Version 2.0",
+    "license_expression": null,
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Environment :: Console",
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: Apache Software License",
+      "Natural Language :: English",
+      "Operating System :: MacOS :: MacOS X",
+      "Operating System :: Microsoft :: Windows",
+      "Operating System :: POSIX :: BSD",
+      "Operating System :: POSIX :: Linux",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Topic :: Software Development :: Build Tools"
+    ],
+    "requires_dist": [
+      "ninja>=1.8.2; extra == \"ninja\"",
+      "tqdm; extra == \"progress\"",
+      "mypy; extra == \"typing\"",
+      "typing_extensions; python_version < \"3.8\" and extra == \"typing\""
+    ]
+  },
+  {
+    "name": "mako",
+    "version": "1.4.3",
+    "source": "https://pypi.org/pypi/mako/1.4.3/json",
+    "license": null,
+    "license_expression": "MIT",
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Environment :: Web Environment",
+      "Intended Audience :: Developers",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: 3.15",
+      "Programming Language :: Python :: Implementation :: CPython",
+      "Programming Language :: Python :: Implementation :: PyPy",
+      "Topic :: Internet :: WWW/HTTP :: Dynamic Content"
+    ],
+    "requires_dist": [
+      "MarkupSafe>=2.0",
+      "pytest; extra == \"testing\"",
+      "Babel; extra == \"babel\"",
+      "lingua>=4.16; extra == \"lingua\""
+    ]
+  },
+  {
+    "name": "packaging",
+    "version": "25.0",
+    "source": "https://pypi.org/pypi/packaging/25.0/json",
+    "license": null,
+    "license_expression": null,
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: Apache Software License",
+      "License :: OSI Approved :: BSD License",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3 :: Only",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.8",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: Implementation :: CPython",
+      "Programming Language :: Python :: Implementation :: PyPy",
+      "Typing :: Typed"
+    ],
+    "requires_dist": null
+  },
+  {
+    "name": "PyYAML",
+    "version": "6.0.3",
+    "source": "https://pypi.org/pypi/PyYAML/6.0.3/json",
+    "license": "MIT",
+    "license_expression": null,
+    "classifiers": [
+      "Development Status :: 5 - Production/Stable",
+      "Intended Audience :: Developers",
+      "License :: OSI Approved :: MIT License",
+      "Operating System :: OS Independent",
+      "Programming Language :: Cython",
+      "Programming Language :: Python",
+      "Programming Language :: Python :: 3",
+      "Programming Language :: Python :: 3.10",
+      "Programming Language :: Python :: 3.11",
+      "Programming Language :: Python :: 3.12",
+      "Programming Language :: Python :: 3.13",
+      "Programming Language :: Python :: 3.14",
+      "Programming Language :: Python :: 3.8",
+      "Programming Language :: Python :: 3.9",
+      "Programming Language :: Python :: Implementation :: CPython",
+      "Programming Language :: Python :: Implementation :: PyPy",
+      "Topic :: Software Development :: Libraries :: Python Modules",
+      "Topic :: Text Processing :: Markup"
+    ],
+    "requires_dist": null
+  }
+]

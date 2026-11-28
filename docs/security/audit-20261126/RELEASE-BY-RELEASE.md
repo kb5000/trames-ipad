@@ -1,0 +1,49 @@
+# 已发布包逐个检查
+
+已下载所有83附件，43个IPA/ZIP/源码归档解包索引完成；28条已发布SHA-256验证全部匹配。macOS AppleDouble `._`是资源元数据，不当成损坏源码归档。
+
+| 仓库 | Tag | 附件 | 类型 | 结论 |
+| --- | --- | --- | --- | --- |
+| trames-ipad | v0.14.0 | Trames-0.14.0-build15-unsigned.ipa | 二进制包 | 归档已检查；不能以符号名未命中认定没有依赖 |
+| trames-ipad | v0.14.0 | musl-hybrid-1.2.5-source.tar.gz | 源码包 | 源码归档及嵌套原生源码已扫描 |
+| trames-ipad | v0.15.0 | Trames-0.15.0-build16-unsigned.ipa | 二进制包 | 归档已检查；不能以符号名未命中认定没有依赖 |
+| trames-ipad | v0.15.0 | musl-hybrid-1.2.5-source.tar.gz | 源码包 | 源码归档及嵌套原生源码已扫描 |
+| trames-ipad | v0.15.0 | vulkan-native-upstream-source.tar.gz | 源码包 | 源码归档及嵌套原生源码已扫描 |
+| trames-ipad | v0.16.0 | Trames-0.16.0-build17-unsigned.ipa | 二进制包 | 确认缺3项版权声明（F01） |
+| trames-ipad | v0.16.0 | musl-hybrid-1.2.5-source.tar.gz | 源码包 | 源码归档及嵌套原生源码已扫描 |
+| trames-ipad | v0.16.0 | vulkan-native-upstream-source.tar.gz | 源码包 | 源码归档及嵌套原生源码已扫描 |
+| trames-ipad | v0.17.0 | Trames-0.17.0-build19-unsigned.ipa | 二进制包 | 确认缺3项版权声明（F01） |
+| trames-ipad | v0.17.0 | musl-hybrid-1.2.5-source.tar.gz | 源码包 | 源码归档及嵌套原生源码已扫描 |
+| trames-ipad | v0.17.0 | vulkan-native-upstream-source.tar.gz | 源码包 | 源码归档及嵌套原生源码已扫描 |
+| trames-ipad | v1.0.0 | Trames-1.0.0-build26-unsigned.ipa | 二进制包 | 确认缺3项版权声明（F01） |
+| trames-ipad | v1.0.0 | musl-hybrid-1.2.5-source.tar.gz | 源码包 | 源码归档及嵌套原生源码已扫描 |
+| trames-ipad | v1.0.0 | vulkan-native-upstream-source.tar.gz | 源码包 | 源码归档及嵌套原生源码已扫描 |
+| trames-ipad | v1.1.0 | Trames-1.1.0-build32-unsigned.ipa | 二进制包 | 确认缺3项版权声明（F01） |
+| trames-ipad | v1.1.0 | Trames-1.1.0-source.tar.gz | 源码包 | 源码归档及嵌套原生源码已扫描 |
+| trames-ipad | v1.1.0 | musl-hybrid-1.2.5-source.tar.gz | 源码包 | 源码归档及嵌套原生源码已扫描 |
+| trames-ipad | v1.1.0 | vulkan-native-upstream-source.tar.gz | 源码包 | 源码归档及嵌套原生源码已扫描 |
+| trames-ipad | v1.2.0 | Trames-1.2.0-build33-unsigned.ipa | 二进制包 | 确认缺3项版权声明（F01） |
+| trames-ipad | v1.2.0 | Trames-1.2.0-source.tar.gz | 源码包 | 源码归档及嵌套原生源码已扫描 |
+| trames-ipad | v1.2.0 | mesa-egl-25.1.9-source.tar.gz | 源码包 | 源码归档及嵌套原生源码已扫描 |
+| trames-ipad | v1.2.0 | musl-hybrid-1.2.5-source.tar.gz | 源码包 | 源码归档及嵌套原生源码已扫描 |
+| trames-ipad | v1.2.0 | vulkan-native-upstream-source.tar.gz | 源码包 | 源码归档及嵌套原生源码已扫描 |
+| trames-ipad | v1.3.0 | Trames-1.3.0-build35-source.tar.gz | 源码包 | 源码归档及嵌套原生源码已扫描 |
+| trames-ipad | v1.3.0 | Trames-1.3.0-build35-unsigned.ipa | 二进制包 | 确认缺3项版权声明（F01） |
+| trames-ipad | v1.3.0 | mesa-egl-25.1.9-source.tar.gz | 源码包 | 源码归档及嵌套原生源码已扫描 |
+| trames-ipad | v1.3.0 | musl-hybrid-1.2.5-source.tar.gz | 源码包 | 源码归档及嵌套原生源码已扫描 |
+| trames-ipad | v1.3.0 | vulkan-native-upstream-source.tar.gz | 源码包 | 源码归档及嵌套原生源码已扫描 |
+| trames-ipad | v1.3.0 | xwayland-launcher-source.tar.gz | 源码包 | 源码归档及嵌套原生源码已扫描 |
+| trames-ipad | v1.3.0 | xwayland-native-source.tar.gz | 源码包 | 源码归档及嵌套原生源码已扫描 |
+| trames-ipad | v1.5.4 | Trames-1.5.4-build49-personal-team.ipa | 二进制包 | 确认缺3项版权声明（F01） |
+| trames-ipad | v1.5.4 | Trames-1.5.4-build49-unsigned.ipa | 二进制包 | 确认缺3项版权声明（F01） |
+| trames-ipad | v1.5.4 | Trames-1.5.4-corresponding-source.tar.gz | 源码包 | 源码归档及嵌套原生源码已扫描 |
+| trames-mac | v1.5.0 | Trames-1.5.0-mac-arm64-unnotarized.zip | 二进制包 | 确认缺3项版权声明（F01） |
+| trames-mac | v1.5.0 | Trames-Dev-1.5.0-mac-arm64-unnotarized.zip | 二进制包 | 确认缺3项版权声明（F01） |
+| trames-mac | v1.5.1 | Trames-1.5.1-mac-arm64-unnotarized.zip | 二进制包 | 确认缺3项版权声明（F01） |
+| trames-mac | v1.5.1 | Trames-Dev-1.5.1-mac-arm64-unnotarized.zip | 二进制包 | 确认缺3项版权声明（F01） |
+| trames-mac | v1.5.2 | Trames-1.5.2-mac-arm64-unnotarized.zip | 二进制包 | 确认缺3项版权声明（F01） |
+| trames-mac | v1.5.2 | Trames-Dev-1.5.2-mac-arm64-unnotarized.zip | 二进制包 | 确认缺3项版权声明（F01） |
+| trames-mac | v1.5.3 | Trames-1.5.3-mac-arm64-unnotarized.zip | 二进制包 | 确认缺3项版权声明（F01） |
+| trames-mac | v1.5.3 | Trames-Dev-1.5.3-mac-arm64-unnotarized.zip | 二进制包 | 确认缺3项版权声明（F01） |
+| trames-mac | v1.5.4 | Trames-1.5.4-mac-arm64-unnotarized.zip | 二进制包 | 确认缺3项版权声明（F01） |
+| trames-mac | v1.5.4 | Trames-Dev-1.5.4-mac-arm64-unnotarized.zip | 二进制包 | 确认缺3项版权声明（F01） |

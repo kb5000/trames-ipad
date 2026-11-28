@@ -12,6 +12,7 @@ final class TerminalSession: NSObject, ObservableObject, Identifiable, TerminalV
     private(set) var environmentID = "alpine"
     private(set) var environmentName = "Alpine"
     var onWaylandChanged: (([LocalWaylandWindow]) -> Void)?
+    var onLocalReady: (() -> Void)?
     var onFileProviderError: ((String) -> Void)?
     @Published var title: String
     @Published var state = L10n.text("连接中…")
@@ -33,6 +34,7 @@ final class TerminalSession: NSObject, ObservableObject, Identifiable, TerminalV
     }
     var bridge: BridgeController { environmentOwner?.bridge ?? storedBridge }
     @Published private(set) var cpuPercent: Int?
+    @Published private(set) var memoryBytes: UInt64?
     private var cpuSample: (wall:TimeInterval,cpu:TimeInterval)?
     private var task: Task<Void,Never>?
     private var pendingInput = Data()
@@ -78,6 +80,7 @@ final class TerminalSession: NSObject, ObservableObject, Identifiable, TerminalV
                 }
                 guard let self, !self.closed else { local.close(); return }
                 self.local = local
+                onLocalReady?()
                 try local.suspendGPU(UIApplication.shared.applicationState != .active)
                 waylandCommand(["op":"output_scale","window":0,"scale":Int(UIScreen.main.scale.rounded(.up))])
                 bridge.attach(local)
@@ -124,7 +127,7 @@ final class TerminalSession: NSObject, ObservableObject, Identifiable, TerminalV
                 let status=try local.terminalStatus(terminalID)
                 if status.phase != lastPhase {
                     lastPhase=status.phase
-                    state=status.phase == "running" ? L10n.text("%@ · 本地", String(describing: environmentName)) : status.phase
+                    state=status.phase == "running" ? environmentName : status.phase
                     terminalExited=["exited","failed","cancelled"].contains(status.phase)
                     if terminalExited {pendingInput.removeAll();state=status.error ?? L10n.text("已退出")}
                 }
@@ -146,7 +149,10 @@ final class TerminalSession: NSObject, ObservableObject, Identifiable, TerminalV
                 applyWaylandStatus(try local.waylandStatus())
                 sampleCPU()
                 FileProviderService.poll()
-            } else if cpuPercent != environmentOwner?.cpuPercent {cpuPercent=environmentOwner?.cpuPercent}
+            } else {
+                if cpuPercent != environmentOwner?.cpuPercent { cpuPercent = environmentOwner?.cpuPercent }
+                if memoryBytes != environmentOwner?.memoryBytes { memoryBytes = environmentOwner?.memoryBytes }
+            }
             let status = try local.status()
             if status != capacity { capacity = status }
             if let error=status.error {fail(TramesError.message(error))}
@@ -168,6 +174,10 @@ final class TerminalSession: NSObject, ObservableObject, Identifiable, TerminalV
             if cpuPercent != percent { cpuPercent=percent }
         }
         cpuSample=(wall,cpu)
+        if let memory = try? LocalSession.processMemory() {
+            let bytes = memory.physical_footprint_bytes ?? memory.resident_bytes
+            if memoryBytes != bytes { memoryBytes = bytes }
+        }
     }
     func applyWaylandStatus(_ status: LocalWaylandStatus) {
         guard status.revision != waylandRevision else { return }

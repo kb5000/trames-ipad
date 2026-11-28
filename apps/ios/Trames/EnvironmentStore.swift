@@ -15,6 +15,8 @@ actor EnvironmentStore {
     }
     nonisolated let root: URL
     nonisolated let authorizationRoot: URL
+    nonisolated let mountStore: MountStore
+    private var failedMountIDsByEnvironment: [String: Set<UUID>] = [:]
     static func glibcBundle() throws -> URL {
         guard let manifest=Bundle.main.url(forResource:"manifest",withExtension:"json",subdirectory:"GuestGlibc") else {throw TramesError.message("Missing bundled Debian library adapter")}
         return manifest.deletingLastPathComponent()
@@ -29,6 +31,7 @@ actor EnvironmentStore {
         let sharedRoot=storageRoot == nil ? RootfsLocations.sharedRoot : nil
         authorizationRoot=privateRoot
         try FileManager.default.createDirectory(at:privateRoot,withIntermediateDirectories:true)
+        mountStore = try MountStore(directory: privateRoot)
         let newCatalog = !FileManager.default.fileExists(atPath:privateRoot.appendingPathComponent("roots.json").path) && !FileManager.default.fileExists(atPath:(sharedRoot ?? privateRoot).appendingPathComponent("roots.json").path)
         root=try RootfsLocations.prepare(privateRoot:privateRoot,sharedRoot:sharedRoot)
         if storageRoot == nil {UserDefaults.standard.set(root==RootfsLocations.sharedRoot,forKey:"rootfsFileProviderAvailable")}
@@ -102,7 +105,12 @@ actor EnvironmentStore {
     func create(name:String,distribution:String,initMode:String,packages:String,archive:URL?,sha256:String?,configuration:EnvironmentConfiguration? = nil) async throws -> RootfsEnvironment {
         guard !resetting else {throw TramesError.message(L10n.text("环境仍在准备，请稍后再试"))}
         let name=name.trimmingCharacters(in:.whitespacesAndNewlines)
-        guard !name.isEmpty,name.utf8.count<=255,!name.contains("/"),!name.utf8.contains(0),["alpine","debian","custom","android"].contains(distribution),["shell","systemd"].contains(initMode),["minimal","standard","development"].contains(packages),distribution != "alpine" || initMode=="shell" else {throw TramesError.message(L10n.text("环境配置无效"))}
+        #if TRAMES_ENABLE_ANDROID
+        let allowedDistributions = ["alpine", "debian", "custom", "android"]
+        #else
+        let allowedDistributions = ["alpine", "debian", "custom"]
+        #endif
+        guard !name.isEmpty,name.utf8.count<=255,!name.contains("/"),!name.utf8.contains(0),allowedDistributions.contains(distribution),["shell","systemd"].contains(initMode),["minimal","standard","development"].contains(packages),distribution != "alpine" || initMode=="shell" else {throw TramesError.message(L10n.text("环境配置无效"))}
         if distribution == "android", initMode != "shell" {throw TramesError.message("Android uses its own init")}
         let digest=sha256?.trimmingCharacters(in:.whitespacesAndNewlines).lowercased()
         if let digest,!digest.isEmpty, digest.count != 64 || !digest.allSatisfy({$0.isHexDigit && $0.isASCII}) {throw TramesError.message(L10n.text("SHA-256 应为 64 位十六进制字符"))}
@@ -170,7 +178,12 @@ actor EnvironmentStore {
         for path in [configuration(profile),grants(profile),source(profile)] {
             if FileManager.default.fileExists(atPath:path.path) {try FileManager.default.removeItem(at:path)}
         }
+        await mountStore.deleteConfiguration(for: profile.id)
+        failedMountIDsByEnvironment.removeValue(forKey: profile.id)
         // Retain the lock inode so concurrent openers always share one lock.
+    }
+    func failedMountIDs(for environmentID: String) -> Set<UUID> {
+        failedMountIDsByEnvironment[environmentID] ?? []
     }
     func start(profile:RootfsEnvironment? = nil,useVolumeBudget:Bool,vulkan:Bool=false,memoryBudgetMiB:Int=1024,processMemoryBudgetMiB:Int=512,maintenance:Bool=false,output:@escaping @Sendable(Data)->Void = {_ in}) async throws -> LocalSession {
         guard !resetting,!starting else {throw TramesError.message(L10n.text("环境仍在准备，请稍后再试"))}
@@ -248,9 +261,13 @@ actor EnvironmentStore {
             // TOML's Android boot target owns /init. The embedding's separate Linux
             // init selector remains "shell"; forwarding "android" rejects startup.
             let linuxInit=profile.bootTarget == "android" ? "shell" : profile.boot
+            SharedInboxBridge.drainSharedInbox()
+            let sharedDir = try? SharedInboxBridge.sharedDirectory()
             while true {
                 try Task.checkCancellation()
-                let local=try LocalSession(store:active,rootfs:nil,total:UInt64(total),available:UInt64(available),network:"host",useVolumeBudget:useVolumeBudget,muslLibc:musl,bionicBundle:bionic,glibcBundle:glibc,pureAccelerator:true,vulkanICD:icd,memoryBudgetMiB:memoryBudgetMiB,processMemoryBudgetMiB:processMemoryBudgetMiB,multipleTerminals:profile.bootTarget == "linux",initiallyPaused:true,storeOwnerLock:lock,distribution:profile.distro,initMode:maintenance ? "shell" : linuxInit,target:profile.bootTarget,environmentConfig: !maintenance && FileManager.default.fileExists(atPath:configuration(profile).path) ? configuration(profile):nil,environmentGrants: !maintenance && FileManager.default.fileExists(atPath:grants(profile).path) ? grants(profile):nil)
+                let resolvedMounts = await mountStore.resolveForSession(environmentID: profile.id, sharedDirectory: sharedDir)
+                failedMountIDsByEnvironment[profile.id] = Set(resolvedMounts.failedMountIDs)
+                let local=try LocalSession(store:active,rootfs:nil,total:UInt64(total),available:UInt64(available),network:"host",useVolumeBudget:useVolumeBudget,muslLibc:musl,bionicBundle:bionic,glibcBundle:glibc,pureAccelerator:true,vulkanICD:icd,memoryBudgetMiB:memoryBudgetMiB,processMemoryBudgetMiB:processMemoryBudgetMiB,multipleTerminals:profile.bootTarget == "linux",initiallyPaused:true,storeOwnerLock:lock,distribution:profile.distro,initMode:maintenance ? "shell" : linuxInit,target:profile.bootTarget,environmentConfig: !maintenance && FileManager.default.fileExists(atPath:configuration(profile).path) ? configuration(profile):nil,environmentGrants: !maintenance && FileManager.default.fileExists(atPath:grants(profile).path) ? grants(profile):nil,hostMounts:resolvedMounts.mounts,mountLease:resolvedMounts.lease)
                 do {
                     var status=try local.status()
                     while status.phase=="starting" {try await Task.sleep(for:.milliseconds(20));status=try local.status()}

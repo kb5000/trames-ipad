@@ -1,0 +1,226 @@
+[
+  {
+    "checksum_asset": "Trames-1.5.4-build49-personal-team.ipa.sha256",
+    "repo": "trames-ipad",
+    "tag": "v1.5.4",
+    "target": "Trames-1.5.4-build49-personal-team.ipa",
+    "expected": "112dedf057765b91ade1531e476a585fb824d972d4fa88127c032e5e43888be5",
+    "verified": true
+  },
+  {
+    "checksum_asset": "Trames-1.5.4-build49-unsigned.ipa.sha256",
+    "repo": "trames-ipad",
+    "tag": "v1.5.4",
+    "target": "Trames-1.5.4-build49-unsigned.ipa",
+    "expected": "d501a60ab67ea6a7294cc0b628e747fe9d072e10ad07c2ff9999970e898a052b",
+    "verified": true
+  },
+  {
+    "checksum_asset": "Trames-1.5.4-corresponding-source.tar.gz.sha256",
+    "repo": "trames-ipad",
+    "tag": "v1.5.4",
+    "target": "Trames-1.5.4-corresponding-source.tar.gz",
+    "expected": "137e27d7a85a9983b2b79493a9c07ab6d0d3e345ca0d4e80067537ff06b91a59",
+    "verified": true
+  },
+  {
+    "checksum_asset": "SHA256SUMS",
+    "repo": "trames-ipad",
+    "tag": "v1.3.0",
+    "target": "Trames-1.3.0-build35-unsigned.ipa",
+    "expected": "beb454f591719644f073c195148438a9c01d49aca67830971ebc7f3756ae466c",
+    "verified": true
+  },
+  {
+    "checksum_asset": "SHA256SUMS",
+    "repo": "trames-ipad",
+    "tag": "v1.3.0",
+    "target": "build35-verification.json",
+    "expected": "127cfe54f4918158eec29eb4432edb0d828c627842844efd95f44fa85baf549f",
+    "verified": true
+  },
+  {
+    "checksum_asset": "SHA256SUMS",
+    "repo": "trames-ipad",
+    "tag": "v1.3.0",
+    "target": "musl-hybrid-1.2.5-source.tar.gz",
+    "expected": "16be4a115dd55670eb78f3e9aaf17c2046b1fb5baca454824c3f7d10d8d357fa",
+    "verified": true
+  },
+  {
+    "checksum_asset": "SHA256SUMS",
+    "repo": "trames-ipad",
+    "tag": "v1.3.0",
+    "target": "vulkan-native-upstream-source.tar.gz",
+    "expected": "88349a00a9460c56b04093eccf8bb26d24bc0a1701d9ca10bb6c9775321ab85c",
+    "verified": true
+  },
+  {
+    "checksum_asset": "SHA256SUMS",
+    "repo": "trames-ipad",
+    "tag": "v1.3.0",
+    "target": "mesa-egl-25.1.9-source.tar.gz",
+    "expected": "b8c5838307778fdefbf38c2d98fad2f4e3174d630bcbe677756f3be70e5b70ff",
+    "verified": true
+  },
+  {
+    "checksum_asset": "SHA256SUMS",
+    "repo": "trames-ipad",
+    "tag": "v1.3.0",
+    "target": "xwayland-native-source.tar.gz",
+    "expected": "0273f596da5c73748ffec090782157b972305a316881a77f2c0875100e9f664c",
+    "verified": true
+  },
+  {
+    "checksum_asset": "SHA256SUMS",
+    "repo": "trames-ipad",
+    "tag": "v1.3.0",
+    "target": "xwayland-launcher-source.tar.gz",
+    "expected": "2e3e8e02a419b4914396ee27ec88d685eadb30bf02064d128e3528cd1cbf80d9",
+    "verified": true
+  },
+  {
+    "checksum_asset": "SHA256SUMS",
+    "repo": "trames-ipad",
+    "tag": "v1.3.0",
+    "target": "Trames-1.3.0-build35-source.tar.gz",
+    "expected": "2c1508c5ba968f6a4c516e411755592ccac656c1d60bb6af870eac1d635cc495",
+    "verified": true
+  },
+  {
+    "checksum_asset": "Trames-1.2.0-build33-unsigned.ipa.sha256",
+    "repo": "trames-ipad",
+    "tag": "v1.2.0",
+    "target": "Trames-1.2.0-build33-unsigned.ipa",
+    "expected": "c46f6a49f7ee66f8b6397b2b2530edff4062ad71b2f9dde183dd0c9013f47bb1",
+    "verified": true
+  },
+  {
+    "checksum_asset": "Trames-1.1.0-build32-unsigned.ipa.sha256",
+    "repo": "trames-ipad",
+    "tag": "v1.1.0",
+    "target": "Trames-1.1.0-build32-unsigned.ipa",
+    "expected": "e6c4c5da9aee9f10fcc65dfb173b9593a2cf3858ad1447b66e71ce091acc3f94",
+    "verified": true
+  },
+  {
+    "checksum_asset": "Trames-1.0.0-build26-unsigned.ipa.sha256",
+    "repo": "trames-ipad",
+    "tag": "v1.0.0",
+    "target": "Trames-1.0.0-build26-unsigned.ipa",
+    "expected": "264df460a1b224a7e0570c43d1fa78de745b18ea7a6824c2aeed635e6cfda754",
+    "verified": true
+  },
+  {
+    "checksum_asset": "Trames-0.17.0-build19-unsigned.ipa.sha256",
+    "repo": "trames-ipad",
+    "tag": "v0.17.0",
+    "target": "Trames-0.17.0-build19-unsigned.ipa",
+    "expected": "c2cbb3eed53209fc911148852afa642feebb2c43498fada6e90edf4f268fc3a2",
+    "verified": true
+  },
+  {
+    "checksum_asset": "Trames-0.16.0-build17-unsigned.ipa.sha256",
+    "repo": "trames-ipad",
+    "tag": "v0.16.0",
+    "target": "Trames-0.16.0-build17-unsigned.ipa",
+    "expected": "e8c62938ab8135cae6b0df0595cc928cf8bba50cb1500f52040c116fdc1b11e5",
+    "verified": true
+  },
+  {
+    "checksum_asset": "Trames-0.15.0-build16-unsigned.ipa.sha256",
+    "repo": "trames-ipad",
+    "tag": "v0.15.0",
+    "target": "Trames-0.15.0-build16-unsigned.ipa",
+    "expected": "c83b44142042c90d277d01d750d6360e03160694e3f30dcf8e1c1d19063c8d67",
+    "verified": true
+  },
+  {
+    "checksum_asset": "Trames-0.14.0-build15-unsigned.ipa.sha256",
+    "repo": "trames-ipad",
+    "tag": "v0.14.0",
+    "target": "Trames-0.14.0-build15-unsigned.ipa",
+    "expected": "6c4dd9e055639f52405b30f10a16b961a08fba6e97d2b439009e094c2b335681",
+    "verified": true
+  },
+  {
+    "checksum_asset": "Trames-1.5.4-mac-arm64-unnotarized.zip.sha256",
+    "repo": "trames-mac",
+    "tag": "v1.5.4",
+    "target": "Trames-1.5.4-mac-arm64-unnotarized.zip",
+    "expected": "6def28d553b1c7bb39244aee6be0c4213a829f89286b92a4307e0405ad6389c9",
+    "verified": true
+  },
+  {
+    "checksum_asset": "Trames-Dev-1.5.4-mac-arm64-unnotarized.zip.sha256",
+    "repo": "trames-mac",
+    "tag": "v1.5.4",
+    "target": "Trames-Dev-1.5.4-mac-arm64-unnotarized.zip",
+    "expected": "c36cd55b653497cf3bc34d044740abb1a740407a5c313226ad15ff2ed8590833",
+    "verified": true
+  },
+  {
+    "checksum_asset": "Trames-1.5.3-mac-arm64-unnotarized.zip.sha256",
+    "repo": "trames-mac",
+    "tag": "v1.5.3",
+    "target": "Trames-1.5.3-mac-arm64-unnotarized.zip",
+    "expected": "aff6db41af62766fa15726ebf0549186d10cded3df393575c283594c53bb7b8b",
+    "verified": true
+  },
+  {
+    "checksum_asset": "Trames-Dev-1.5.3-mac-arm64-unnotarized.zip.sha256",
+    "repo": "trames-mac",
+    "tag": "v1.5.3",
+    "target": "Trames-Dev-1.5.3-mac-arm64-unnotarized.zip",
+    "expected": "0097ae7fd8c6db4c13986c884cfe125960764cd3735e1dcd92857a62a4d5a3fe",
+    "verified": true
+  },
+  {
+    "checksum_asset": "Trames-1.5.2-mac-arm64-unnotarized.zip.sha256",
+    "repo": "trames-mac",
+    "tag": "v1.5.2",
+    "target": "Trames-1.5.2-mac-arm64-unnotarized.zip",
+    "expected": "94cc326ec659e3485cddc35b353693733b49bd281389f1468c9d0a5faa8606b0",
+    "verified": true
+  },
+  {
+    "checksum_asset": "Trames-Dev-1.5.2-mac-arm64-unnotarized.zip.sha256",
+    "repo": "trames-mac",
+    "tag": "v1.5.2",
+    "target": "Trames-Dev-1.5.2-mac-arm64-unnotarized.zip",
+    "expected": "9b4cb8ca070c6f9fed19e8e3d6522d37c0fec1d264d6ded51da7dd9f1398d78e",
+    "verified": true
+  },
+  {
+    "checksum_asset": "Trames-1.5.1-mac-arm64-unnotarized.zip.sha256",
+    "repo": "trames-mac",
+    "tag": "v1.5.1",
+    "target": "Trames-1.5.1-mac-arm64-unnotarized.zip",
+    "expected": "bbbf42a8d6114805fc14b566db5def88cd8c166e99faf325aefe070b795db297",
+    "verified": true
+  },
+  {
+    "checksum_asset": "Trames-Dev-1.5.1-mac-arm64-unnotarized.zip.sha256",
+    "repo": "trames-mac",
+    "tag": "v1.5.1",
+    "target": "Trames-Dev-1.5.1-mac-arm64-unnotarized.zip",
+    "expected": "1712c4c01ce415144b8dfd4822e10295cad00a931dcd8dd9d7e1806765215b20",
+    "verified": true
+  },
+  {
+    "checksum_asset": "Trames-1.5.0-mac-arm64-unnotarized.zip.sha256",
+    "repo": "trames-mac",
+    "tag": "v1.5.0",
+    "target": "Trames-1.5.0-mac-arm64-unnotarized.zip",
+    "expected": "34bae7f5dcd37e897bb6d7d4c6b2b4e95129987a5dda8847bf156b18408e5562",
+    "verified": true
+  },
+  {
+    "checksum_asset": "Trames-Dev-1.5.0-mac-arm64-unnotarized.zip.sha256",
+    "repo": "trames-mac",
+    "tag": "v1.5.0",
+    "target": "Trames-Dev-1.5.0-mac-arm64-unnotarized.zip",
+    "expected": "a80ba7e19d638c9ca0637b5ef4abfe8f7904bd67c983debfffe7832ee5b6bc36",
+    "verified": true
+  }
+]

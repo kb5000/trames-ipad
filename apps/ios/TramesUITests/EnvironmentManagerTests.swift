@@ -6,8 +6,9 @@ final class EnvironmentManagerTests:XCTestCase {
     private func launch(_ language:String="zh-Hans",reset:Bool=true)->XCUIApplication {
         let app=XCUIApplication();app.launchArguments=["--ui-acceptance","--environment-ui-acceptance","-AppleLanguages","(\(language))","-AppleLocale",language=="en" ? "en_US":"zh_CN"]+(reset ? ["--environment-ui-reset"]:[]);app.launch();return app
     }
-    private func manager(_ app:XCUIApplication,_ name:String="Linux 环境") {
-        let menu=app.buttons["session-actions"];XCTAssertTrue(menu.waitForExistence(timeout:20),app.debugDescription);menu.tap();app.buttons[name].firstMatch.tap()
+    private func manager(_ app:XCUIApplication,_ name:String="环境与设置") {
+        let button=app.buttons["open-manager"];XCTAssertTrue(button.waitForExistence(timeout:20),app.debugDescription)
+        XCTAssertEqual(button.label,name);button.tap()
         XCTAssertTrue(app.buttons["create-linux-environment"].waitForExistence(timeout:15),app.debugDescription)
     }
     private func choose(_ app:XCUIApplication,_ distro:String) {
@@ -43,10 +44,12 @@ final class EnvironmentManagerTests:XCTestCase {
         app.terminate()
     }
     func testEnglishConfigurationAndroidAndCreationSheetInPortrait() {
-        let app=launch("en");manager(app,"Linux Environments");choose(app,"android");app.buttons["environment-tab-configuration"].tap()
+        let app=launch("en");manager(app,"Environments & Settings");choose(app,"android");app.buttons["environment-tab-configuration"].tap()
         XCTAssertTrue(app.staticTexts.matching(NSPredicate(format:"label ENDSWITH %@","Android init")).firstMatch.waitForExistence(timeout:5),app.debugDescription)
         XCTAssertFalse(app.textFields["environment-cwd"].exists)
-        app.buttons["environment-tab-permissions"].tap();XCTAssertTrue(app.staticTexts.matching(NSPredicate(format:"label CONTAINS %@","Mac Only")).firstMatch.exists)
+        app.buttons["environment-tab-permissions"].tap()
+        XCTAssertTrue(app.switches["environment-permission-clipboard"].waitForExistence(timeout:5),app.debugDescription)
+        XCTAssertFalse(app.staticTexts.matching(NSPredicate(format:"label CONTAINS %@","Mac Only")).firstMatch.exists)
         XCUIDevice.shared.orientation = .portrait
         let new=app.buttons["create-linux-environment"]
         if !new.isHittable {app.navigationBars.buttons.firstMatch.tap()}

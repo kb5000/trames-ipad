@@ -1,0 +1,1720 @@
+[
+  {
+    "name": "assimp-libs",
+    "version": "5.4.3-r0",
+    "license": [
+      "BSD-3-Clause"
+    ],
+    "origin": [
+      "assimp"
+    ],
+    "url": [
+      "https://www.assimp.org/"
+    ],
+    "dependencies": [
+      "so:libc.musl-aarch64.so.1",
+      "so:libgcc_s.so.1",
+      "so:libstdc++.so.6",
+      "so:libz.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/community/aarch64/assimp-libs-5.4.3-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/community/aarch64/assimp-libs-5.4.3-r0.apk"
+    ]
+  },
+  {
+    "name": "breeze-cursors",
+    "version": "6.3.6-r0",
+    "license": [
+      "GPL-2.0-or-later"
+    ],
+    "origin": [
+      "breeze"
+    ],
+    "url": [
+      "https://kde.org/plasma-desktop/"
+    ],
+    "dependencies": [],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/community/aarch64/breeze-cursors-6.3.6-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/community/aarch64/breeze-cursors-6.3.6-r0.apk"
+    ]
+  },
+  {
+    "name": "brotli-libs",
+    "version": "1.1.0-r2",
+    "license": [
+      "MIT"
+    ],
+    "origin": [
+      "brotli"
+    ],
+    "url": [
+      "https://github.com/google/brotli"
+    ],
+    "dependencies": [
+      "so:libc.musl-aarch64.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/brotli-libs-1.1.0-r2.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/brotli-libs-1.1.0-r2.apk"
+    ]
+  },
+  {
+    "name": "busybox",
+    "version": "1.37.0-r20",
+    "license": [
+      "GPL-2.0-only"
+    ],
+    "origin": [
+      "busybox"
+    ],
+    "url": [
+      "https://busybox.net/"
+    ],
+    "dependencies": [
+      "so:libc.musl-aarch64.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/busybox-1.37.0-r20.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/busybox-1.37.0-r20.apk"
+    ]
+  },
+  {
+    "name": "busybox-binsh",
+    "version": "1.37.0-r20",
+    "license": [
+      "GPL-2.0-only"
+    ],
+    "origin": [
+      "busybox"
+    ],
+    "url": [
+      "https://busybox.net/"
+    ],
+    "dependencies": [
+      "busybox=1.37.0-r20"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/busybox-binsh-1.37.0-r20.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/busybox-binsh-1.37.0-r20.apk"
+    ]
+  },
+  {
+    "name": "cairo",
+    "version": "1.18.4-r0",
+    "license": [
+      "LGPL-2.1-or-later OR MPL-1.1"
+    ],
+    "origin": [
+      "cairo"
+    ],
+    "url": [
+      "https://cairographics.org/"
+    ],
+    "dependencies": [
+      "so:libX11.so.6",
+      "so:libXext.so.6",
+      "so:libXrender.so.1",
+      "so:libc.musl-aarch64.so.1",
+      "so:libfontconfig.so.1",
+      "so:libfreetype.so.6",
+      "so:libpixman-1.so.0",
+      "so:libpng16.so.16",
+      "so:libxcb-render.so.0",
+      "so:libxcb-shm.so.0",
+      "so:libxcb.so.1",
+      "so:libz.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/cairo-1.18.4-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/cairo-1.18.4-r0.apk"
+    ]
+  },
+  {
+    "name": "dash",
+    "version": "0.5.12-r3",
+    "license": [
+      "BSD-3-Clause AND GPL-2.0-or-later"
+    ],
+    "origin": [
+      "dash"
+    ],
+    "url": [
+      "http://gondor.apana.org.au/~herbert/dash/"
+    ],
+    "dependencies": [
+      "busybox",
+      "so:libc.musl-aarch64.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/dash-0.5.12-r3.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/dash-0.5.12-r3.apk"
+    ]
+  },
+  {
+    "name": "dash-binsh",
+    "version": "0.5.12-r3",
+    "license": [
+      "BSD-3-Clause AND GPL-2.0-or-later"
+    ],
+    "origin": [
+      "dash"
+    ],
+    "url": [
+      "http://gondor.apana.org.au/~herbert/dash/"
+    ],
+    "dependencies": [
+      "busybox",
+      "dash=0.5.12-r3"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/dash-binsh-0.5.12-r3.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/dash-binsh-0.5.12-r3.apk"
+    ]
+  },
+  {
+    "name": "encodings",
+    "version": "1.0.7-r1",
+    "license": [
+      "Public Domain"
+    ],
+    "origin": [
+      "encodings"
+    ],
+    "url": [
+      "https://xorg.freedesktop.org/"
+    ],
+    "dependencies": [],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/encodings-1.0.7-r1.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/encodings-1.0.7-r1.apk"
+    ]
+  },
+  {
+    "name": "eudev-libs",
+    "version": "3.2.14-r5",
+    "license": [
+      "GPL-2.0-or-later"
+    ],
+    "origin": [
+      "eudev"
+    ],
+    "url": [
+      "https://github.com/eudev-project/eudev"
+    ],
+    "dependencies": [
+      "so:libc.musl-aarch64.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/eudev-libs-3.2.14-r5.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/eudev-libs-3.2.14-r5.apk"
+    ]
+  },
+  {
+    "name": "font-dejavu",
+    "version": "2.37-r6",
+    "license": [
+      "Bitstream-Vera"
+    ],
+    "origin": [
+      "font-dejavu"
+    ],
+    "url": [
+      "https://dejavu-fonts.github.io/"
+    ],
+    "dependencies": [
+      "fontconfig",
+      "encodings",
+      "mkfontscale"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/font-dejavu-2.37-r6.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/font-dejavu-2.37-r6.apk"
+    ]
+  },
+  {
+    "name": "fontconfig",
+    "version": "2.15.0-r3",
+    "license": [
+      "MIT"
+    ],
+    "origin": [
+      "fontconfig"
+    ],
+    "url": [
+      "https://www.freedesktop.org/wiki/Software/fontconfig"
+    ],
+    "dependencies": [
+      "/bin/sh",
+      "so:libc.musl-aarch64.so.1",
+      "so:libexpat.so.1",
+      "so:libfreetype.so.6"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/fontconfig-2.15.0-r3.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/fontconfig-2.15.0-r3.apk"
+    ]
+  },
+  {
+    "name": "freetype",
+    "version": "2.13.3-r0",
+    "license": [
+      "FTL OR GPL-2.0-or-later"
+    ],
+    "origin": [
+      "freetype"
+    ],
+    "url": [
+      "https://www.freetype.org/"
+    ],
+    "dependencies": [
+      "so:libbrotlidec.so.1",
+      "so:libbz2.so.1",
+      "so:libc.musl-aarch64.so.1",
+      "so:libpng16.so.16",
+      "so:libz.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/freetype-2.13.3-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/freetype-2.13.3-r0.apk"
+    ]
+  },
+  {
+    "name": "fribidi",
+    "version": "1.0.16-r1",
+    "license": [
+      "LGPL-2.1-or-later"
+    ],
+    "origin": [
+      "fribidi"
+    ],
+    "url": [
+      "https://github.com/fribidi/fribidi"
+    ],
+    "dependencies": [
+      "so:libc.musl-aarch64.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/fribidi-1.0.16-r1.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/fribidi-1.0.16-r1.apk"
+    ]
+  },
+  {
+    "name": "glib",
+    "version": "2.84.4-r0",
+    "license": [
+      "LGPL-2.1-or-later"
+    ],
+    "origin": [
+      "glib"
+    ],
+    "url": [
+      "https://developer.gnome.org/glib/"
+    ],
+    "dependencies": [
+      "/bin/sh",
+      "so:libc.musl-aarch64.so.1",
+      "so:libffi.so.8",
+      "so:libintl.so.8",
+      "so:libmount.so.1",
+      "so:libpcre2-8.so.0",
+      "so:libz.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/glib-2.84.4-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/glib-2.84.4-r0.apk"
+    ]
+  },
+  {
+    "name": "graphite2",
+    "version": "1.3.14-r6",
+    "license": [
+      "LGPL-2.1-or-later OR MPL-1.1"
+    ],
+    "origin": [
+      "graphite2"
+    ],
+    "url": [
+      "https://graphite.sil.org/"
+    ],
+    "dependencies": [
+      "so:libc.musl-aarch64.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/graphite2-1.3.14-r6.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/graphite2-1.3.14-r6.apk"
+    ]
+  },
+  {
+    "name": "harfbuzz",
+    "version": "11.2.1-r0",
+    "license": [
+      "MIT"
+    ],
+    "origin": [
+      "harfbuzz"
+    ],
+    "url": [
+      "https://harfbuzz.github.io/"
+    ],
+    "dependencies": [
+      "so:libc.musl-aarch64.so.1",
+      "so:libfreetype.so.6",
+      "so:libglib-2.0.so.0",
+      "so:libgraphite2.so.3"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/harfbuzz-11.2.1-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/harfbuzz-11.2.1-r0.apk"
+    ]
+  },
+  {
+    "name": "hwdata-pci",
+    "version": "0.395-r0",
+    "license": [
+      "GPL-2.0-or-later OR XFree86-1.1"
+    ],
+    "origin": [
+      "hwdata"
+    ],
+    "url": [
+      "https://github.com/vcrhonek/hwdata"
+    ],
+    "dependencies": [],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/hwdata-pci-0.395-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/hwdata-pci-0.395-r0.apk"
+    ]
+  },
+  {
+    "name": "libblkid",
+    "version": "2.41.6-r1",
+    "license": [
+      "LGPL-2.1-or-later"
+    ],
+    "origin": [
+      "util-linux"
+    ],
+    "url": [
+      "https://git.kernel.org/cgit/utils/util-linux/util-linux.git"
+    ],
+    "dependencies": [
+      "so:libc.musl-aarch64.so.1",
+      "so:libeconf.so.0"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/libblkid-2.41.6-r1.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/libblkid-2.41.6-r1.apk"
+    ]
+  },
+  {
+    "name": "libbsd",
+    "version": "0.12.2-r0",
+    "license": [
+      "BSD-3-Clause"
+    ],
+    "origin": [
+      "libbsd"
+    ],
+    "url": [
+      "https://libbsd.freedesktop.org/"
+    ],
+    "dependencies": [
+      "musl",
+      "so:libc.musl-aarch64.so.1",
+      "so:libmd.so.0"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/libbsd-0.12.2-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/libbsd-0.12.2-r0.apk"
+    ]
+  },
+  {
+    "name": "libbz2",
+    "version": "1.0.8-r6",
+    "license": [
+      "bzip2-1.0.6"
+    ],
+    "origin": [
+      "bzip2"
+    ],
+    "url": [
+      "https://sourceware.org/bzip2/"
+    ],
+    "dependencies": [
+      "so:libc.musl-aarch64.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/libbz2-1.0.8-r6.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/libbz2-1.0.8-r6.apk"
+    ]
+  },
+  {
+    "name": "libdrm",
+    "version": "2.4.124-r0",
+    "license": [
+      "MIT"
+    ],
+    "origin": [
+      "libdrm"
+    ],
+    "url": [
+      "https://gitlab.freedesktop.org/mesa/drm"
+    ],
+    "dependencies": [
+      "so:libc.musl-aarch64.so.1",
+      "so:libpciaccess.so.0"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/libdrm-2.4.124-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/libdrm-2.4.124-r0.apk"
+    ]
+  },
+  {
+    "name": "libeconf",
+    "version": "0.6.3-r0",
+    "license": [
+      "MIT"
+    ],
+    "origin": [
+      "libeconf"
+    ],
+    "url": [
+      "https://github.com/openSUSE/libeconf"
+    ],
+    "dependencies": [
+      "so:libc.musl-aarch64.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/libeconf-0.6.3-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/libeconf-0.6.3-r0.apk"
+    ]
+  },
+  {
+    "name": "libelf",
+    "version": "0.193-r0",
+    "license": [
+      "GPL-3.0-or-later AND ( GPL-2.0-or-later OR LGPL-3.0-or-later )"
+    ],
+    "origin": [
+      "elfutils"
+    ],
+    "url": [
+      "https://sourceware.org/elfutils/"
+    ],
+    "dependencies": [
+      "so:libc.musl-aarch64.so.1",
+      "so:libz.so.1",
+      "so:libzstd.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/libelf-0.193-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/libelf-0.193-r0.apk"
+    ]
+  },
+  {
+    "name": "libexpat",
+    "version": "2.8.5-r0",
+    "license": [
+      "MIT"
+    ],
+    "origin": [
+      "expat"
+    ],
+    "url": [
+      "https://libexpat.github.io/"
+    ],
+    "dependencies": [
+      "so:libc.musl-aarch64.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/libexpat-2.8.5-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/libexpat-2.8.5-r0.apk"
+    ]
+  },
+  {
+    "name": "libffi",
+    "version": "3.4.8-r0",
+    "license": [
+      "MIT"
+    ],
+    "origin": [
+      "libffi"
+    ],
+    "url": [
+      "https://sourceware.org/libffi/"
+    ],
+    "dependencies": [
+      "so:libc.musl-aarch64.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/libffi-3.4.8-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/libffi-3.4.8-r0.apk"
+    ]
+  },
+  {
+    "name": "libfontenc",
+    "version": "1.1.8-r0",
+    "license": [
+      "MIT"
+    ],
+    "origin": [
+      "libfontenc"
+    ],
+    "url": [
+      "https://xorg.freedesktop.org/"
+    ],
+    "dependencies": [
+      "so:libc.musl-aarch64.so.1",
+      "so:libz.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/libfontenc-1.1.8-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/libfontenc-1.1.8-r0.apk"
+    ]
+  },
+  {
+    "name": "libgcc",
+    "version": "14.2.0-r6",
+    "license": [
+      "GPL-2.0-or-later AND LGPL-2.1-or-later"
+    ],
+    "origin": [
+      "gcc"
+    ],
+    "url": [
+      "https://gcc.gnu.org"
+    ],
+    "dependencies": [
+      "so:libc.musl-aarch64.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/libgcc-14.2.0-r6.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/libgcc-14.2.0-r6.apk"
+    ]
+  },
+  {
+    "name": "libintl",
+    "version": "0.24.1-r0",
+    "license": [
+      "LGPL-2.1-or-later"
+    ],
+    "origin": [
+      "gettext"
+    ],
+    "url": [
+      "https://www.gnu.org/software/gettext/gettext.html"
+    ],
+    "dependencies": [
+      "so:libc.musl-aarch64.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/libintl-0.24.1-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/libintl-0.24.1-r0.apk"
+    ]
+  },
+  {
+    "name": "libjpeg-turbo",
+    "version": "3.1.0-r0",
+    "license": [
+      "BSD-3-Clause AND IJG AND Zlib"
+    ],
+    "origin": [
+      "libjpeg-turbo"
+    ],
+    "url": [
+      "https://libjpeg-turbo.org/"
+    ],
+    "dependencies": [
+      "so:libc.musl-aarch64.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/libjpeg-turbo-3.1.0-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/libjpeg-turbo-3.1.0-r0.apk"
+    ]
+  },
+  {
+    "name": "libmd",
+    "version": "1.1.0-r0",
+    "license": [
+      "BSD-3-Clause AND BSD-2-Clause AND ISC AND Beerware AND Public Domain"
+    ],
+    "origin": [
+      "libmd"
+    ],
+    "url": [
+      "https://www.hadrons.org/software/libmd/"
+    ],
+    "dependencies": [
+      "so:libc.musl-aarch64.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/libmd-1.1.0-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/libmd-1.1.0-r0.apk"
+    ]
+  },
+  {
+    "name": "libmount",
+    "version": "2.41.6-r1",
+    "license": [
+      "LGPL-2.1-or-later"
+    ],
+    "origin": [
+      "util-linux"
+    ],
+    "url": [
+      "https://git.kernel.org/cgit/utils/util-linux/util-linux.git"
+    ],
+    "dependencies": [
+      "so:libblkid.so.1",
+      "so:libc.musl-aarch64.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/libmount-2.41.6-r1.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/libmount-2.41.6-r1.apk"
+    ]
+  },
+  {
+    "name": "libncursesw",
+    "version": "6.5_p20250503-r0",
+    "license": [
+      "X11"
+    ],
+    "origin": [
+      "ncurses"
+    ],
+    "url": [
+      "https://invisible-island.net/ncurses/"
+    ],
+    "dependencies": [
+      "ncurses-terminfo-base=6.5_p20250503-r0",
+      "so:libc.musl-aarch64.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/libncursesw-6.5_p20250503-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/libncursesw-6.5_p20250503-r0.apk"
+    ]
+  },
+  {
+    "name": "libpciaccess",
+    "version": "0.18.1-r0",
+    "license": [
+      "X11"
+    ],
+    "origin": [
+      "libpciaccess"
+    ],
+    "url": [
+      "https://xorg.freedesktop.org/"
+    ],
+    "dependencies": [
+      "hwdata-pci",
+      "so:libc.musl-aarch64.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/libpciaccess-0.18.1-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/libpciaccess-0.18.1-r0.apk"
+    ]
+  },
+  {
+    "name": "libpng",
+    "version": "1.6.59-r0",
+    "license": [
+      "Libpng"
+    ],
+    "origin": [
+      "libpng"
+    ],
+    "url": [
+      "http://www.libpng.org"
+    ],
+    "dependencies": [
+      "so:libc.musl-aarch64.so.1",
+      "so:libz.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/libpng-1.6.59-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/libpng-1.6.59-r0.apk"
+    ]
+  },
+  {
+    "name": "libsharpyuv",
+    "version": "1.5.0-r0",
+    "license": [
+      "BSD-3-Clause"
+    ],
+    "origin": [
+      "libwebp"
+    ],
+    "url": [
+      "https://developers.google.com/speed/webp"
+    ],
+    "dependencies": [
+      "so:libc.musl-aarch64.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/libsharpyuv-1.5.0-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/libsharpyuv-1.5.0-r0.apk"
+    ]
+  },
+  {
+    "name": "libstdc++",
+    "version": "14.2.0-r6",
+    "license": [
+      "GPL-2.0-or-later AND LGPL-2.1-or-later"
+    ],
+    "origin": [
+      "gcc"
+    ],
+    "url": [
+      "https://gcc.gnu.org"
+    ],
+    "dependencies": [
+      "so:libc.musl-aarch64.so.1",
+      "so:libgcc_s.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/libstdc++-14.2.0-r6.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/libstdc++-14.2.0-r6.apk"
+    ]
+  },
+  {
+    "name": "libudev-zero",
+    "version": "1.0.3-r5",
+    "license": [
+      "ISC"
+    ],
+    "origin": [
+      "libudev-zero"
+    ],
+    "url": [
+      "https://github.com/illiliti/libudev-zero/"
+    ],
+    "dependencies": [
+      "so:libc.musl-aarch64.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/community/aarch64/libudev-zero-1.0.3-r5.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/community/aarch64/libudev-zero-1.0.3-r5.apk"
+    ]
+  },
+  {
+    "name": "libwebp",
+    "version": "1.5.0-r0",
+    "license": [
+      "BSD-3-Clause"
+    ],
+    "origin": [
+      "libwebp"
+    ],
+    "url": [
+      "https://developers.google.com/speed/webp"
+    ],
+    "dependencies": [
+      "so:libc.musl-aarch64.so.1",
+      "so:libsharpyuv.so.0"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/libwebp-1.5.0-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/libwebp-1.5.0-r0.apk"
+    ]
+  },
+  {
+    "name": "libweston",
+    "version": "14.0.2-r1",
+    "license": [
+      "MIT"
+    ],
+    "origin": [
+      "weston"
+    ],
+    "url": [
+      "https://wayland.freedesktop.org/"
+    ],
+    "dependencies": [
+      "so:libc.musl-aarch64.so.1",
+      "so:libdrm.so.2",
+      "so:libpixman-1.so.0",
+      "so:libwayland-server.so.0",
+      "so:libxkbcommon.so.0"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/community/aarch64/libweston-14.0.2-r1.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/community/aarch64/libweston-14.0.2-r1.apk"
+    ]
+  },
+  {
+    "name": "libx11",
+    "version": "1.8.11-r0",
+    "license": [
+      "X11"
+    ],
+    "origin": [
+      "libx11"
+    ],
+    "url": [
+      "https://xorg.freedesktop.org/"
+    ],
+    "dependencies": [
+      "so:libc.musl-aarch64.so.1",
+      "so:libxcb.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/libx11-1.8.11-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/libx11-1.8.11-r0.apk"
+    ]
+  },
+  {
+    "name": "libxau",
+    "version": "1.0.12-r0",
+    "license": [
+      "MIT"
+    ],
+    "origin": [
+      "libxau"
+    ],
+    "url": [
+      "https://xorg.freedesktop.org/"
+    ],
+    "dependencies": [
+      "so:libc.musl-aarch64.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/libxau-1.0.12-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/libxau-1.0.12-r0.apk"
+    ]
+  },
+  {
+    "name": "libxcb",
+    "version": "1.17.0-r0",
+    "license": [
+      "MIT"
+    ],
+    "origin": [
+      "libxcb"
+    ],
+    "url": [
+      "https://xcb.freedesktop.org/"
+    ],
+    "dependencies": [
+      "so:libXau.so.6",
+      "so:libXdmcp.so.6",
+      "so:libc.musl-aarch64.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/libxcb-1.17.0-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/libxcb-1.17.0-r0.apk"
+    ]
+  },
+  {
+    "name": "libxdmcp",
+    "version": "1.1.5-r1",
+    "license": [
+      "MIT"
+    ],
+    "origin": [
+      "libxdmcp"
+    ],
+    "url": [
+      "https://xorg.freedesktop.org/"
+    ],
+    "dependencies": [
+      "so:libbsd.so.0",
+      "so:libc.musl-aarch64.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/libxdmcp-1.1.5-r1.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/libxdmcp-1.1.5-r1.apk"
+    ]
+  },
+  {
+    "name": "libxext",
+    "version": "1.3.6-r2",
+    "license": [
+      "MIT"
+    ],
+    "origin": [
+      "libxext"
+    ],
+    "url": [
+      "https://xorg.freedesktop.org/"
+    ],
+    "dependencies": [
+      "so:libX11.so.6",
+      "so:libc.musl-aarch64.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/libxext-1.3.6-r2.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/libxext-1.3.6-r2.apk"
+    ]
+  },
+  {
+    "name": "libxft",
+    "version": "2.3.8-r3",
+    "license": [
+      "MIT"
+    ],
+    "origin": [
+      "libxft"
+    ],
+    "url": [
+      "https://xorg.freedesktop.org/"
+    ],
+    "dependencies": [
+      "so:libX11.so.6",
+      "so:libXrender.so.1",
+      "so:libc.musl-aarch64.so.1",
+      "so:libfontconfig.so.1",
+      "so:libfreetype.so.6"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/libxft-2.3.8-r3.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/libxft-2.3.8-r3.apk"
+    ]
+  },
+  {
+    "name": "libxkbcommon",
+    "version": "1.8.1-r2",
+    "license": [
+      "MIT AND MIT-open-group AND HPND AND HPND-sell-variant AND LicenseRef-digital-equipment-corporation"
+    ],
+    "origin": [
+      "libxkbcommon"
+    ],
+    "url": [
+      "https://xkbcommon.org/"
+    ],
+    "dependencies": [
+      "xkeyboard-config",
+      "so:libc.musl-aarch64.so.1",
+      "so:libxml2.so.2"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/libxkbcommon-1.8.1-r2.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/libxkbcommon-1.8.1-r2.apk"
+    ]
+  },
+  {
+    "name": "libxml2",
+    "version": "2.13.9-r1",
+    "license": [
+      "MIT"
+    ],
+    "origin": [
+      "libxml2"
+    ],
+    "url": [
+      "https://gitlab.gnome.org/GNOME/libxml2"
+    ],
+    "dependencies": [
+      "so:libc.musl-aarch64.so.1",
+      "so:liblzma.so.5",
+      "so:libz.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/libxml2-2.13.9-r1.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/libxml2-2.13.9-r1.apk"
+    ]
+  },
+  {
+    "name": "libxrender",
+    "version": "0.9.12-r0",
+    "license": [
+      "MIT"
+    ],
+    "origin": [
+      "libxrender"
+    ],
+    "url": [
+      "https://xorg.freedesktop.org/"
+    ],
+    "dependencies": [
+      "so:libX11.so.6",
+      "so:libc.musl-aarch64.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/libxrender-0.9.12-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/libxrender-0.9.12-r0.apk"
+    ]
+  },
+  {
+    "name": "libxshmfence",
+    "version": "1.3.3-r0",
+    "license": [
+      "MIT"
+    ],
+    "origin": [
+      "libxshmfence"
+    ],
+    "url": [
+      "https://www.x.org/"
+    ],
+    "dependencies": [
+      "so:libc.musl-aarch64.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/libxshmfence-1.3.3-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/libxshmfence-1.3.3-r0.apk"
+    ]
+  },
+  {
+    "name": "llvm20-libs",
+    "version": "20.1.8-r0",
+    "license": [
+      "Apache-2.0"
+    ],
+    "origin": [
+      "llvm20"
+    ],
+    "url": [
+      "https://llvm.org/"
+    ],
+    "dependencies": [
+      "so:libc.musl-aarch64.so.1",
+      "so:libffi.so.8",
+      "so:libgcc_s.so.1",
+      "so:libstdc++.so.6",
+      "so:libxml2.so.2",
+      "so:libz.so.1",
+      "so:libzstd.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/llvm20-libs-20.1.8-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/llvm20-libs-20.1.8-r0.apk"
+    ]
+  },
+  {
+    "name": "mesa",
+    "version": "25.1.9-r0",
+    "license": [
+      "MIT AND SGI-B-2.0 AND BSL-1.0"
+    ],
+    "origin": [
+      "mesa"
+    ],
+    "url": [
+      "https://www.mesa3d.org"
+    ],
+    "dependencies": [
+      "so:libLLVM.so.20.1",
+      "so:libSPIRV-Tools.so",
+      "so:libX11-xcb.so.1",
+      "so:libc.musl-aarch64.so.1",
+      "so:libdrm.so.2",
+      "so:libdrm_amdgpu.so.1",
+      "so:libelf.so.1",
+      "so:libexpat.so.1",
+      "so:libgcc_s.so.1",
+      "so:libstdc++.so.6",
+      "so:libwayland-server.so.0",
+      "so:libxcb-dri3.so.0",
+      "so:libxcb-present.so.0",
+      "so:libxcb-randr.so.0",
+      "so:libxcb-sync.so.1",
+      "so:libxcb-xfixes.so.0",
+      "so:libxcb.so.1",
+      "so:libxshmfence.so.1",
+      "so:libz.so.1",
+      "so:libzstd.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/mesa-25.1.9-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/mesa-25.1.9-r0.apk"
+    ]
+  },
+  {
+    "name": "mesa-egl",
+    "version": "25.1.9-r0",
+    "license": [
+      "MIT AND SGI-B-2.0 AND BSL-1.0"
+    ],
+    "origin": [
+      "mesa"
+    ],
+    "url": [
+      "https://www.mesa3d.org"
+    ],
+    "dependencies": [
+      "mesa=25.1.9-r0",
+      "so:libX11-xcb.so.1",
+      "so:libc.musl-aarch64.so.1",
+      "so:libdrm.so.2",
+      "so:libexpat.so.1",
+      "so:libgallium-25.1.9.so",
+      "so:libgbm.so.1",
+      "so:libwayland-client.so.0",
+      "so:libwayland-server.so.0",
+      "so:libxcb-dri3.so.0",
+      "so:libxcb-present.so.0",
+      "so:libxcb-randr.so.0",
+      "so:libxcb-shm.so.0",
+      "so:libxcb-xfixes.so.0",
+      "so:libxcb.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/mesa-egl-25.1.9-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/mesa-egl-25.1.9-r0.apk"
+    ]
+  },
+  {
+    "name": "mesa-gbm",
+    "version": "25.1.9-r0",
+    "license": [
+      "MIT AND SGI-B-2.0 AND BSL-1.0"
+    ],
+    "origin": [
+      "mesa"
+    ],
+    "url": [
+      "https://www.mesa3d.org"
+    ],
+    "dependencies": [
+      "mesa=25.1.9-r0",
+      "so:libc.musl-aarch64.so.1",
+      "so:libdrm.so.2",
+      "so:libexpat.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/mesa-gbm-25.1.9-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/mesa-gbm-25.1.9-r0.apk"
+    ]
+  },
+  {
+    "name": "mesa-gles",
+    "version": "25.1.9-r0",
+    "license": [
+      "MIT AND SGI-B-2.0 AND BSL-1.0"
+    ],
+    "origin": [
+      "mesa"
+    ],
+    "url": [
+      "https://www.mesa3d.org"
+    ],
+    "dependencies": [
+      "mesa=25.1.9-r0",
+      "so:libgallium-25.1.9.so"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/mesa-gles-25.1.9-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/mesa-gles-25.1.9-r0.apk"
+    ]
+  },
+  {
+    "name": "mkfontscale",
+    "version": "1.2.3-r1",
+    "license": [
+      "MIT"
+    ],
+    "origin": [
+      "mkfontscale"
+    ],
+    "url": [
+      "https://xorg.freedesktop.org/"
+    ],
+    "dependencies": [
+      "/bin/sh",
+      "so:libc.musl-aarch64.so.1",
+      "so:libfontenc.so.1",
+      "so:libfreetype.so.6",
+      "so:libz.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/mkfontscale-1.2.3-r1.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/mkfontscale-1.2.3-r1.apk"
+    ]
+  },
+  {
+    "name": "musl",
+    "version": "1.2.5-r12",
+    "license": [
+      "MIT"
+    ],
+    "origin": [
+      "musl"
+    ],
+    "url": [
+      "https://musl.libc.org/"
+    ],
+    "dependencies": [],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/acceptance/musl-1.2.5-r12.apk",
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/musl-1.2.5-r12.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/acceptance/musl-1.2.5-r12.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/musl-1.2.5-r12.apk"
+    ]
+  },
+  {
+    "name": "ncurses-terminfo-base",
+    "version": "6.5_p20250503-r0",
+    "license": [
+      "X11"
+    ],
+    "origin": [
+      "ncurses"
+    ],
+    "url": [
+      "https://invisible-island.net/ncurses/"
+    ],
+    "dependencies": [],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/ncurses-terminfo-base-6.5_p20250503-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/ncurses-terminfo-base-6.5_p20250503-r0.apk"
+    ]
+  },
+  {
+    "name": "pango",
+    "version": "1.56.3-r0",
+    "license": [
+      "LGPL-2.1-or-later"
+    ],
+    "origin": [
+      "pango"
+    ],
+    "url": [
+      "https://www.pango.org/"
+    ],
+    "dependencies": [
+      "/bin/sh",
+      "so:libX11.so.6",
+      "so:libXft.so.2",
+      "so:libXrender.so.1",
+      "so:libc.musl-aarch64.so.1",
+      "so:libcairo.so.2",
+      "so:libfontconfig.so.1",
+      "so:libfreetype.so.6",
+      "so:libfribidi.so.0",
+      "so:libgio-2.0.so.0",
+      "so:libglib-2.0.so.0",
+      "so:libgobject-2.0.so.0",
+      "so:libharfbuzz.so.0"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/pango-1.56.3-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/pango-1.56.3-r0.apk"
+    ]
+  },
+  {
+    "name": "pcre2",
+    "version": "10.46-r0",
+    "license": [
+      "BSD-3-Clause"
+    ],
+    "origin": [
+      "pcre2"
+    ],
+    "url": [
+      "https://pcre.org/"
+    ],
+    "dependencies": [
+      "so:libc.musl-aarch64.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/pcre2-10.46-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/pcre2-10.46-r0.apk"
+    ]
+  },
+  {
+    "name": "pixman",
+    "version": "0.46.4-r0",
+    "license": [
+      "MIT"
+    ],
+    "origin": [
+      "pixman"
+    ],
+    "url": [
+      "https://gitlab.freedesktop.org/pixman"
+    ],
+    "dependencies": [
+      "so:libc.musl-aarch64.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/pixman-0.46.4-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/pixman-0.46.4-r0.apk"
+    ]
+  },
+  {
+    "name": "spirv-tools",
+    "version": "1.4.313.0-r0",
+    "license": [
+      "Apache-2.0"
+    ],
+    "origin": [
+      "spirv-tools"
+    ],
+    "url": [
+      "https://github.com/KhronosGroup/SPIRV-Tools"
+    ],
+    "dependencies": [
+      "so:libc.musl-aarch64.so.1",
+      "so:libstdc++.so.6"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/spirv-tools-1.4.313.0-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/spirv-tools-1.4.313.0-r0.apk"
+    ]
+  },
+  {
+    "name": "vkmark",
+    "version": "2025.01-r0",
+    "license": [
+      "LGPL-2.1-or-later"
+    ],
+    "origin": [
+      "vkmark"
+    ],
+    "url": [
+      "https://github.com/vkmark/vkmark"
+    ],
+    "dependencies": [
+      "so:libassimp.so.5",
+      "so:libc.musl-aarch64.so.1",
+      "so:libgcc_s.so.1",
+      "so:libstdc++.so.6",
+      "so:libvulkan.so.1",
+      "so:libwayland-client.so.0",
+      "so:libxcb-icccm.so.4",
+      "so:libxcb.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/community/aarch64/vkmark-2025.01-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/community/aarch64/vkmark-2025.01-r0.apk"
+    ]
+  },
+  {
+    "name": "vulkan-loader",
+    "version": "1.4.313.0-r0",
+    "license": [
+      "Apache-2.0"
+    ],
+    "origin": [
+      "vulkan-loader"
+    ],
+    "url": [
+      "https://www.khronos.org/vulkan"
+    ],
+    "dependencies": [
+      "so:libc.musl-aarch64.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/acceptance/vulkan-loader-1.4.313.0-r0.apk",
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/vulkan-loader-1.4.313.0-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/acceptance/vulkan-loader-1.4.313.0-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/vulkan-loader-1.4.313.0-r0.apk"
+    ]
+  },
+  {
+    "name": "vulkan-tools",
+    "version": "1.4.313.0-r0",
+    "license": [
+      "Apache-2.0"
+    ],
+    "origin": [
+      "vulkan-tools"
+    ],
+    "url": [
+      "https://www.khronos.org/vulkan"
+    ],
+    "dependencies": [
+      "so:libX11.so.6",
+      "so:libc.musl-aarch64.so.1",
+      "so:libgcc_s.so.1",
+      "so:libstdc++.so.6",
+      "so:libwayland-client.so.0",
+      "so:libxcb.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/vulkan-tools-1.4.313.0-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/vulkan-tools-1.4.313.0-r0.apk"
+    ]
+  },
+  {
+    "name": "wayland-libs-client",
+    "version": "1.23.1-r3",
+    "license": [
+      "MIT"
+    ],
+    "origin": [
+      "wayland"
+    ],
+    "url": [
+      "https://wayland.freedesktop.org"
+    ],
+    "dependencies": [
+      "so:libc.musl-aarch64.so.1",
+      "so:libffi.so.8"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/wayland-libs-client-1.23.1-r3.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/wayland-libs-client-1.23.1-r3.apk"
+    ]
+  },
+  {
+    "name": "wayland-libs-cursor",
+    "version": "1.23.1-r3",
+    "license": [
+      "MIT"
+    ],
+    "origin": [
+      "wayland"
+    ],
+    "url": [
+      "https://wayland.freedesktop.org"
+    ],
+    "dependencies": [
+      "so:libc.musl-aarch64.so.1",
+      "so:libwayland-client.so.0"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/wayland-libs-cursor-1.23.1-r3.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/wayland-libs-cursor-1.23.1-r3.apk"
+    ]
+  },
+  {
+    "name": "wayland-libs-egl",
+    "version": "1.23.1-r3",
+    "license": [
+      "MIT"
+    ],
+    "origin": [
+      "wayland"
+    ],
+    "url": [
+      "https://wayland.freedesktop.org"
+    ],
+    "dependencies": [
+      "so:libc.musl-aarch64.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/wayland-libs-egl-1.23.1-r3.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/wayland-libs-egl-1.23.1-r3.apk"
+    ]
+  },
+  {
+    "name": "wayland-libs-server",
+    "version": "1.23.1-r3",
+    "license": [
+      "MIT"
+    ],
+    "origin": [
+      "wayland"
+    ],
+    "url": [
+      "https://wayland.freedesktop.org"
+    ],
+    "dependencies": [
+      "so:libc.musl-aarch64.so.1",
+      "so:libffi.so.8"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/wayland-libs-server-1.23.1-r3.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/wayland-libs-server-1.23.1-r3.apk"
+    ]
+  },
+  {
+    "name": "wayland-utils",
+    "version": "1.2.0-r0",
+    "license": [
+      "MIT"
+    ],
+    "origin": [
+      "wayland-utils"
+    ],
+    "url": [
+      "https://wayland.freedesktop.org"
+    ],
+    "dependencies": [
+      "so:libc.musl-aarch64.so.1",
+      "so:libdrm.so.2",
+      "so:libwayland-client.so.0"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/community/aarch64/wayland-utils-1.2.0-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/community/aarch64/wayland-utils-1.2.0-r0.apk"
+    ]
+  },
+  {
+    "name": "weston-clients",
+    "version": "14.0.2-r1",
+    "license": [
+      "MIT"
+    ],
+    "origin": [
+      "weston"
+    ],
+    "url": [
+      "https://wayland.freedesktop.org/"
+    ],
+    "dependencies": [
+      "so:libEGL.so.1",
+      "so:libGLESv2.so.2",
+      "so:libc.musl-aarch64.so.1",
+      "so:libcairo.so.2",
+      "so:libdrm.so.2",
+      "so:libfontconfig.so.1",
+      "so:libgbm.so.1",
+      "so:libglib-2.0.so.0",
+      "so:libgobject-2.0.so.0",
+      "so:libjpeg.so.8",
+      "so:libpango-1.0.so.0",
+      "so:libpangocairo-1.0.so.0",
+      "so:libpixman-1.so.0",
+      "so:libpng16.so.16",
+      "so:libudev.so.1",
+      "so:libwayland-client.so.0",
+      "so:libwayland-cursor.so.0",
+      "so:libwayland-egl.so.1",
+      "so:libwebp.so.7",
+      "so:libweston-14.so.0",
+      "so:libxkbcommon.so.0"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/community/aarch64/weston-clients-14.0.2-r1.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/community/aarch64/weston-clients-14.0.2-r1.apk"
+    ]
+  },
+  {
+    "name": "xcb-util-wm",
+    "version": "0.4.2-r0",
+    "license": [
+      "MIT"
+    ],
+    "origin": [
+      "xcb-util-wm"
+    ],
+    "url": [
+      "https://xcb.freedesktop.org/"
+    ],
+    "dependencies": [
+      "so:libc.musl-aarch64.so.1",
+      "so:libxcb.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/community/aarch64/xcb-util-wm-0.4.2-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/community/aarch64/xcb-util-wm-0.4.2-r0.apk"
+    ]
+  },
+  {
+    "name": "xkeyboard-config",
+    "version": "2.43-r0",
+    "license": [
+      "MIT"
+    ],
+    "origin": [
+      "xkeyboard-config"
+    ],
+    "url": [
+      "https://gitlab.freedesktop.org/xkeyboard-config/xkeyboard-config"
+    ],
+    "dependencies": [],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/xkeyboard-config-2.43-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/xkeyboard-config-2.43-r0.apk"
+    ]
+  },
+  {
+    "name": "xz-libs",
+    "version": "5.8.4-r0",
+    "license": [
+      "GPL-2.0-or-later AND 0BSD AND Public-Domain AND LGPL-2.1-or-later"
+    ],
+    "origin": [
+      "xz"
+    ],
+    "url": [
+      "https://tukaani.org/xz/"
+    ],
+    "dependencies": [
+      "so:libc.musl-aarch64.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/xz-libs-5.8.4-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/xz-libs-5.8.4-r0.apk"
+    ]
+  },
+  {
+    "name": "yash",
+    "version": "2.58.1-r0",
+    "license": [
+      "GPL-2.0-or-later"
+    ],
+    "origin": [
+      "yash"
+    ],
+    "url": [
+      "https://magicant.github.io/yash/"
+    ],
+    "dependencies": [
+      "busybox",
+      "so:libc.musl-aarch64.so.1",
+      "so:libncursesw.so.6"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/yash-2.58.1-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/yash-2.58.1-r0.apk"
+    ]
+  },
+  {
+    "name": "yash-binsh",
+    "version": "2.58.1-r0",
+    "license": [
+      "GPL-2.0-or-later"
+    ],
+    "origin": [
+      "yash"
+    ],
+    "url": [
+      "https://magicant.github.io/yash/"
+    ],
+    "dependencies": [
+      "busybox",
+      "yash=2.58.1-r0"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/yash-binsh-2.58.1-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/yash-binsh-2.58.1-r0.apk"
+    ]
+  },
+  {
+    "name": "zlib",
+    "version": "1.3.2-r1",
+    "license": [
+      "Zlib"
+    ],
+    "origin": [
+      "zlib"
+    ],
+    "url": [
+      "https://zlib.net/"
+    ],
+    "dependencies": [
+      "so:libc.musl-aarch64.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/zlib-1.3.2-r1.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/zlib-1.3.2-r1.apk"
+    ]
+  },
+  {
+    "name": "zstd-libs",
+    "version": "1.5.7-r0",
+    "license": [
+      "BSD-3-Clause OR GPL-2.0-or-later"
+    ],
+    "origin": [
+      "zstd"
+    ],
+    "url": [
+      "https://facebook.github.io/zstd/"
+    ],
+    "dependencies": [
+      "so:libc.musl-aarch64.so.1"
+    ],
+    "paths": [
+      "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/wayland-acceptance/repository/main/aarch64/zstd-libs-1.5.7-r0.apk",
+      "/Users/main/dev/trames/target/vulkan-guest/wayland-acceptance/repository/main/aarch64/zstd-libs-1.5.7-r0.apk"
+    ]
+  }
+]

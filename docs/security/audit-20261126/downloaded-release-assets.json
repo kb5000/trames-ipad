@@ -1,0 +1,832 @@
+[
+  {
+    "repository": "trames-ipad",
+    "tag": "v1.5.4",
+    "name": "release-acceptance.json",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v1.5.4/release-acceptance.json",
+    "bytes": 23737,
+    "sha256": "3cdbca502103e2ae3fd635bf81aa05ffc50ab3ca822167b5c3b908afa42d23e2",
+    "github_digest": "sha256:3cdbca502103e2ae3fd635bf81aa05ffc50ab3ca822167b5c3b908afa42d23e2",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v1.5.4/release-acceptance.json"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v1.5.4",
+    "name": "release-report.json",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v1.5.4/release-report.json",
+    "bytes": 3503,
+    "sha256": "9dc520b6d11e6d08401b0030147f733791cb77dec6f1aa88d51640bb23a8a0a0",
+    "github_digest": "sha256:9dc520b6d11e6d08401b0030147f733791cb77dec6f1aa88d51640bb23a8a0a0",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v1.5.4/release-report.json"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v1.5.4",
+    "name": "Trames-1.5.4-build49-personal-team.ipa",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v1.5.4/Trames-1.5.4-build49-personal-team.ipa",
+    "bytes": 16709442,
+    "sha256": "112dedf057765b91ade1531e476a585fb824d972d4fa88127c032e5e43888be5",
+    "github_digest": "sha256:112dedf057765b91ade1531e476a585fb824d972d4fa88127c032e5e43888be5",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v1.5.4/Trames-1.5.4-build49-personal-team.ipa"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v1.5.4",
+    "name": "Trames-1.5.4-build49-personal-team.ipa.sha256",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v1.5.4/Trames-1.5.4-build49-personal-team.ipa.sha256",
+    "bytes": 105,
+    "sha256": "46b54d849a940da2e6db61c5feb5022e811c583795dbd5209fa05339abde349e",
+    "github_digest": "sha256:46b54d849a940da2e6db61c5feb5022e811c583795dbd5209fa05339abde349e",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v1.5.4/Trames-1.5.4-build49-personal-team.ipa.sha256"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v1.5.4",
+    "name": "Trames-1.5.4-build49-unsigned.ipa",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v1.5.4/Trames-1.5.4-build49-unsigned.ipa",
+    "bytes": 16586126,
+    "sha256": "d501a60ab67ea6a7294cc0b628e747fe9d072e10ad07c2ff9999970e898a052b",
+    "github_digest": "sha256:d501a60ab67ea6a7294cc0b628e747fe9d072e10ad07c2ff9999970e898a052b",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v1.5.4/Trames-1.5.4-build49-unsigned.ipa"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v1.5.4",
+    "name": "Trames-1.5.4-build49-unsigned.ipa.sha256",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v1.5.4/Trames-1.5.4-build49-unsigned.ipa.sha256",
+    "bytes": 100,
+    "sha256": "d87870dd63a26ddf64a21b636caa9580998ef38460f06d1ec07b10896330770b",
+    "github_digest": "sha256:d87870dd63a26ddf64a21b636caa9580998ef38460f06d1ec07b10896330770b",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v1.5.4/Trames-1.5.4-build49-unsigned.ipa.sha256"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v1.5.4",
+    "name": "Trames-1.5.4-corresponding-source.tar.gz",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v1.5.4/Trames-1.5.4-corresponding-source.tar.gz",
+    "bytes": 81415484,
+    "sha256": "137e27d7a85a9983b2b79493a9c07ab6d0d3e345ca0d4e80067537ff06b91a59",
+    "github_digest": "sha256:137e27d7a85a9983b2b79493a9c07ab6d0d3e345ca0d4e80067537ff06b91a59",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v1.5.4/Trames-1.5.4-corresponding-source.tar.gz"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v1.5.4",
+    "name": "Trames-1.5.4-corresponding-source.tar.gz.sha256",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v1.5.4/Trames-1.5.4-corresponding-source.tar.gz.sha256",
+    "bytes": 107,
+    "sha256": "c674f1990a989cf96b0f9bd31ed98029d251d212f283a3acde8f6960266ddcfe",
+    "github_digest": "sha256:c674f1990a989cf96b0f9bd31ed98029d251d212f283a3acde8f6960266ddcfe",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v1.5.4/Trames-1.5.4-corresponding-source.tar.gz.sha256"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v1.3.0",
+    "name": "build35-verification.json",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v1.3.0/build35-verification.json",
+    "bytes": 1743,
+    "sha256": "127cfe54f4918158eec29eb4432edb0d828c627842844efd95f44fa85baf549f",
+    "github_digest": "sha256:127cfe54f4918158eec29eb4432edb0d828c627842844efd95f44fa85baf549f",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v1.3.0/build35-verification.json"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v1.3.0",
+    "name": "mesa-egl-25.1.9-source.tar.gz",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v1.3.0/mesa-egl-25.1.9-source.tar.gz",
+    "bytes": 47260652,
+    "sha256": "b8c5838307778fdefbf38c2d98fad2f4e3174d630bcbe677756f3be70e5b70ff",
+    "github_digest": "sha256:b8c5838307778fdefbf38c2d98fad2f4e3174d630bcbe677756f3be70e5b70ff",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v1.3.0/mesa-egl-25.1.9-source.tar.gz"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v1.3.0",
+    "name": "musl-hybrid-1.2.5-source.tar.gz",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v1.3.0/musl-hybrid-1.2.5-source.tar.gz",
+    "bytes": 1600750,
+    "sha256": "16be4a115dd55670eb78f3e9aaf17c2046b1fb5baca454824c3f7d10d8d357fa",
+    "github_digest": "sha256:16be4a115dd55670eb78f3e9aaf17c2046b1fb5baca454824c3f7d10d8d357fa",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v1.3.0/musl-hybrid-1.2.5-source.tar.gz"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v1.3.0",
+    "name": "SHA256SUMS",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v1.3.0/SHA256SUMS",
+    "bytes": 784,
+    "sha256": "fa6986b6f036fc5febad7730d5da9f18cd5e28e399fd1aecded99b77ab79b4af",
+    "github_digest": "sha256:fa6986b6f036fc5febad7730d5da9f18cd5e28e399fd1aecded99b77ab79b4af",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v1.3.0/SHA256SUMS"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v1.3.0",
+    "name": "Trames-1.3.0-build35-source.tar.gz",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v1.3.0/Trames-1.3.0-build35-source.tar.gz",
+    "bytes": 1913484,
+    "sha256": "2c1508c5ba968f6a4c516e411755592ccac656c1d60bb6af870eac1d635cc495",
+    "github_digest": "sha256:2c1508c5ba968f6a4c516e411755592ccac656c1d60bb6af870eac1d635cc495",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v1.3.0/Trames-1.3.0-build35-source.tar.gz"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v1.3.0",
+    "name": "Trames-1.3.0-build35-unsigned.ipa",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v1.3.0/Trames-1.3.0-build35-unsigned.ipa",
+    "bytes": 12769200,
+    "sha256": "beb454f591719644f073c195148438a9c01d49aca67830971ebc7f3756ae466c",
+    "github_digest": "sha256:beb454f591719644f073c195148438a9c01d49aca67830971ebc7f3756ae466c",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v1.3.0/Trames-1.3.0-build35-unsigned.ipa"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v1.3.0",
+    "name": "vulkan-native-upstream-source.tar.gz",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v1.3.0/vulkan-native-upstream-source.tar.gz",
+    "bytes": 14289242,
+    "sha256": "88349a00a9460c56b04093eccf8bb26d24bc0a1701d9ca10bb6c9775321ab85c",
+    "github_digest": "sha256:88349a00a9460c56b04093eccf8bb26d24bc0a1701d9ca10bb6c9775321ab85c",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v1.3.0/vulkan-native-upstream-source.tar.gz"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v1.3.0",
+    "name": "xwayland-launcher-source.tar.gz",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v1.3.0/xwayland-launcher-source.tar.gz",
+    "bytes": 13536,
+    "sha256": "2e3e8e02a419b4914396ee27ec88d685eadb30bf02064d128e3528cd1cbf80d9",
+    "github_digest": "sha256:2e3e8e02a419b4914396ee27ec88d685eadb30bf02064d128e3528cd1cbf80d9",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v1.3.0/xwayland-launcher-source.tar.gz"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v1.3.0",
+    "name": "xwayland-native-source.tar.gz",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v1.3.0/xwayland-native-source.tar.gz",
+    "bytes": 1333483,
+    "sha256": "0273f596da5c73748ffec090782157b972305a316881a77f2c0875100e9f664c",
+    "github_digest": "sha256:0273f596da5c73748ffec090782157b972305a316881a77f2c0875100e9f664c",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v1.3.0/xwayland-native-source.tar.gz"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v1.2.0",
+    "name": "mesa-egl-25.1.9-source.tar.gz",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v1.2.0/mesa-egl-25.1.9-source.tar.gz",
+    "bytes": 47259997,
+    "sha256": "99b9a12777fa541fde0b3745dfa174fb05cdf9d398862d13581c84c1a197ad84",
+    "github_digest": "sha256:99b9a12777fa541fde0b3745dfa174fb05cdf9d398862d13581c84c1a197ad84",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v1.2.0/mesa-egl-25.1.9-source.tar.gz"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v1.2.0",
+    "name": "musl-hybrid-1.2.5-source.tar.gz",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v1.2.0/musl-hybrid-1.2.5-source.tar.gz",
+    "bytes": 1600750,
+    "sha256": "16be4a115dd55670eb78f3e9aaf17c2046b1fb5baca454824c3f7d10d8d357fa",
+    "github_digest": "sha256:16be4a115dd55670eb78f3e9aaf17c2046b1fb5baca454824c3f7d10d8d357fa",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v1.2.0/musl-hybrid-1.2.5-source.tar.gz"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v1.2.0",
+    "name": "Trames-1.2.0-build33-unsigned.ipa",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v1.2.0/Trames-1.2.0-build33-unsigned.ipa",
+    "bytes": 11159672,
+    "sha256": "c46f6a49f7ee66f8b6397b2b2530edff4062ad71b2f9dde183dd0c9013f47bb1",
+    "github_digest": "sha256:c46f6a49f7ee66f8b6397b2b2530edff4062ad71b2f9dde183dd0c9013f47bb1",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v1.2.0/Trames-1.2.0-build33-unsigned.ipa"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v1.2.0",
+    "name": "Trames-1.2.0-build33-unsigned.ipa.sha256",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v1.2.0/Trames-1.2.0-build33-unsigned.ipa.sha256",
+    "bytes": 100,
+    "sha256": "871ed581fb5d951cc8a0bc33f9372faa33faeb6bce1a10b7c0e49b1eb03fa994",
+    "github_digest": "sha256:871ed581fb5d951cc8a0bc33f9372faa33faeb6bce1a10b7c0e49b1eb03fa994",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v1.2.0/Trames-1.2.0-build33-unsigned.ipa.sha256"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v1.2.0",
+    "name": "Trames-1.2.0-source.tar.gz",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v1.2.0/Trames-1.2.0-source.tar.gz",
+    "bytes": 4068338,
+    "sha256": "0b1e562dc38305ee3d78133cec32c157e85f8d5e9fc827fc918c019d458a0a26",
+    "github_digest": "sha256:0b1e562dc38305ee3d78133cec32c157e85f8d5e9fc827fc918c019d458a0a26",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v1.2.0/Trames-1.2.0-source.tar.gz"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v1.2.0",
+    "name": "Trames-1.2.0-verification.json",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v1.2.0/Trames-1.2.0-verification.json",
+    "bytes": 4172,
+    "sha256": "8186fdbc01bc4ee5d9c1e632d5275ec9d44ccd0d2a885771998293a566471284",
+    "github_digest": "sha256:8186fdbc01bc4ee5d9c1e632d5275ec9d44ccd0d2a885771998293a566471284",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v1.2.0/Trames-1.2.0-verification.json"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v1.2.0",
+    "name": "vulkan-native-upstream-source.tar.gz",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v1.2.0/vulkan-native-upstream-source.tar.gz",
+    "bytes": 14257361,
+    "sha256": "84ee0d1b3eba9debaa2cc44e5ee81cc66c72e0d07e45b5a52ab7fb67b75bf401",
+    "github_digest": "sha256:84ee0d1b3eba9debaa2cc44e5ee81cc66c72e0d07e45b5a52ab7fb67b75bf401",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v1.2.0/vulkan-native-upstream-source.tar.gz"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v1.1.0",
+    "name": "musl-hybrid-1.2.5-source.tar.gz",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v1.1.0/musl-hybrid-1.2.5-source.tar.gz",
+    "bytes": 1600750,
+    "sha256": "16be4a115dd55670eb78f3e9aaf17c2046b1fb5baca454824c3f7d10d8d357fa",
+    "github_digest": "sha256:16be4a115dd55670eb78f3e9aaf17c2046b1fb5baca454824c3f7d10d8d357fa",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v1.1.0/musl-hybrid-1.2.5-source.tar.gz"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v1.1.0",
+    "name": "Trames-1.1.0-build32-unsigned.ipa",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v1.1.0/Trames-1.1.0-build32-unsigned.ipa",
+    "bytes": 10962236,
+    "sha256": "e6c4c5da9aee9f10fcc65dfb173b9593a2cf3858ad1447b66e71ce091acc3f94",
+    "github_digest": "sha256:e6c4c5da9aee9f10fcc65dfb173b9593a2cf3858ad1447b66e71ce091acc3f94",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v1.1.0/Trames-1.1.0-build32-unsigned.ipa"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v1.1.0",
+    "name": "Trames-1.1.0-build32-unsigned.ipa.sha256",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v1.1.0/Trames-1.1.0-build32-unsigned.ipa.sha256",
+    "bytes": 100,
+    "sha256": "9bbc0cc9fb7184631ab9ba350f63dd5d7e7bfe81e69fd8eff73a11f2325904e1",
+    "github_digest": "sha256:9bbc0cc9fb7184631ab9ba350f63dd5d7e7bfe81e69fd8eff73a11f2325904e1",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v1.1.0/Trames-1.1.0-build32-unsigned.ipa.sha256"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v1.1.0",
+    "name": "Trames-1.1.0-source.tar.gz",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v1.1.0/Trames-1.1.0-source.tar.gz",
+    "bytes": 3619572,
+    "sha256": "451deac7dc32787ffc061591c857e24a9d9533f52655ec07810cb8c2423f5571",
+    "github_digest": "sha256:451deac7dc32787ffc061591c857e24a9d9533f52655ec07810cb8c2423f5571",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v1.1.0/Trames-1.1.0-source.tar.gz"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v1.1.0",
+    "name": "Trames-1.1.0-verification.json",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v1.1.0/Trames-1.1.0-verification.json",
+    "bytes": 3792,
+    "sha256": "a0c4efa9aa11944b06c1258660a9989489b1fcf3a9eaefb4f1620e551e31f331",
+    "github_digest": "sha256:a0c4efa9aa11944b06c1258660a9989489b1fcf3a9eaefb4f1620e551e31f331",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v1.1.0/Trames-1.1.0-verification.json"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v1.1.0",
+    "name": "vulkan-native-upstream-source.tar.gz",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v1.1.0/vulkan-native-upstream-source.tar.gz",
+    "bytes": 14257361,
+    "sha256": "84ee0d1b3eba9debaa2cc44e5ee81cc66c72e0d07e45b5a52ab7fb67b75bf401",
+    "github_digest": "sha256:84ee0d1b3eba9debaa2cc44e5ee81cc66c72e0d07e45b5a52ab7fb67b75bf401",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v1.1.0/vulkan-native-upstream-source.tar.gz"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v1.0.0",
+    "name": "musl-hybrid-1.2.5-source.tar.gz",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v1.0.0/musl-hybrid-1.2.5-source.tar.gz",
+    "bytes": 1600750,
+    "sha256": "16be4a115dd55670eb78f3e9aaf17c2046b1fb5baca454824c3f7d10d8d357fa",
+    "github_digest": "sha256:16be4a115dd55670eb78f3e9aaf17c2046b1fb5baca454824c3f7d10d8d357fa",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v1.0.0/musl-hybrid-1.2.5-source.tar.gz"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v1.0.0",
+    "name": "Trames-1.0.0-build26-unsigned.ipa",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v1.0.0/Trames-1.0.0-build26-unsigned.ipa",
+    "bytes": 10607498,
+    "sha256": "264df460a1b224a7e0570c43d1fa78de745b18ea7a6824c2aeed635e6cfda754",
+    "github_digest": "sha256:264df460a1b224a7e0570c43d1fa78de745b18ea7a6824c2aeed635e6cfda754",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v1.0.0/Trames-1.0.0-build26-unsigned.ipa"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v1.0.0",
+    "name": "Trames-1.0.0-build26-unsigned.ipa.sha256",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v1.0.0/Trames-1.0.0-build26-unsigned.ipa.sha256",
+    "bytes": 100,
+    "sha256": "181100755686f1045a785435b1306709ddb6d8b81a43c1868c7f24e3bb3b27fb",
+    "github_digest": "sha256:181100755686f1045a785435b1306709ddb6d8b81a43c1868c7f24e3bb3b27fb",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v1.0.0/Trames-1.0.0-build26-unsigned.ipa.sha256"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v1.0.0",
+    "name": "Trames-1.0.0-simulator.json",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v1.0.0/Trames-1.0.0-simulator.json",
+    "bytes": 1152,
+    "sha256": "fd384199c8fe96262a32dc0eeea2dc9049e001272dc246e3960352ed38587ec0",
+    "github_digest": "sha256:fd384199c8fe96262a32dc0eeea2dc9049e001272dc246e3960352ed38587ec0",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v1.0.0/Trames-1.0.0-simulator.json"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v1.0.0",
+    "name": "Trames-1.0.0-verification.json",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v1.0.0/Trames-1.0.0-verification.json",
+    "bytes": 4855,
+    "sha256": "8be431ab7ada572df88a0f180c7450e8c2d145c783358fe731ba22300e05cc7c",
+    "github_digest": "sha256:8be431ab7ada572df88a0f180c7450e8c2d145c783358fe731ba22300e05cc7c",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v1.0.0/Trames-1.0.0-verification.json"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v1.0.0",
+    "name": "vulkan-native-upstream-source.tar.gz",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v1.0.0/vulkan-native-upstream-source.tar.gz",
+    "bytes": 14257361,
+    "sha256": "84ee0d1b3eba9debaa2cc44e5ee81cc66c72e0d07e45b5a52ab7fb67b75bf401",
+    "github_digest": "sha256:84ee0d1b3eba9debaa2cc44e5ee81cc66c72e0d07e45b5a52ab7fb67b75bf401",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v1.0.0/vulkan-native-upstream-source.tar.gz"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v0.17.0",
+    "name": "musl-hybrid-1.2.5-source.tar.gz",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v0.17.0/musl-hybrid-1.2.5-source.tar.gz",
+    "bytes": 1600751,
+    "sha256": "17f12be2dea8e2ebb56909960fbbf5d6feb929ebd9023270c59062331876d5ad",
+    "github_digest": "sha256:17f12be2dea8e2ebb56909960fbbf5d6feb929ebd9023270c59062331876d5ad",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v0.17.0/musl-hybrid-1.2.5-source.tar.gz"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v0.17.0",
+    "name": "Trames-0.17.0-build19-unsigned.ipa",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v0.17.0/Trames-0.17.0-build19-unsigned.ipa",
+    "bytes": 14164730,
+    "sha256": "c2cbb3eed53209fc911148852afa642feebb2c43498fada6e90edf4f268fc3a2",
+    "github_digest": "sha256:c2cbb3eed53209fc911148852afa642feebb2c43498fada6e90edf4f268fc3a2",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v0.17.0/Trames-0.17.0-build19-unsigned.ipa"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v0.17.0",
+    "name": "Trames-0.17.0-build19-unsigned.ipa.sha256",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v0.17.0/Trames-0.17.0-build19-unsigned.ipa.sha256",
+    "bytes": 101,
+    "sha256": "0a09c1e419148a8d9b38f592141b715349e5c4160c4f930ffc07c9d6691f48a5",
+    "github_digest": "sha256:0a09c1e419148a8d9b38f592141b715349e5c4160c4f930ffc07c9d6691f48a5",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v0.17.0/Trames-0.17.0-build19-unsigned.ipa.sha256"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v0.17.0",
+    "name": "Trames-0.17.0-simulator.json",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v0.17.0/Trames-0.17.0-simulator.json",
+    "bytes": 1137,
+    "sha256": "90f05cfc9edff8d5d0cb134457d8e23f0bef31b14633b30212ce7b2272a1bd30",
+    "github_digest": "sha256:90f05cfc9edff8d5d0cb134457d8e23f0bef31b14633b30212ce7b2272a1bd30",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v0.17.0/Trames-0.17.0-simulator.json"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v0.17.0",
+    "name": "Trames-0.17.0-verification.json",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v0.17.0/Trames-0.17.0-verification.json",
+    "bytes": 3387,
+    "sha256": "671e074c259325ad549e4d14ff37dc9988ed67deec238f5244d562bf916531da",
+    "github_digest": "sha256:671e074c259325ad549e4d14ff37dc9988ed67deec238f5244d562bf916531da",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v0.17.0/Trames-0.17.0-verification.json"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v0.17.0",
+    "name": "Trames-0.17.0-workspace.json",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v0.17.0/Trames-0.17.0-workspace.json",
+    "bytes": 943,
+    "sha256": "b3b3b991a7b9aecbfc7dea52bfeb69792755719649998f79913778ee71974474",
+    "github_digest": "sha256:b3b3b991a7b9aecbfc7dea52bfeb69792755719649998f79913778ee71974474",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v0.17.0/Trames-0.17.0-workspace.json"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v0.17.0",
+    "name": "vulkan-native-upstream-source.tar.gz",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v0.17.0/vulkan-native-upstream-source.tar.gz",
+    "bytes": 14257385,
+    "sha256": "c24836fcbb9c463f40f6e777f12d518fdaa49e2a8fd0cc255533bd5f630634d7",
+    "github_digest": "sha256:c24836fcbb9c463f40f6e777f12d518fdaa49e2a8fd0cc255533bd5f630634d7",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v0.17.0/vulkan-native-upstream-source.tar.gz"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v0.16.0",
+    "name": "musl-hybrid-1.2.5-source.tar.gz",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v0.16.0/musl-hybrid-1.2.5-source.tar.gz",
+    "bytes": 1600752,
+    "sha256": "38fc839c850bb38d4fc58c750d91e12735b3fb17bd1e7a0a1722463f2a444787",
+    "github_digest": "sha256:38fc839c850bb38d4fc58c750d91e12735b3fb17bd1e7a0a1722463f2a444787",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v0.16.0/musl-hybrid-1.2.5-source.tar.gz"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v0.16.0",
+    "name": "Trames-0.16.0-build17-unsigned.ipa",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v0.16.0/Trames-0.16.0-build17-unsigned.ipa",
+    "bytes": 13457636,
+    "sha256": "e8c62938ab8135cae6b0df0595cc928cf8bba50cb1500f52040c116fdc1b11e5",
+    "github_digest": "sha256:e8c62938ab8135cae6b0df0595cc928cf8bba50cb1500f52040c116fdc1b11e5",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v0.16.0/Trames-0.16.0-build17-unsigned.ipa"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v0.16.0",
+    "name": "Trames-0.16.0-build17-unsigned.ipa.sha256",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v0.16.0/Trames-0.16.0-build17-unsigned.ipa.sha256",
+    "bytes": 101,
+    "sha256": "8807d16e25099e7dba3d7217c6618042a6ec937beeaea0ca231284862e3ca389",
+    "github_digest": "sha256:8807d16e25099e7dba3d7217c6618042a6ec937beeaea0ca231284862e3ca389",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v0.16.0/Trames-0.16.0-build17-unsigned.ipa.sha256"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v0.16.0",
+    "name": "Trames-0.16.0-simulator.json",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v0.16.0/Trames-0.16.0-simulator.json",
+    "bytes": 945,
+    "sha256": "ab7146b4680921ae67ae48e5ce55a4d6350ce61729a228d71cd3c3b42329d5f3",
+    "github_digest": "sha256:ab7146b4680921ae67ae48e5ce55a4d6350ce61729a228d71cd3c3b42329d5f3",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v0.16.0/Trames-0.16.0-simulator.json"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v0.16.0",
+    "name": "Trames-0.16.0-verification.json",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v0.16.0/Trames-0.16.0-verification.json",
+    "bytes": 2706,
+    "sha256": "4126cffa4dc49a05d8ecca1a6631186ab583191533e042e48e8e8f83351c27d9",
+    "github_digest": "sha256:4126cffa4dc49a05d8ecca1a6631186ab583191533e042e48e8e8f83351c27d9",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v0.16.0/Trames-0.16.0-verification.json"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v0.16.0",
+    "name": "vulkan-native-upstream-source.tar.gz",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v0.16.0/vulkan-native-upstream-source.tar.gz",
+    "bytes": 14257365,
+    "sha256": "3e7e012c5e7b35b240f1b243e8ed1f0089ab6737f08224c5140ff38d82672fbe",
+    "github_digest": "sha256:3e7e012c5e7b35b240f1b243e8ed1f0089ab6737f08224c5140ff38d82672fbe",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v0.16.0/vulkan-native-upstream-source.tar.gz"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v0.15.0",
+    "name": "musl-hybrid-1.2.5-source.tar.gz",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v0.15.0/musl-hybrid-1.2.5-source.tar.gz",
+    "bytes": 1600749,
+    "sha256": "09de8289d748d60bd9fb62094c6fa874f87a4ab77206e9090bb931848e1d3022",
+    "github_digest": "sha256:09de8289d748d60bd9fb62094c6fa874f87a4ab77206e9090bb931848e1d3022",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v0.15.0/musl-hybrid-1.2.5-source.tar.gz"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v0.15.0",
+    "name": "Trames-0.15.0-build16-unsigned.ipa",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v0.15.0/Trames-0.15.0-build16-unsigned.ipa",
+    "bytes": 16741917,
+    "sha256": "c83b44142042c90d277d01d750d6360e03160694e3f30dcf8e1c1d19063c8d67",
+    "github_digest": "sha256:c83b44142042c90d277d01d750d6360e03160694e3f30dcf8e1c1d19063c8d67",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v0.15.0/Trames-0.15.0-build16-unsigned.ipa"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v0.15.0",
+    "name": "Trames-0.15.0-build16-unsigned.ipa.sha256",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v0.15.0/Trames-0.15.0-build16-unsigned.ipa.sha256",
+    "bytes": 101,
+    "sha256": "410742ac12425a21bc73944bbe314601e74e29bb3a59cc4fffe59a82d98ee4cc",
+    "github_digest": "sha256:410742ac12425a21bc73944bbe314601e74e29bb3a59cc4fffe59a82d98ee4cc",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v0.15.0/Trames-0.15.0-build16-unsigned.ipa.sha256"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v0.15.0",
+    "name": "Trames-0.15.0-simulator.json",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v0.15.0/Trames-0.15.0-simulator.json",
+    "bytes": 946,
+    "sha256": "6cefd42b97d9d9f268add4d84d35388c4194a948981f3ee6efd89957f9ef18d8",
+    "github_digest": "sha256:6cefd42b97d9d9f268add4d84d35388c4194a948981f3ee6efd89957f9ef18d8",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v0.15.0/Trames-0.15.0-simulator.json"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v0.15.0",
+    "name": "Trames-0.15.0-verification.json",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v0.15.0/Trames-0.15.0-verification.json",
+    "bytes": 2739,
+    "sha256": "8ae960ba472f2fef9c183f76900cb66d8c916e173a9c573e574a85c710a9a8dd",
+    "github_digest": "sha256:8ae960ba472f2fef9c183f76900cb66d8c916e173a9c573e574a85c710a9a8dd",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v0.15.0/Trames-0.15.0-verification.json"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v0.15.0",
+    "name": "vulkan-native-upstream-source.tar.gz",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v0.15.0/vulkan-native-upstream-source.tar.gz",
+    "bytes": 14257374,
+    "sha256": "3a78489fc280acc1e354b6ff50f1e2f21c7f536edff153522eb8bfaedb8d985a",
+    "github_digest": "sha256:3a78489fc280acc1e354b6ff50f1e2f21c7f536edff153522eb8bfaedb8d985a",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v0.15.0/vulkan-native-upstream-source.tar.gz"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v0.14.0",
+    "name": "musl-hybrid-1.2.5-source.tar.gz",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v0.14.0/musl-hybrid-1.2.5-source.tar.gz",
+    "bytes": 1600748,
+    "sha256": "d15fea8c8a2a8e20c561d5232a33d7410b44ec7f1de5b8b493275af9a96c78e3",
+    "github_digest": "sha256:d15fea8c8a2a8e20c561d5232a33d7410b44ec7f1de5b8b493275af9a96c78e3",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v0.14.0/musl-hybrid-1.2.5-source.tar.gz"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v0.14.0",
+    "name": "Trames-0.14.0-build15-unsigned.ipa",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v0.14.0/Trames-0.14.0-build15-unsigned.ipa",
+    "bytes": 10171287,
+    "sha256": "6c4dd9e055639f52405b30f10a16b961a08fba6e97d2b439009e094c2b335681",
+    "github_digest": "sha256:6c4dd9e055639f52405b30f10a16b961a08fba6e97d2b439009e094c2b335681",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v0.14.0/Trames-0.14.0-build15-unsigned.ipa"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v0.14.0",
+    "name": "Trames-0.14.0-build15-unsigned.ipa.sha256",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v0.14.0/Trames-0.14.0-build15-unsigned.ipa.sha256",
+    "bytes": 101,
+    "sha256": "29193318d920225734eeac7de61ebc4dac2753e5b622ec6a1c871eaca8367ed6",
+    "github_digest": "sha256:29193318d920225734eeac7de61ebc4dac2753e5b622ec6a1c871eaca8367ed6",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v0.14.0/Trames-0.14.0-build15-unsigned.ipa.sha256"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v0.14.0",
+    "name": "Trames-0.14.0-simulator.json",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v0.14.0/Trames-0.14.0-simulator.json",
+    "bytes": 943,
+    "sha256": "bb576231331c512fdd25dd4b12389ccf0d578af55c382af01cccf4554ad4a5ab",
+    "github_digest": "sha256:bb576231331c512fdd25dd4b12389ccf0d578af55c382af01cccf4554ad4a5ab",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v0.14.0/Trames-0.14.0-simulator.json"
+  },
+  {
+    "repository": "trames-ipad",
+    "tag": "v0.14.0",
+    "name": "Trames-0.14.0-verification.json",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-ipad/v0.14.0/Trames-0.14.0-verification.json",
+    "bytes": 1943,
+    "sha256": "6d0859e9dac80f2fa014a653103f240bb1939fa7f88a35029b0b131112c88fd9",
+    "github_digest": "sha256:6d0859e9dac80f2fa014a653103f240bb1939fa7f88a35029b0b131112c88fd9",
+    "url": "https://github.com/project-trames/trames-ipad/releases/download/v0.14.0/Trames-0.14.0-verification.json"
+  },
+  {
+    "repository": "trames-mac",
+    "tag": "v1.5.4",
+    "name": "release-acceptance.json",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-mac/v1.5.4/release-acceptance.json",
+    "bytes": 23737,
+    "sha256": "3cdbca502103e2ae3fd635bf81aa05ffc50ab3ca822167b5c3b908afa42d23e2",
+    "github_digest": "sha256:3cdbca502103e2ae3fd635bf81aa05ffc50ab3ca822167b5c3b908afa42d23e2",
+    "url": "https://github.com/project-trames/trames-mac/releases/download/v1.5.4/release-acceptance.json"
+  },
+  {
+    "repository": "trames-mac",
+    "tag": "v1.5.4",
+    "name": "release-report.json",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-mac/v1.5.4/release-report.json",
+    "bytes": 3503,
+    "sha256": "9dc520b6d11e6d08401b0030147f733791cb77dec6f1aa88d51640bb23a8a0a0",
+    "github_digest": "sha256:9dc520b6d11e6d08401b0030147f733791cb77dec6f1aa88d51640bb23a8a0a0",
+    "url": "https://github.com/project-trames/trames-mac/releases/download/v1.5.4/release-report.json"
+  },
+  {
+    "repository": "trames-mac",
+    "tag": "v1.5.4",
+    "name": "Trames-1.5.4-mac-arm64-unnotarized.zip",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-mac/v1.5.4/Trames-1.5.4-mac-arm64-unnotarized.zip",
+    "bytes": 38586756,
+    "sha256": "6def28d553b1c7bb39244aee6be0c4213a829f89286b92a4307e0405ad6389c9",
+    "github_digest": "sha256:6def28d553b1c7bb39244aee6be0c4213a829f89286b92a4307e0405ad6389c9",
+    "url": "https://github.com/project-trames/trames-mac/releases/download/v1.5.4/Trames-1.5.4-mac-arm64-unnotarized.zip"
+  },
+  {
+    "repository": "trames-mac",
+    "tag": "v1.5.4",
+    "name": "Trames-1.5.4-mac-arm64-unnotarized.zip.sha256",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-mac/v1.5.4/Trames-1.5.4-mac-arm64-unnotarized.zip.sha256",
+    "bytes": 105,
+    "sha256": "63153874e52c6f3570f69b004f046a98e6974b5fa65c14f3f77b0245ae6ebf44",
+    "github_digest": "sha256:63153874e52c6f3570f69b004f046a98e6974b5fa65c14f3f77b0245ae6ebf44",
+    "url": "https://github.com/project-trames/trames-mac/releases/download/v1.5.4/Trames-1.5.4-mac-arm64-unnotarized.zip.sha256"
+  },
+  {
+    "repository": "trames-mac",
+    "tag": "v1.5.4",
+    "name": "Trames-Dev-1.5.4-mac-arm64-unnotarized.zip",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-mac/v1.5.4/Trames-Dev-1.5.4-mac-arm64-unnotarized.zip",
+    "bytes": 38587613,
+    "sha256": "c36cd55b653497cf3bc34d044740abb1a740407a5c313226ad15ff2ed8590833",
+    "github_digest": "sha256:c36cd55b653497cf3bc34d044740abb1a740407a5c313226ad15ff2ed8590833",
+    "url": "https://github.com/project-trames/trames-mac/releases/download/v1.5.4/Trames-Dev-1.5.4-mac-arm64-unnotarized.zip"
+  },
+  {
+    "repository": "trames-mac",
+    "tag": "v1.5.4",
+    "name": "Trames-Dev-1.5.4-mac-arm64-unnotarized.zip.sha256",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-mac/v1.5.4/Trames-Dev-1.5.4-mac-arm64-unnotarized.zip.sha256",
+    "bytes": 109,
+    "sha256": "fe63a619666c8d37a9554ba7cdbf22a04e9af2399b7e3a813a1a0fe383b72d52",
+    "github_digest": "sha256:fe63a619666c8d37a9554ba7cdbf22a04e9af2399b7e3a813a1a0fe383b72d52",
+    "url": "https://github.com/project-trames/trames-mac/releases/download/v1.5.4/Trames-Dev-1.5.4-mac-arm64-unnotarized.zip.sha256"
+  },
+  {
+    "repository": "trames-mac",
+    "tag": "v1.5.3",
+    "name": "release-report.json",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-mac/v1.5.3/release-report.json",
+    "bytes": 954,
+    "sha256": "152c5c288c3d152fe01deb169af46dd819599d5b30935d735a29fa3e330f2be9",
+    "github_digest": "sha256:152c5c288c3d152fe01deb169af46dd819599d5b30935d735a29fa3e330f2be9",
+    "url": "https://github.com/project-trames/trames-mac/releases/download/v1.5.3/release-report.json"
+  },
+  {
+    "repository": "trames-mac",
+    "tag": "v1.5.3",
+    "name": "Trames-1.5.3-mac-arm64-unnotarized.zip",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-mac/v1.5.3/Trames-1.5.3-mac-arm64-unnotarized.zip",
+    "bytes": 26606502,
+    "sha256": "aff6db41af62766fa15726ebf0549186d10cded3df393575c283594c53bb7b8b",
+    "github_digest": "sha256:aff6db41af62766fa15726ebf0549186d10cded3df393575c283594c53bb7b8b",
+    "url": "https://github.com/project-trames/trames-mac/releases/download/v1.5.3/Trames-1.5.3-mac-arm64-unnotarized.zip"
+  },
+  {
+    "repository": "trames-mac",
+    "tag": "v1.5.3",
+    "name": "Trames-1.5.3-mac-arm64-unnotarized.zip.sha256",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-mac/v1.5.3/Trames-1.5.3-mac-arm64-unnotarized.zip.sha256",
+    "bytes": 105,
+    "sha256": "3747b1a66bbcd7c624f0d86780d4f3121fbb725286614075075e14b1146ca607",
+    "github_digest": "sha256:3747b1a66bbcd7c624f0d86780d4f3121fbb725286614075075e14b1146ca607",
+    "url": "https://github.com/project-trames/trames-mac/releases/download/v1.5.3/Trames-1.5.3-mac-arm64-unnotarized.zip.sha256"
+  },
+  {
+    "repository": "trames-mac",
+    "tag": "v1.5.3",
+    "name": "Trames-Dev-1.5.3-mac-arm64-unnotarized.zip",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-mac/v1.5.3/Trames-Dev-1.5.3-mac-arm64-unnotarized.zip",
+    "bytes": 26607327,
+    "sha256": "0097ae7fd8c6db4c13986c884cfe125960764cd3735e1dcd92857a62a4d5a3fe",
+    "github_digest": "sha256:0097ae7fd8c6db4c13986c884cfe125960764cd3735e1dcd92857a62a4d5a3fe",
+    "url": "https://github.com/project-trames/trames-mac/releases/download/v1.5.3/Trames-Dev-1.5.3-mac-arm64-unnotarized.zip"
+  },
+  {
+    "repository": "trames-mac",
+    "tag": "v1.5.3",
+    "name": "Trames-Dev-1.5.3-mac-arm64-unnotarized.zip.sha256",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-mac/v1.5.3/Trames-Dev-1.5.3-mac-arm64-unnotarized.zip.sha256",
+    "bytes": 109,
+    "sha256": "87685e4c86f1a1cc1933a27f9eb0c12858002f8a4c5acc01457f86d17e688c48",
+    "github_digest": "sha256:87685e4c86f1a1cc1933a27f9eb0c12858002f8a4c5acc01457f86d17e688c48",
+    "url": "https://github.com/project-trames/trames-mac/releases/download/v1.5.3/Trames-Dev-1.5.3-mac-arm64-unnotarized.zip.sha256"
+  },
+  {
+    "repository": "trames-mac",
+    "tag": "v1.5.2",
+    "name": "Trames-1.5.2-mac-arm64-unnotarized.zip",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-mac/v1.5.2/Trames-1.5.2-mac-arm64-unnotarized.zip",
+    "bytes": 26603859,
+    "sha256": "94cc326ec659e3485cddc35b353693733b49bd281389f1468c9d0a5faa8606b0",
+    "github_digest": "sha256:94cc326ec659e3485cddc35b353693733b49bd281389f1468c9d0a5faa8606b0",
+    "url": "https://github.com/project-trames/trames-mac/releases/download/v1.5.2/Trames-1.5.2-mac-arm64-unnotarized.zip"
+  },
+  {
+    "repository": "trames-mac",
+    "tag": "v1.5.2",
+    "name": "Trames-1.5.2-mac-arm64-unnotarized.zip.sha256",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-mac/v1.5.2/Trames-1.5.2-mac-arm64-unnotarized.zip.sha256",
+    "bytes": 105,
+    "sha256": "7328e7b0958d56245bb35e02c54a872f64e868ccbb7b56c79e07c93b91de8f08",
+    "github_digest": "sha256:7328e7b0958d56245bb35e02c54a872f64e868ccbb7b56c79e07c93b91de8f08",
+    "url": "https://github.com/project-trames/trames-mac/releases/download/v1.5.2/Trames-1.5.2-mac-arm64-unnotarized.zip.sha256"
+  },
+  {
+    "repository": "trames-mac",
+    "tag": "v1.5.2",
+    "name": "Trames-Dev-1.5.2-mac-arm64-unnotarized.zip",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-mac/v1.5.2/Trames-Dev-1.5.2-mac-arm64-unnotarized.zip",
+    "bytes": 26604655,
+    "sha256": "9b4cb8ca070c6f9fed19e8e3d6522d37c0fec1d264d6ded51da7dd9f1398d78e",
+    "github_digest": "sha256:9b4cb8ca070c6f9fed19e8e3d6522d37c0fec1d264d6ded51da7dd9f1398d78e",
+    "url": "https://github.com/project-trames/trames-mac/releases/download/v1.5.2/Trames-Dev-1.5.2-mac-arm64-unnotarized.zip"
+  },
+  {
+    "repository": "trames-mac",
+    "tag": "v1.5.2",
+    "name": "Trames-Dev-1.5.2-mac-arm64-unnotarized.zip.sha256",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-mac/v1.5.2/Trames-Dev-1.5.2-mac-arm64-unnotarized.zip.sha256",
+    "bytes": 109,
+    "sha256": "3567165fb64941d92af43ff0606a4b9baaa297f6058486621d3ec366966b8b40",
+    "github_digest": "sha256:3567165fb64941d92af43ff0606a4b9baaa297f6058486621d3ec366966b8b40",
+    "url": "https://github.com/project-trames/trames-mac/releases/download/v1.5.2/Trames-Dev-1.5.2-mac-arm64-unnotarized.zip.sha256"
+  },
+  {
+    "repository": "trames-mac",
+    "tag": "v1.5.1",
+    "name": "Trames-1.5.1-mac-arm64-unnotarized.zip",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-mac/v1.5.1/Trames-1.5.1-mac-arm64-unnotarized.zip",
+    "bytes": 26506689,
+    "sha256": "bbbf42a8d6114805fc14b566db5def88cd8c166e99faf325aefe070b795db297",
+    "github_digest": "sha256:bbbf42a8d6114805fc14b566db5def88cd8c166e99faf325aefe070b795db297",
+    "url": "https://github.com/project-trames/trames-mac/releases/download/v1.5.1/Trames-1.5.1-mac-arm64-unnotarized.zip"
+  },
+  {
+    "repository": "trames-mac",
+    "tag": "v1.5.1",
+    "name": "Trames-1.5.1-mac-arm64-unnotarized.zip.sha256",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-mac/v1.5.1/Trames-1.5.1-mac-arm64-unnotarized.zip.sha256",
+    "bytes": 105,
+    "sha256": "f9c2e172f480ffa724ca2136100419b6f1bae3f20e5417d63b104f2a34e58a97",
+    "github_digest": "sha256:f9c2e172f480ffa724ca2136100419b6f1bae3f20e5417d63b104f2a34e58a97",
+    "url": "https://github.com/project-trames/trames-mac/releases/download/v1.5.1/Trames-1.5.1-mac-arm64-unnotarized.zip.sha256"
+  },
+  {
+    "repository": "trames-mac",
+    "tag": "v1.5.1",
+    "name": "Trames-Dev-1.5.1-mac-arm64-unnotarized.zip",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-mac/v1.5.1/Trames-Dev-1.5.1-mac-arm64-unnotarized.zip",
+    "bytes": 26507530,
+    "sha256": "1712c4c01ce415144b8dfd4822e10295cad00a931dcd8dd9d7e1806765215b20",
+    "github_digest": "sha256:1712c4c01ce415144b8dfd4822e10295cad00a931dcd8dd9d7e1806765215b20",
+    "url": "https://github.com/project-trames/trames-mac/releases/download/v1.5.1/Trames-Dev-1.5.1-mac-arm64-unnotarized.zip"
+  },
+  {
+    "repository": "trames-mac",
+    "tag": "v1.5.1",
+    "name": "Trames-Dev-1.5.1-mac-arm64-unnotarized.zip.sha256",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-mac/v1.5.1/Trames-Dev-1.5.1-mac-arm64-unnotarized.zip.sha256",
+    "bytes": 109,
+    "sha256": "297fd6c52f63e7e3084e2ba07fd02f6f4d24c32b355ef3e17247c0c023b473f9",
+    "github_digest": "sha256:297fd6c52f63e7e3084e2ba07fd02f6f4d24c32b355ef3e17247c0c023b473f9",
+    "url": "https://github.com/project-trames/trames-mac/releases/download/v1.5.1/Trames-Dev-1.5.1-mac-arm64-unnotarized.zip.sha256"
+  },
+  {
+    "repository": "trames-mac",
+    "tag": "v1.5.0",
+    "name": "Trames-1.5.0-mac-arm64-unnotarized.zip",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-mac/v1.5.0/Trames-1.5.0-mac-arm64-unnotarized.zip",
+    "bytes": 12170724,
+    "sha256": "34bae7f5dcd37e897bb6d7d4c6b2b4e95129987a5dda8847bf156b18408e5562",
+    "github_digest": "sha256:34bae7f5dcd37e897bb6d7d4c6b2b4e95129987a5dda8847bf156b18408e5562",
+    "url": "https://github.com/project-trames/trames-mac/releases/download/v1.5.0/Trames-1.5.0-mac-arm64-unnotarized.zip"
+  },
+  {
+    "repository": "trames-mac",
+    "tag": "v1.5.0",
+    "name": "Trames-1.5.0-mac-arm64-unnotarized.zip.sha256",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-mac/v1.5.0/Trames-1.5.0-mac-arm64-unnotarized.zip.sha256",
+    "bytes": 105,
+    "sha256": "c7e9bbd622f4ed61e6e38893516697af9d1c498bc81e52bbd10af2feede088fd",
+    "github_digest": "sha256:c7e9bbd622f4ed61e6e38893516697af9d1c498bc81e52bbd10af2feede088fd",
+    "url": "https://github.com/project-trames/trames-mac/releases/download/v1.5.0/Trames-1.5.0-mac-arm64-unnotarized.zip.sha256"
+  },
+  {
+    "repository": "trames-mac",
+    "tag": "v1.5.0",
+    "name": "Trames-Dev-1.5.0-mac-arm64-unnotarized.zip",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-mac/v1.5.0/Trames-Dev-1.5.0-mac-arm64-unnotarized.zip",
+    "bytes": 12171524,
+    "sha256": "a80ba7e19d638c9ca0637b5ef4abfe8f7904bd67c983debfffe7832ee5b6bc36",
+    "github_digest": "sha256:a80ba7e19d638c9ca0637b5ef4abfe8f7904bd67c983debfffe7832ee5b6bc36",
+    "url": "https://github.com/project-trames/trames-mac/releases/download/v1.5.0/Trames-Dev-1.5.0-mac-arm64-unnotarized.zip"
+  },
+  {
+    "repository": "trames-mac",
+    "tag": "v1.5.0",
+    "name": "Trames-Dev-1.5.0-mac-arm64-unnotarized.zip.sha256",
+    "path": "/private/tmp/trames-license-audit-20261126/releases/trames-mac/v1.5.0/Trames-Dev-1.5.0-mac-arm64-unnotarized.zip.sha256",
+    "bytes": 109,
+    "sha256": "97d340bb77c57b31020a0c6ba91b6b20ce13c3c404f20529f72f19a15d6fe62a",
+    "github_digest": "sha256:97d340bb77c57b31020a0c6ba91b6b20ce13c3c404f20529f72f19a15d6fe62a",
+    "url": "https://github.com/project-trames/trames-mac/releases/download/v1.5.0/Trames-Dev-1.5.0-mac-arm64-unnotarized.zip.sha256"
+  }
+]

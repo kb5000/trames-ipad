@@ -75,6 +75,9 @@ fn enqueue(
 fn live_import_wait_preserves_the_open_host_file_and_publishes_only_after_resume() {
     let temp = Temp::new();
     let mut v = setup(&temp);
+    let journal_before = fs::metadata(temp.0.join("store/manifest.wal"))
+        .unwrap()
+        .len();
     let mut adapter = test_adapter(None);
     let queue = disk(&mut adapter);
     let source = temp.0.join("source");
@@ -110,7 +113,11 @@ fn live_import_wait_preserves_the_open_host_file_and_publishes_only_after_resume
     assert_eq!(u64::from_le_bytes(stat[8..16].try_into().unwrap()), inode);
     let stats = String::from_utf8(read(&mut v, b"/sys/fs/cgroup/a/io.stat", 4096)).unwrap();
     assert!(stats.split_whitespace().any(|field| field == "wios=3"));
-    let written = bytes.len() as u64 + fs::metadata(temp.0.join("store/manifest")).unwrap().len();
+    let written = bytes.len() as u64
+        + fs::metadata(temp.0.join("store/manifest.wal"))
+            .unwrap()
+            .len()
+        - journal_before;
     assert!(
         stats
             .split_whitespace()

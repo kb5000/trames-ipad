@@ -67,6 +67,26 @@ final class TerminalViewportTests: XCTestCase {
             XCTAssertTrue(original.controlModifier);XCTAssertTrue(view.controlModifier)
             view.insertText("c")
             XCTAssertFalse(original.controlModifier);XCTAssertFalse(view.controlModifier)
+            let mouse=try XCTUnwrap(original.subviews.first {$0.accessibilityIdentifier=="terminal-mouse-mode-toggle"} as? UIButton)
+            XCTAssertEqual(mouse.isSelected,view.allowMouseReporting)
+            let before=view.allowMouseReporting
+            mouse.sendActions(for:.touchDown)
+            XCTAssertEqual(view.allowMouseReporting,!before)
+            XCTAssertEqual(mouse.isSelected,!before)
+            mouse.sendActions(for:.touchDown)
+            XCTAssertEqual(view.allowMouseReporting,before)
+            XCTAssertEqual(mouse.isSelected,before)
+            let keyboardToggle=try XCTUnwrap(original.subviews.first {$0.accessibilityIdentifier=="terminal-extended-keyboard-toggle"} as? UIButton)
+            XCTAssertFalse(keyboardToggle.isSelected)
+            XCTAssertEqual(keyboardToggle.accessibilityValue,L10n.text("已收起"))
+            let collapsedImage=try XCTUnwrap(keyboardToggle.image(for:.normal)?.pngData())
+            keyboardToggle.sendActions(for:.touchDown)
+            XCTAssertFalse(keyboardToggle.isSelected)
+            XCTAssertEqual(keyboardToggle.accessibilityValue,L10n.text("已展开"))
+            let expandedImage=try XCTUnwrap(keyboardToggle.image(for:.normal)?.pngData())
+            XCTAssertNotEqual(collapsedImage,expandedImage)
+            keyboardToggle.sendActions(for:.touchDown)
+            XCTAssertEqual(keyboardToggle.accessibilityValue,L10n.text("已收起"))
         }
     }
 

@@ -1,0 +1,15 @@
+{
+  "rust_packages": 186,
+  "swift_package_records": 11,
+  "downloaded_release_assets": 83,
+  "release_archive_records": 43,
+  "published_checksums": 28,
+  "all_published_checksums_match": true,
+  "license_text_checksums_verified": true,
+  "final_report_links_resolve": true,
+  "final_findings": "confirmed-findings.json",
+  "superseded_files": [
+    "REPORT-initial-superseded.md",
+    "risks-initial-superseded.json"
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "ipad": {
+    "path": "/Users/main/dev/trames",
+    "head": "0192b6227be94ba2a569084b4510875c72bbd0b9",
+    "status": [
+      " M apps/ios/TramesKit/Sources/TramesKit/LocalSession.swift",
+      " M runtime",
+      " M tests/fixtures/musl-allocator.c",
+      " M tests/performance/allocator.py",
+      "?? apps/ios/Trames/LocalMemoryProbe.swift",
+      "?? apps/ios/TramesTests/LocalMemoryTests.swift",
+      "?? tests/performance/idle-memory.py",
+      "?? tests/performance/process_accounting.py",
+      "?? tests/performance/storage-durability.py"
+    ],
+    "submodules": [
+      " 078cc9e21ceafd79f631c74bc2f52083d6282a09 cli (heads/main)",
+      "+00fb019c9a3e3b3f8663d821c1e5e66b41e7f0c5 runtime (heads/main)"
+    ]
+  },
+  "runtime": {
+    "path": "/Users/main/dev/trames/runtime",
+    "head": "00fb019c9a3e3b3f8663d821c1e5e66b41e7f0c5",
+    "status": [
+      "?? tests/fixtures/debugger-sessions.c",
+      "?? tests/fixtures/debugger-sessions.py",
+      "?? tests/fixtures/storage-durability.c"
+    ],
+    "submodules": []
+  },
+  "mac": {
+    "path": "/Users/main/dev/trames-mac",
+    "head": "808a62b271e6cdf0a8f2adf3da3b6bbb8018e5e2",
+    "status": [
+      "?? .DS_Store"
+    ],
+    "submodules": [
+      " 078cc9e21ceafd79f631c74bc2f52083d6282a09 cli (heads/main)",
+      " 9705b718745b02f6988c1303d49d5b1d789037fe runtime (remotes/origin/HEAD-16-g9705b71)"
+    ]
+  },
+  "linux": {
+    "path": "/Users/main/dev/trames-linux",
+    "head": "d1ac3875de30347d4ab7c2c4edee89334833c431",
+    "status": [],
+    "submodules": [
+      " 078cc9e21ceafd79f631c74bc2f52083d6282a09 cli (heads/main)",
+      " d544939a6dc1631dc01bd6af0b881560856c0a8c runtime (remotes/origin/HEAD-7-gd544939)"
+    ]
+  },
+  "cli": {
+    "path": "/Users/main/dev/trames-cli",
+    "head": "ac88faf29786196b6c933824ce419147f4cd888f",
+    "status": [],
+    "submodules": []
+  }
+}

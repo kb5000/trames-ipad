@@ -74,10 +74,21 @@ pub struct Options {
     pub multiple_terminals: bool,
     pub vulkan_icd: Option<PathBuf>,
     pub video_driver: Option<PathBuf>,
+    pub audio_plugin: Option<PathBuf>,
     pub timezone: Option<HostTimezone>,
     #[serde(default)]
     pub initially_paused: bool,
     pub store_owner_lock: Option<PathBuf>,
+    #[serde(default)]
+    pub host_mounts: Vec<HostMount>,
+}
+#[derive(Deserialize, Clone, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct HostMount {
+    pub target: String,
+    pub host: PathBuf,
+    #[serde(default)]
+    pub readonly: bool,
 }
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -92,6 +103,89 @@ pub struct HostTimezone {
     pub identifier: String,
     pub data: Vec<u8>,
 }
+fn apply_host_mounts(vfs: &mut Vfs, mounts: &[HostMount]) -> Result<(), String> {
+    if mounts.is_empty() {
+        return Ok(());
+    }
+    #[cfg(unix)]
+    {
+        for mount in mounts {
+            let target = normalize_host_mount_target(&mount.target)?;
+            let mut prefix = String::new();
+            for segment in target.split('/').filter(|s| !s.is_empty()) {
+                prefix.push('/');
+                prefix.push_str(segment);
+                match vfs.mkdir_at(trames_vfs::AT_FDCWD, prefix.as_bytes(), 0o755) {
+                    Ok(()) | Err(trames_vfs::Errno(17)) => {}
+                    Err(e) => {
+                        return Err(format!("create mount point {prefix}: {e:?}"));
+                    }
+                }
+            }
+            vfs.mount_host(target.as_bytes(), &mount.host, mount.readonly)
+                .map_err(|e| format!("mount {} at {target}: {e:?}", mount.host.display()))?;
+        }
+        Ok(())
+    }
+    #[cfg(not(unix))]
+    {
+        let _ = vfs;
+        Err("host directory mounts require a Unix host".into())
+    }
+}
+
+fn remove_host_mount(vfs: &mut Vfs, target: &str) -> Result<(), String> {
+    #[cfg(unix)]
+    {
+        let normalized = normalize_host_mount_target(target)?;
+        match vfs.unmount_host_authorized(normalized.as_bytes()) {
+            Ok(())
+            | Err(trames_vfs::Errno(1))
+            | Err(trames_vfs::Errno(2))
+            | Err(trames_vfs::Errno(22)) => {
+                // Clean up the empty mountpoint directory (and empty /mnt/iPad parent)
+                // so unmounted folders do not leave stale directories under /mnt.
+                let _ = vfs.unlink_at(trames_vfs::AT_FDCWD, normalized.as_bytes(), true);
+                if let Some((parent, _)) = normalized.rsplit_once('/') {
+                    if parent == "/mnt/iPad" {
+                        let _ = vfs.unlink_at(trames_vfs::AT_FDCWD, parent.as_bytes(), true);
+                    }
+                }
+                Ok(())
+            }
+            Err(trames_vfs::Errno(16)) => {
+                Err(format!("mount point {normalized} is busy (EBUSY)"))
+            }
+            Err(e) => Err(format!("unmount {normalized}: {e:?}")),
+        }
+    }
+    #[cfg(not(unix))]
+    {
+        let _ = (vfs, target);
+        Err("host directory mounts require a Unix host".into())
+    }
+}
+
+fn normalize_host_mount_target(target: &str) -> Result<String, String> {
+    if !target.starts_with('/') || target.contains('\0') {
+        return Err(format!("invalid host mount target: {target}"));
+    }
+    let mut parts = Vec::new();
+    for segment in target.split('/') {
+        if segment.is_empty() {
+            continue;
+        }
+        if segment == "." || segment == ".." {
+            return Err(format!("host mount target cannot traverse segments: {target}"));
+        }
+        parts.push(segment);
+    }
+    if parts.is_empty() {
+        return Err("host mount target cannot be root /".into());
+    }
+    Ok(format!("/{}", parts.join("/")))
+}
+
 fn apply_host_timezone(
     vfs: &mut Vfs,
     target: trames_distro::boot::Target,
@@ -108,6 +202,8 @@ fn apply_host_timezone(
 enum Command {
     Transfer(Transfer),
     Timezone(HostTimezone, mpsc::SyncSender<Result<(), String>>),
+    MountHost(HostMount, mpsc::SyncSender<Result<(), String>>),
+    UnmountHost(String, mpsc::SyncSender<Result<(), String>>),
     AndroidLogcat(mpsc::SyncSender<Result<Arc<trames_linux::HostProcess>, String>>),
 }
 pub fn install(options: Options) -> Result<(), String> {
@@ -227,29 +323,40 @@ fn configured_memory_limits(
     options: &Options,
     config: Option<&trames_distro::environment::Manifest>,
 ) -> Result<trames_core::MemoryLimits, String> {
-    let Some(config) = config else {
-        return memory_limits(options);
-    };
-    let size = config
-        .resources
-        .memory_limit
-        .as_deref()
-        .unwrap_or(&config.resources.memory);
-    match trames_distro::environment::memory_mib(size).map_err(|e| e.to_string())? {
-        None => Ok(trames_core::MemoryLimits::host_managed()),
-        Some(mib) => {
-            let bytes = usize::try_from(mib)
-                .ok()
-                .and_then(|n| n.checked_mul(1 << 20))
-                .ok_or("memory size overflow")?;
-            let limits = trames_core::MemoryLimits {
-                total: bytes,
-                per_process: bytes,
-            };
-            limits.validate().map_err(|e| e.to_string())?;
-            Ok(limits)
+    configured_memory_limits_with_cap(options, config, crate::host_memory::ios_safe_guest_limit())
+}
+
+fn configured_memory_limits_with_cap(
+    options: &Options,
+    config: Option<&trames_distro::environment::Manifest>,
+    host_safe_cap: Option<usize>,
+) -> Result<trames_core::MemoryLimits, String> {
+    let limits = match config {
+        None => memory_limits(options)?,
+        Some(config) => {
+            let size = config
+                .resources
+                .memory_limit
+                .as_deref()
+                .unwrap_or(&config.resources.memory);
+            match trames_distro::environment::memory_mib(size).map_err(|e| e.to_string())? {
+                None => trames_core::MemoryLimits::host_managed(),
+                Some(mib) => {
+                    let bytes = usize::try_from(mib)
+                        .ok()
+                        .and_then(|n| n.checked_mul(1 << 20))
+                        .ok_or("memory size overflow")?;
+                    trames_core::MemoryLimits {
+                        total: bytes,
+                        per_process: bytes,
+                    }
+                }
+            }
         }
-    }
+    };
+    let clamped = crate::host_memory::clamp_guest_limits(limits, host_safe_cap);
+    clamped.validate().map_err(|e| e.to_string())?;
+    Ok(clamped)
 }
 fn default_rows() -> u16 {
     24
@@ -295,6 +402,8 @@ pub struct Session {
     next_transfer: AtomicU64,
     diagnostic_busy: AtomicBool,
     diagnostic_launch: Mutex<crate::android_logcat::LaunchQueue>,
+    root_network: Mutex<Option<trames_net::Network>>,
+    web_proxy: Mutex<Option<crate::guest_proxy::GuestProxy>>,
 }
 impl trames_vfs::ReadinessDriver for Session {
     fn notification_only(&self) -> bool {
@@ -344,6 +453,37 @@ impl Session {
         if let Some(wake) = self.host_wake.get() {
             wake.notify();
         }
+    }
+    pub fn web_proxy_port(&self) -> Result<u16, String> {
+        let mut guard = self
+            .web_proxy
+            .lock()
+            .map_err(|_| "web proxy lock poisoned")?;
+        if let Some(proxy) = guard.as_ref() {
+            return Ok(proxy.port());
+        }
+        let network = self
+            .root_network
+            .lock()
+            .map_err(|_| "network lock poisoned")?
+            .clone()
+            .ok_or_else(|| "session network is not ready".to_string())?;
+        let proxy = crate::guest_proxy::GuestProxy::start(network)?;
+        let port = proxy.port();
+        *guard = Some(proxy);
+        Ok(port)
+    }
+    pub fn listening_ports_json(&self) -> Result<Vec<u8>, String> {
+        let network = self
+            .root_network
+            .lock()
+            .map_err(|_| "network lock poisoned")?
+            .clone();
+        let endpoints = network
+            .as_ref()
+            .map(crate::guest_proxy::listening_tcp_endpoints)
+            .unwrap_or_default();
+        serde_json::to_vec(&endpoints).map_err(|e| e.to_string())
     }
     pub fn start(options: Options) -> Result<Arc<Self>, String> {
         if !options.store.is_absolute()
@@ -418,6 +558,8 @@ impl Session {
             next_transfer: AtomicU64::new(1),
             diagnostic_busy: AtomicBool::new(false),
             diagnostic_launch: Mutex::new(Default::default()),
+            root_network: Mutex::new(None),
+            web_proxy: Mutex::new(None),
         });
         let driver: Arc<dyn trames_vfs::ReadinessDriver> = session.clone();
         session
@@ -499,6 +641,40 @@ impl Session {
             },
         );
         Ok(token)
+    }
+    pub fn mount_host(&self, mount: HostMount) -> Result<(), String> {
+        let (response, receiver) = mpsc::sync_channel(1);
+        self.commands
+            .try_send(Command::MountHost(mount, response))
+            .map_err(|_| "local session is busy or closed")?;
+        self.notify_host();
+        loop {
+            if self.cancelled.load(Ordering::Acquire) {
+                return Err("session cancelled".into());
+            }
+            match receiver.recv_timeout(Duration::from_millis(50)) {
+                Ok(result) => return result,
+                Err(mpsc::RecvTimeoutError::Timeout) => {}
+                Err(_) => return Err("local session closed".into()),
+            }
+        }
+    }
+    pub fn unmount_host(&self, target: String) -> Result<(), String> {
+        let (response, receiver) = mpsc::sync_channel(1);
+        self.commands
+            .try_send(Command::UnmountHost(target, response))
+            .map_err(|_| "local session is busy or closed")?;
+        self.notify_host();
+        loop {
+            if self.cancelled.load(Ordering::Acquire) {
+                return Err("session cancelled".into());
+            }
+            match receiver.recv_timeout(Duration::from_millis(50)) {
+                Ok(result) => return result,
+                Err(mpsc::RecvTimeoutError::Timeout) => {}
+                Err(_) => return Err("local session closed".into()),
+            }
+        }
     }
     pub fn synchronize_timezone(&self, timezone: HostTimezone) -> Result<(), String> {
         if self.target == trames_distro::boot::Target::Android {
@@ -690,6 +866,23 @@ mod control_policy_tests {
                 .per_process,
             512usize << 20
         );
+        // With an iOS host safety cap, auto and oversized budgets clamp cleanly.
+        let auto_capped = configured_memory_limits_with_cap(
+            &options,
+            Some(&Manifest::new("debian")),
+            Some(1536usize << 20),
+        )
+        .unwrap();
+        assert_eq!(auto_capped.total, 1536usize << 20);
+        assert_eq!(auto_capped.per_process, 1536usize << 20);
+        let manual_capped = configured_memory_limits_with_cap(
+            &options,
+            Some(&config),
+            Some(512usize << 20),
+        )
+        .unwrap();
+        assert_eq!(manual_capped.total, 512usize << 20);
+        assert_eq!(manual_capped.per_process, 512usize << 20);
     }
 
     #[test]
@@ -861,9 +1054,6 @@ fn run(
                 "shell"
             }
             .into();
-            if !options.multiple_terminals && !android {
-                options.command = Some(config.session.shell.clone());
-            }
             login = Some(config.session.clone());
         }
         if !config.mounts.is_empty() {
@@ -923,16 +1113,11 @@ fn run(
     } else {
         None
     };
+    let session_cfg = login.clone().unwrap_or_default();
     let native_terminals = if options.multiple_terminals && init_monitor.is_some() {
         Some(crate::terminals::NativeTerminals::for_systemd_launcher(
             &mut vfs,
-            &trames_distro::terminals::launcher_at(
-                &manifest
-                    .as_ref()
-                    .map(|c| c.session.shell.clone())
-                    .unwrap_or_else(|| vec!["/bin/sh".into(), "-il".into()]),
-                manifest.as_ref().map(|c| c.session.cwd.as_str()),
-            ),
+            &trames_distro::terminals::launcher_for_session(&session_cfg),
         )?)
     } else {
         None
@@ -944,6 +1129,7 @@ fn run(
             .map_err(|error| format!("prepare runtime tmpfs: {error}"))?;
         prepare_guest_defaults(&mut vfs, &options.network, &options.distro)?;
     }
+    apply_host_mounts(&mut vfs, &options.host_mounts)?;
     vfs.chdir(if android { b"/" } else { b"/root" })
         .map_err(|e| e.to_string())?;
     // Bundled Mesa/Xwayland adapters target musl. Keep glibc rootfs loaders
@@ -980,27 +1166,72 @@ fn run(
         }
     }
     let mut zink_egl = false;
-    if options.vulkan_accelerator && bundled_musl {
+    if options.vulkan_accelerator {
         if let Some(path) = &options.vulkan_icd {
-            trames_distro::install_vulkan_icd(
-                &mut File::open(path).map_err(|e| e.to_string())?,
-                &mut vfs,
-            )
-            .map_err(|e| format!("install Vulkan ICD: {e}"))?;
-            match File::open(path.with_file_name("libEGL.so.1")) {
-                Ok(mut reader) => {
-                    // Mesa's private frontend/Gallium ABI must match. A lone
-                    // frontend can initialize EGL then crash during drawing.
-                    let mut gallium = File::open(path.with_file_name("libgallium-25.1.9.so"))
-                        .map_err(|e| format!("read paired Mesa Gallium: {e}"))?;
-                    trames_distro::install_zink_gallium(&mut gallium, &mut vfs)
-                        .map_err(|e| format!("install Mesa Gallium: {e}"))?;
-                    trames_distro::install_zink_egl(&mut reader, &mut vfs)
-                        .map_err(|e| format!("install Mesa EGL: {e}"))?;
-                    zink_egl = true;
+            if bundled_musl {
+                trames_distro::install_vulkan_icd(
+                    &mut File::open(path).map_err(|e| e.to_string())?,
+                    &mut vfs,
+                )
+                .map_err(|e| format!("install Vulkan ICD: {e}"))?;
+                match File::open(path.with_file_name("libEGL.so.1")) {
+                    Ok(mut reader) => {
+                        // Mesa's private frontend/Gallium ABI must match. A lone
+                        // frontend can initialize EGL then crash during drawing.
+                        let mut gallium = File::open(path.with_file_name("libgallium-25.1.9.so"))
+                            .map_err(|e| format!("read paired Mesa Gallium: {e}"))?;
+                        trames_distro::install_zink_gallium(&mut gallium, &mut vfs)
+                            .map_err(|e| format!("install Mesa Gallium: {e}"))?;
+                        trames_distro::install_zink_egl(&mut reader, &mut vfs)
+                            .map_err(|e| format!("install Mesa EGL: {e}"))?;
+                        zink_egl = true;
+                    }
+                    Err(e) if e.kind() == io::ErrorKind::NotFound => {}
+                    Err(e) => return Err(format!("read bundled Mesa EGL: {e}")),
                 }
-                Err(e) if e.kind() == io::ErrorKind::NotFound => {}
-                Err(e) => return Err(format!("read bundled Mesa EGL: {e}")),
+            } else if !android
+                && (vfs.executable(b"/lib/ld-linux-aarch64.so.1").is_ok()
+                    || vfs
+                        .executable(b"/usr/lib/aarch64-linux-gnu/ld-linux-aarch64.so.1")
+                        .is_ok())
+            {
+                let glibc_icd = path.with_file_name("libtrames_vulkan_icd_glibc.so");
+                match File::open(&glibc_icd) {
+                    Ok(mut reader) => {
+                        trames_distro::install_vulkan_icd(&mut reader, &mut vfs)
+                            .map_err(|e| format!("install glibc Vulkan ICD: {e}"))?;
+                    }
+                    Err(e) if e.kind() == io::ErrorKind::NotFound => {}
+                    Err(e) => return Err(format!("read bundled glibc Vulkan ICD: {e}")),
+                }
+            }
+        }
+    }
+    let audio_output = manifest.as_ref().is_some_and(|c| c.components.audio);
+    let audio_input = manifest.as_ref().is_some_and(|c| c.components.audio_input);
+    if (audio_output || audio_input) && !android {
+        if let Some(path) = &options.audio_plugin {
+            if bundled_musl {
+                trames_distro::install_alsa_plugin(
+                    &mut File::open(path).map_err(|e| e.to_string())?,
+                    &mut vfs,
+                    false,
+                )
+                .map_err(|e| format!("install ALSA plugin: {e}"))?;
+            } else if vfs.executable(b"/lib/ld-linux-aarch64.so.1").is_ok()
+                || vfs
+                    .executable(b"/usr/lib/aarch64-linux-gnu/ld-linux-aarch64.so.1")
+                    .is_ok()
+            {
+                let glibc_plugin = path.with_file_name("libasound_module_pcm_trames_glibc.so");
+                match File::open(&glibc_plugin) {
+                    Ok(mut reader) => {
+                        trames_distro::install_alsa_plugin(&mut reader, &mut vfs, true)
+                            .map_err(|e| format!("install glibc ALSA plugin: {e}"))?;
+                    }
+                    Err(e) if e.kind() == io::ErrorKind::NotFound => {}
+                    Err(e) => return Err(format!("read bundled glibc ALSA plugin: {e}")),
+                }
             }
         }
     }
@@ -1020,13 +1251,19 @@ fn run(
         vfs.configure_network(mode)
     }
     .map_err(|e| e.to_string())?;
+    if let Ok(mut guard) = session.root_network.lock() {
+        *guard = Some(vfs.root_network());
+    }
+    let resolved_login = (!android).then(|| model::resolve_login(&mut vfs, &session_cfg));
     let mut environment: Vec<String> = if android {
         trames_distro::android::environment()
     } else {
+        let info = resolved_login.as_ref().unwrap();
         vec![
-            "HOME=/root".into(),
-            "USER=root".into(),
-            "LOGNAME=root".into(),
+            format!("HOME={}", info.home),
+            format!("USER={}", info.user),
+            format!("LOGNAME={}", info.user),
+            format!("SHELL={}", info.shell),
             "PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin".into(),
             "TERM=xterm-256color".into(),
             "LANG=C.UTF-8".into(),
@@ -1131,24 +1368,21 @@ fn run(
         vec![
             "/bin/sh".into(),
             "-c".into(),
-            trames_distro::terminals::launcher_at(
-                &manifest
-                    .as_ref()
-                    .map(|c| c.session.shell.clone())
-                    .unwrap_or_else(|| vec!["/bin/sh".into(), "-il".into()]),
-                manifest.as_ref().map(|c| c.session.cwd.as_str()),
-            ),
+            trames_distro::terminals::launcher_for_session(&session_cfg),
         ]
     } else {
-        vec!["/bin/sh".into(), "-il".into()]
+        resolved_login
+            .as_ref()
+            .map(|info| info.argv.clone())
+            .unwrap_or_else(|| vec!["/bin/sh".into(), "-l".into()])
     };
     trames_distro::rootfs::validate_command(&mut vfs, &argv).map_err(|e| e.to_string())?;
     let bytes = vfs
         .executable(argv.first().ok_or("empty Linux command")?.as_bytes())
         .map_err(|e| e.to_string())?;
-    if let Some(login) = &login {
+    if let Some(info) = &resolved_login {
         if !android && init_monitor.is_none() {
-            vfs.chdir(login.cwd.as_bytes()).map_err(|e| e.to_string())?;
+            vfs.chdir(info.cwd.as_bytes()).map_err(|e| e.to_string())?;
         }
     }
     let mut runtime = Runtime::load_with_options(
@@ -1163,8 +1397,8 @@ fn run(
             native_allocator: options.native_allocator,
             vulkan_accelerator: options.vulkan_accelerator,
             video_accelerator,
-            audio_output: manifest.as_ref().is_some_and(|c| c.components.audio),
-            audio_input: manifest.as_ref().is_some_and(|c| c.components.audio_input),
+            audio_output,
+            audio_input,
         },
     )
     .map_err(|e| e.to_string())?;
@@ -1200,6 +1434,12 @@ fn run(
         .status
         .phase = "running";
     let result = runtime.run(&mut io, u64::MAX);
+    if let Ok(mut guard) = session.web_proxy.lock() {
+        *guard = None;
+    }
+    if let Ok(mut guard) = session.root_network.lock() {
+        *guard = None;
+    }
     runtime.linux.vfs.finish_network();
     runtime.linux.vfs.close_all();
     io.snapshot(&runtime.linux.vfs);
@@ -1315,6 +1555,14 @@ impl Adapter {
                 Self::snapshot_session(session, vfs);
                 let _ = response.send(result);
             }
+            Command::MountHost(mount, response) => {
+                let result = apply_host_mounts(vfs, &[mount]);
+                let _ = response.send(result);
+            }
+            Command::UnmountHost(target, response) => {
+                let result = remove_host_mount(vfs, &target);
+                let _ = response.send(result);
+            }
             Command::AndroidLogcat(response) => {
                 let result = crate::android_logcat::prepare(vfs).and_then(|launch| {
                     let process = launch.process.clone();
@@ -1422,7 +1670,7 @@ fn fail_command(command: Command, error: String) {
         Command::Transfer(t) => {
             let _ = t.result.send(Err(error));
         }
-        Command::Timezone(_, reply) => {
+        Command::Timezone(_, reply) | Command::MountHost(_, reply) | Command::UnmountHost(_, reply) => {
             let _ = reply.send(Err(error));
         }
         Command::AndroidLogcat(reply) => {
@@ -1830,6 +2078,8 @@ mod memory_tests {
             next_transfer: AtomicU64::new(1),
             diagnostic_busy: AtomicBool::new(false),
             diagnostic_launch: Mutex::new(Default::default()),
+            root_network: Mutex::new(None),
+            web_proxy: Mutex::new(None),
         });
         Adapter {
             session: session.clone(),
@@ -2324,5 +2574,119 @@ mod memory_tests {
             .unwrap_err()
             .contains("checksum"));
         fs::remove_file(path).unwrap();
+    }
+    #[cfg(unix)]
+    #[test]
+    fn host_mounts_create_mountpoints_and_enforce_readonly_and_readwrite() {
+        let base = std::env::temp_dir().join(format!(
+            "trames-host-mount-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        let rw_dir = base.join("rw");
+        let ro_dir = base.join("ro");
+        fs::create_dir_all(&rw_dir).unwrap();
+        fs::create_dir_all(&ro_dir).unwrap();
+        fs::write(rw_dir.join("hello.txt"), b"from-host").unwrap();
+        fs::write(ro_dir.join("locked.txt"), b"readonly").unwrap();
+
+        let mut vfs = Vfs::default();
+        assert!(apply_host_mounts(
+            &mut vfs,
+            &[HostMount {
+                target: "mnt/iPad/Shared".into(),
+                host: rw_dir.clone(),
+                readonly: false,
+            }]
+        )
+        .is_err());
+        assert!(apply_host_mounts(
+            &mut vfs,
+            &[HostMount {
+                target: "/mnt/iPad/../escape".into(),
+                host: rw_dir.clone(),
+                readonly: false,
+            }]
+        )
+        .is_err());
+
+        apply_host_mounts(
+            &mut vfs,
+            &[
+                HostMount {
+                    target: "/mnt/iPad/Shared".into(),
+                    host: rw_dir.clone(),
+                    readonly: false,
+                },
+                HostMount {
+                    target: "/mnt/iPad/ReadOnly".into(),
+                    host: ro_dir.clone(),
+                    readonly: true,
+                },
+            ],
+        )
+        .unwrap();
+
+        let fd = vfs
+            .open_at(trames_vfs::AT_FDCWD, b"/mnt/iPad/Shared/hello.txt", 0, 0)
+            .unwrap();
+        let data = vfs.read(fd, 32).unwrap();
+        vfs.close(fd).unwrap();
+        assert_eq!(data, b"from-host");
+
+        // Write from guest into read-write mount and verify on host.
+        let wfd = vfs
+            .open_at(
+                trames_vfs::AT_FDCWD,
+                b"/mnt/iPad/Shared/from-guest.txt",
+                1 | 0x40 | 0x200,
+                0o644,
+            )
+            .unwrap();
+        vfs.write(wfd, b"guest-data").unwrap();
+        vfs.close(wfd).unwrap();
+        assert_eq!(fs::read(rw_dir.join("from-guest.txt")).unwrap(), b"guest-data");
+
+        // Read-only mount rejects writes (EROFS = 30).
+        let ro_write = vfs.open_at(
+            trames_vfs::AT_FDCWD,
+            b"/mnt/iPad/ReadOnly/nope.txt",
+            1 | 0x40,
+            0o644,
+        );
+        assert!(ro_write.is_err());
+
+        // Live unmount removes the empty mountpoint directory and remount recreates it as read-write.
+        remove_host_mount(&mut vfs, "/mnt/iPad/ReadOnly").unwrap();
+        assert!(vfs
+            .stat_at(trames_vfs::AT_FDCWD, b"/mnt/iPad/ReadOnly")
+            .is_err());
+        // Second unmount is an idempotent no-op.
+        remove_host_mount(&mut vfs, "/mnt/iPad/ReadOnly").unwrap();
+        apply_host_mounts(
+            &mut vfs,
+            &[HostMount {
+                target: "/mnt/iPad/ReadOnly".into(),
+                host: ro_dir.clone(),
+                readonly: false,
+            }],
+        )
+        .unwrap();
+        let rw_fd = vfs
+            .open_at(
+                trames_vfs::AT_FDCWD,
+                b"/mnt/iPad/ReadOnly/now-writable.txt",
+                1 | 0x40 | 0x200,
+                0o644,
+            )
+            .unwrap();
+        vfs.write(rw_fd, b"ok").unwrap();
+        vfs.close(rw_fd).unwrap();
+        assert_eq!(fs::read(ro_dir.join("now-writable.txt")).unwrap(), b"ok");
+
+        fs::remove_dir_all(base).unwrap();
     }
 }

@@ -14,7 +14,8 @@ trames-shared = { workspace = true }
 trames-wayland = { workspace = true }
 trames-core = { path = "../trames-core" }
 trames-linux = { workspace = true }
-trames-vfs = { workspace = true }
+trames-vfs = { workspace = true, features = ["hostfs"] }
+trames-net = { workspace = true }
 trames-distro = { workspace = true }
 trames-bridge = { workspace = true }
 serde = { version = "1.0", features = ["derive"] }

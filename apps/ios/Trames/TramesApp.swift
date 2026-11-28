@@ -24,12 +24,14 @@ struct TramesApp: App {
 }
 struct WorkspaceView: View {
     @ObservedObject var workspace: WorkspaceModel
+    #if TRAMES_ENABLE_PIP
     @ObservedObject private var pictureInPicture:WindowPictureInPicture
     init(workspace:WorkspaceModel) {self.workspace=workspace;self.pictureInPicture=workspace.pictureInPicture}
-    @State private var filesSheet = false
-    @State private var settingsSheet = false
-    @State private var environmentsSheet = false
-    @State private var sessionActions = false
+    #else
+    init(workspace:WorkspaceModel) {self.workspace=workspace}
+    #endif
+    @State private var managerSheet = false
+    @State private var managerDestination: ManagerDestination?
     @State private var frames: [String:CGRect] = [:]
     @State private var draggedTab: WorkspaceItemID?
     @State private var dragLocation = CGPoint.zero
@@ -40,10 +42,10 @@ struct WorkspaceView: View {
                 ScrollView(.horizontal,showsIndicators:false) {
                     HStack(spacing:4) {
                         ForEach(workspace.layout.tabs,id:\.self) { item in
-                            if let session=workspace.session(for:item) {
+                            if workspace.session(for: item) != nil || workspace.webTab(for: item) != nil {
                                 HStack(spacing:0) {
                                     Button { workspace.select(item) } label: {
-                                        WorkspaceTabLabel(session:session,item:item).lineLimit(1)
+                                        WorkspaceTabLabel(workspace: workspace, item: item).lineLimit(1)
                                             .padding(.horizontal,8).frame(minHeight:44).contentShape(Rectangle())
                                     }.buttonStyle(.plain)
                                         .accessibilityIdentifier("tab-\(item.token)")
@@ -67,19 +69,34 @@ struct WorkspaceView: View {
                         }
                     }
                 }.workspaceFrame("tabs")
+                #if TRAMES_ENABLE_PIP
                 if let active=workspace.layout.focused ?? workspace.layout.selected,pictureInPicture.supported {
                     Button {workspace.preview(active)} label: {Image(systemName:pictureInPicture.item == active ? "pip.exit" : "pip.enter").frame(width:44,height:44)}
                         .accessibilityLabel(L10n.text("画中画")).accessibilityIdentifier("window-pip")
                 }
-                Button { sessionActions = true } label: {
-                    Label(L10n.text("新建或管理会话"), systemImage: "plus")
+                #endif
+                Button { openManager(destination: nil) } label: {
+                    Label(L10n.text("环境与设置"), systemImage: "slider.horizontal.3")
                         .labelStyle(.iconOnly).frame(minWidth: 44, minHeight: 44)
-                }.accessibilityIdentifier("session-actions").confirmationDialog(L10n.text("新建或管理会话"), isPresented: $sessionActions, titleVisibility: .visible) {
-                    Button(L10n.text("新建终端"),systemImage:"terminal") {if workspace.profiles.isEmpty {environmentsSheet=true}else{workspace.openLocal()}}
-                    Button(L10n.text("Linux 环境"),systemImage:"square.stack.3d.up") {environmentsSheet=true}
-                    Button("Files", systemImage: "folder") { filesSheet = true }
-                    Button(L10n.text("设置"), systemImage: "gear") { settingsSheet = true }
-                }
+                }.accessibilityIdentifier("open-manager")
+                Menu {
+                    Button {
+                        if workspace.profiles.isEmpty { openManager(destination: nil) }
+                        else { workspace.openLocal() }
+                    } label: {
+                        Label(L10n.text("新建终端"), systemImage: "terminal")
+                    }
+                    .accessibilityIdentifier("new-terminal-action")
+                    Button {
+                        workspace.openWebBrowser()
+                    } label: {
+                        Label(L10n.text("内置浏览器"), systemImage: "globe")
+                    }
+                    .accessibilityIdentifier("new-browser-action")
+                } label: {
+                    Label(L10n.text("新建"), systemImage: "plus")
+                        .labelStyle(.iconOnly).frame(minWidth: 44, minHeight: 44)
+                }.accessibilityIdentifier("session-actions")
 
             }.padding(.horizontal,12).padding(.vertical,6).workspaceFrame("header")
             GeometryReader { proxy in
@@ -96,8 +113,8 @@ struct WorkspaceView: View {
                 .overlay {
                     if workspace.layout.selected == nil && workspace.layout.floating.isEmpty {
                         if workspace.profiles.isEmpty {
-                            ContentUnavailableView {Label(L10n.text("尚未创建环境"),systemImage:"square.stack.3d.up")} actions: {Button(L10n.text("新建环境")) {environmentsSheet=true}}
-                        } else {ContentUnavailableView(L10n.text("打开一个终端"),systemImage:"terminal",description:Text(L10n.text("从顶部标签栏恢复窗口，或选择 Linux 环境。")))}
+                            ContentUnavailableView {Label(L10n.text("尚未创建环境"),systemImage:"square.stack.3d.up")} actions: {Button(L10n.text("新建环境")) {openManager(destination: nil)}}
+                        } else {ContentUnavailableView(L10n.text("打开一个终端"),systemImage:"terminal",description:Text(L10n.text("从顶部标签栏恢复窗口，或打开环境与设置。")))}
                     }
                 }
             .onAppear { workspace.updateViewport(proxy.size) }
@@ -105,26 +122,58 @@ struct WorkspaceView: View {
             }.workspaceFrame("body")
         }
         .coordinateSpace(name:"workspace")
-        .onReceive(NotificationCenter.default.publisher(for:Notification.Name("TramesShowEnvironments"))) { _ in environmentsSheet=true }
+        .onReceive(NotificationCenter.default.publisher(for:Notification.Name("TramesShowEnvironments"))) { _ in openManager(destination: nil) }
         .onPreferenceChange(WorkspaceFramesKey.self) { frames=$0 }
         .overlay(alignment:.topLeading) {
-            if let item=draggedTab,let session=workspace.session(for:item) {
-                WorkspaceTabLabel(session:session,item:item).padding(10).background(.ultraThinMaterial)
+            if let item=draggedTab, workspace.session(for: item) != nil || workspace.webTab(for: item) != nil {
+                WorkspaceTabLabel(workspace: workspace, item: item).padding(10).background(.ultraThinMaterial)
                     .clipShape(RoundedRectangle(cornerRadius:6)).offset(x:dragLocation.x-40,y:dragLocation.y-18).allowsHitTesting(false)
             }
         }
+        .overlay(alignment: .top) {
+            if let notice = workspace.inboxNotice {
+                HStack(spacing: 10) {
+                    Image(systemName: "checkmark.circle.fill").foregroundStyle(.green)
+                    Text(notice.message).font(.callout).lineLimit(2)
+                    Button(L10n.text("复制路径")) {
+                        UIPasteboard.general.string = notice.guestPath
+                        workspace.dismissInboxNotice()
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+                    Button {
+                        workspace.dismissInboxNotice()
+                    } label: {
+                        Image(systemName: "xmark").font(.caption)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(L10n.text("关闭"))
+                }
+                .padding(.horizontal, 14)
+                .padding(.vertical, 10)
+                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
+                .shadow(radius: 6, y: 2)
+                .padding(.top, 56)
+                .padding(.horizontal, 16)
+                .transition(.move(edge: .top).combined(with: .opacity))
+            }
+        }
+        #if TRAMES_ENABLE_PIP
         .overlay(alignment:.bottomTrailing) {
             PictureInPictureSource(controller:pictureInPicture)
                 .frame(width:pictureInPicture.item != nil ? 160 : 1,height:pictureInPicture.item != nil ? 100 : 1)
                 .opacity(pictureInPicture.item != nil ? 1 : 0.01).allowsHitTesting(false).accessibilityHidden(true)
         }
+        #endif
         .background(Color(uiColor:.systemBackground))
-        .sheet(isPresented: $filesSheet) { if let session = workspace.current { TransferView(session: session) } }
-        .fullScreenCover(isPresented:$environmentsSheet) {EnvironmentManagerView(workspace:workspace)}
-        .sheet(isPresented: $settingsSheet) { SettingsView(workspace: workspace) }
+        .fullScreenCover(isPresented:$managerSheet) {EnvironmentManagerView(workspace:workspace, initialDestination: managerDestination)}
         .alert("Trames", isPresented: Binding(get: { workspace.error != nil }, set: { if !$0 { workspace.error = nil } })) {
             Button(L10n.text("好")) { workspace.error = nil }
         } message: { Text(workspace.error ?? "") }
+    }
+    private func openManager(destination: ManagerDestination?) {
+        managerDestination = destination
+        managerSheet = true
     }
     private func finishTabDrag(_ item: WorkspaceItemID, at point: CGPoint) {
         defer { draggedTab=nil }
@@ -149,87 +198,26 @@ struct SessionView: View {
                 TerminalPane(session:session,workspace:workspace,onFocus:{ [weak workspace, weak session] in if let session { workspace?.focus(.terminal(session.id)) } })
                     .frame(width:proxy.size.width,height:proxy.size.height)
             }.frame(minHeight:0,maxHeight:.infinity).clipped()
-            HStack {
-                Text(session.state).lineLimit(2).accessibilityIdentifier("session-state")
-                Spacer()
+            HStack(spacing: 10) {
+                Text(session.state).lineLimit(1).accessibilityIdentifier("session-state")
+                Spacer(minLength: 8)
                 if let cpu = session.cpuPercent {
                     Text("CPU \(cpu)%").monospacedDigit().accessibilityIdentifier("cpu-usage")
                         .accessibilityHint(L10n.text("App CPU 用量，一个核心满载为百分之百"))
                 }
+                if let memory = session.memoryBytes {
+                    Text(L10n.text("内存 %@", ByteCountFormatter.string(fromByteCount: Int64(memory), countStyle: .binary)))
+                        .monospacedDigit().accessibilityIdentifier("memory-usage")
+                }
                 if let capacity = session.capacity {
-                    Text("\(ByteCountFormatter.string(fromByteCount: Int64(capacity.used_bytes), countStyle: .binary)) / \(ByteCountFormatter.string(fromByteCount: Int64(capacity.budget_bytes), countStyle: .binary))")
+                    Text(L10n.text("磁盘 %@ / %@",
+                                   ByteCountFormatter.string(fromByteCount: Int64(capacity.used_bytes), countStyle: .binary),
+                                   ByteCountFormatter.string(fromByteCount: Int64(capacity.budget_bytes), countStyle: .binary)))
+                        .monospacedDigit().accessibilityIdentifier("disk-usage")
                 }
             }.font(.caption).foregroundStyle(.secondary).padding(.horizontal,12)
                 .padding(.vertical,6).fixedSize(horizontal:false,vertical:true)
                 .layoutPriority(1)
-        }
-    }
-}
-struct SettingsView: View {
-    @ObservedObject var workspace: WorkspaceModel
-    @Environment(\.dismiss) private var dismiss
-    @AppStorage("useVolumeBudget") private var volume = false
-    @AppStorage(InterfaceStyle.defaultsKey) private var interfaceStyle = "system"
-    @State private var managingEnvironments=false
-    @State private var resetConfirmation = false
-    @State private var collectingAndroidDiagnostics = false
-    @State private var androidDiagnosticsURL:URL?
-    @State private var diagnosticsError:String?
-    var body: some View {
-        NavigationStack {
-            Form {
-                Section(L10n.text("外观")) {
-                    Picker(L10n.text("界面模式"),selection:$interfaceStyle) {
-                        ForEach(InterfaceStyle.allCases) {style in Text(L10n.text(style.title)).tag(style.rawValue)}
-                    }.accessibilityIdentifier("interface-style")
-                    Text(L10n.text("仅改变 Trames 界面，不改变环境内应用的主题。")).font(.caption).foregroundStyle(.secondary)
-                }
-                Section(L10n.text("环境配置")) {
-                    if workspace.profiles.isEmpty {Text(L10n.text("尚未创建环境"))}else{LabeledContent(L10n.text("当前环境"),value:workspace.selectedEnvironment.name)}
-                    Button(L10n.text("管理环境配置"),systemImage:"slider.horizontal.3") {managingEnvironments=true}
-                    Text(L10n.text("CPU、内存、原生组件、网络与访问权限分别保存在每个环境的 TOML 配置中。")).font(.caption).foregroundStyle(.secondary)
-                }
-                Section(L10n.text("本地磁盘")) {
-                    Toggle(L10n.text("使用设备卷容量作为存储预算"), isOn: $volume)
-                    Text(L10n.text("默认预算 16 GiB；启用后按应用所在卷的总容量计算。实际可用空间仍受系统剩余容量限制，下次打开本地终端生效。")).font(.caption)
-                    Button(L10n.text("重置 Linux 环境"),role:.destructive) {resetConfirmation=true}.disabled(workspace.resetting || workspace.profiles.isEmpty)
-                }
-                if let directories=workspace.directories {Section(L10n.text("设备目录授权")) {NavigationLink(L10n.text("Files 目录授权")) {FolderGrantsView(store:directories)}}}
-                Section(L10n.text("后台行为")) { Text(L10n.text("进入后台后暂停本地 Linux；返回前台后继续。Files 采用独立副本导入和导出。")).font(.caption) }
-                if FileManager.default.fileExists(atPath:PreparationDiagnostics.logURL.path) {
-                    Section(L10n.text("诊断")) {
-                        ShareLink(item:PreparationDiagnostics.logURL) {Label(L10n.text("共享环境准备日志"),systemImage:"square.and.arrow.up")}
-                        if workspace.selectedEnvironment.bootTarget == "android",let root=RootfsLocations.sharedRoot {
-                            Button(L10n.text("采集 Android 诊断日志")) {
-                                let profile=workspace.selectedEnvironment
-                                let local=workspace.local?.local
-                                collectingAndroidDiagnostics=true
-                                Task {
-                                    defer {collectingAndroidDiagnostics=false}
-                                    do {androidDiagnosticsURL=try await Task.detached(priority:.utility) {
-                                        var warning:String?
-                                        do {try local?.captureAndroidLogcat()}
-                                        catch {warning=error.localizedDescription}
-                                        return try AndroidDiagnostics.capture(root:root,environment:profile,logcatError:warning)
-                                    }.value}
-                                    catch {diagnosticsError=error.localizedDescription}
-                                }
-                            }.disabled(collectingAndroidDiagnostics)
-                            if collectingAndroidDiagnostics {ProgressView()}
-                            if let androidDiagnosticsURL {ShareLink(item:androidDiagnosticsURL) {Label(L10n.text("共享 Android 诊断日志"),systemImage:"square.and.arrow.up")}}
-                            if let diagnosticsError {Text(diagnosticsError).foregroundStyle(.red)}
-                        }
-                    }
-                }
-            }.navigationTitle(L10n.text("设置")).toolbar { Button(L10n.text("完成")) { dismiss() } }
-                // This sheet is presented by the nested UIKit hosting controller.
-                // Update its presentation preference as well as the app root.
-                .preferredColorScheme((InterfaceStyle(rawValue:interfaceStyle) ?? .system).colorScheme)
-                .fullScreenCover(isPresented:$managingEnvironments) {EnvironmentManagerView(workspace:workspace)}
-                .alert(L10n.text("重置 Linux 环境？"),isPresented:$resetConfirmation) {
-                    Button(L10n.text("删除并重新初始化"),role:.destructive) {dismiss(); workspace.resetLocal()}
-                    Button(L10n.text("取消"),role:.cancel) {}
-                } message: {Text(L10n.text("将重置当前环境中的软件、文件和配置。其他 Linux 环境和 Files 目录授权会保留。"))}
         }
     }
 }

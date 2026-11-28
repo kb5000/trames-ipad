@@ -1,0 +1,350 @@
+[
+  {
+    "repo": "ipad",
+    "path": "apps/ios/NativeCoreMark/Sources/CCoreMark/core_list_join.c",
+    "headers": [
+      [
+        2,
+        "Copyright 2018 Embedded Microprocessor Benchmark Consortium (EEMBC)"
+      ]
+    ]
+  },
+  {
+    "repo": "ipad",
+    "path": "apps/ios/NativeCoreMark/Sources/CCoreMark/core_main.c",
+    "headers": [
+      [
+        2,
+        "Copyright 2018 Embedded Microprocessor Benchmark Consortium (EEMBC)"
+      ]
+    ]
+  },
+  {
+    "repo": "ipad",
+    "path": "apps/ios/NativeCoreMark/Sources/CCoreMark/core_matrix.c",
+    "headers": [
+      [
+        2,
+        "Copyright 2018 Embedded Microprocessor Benchmark Consortium (EEMBC)"
+      ]
+    ]
+  },
+  {
+    "repo": "ipad",
+    "path": "apps/ios/NativeCoreMark/Sources/CCoreMark/core_portme.c",
+    "headers": [
+      [
+        2,
+        "Copyright 2018 Embedded Microprocessor Benchmark Consortium (EEMBC)"
+      ]
+    ]
+  },
+  {
+    "repo": "ipad",
+    "path": "apps/ios/NativeCoreMark/Sources/CCoreMark/core_portme.h",
+    "headers": [
+      [
+        2,
+        "Copyright 2018 Embedded Microprocessor Benchmark Consortium (EEMBC)"
+      ]
+    ]
+  },
+  {
+    "repo": "ipad",
+    "path": "apps/ios/NativeCoreMark/Sources/CCoreMark/core_state.c",
+    "headers": [
+      [
+        2,
+        "Copyright 2018 Embedded Microprocessor Benchmark Consortium (EEMBC)"
+      ]
+    ]
+  },
+  {
+    "repo": "ipad",
+    "path": "apps/ios/NativeCoreMark/Sources/CCoreMark/core_util.c",
+    "headers": [
+      [
+        2,
+        "Copyright 2018 Embedded Microprocessor Benchmark Consortium (EEMBC)"
+      ]
+    ]
+  },
+  {
+    "repo": "ipad",
+    "path": "apps/ios/NativeCoreMark/Sources/CCoreMark/coremark.h",
+    "headers": [
+      [
+        2,
+        "Copyright 2018 Embedded Microprocessor Benchmark Consortium (EEMBC)"
+      ]
+    ]
+  },
+  {
+    "repo": "ipad",
+    "path": "apps/ios/TramesKit/Tests/NIOSSHRegressionTests/ChildChannelMultiplexerTests.swift",
+    "headers": [
+      [
+        11,
+        "// SPDX-License-Identifier: Apache-2.0"
+      ]
+    ]
+  },
+  {
+    "repo": "runtime",
+    "path": "crates/trames-native/upstream/bionic-android13/arith.h",
+    "headers": [
+      [
+        2,
+        " * Copyright (C) 2014 The Android Open Source Project"
+      ]
+    ]
+  },
+  {
+    "repo": "runtime",
+    "path": "crates/trames-native/upstream/bionic-android13/gd_qnan.h",
+    "headers": [
+      [
+        2,
+        " * Copyright (C) 2014 The Android Open Source Project"
+      ]
+    ]
+  },
+  {
+    "repo": "runtime",
+    "path": "crates/trames-native/upstream/bionic-android13/gdtoa.h",
+    "headers": [
+      [
+        5,
+        "Copyright (C) 1998 by Lucent Technologies"
+      ]
+    ]
+  },
+  {
+    "repo": "runtime",
+    "path": "crates/trames-native/upstream/bionic-android13/gdtoaimp.h",
+    "headers": [
+      [
+        5,
+        "Copyright (C) 1998-2000 by Lucent Technologies"
+      ]
+    ]
+  },
+  {
+    "repo": "runtime",
+    "path": "crates/trames-native/upstream/bionic-android13/gethex.c",
+    "headers": [
+      [
+        5,
+        "Copyright (C) 1998 by Lucent Technologies"
+      ]
+    ]
+  },
+  {
+    "repo": "runtime",
+    "path": "crates/trames-native/upstream/bionic-android13/gmisc.c",
+    "headers": [
+      [
+        5,
+        "Copyright (C) 1998 by Lucent Technologies"
+      ]
+    ]
+  },
+  {
+    "repo": "runtime",
+    "path": "crates/trames-native/upstream/bionic-android13/hd_init.c",
+    "headers": [
+      [
+        5,
+        "Copyright (C) 2000 by Lucent Technologies"
+      ]
+    ]
+  },
+  {
+    "repo": "runtime",
+    "path": "crates/trames-native/upstream/bionic-android13/hexnan.c",
+    "headers": [
+      [
+        5,
+        "Copyright (C) 2000 by Lucent Technologies"
+      ]
+    ]
+  },
+  {
+    "repo": "runtime",
+    "path": "crates/trames-native/upstream/bionic-android13/misc.c",
+    "headers": [
+      [
+        5,
+        "Copyright (C) 1998, 1999 by Lucent Technologies"
+      ]
+    ]
+  },
+  {
+    "repo": "runtime",
+    "path": "crates/trames-native/upstream/bionic-android13/smisc.c",
+    "headers": [
+      [
+        5,
+        "Copyright (C) 1998, 1999 by Lucent Technologies"
+      ]
+    ]
+  },
+  {
+    "repo": "runtime",
+    "path": "crates/trames-native/upstream/bionic-android13/strtod.c",
+    "headers": [
+      [
+        5,
+        "Copyright (C) 1998-2001 by Lucent Technologies"
+      ]
+    ]
+  },
+  {
+    "repo": "runtime",
+    "path": "crates/trames-native/upstream/bionic-android13/strtodg.c",
+    "headers": [
+      [
+        5,
+        "Copyright (C) 1998-2001 by Lucent Technologies"
+      ]
+    ]
+  },
+  {
+    "repo": "runtime",
+    "path": "crates/trames-native/upstream/bionic-android13/strtof.c",
+    "headers": [
+      [
+        5,
+        "Copyright (C) 1998, 2000 by Lucent Technologies"
+      ]
+    ]
+  },
+  {
+    "repo": "runtime",
+    "path": "crates/trames-native/upstream/bionic-android13/strtord.c",
+    "headers": [
+      [
+        5,
+        "Copyright (C) 1998, 2000 by Lucent Technologies"
+      ]
+    ]
+  },
+  {
+    "repo": "runtime",
+    "path": "crates/trames-native/upstream/bionic-android13/sum.c",
+    "headers": [
+      [
+        5,
+        "Copyright (C) 1998 by Lucent Technologies"
+      ]
+    ]
+  },
+  {
+    "repo": "runtime",
+    "path": "crates/trames-native/upstream/bionic-android13/ulp.c",
+    "headers": [
+      [
+        5,
+        "Copyright (C) 1998, 1999 by Lucent Technologies"
+      ]
+    ]
+  },
+  {
+    "repo": "runtime",
+    "path": "crates/trames-native/upstream/glibc-2.41/locale/bits/types/__locale_t.h",
+    "headers": [
+      [
+        2,
+        "   Copyright (C) 1997-2025 Free Software Foundation, Inc."
+      ]
+    ]
+  },
+  {
+    "repo": "runtime",
+    "path": "crates/trames-native/upstream/glibc-2.41/stdlib/strtod_l.c",
+    "headers": [
+      [
+        2,
+        "   Copyright (C) 1997-2025 Free Software Foundation, Inc."
+      ]
+    ]
+  },
+  {
+    "repo": "runtime",
+    "path": "crates/trames-native/upstream/glibc-2.41/stdlib/strtod_nan_main.c",
+    "headers": [
+      [
+        2,
+        "   Copyright (C) 1997-2025 Free Software Foundation, Inc."
+      ]
+    ]
+  },
+  {
+    "repo": "runtime",
+    "path": "crates/trames-native/upstream/glibc-2.41/stdlib/strtol_l.c",
+    "headers": [
+      [
+        2,
+        "   Copyright (C) 1997-2025 Free Software Foundation, Inc."
+      ]
+    ]
+  },
+  {
+    "repo": "runtime",
+    "path": "crates/trames-native/upstream/glibc-2.41/sysdeps/generic/tininess.h",
+    "headers": [
+      [
+        3,
+        "   Copyright (C) 2012-2025 Free Software Foundation, Inc."
+      ]
+    ]
+  },
+  {
+    "repo": "runtime",
+    "path": "crates/trames-native/upstream/musl-1.2.5/aarch64/memcpy.S",
+    "headers": [
+      [
+        4,
+        " * Copyright (c) 2012-2020, Arm Limited."
+      ],
+      [
+        5,
+        " * SPDX-License-Identifier: MIT"
+      ]
+    ]
+  },
+  {
+    "repo": "runtime",
+    "path": "crates/trames-native/upstream/musl-1.2.5/aarch64/memset.S",
+    "headers": [
+      [
+        4,
+        " * Copyright (c) 2012-2020, Arm Limited."
+      ],
+      [
+        5,
+        " * SPDX-License-Identifier: MIT"
+      ]
+    ]
+  },
+  {
+    "repo": "runtime",
+    "path": "crates/trames-shared/src/socket.rs",
+    "headers": [
+      [
+        1,
+        "// SPDX-License-Identifier: MIT"
+      ]
+    ]
+  },
+  {
+    "repo": "runtime",
+    "path": "crates/trames-video/guest/bitstream.h",
+    "headers": [
+      [
+        1,
+        "// SPDX-License-Identifier: LGPL-2.1-or-later"
+      ]
+    ]
+  }
+]

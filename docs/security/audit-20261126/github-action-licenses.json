@@ -1,0 +1,32 @@
+[
+  {
+    "archived": false,
+    "full_name": "actions/cache",
+    "html_url": "https://github.com/actions/cache",
+    "license": "MIT"
+  },
+  {
+    "archived": false,
+    "full_name": "actions/checkout",
+    "html_url": "https://github.com/actions/checkout",
+    "license": "MIT"
+  },
+  {
+    "archived": false,
+    "full_name": "actions/download-artifact",
+    "html_url": "https://github.com/actions/download-artifact",
+    "license": "MIT"
+  },
+  {
+    "archived": false,
+    "full_name": "actions/upload-artifact",
+    "html_url": "https://github.com/actions/upload-artifact",
+    "license": "MIT"
+  },
+  {
+    "archived": false,
+    "full_name": "dtolnay/rust-toolchain",
+    "html_url": "https://github.com/dtolnay/rust-toolchain",
+    "license": "MIT"
+  }
+]

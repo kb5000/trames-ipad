@@ -4,6 +4,7 @@
 <key>TramesAppGroup</key><string>$(TRAMES_APP_GROUP)</string>
 <key>UIFileSharingEnabled</key><true/>
 <key>LSSupportsOpeningDocumentsInPlace</key><true/>
-<key>UIBackgroundModes</key><array><string>audio</string></array>
+<key>NSAppTransportSecurity</key><dict><key>NSAllowsLocalNetworking</key><true/><key>NSAllowsArbitraryLoadsInWebContent</key><true/></dict>
+<key>NSLocalNetworkUsageDescription</key><string>Allow Linux applications to connect to services on your local network.</string>
 <key>NSMicrophoneUsageDescription</key><string>Allow microphone input for applications in environments where you enable audio capture.</string>
 </dict></plist>

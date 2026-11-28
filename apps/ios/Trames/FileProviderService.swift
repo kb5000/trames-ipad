@@ -63,8 +63,8 @@ enum FileProviderService {
         lastCheck=now
         guard let catalog=try? RootfsCatalog.load(root) else {return}
         let version=catalog.environments.compactMap { environment -> String? in
-            guard let url=try? environment.storeURL(in:root),let a=try? FileManager.default.attributesOfItem(atPath:url.appendingPathComponent("manifest").path) else {return nil}
-            return "\(environment.id)/\(a[.systemFileNumber] ?? "")/\(a[.modificationDate] ?? "")/\(a[.size] ?? "")"
+            guard let url=try? environment.storeURL(in:root),let signature=try? RootfsSnapshot.signature(store:url) else {return nil}
+            return "\(environment.id)/\(signature)"
         }.joined(separator:";")
         guard version != lastVersion else {return};lastVersion=version
         let observed=(try? JSONDecoder().decode([String].self,from:Data(contentsOf:root.appendingPathComponent("observed-folders.json")))) ?? []

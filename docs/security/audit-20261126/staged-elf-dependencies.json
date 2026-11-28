@@ -1,0 +1,129 @@
+[
+  {
+    "path": "/Users/main/dev/trames/apps/ios/Trames/GuestMusl/libc.so",
+    "sha256": "6dfdda48693d125350664f3e7f5fe2bb1ae4a9801b4f647ba1576a8b98f1b93f",
+    "needed": [],
+    "configuration_or_license_strings": []
+  },
+  {
+    "path": "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/libtrames_vulkan_icd.so",
+    "sha256": "bb5f0db55e9bbf55d4056d33ff020781c465514ac69fd42f0400899528fa14d2",
+    "needed": [
+      "libc.musl-aarch64.so.1"
+    ],
+    "configuration_or_license_strings": []
+  },
+  {
+    "path": "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/Xwayland-native",
+    "sha256": "08257be95ca38b39559e90f8b0af19bf841153d9d31f2a9d493a641b8f64be34",
+    "needed": [
+      "libpixman-1.so.0",
+      "libXfont2.so.2",
+      "libwayland-client.so.0",
+      "libxcvt.so.0",
+      "libxshmfence.so.1",
+      "libdrm.so.2",
+      "libepoxy.so.0",
+      "libgbm.so.1",
+      "libwayland-egl.so.1",
+      "libmd.so.0",
+      "libXau.so.6",
+      "libc.musl-aarch64.so.1"
+    ],
+    "configuration_or_license_strings": []
+  },
+  {
+    "path": "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/libgallium-25.1.9.so",
+    "sha256": "9787c76a6d2f8dfa0380ebac87f7644409758e9e3ce95b4f1f1a90bcc35f2133",
+    "needed": [
+      "libdrm.so.2",
+      "libexpat.so.1",
+      "libz.so.1",
+      "libstdc++.so.6",
+      "libgcc_s.so.1",
+      "libc.musl-aarch64.so.1"
+    ],
+    "configuration_or_license_strings": []
+  },
+  {
+    "path": "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/libEGL.so.1",
+    "sha256": "2170935710eff6a9d887be8d68c87f76adc52a426ea8e93c457a393159e53fa6",
+    "needed": [
+      "libgallium-25.1.9.so",
+      "libexpat.so.1",
+      "libwayland-client.so.0",
+      "libwayland-server.so.0",
+      "libdrm.so.2",
+      "libc.musl-aarch64.so.1"
+    ],
+    "configuration_or_license_strings": []
+  },
+  {
+    "path": "/Users/main/dev/trames/apps/ios/Trames/GuestVulkan/trames-xwayland",
+    "sha256": "cc53ae46c81c314d7deea280d2d72cd1711d67403612433510fd12adf0deda11",
+    "needed": [
+      "libc.musl-aarch64.so.1"
+    ],
+    "configuration_or_license_strings": []
+  },
+  {
+    "path": "/Users/main/dev/trames/apps/ios/Trames/GuestVideo/trames_drv_video.so",
+    "sha256": "a936343324564cfd4c23dfb379588b9e113753d8322c8563a24dc8b54f623b0c",
+    "needed": [
+      "libc.musl-aarch64.so.1"
+    ],
+    "configuration_or_license_strings": []
+  },
+  {
+    "path": "/Users/main/dev/trames/apps/ios/Trames/GuestVideo/libavcodec.so.61",
+    "sha256": "a7dab96bc8016f0e504991b131f55e844c4d5527f91b313e910c0774c5f1b244",
+    "needed": [
+      "libswresample.so.5",
+      "libavutil.so.59",
+      "libva.so.2",
+      "libc.musl-aarch64.so.1"
+    ],
+    "configuration_or_license_strings": [
+      "--prefix=/work/ipad-video-build/target/video-ffmpeg/install --disable-doc --disable-debug --disable-static --enable-shared --disable-autodetect --disable-ffplay --enable-vaapi --enable-libdrm --enable-cross-compile --arch=aarch64 --target-os=linux --cc=/work/ipad-graphics-build/target/mesa-egl/musl-cc --disable-programs --disable-avdevice --disable-avfilter --disable-avformat --disable-postproc",
+      "libavcodec license: LGPL version 2.1 or later"
+    ]
+  },
+  {
+    "path": "/Users/main/dev/trames/apps/ios/Trames/GuestVideo/libswresample.so.5",
+    "sha256": "cbb2a97358ec28d1861a823022bb384c64edd334743e98ae408f1c0d33817ac1",
+    "needed": [
+      "libavutil.so.59",
+      "libc.musl-aarch64.so.1"
+    ],
+    "configuration_or_license_strings": [
+      "--prefix=/work/ipad-video-build/target/video-ffmpeg/install --disable-doc --disable-debug --disable-static --enable-shared --disable-autodetect --disable-ffplay --enable-vaapi --enable-libdrm --enable-cross-compile --arch=aarch64 --target-os=linux --cc=/work/ipad-graphics-build/target/mesa-egl/musl-cc --disable-programs --disable-avdevice --disable-avfilter --disable-avformat --disable-postproc",
+      "libswresample license: LGPL version 2.1 or later"
+    ]
+  },
+  {
+    "path": "/Users/main/dev/trames/apps/ios/Trames/GuestVideo/libswscale.so.8",
+    "sha256": "75ef3705026e8e7904d60e212776193b127126412246600c38c994b98656077f",
+    "needed": [
+      "libavutil.so.59",
+      "libc.musl-aarch64.so.1"
+    ],
+    "configuration_or_license_strings": [
+      "--prefix=/work/ipad-video-build/target/video-ffmpeg/install --disable-doc --disable-debug --disable-static --enable-shared --disable-autodetect --disable-ffplay --enable-vaapi --enable-libdrm --enable-cross-compile --arch=aarch64 --target-os=linux --cc=/work/ipad-graphics-build/target/mesa-egl/musl-cc --disable-programs --disable-avdevice --disable-avfilter --disable-avformat --disable-postproc",
+      "libswscale license: LGPL version 2.1 or later"
+    ]
+  },
+  {
+    "path": "/Users/main/dev/trames/apps/ios/Trames/GuestVideo/libavutil.so.59",
+    "sha256": "99c721cac2df0da7c205c9ef49e1827185a3c04e12216b06ae665571cd7fe892",
+    "needed": [
+      "libva-drm.so.2",
+      "libva.so.2",
+      "libdrm.so.2",
+      "libc.musl-aarch64.so.1"
+    ],
+    "configuration_or_license_strings": [
+      "--prefix=/work/ipad-video-build/target/video-ffmpeg/install --disable-doc --disable-debug --disable-static --enable-shared --disable-autodetect --disable-ffplay --enable-vaapi --enable-libdrm --enable-cross-compile --arch=aarch64 --target-os=linux --cc=/work/ipad-graphics-build/target/mesa-egl/musl-cc --disable-programs --disable-avdevice --disable-avfilter --disable-avformat --disable-postproc",
+      "libavutil license: LGPL version 2.1 or later"
+    ]
+  }
+]

@@ -17,6 +17,13 @@ public struct LocalDisplayStatus: Decodable, Sendable {
     public let height: UInt32
     public let presented: UInt64
 }
+/// Whole embedding process, shared by the manager and all local sessions.
+public struct LocalProcessMemory: Codable, Sendable {
+    public let pid: UInt32
+    public let resident_bytes: UInt64
+    public let physical_footprint_bytes: UInt64?
+    public let runtime_workers: UInt64
+}
 public struct LocalTerminalStatus: Decodable, Sendable {
     public let phase: String
     public let error: String?
@@ -28,11 +35,28 @@ public struct AndroidImageDownload: Decodable, Sendable {
     public let size: UInt64
     public let sha256: String
 }
+public struct LocalListeningPort: Decodable, Sendable, Hashable, Identifiable {
+    public let port: UInt16
+    public let address: String
+    public let url: String
+    public var id: String { "\(address):\(port)" }
+}
+public struct LocalHostMount: Sendable, Equatable {
+    public let target: String
+    public let host: URL
+    public let readonly: Bool
+    public init(target: String, host: URL, readonly: Bool = false) {
+        self.target = target
+        self.host = host
+        self.readonly = readonly
+    }
+}
 /// Methods are serialized by the frontend; the ABI itself is thread-safe.
 public final class LocalSession: @unchecked Sendable {
     private let lock = NSLock()
     private var handle: UInt64
-    public init(store: URL, rootfs: URL?, total: UInt64, available: UInt64, network: String = "host", useVolumeBudget: Bool = false, muslLibc: URL? = nil, bionicBundle: URL? = nil, glibcBundle: URL? = nil, pureAccelerator: Bool = false, vulkanICD: URL? = nil, memoryBudgetMiB: Int = 1024, processMemoryBudgetMiB: Int = 512, multipleTerminals: Bool = false, initiallyPaused: Bool = false, storeOwnerLock: URL? = nil, distribution: String = "alpine", initMode: String = "shell", command: [String]? = nil, debianPackages: String? = nil, prepareSystemd: Bool = false, target: String = "linux", environmentConfig: URL? = nil, environmentGrants: URL? = nil) throws {
+    private var mountLease: SessionMountLease?
+    public init(store: URL, rootfs: URL?, total: UInt64, available: UInt64, network: String = "host", useVolumeBudget: Bool = true, muslLibc: URL? = nil, bionicBundle: URL? = nil, glibcBundle: URL? = nil, pureAccelerator: Bool = false, vulkanICD: URL? = nil, memoryBudgetMiB: Int = 1024, processMemoryBudgetMiB: Int = 512, multipleTerminals: Bool = false, initiallyPaused: Bool = false, storeOwnerLock: URL? = nil, distribution: String = "alpine", initMode: String = "shell", command: [String]? = nil, debianPackages: String? = nil, prepareSystemd: Bool = false, target: String = "linux", environmentConfig: URL? = nil, environmentGrants: URL? = nil, hostMounts: [LocalHostMount] = [], mountLease: SessionMountLease? = nil) throws {
         guard memoryBudgetMiB > 0, processMemoryBudgetMiB > 0,
               processMemoryBudgetMiB <= memoryBudgetMiB,
               memoryBudgetMiB <= (1 << 28) else { throw TramesError.message("Invalid guest memory budget") }
@@ -62,11 +86,21 @@ public final class LocalSession: @unchecked Sendable {
         if let driver = Bundle.main.url(forResource: "trames_drv_video", withExtension: "so", subdirectory: "GuestVideo") {
             options["video_driver"] = driver.path
         }
+        if let audioPlugin = Bundle.main.url(forResource: "libasound_module_pcm_trames", withExtension: "so", subdirectory: "GuestAudio") {
+            options["audio_plugin"] = audioPlugin.path
+        }
         options["budget_bytes"] = useVolumeBudget ? total : UInt64(16) << 30
         options["timezone"] = try LocalTimezone().options
+        if !hostMounts.isEmpty {
+            options["host_mounts"] = hostMounts.map { ["target": $0.target, "host": $0.host.path, "readonly": $0.readonly] }
+        }
         let data = try JSONSerialization.data(withJSONObject: options)
         handle = data.withUnsafeBytes { trames_session_open($0.bindMemory(to: UInt8.self).baseAddress, UInt32($0.count)) }
-        guard handle != 0 else { throw Self.lastError() }
+        guard handle != 0 else {
+            mountLease?.release()
+            throw Self.lastError()
+        }
+        self.mountLease = mountLease ?? SessionMountLease()
     }
     deinit { close() }
     public static func environmentConfig(_ request:[String:Any]) throws -> Data {
@@ -126,6 +160,8 @@ public final class LocalSession: @unchecked Sendable {
     public func close() {
         lock.lock(); defer { lock.unlock() }
         if handle != 0 { _ = trames_session_close(handle); handle = 0 }
+        mountLease?.release()
+        mountLease = nil
     }
     func currentHandle() throws -> UInt64 {
         lock.lock(); defer { lock.unlock() }
@@ -133,6 +169,21 @@ public final class LocalSession: @unchecked Sendable {
     }
     public func captureAndroidLogcat() throws {
         guard trames_session_android_logcat(try currentHandle()) == 0 else {throw Self.lastError()}
+    }
+    public func webProxyPort() throws -> UInt16 {
+        let port = trames_session_web_proxy_port(try currentHandle())
+        guard port > 0 && port <= Int32(UInt16.max) else { throw Self.lastError() }
+        return UInt16(port)
+    }
+    public func listeningPorts() throws -> [LocalListeningPort] {
+        let h = try currentHandle()
+        var data = Data(count: 16384)
+        let count = data.withUnsafeMutableBytes {
+            trames_session_listening_ports(h, $0.bindMemory(to: UInt8.self).baseAddress, UInt32($0.count))
+        }
+        guard count >= 0 else { throw Self.lastError() }
+        data.count = Int(count)
+        return try JSONDecoder().decode([LocalListeningPort].self, from: data)
     }
     public func send(_ data: Data, terminal: UInt64 = 1) throws -> Int {
         guard data.count <= 65536 else { throw TramesError.message("Input chunk exceeds 64 KiB") }
@@ -152,6 +203,15 @@ public final class LocalSession: @unchecked Sendable {
         let count = data.withUnsafeMutableBytes { trames_session_status(h, $0.bindMemory(to: UInt8.self).baseAddress, UInt32($0.count)) }
         guard count >= 0 else { throw Self.lastError() }; data.count = Int(count)
         return try JSONDecoder().decode(LocalStatus.self, from: data)
+    }
+    /// Explicit diagnostic; safe before opening or after closing the last session.
+    public static func processMemory() throws -> LocalProcessMemory {
+        var data = Data(count: 4096)
+        let count = data.withUnsafeMutableBytes {
+            trames_process_memory($0.bindMemory(to: UInt8.self).baseAddress, UInt32($0.count))
+        }
+        guard count >= 0 else { throw Self.lastError() }; data.count = Int(count)
+        return try JSONDecoder().decode(LocalProcessMemory.self, from: data)
     }
     public func resize(columns: Int, rows: Int, terminal: UInt64 = 1) throws {
         guard (1...4096).contains(columns), (1...4096).contains(rows) else { return }
@@ -190,6 +250,40 @@ public final class LocalSession: @unchecked Sendable {
         let count = data.withUnsafeMutableBytes { trames_session_display_status(h, $0.bindMemory(to: UInt8.self).baseAddress, UInt32($0.count)) }
         guard count >= 0 else { throw Self.lastError() }; data.count = Int(count)
         return try JSONDecoder().decode(LocalDisplayStatus.self, from: data)
+    }
+    /// Live hot-mount on a running session; call on a background queue.
+    public func mountHost(_ mount: LocalHostMount, scopedURL: URL? = nil) throws {
+        let payload: [String: Any] = ["target": mount.target, "host": mount.host.path, "readonly": mount.readonly]
+        let data = try JSONSerialization.data(withJSONObject: payload)
+        guard data.count <= 65536 else { throw TramesError.message("Mount request exceeds 64 KiB") }
+        let h = try currentHandle()
+        let result = data.withUnsafeBytes {
+            trames_session_mount_host(h, $0.bindMemory(to: UInt8.self).baseAddress, UInt32($0.count))
+        }
+        if result < 0 {
+            scopedURL?.stopAccessingSecurityScopedResource()
+            throw Self.lastError()
+        }
+        if let scopedURL {
+            lock.lock()
+            let lease = mountLease
+            lock.unlock()
+            lease?.retain(scopedURL, for: mount.target)
+        }
+    }
+    /// Live hot-unmount on a running session; call on a background queue.
+    public func unmountHost(target: String) throws {
+        let data = try JSONSerialization.data(withJSONObject: ["target": target])
+        guard data.count <= 65536 else { throw TramesError.message("Unmount request exceeds 64 KiB") }
+        let h = try currentHandle()
+        let result = data.withUnsafeBytes {
+            trames_session_unmount_host(h, $0.bindMemory(to: UInt8.self).baseAddress, UInt32($0.count))
+        }
+        if result < 0 { throw Self.lastError() }
+        lock.lock()
+        let lease = mountLease
+        lock.unlock()
+        lease?.release(target: target)
     }
     /// Blocking coordinator update; caller runs it off the main queue after resuming.
     public func synchronizeTimezone(_ zone: TimeZone = .current) throws {

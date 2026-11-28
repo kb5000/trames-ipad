@@ -10,7 +10,9 @@ final class AppearanceTests:XCTestCase {
         app.launch();XCTAssertTrue(app.buttons["session-actions"].waitForExistence(timeout:15));return app
     }
     private func settings(_ app:XCUIApplication) {
-        app.buttons["session-actions"].tap();app.buttons["Settings"].firstMatch.tap()
+        app.buttons["open-manager"].tap()
+        let row=app.descendants(matching:.any)["manager-row-settings"].firstMatch
+        XCTAssertTrue(row.waitForExistence(timeout:8),app.debugDescription);row.tap()
         XCTAssertTrue(app.buttons["interface-style"].waitForExistence(timeout:5),app.debugDescription)
     }
     private func select(_ style:String,in app:XCUIApplication) {
@@ -34,13 +36,12 @@ final class AppearanceTests:XCTestCase {
     func testAppearanceSwitchesLiveAndPersistsAcrossLaunch() {
         var app=launch();settings(app);select("Light",in:app);XCTAssertGreaterThan(capture("iPad settings light"),0.65)
         select("Dark",in:app);XCTAssertLessThan(capture("iPad settings dark"),0.35)
-        app.buttons["Done"].tap();app.buttons["session-actions"].tap();app.buttons["Linux Environments"].firstMatch.tap()
         XCTAssertTrue(app.buttons["create-linux-environment"].waitForExistence(timeout:8));capture("iPad manager dark")
         app.terminate();app=launch();settings(app)
         XCTAssertTrue(app.buttons["interface-style"].label.contains("Dark"))
-        select("Light",in:app);app.buttons["Done"].tap();app.buttons["session-actions"].tap();app.buttons["Linux Environments"].firstMatch.tap()
+        select("Light",in:app)
         XCTAssertTrue(app.buttons["create-linux-environment"].waitForExistence(timeout:8));capture("iPad manager light")
-        app.buttons["Done"].tap();settings(app);select("Follow System",in:app)
+        select("Follow System",in:app)
         app.terminate()
     }
 }

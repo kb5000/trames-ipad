@@ -6,11 +6,12 @@
 mod android_boot;
 mod android_logcat;
 mod clipboard;
+mod guest_proxy;
 mod host_memory;
 mod session;
 mod terminals;
 mod wayland;
-use session::{HostTimezone, Options, Session, TransferOptions, QUEUE_LIMIT};
+use session::{HostMount, HostTimezone, Options, Session, TransferOptions, QUEUE_LIMIT};
 use std::{
     cell::RefCell,
     collections::BTreeMap,
@@ -39,6 +40,32 @@ pub extern "C" fn trames_session_android_logcat(handle: u64) -> i32 {
             .map_err(str::to_string)
             .and_then(|s| s.capture_android_logcat())
             .map(|()| 0)
+            .unwrap_or_else(error)
+    })
+}
+#[no_mangle]
+pub extern "C" fn trames_session_web_proxy_port(handle: u64) -> i32 {
+    boundary(|| {
+        session(handle)
+            .map_err(str::to_string)
+            .and_then(|s| s.web_proxy_port())
+            .map(i32::from)
+            .unwrap_or_else(error)
+    })
+}
+/// # Safety
+/// `json` must be valid for `capacity` writable bytes when `capacity > 0`.
+#[no_mangle]
+pub unsafe extern "C" fn trames_session_listening_ports(
+    handle: u64,
+    json: *mut u8,
+    capacity: u32,
+) -> i32 {
+    boundary(|| {
+        session(handle)
+            .map_err(str::to_string)
+            .and_then(|s| s.listening_ports_json())
+            .and_then(|bytes| unsafe { copy(json, capacity, &bytes) }.map_err(str::to_string))
             .unwrap_or_else(error)
     })
 }
@@ -681,6 +708,49 @@ pub extern "C" fn trames_session_transfer_begin(handle: u64) -> u64 {
             0
         }
     }
+}
+/// # Safety
+/// JSON is a caller-owned readable buffer; see `bytes`. Runs on the guest coordinator.
+#[no_mangle]
+pub unsafe extern "C" fn trames_session_mount_host(
+    handle: u64,
+    pointer: *const u8,
+    length: u32,
+) -> i32 {
+    boundary(|| {
+        let result = (|| {
+            let mount: HostMount =
+                serde_json::from_slice(unsafe { bytes(pointer, length) }.map_err(str::to_string)?)
+                    .map_err(|e| e.to_string())?;
+            session(handle).map_err(str::to_string)?.mount_host(mount)
+        })();
+        result.map(|_| 0).unwrap_or_else(error)
+    })
+}
+/// # Safety
+/// JSON is a caller-owned readable buffer (`{"target":"/mnt/iPad/..."}`); see `bytes`.
+#[no_mangle]
+pub unsafe extern "C" fn trames_session_unmount_host(
+    handle: u64,
+    pointer: *const u8,
+    length: u32,
+) -> i32 {
+    #[derive(serde::Deserialize)]
+    #[serde(deny_unknown_fields)]
+    struct UnmountRequest {
+        target: String,
+    }
+    boundary(|| {
+        let result = (|| {
+            let request: UnmountRequest =
+                serde_json::from_slice(unsafe { bytes(pointer, length) }.map_err(str::to_string)?)
+                    .map_err(|e| e.to_string())?;
+            session(handle)
+                .map_err(str::to_string)?
+                .unmount_host(request.target)
+        })();
+        result.map(|_| 0).unwrap_or_else(error)
+    })
 }
 /// # Safety
 /// JSON is a caller-owned readable buffer; see `bytes`. Runs on the guest coordinator.

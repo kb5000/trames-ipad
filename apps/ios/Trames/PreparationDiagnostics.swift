@@ -8,7 +8,7 @@ import TramesKit
 /// Producers call directly; no timer, polling task, or resource service thread.
 final class PreparationDiagnostics:@unchecked Sendable {
     static var logURL:URL {
-        FileManager.default.urls(for:.documentDirectory,in:.userDomainMask)[0]
+        FileManager.default.urls(for:.cachesDirectory,in:.userDomainMask)[0]
             .appendingPathComponent("Diagnostics/environment-preparation.jsonl")
     }
     private let lock=NSLock()

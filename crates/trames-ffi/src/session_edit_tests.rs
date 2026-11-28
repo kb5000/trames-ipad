@@ -83,6 +83,9 @@ fn enqueue(
 fn live_edit_waits_for_staging_and_validation_and_uses_the_once_opened_native_source() {
     let temp = Temp::new();
     let (mut v, _, replacement, expected) = setup(&temp);
+    let journal_before = fs::metadata(temp.0.join("store/manifest.wal"))
+        .unwrap()
+        .len();
     let old_inode = expected.inode;
     let source = temp.0.join("source");
     fs::write(&source, &replacement).unwrap();
@@ -128,8 +131,11 @@ fn live_edit_waits_for_staging_and_validation_and_uses_the_once_opened_native_so
             "{stats}"
         );
     }
-    let written =
-        replacement.len() as u64 + fs::metadata(temp.0.join("store/manifest")).unwrap().len();
+    let written = replacement.len() as u64
+        + fs::metadata(temp.0.join("store/manifest.wal"))
+            .unwrap()
+            .len()
+        - journal_before;
     assert!(
         stats
             .split_whitespace()

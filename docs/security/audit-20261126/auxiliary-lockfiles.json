@@ -1,0 +1,17 @@
+[
+  {
+    "repo": "ipad",
+    "path": "tests/performance/boundary-cost/Cargo.lock",
+    "packages": 21
+  },
+  {
+    "repo": "runtime",
+    "path": "vendor/wayland-backend/Cargo.lock",
+    "packages": 60
+  },
+  {
+    "repo": "mac",
+    "path": "benchmarks/memory-architecture/Cargo.lock",
+    "packages": 3
+  }
+]

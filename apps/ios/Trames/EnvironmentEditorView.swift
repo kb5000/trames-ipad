@@ -70,21 +70,33 @@ struct EnvironmentDetailView:View {
     let open:(Bool)->Void
     let restart:()->Void
     let stop:()->Void
+    let reset:()->Void
     let delete:()->Void
     @State private var page:EnvironmentPage = .overview
     @State private var editingTOML=false
     @State private var importing=false
     @State private var export:URL?
     @State private var toml=""
+    @State private var mountConfig = EnvironmentMountConfiguration()
+    @State private var failedMountIDs: Set<UUID> = []
+    @State private var pickingMountFolder = false
+    @State private var mountError: String?
+    @State private var mountNotice: String?
+    @State private var renamingMount: EnvironmentMount?
+    @State private var renameText = ""
+    @State private var copiedPath: String?
     var body:some View {
         VStack(spacing:0) {
-            HStack(alignment:.top) {
+            HStack(alignment:.center, spacing:12) {
                 VStack(alignment:.leading,spacing:5) {
                     Text(profile.name).font(.title2.bold()).accessibilityIdentifier("environment-detail-name")
                     Text("\(profile.distro.capitalized) · \(editor.document?.string("boot.mode") ?? profile.boot)").font(.subheadline).foregroundStyle(.secondary)
                 }
                 Spacer(minLength:12)
-                Button(L10n.text(workspace.selectedEnvironmentID==profile.id && workspace.local != nil ? "打开终端":"打开环境"),systemImage:"terminal") {open(false)}.buttonStyle(.borderedProminent).accessibilityIdentifier("open-environment")
+                HStack(alignment:.center, spacing:8) {
+                    Button(L10n.text(workspace.selectedEnvironmentID==profile.id && workspace.local != nil ? "打开终端":"打开环境"),systemImage:"terminal") {open(false)}
+                        .buttonStyle(.borderedProminent)
+                        .accessibilityIdentifier("open-environment")
                     Menu {
                         if workspace.selectedEnvironmentID==profile.id,workspace.local != nil {
                             Button(L10n.text("重新启动环境"),systemImage:"arrow.clockwise") {restart()}
@@ -92,8 +104,16 @@ struct EnvironmentDetailView:View {
                         }
                         if profile.bootTarget=="linux" {Button(L10n.text("打开维护终端")) {open(true)}}
                         Divider()
+                        Button(L10n.text("重置环境…"),systemImage:"arrow.counterclockwise",role:.destructive) {reset()}.accessibilityIdentifier("reset-environment")
                         Button(L10n.text("删除环境…"),systemImage:"trash",role:.destructive) {delete()}.accessibilityIdentifier("delete-environment")
-                    } label:{Image(systemName:"ellipsis.circle").font(.title2)}.accessibilityLabel(L10n.text("更多"))
+                    } label:{
+                        Image(systemName:"ellipsis")
+                            .font(.body.weight(.semibold))
+                            .frame(minWidth:20,minHeight:20)
+                    }
+                    .buttonStyle(.bordered)
+                    .accessibilityLabel(L10n.text("更多"))
+                }
             }.padding()
             ScrollView(.horizontal) {
                 HStack(spacing:6) {ForEach(EnvironmentPage.allCases) {item in
@@ -119,7 +139,11 @@ struct EnvironmentDetailView:View {
                 Button(L10n.text("还原草稿")) {editor.revert()}.disabled(!editor.dirty || editor.saving)
                 Button(L10n.text("保存配置")) {Task {_=await editor.save(profile,workspace:workspace)}}.buttonStyle(.borderedProminent).disabled(!editor.dirty || editor.saving).accessibilityIdentifier("save-environment-config")
             }.padding().background(.bar)
-        }.task(id:profile.id) {page = .overview;export=nil;await editor.load(profile,workspace:workspace)}
+        }.task(id:profile.id) {
+            page = .overview; export = nil; mountError = nil; mountNotice = nil
+            await editor.load(profile, workspace: workspace)
+            await reloadMounts()
+        }
             .sheet(isPresented:$editingTOML) {TOMLEditor(text:toml) {text in try editor.applyTOML(text)}}
             .fileImporter(isPresented:$importing,allowedContentTypes:[.plainText,.data]) {result in
                 do {
@@ -127,6 +151,46 @@ struct EnvironmentDetailView:View {
                     guard (try url.resourceValues(forKeys:[.fileSizeKey])).fileSize ?? Int.max <= 65536 else {throw TramesError.message(L10n.text("配置文件不能超过 64 KiB"))}
                     try editor.applyTOML(String(contentsOf:url,encoding:.utf8),importing:true)
                 } catch {editor.failure=error.localizedDescription}
+            }
+            .fileImporter(isPresented: $pickingMountFolder, allowedContentTypes: [.folder]) { result in
+                Task {
+                    do {
+                        guard let store = workspace.mounts else { return }
+                        let url = try result.get()
+                        let updated = try await store.add(selected: url, readonly: false, for: profile.id)
+                        mountConfig = updated
+                        mountError = nil
+                        if let added = updated.mounts.last {
+                            await applyLiveMount(id: added.id)
+                        }
+                    } catch {
+                        mountError = error.localizedDescription
+                    }
+                }
+            }
+            .alert(L10n.text("重命名挂载点"), isPresented: Binding(get: { renamingMount != nil }, set: { if !$0 { renamingMount = nil } })) {
+                TextField(L10n.text("目录名称"), text: $renameText)
+                    .autocorrectionDisabled()
+                    .textInputAutocapitalization(.never)
+                Button(L10n.text("保存")) {
+                    guard let target = renamingMount else { return }
+                    let oldPath = target.guestPath
+                    let newName = renameText
+                    renamingMount = nil
+                    Task {
+                        do {
+                            guard let store = workspace.mounts else { return }
+                            mountConfig = try await store.rename(newName, id: target.id, for: profile.id)
+                            mountError = nil
+                            await applyLiveRemount(oldPath: oldPath, id: target.id)
+                        } catch {
+                            mountError = error.localizedDescription
+                        }
+                    }
+                }
+                Button(L10n.text("取消"), role: .cancel) { renamingMount = nil }
+            } message: {
+                Text(L10n.text("目录将挂载到 /mnt/iPad/<名称>，不能命名为 Shared。"))
             }
     }
     private func overview(_ document:EnvironmentConfiguration)->some View {
@@ -160,25 +224,73 @@ struct EnvironmentDetailView:View {
                     Text(L10n.text("全部可用核心")).tag("all")
                     ForEach(1...max(1,min(32,ProcessInfo.processInfo.activeProcessorCount)),id:\.self) {Text(String($0)).tag(String($0))}
                 }.accessibilityIdentifier("environment-cpus")
-                EnvironmentMemoryPicker(title:"内存",value:editor.string("resources.memory"),automatic:true).accessibilityIdentifier("environment-memory")
-                EnvironmentMemoryPicker(title:"额外内存上限",value:Binding(get:{editor.document?.string("resources.memory_limit") ?? ""},set:{editor.document?.set("resources.memory_limit",$0.isEmpty ? .null:.string($0))}),automatic:false)
-                Text(L10n.text("内存按需分配，不会预先占满。自动模式由系统管理，iPadOS 仍决定 App 可用的内存额度。")).font(.caption).foregroundStyle(.secondary)
+                EnvironmentMemoryPicker(title:"内存",value:Binding(get:{
+                    let limit = editor.document?.string("resources.memory_limit") ?? ""
+                    return limit.isEmpty ? (editor.document?.string("resources.memory") ?? "auto") : limit
+                },set:{
+                    editor.document?.set("resources.memory",.string($0))
+                    editor.document?.set("resources.memory_limit",.null)
+                }),automatic:true).accessibilityIdentifier("environment-memory")
+                let availableBytes = WorkspaceModel.currentAvailableMemoryBytes()
+                if availableBytes > 0 {
+                    LabeledContent(L10n.text("当前设备可用内存"), value: ByteCountFormatter.string(fromByteCount: Int64(availableBytes), countStyle: .binary))
+                }
+                Text(L10n.text("内存按需分配，不会预先占满。iPadOS 上会自动保留安全余量以防止超限闪退。")).font(.caption).foregroundStyle(.secondary)
             }
             Section(L10n.text("启动与会话")) {
                 if profile.bootTarget=="android" {LabeledContent(L10n.text("启动方式"),value:"Android init")}
                 else {
                     Picker(L10n.text("启动方式"),selection:editor.string("boot.mode")) {Text("Shell").tag("shell");if profile.distro != "alpine" {Text("systemd").tag("systemd")}}
                     if profile.distro=="debian" {Text(L10n.text("选择 systemd 后，下次启动会自动准备所需的软件包。")).font(.caption).foregroundStyle(.secondary)}
-                    TextField(L10n.text("工作目录"),text:editor.string("session.cwd")).autocorrectionDisabled().textInputAutocapitalization(.never).accessibilityIdentifier("environment-cwd")
+                    HStack {
+                        Text(L10n.text("登录用户"))
+                        TextField("root",text:editor.string("session.user"))
+                            .multilineTextAlignment(.trailing)
+                            .autocorrectionDisabled()
+                            .textInputAutocapitalization(.never)
+                            .accessibilityIdentifier("environment-user")
+                    }
+                    HStack {
+                        Text(L10n.text("工作目录"))
+                        TextField(L10n.text("自动（用户主目录）"),text:editor.string("session.cwd"))
+                            .multilineTextAlignment(.trailing)
+                            .autocorrectionDisabled()
+                            .textInputAutocapitalization(.never)
+                            .accessibilityIdentifier("environment-cwd")
+                    }
                     let args=document.strings("session.shell")
-                    ForEach(Array(args.enumerated()),id:\.offset) {index,_ in
+                    if args.isEmpty {
+                        LabeledContent(L10n.text("启动 Shell"), value: L10n.text("跟随登录用户（/etc/passwd）"))
+                        Button(L10n.text("自定义启动命令"),systemImage:"plus") {
+                            editor.document?.set("session.shell",.array([.string("/bin/sh"), .string("-l")]))
+                        }
+                    } else {
+                        ForEach(Array(args.enumerated()),id:\.offset) {index,_ in
+                            HStack {
+                                TextField(L10n.text(index==0 ? "Shell 路径":"参数"),text:Binding(get:{editor.document?.strings("session.shell").indices.contains(index)==true ? editor.document!.strings("session.shell")[index]:""},set:{var args=editor.document?.strings("session.shell") ?? [];if args.indices.contains(index) {args[index]=$0;editor.document?.set("session.shell",.array(args.map(BridgeValue.string)))}})).textInputAutocapitalization(.never).autocorrectionDisabled()
+                                Button(role:.destructive) {
+                                    var args=editor.document?.strings("session.shell") ?? []
+                                    if args.indices.contains(index) {
+                                        if index == 0 {
+                                            args.removeAll()
+                                        } else {
+                                            args.remove(at:index)
+                                        }
+                                        editor.document?.set("session.shell",.array(args.map(BridgeValue.string)))
+                                    }
+                                } label:{Image(systemName:"minus.circle")}.accessibilityLabel(L10n.text("删除参数"))
+                            }
+                        }
                         HStack {
-                            TextField(L10n.text(index==0 ? "Shell 路径":"参数"),text:Binding(get:{editor.document?.strings("session.shell").indices.contains(index)==true ? editor.document!.strings("session.shell")[index]:""},set:{var args=editor.document?.strings("session.shell") ?? [];if args.indices.contains(index) {args[index]=$0;editor.document?.set("session.shell",.array(args.map(BridgeValue.string)))}})).textInputAutocapitalization(.never).autocorrectionDisabled()
-                            if index>0 {Button(role:.destructive) {var args=editor.document?.strings("session.shell") ?? [];args.remove(at:index);editor.document?.set("session.shell",.array(args.map(BridgeValue.string)))} label:{Image(systemName:"minus.circle")}.accessibilityLabel(L10n.text("删除参数"))}
+                            Button(L10n.text("添加参数"),systemImage:"plus") {var args=editor.document?.strings("session.shell") ?? [];args.append("");editor.document?.set("session.shell",.array(args.map(BridgeValue.string)))}
+                            Spacer()
+                            Button(L10n.text("跟随登录用户")) {
+                                editor.document?.set("session.shell",.array([]))
+                            }
+                            .foregroundStyle(.secondary)
                         }
                     }
-                    Button(L10n.text("添加参数"),systemImage:"plus") {var args=editor.document?.strings("session.shell") ?? [];args.append("");editor.document?.set("session.shell",.array(args.map(BridgeValue.string)))}
-                    Text(L10n.text("每一项是独立参数；空格和引号会原样传给程序。")).font(.caption).foregroundStyle(.secondary)
+                    Text(L10n.text("留空时自动读取 /etc/passwd 中该用户的登录 Shell 与主目录（例如 Debian 默认 bash，chsh 修改后新终端即生效）。")).font(.caption).foregroundStyle(.secondary)
                 }
             }
             Section(L10n.text("原生组件")) {
@@ -210,7 +322,6 @@ struct EnvironmentDetailView:View {
                 permission("文件传输","仅访问 Files 中已授权的目录","files")
                 permission("宿主界面操作","从环境打开网址、管理器和设备信息","host_ui")
             } header:{Text(L10n.text("环境权限"))} footer:{Text(L10n.text("允许后按环境权限直接执行，iPadOS 系统权限仍然有效。保存后下次启动生效。"))}
-            Section(L10n.text("平台支持")) {ForEach(["宿主命令执行","宿主 Trames CLI","动态挂载","端口管理"],id:\.self) {title in LabeledContent(L10n.text(title),value:L10n.text("Mac 专属"))}}
         }
     }
     private func permission(_ title:String,_ detail:String,_ key:String)->some View {
@@ -218,12 +329,223 @@ struct EnvironmentDetailView:View {
     }
     private var files:some View {
         Form {
-            Section(L10n.text("Files 互通")) {
-                if let directories=workspace.directories {NavigationLink(L10n.text("Files 目录授权")) {FolderGrantsView(store:directories)}}
-                Text(L10n.text("已安装环境可在 Files App 的 Trames 位置浏览。目录授权保存在此 iPad，环境只能通过已授权目录传输文件。")).font(.callout)
-                Text(L10n.text("iPad 目前使用文件导入、导出和编辑写回；宿主目录直通挂载仅在 Mac 提供。")).font(.caption).foregroundStyle(.secondary)
+            Section {
+                Toggle(L10n.text("挂载「我的 iPad → Trames」"), isOn: Binding(
+                    get: { mountConfig.mountSharedDirectory },
+                    set: { enabled in
+                        mountConfig.mountSharedDirectory = enabled
+                        Task {
+                            do {
+                                guard let store = workspace.mounts else { return }
+                                mountConfig = try await store.setMountSharedDirectory(enabled, for: profile.id)
+                                mountError = nil
+                                await applyLiveSharedDirectory(enabled: enabled)
+                            } catch {
+                                mountError = error.localizedDescription
+                            }
+                        }
+                    }
+                ))
+                .accessibilityIdentifier("toggle-shared-directory")
+                if mountConfig.mountSharedDirectory {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(L10n.text("挂载路径")).font(.subheadline)
+                            Text(MountStore.sharedGuestPath).font(.caption.monospaced()).foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                        Button {
+                            copyGuestPath(MountStore.sharedGuestPath)
+                        } label: {
+                            Image(systemName: copiedPath == MountStore.sharedGuestPath ? "checkmark" : "doc.on.doc")
+                        }
+                        .buttonStyle(.borderless)
+                        .accessibilityLabel(L10n.text("复制路径"))
+                    }
+                }
+            } header: {
+                Text(L10n.text("内置共享目录"))
+            } footer: {
+                Text(L10n.text("开启后，Linux 内可直接读写「我的 iPad → Trames」与 USB 访达文件共享目录。从其他 App 分享到 Trames 的文件保存在 /mnt/iPad/Shared/Imports。"))
             }
-            Section(L10n.text("私有存储")) {LabeledContent(L10n.text("环境目录")) {Text(profile.store).font(.caption.monospaced()).textSelection(.enabled)};Text(L10n.text("每个环境独立保存软件和文件。切换环境不会复制或删除这些数据。")).font(.caption).foregroundStyle(.secondary)}
+
+            Section {
+                if mountConfig.mounts.isEmpty {
+                    Text(L10n.text("尚未添加自定义目录")).foregroundStyle(.secondary)
+                } else {
+                    ForEach(mountConfig.mounts) { mount in
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack(alignment: .center, spacing: 10) {
+                                Image(systemName: "folder.fill").foregroundStyle(.tint)
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(mount.name).font(.body.weight(.medium))
+                                    Text(mount.guestPath).font(.caption.monospaced()).foregroundStyle(.secondary)
+                                }
+                                Spacer()
+                                Button {
+                                    copyGuestPath(mount.guestPath)
+                                } label: {
+                                    Image(systemName: copiedPath == mount.guestPath ? "checkmark" : "doc.on.doc")
+                                }
+                                .buttonStyle(.borderless)
+                                .accessibilityLabel(L10n.text("复制路径"))
+                            }
+                            Toggle(L10n.text("只读挂载"), isOn: Binding(
+                                get: { mount.readonly },
+                                set: { readonly in
+                                    Task {
+                                        do {
+                                            guard let store = workspace.mounts else { return }
+                                            mountConfig = try await store.setReadonly(readonly, id: mount.id, for: profile.id)
+                                            mountError = nil
+                                            await applyLiveRemount(oldPath: mount.guestPath, id: mount.id)
+                                        } catch {
+                                            mountError = error.localizedDescription
+                                        }
+                                    }
+                                }
+                            ))
+                            .font(.subheadline)
+                            if mount.isCloudBacked {
+                                Label(L10n.text("云端目录可能会在访问时按需下载文件。"), systemImage: "icloud")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                            if failedMountIDs.contains(mount.id) {
+                                Label(L10n.text("上次启动时无法访问此目录，请确认目录存在或重新添加。"), systemImage: "exclamationmark.triangle")
+                                    .font(.caption)
+                                    .foregroundStyle(.orange)
+                            }
+                        }
+                        .padding(.vertical, 2)
+                        .contextMenu {
+                            Button(L10n.text("重命名挂载点…"), systemImage: "pencil") {
+                                renameText = mount.name
+                                renamingMount = mount
+                            }
+                            Button(L10n.text("移除"), systemImage: "trash", role: .destructive) {
+                                removeMount(mount.id)
+                            }
+                        }
+                        .swipeActions(edge: .trailing) {
+                            Button(L10n.text("移除"), role: .destructive) {
+                                removeMount(mount.id)
+                            }
+                        }
+                    }
+                }
+                Button(L10n.text("添加文件夹…"), systemImage: "folder.badge.plus") {
+                    pickingMountFolder = true
+                }
+                .accessibilityIdentifier("add-mounted-folder")
+                if let mountNotice {
+                    Text(mountNotice).font(.caption).foregroundStyle(.secondary)
+                }
+                if let mountError {
+                    Text(mountError).font(.caption).foregroundStyle(.red)
+                }
+            } header: {
+                Text(L10n.text("自定义挂载目录"))
+            } footer: {
+                Text(L10n.text("新添加的目录默认以读写模式挂载到 /mnt/iPad/<名称>，运行中的环境会立即生效。同名目录会自动编号去重。"))
+            }
+
+            Section(L10n.text("环境根目录")) {
+                Text(L10n.text("在「文件」App 左侧栏开启「Trames」位置可直接浏览此环境的 Linux 根目录。")).font(.callout)
+                LabeledContent(L10n.text("环境目录")) {Text(profile.store).font(.caption.monospaced()).textSelection(.enabled)}
+            }
+        }
+    }
+    private func reloadMounts() async {
+        guard let store = workspace.mounts else { return }
+        mountConfig = await store.configuration(for: profile.id)
+        if let env = workspace.environment {
+            failedMountIDs = await env.failedMountIDs(for: profile.id)
+        }
+    }
+    private var activeLocalSession: LocalSession? {
+        guard workspace.selectedEnvironmentID == profile.id else { return nil }
+        return workspace.local?.local
+    }
+    private func applyLiveSharedDirectory(enabled: Bool) async {
+        guard let local = activeLocalSession else { return }
+        do {
+            if enabled {
+                let dir = try SharedInboxBridge.sharedDirectory()
+                try await Task.detached(priority: .userInitiated) {
+                    try local.mountHost(LocalHostMount(target: MountStore.sharedGuestPath, host: dir, readonly: false))
+                }.value
+                mountNotice = L10n.text("已实时挂载 %@", MountStore.sharedGuestPath)
+            } else {
+                try await Task.detached(priority: .userInitiated) {
+                    try local.unmountHost(target: MountStore.sharedGuestPath)
+                }.value
+                mountNotice = L10n.text("已实时卸载 %@", MountStore.sharedGuestPath)
+            }
+            mountError = nil
+        } catch {
+            mountNotice = L10n.text("目录当前正被使用，关闭相关进程或下次启动时生效。")
+        }
+    }
+    private func applyLiveMount(id: UUID) async {
+        guard let local = activeLocalSession, let store = workspace.mounts else { return }
+        guard let resolved = await store.resolveSingleMount(id: id, for: profile.id) else { return }
+        do {
+            try await Task.detached(priority: .userInitiated) {
+                try local.mountHost(resolved.mount, scopedURL: resolved.scopedURL)
+            }.value
+            failedMountIDs.remove(id)
+            mountError = nil
+            mountNotice = L10n.text("已实时挂载 %@", resolved.mount.target)
+        } catch {
+            mountError = error.localizedDescription
+        }
+    }
+    private func applyLiveRemount(oldPath: String, id: UUID) async {
+        guard let local = activeLocalSession, let store = workspace.mounts else { return }
+        do {
+            try await Task.detached(priority: .userInitiated) {
+                try local.unmountHost(target: oldPath)
+            }.value
+            guard let resolved = await store.resolveSingleMount(id: id, for: profile.id) else { return }
+            try await Task.detached(priority: .userInitiated) {
+                try local.mountHost(resolved.mount, scopedURL: resolved.scopedURL)
+            }.value
+            mountError = nil
+            mountNotice = L10n.text("已实时更新挂载 %@", resolved.mount.target)
+        } catch {
+            mountNotice = L10n.text("目录当前正被使用，关闭相关进程或下次启动时生效。")
+        }
+    }
+    private func removeMount(_ id: UUID) {
+        let oldPath = mountConfig.mounts.first(where: { $0.id == id })?.guestPath
+        Task {
+            do {
+                guard let store = workspace.mounts else { return }
+                mountConfig = try await store.remove(id: id, for: profile.id)
+                failedMountIDs.remove(id)
+                mountError = nil
+                if let oldPath, let local = activeLocalSession {
+                    do {
+                        try await Task.detached(priority: .userInitiated) {
+                            try local.unmountHost(target: oldPath)
+                        }.value
+                        mountNotice = L10n.text("已实时卸载 %@", oldPath)
+                    } catch {
+                        mountNotice = L10n.text("目录当前正被使用，关闭相关进程或下次启动时生效。")
+                    }
+                }
+            } catch {
+                mountError = error.localizedDescription
+            }
+        }
+    }
+    private func copyGuestPath(_ path: String) {
+        UIPasteboard.general.string = path
+        copiedPath = path
+        Task { @MainActor in
+            try? await Task.sleep(for: .seconds(1.5))
+            if copiedPath == path { copiedPath = nil }
         }
     }
     private var activity:some View {
