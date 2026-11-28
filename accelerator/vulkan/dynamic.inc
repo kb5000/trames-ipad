@@ -15,8 +15,8 @@ VKAPI_ATTR void VKAPI_CALL vkCmdBeginRendering(VkCommandBuffer c,const VkRenderi
     const VkDeviceGroupRenderPassBeginInfo *g=find_next(info->pNext,VK_STRUCTURE_TYPE_DEVICE_GROUP_RENDER_PASS_BEGIN_INFO);
     if(g && (g->deviceMask!=1 || g->deviceRenderAreaCount>1))checked(VK_ERROR_FEATURE_NOT_PRESENT);
     if(g && g->deviceRenderAreaCount){areas[0]=(uint64_t)(int64_t)g->pDeviceRenderAreas[0].offset.x;areas[1]=(uint64_t)(int64_t)g->pDeviceRenderAreas[0].offset.y;areas[2]=g->pDeviceRenderAreas[0].extent.width;areas[3]=g->pDeviceRenderAreas[0].extent.height;}
-    checked(CALL(253,DEVKEY(c),KEY(c),PTR(h),g?g->deviceMask:0,PTR(areas),g?g->deviceRenderAreaCount:0));
+    checked(COMMAND(253,c,PTR(h),g?g->deviceMask:0,PTR(areas),g?g->deviceRenderAreaCount:0));
 }
-VKAPI_ATTR void VKAPI_CALL vkCmdEndRendering(VkCommandBuffer c) {checked(CALL(254,DEVKEY(c),KEY(c)));}
+VKAPI_ATTR void VKAPI_CALL vkCmdEndRendering(VkCommandBuffer c) {checked(COMMAND(254,c));}
 VKAPI_ATTR void VKAPI_CALL vkCmdBeginRenderingKHR(VkCommandBuffer c,const VkRenderingInfo *info) {vkCmdBeginRendering(c,info);}
 VKAPI_ATTR void VKAPI_CALL vkCmdEndRenderingKHR(VkCommandBuffer c) {vkCmdEndRendering(c);}

@@ -90,9 +90,9 @@ static VkResult unsupported_graphics_pipeline(unsigned line) {
     if(getenv("TRAMES_VULKAN_TRACE"))fprintf(stderr,"Trames Vulkan: unsupported graphics pipeline state at graphics.inc:%u\n",line);
     return VK_ERROR_FEATURE_NOT_PRESENT;
 }
-VKAPI_ATTR void VKAPI_CALL vkCmdDrawIndirect(VkCommandBuffer c,VkBuffer buffer,VkDeviceSize offset,uint32_t count,uint32_t stride) {checked(CALL(203,DEVKEY(c),KEY(c),(uint64_t)buffer,offset,count,stride));}
-VKAPI_ATTR void VKAPI_CALL vkCmdDrawIndexedIndirect(VkCommandBuffer c,VkBuffer buffer,VkDeviceSize offset,uint32_t count,uint32_t stride) {checked(CALL(204,DEVKEY(c),KEY(c),(uint64_t)buffer,offset,count,stride));}
-VKAPI_ATTR void VKAPI_CALL vkCmdDispatchIndirect(VkCommandBuffer c,VkBuffer buffer,VkDeviceSize offset) {checked(CALL(205,DEVKEY(c),KEY(c),(uint64_t)buffer,offset));}
+VKAPI_ATTR void VKAPI_CALL vkCmdDrawIndirect(VkCommandBuffer c,VkBuffer buffer,VkDeviceSize offset,uint32_t count,uint32_t stride) {checked(COMMAND(203,c,(uint64_t)buffer,offset,count,stride));}
+VKAPI_ATTR void VKAPI_CALL vkCmdDrawIndexedIndirect(VkCommandBuffer c,VkBuffer buffer,VkDeviceSize offset,uint32_t count,uint32_t stride) {checked(COMMAND(204,c,(uint64_t)buffer,offset,count,stride));}
+VKAPI_ATTR void VKAPI_CALL vkCmdDispatchIndirect(VkCommandBuffer c,VkBuffer buffer,VkDeviceSize offset) {checked(COMMAND(205,c,(uint64_t)buffer,offset));}
 VKAPI_ATTR VkResult VKAPI_CALL vkCreateGraphicsPipelines(VkDevice d,VkPipelineCache cache,uint32_t count,const VkGraphicsPipelineCreateInfo *info,const VkAllocationCallbacks *allocator,VkPipeline *out) {
     if(count!=1){memset(out,0,count*sizeof(*out));VkResult result=VK_SUCCESS;for(uint32_t i=0;i<count;i++){VkResult r=vkCreateGraphicsPipelines(d,cache,1,info+i,allocator,out+i);if(r!=VK_SUCCESS){result=r;if(info[i].flags&VK_PIPELINE_CREATE_EARLY_RETURN_ON_FAILURE_BIT)break;}}return result;}
     OBJECT_ALLOCATOR(d,allocator,VK_SYSTEM_ALLOCATION_SCOPE_OBJECT);*out=VK_NULL_HANDLE;
@@ -203,11 +203,11 @@ static VkResult begin_pass(VkCommandBuffer c,const VkRenderPassBeginInfo *info,V
     if(!info || info->sType!=VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO || contents>VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS)return VK_ERROR_FEATURE_NOT_PRESENT;
     const VkRenderPassAttachmentBeginInfo *a=find_next(info->pNext,VK_STRUCTURE_TYPE_RENDER_PASS_ATTACHMENT_BEGIN_INFO);
     if(a && (!VALID(a,VK_STRUCTURE_TYPE_RENDER_PASS_ATTACHMENT_BEGIN_INFO)))return VK_ERROR_FEATURE_NOT_PRESENT;
-    return CALL(op,DEVKEY(c),KEY(c),(uint64_t)info->renderPass,(uint64_t)info->framebuffer,(uint64_t)(int64_t)info->renderArea.offset.x,(uint64_t)(int64_t)info->renderArea.offset.y,info->renderArea.extent.width,info->renderArea.extent.height,PTR(info->pClearValues),info->clearValueCount,a?PTR(a->pAttachments):0,a?a->attachmentCount:0,contents);
+    return COMMAND(op,c,(uint64_t)info->renderPass,(uint64_t)info->framebuffer,(uint64_t)(int64_t)info->renderArea.offset.x,(uint64_t)(int64_t)info->renderArea.offset.y,info->renderArea.extent.width,info->renderArea.extent.height,PTR(info->pClearValues),info->clearValueCount,a?PTR(a->pAttachments):0,a?a->attachmentCount:0,contents);
 }
 VKAPI_ATTR void VKAPI_CALL vkCmdBeginRenderPass(VkCommandBuffer c,const VkRenderPassBeginInfo *info,VkSubpassContents contents) {checked(begin_pass(c,info,contents,71));}
-VKAPI_ATTR void VKAPI_CALL vkCmdNextSubpass(VkCommandBuffer c,VkSubpassContents contents) {checked(CALL(218,DEVKEY(c),KEY(c),contents,0));}
-VKAPI_ATTR void VKAPI_CALL vkCmdEndRenderPass(VkCommandBuffer c) {checked(CALL(72,DEVKEY(c),KEY(c)));}
+VKAPI_ATTR void VKAPI_CALL vkCmdNextSubpass(VkCommandBuffer c,VkSubpassContents contents) {checked(COMMAND(218,c,contents,0));}
+VKAPI_ATTR void VKAPI_CALL vkCmdEndRenderPass(VkCommandBuffer c) {checked(COMMAND(72,c));}
 VKAPI_ATTR void VKAPI_CALL vkCmdClearAttachments(VkCommandBuffer c,uint32_t count,const VkClearAttachment *attachments,uint32_t rect_count,const VkClearRect *rects) {
     if(!count || count>9 || !attachments || !rect_count || rect_count>64 || !rects)checked(VK_ERROR_FEATURE_NOT_PRESENT);
     uint64_t values[9][6],regions[64][6];
@@ -221,16 +221,16 @@ VKAPI_ATTR void VKAPI_CALL vkCmdClearAttachments(VkCommandBuffer c,uint32_t coun
         regions[i][2]=rects[i].rect.extent.width;regions[i][3]=rects[i].rect.extent.height;
         regions[i][4]=rects[i].baseArrayLayer;regions[i][5]=rects[i].layerCount;
     }
-    checked(CALL(151,DEVKEY(c),KEY(c),PTR(values),count,PTR(regions),rect_count));
+    checked(COMMAND(151,c,PTR(values),count,PTR(regions),rect_count));
 }
-VKAPI_ATTR void VKAPI_CALL vkCmdDraw(VkCommandBuffer c,uint32_t vertices,uint32_t instances,uint32_t firstVertex,uint32_t firstInstance) {checked(CALL(73,DEVKEY(c),KEY(c),vertices,instances,firstVertex,firstInstance));}
+VKAPI_ATTR void VKAPI_CALL vkCmdDraw(VkCommandBuffer c,uint32_t vertices,uint32_t instances,uint32_t firstVertex,uint32_t firstInstance) {checked(COMMAND(73,c,vertices,instances,firstVertex,firstInstance));}
 static void buffer_image_copy(VkCommandBuffer c,VkImage image,VkImageLayout layout,VkBuffer buffer,uint32_t count,const VkBufferImageCopy *regions,unsigned op) {
     if(count>64)checked(VK_ERROR_FEATURE_NOT_PRESENT);uint64_t data[64][13];
     for(uint32_t i=0;i<count;i++){const VkBufferImageCopy *x=&regions[i];uint64_t *v=data[i];v[0]=x->bufferOffset;v[1]=x->bufferRowLength;v[2]=x->bufferImageHeight;v[3]=x->imageSubresource.aspectMask;v[4]=x->imageSubresource.mipLevel;v[5]=x->imageSubresource.baseArrayLayer;v[6]=x->imageSubresource.layerCount;v[7]=x->imageOffset.x;v[8]=x->imageOffset.y;v[9]=x->imageOffset.z;v[10]=x->imageExtent.width;v[11]=x->imageExtent.height;v[12]=x->imageExtent.depth;}
-    checked(CALL(op,DEVKEY(c),KEY(c),(uint64_t)image,layout,(uint64_t)buffer,PTR(data),count));
+    checked(COMMAND(op,c,(uint64_t)image,layout,(uint64_t)buffer,PTR(data),count));
 }
-VKAPI_ATTR void VKAPI_CALL vkCmdSetViewport(VkCommandBuffer c,uint32_t first,uint32_t count,const VkViewport *viewports) {if(first || count!=1)checked(VK_ERROR_FEATURE_NOT_PRESENT);checked(CALL(75,DEVKEY(c),KEY(c),PTR(viewports)));}
-VKAPI_ATTR void VKAPI_CALL vkCmdSetScissor(VkCommandBuffer c,uint32_t first,uint32_t count,const VkRect2D *scissors) {if(first || count!=1)checked(VK_ERROR_FEATURE_NOT_PRESENT);checked(CALL(76,DEVKEY(c),KEY(c),scissors[0].offset.x,scissors[0].offset.y,scissors[0].extent.width,scissors[0].extent.height));}
+VKAPI_ATTR void VKAPI_CALL vkCmdSetViewport(VkCommandBuffer c,uint32_t first,uint32_t count,const VkViewport *viewports) {if(first || count!=1)checked(VK_ERROR_FEATURE_NOT_PRESENT);checked(COMMAND(75,c,PTR(viewports)));}
+VKAPI_ATTR void VKAPI_CALL vkCmdSetScissor(VkCommandBuffer c,uint32_t first,uint32_t count,const VkRect2D *scissors) {if(first || count!=1)checked(VK_ERROR_FEATURE_NOT_PRESENT);checked(COMMAND(76,c,scissors[0].offset.x,scissors[0].offset.y,scissors[0].extent.width,scissors[0].extent.height));}
 
 VKAPI_ATTR void VKAPI_CALL vkCmdCopyImageToBuffer(VkCommandBuffer c,VkImage image,VkImageLayout layout,VkBuffer buffer,uint32_t count,const VkBufferImageCopy *regions) {buffer_image_copy(c,image,layout,buffer,count,regions,74);}
 VKAPI_ATTR void VKAPI_CALL vkCmdCopyBufferToImage(VkCommandBuffer c,VkBuffer buffer,VkImage image,VkImageLayout layout,uint32_t count,const VkBufferImageCopy *regions) {buffer_image_copy(c,image,layout,buffer,count,regions,94);}
@@ -244,7 +244,7 @@ VKAPI_ATTR void VKAPI_CALL vkCmdCopyImage(VkCommandBuffer c,VkImage src,VkImageL
         v[11]=(int64_t)r->dstOffset.x;v[12]=(int64_t)r->dstOffset.y;v[13]=(int64_t)r->dstOffset.z;
         v[14]=r->extent.width;v[15]=r->extent.height;v[16]=r->extent.depth;
     }
-    checked(CALL(134,DEVKEY(c),KEY(c),(uint64_t)src,src_layout,(uint64_t)dst,dst_layout,PTR(data),count));
+    checked(COMMAND(134,c,(uint64_t)src,src_layout,(uint64_t)dst,dst_layout,PTR(data),count));
 }
 VKAPI_ATTR void VKAPI_CALL vkCmdResolveImage(VkCommandBuffer c,VkImage src,VkImageLayout src_layout,VkImage dst,VkImageLayout dst_layout,uint32_t count,const VkImageResolve *regions) {
     if(!count || count>64 || !regions)checked(VK_ERROR_FEATURE_NOT_PRESENT);uint64_t data[64][17];
@@ -256,7 +256,7 @@ VKAPI_ATTR void VKAPI_CALL vkCmdResolveImage(VkCommandBuffer c,VkImage src,VkIma
         v[11]=(int64_t)r->dstOffset.x;v[12]=(int64_t)r->dstOffset.y;v[13]=(int64_t)r->dstOffset.z;
         v[14]=r->extent.width;v[15]=r->extent.height;v[16]=r->extent.depth;
     }
-    checked(CALL(215,DEVKEY(c),KEY(c),(uint64_t)src,src_layout,(uint64_t)dst,dst_layout,PTR(data),count));
+    checked(COMMAND(215,c,(uint64_t)src,src_layout,(uint64_t)dst,dst_layout,PTR(data),count));
 }
 VKAPI_ATTR void VKAPI_CALL vkCmdBlitImage(VkCommandBuffer c,VkImage src,VkImageLayout src_layout,VkImage dst,VkImageLayout dst_layout,uint32_t count,const VkImageBlit *regions,VkFilter filter) {
     if(!count || count>64 || !regions)checked(VK_ERROR_FEATURE_NOT_PRESENT);uint64_t data[64][20];
@@ -267,12 +267,12 @@ VKAPI_ATTR void VKAPI_CALL vkCmdBlitImage(VkCommandBuffer c,VkImage src,VkImageL
         for(unsigned j=0;j<2;j++){v[4+j*3]=(int64_t)r->srcOffsets[j].x;v[5+j*3]=(int64_t)r->srcOffsets[j].y;v[6+j*3]=(int64_t)r->srcOffsets[j].z;
             v[14+j*3]=(int64_t)r->dstOffsets[j].x;v[15+j*3]=(int64_t)r->dstOffsets[j].y;v[16+j*3]=(int64_t)r->dstOffsets[j].z;}
     }
-    checked(CALL(135,DEVKEY(c),KEY(c),(uint64_t)src,src_layout,(uint64_t)dst,dst_layout,PTR(data),count,filter));
+    checked(COMMAND(135,c,(uint64_t)src,src_layout,(uint64_t)dst,dst_layout,PTR(data),count,filter));
 }
 VKAPI_ATTR void VKAPI_CALL vkCmdClearDepthStencilImage(VkCommandBuffer c,VkImage image,VkImageLayout layout,const VkClearDepthStencilValue *clear,uint32_t count,const VkImageSubresourceRange *ranges) {
     if(!count || count>64 || !clear || !ranges)checked(VK_ERROR_FEATURE_NOT_PRESENT);
     uint64_t wire[64][5];for(uint32_t i=0;i<count;i++){const VkImageSubresourceRange *r=ranges+i;wire[i][0]=r->aspectMask;wire[i][1]=r->baseMipLevel;wire[i][2]=r->levelCount;wire[i][3]=r->baseArrayLayer;wire[i][4]=r->layerCount;}
-    checked(CALL(136,DEVKEY(c),KEY(c),(uint64_t)image,layout,PTR(clear),PTR(wire),count));
+    checked(COMMAND(136,c,(uint64_t)image,layout,PTR(clear),PTR(wire),count));
 }
 VKAPI_ATTR VkResult VKAPI_CALL vkCreateSampler(VkDevice d,const VkSamplerCreateInfo *info,const VkAllocationCallbacks *allocator,VkSampler *out) {
     if(!info || info->sType!=VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO)return VK_ERROR_FEATURE_NOT_PRESENT;OBJECT_ALLOCATOR(d,allocator,VK_SYSTEM_ALLOCATION_SCOPE_OBJECT);
@@ -287,15 +287,15 @@ VKAPI_ATTR VkResult VKAPI_CALL vkCreateSampler(VkDevice d,const VkSamplerCreateI
 }
 VKAPI_ATTR void VKAPI_CALL vkDestroySampler(VkDevice d,VkSampler sampler,const VkAllocationCallbacks *allocator) {if(sampler)checked(CALL(93,KEY(d),(uint64_t)sampler));if(allocator || D(d)->custom_allocator)allocation_release(D(d),(uint64_t)sampler);}
 VKAPI_ATTR void VKAPI_CALL vkCmdBindVertexBuffers(VkCommandBuffer c,uint32_t first,uint32_t count,const VkBuffer *buffers,const VkDeviceSize *offsets) {
-    if(count>16)checked(VK_ERROR_FEATURE_NOT_PRESENT);checked(CALL(95,DEVKEY(c),KEY(c),first,count,PTR(buffers),PTR(offsets)));
+    if(count>16)checked(VK_ERROR_FEATURE_NOT_PRESENT);checked(COMMAND(95,c,first,count,PTR(buffers),PTR(offsets)));
 }
-VKAPI_ATTR void VKAPI_CALL vkCmdBindIndexBuffer(VkCommandBuffer c,VkBuffer buffer,VkDeviceSize offset,VkIndexType type) {checked(CALL(96,DEVKEY(c),KEY(c),(uint64_t)buffer,offset,type));}
-VKAPI_ATTR void VKAPI_CALL vkCmdDrawIndexed(VkCommandBuffer c,uint32_t indices,uint32_t instances,uint32_t firstIndex,int32_t vertexOffset,uint32_t firstInstance) {checked(CALL(97,DEVKEY(c),KEY(c),indices,instances,firstIndex,(uint64_t)(int64_t)vertexOffset,firstInstance));}
+VKAPI_ATTR void VKAPI_CALL vkCmdBindIndexBuffer(VkCommandBuffer c,VkBuffer buffer,VkDeviceSize offset,VkIndexType type) {checked(COMMAND(96,c,(uint64_t)buffer,offset,type));}
+VKAPI_ATTR void VKAPI_CALL vkCmdDrawIndexed(VkCommandBuffer c,uint32_t indices,uint32_t instances,uint32_t firstIndex,int32_t vertexOffset,uint32_t firstInstance) {checked(COMMAND(97,c,indices,instances,firstIndex,(uint64_t)(int64_t)vertexOffset,firstInstance));}
 
 VKAPI_ATTR void VKAPI_CALL vkCmdClearColorImage(VkCommandBuffer c,VkImage image,VkImageLayout layout,const VkClearColorValue *color,uint32_t count,const VkImageSubresourceRange *ranges) {
     if(!count || count>64 || !color || !ranges)checked(VK_ERROR_FEATURE_NOT_PRESENT);
     uint64_t wire[64][5];for(uint32_t i=0;i<count;i++){const VkImageSubresourceRange *r=ranges+i;wire[i][0]=r->aspectMask;wire[i][1]=r->baseMipLevel;wire[i][2]=r->levelCount;wire[i][3]=r->baseArrayLayer;wire[i][4]=r->layerCount;}
-    checked(CALL(114,DEVKEY(c),KEY(c),(uint64_t)image,layout,PTR(color),PTR(wire),count));
+    checked(COMMAND(114,c,(uint64_t)image,layout,PTR(color),PTR(wire),count));
 }
 
 VKAPI_ATTR VkResult VKAPI_CALL vkCreateBufferView(VkDevice d,const VkBufferViewCreateInfo *info,const VkAllocationCallbacks *allocator,VkBufferView *out) {
@@ -304,10 +304,10 @@ VKAPI_ATTR VkResult VKAPI_CALL vkCreateBufferView(VkDevice d,const VkBufferViewC
 }
 VKAPI_ATTR void VKAPI_CALL vkDestroyBufferView(VkDevice d,VkBufferView view,const VkAllocationCallbacks *allocator) {if(view)checked(CALL(128,KEY(d),(uint64_t)view));if(allocator || D(d)->custom_allocator)allocation_release(D(d),(uint64_t)view);}
 
-VKAPI_ATTR void VKAPI_CALL vkCmdSetLineWidth(VkCommandBuffer c,float value) {uint32_t bits;memcpy(&bits,&value,4);checked(CALL(132,DEVKEY(c),KEY(c),VK_DYNAMIC_STATE_LINE_WIDTH,PTR(&bits),1));}
-VKAPI_ATTR void VKAPI_CALL vkCmdSetDepthBias(VkCommandBuffer c,float constant,float clamp,float slope) {float values[3]={constant,clamp,slope};checked(CALL(132,DEVKEY(c),KEY(c),VK_DYNAMIC_STATE_DEPTH_BIAS,PTR(values),3));}
-VKAPI_ATTR void VKAPI_CALL vkCmdSetBlendConstants(VkCommandBuffer c,const float values[4]) {checked(CALL(132,DEVKEY(c),KEY(c),VK_DYNAMIC_STATE_BLEND_CONSTANTS,PTR(values),4));}
-VKAPI_ATTR void VKAPI_CALL vkCmdSetDepthBounds(VkCommandBuffer c,float min,float max) {float values[2]={min,max};checked(CALL(132,DEVKEY(c),KEY(c),VK_DYNAMIC_STATE_DEPTH_BOUNDS,PTR(values),2));}
-VKAPI_ATTR void VKAPI_CALL vkCmdSetStencilCompareMask(VkCommandBuffer c,VkStencilFaceFlags face,uint32_t mask) {uint32_t values[2]={face,mask};checked(CALL(132,DEVKEY(c),KEY(c),VK_DYNAMIC_STATE_STENCIL_COMPARE_MASK,PTR(values),2));}
-VKAPI_ATTR void VKAPI_CALL vkCmdSetStencilWriteMask(VkCommandBuffer c,VkStencilFaceFlags face,uint32_t mask) {uint32_t values[2]={face,mask};checked(CALL(132,DEVKEY(c),KEY(c),VK_DYNAMIC_STATE_STENCIL_WRITE_MASK,PTR(values),2));}
-VKAPI_ATTR void VKAPI_CALL vkCmdSetStencilReference(VkCommandBuffer c,VkStencilFaceFlags face,uint32_t reference) {uint32_t values[2]={face,reference};checked(CALL(132,DEVKEY(c),KEY(c),VK_DYNAMIC_STATE_STENCIL_REFERENCE,PTR(values),2));}
+VKAPI_ATTR void VKAPI_CALL vkCmdSetLineWidth(VkCommandBuffer c,float value) {uint32_t bits;memcpy(&bits,&value,4);checked(COMMAND(132,c,VK_DYNAMIC_STATE_LINE_WIDTH,PTR(&bits),1));}
+VKAPI_ATTR void VKAPI_CALL vkCmdSetDepthBias(VkCommandBuffer c,float constant,float clamp,float slope) {float values[3]={constant,clamp,slope};checked(COMMAND(132,c,VK_DYNAMIC_STATE_DEPTH_BIAS,PTR(values),3));}
+VKAPI_ATTR void VKAPI_CALL vkCmdSetBlendConstants(VkCommandBuffer c,const float values[4]) {checked(COMMAND(132,c,VK_DYNAMIC_STATE_BLEND_CONSTANTS,PTR(values),4));}
+VKAPI_ATTR void VKAPI_CALL vkCmdSetDepthBounds(VkCommandBuffer c,float min,float max) {float values[2]={min,max};checked(COMMAND(132,c,VK_DYNAMIC_STATE_DEPTH_BOUNDS,PTR(values),2));}
+VKAPI_ATTR void VKAPI_CALL vkCmdSetStencilCompareMask(VkCommandBuffer c,VkStencilFaceFlags face,uint32_t mask) {uint32_t values[2]={face,mask};checked(COMMAND(132,c,VK_DYNAMIC_STATE_STENCIL_COMPARE_MASK,PTR(values),2));}
+VKAPI_ATTR void VKAPI_CALL vkCmdSetStencilWriteMask(VkCommandBuffer c,VkStencilFaceFlags face,uint32_t mask) {uint32_t values[2]={face,mask};checked(COMMAND(132,c,VK_DYNAMIC_STATE_STENCIL_WRITE_MASK,PTR(values),2));}
+VKAPI_ATTR void VKAPI_CALL vkCmdSetStencilReference(VkCommandBuffer c,VkStencilFaceFlags face,uint32_t reference) {uint32_t values[2]={face,reference};checked(COMMAND(132,c,VK_DYNAMIC_STATE_STENCIL_REFERENCE,PTR(values),2));}

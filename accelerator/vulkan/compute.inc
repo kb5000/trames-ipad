@@ -102,9 +102,9 @@ VKAPI_ATTR void VKAPI_CALL vkGetDeviceQueue2(VkDevice d,const VkDeviceQueueInfo2
 
 VKAPI_ATTR void VKAPI_CALL vkResetQueryPool(VkDevice d,VkQueryPool pool,uint32_t first,uint32_t count) {checked(CALL(209,KEY(d),(uint64_t)pool,first,count));}
 VKAPI_ATTR void VKAPI_CALL vkResetQueryPoolEXT(VkDevice d,VkQueryPool pool,uint32_t first,uint32_t count) {vkResetQueryPool(d,pool,first,count);}
-VKAPI_ATTR void VKAPI_CALL vkCmdDispatchBase(VkCommandBuffer c,uint32_t x,uint32_t y,uint32_t z,uint32_t nx,uint32_t ny,uint32_t nz) {checked(CALL(210,DEVKEY(c),KEY(c),x,y,z,nx,ny,nz));}
+VKAPI_ATTR void VKAPI_CALL vkCmdDispatchBase(VkCommandBuffer c,uint32_t x,uint32_t y,uint32_t z,uint32_t nx,uint32_t ny,uint32_t nz) {checked(COMMAND(210,c,x,y,z,nx,ny,nz));}
 VKAPI_ATTR void VKAPI_CALL vkCmdDispatchBaseKHR(VkCommandBuffer c,uint32_t x,uint32_t y,uint32_t z,uint32_t nx,uint32_t ny,uint32_t nz) {vkCmdDispatchBase(c,x,y,z,nx,ny,nz);}
-VKAPI_ATTR void VKAPI_CALL vkCmdSetDeviceMask(VkCommandBuffer c,uint32_t mask) {checked(CALL(211,DEVKEY(c),KEY(c),mask));}
+VKAPI_ATTR void VKAPI_CALL vkCmdSetDeviceMask(VkCommandBuffer c,uint32_t mask) {checked(COMMAND(211,c,mask));}
 VKAPI_ATTR void VKAPI_CALL vkCmdSetDeviceMaskKHR(VkCommandBuffer c,uint32_t mask) {vkCmdSetDeviceMask(c,mask);}
-VKAPI_ATTR void VKAPI_CALL vkCmdUpdateBuffer(VkCommandBuffer c,VkBuffer b,VkDeviceSize offset,VkDeviceSize size,const void *data) {checked(CALL(213,DEVKEY(c),KEY(c),(uint64_t)b,offset,size,PTR(data)));}
+VKAPI_ATTR void VKAPI_CALL vkCmdUpdateBuffer(VkCommandBuffer c,VkBuffer b,VkDeviceSize offset,VkDeviceSize size,const void *data) {checked(COMMAND(213,c,(uint64_t)b,offset,size,PTR(data)));}
 VKAPI_ATTR void VKAPI_CALL vkGetRenderAreaGranularity(VkDevice d,VkRenderPass pass,VkExtent2D *out) {checked(CALL(214,KEY(d),(uint64_t)pass,PTR(out)));}

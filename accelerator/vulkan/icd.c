@@ -26,12 +26,14 @@ typedef struct memory_record { uint64_t key,size; void *base,*mapped; size_t len
 typedef struct descriptor_template DescriptorTemplate;
 static void free_templates(DescriptorTemplate *head);
 typedef struct object_allocation ObjectAllocation;
+typedef struct command_batch CommandBatch;
 typedef struct dispatch {
     uintptr_t magic; uint64_t key;
     struct dispatch *device, *physical, *queue, *commands, *next;
     uint64_t parent,map_alignment,capabilities[2],compute_caps[4],enabled,bridge; uint32_t family,level;
     pthread_mutex_t lock; Memory *memories; DescriptorTemplate *templates;
     ObjectAllocation *allocations;VkAllocationCallbacks callbacks;VkSystemAllocationScope allocation_scope;int custom_allocator;
+    CommandBatch *batch;
 } Dispatch;
 #define D(h) ((Dispatch *)(h))
 #define KEY(h) (D(h)->key)
@@ -56,7 +58,8 @@ static const void *find_next(const void *chain,VkStructureType type) {
 #define CHECK(p, st) do { if (!VALID(p,st)) return VK_ERROR_FEATURE_NOT_PRESENT; } while (0)
 static void check_result(VkResult r,const char *name) { if (r!=VK_SUCCESS) { fprintf(stderr,"Trames Vulkan: %s failed (%d)\n",name,r); abort(); } }
 #define checked(r) check_result((r),__func__)
-static void free_dispatch(Dispatch *d) {VkAllocationCallbacks callbacks=d->callbacks;int custom=d->custom_allocator;allocations_clear(d);pthread_mutex_destroy(&d->lock);if(custom)callbacks.pfnFree(callbacks.pUserData,d);else free(d);}
+#include "command-batch.inc"
+static void free_dispatch(Dispatch *d) {VkAllocationCallbacks callbacks=d->callbacks;int custom=d->custom_allocator;command_batch_free(d);allocations_clear(d);pthread_mutex_destroy(&d->lock);if(custom)callbacks.pfnFree(callbacks.pUserData,d);else free(d);}
 static void free_memory_record(Memory *r){if(r->custom_allocator){VkAllocationCallbacks a=r->callbacks;a.pfnFree(a.pUserData,r);}else free(r);}
 static Memory *memory(Dispatch *d,VkDeviceMemory key) {for (Memory *m=d->memories;m;m=m->next) if(m->key==(uint64_t)key)return m;return NULL;}
 
@@ -413,7 +416,7 @@ static void unlink_commands(Dispatch *d,uint64_t pool,Dispatch *specific) {
     pthread_mutex_unlock(&d->lock);
     while(released){Dispatch *next=released->next;free_dispatch(released);released=next;}
 }
-VKAPI_ATTR void VKAPI_CALL vkDestroyCommandPool(VkDevice d,VkCommandPool pool,const VkAllocationCallbacks *allocator) {if(pool){checked(CALL(35,KEY(d),(uint64_t)pool));unlink_commands(D(d),(uint64_t)pool,NULL);}if(allocator || D(d)->custom_allocator)allocation_release(D(d),(uint64_t)pool);}
+VKAPI_ATTR void VKAPI_CALL vkDestroyCommandPool(VkDevice d,VkCommandPool pool,const VkAllocationCallbacks *allocator) {if(pool){checked(command_pool_flush(D(d),(uint64_t)pool));checked(CALL(35,KEY(d),(uint64_t)pool));unlink_commands(D(d),(uint64_t)pool,NULL);}if(allocator || D(d)->custom_allocator)allocation_release(D(d),(uint64_t)pool);}
 VKAPI_ATTR VkResult VKAPI_CALL vkAllocateCommandBuffers(VkDevice device,const VkCommandBufferAllocateInfo *info,VkCommandBuffer *out) {
     CHECK(info,VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO);if(info->level>VK_COMMAND_BUFFER_LEVEL_SECONDARY)return VK_ERROR_FEATURE_NOT_PRESENT;
     Dispatch *d=D(device);VkAllocationCallbacks callbacks;int custom=pool_allocator(d,(uint64_t)info->commandPool,&callbacks);
@@ -423,7 +426,7 @@ VKAPI_ATTR VkResult VKAPI_CALL vkAllocateCommandBuffers(VkDevice device,const Vk
         c->parent=(uint64_t)info->commandPool;c->level=info->level;pthread_mutex_lock(&d->lock);c->next=d->commands;d->commands=c;pthread_mutex_unlock(&d->lock);out[i]=(VkCommandBuffer)c;
     }return VK_SUCCESS;
 }
-VKAPI_ATTR void VKAPI_CALL vkFreeCommandBuffers(VkDevice d,VkCommandPool pool,uint32_t count,const VkCommandBuffer *commands) {for(uint32_t i=0;i<count;i++){checked(CALL(37,KEY(d),(uint64_t)pool,KEY(commands[i])));unlink_commands(D(d),0,D(commands[i]));}}
+VKAPI_ATTR void VKAPI_CALL vkFreeCommandBuffers(VkDevice d,VkCommandPool pool,uint32_t count,const VkCommandBuffer *commands) {for(uint32_t i=0;i<count;i++){checked(command_batch_flush(D(commands[i])));checked(CALL(37,KEY(d),(uint64_t)pool,KEY(commands[i])));unlink_commands(D(d),0,D(commands[i]));}}
 VKAPI_ATTR VkResult VKAPI_CALL vkBeginCommandBuffer(VkCommandBuffer c,const VkCommandBufferBeginInfo *info) {
     if(!info || info->sType!=VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO)return VK_ERROR_FEATURE_NOT_PRESENT;
     const VkDeviceGroupCommandBufferBeginInfo *group=(void *)find_next(info->pNext,VK_STRUCTURE_TYPE_DEVICE_GROUP_COMMAND_BUFFER_BEGIN_INFO);
@@ -434,18 +437,18 @@ VKAPI_ATTR VkResult VKAPI_CALL vkBeginCommandBuffer(VkCommandBuffer c,const VkCo
         dr=find_next(v->pNext,VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_RENDERING_INFO);
         if(dr){rendering[0]=dr->viewMask;rendering[1]=dr->colorAttachmentCount;rendering[2]=PTR(dr->pColorAttachmentFormats);rendering[3]=dr->depthAttachmentFormat;rendering[4]=dr->stencilAttachmentFormat;rendering[5]=dr->rasterizationSamples;}
     }
-    return CALL(38,DEVKEY(c),KEY(c),D(c)->level==VK_COMMAND_BUFFER_LEVEL_PRIMARY?(info->flags&~VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT):info->flags,v?PTR(inherited):0,dr?PTR(rendering):0,dr?dr->flags:0);
+    return COMMAND(38,c,D(c)->level==VK_COMMAND_BUFFER_LEVEL_PRIMARY?(info->flags&~VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT):info->flags,v?PTR(inherited):0,dr?PTR(rendering):0,dr?dr->flags:0);
 }
 VKAPI_ATTR void VKAPI_CALL vkCmdExecuteCommands(VkCommandBuffer c,uint32_t count,const VkCommandBuffer *commands) {
     uint64_t *keys=count?malloc((size_t)count*8):NULL;if(count && !keys)checked(VK_ERROR_OUT_OF_HOST_MEMORY);
-    for(uint32_t i=0;i<count;i++)keys[i]=KEY(commands[i]);VkResult r=CALL(219,DEVKEY(c),KEY(c),PTR(keys),count);free(keys);checked(r);
+    for(uint32_t i=0;i<count;i++)keys[i]=KEY(commands[i]);VkResult r=COMMAND(219,c,PTR(keys),count);free(keys);checked(r);
 }
-VKAPI_ATTR VkResult VKAPI_CALL vkEndCommandBuffer(VkCommandBuffer c) {return CALL(39,DEVKEY(c),KEY(c));}
-VKAPI_ATTR VkResult VKAPI_CALL vkResetCommandBuffer(VkCommandBuffer c,VkCommandBufferResetFlags flags) {return CALL(40,DEVKEY(c),KEY(c),flags);}
-VKAPI_ATTR VkResult VKAPI_CALL vkResetCommandPool(VkDevice d,VkCommandPool pool,VkCommandPoolResetFlags flags) {return CALL(53,KEY(d),(uint64_t)pool,flags);}
-VKAPI_ATTR void VKAPI_CALL vkCmdBindPipeline(VkCommandBuffer c,VkPipelineBindPoint point,VkPipeline p) {if(point!=VK_PIPELINE_BIND_POINT_COMPUTE && point!=VK_PIPELINE_BIND_POINT_GRAPHICS)checked(VK_ERROR_FEATURE_NOT_PRESENT);checked(CALL(41,DEVKEY(c),KEY(c),(uint64_t)p,point));}
-VKAPI_ATTR void VKAPI_CALL vkCmdBindDescriptorSets(VkCommandBuffer c,VkPipelineBindPoint point,VkPipelineLayout layout,uint32_t first,uint32_t count,const VkDescriptorSet *sets,uint32_t offsets,const uint32_t *offset) {if((point!=VK_PIPELINE_BIND_POINT_COMPUTE && point!=VK_PIPELINE_BIND_POINT_GRAPHICS) || offsets>64)checked(VK_ERROR_FEATURE_NOT_PRESENT);checked(CALL(42,DEVKEY(c),KEY(c),(uint64_t)layout,first,PTR(sets),count,point==VK_PIPELINE_BIND_POINT_GRAPHICS,PTR(offset),offsets));}
-VKAPI_ATTR void VKAPI_CALL vkCmdDispatch(VkCommandBuffer c,uint32_t x,uint32_t y,uint32_t z) {checked(CALL(43,DEVKEY(c),KEY(c),x,y,z));}
+VKAPI_ATTR VkResult VKAPI_CALL vkEndCommandBuffer(VkCommandBuffer c) {return COMMAND(39,c);}
+VKAPI_ATTR VkResult VKAPI_CALL vkResetCommandBuffer(VkCommandBuffer c,VkCommandBufferResetFlags flags) {return COMMAND(40,c,flags);}
+VKAPI_ATTR VkResult VKAPI_CALL vkResetCommandPool(VkDevice d,VkCommandPool pool,VkCommandPoolResetFlags flags) {VkResult r=command_pool_flush(D(d),(uint64_t)pool);return r==VK_SUCCESS?CALL(53,KEY(d),(uint64_t)pool,flags):r;}
+VKAPI_ATTR void VKAPI_CALL vkCmdBindPipeline(VkCommandBuffer c,VkPipelineBindPoint point,VkPipeline p) {if(point!=VK_PIPELINE_BIND_POINT_COMPUTE && point!=VK_PIPELINE_BIND_POINT_GRAPHICS)checked(VK_ERROR_FEATURE_NOT_PRESENT);checked(COMMAND(41,c,(uint64_t)p,point));}
+VKAPI_ATTR void VKAPI_CALL vkCmdBindDescriptorSets(VkCommandBuffer c,VkPipelineBindPoint point,VkPipelineLayout layout,uint32_t first,uint32_t count,const VkDescriptorSet *sets,uint32_t offsets,const uint32_t *offset) {if((point!=VK_PIPELINE_BIND_POINT_COMPUTE && point!=VK_PIPELINE_BIND_POINT_GRAPHICS) || offsets>64)checked(VK_ERROR_FEATURE_NOT_PRESENT);checked(COMMAND(42,c,(uint64_t)layout,first,PTR(sets),count,point==VK_PIPELINE_BIND_POINT_GRAPHICS,PTR(offset),offsets));}
+VKAPI_ATTR void VKAPI_CALL vkCmdDispatch(VkCommandBuffer c,uint32_t x,uint32_t y,uint32_t z) {checked(COMMAND(43,c,x,y,z));}
 VKAPI_ATTR void VKAPI_CALL vkCmdPipelineBarrier(VkCommandBuffer c,VkPipelineStageFlags src,VkPipelineStageFlags dst,VkDependencyFlags flags,uint32_t count,const VkMemoryBarrier *barriers,uint32_t buffers,const VkBufferMemoryBarrier *buffer,uint32_t images,const VkImageMemoryBarrier *image) {
     if(flags&~(VK_DEPENDENCY_BY_REGION_BIT|VK_DEPENDENCY_VIEW_LOCAL_BIT|VK_DEPENDENCY_DEVICE_GROUP_BIT) || images>64)checked(VK_ERROR_FEATURE_NOT_PRESENT);VkAccessFlags sa=0,da=0;uint64_t data[64][12];uint64_t *bw=buffers?malloc((size_t)buffers*7*8):NULL;if(buffers&&!bw)checked(VK_ERROR_OUT_OF_HOST_MEMORY);
     for(uint32_t i=0;i<images;i++){const VkImageMemoryBarrier *b=&image[i];if(!VALID(b,VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER) || (b->subresourceRange.aspectMask!=VK_IMAGE_ASPECT_COLOR_BIT && (!b->subresourceRange.aspectMask || (b->subresourceRange.aspectMask&~(VK_IMAGE_ASPECT_DEPTH_BIT|VK_IMAGE_ASPECT_STENCIL_BIT)))))checked(VK_ERROR_FEATURE_NOT_PRESENT);data[i][0]=(uint64_t)b->image;data[i][1]=b->srcAccessMask;data[i][2]=b->dstAccessMask;data[i][3]=b->oldLayout;data[i][4]=b->newLayout;data[i][5]=b->subresourceRange.aspectMask;data[i][6]=b->subresourceRange.baseMipLevel;data[i][7]=b->subresourceRange.levelCount;data[i][8]=b->subresourceRange.baseArrayLayer;data[i][9]=b->subresourceRange.layerCount;data[i][10]=b->srcQueueFamilyIndex;data[i][11]=b->dstQueueFamilyIndex;}
@@ -453,11 +456,11 @@ VKAPI_ATTR void VKAPI_CALL vkCmdPipelineBarrier(VkCommandBuffer c,VkPipelineStag
     for(uint32_t i=0;i<buffers;i++){
         const VkBufferMemoryBarrier *v=buffer+i;if(!VALID(v,VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER))checked(VK_ERROR_FEATURE_NOT_PRESENT);uint64_t *x=bw+i*7;x[0]=(uint64_t)v->buffer;x[1]=v->srcAccessMask;x[2]=v->dstAccessMask;x[3]=v->srcQueueFamilyIndex;x[4]=v->dstQueueFamilyIndex;x[5]=v->offset;x[6]=v->size;
     }
-    VkResult result=CALL(44,DEVKEY(c),KEY(c),src,dst,sa,da,PTR(data),images,12,flags,PTR(bw),buffers);free(bw);checked(result);
+    VkResult result=COMMAND(44,c,src,dst,sa,da,PTR(data),images,12,flags,PTR(bw),buffers);free(bw);checked(result);
 }
-VKAPI_ATTR void VKAPI_CALL vkCmdCopyBuffer(VkCommandBuffer c,VkBuffer src,VkBuffer dst,uint32_t count,const VkBufferCopy *regions) {if(count>64)checked(VK_ERROR_FEATURE_NOT_PRESENT);uint64_t data[192];for(uint32_t i=0;i<count;i++){data[i*3]=regions[i].srcOffset;data[i*3+1]=regions[i].dstOffset;data[i*3+2]=regions[i].size;}checked(CALL(45,DEVKEY(c),KEY(c),(uint64_t)src,(uint64_t)dst,PTR(data),count));}
-VKAPI_ATTR void VKAPI_CALL vkCmdFillBuffer(VkCommandBuffer c,VkBuffer buffer,VkDeviceSize offset,VkDeviceSize size,uint32_t value) {checked(CALL(46,DEVKEY(c),KEY(c),(uint64_t)buffer,offset,size,value));}
-VKAPI_ATTR void VKAPI_CALL vkCmdPushConstants(VkCommandBuffer c,VkPipelineLayout layout,VkShaderStageFlags stages,uint32_t offset,uint32_t size,const void *values) {if(stages!=VK_SHADER_STAGE_ALL && (!stages || (stages & ~0x3fU)))checked(VK_ERROR_FEATURE_NOT_PRESENT);checked(CALL(47,DEVKEY(c),KEY(c),(uint64_t)layout,offset,size,PTR(values),stages));}
+VKAPI_ATTR void VKAPI_CALL vkCmdCopyBuffer(VkCommandBuffer c,VkBuffer src,VkBuffer dst,uint32_t count,const VkBufferCopy *regions) {if(count>64)checked(VK_ERROR_FEATURE_NOT_PRESENT);uint64_t data[192];for(uint32_t i=0;i<count;i++){data[i*3]=regions[i].srcOffset;data[i*3+1]=regions[i].dstOffset;data[i*3+2]=regions[i].size;}checked(COMMAND(45,c,(uint64_t)src,(uint64_t)dst,PTR(data),count));}
+VKAPI_ATTR void VKAPI_CALL vkCmdFillBuffer(VkCommandBuffer c,VkBuffer buffer,VkDeviceSize offset,VkDeviceSize size,uint32_t value) {checked(COMMAND(46,c,(uint64_t)buffer,offset,size,value));}
+VKAPI_ATTR void VKAPI_CALL vkCmdPushConstants(VkCommandBuffer c,VkPipelineLayout layout,VkShaderStageFlags stages,uint32_t offset,uint32_t size,const void *values) {if(stages!=VK_SHADER_STAGE_ALL && (!stages || (stages & ~0x3fU)))checked(VK_ERROR_FEATURE_NOT_PRESENT);checked(COMMAND(47,c,(uint64_t)layout,offset,size,PTR(values),stages));}
 VKAPI_ATTR VkResult VKAPI_CALL vkCreateFence(VkDevice d,const VkFenceCreateInfo *info,const VkAllocationCallbacks *allocator,VkFence *out) {CHECK(info,VK_STRUCTURE_TYPE_FENCE_CREATE_INFO);OBJECT_ALLOCATOR(d,allocator,VK_SYSTEM_ALLOCATION_SCOPE_OBJECT);return CALL(48,KEY(d),info->flags,PTR(out));}
 VKAPI_ATTR void VKAPI_CALL vkDestroyFence(VkDevice d,VkFence f,const VkAllocationCallbacks *allocator) {if(f)checked(CALL(49,KEY(d),(uint64_t)f));if(allocator || D(d)->custom_allocator)allocation_release(D(d),(uint64_t)f);}
 VKAPI_ATTR VkResult VKAPI_CALL vkCreateSemaphore(VkDevice d,const VkSemaphoreCreateInfo *info,const VkAllocationCallbacks *allocator,VkSemaphore *out) {

@@ -1,0 +1,120 @@
+{
+  "date": "2026-11-28",
+  "runtime": "8842c81c91bdab71b7bdf286db527e6a94dbef40",
+  "cli": "978a7151472299ca9793ba27954df1b3d18d1a1f",
+  "guest": {
+    "wire_revision": 22,
+    "icd_sha256": "d6d7ecdd3308ca6eb8f3711086eba01ed834335cef7fa7c0a7ff04a2c1949d13",
+    "baseline_icd_sha256": "bb5f0db55e9bbf55d4056d33ff020781c465514ac69fd42f0400899528fa14d2",
+    "manifest_sha256": "1122d620da4d16d69e4b88848a80c85803aa0eaf974f4dcf3a70d635298307c1",
+    "musl_glibc_bionic_builds": true
+  },
+  "device_delivery": {
+    "model": "iPad Air 11-inch (M3)",
+    "bundle_id": "org.trames.Trames",
+    "version": "1.5.4",
+    "build": "49",
+    "xcode_release_build": "succeeded",
+    "signature_verification": "codesign --verify --deep --strict passed",
+    "installation": "success",
+    "launch": "success",
+    "process_verified": 22749,
+    "data": "existing stable application updated in place; not uninstalled",
+    "app_binary_sha256": "9bd65749a5571dc5f1730beb20d2d816122c5f546f1fc1262290b7a0aa021c9f",
+    "packaged_icd_sha256": "d6d7ecdd3308ca6eb8f3711086eba01ed834335cef7fa7c0a7ff04a2c1949d13"
+  },
+  "gpu_comparison_host": "Mac Metal using original source-checked MoltenVK, not iPad measurements",
+  "gpu_comparison": [
+    {
+      "cpus": 1,
+      "kind": "compute",
+      "mode": "default",
+      "immediate_calls": 183,
+      "packet_calls": 159,
+      "identical_output": true
+    },
+    {
+      "cpus": 1,
+      "kind": "compute",
+      "mode": "coherent",
+      "immediate_calls": 182,
+      "packet_calls": 158,
+      "identical_output": true
+    },
+    {
+      "cpus": 1,
+      "kind": "compute",
+      "mode": "batch-template",
+      "immediate_calls": 185,
+      "packet_calls": 161,
+      "identical_output": true
+    },
+    {
+      "cpus": 1,
+      "kind": "render",
+      "mode": "compatible-dynamic",
+      "immediate_calls": 149,
+      "packet_calls": 104,
+      "identical_output": true
+    },
+    {
+      "cpus": 1,
+      "kind": "render",
+      "mode": "clear-attachments",
+      "immediate_calls": 146,
+      "packet_calls": 119,
+      "identical_output": true
+    },
+    {
+      "cpus": 4,
+      "kind": "compute",
+      "mode": "default",
+      "immediate_calls": 183,
+      "packet_calls": 159,
+      "identical_output": true
+    },
+    {
+      "cpus": 4,
+      "kind": "compute",
+      "mode": "coherent",
+      "immediate_calls": 182,
+      "packet_calls": 158,
+      "identical_output": true
+    },
+    {
+      "cpus": 4,
+      "kind": "compute",
+      "mode": "batch-template",
+      "immediate_calls": 185,
+      "packet_calls": 161,
+      "identical_output": true
+    },
+    {
+      "cpus": 4,
+      "kind": "render",
+      "mode": "compatible-dynamic",
+      "immediate_calls": 149,
+      "packet_calls": 104,
+      "identical_output": true
+    },
+    {
+      "cpus": 4,
+      "kind": "render",
+      "mode": "clear-attachments",
+      "immediate_calls": 146,
+      "packet_calls": 119,
+      "identical_output": true
+    }
+  ],
+  "source_sha256": {
+    "apps/ios/Trames/EnvironmentEditorView.swift": "2fbb385dc5a45d799de7e1c7442b2f193b39d117c6cd8e1aaacc4565a261486f",
+    "apps/ios/TramesFileSystem/en.lproj/Localizable.strings": "a2d4614a3b9b1d15482fe41b0efb80c9818a82845c8ebad0e4faeea84f23a7a3",
+    "apps/ios/TramesFileSystem/zh-Hans.lproj/Localizable.strings": "450d6c2306621f79352936ee250c8a8c2844efcb16382d01e9550b0bfcbe586d",
+    "accelerator/vulkan/command-batch.inc": "85a67196de56d209c71a23763390c5cdc1c198f469b9aef9a91ad4be3db0408d",
+    "crates/trames-cli/src/main.rs": "4f7dab0efc6772ed341ec6b5b43e84b5cb55c27eb1263f2f76a5563388fdedfe"
+  },
+  "paired_consumer_compile_checks": {
+    "mac": "cargo check -p trames-mac --offline --locked passed",
+    "linux": "cargo check -p trames-linux-app --offline --locked passed; existing Linux VM snapshot, not KVM hardware acceptance"
+  }
+}

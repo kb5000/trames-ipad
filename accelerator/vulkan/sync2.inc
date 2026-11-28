@@ -59,15 +59,15 @@ static void s2_dependency(S2Arena *a,const VkDependencyInfo *d,uint64_t h[7]){
         r[0]=(uint64_t)v->image;r[1]=v->srcStageMask;r[2]=v->srcAccessMask;r[3]=v->dstStageMask;r[4]=v->dstAccessMask;r[5]=v->oldLayout;r[6]=v->newLayout;r[7]=v->srcQueueFamilyIndex;r[8]=v->dstQueueFamilyIndex;r[9]=v->subresourceRange.aspectMask;r[10]=v->subresourceRange.baseMipLevel;r[11]=v->subresourceRange.levelCount;r[12]=v->subresourceRange.baseArrayLayer;r[13]=v->subresourceRange.layerCount;
     }
 }
-VKAPI_ATTR void VKAPI_CALL vkCmdPipelineBarrier2(VkCommandBuffer c,const VkDependencyInfo *d){S2Arena a;s2_init(&a);uint64_t h[7];s2_dependency(&a,d,h);VkResult r=a.spill.result;if(r==VK_SUCCESS)r=CALL(266,DEVKEY(c),KEY(c),PTR(h));s2_free(&a);checked(r);}
-VKAPI_ATTR void VKAPI_CALL vkCmdSetEvent2(VkCommandBuffer c,VkEvent e,const VkDependencyInfo *d){S2Arena a;s2_init(&a);uint64_t h[7];s2_dependency(&a,d,h);VkResult r=a.spill.result;if(r==VK_SUCCESS)r=CALL(267,DEVKEY(c),KEY(c),(uint64_t)e,PTR(h));s2_free(&a);checked(r);}
-VKAPI_ATTR void VKAPI_CALL vkCmdResetEvent2(VkCommandBuffer c,VkEvent e,VkPipelineStageFlags2 stage){checked(CALL(268,DEVKEY(c),KEY(c),(uint64_t)e,stage));}
+VKAPI_ATTR void VKAPI_CALL vkCmdPipelineBarrier2(VkCommandBuffer c,const VkDependencyInfo *d){S2Arena a;s2_init(&a);uint64_t h[7];s2_dependency(&a,d,h);VkResult r=a.spill.result;if(r==VK_SUCCESS)r=COMMAND(266,c,PTR(h));s2_free(&a);checked(r);}
+VKAPI_ATTR void VKAPI_CALL vkCmdSetEvent2(VkCommandBuffer c,VkEvent e,const VkDependencyInfo *d){S2Arena a;s2_init(&a);uint64_t h[7];s2_dependency(&a,d,h);VkResult r=a.spill.result;if(r==VK_SUCCESS)r=COMMAND(267,c,(uint64_t)e,PTR(h));s2_free(&a);checked(r);}
+VKAPI_ATTR void VKAPI_CALL vkCmdResetEvent2(VkCommandBuffer c,VkEvent e,VkPipelineStageFlags2 stage){checked(COMMAND(268,c,(uint64_t)e,stage));}
 VKAPI_ATTR void VKAPI_CALL vkCmdWaitEvents2(VkCommandBuffer c,uint32_t count,const VkEvent *events,const VkDependencyInfo *deps){
     S2Arena a;s2_init(&a);uint64_t *h=s2_alloc(&a,count,7);
     if(a.spill.result==VK_SUCCESS)for(uint32_t i=0;i<count && a.spill.result==VK_SUCCESS;i++)s2_dependency(&a,deps+i,h+i*7);
-    VkResult r=a.spill.result;if(r==VK_SUCCESS)r=CALL(269,DEVKEY(c),KEY(c),PTR(events),PTR(h),count);s2_free(&a);checked(r);
+    VkResult r=a.spill.result;if(r==VK_SUCCESS)r=COMMAND(269,c,PTR(events),PTR(h),count);s2_free(&a);checked(r);
 }
-VKAPI_ATTR void VKAPI_CALL vkCmdWriteTimestamp2(VkCommandBuffer c,VkPipelineStageFlags2 stage,VkQueryPool p,uint32_t query){checked(CALL(270,DEVKEY(c),KEY(c),(uint64_t)p,query,stage));}
+VKAPI_ATTR void VKAPI_CALL vkCmdWriteTimestamp2(VkCommandBuffer c,VkPipelineStageFlags2 stage,VkQueryPool p,uint32_t query){checked(COMMAND(270,c,(uint64_t)p,query,stage));}
 VKAPI_ATTR VkResult VKAPI_CALL vkQueueSubmit2(VkQueue q,uint32_t count,const VkSubmitInfo2 *infos,VkFence f){
     S2Arena a;s2_init(&a);uint64_t *h=s2_alloc(&a,count,7);
     for(uint32_t i=0;i<count && a.spill.result==VK_SUCCESS;i++){

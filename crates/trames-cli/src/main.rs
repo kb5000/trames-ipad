@@ -103,14 +103,34 @@ fn run() -> Result<u8, Box<dyn std::error::Error>> {
     let mut bionic_bundle = None;
     let mut glibc_bundle = None;
     let mut guest_path = false;
+    let mut login_user = "root".to_owned();
+    let mut login_cwd = String::new();
     let mut extra_env = Vec::new();
     let mut kernel = trames_distro::environment::Kernel::default();
     if args.peek().is_some_and(|a| a == "--help" || a == "-h") {
-        println!("Usage: trames-run [--rootfs VERIFIED_ALPINE_TAR_GZ] [--guest] [--env KEY=VALUE] [--sysctl NAME=VALUE] [--virtual-network ID] [--host-map VIRTUAL_IP=HOST_IP] [--network off|loopback|outbound|full] [--storage DIR | --memory] [--storage-budget BYTES|16GiB|auto] [--storage-info] [--memory-budget 1GiB] [--process-memory-budget 512MiB] [--max-instructions N] [--trace-syscalls] [--metrics] [--cpus auto|1..32] [--accelerator pure|off] [--native-bsearch] [--native-allocator] [--wayland] [--vulkan] [--video] [--musl-libc HOST_ELF] [--bionic-bundle DIR] [--glibc-bundle DIR] [--file /GUEST=HOST] [--exec-file /GUEST=HOST] [--export /GUEST=HOST] [--install-busybox] [--target linux|android] [--android-init] [--pty] [--] ELF [ARG ...]\nDefault native network: full host TCP/UDP access and listeners, subject to host OS permissions; use --network outbound or loopback to restrict it.\n--virtual-network ID selects isolated 10.0.0.ID / fd00::ID and private loopback; ID must be 2..254.\n--host-map explicitly forwards a logical external IP to a trusted host service.\nDefault storage: .trames/storage in the current directory, 16 GiB logical file budget on first creation.\nDefault committed memory: 512 MiB per address space, 1 GiB aggregate; --process-memory-budget and --memory-budget change these limits without preallocation.\nImports copy selected host files; exports create new host files after guest exit.\n--memory selects the ephemeral 16 MiB test backend. auto uses the storage volume's total capacity.");
+        println!("Usage: trames-run [--rootfs VERIFIED_ALPINE_TAR_GZ] [--guest] [--user USER] [--cwd DIR] [--env KEY=VALUE] [--sysctl NAME=VALUE] [--virtual-network ID] [--host-map VIRTUAL_IP=HOST_IP] [--network off|loopback|outbound|full] [--storage DIR | --memory] [--storage-budget BYTES|16GiB|auto] [--storage-info] [--memory-budget 1GiB] [--process-memory-budget 512MiB] [--max-instructions N] [--trace-syscalls] [--metrics] [--cpus auto|1..32] [--accelerator pure|off] [--native-bsearch] [--native-allocator] [--wayland] [--vulkan] [--video] [--musl-libc HOST_ELF] [--bionic-bundle DIR] [--glibc-bundle DIR] [--file /GUEST=HOST] [--exec-file /GUEST=HOST] [--export /GUEST=HOST] [--install-busybox] [--target linux|android] [--android-init] [--pty] [--] [ELF [ARG ...]]\nDefault native network: full host TCP/UDP access and listeners, subject to host OS permissions; use --network outbound or loopback to restrict it.\n--virtual-network ID selects isolated 10.0.0.ID / fd00::ID and private loopback; ID must be 2..254.\n--host-map explicitly forwards a logical external IP to a trusted host service.\nDefault storage: .trames/storage in the current directory, 16 GiB logical file budget on first creation.\nDefault committed memory: 512 MiB per address space, 1 GiB aggregate; --process-memory-budget and --memory-budget change these limits without preallocation.\nImports copy selected host files; exports create new host files after guest exit.\n--memory selects the ephemeral 16 MiB test backend. auto uses the storage volume's total capacity.");
         return Ok(0);
     }
     while let Some(option) = args.peek() {
         match option.as_str() {
+            "--user" | "-u" => {
+                args.next();
+                login_user = args.next().ok_or("missing user name")?;
+                if login_user.is_empty()
+                    || login_user
+                        .chars()
+                        .any(|c| matches!(c, ':' | '/' | '\0' | '\n' | '\r') || c.is_whitespace())
+                {
+                    return Err("invalid user name".into());
+                }
+            }
+            "--cwd" => {
+                args.next();
+                login_cwd = args.next().ok_or("missing working directory")?;
+                if !login_cwd.starts_with('/') || login_cwd.contains('\0') {
+                    return Err("--cwd must be an absolute path".into());
+                }
+            }
             "--sysctl" => {
                 args.next();
                 kernel.argument(&args.next().ok_or("missing sysctl declaration")?)?;
@@ -303,12 +323,16 @@ fn run() -> Result<u8, Box<dyn std::error::Error>> {
     if args.peek().is_some_and(|a| a == "--") {
         args.next();
     }
-    let path = args
+    let explicit_path = args
         .next()
-        .or_else(|| android_init.then(|| "/system/bin/init".to_owned()))
-        .ok_or("Usage: trames-run [--max-instructions N] [--] ELF [ARG ...]")?;
-    let mut argv = vec![path.clone()];
-    argv.extend(args);
+        .or_else(|| android_init.then(|| "/system/bin/init".to_owned()));
+    let mut argv = Vec::new();
+    if let Some(p) = &explicit_path {
+        argv.push(p.clone());
+        argv.extend(args);
+    } else if !guest_path {
+        return Err("Usage: trames-run [--max-instructions N] [--] ELF [ARG ...]".into());
+    }
     if android_init && argv == ["/system/bin/init"] {
         argv.push("second_stage".into());
     }
@@ -319,10 +343,10 @@ fn run() -> Result<u8, Box<dyn std::error::Error>> {
         "USER=root".into(),
         "LOGNAME=root".into(),
     ];
-    for value in extra_env {
+    for value in &extra_env {
         let name = value.split_once('=').expect("validated env").0;
         envp.retain(|e: &String| e.split_once('=').is_none_or(|(key, _)| key != name));
-        envp.push(value);
+        envp.push(value.clone());
     }
     memory_limits.validate()?;
     let mut vfs = Vfs::default();
@@ -409,12 +433,44 @@ fn run() -> Result<u8, Box<dyn std::error::Error>> {
     if let Some(bundle) = bionic_bundle {
         trames_distro::bionic::install(std::path::Path::new(&bundle), &mut vfs, pure_accelerator)?;
     }
-    if guest_path {
-        if vfs.stat_at(-100, b"/root").is_err_and(|e| e.0 == 2) {
+    let path = if guest_path && !android_init {
+        if login_user == "root" && vfs.stat_at(-100, b"/root").is_err_and(|e| e.0 == 2) {
             vfs.mkdir_at(-100, b"/root", 0o700)?;
         }
-        vfs.chdir(b"/root")?;
-    }
+        let session = trames_distro::environment::Session {
+            user: login_user.clone(),
+            shell: argv.clone(),
+            cwd: login_cwd.clone(),
+        };
+        let resolved = trames_distro::environment::resolve_login(&mut vfs, &session);
+        if argv.is_empty() {
+            argv = resolved.argv.clone();
+        }
+        for (key, value) in [
+            ("HOME", resolved.home.as_str()),
+            ("USER", resolved.user.as_str()),
+            ("LOGNAME", resolved.user.as_str()),
+            ("SHELL", resolved.shell.as_str()),
+        ] {
+            if !extra_env
+                .iter()
+                .any(|e: &String| e.split_once('=').is_some_and(|(k, _)| k == key))
+            {
+                envp.retain(|e: &String| e.split_once('=').is_none_or(|(k, _)| k != key));
+                envp.push(format!("{key}={value}"));
+            }
+        }
+        vfs.chdir(resolved.cwd.as_bytes())?;
+        argv[0].clone()
+    } else {
+        if guest_path {
+            if vfs.stat_at(-100, b"/root").is_err_and(|e| e.0 == 2) {
+                vfs.mkdir_at(-100, b"/root", 0o700)?;
+            }
+            vfs.chdir(b"/root")?;
+        }
+        explicit_path.ok_or("Usage: trames-run [--max-instructions N] [--] ELF [ARG ...]")?
+    };
     if wayland {
         let directory = envp
             .iter()

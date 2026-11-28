@@ -32,11 +32,11 @@ VKAPI_ATTR VkResult VKAPI_CALL vkCreateRenderPass2(VkDevice d,const VkRenderPass
 VKAPI_ATTR VkResult VKAPI_CALL vkCreateRenderPass2KHR(VkDevice d,const VkRenderPassCreateInfo2 *info,const VkAllocationCallbacks *allocator,VkRenderPass *out) {return vkCreateRenderPass2(d,info,allocator,out);}
 VKAPI_ATTR void VKAPI_CALL vkCmdBeginRenderPass2(VkCommandBuffer c,const VkRenderPassBeginInfo *info,const VkSubpassBeginInfo *begin) {if(!VALID(begin,VK_STRUCTURE_TYPE_SUBPASS_BEGIN_INFO))checked(VK_ERROR_FEATURE_NOT_PRESENT);checked(begin_pass(c,info,begin->contents,123));}
 VKAPI_ATTR void VKAPI_CALL vkCmdBeginRenderPass2KHR(VkCommandBuffer c,const VkRenderPassBeginInfo *info,const VkSubpassBeginInfo *begin) {vkCmdBeginRenderPass2(c,info,begin);}
-VKAPI_ATTR void VKAPI_CALL vkCmdEndRenderPass2(VkCommandBuffer c,const VkSubpassEndInfo *end) {if(!VALID(end,VK_STRUCTURE_TYPE_SUBPASS_END_INFO))checked(VK_ERROR_FEATURE_NOT_PRESENT);checked(CALL(124,DEVKEY(c),KEY(c)));}
+VKAPI_ATTR void VKAPI_CALL vkCmdEndRenderPass2(VkCommandBuffer c,const VkSubpassEndInfo *end) {if(!VALID(end,VK_STRUCTURE_TYPE_SUBPASS_END_INFO))checked(VK_ERROR_FEATURE_NOT_PRESENT);checked(COMMAND(124,c));}
 VKAPI_ATTR void VKAPI_CALL vkCmdEndRenderPass2KHR(VkCommandBuffer c,const VkSubpassEndInfo *end) {vkCmdEndRenderPass2(c,end);}
 VKAPI_ATTR void VKAPI_CALL vkCmdNextSubpass2(VkCommandBuffer c,const VkSubpassBeginInfo *begin,const VkSubpassEndInfo *end) {
     if(!VALID(begin,VK_STRUCTURE_TYPE_SUBPASS_BEGIN_INFO) || !VALID(end,VK_STRUCTURE_TYPE_SUBPASS_END_INFO))checked(VK_ERROR_FEATURE_NOT_PRESENT);
-    checked(CALL(218,DEVKEY(c),KEY(c),begin->contents,1));
+    checked(COMMAND(218,c,begin->contents,1));
 }
 VKAPI_ATTR void VKAPI_CALL vkCmdNextSubpass2KHR(VkCommandBuffer c,const VkSubpassBeginInfo *begin,const VkSubpassEndInfo *end) {vkCmdNextSubpass2(c,begin,end);}
 
@@ -57,27 +57,27 @@ VKAPI_ATTR VkResult VKAPI_CALL vkGetQueryPoolResults(VkDevice d,VkQueryPool pool
         struct timespec sleep={0,1000000};nanosleep(&sleep,NULL);
     }
 }
-VKAPI_ATTR void VKAPI_CALL vkCmdResetQueryPool(VkCommandBuffer c,VkQueryPool pool,uint32_t first,uint32_t count) {checked(CALL(140,DEVKEY(c),KEY(c),(uint64_t)pool,first,count));}
+VKAPI_ATTR void VKAPI_CALL vkCmdResetQueryPool(VkCommandBuffer c,VkQueryPool pool,uint32_t first,uint32_t count) {checked(COMMAND(140,c,(uint64_t)pool,first,count));}
 VKAPI_ATTR void VKAPI_CALL vkCmdCopyQueryPoolResults(VkCommandBuffer c,VkQueryPool pool,uint32_t first,uint32_t count,VkBuffer dst,VkDeviceSize offset,VkDeviceSize stride,VkQueryResultFlags flags) {
-    checked(CALL(142,DEVKEY(c),KEY(c),(uint64_t)pool,first,count,(uint64_t)dst,offset,stride,flags));
+    checked(COMMAND(142,c,(uint64_t)pool,first,count,(uint64_t)dst,offset,stride,flags));
 }
-VKAPI_ATTR void VKAPI_CALL vkCmdWriteTimestamp(VkCommandBuffer c,VkPipelineStageFlagBits stage,VkQueryPool pool,uint32_t query) {checked(CALL(143,DEVKEY(c),KEY(c),(uint64_t)pool,query,stage));}
-VKAPI_ATTR void VKAPI_CALL vkCmdBeginQuery(VkCommandBuffer c,VkQueryPool pool,uint32_t query,VkQueryControlFlags flags) {checked(CALL(144,DEVKEY(c),KEY(c),(uint64_t)pool,query,flags));}
-VKAPI_ATTR void VKAPI_CALL vkCmdEndQuery(VkCommandBuffer c,VkQueryPool pool,uint32_t query) {checked(CALL(145,DEVKEY(c),KEY(c),(uint64_t)pool,query));}
-VKAPI_ATTR void VKAPI_CALL vkCmdBeginQueryIndexedEXT(VkCommandBuffer c,VkQueryPool pool,uint32_t query,VkQueryControlFlags flags,uint32_t index) {checked(CALL(144,DEVKEY(c),KEY(c),(uint64_t)pool,query,flags,index,1));}
-VKAPI_ATTR void VKAPI_CALL vkCmdEndQueryIndexedEXT(VkCommandBuffer c,VkQueryPool pool,uint32_t query,uint32_t index) {checked(CALL(145,DEVKEY(c),KEY(c),(uint64_t)pool,query,0,index,1));}
+VKAPI_ATTR void VKAPI_CALL vkCmdWriteTimestamp(VkCommandBuffer c,VkPipelineStageFlagBits stage,VkQueryPool pool,uint32_t query) {checked(COMMAND(143,c,(uint64_t)pool,query,stage));}
+VKAPI_ATTR void VKAPI_CALL vkCmdBeginQuery(VkCommandBuffer c,VkQueryPool pool,uint32_t query,VkQueryControlFlags flags) {checked(COMMAND(144,c,(uint64_t)pool,query,flags));}
+VKAPI_ATTR void VKAPI_CALL vkCmdEndQuery(VkCommandBuffer c,VkQueryPool pool,uint32_t query) {checked(COMMAND(145,c,(uint64_t)pool,query));}
+VKAPI_ATTR void VKAPI_CALL vkCmdBeginQueryIndexedEXT(VkCommandBuffer c,VkQueryPool pool,uint32_t query,VkQueryControlFlags flags,uint32_t index) {checked(COMMAND(144,c,(uint64_t)pool,query,flags,index,1));}
+VKAPI_ATTR void VKAPI_CALL vkCmdEndQueryIndexedEXT(VkCommandBuffer c,VkQueryPool pool,uint32_t query,uint32_t index) {checked(COMMAND(145,c,(uint64_t)pool,query,0,index,1));}
 VKAPI_ATTR void VKAPI_CALL vkCmdBindTransformFeedbackBuffersEXT(VkCommandBuffer c,uint32_t first,uint32_t count,const VkBuffer *buffers,const VkDeviceSize *offsets,const VkDeviceSize *sizes) {
     if(count>4)checked(VK_ERROR_FEATURE_NOT_PRESENT);
-    checked(CALL(146,DEVKEY(c),KEY(c),first,count,PTR(buffers),PTR(offsets),PTR(sizes)));
+    checked(COMMAND(146,c,first,count,PTR(buffers),PTR(offsets),PTR(sizes)));
 }
 VKAPI_ATTR void VKAPI_CALL vkCmdBeginTransformFeedbackEXT(VkCommandBuffer c,uint32_t first,uint32_t count,const VkBuffer *counters,const VkDeviceSize *offsets) {
     if(count>4)checked(VK_ERROR_FEATURE_NOT_PRESENT);
-    checked(CALL(147,DEVKEY(c),KEY(c),first,count,PTR(counters),PTR(offsets)));
+    checked(COMMAND(147,c,first,count,PTR(counters),PTR(offsets)));
 }
 VKAPI_ATTR void VKAPI_CALL vkCmdEndTransformFeedbackEXT(VkCommandBuffer c,uint32_t first,uint32_t count,const VkBuffer *counters,const VkDeviceSize *offsets) {
     if(count>4)checked(VK_ERROR_FEATURE_NOT_PRESENT);
-    checked(CALL(148,DEVKEY(c),KEY(c),first,count,PTR(counters),PTR(offsets)));
+    checked(COMMAND(148,c,first,count,PTR(counters),PTR(offsets)));
 }
 VKAPI_ATTR void VKAPI_CALL vkCmdDrawIndirectByteCountEXT(VkCommandBuffer c,uint32_t instances,uint32_t firstInstance,VkBuffer counter,VkDeviceSize offset,uint32_t subtract,uint32_t stride) {
-    checked(CALL(149,DEVKEY(c),KEY(c),instances,firstInstance,(uint64_t)counter,offset,subtract,stride));
+    checked(COMMAND(149,c,instances,firstInstance,(uint64_t)counter,offset,subtract,stride));
 }

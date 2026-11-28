@@ -257,6 +257,16 @@ struct EnvironmentDetailView:View {
                             .autocorrectionDisabled()
                             .textInputAutocapitalization(.never)
                             .accessibilityIdentifier("environment-cwd")
+                        if !document.string("session.cwd").isEmpty {
+                            Button {
+                                editor.document?.set("session.cwd",.string(""))
+                            } label: {
+                                Image(systemName:"xmark.circle.fill")
+                                    .foregroundStyle(.secondary)
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel(L10n.text("恢复为用户主目录"))
+                        }
                     }
                     let args=document.strings("session.shell")
                     if args.isEmpty {
@@ -286,6 +296,7 @@ struct EnvironmentDetailView:View {
                             Spacer()
                             Button(L10n.text("跟随登录用户")) {
                                 editor.document?.set("session.shell",.array([]))
+                                editor.document?.set("session.cwd",.string(""))
                             }
                             .foregroundStyle(.secondary)
                         }

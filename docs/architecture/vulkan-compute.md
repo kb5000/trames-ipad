@@ -49,6 +49,39 @@ to the next local session, which receives the verified ICD at
 `/usr/lib/libtrames_vulkan_icd.so` and its JSON under `/usr/share/vulkan/icd.d`.
 Install the ordinary `vulkan-loader` package with apk.
 
+## Command recording before HLT (2026-11-28)
+
+The guest ICD negotiates capability bit `65536` independently of the public
+Vulkan feature set. On supporting hosts, recording commands accumulate on their
+command-buffer dispatch object before entering `HLT #0x5452`. A packet contains
+at most 64 records of 17 little-endian u64 words (operation plus the original
+16 arguments), and 16 KiB of owned parameter bytes. Operation 276 publishes it
+synchronously on the executing worker. No polling, coordinator or resource
+thread is added. This is recording transport batching; native queue submission
+and GPU completion keep their existing asynchronous semantics.
+
+All input arrays, serializer scratch and nested structures are copied before
+the public `vkCmd*` function returns. References inside a packet are checked
+byte offsets; zero denotes NULL. The packet belongs to the command buffer,
+allowing externally synchronized handoff between application threads. Vulkan's
+original command-buffer/pool synchronization responsibility is unchanged.
+Scratch allocation uses the object's original allocation callbacks, with the
+immediate path retained if allocation fails.
+
+Full count/payload boundaries publish pending commands. Begin, end, reset,
+free and pool reset/destruction publish the affected pending buffers before
+their original host call. An oversized single input publishes its predecessors
+and then uses the original immediate transport. An older host without the
+capability keeps every call immediate; an older ICD works with the new host.
+There is no timer and no extra iPad UI control.
+
+The host snapshots all guest transport bytes before recording the first native
+command, then reuses existing command/object/feature validation on the owned
+payload. It rejects foreign command buffers and non-recording operations for
+the whole envelope. Malformed inner offsets return a Vulkan error instead of
+requesting a guest-memory fault/retry after effects. A failed packet can have an
+accepted prefix and is never replayed. See the [validation record](../validation/vulkan-command-batch-20261128.md).
+
 ## Supported compute operations
 
 The [catalog](../../accelerator/vulkan/entrypoints.inc) exposes the core ABI and
